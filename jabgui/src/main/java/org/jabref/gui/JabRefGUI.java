@@ -22,6 +22,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
+import org.jabref.gui.keyboard.WalkthroughKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
@@ -210,10 +211,16 @@ public class JabRefGUI extends Application {
     }
 
     private void setupProxy() {
-        if (!preferences.getProxyPreferences().shouldUseProxy()
-                || !preferences.getProxyPreferences().shouldUseAuthentication()) {
+        if (!preferences.getProxyPreferences().shouldUseProxy()) {
             return;
         }
+
+        if (!preferences.getProxyPreferences().shouldUseAuthentication()) {
+            ProxyRegisterer.register(preferences.getProxyPreferences());
+            return;
+        }
+
+        assert preferences.getProxyPreferences().shouldUseAuthentication();
 
         if (preferences.getProxyPreferences().shouldPersistPassword()
                 && StringUtil.isNotBlank(preferences.getProxyPreferences().getPassword())) {
@@ -279,6 +286,7 @@ public class JabRefGUI extends Application {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             TextInputKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
             SelectableTextFlowKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
+            WalkthroughKeyBindings.call(event, stateManager, preferences.getKeyBindingRepository());
         });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
@@ -505,5 +513,8 @@ public class JabRefGUI extends Application {
         }
 
         LOGGER.trace("Finished stop");
+
+        // Just to be sure that we do not leave any threads running
+        System.exit(0);
     }
 }

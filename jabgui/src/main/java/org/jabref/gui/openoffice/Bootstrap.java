@@ -181,7 +181,7 @@ public class Bootstrap {
      * @throws Exception if things go awry.
      */
     public static XComponentContext defaultBootstrap_InitialComponentContext() {
-        return defaultBootstrap_InitialComponentContext((String) null, (Map<String, String>) null);
+        return defaultBootstrap_InitialComponentContext(null, (Map<String, String>) null);
     }
 
     /**

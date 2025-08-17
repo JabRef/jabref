@@ -289,7 +289,7 @@ public class StringUtil {
             }
             escaped = false;
         }
-        if (sb.length() > 0) {
+        if (!sb.isEmpty()) {
             thisEntry.add(sb.toString());
         }
         if (!thisEntry.isEmpty()) {
@@ -738,6 +738,17 @@ public class StringUtil {
     @AllowedToUseApacheCommonsLang3("No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282")
     public static boolean containsIgnoreCase(String text, String searchString) {
         return StringUtils.containsIgnoreCase(text, searchString);
+    }
+
+    public static boolean equalsUnifiedLineBreak(Optional<String> stringOne, Optional<String> stringTwo) {
+        if (stringOne.isEmpty() && stringTwo.isEmpty()) {
+            return true;
+        }
+        if (stringOne.isEmpty() || stringTwo.isEmpty()) {
+            return false;
+        }
+        return StringUtil.unifyLineBreaks(stringOne.get(), OS.NEWLINE).equals(
+                StringUtil.unifyLineBreaks(stringTwo.get(), OS.NEWLINE));
     }
 
     public static String substringBetween(String str, String open, String close) {

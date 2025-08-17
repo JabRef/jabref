@@ -71,6 +71,7 @@ import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -98,6 +99,7 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,6 +119,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
 
     private BibDatabaseContext bibDatabaseContext;
+
+    // All subscribers needing "coarse" change events should use this filter
+    // See https://devdocs.jabref.org/code-howtos/eventbus.html for details
+    private CoarseChangeFilter coarseChangeFilter;
+
     private MainTableDataModel tableModel;
     private FileAnnotationCache annotationCache;
     private MainTable mainTable;
@@ -158,8 +165,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
      *                       If the index is created for the dummy context, the actual context will not be able to open the index until it is closed by the dummy context.
      *                       Closing the index takes time and will slow down opening the library.
      */
-    private LibraryTab(BibDatabaseContext bibDatabaseContext,
-                       LibraryTabContainer tabContainer,
+    private LibraryTab(@NonNull BibDatabaseContext bibDatabaseContext,
+                       @NonNull LibraryTabContainer tabContainer,
                        DialogService dialogService,
                        AiService aiService,
                        GuiPreferences preferences,
@@ -170,8 +177,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        ClipBoardManager clipBoardManager,
                        TaskExecutor taskExecutor,
                        boolean isDummyContext) {
-        this.tabContainer = Objects.requireNonNull(tabContainer);
-        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
+        this.bibDatabaseContext = bibDatabaseContext;
+        this.tabContainer = tabContainer;
         this.undoManager = undoManager;
         this.dialogService = dialogService;
         this.preferences = Objects.requireNonNull(preferences);
@@ -207,8 +214,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (tableModel != null) {
             tableModel.unbind();
         }
-        bibDatabaseContext.getDatabase().registerListener(this);
-        bibDatabaseContext.getMetaData().registerListener(this);
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, getIndexManager(), selectedGroupsProperty(), searchQueryProperty, resultSizeProperty());
@@ -227,12 +232,15 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         setupMainPanel();
         setupAutoCompletion();
 
+        this.coarseChangeFilter = new CoarseChangeFilter(bibDatabaseContext);
+
         this.getDatabase().registerListener(new IndexUpdateListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
         // ensure that all entry changes mark the panel as changed
         this.bibDatabaseContext.getDatabase().registerListener(this);
+        this.bibDatabaseContext.getMetaData().registerListener(this);
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferences));
 
@@ -318,7 +326,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         dialogService.showErrorDialogAndWait(title, content, ex);
     }
 
-    private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
+    private void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
 
         if (tabPane == null) {
@@ -335,7 +343,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
         foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
 
-        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
+        this.bibDatabaseContext = bibDatabaseContext;
 
         stateManager.getOpenDatabases().add(bibDatabaseContext);
 
@@ -345,11 +353,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     public void installAutosaveManagerAndBackupManager() {
         if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
-            AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext);
+            AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext, coarseChangeFilter);
             autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager, stateManager));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
-            BackupManager.start(this, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
+            BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
         }
     }
 
@@ -691,6 +699,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         } catch (RuntimeException e) {
             LOGGER.error("Problem when closing index manager", e);
         }
+
         try {
             AutosaveManager.shutdown(bibDatabaseContext);
         } catch (RuntimeException e) {
@@ -985,7 +994,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return newTab;
     }
 
-    public static LibraryTab createLibraryTab(BibDatabaseContext databaseContext,
+    public static LibraryTab createLibraryTab(@NonNull BibDatabaseContext databaseContext,
                                               LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               AiService aiService,
@@ -996,8 +1005,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               UndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
-        Objects.requireNonNull(databaseContext);
-
         return new LibraryTab(
                 databaseContext,
                 tabContainer,

@@ -39,8 +39,8 @@ import org.jabref.gui.collab.entrychange.PreviewWithSourceTab;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.mergeentries.EntriesMergeResult;
-import org.jabref.gui.mergeentries.MergeEntriesDialog;
+import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
+import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
@@ -149,11 +149,14 @@ public class CitationRelationsTab extends EntryEditorTab {
         AnchorPane citedByHBox = new AnchorPane();
         citedByHBox.setPrefHeight(40);
 
-        // Create Heading Lab
-        Label citingLabel = new Label(Localization.lang("Cites"));
-        styleLabel(citingLabel);
-        Label citedByLabel = new Label(Localization.lang("Cited By"));
-        styleLabel(citedByLabel);
+        // Create Headings
+        // See ADR-0047
+        String citationKey = entry.getCitationKey().orElse("this entry");
+
+        Label citingLabel = new Label(Localization.lang("References cited in %0", citationKey));
+        styleLabel(citingLabel, Localization.lang("Also called \"backward citations\""));
+        Label citedByLabel = new Label(Localization.lang("References that cite %0", citationKey));
+        styleLabel(citedByLabel, Localization.lang("Also called \"forward citations\""));
 
         // Create ListViews
         CheckListView<CitationRelationItem> citingListView = new CheckListView<>();
@@ -372,11 +375,13 @@ public class CitationRelationsTab extends EntryEditorTab {
     /**
      * Method to style heading labels
      *
-     * @param label label to style
+     * @param label       label to style
+     * @param tooltipText tooltip text
      */
-    private void styleLabel(Label label) {
+    private void styleLabel(Label label, String tooltipText) {
         label.setStyle("-fx-padding: 5px");
         label.setAlignment(Pos.CENTER);
+        label.setTooltip(new Tooltip(tooltipText));
         AnchorPane.setTopAnchor(label, 0.0);
         AnchorPane.setLeftAnchor(label, 0.0);
         AnchorPane.setBottomAnchor(label, 0.0);
@@ -444,7 +449,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                   executeSearch(citationComponents);
                                   executeSearch(otherCitationComponents);
                               } else {
-                                  dialogService.notify(Localization.lang("No DOI found"));
+                                  dialogService.notify(Localization.lang("No DOI found."));
                                   setUpEmptyPanel(citationComponents, otherCitationComponents);
                                   setUpEmptyPanel(otherCitationComponents, citationComponents);
                               }
@@ -476,9 +481,9 @@ public class CitationRelationsTab extends EntryEditorTab {
         citationComponents.listView().setItems(observableList);
 
         // TODO: It should not be possible to cancel a search task that is already running for same tab
-        if (citingTask != null && !citingTask.isCancelled() && citationComponents.searchType() == CitationFetcher.SearchType.CITES) {
+        if (citationComponents.searchType() == CitationFetcher.SearchType.CITES && citingTask != null && !citingTask.isCancelled()) {
             citingTask.cancel();
-        } else if (citedByTask != null && !citedByTask.isCancelled() && citationComponents.searchType() == CitationFetcher.SearchType.CITED_BY) {
+        } else if (citationComponents.searchType() == CitationFetcher.SearchType.CITED_BY && citedByTask != null && !citedByTask.isCancelled()) {
             citedByTask.cancel();
         }
 
@@ -489,10 +494,17 @@ public class CitationRelationsTab extends EntryEditorTab {
                     observableList
             ))
             .onFailure(exception -> {
-                LOGGER.error("Error while fetching citing Articles", exception);
+                LOGGER.error("Error while fetching {} papers", citationComponents.searchType() == CitationFetcher.SearchType.CITES ? "cited" : "citing", exception);
                 hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
-                citationComponents.listView().setPlaceholder(new Label(Localization.lang("Error while fetching citing entries: %0",
-                        exception.getMessage())));
+                String labelText;
+                if (citationComponents.searchType() == CitationFetcher.SearchType.CITES) {
+                    labelText = Localization.lang("Error while fetching cited entries: %0", exception.getMessage());
+                } else {
+                    labelText = Localization.lang("Error while fetching citing entries: %0", exception.getMessage());
+                }
+                Label placeholder = new Label(labelText);
+                placeholder.setWrapText(true);
+                citationComponents.listView().setPlaceholder(placeholder);
                 citationComponents.refreshButton().setVisible(true);
                 dialogService.notify(exception.getMessage());
             })
@@ -508,13 +520,13 @@ public class CitationRelationsTab extends EntryEditorTab {
         return switch (searchType) {
             case CitationFetcher.SearchType.CITES -> {
                 citingTask = BackgroundTask.wrap(
-                    () -> this.searchCitationsRelationsService.searchReferences(entry)
+                    () -> this.searchCitationsRelationsService.searchCites(entry)
                 );
                 yield citingTask;
             }
             case CitationFetcher.SearchType.CITED_BY -> {
                 citedByTask = BackgroundTask.wrap(
-                    () -> this.searchCitationsRelationsService.searchCitations(entry)
+                    () -> this.searchCitationsRelationsService.searchCitedBy(entry)
                 );
                 yield citedByTask;
             }
@@ -527,6 +539,8 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         hideNodes(citationComponents.abortButton(), citationComponents.progress());
 
+        // TODO: This could be a wrong database, because the user might have switched to another library
+        //       If we were on fixing this, we would need to a) associate a BibEntry with a database or b) pass the database at "bindToEntry"
         BibDatabase database = stateManager.getActiveDatabase().map(BibDatabaseContext::getDatabase).orElse(new BibDatabase());
         observableList.setAll(
                 fetchedList.stream().map(entr ->
@@ -539,11 +553,11 @@ public class CitationRelationsTab extends EntryEditorTab {
                            .toList()
         );
 
-        if (!observableList.isEmpty()) {
-            citationComponents.listView().refresh();
-        } else {
+        if (observableList.isEmpty()) {
             Label placeholder = new Label(Localization.lang("No articles found"));
             citationComponents.listView().setPlaceholder(placeholder);
+        } else {
+            citationComponents.listView().refresh();
         }
         BooleanBinding booleanBind = Bindings.isEmpty(citationComponents.listView().getCheckModel().getCheckedItems());
         citationComponents.importButton().disableProperty().bind(booleanBind);
