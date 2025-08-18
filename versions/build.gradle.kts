@@ -115,7 +115,7 @@ dependencies.constraints {
     api("org.glassfish.jaxb:jaxb-runtime:4.0.4")
     api("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10")
     api("org.glassfish.jersey.core:jersey-server:3.1.10")
-    api("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
+    api("org.glassfish.jersey.inject:jersey-hk2:3.1.11")
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.0.1.Final")
