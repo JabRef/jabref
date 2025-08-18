@@ -105,7 +105,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
                 })
                 .onFailure(e ->
                         dialogService.showErrorDialogAndWait(
-                                Localization.lang("GitHub Share ailed"),
+                                Localization.lang("GitHub Share failed"),
                                 e.getMessage(),
                                 e
                         )
