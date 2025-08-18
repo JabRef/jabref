@@ -16,7 +16,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
-import org.jabref.logic.git.prefs.GitPreferences;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -95,9 +95,11 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
         );
 
         repositoryUrl.textProperty().bindBidirectional(viewModel.repositoryUrlProperty());
-        username.textProperty().bindBidirectional(viewModel.githubUsernameProperty());
-        personalAccessToken.textProperty().bindBidirectional(viewModel.githubPatProperty());
-        rememberSettingsCheck.selectedProperty().bindBidirectional(viewModel.rememberSettingsProperty());
+        username.textProperty().bindBidirectional(viewModel.usernameProperty());
+        personalAccessToken.textProperty().bindBidirectional(viewModel.patProperty());
+        rememberSettingsCheck.selectedProperty().bindBidirectional(viewModel.rememberPatProperty());
+
+        viewModel.setValues();
 
         Platform.runLater(() -> {
             visualizer.setDecoration(new IconValidationDecorator());
@@ -121,7 +123,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
             );
             this.close();
         })
-      .onFailure(e -> dialogService.showErrorDialogAndWait("GitHub share failed", e.getMessage(), e))
+      .onFailure(e -> dialogService.showErrorDialogAndWait(Localization.lang("GitHub share failed"), e.getMessage(), e))
       .executeWith(taskExecutor);
     }
 }

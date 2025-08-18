@@ -1,4 +1,4 @@
-package org.jabref.logic.git.prefs;
+package org.jabref.logic.git.preferences;
 
 import java.util.Optional;
 
@@ -20,7 +20,7 @@ public class GitPreferences {
     public GitPreferences(String username,
                           String pat,
                           String repositoryUrl,
-                          Boolean rememberPat) {
+                          boolean rememberPat) {
         this.username = new SimpleStringProperty(username);
         this.pat = new SimpleStringProperty(pat);
         this.repositoryUrl = new SimpleStringProperty(repositoryUrl);
@@ -51,7 +51,7 @@ public class GitPreferences {
         this.repositoryUrl.set(repositoryUrl);
     }
 
-    public Boolean getRememberPat() {
+    public boolean getRememberPat() {
         return this.rememberPat.get();
     }
 

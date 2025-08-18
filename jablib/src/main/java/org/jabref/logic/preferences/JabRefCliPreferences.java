@@ -50,7 +50,7 @@ import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.git.prefs.GitPreferences;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -2478,7 +2478,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(gitPreferences.rememberPatProperty(), (_, _, newVal) -> {
             putBoolean(GITHUB_REMEMBER_PAT_KEY, newVal);
             if (!newVal) {
-                try (var keyring = Keyring.create()) {
+                try (final Keyring keyring = Keyring.create()) {
                     keyring.deletePassword("org.jabref", "github");
                 } catch (Exception ex) {
                     LOGGER.warn("Unable to remove GitHub credentials", ex);
@@ -2490,11 +2490,11 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private String getGitHubPat() {
         if (getBoolean(GITHUB_REMEMBER_PAT_KEY)) {
-            try (var keyring = Keyring.create()) {
+            try (final Keyring keyring = Keyring.create()) {
                 return new Password(
                     keyring.getPassword("org.jabref", "github"),
-                    getInternalPreferences().getUserAndHost()
-                ).decrypt();
+                    getInternalPreferences().getUserAndHost())
+                    .decrypt();
             } catch (PasswordAccessException ex) {
                 LOGGER.warn("No GitHub token stored in keyring");
             } catch (Exception ex) {
@@ -2506,14 +2506,14 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private void setGitHubPat(String pat) {
         if (getGitPreferences().rememberPatProperty().get()) {
-            try (var keyring = Keyring.create()) {
+            try (final Keyring keyring = Keyring.create()) {
                 if (StringUtil.isBlank(pat)) {
                     keyring.deletePassword("org.jabref", "github");
                 } else {
                     keyring.setPassword("org.jabref", "github", new Password(
                             pat.trim(),
-                            getInternalPreferences().getUserAndHost()
-                    ).encrypt());
+                            getInternalPreferences().getUserAndHost())
+                            .encrypt());
                 }
             } catch (Exception ex) {
                 LOGGER.warn("Failed to save GitHub token to keyring", ex);
