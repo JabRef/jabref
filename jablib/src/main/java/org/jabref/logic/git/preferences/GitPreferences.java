@@ -11,16 +11,20 @@ import org.jabref.model.util.OptionalUtil;
 
 import org.jspecify.annotations.NonNull;
 
-public record GitPreferences(StringProperty username, StringProperty pat, StringProperty repositoryUrl, BooleanProperty rememberPat) {
+public class GitPreferences {
+    private final StringProperty username;
+    private final StringProperty pat;
+    private final StringProperty repositoryUrl;
+    private final BooleanProperty rememberPat;
+
     public GitPreferences(String username,
                           String pat,
                           String repositoryUrl,
                           boolean rememberPat) {
-        this(
-                new SimpleStringProperty(username),
-                new SimpleStringProperty(pat),
-                new SimpleStringProperty(repositoryUrl),
-                new SimpleBooleanProperty(rememberPat));
+        this.username = new SimpleStringProperty(username);
+        this.pat = new SimpleStringProperty(pat);
+        this.repositoryUrl = new SimpleStringProperty(repositoryUrl);
+        this.rememberPat = new SimpleBooleanProperty(rememberPat);
     }
 
     public void setUsername(@NonNull String username) {
