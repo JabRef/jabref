@@ -27,11 +27,12 @@ public class GitShareToGitHubAction extends SimpleCommand {
     }
 
     private BooleanExpression enabledGitShare() {
-        // TODO: Determine the correct condition for enabling "Git Share". This currently only requires an open database.
+        // TODO: Determine the correct condition for enabling "Git Share". This currently only requires an open library.
         //  In the future, this may need to check whether:
-        //  - the repo is initialized
-        //  - the remote is not already configured, or needs to be reset
+        //  - the repo is initialized (because without a repository, the current implementation does not work -> future work)
         //  - etc.
+        // Can be called independent if a remote is configured or not -- it will be done in the dialog
+        // HowTo: Inject the observables (or maybe the stateManager) containing these constraints
         return needsDatabase(stateManager);
     }
 }

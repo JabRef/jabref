@@ -127,6 +127,8 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         }
 
         // We don't get a new preference object (and re-use the existing one instead), because of ADR-0016
+
+        // TODO: Read remove from the git configuration - and only prompt for a repository if tre is none
         String url = gitPreferences.getRepositoryUrl();
         String user = gitPreferences.getUsername();
         String pat = gitPreferences.getPat();
