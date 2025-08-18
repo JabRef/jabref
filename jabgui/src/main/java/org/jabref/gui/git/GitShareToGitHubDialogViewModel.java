@@ -97,10 +97,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
                     return null;
                 })
                 .onSuccess(_ -> {
-                    dialogService.showInformationDialogAndWait(
-                            Localization.lang("GitHub Share"),
-                            Localization.lang("Successfully pushed to GitHub.")
-                    );
+                    dialogService.notify(Localization.lang("Successfully pushed to GitHub."));
                     close.run();
                 })
                 .onFailure(e ->
