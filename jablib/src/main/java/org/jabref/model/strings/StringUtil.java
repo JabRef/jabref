@@ -418,7 +418,7 @@ public class StringUtil {
      * Strings with escaped characters in curly braces at the beginning and end are respected, too
      *
      * @param toCheck The string to check
-     * @return True, if the check was succesful. False otherwise.
+     * @return True, if the check was successful. False otherwise.
      */
     public static boolean isInCurlyBrackets(String toCheck) {
         int count = 0;
