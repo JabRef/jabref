@@ -189,7 +189,7 @@ public class MainMenu extends MenuBar {
 
                 // TODO: Should be only enabled if not yet shared.
                 factory.createSubMenu(StandardActions.GIT,
-                        factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager, preferences.getExternalApplicationsPreferences(), preferences.getGitPreferences(), taskExecutor))
+                        factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),
 
                 new SeparatorMenuItem(),

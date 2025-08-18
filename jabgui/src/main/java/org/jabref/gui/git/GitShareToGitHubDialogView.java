@@ -12,16 +12,16 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
-import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 
 public class GitShareToGitHubDialogView extends BaseDialog<Void> {
     private static final String GITHUB_PAT_DOCS_URL =
@@ -39,37 +39,37 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
     @FXML private Label repoHelpIcon;
     @FXML private Tooltip repoHelpTooltip;
 
-    private final GitShareToGitHubDialogViewModel viewModel;
+    private GitShareToGitHubDialogViewModel viewModel;
 
-    private final DialogService dialogService;
-    private final TaskExecutor taskExecutor;
-    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+    @Inject
+    private DialogService dialogService;
+
+    @Inject
+    private StateManager stateManager;
+
+    @Inject
+    private TaskExecutor taskExecutor;
+
+    @Inject
+    private GuiPreferences preferences;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public GitShareToGitHubDialogView(
-            StateManager stateManager,
-            DialogService dialogService,
-            TaskExecutor taskExecutor,
-            ExternalApplicationsPreferences externalApplicationsPreferences,
-            GitPreferences gitPreferences
-    ) {
-        this.dialogService = dialogService;
-        this.taskExecutor = taskExecutor;
-        this.externalApplicationsPreferences = externalApplicationsPreferences;
-
-        this.setTitle(Localization.lang("Share this Library to GitHub"));
-
-        this.viewModel = new GitShareToGitHubDialogViewModel(gitPreferences, stateManager, dialogService, taskExecutor);
-
+    public GitShareToGitHubDialogView() {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-        ControlHelper.setAction(shareButton, this.getDialogPane(), _ -> shareToGitHub());
     }
 
     @FXML
     private void initialize() {
+        this.viewModel = new GitShareToGitHubDialogViewModel(preferences.getGitPreferences(), stateManager, dialogService, taskExecutor);
+
+        this.setTitle(Localization.lang("Share this Library to GitHub"));
+
+        // TODO: This does not work - move do initialize (because of @Inject)
+
+        ControlHelper.setAction(shareButton, this.getDialogPane(), _ -> shareToGitHub());
         patHelpTooltip.setText(
                 Localization.lang("Click to open GitHub Personal Access Token documentation")
         );
@@ -85,7 +85,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
                 NativeDesktop.openBrowserShowPopup(
                         GITHUB_NEW_REPO_URL,
                         dialogService,
-                        externalApplicationsPreferences
+                        preferences.getExternalApplicationsPreferences()
                 )
         );
 
@@ -94,7 +94,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
                 NativeDesktop.openBrowserShowPopup(
                         GITHUB_PAT_DOCS_URL,
                         dialogService,
-                        externalApplicationsPreferences
+                        preferences.getExternalApplicationsPreferences()
                 )
         );
 

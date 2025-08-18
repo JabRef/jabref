@@ -5,42 +5,25 @@ import javafx.beans.binding.BooleanExpression;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
-import org.jabref.logic.git.preferences.GitPreferences;
-import org.jabref.logic.util.TaskExecutor;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class GitShareToGitHubAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
-    private final ExternalApplicationsPreferences externalApplicationsPreferences;
-    private final GitPreferences gitPreferences;
-    private final TaskExecutor taskExecutor;
 
     public GitShareToGitHubAction(
             DialogService dialogService,
-            StateManager stateManager,
-            ExternalApplicationsPreferences externalApplicationsPreferences,
-            GitPreferences gitPreferences,
-            TaskExecutor taskExecutor) {
+            StateManager stateManager) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        this.externalApplicationsPreferences = externalApplicationsPreferences;
-        this.gitPreferences = gitPreferences;
-        this.taskExecutor = taskExecutor;
 
         this.executable.bind(this.enabledGitShare());
     }
 
     @Override
     public void execute() {
-        dialogService.showCustomDialogAndWait(new GitShareToGitHubDialogView(
-                stateManager,
-                dialogService,
-                taskExecutor,
-                externalApplicationsPreferences,
-                gitPreferences));
+        dialogService.showCustomDialogAndWait(new GitShareToGitHubDialogView());
     }
 
     private BooleanExpression enabledGitShare() {
