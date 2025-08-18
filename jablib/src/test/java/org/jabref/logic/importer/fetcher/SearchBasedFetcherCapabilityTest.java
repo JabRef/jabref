@@ -36,7 +36,7 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsAuthorSearch() throws FetcherException {
-        StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
+        StringJoiner queryBuilder = new StringJoiner("\" AND author=\"", "author=\"", "\"");
         getTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
@@ -58,7 +58,7 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsYearSearch() throws FetcherException {
-        List<BibEntry> result = getFetcher().performSearch("year:" + getTestYear());
+        List<BibEntry> result = getFetcher().performSearch("year=" + getTestYear());
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);
@@ -79,7 +79,7 @@ interface SearchBasedFetcherCapabilityTest {
     default void supportsYearRangeSearch() throws FetcherException {
         List<String> yearsInYearRange = List.of("2018", "2019", "2020");
 
-        List<BibEntry> result = getFetcher().performSearch("year-range:2018-2020");
+        List<BibEntry> result = getFetcher().performSearch("year-range=2018-2020");
         assertFalse(result.isEmpty());
 
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
