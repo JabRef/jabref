@@ -56,7 +56,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
         this.externalApplicationsPreferences = externalApplicationsPreferences;
 
         this.setTitle(Localization.lang("Share this library to GitHub"));
-        this.viewModel = new GitShareToGitHubDialogViewModel(gitPreferences, stateManager, dialogService);
+        this.viewModel = new GitShareToGitHubDialogViewModel(gitPreferences, stateManager);
 
         ViewLoader.view(this)
                   .load()
@@ -94,10 +94,10 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
                 )
         );
 
-        repositoryUrl.textProperty().bindBidirectional(viewModel.repositoryUrlProperty());
-        username.textProperty().bindBidirectional(viewModel.usernameProperty());
-        personalAccessToken.textProperty().bindBidirectional(viewModel.patProperty());
-        rememberSettingsCheck.selectedProperty().bindBidirectional(viewModel.rememberPatProperty());
+        repositoryUrl.textProperty().bindBidirectional(viewModel.repositoryUrlPropertyProperty());
+        username.textProperty().bindBidirectional(viewModel.usernamePropertyProperty());
+        personalAccessToken.textProperty().bindBidirectional(viewModel.patPropertyProperty());
+        rememberSettingsCheck.selectedProperty().bindBidirectional(viewModel.rememberPatPropertyProperty());
 
         viewModel.setValues();
 
