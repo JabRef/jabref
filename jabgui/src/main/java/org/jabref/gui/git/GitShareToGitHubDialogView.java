@@ -67,8 +67,6 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
 
         this.setTitle(Localization.lang("Share this Library to GitHub"));
 
-        // TODO: This does not work - move do initialize (because of @Inject)
-
         ControlHelper.setAction(shareButton, this.getDialogPane(), _ -> shareToGitHub());
         patHelpTooltip.setText(
                 Localization.lang("Click to open GitHub Personal Access Token documentation")
