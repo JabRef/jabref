@@ -21,6 +21,6 @@ preferences.
 
 ### Consequences
 
-- Import logic will be more hard as exising preferences objects have to be altered; and it is very hard to know which preference objects exactly are needed to be modified.
-- Cached variables need to be observables, too. AKA The cache needs to be observable.
-- There is NO "real" factory pattern for the preferences objects, as they are mutable --> they are passed via the constructor and long-lived
+* Import logic will be more hard as exising preferences objects have to be altered; and it is very hard to know which preference objects exactly are needed to be modified.
+* Cached variables need to be observables, too. AKA The cache needs to be observable.
+* There is NO "real" factory pattern for the preferences objects, as they are mutable --> they are passed via the constructor and long-lived
