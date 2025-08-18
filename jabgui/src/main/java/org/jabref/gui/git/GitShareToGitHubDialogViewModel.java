@@ -148,26 +148,26 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     }
 
     private Predicate<String> notEmptyValidator() {
-        return input -> StringUtil.isNotBlank(input);
+        return StringUtil::isNotBlank;
     }
 
     private Predicate<String> githubHttpsUrlValidator() {
         return input -> StringUtil.isNotBlank(input) && input.trim().matches("^https://.+");
     }
 
-    public StringProperty usernamePropertyProperty() {
+    public StringProperty usernameProperty() {
         return usernameProperty;
     }
 
-    public StringProperty patPropertyProperty() {
+    public StringProperty patProperty() {
         return patProperty;
     }
 
-    public StringProperty repositoryUrlPropertyProperty() {
+    public StringProperty repositoryUrlProperty() {
         return repositoryUrlProperty;
     }
 
-    public BooleanProperty rememberPatPropertyProperty() {
+    public BooleanProperty rememberPatProperty() {
         return rememberPatProperty;
     }
 }

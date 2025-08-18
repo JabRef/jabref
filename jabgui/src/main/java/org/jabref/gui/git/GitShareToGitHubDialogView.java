@@ -94,10 +94,10 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
                 )
         );
 
-        repositoryUrl.textProperty().bindBidirectional(viewModel.repositoryUrlPropertyProperty());
-        username.textProperty().bindBidirectional(viewModel.usernamePropertyProperty());
-        personalAccessToken.textProperty().bindBidirectional(viewModel.patPropertyProperty());
-        rememberSettingsCheck.selectedProperty().bindBidirectional(viewModel.rememberPatPropertyProperty());
+        repositoryUrl.textProperty().bindBidirectional(viewModel.repositoryUrlProperty());
+        username.textProperty().bindBidirectional(viewModel.usernameProperty());
+        personalAccessToken.textProperty().bindBidirectional(viewModel.patProperty());
+        rememberSettingsCheck.selectedProperty().bindBidirectional(viewModel.rememberPatProperty());
 
         viewModel.setValues();
 
