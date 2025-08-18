@@ -222,16 +222,16 @@ class FileUtilTest {
     @Test
     @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Assumed path separator is /")
     void uniquePathSubstrings() {
-       List<String> paths = List.of("C:/uniquefile.bib",
-               "C:/downloads/filename.bib",
-               "C:/mypaper/bib/filename.bib",
-               "C:/external/mypaper/bib/filename.bib",
-               "");
+        List<String> paths = List.of("C:/uniquefile.bib",
+                "C:/downloads/filename.bib",
+                "C:/mypaper/bib/filename.bib",
+                "C:/external/mypaper/bib/filename.bib",
+                "");
         List<String> uniqPath = List.of("uniquefile.bib",
-              "downloads/filename.bib",
-              "C:/mypaper/bib/filename.bib",
-              "external/mypaper/bib/filename.bib",
-              "");
+                "downloads/filename.bib",
+                "C:/mypaper/bib/filename.bib",
+                "external/mypaper/bib/filename.bib",
+                "");
 
         List<String> result = FileUtil.uniquePathSubstrings(paths);
         assertEquals(uniqPath, result);
@@ -452,6 +452,9 @@ class FileUtilTest {
     @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
     @MethodSource
     void relativizeSymlinks(Path file, List<Path> directories, Path expected, String message) {
+        if (message.startsWith("IGNORED")) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(false, message);
+        }
         Path result = FileUtil.relativize(file, directories);
         assertEquals(expected, result, message);
     }
@@ -494,6 +497,19 @@ class FileUtilTest {
         // outside.pdf
         Path outsideFile = Files.createFile(bibTempDir.resolve("outside.pdf"));
         result.add(Arguments.of(outsideFile, List.of(symlinkDir), outsideFile, "Unrelated file remains absolute"));
+
+        // symlink chain escaping base dir (ignored test case, see #12995 issue comment)
+        Path veryPrivate = bibTempDir.resolve("veryprivate");
+        Files.createDirectories(veryPrivate);
+        Path secretFile = Files.createFile(veryPrivate.resolve("a.pdf"));
+        Path expensive = bibTempDir.resolve("expensive");
+        Files.createSymbolicLink(expensive, veryPrivate);
+        Path things = bibTempDir.resolve("things");
+        Files.createSymbolicLink(things, expensive);
+        Path libDir = bibTempDir.resolve("lib");
+        Files.createDirectories(libDir);
+        Path bibFile = Files.createFile(libDir.resolve("bib.bib"));
+        result.add(Arguments.of(secretFile, List.of(things), secretFile, "IGNORED: Symlink chain escaping base dir (#12995 comment)"));
 
         return result.stream();
     }

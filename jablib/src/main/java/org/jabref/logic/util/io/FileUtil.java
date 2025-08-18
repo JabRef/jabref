@@ -153,7 +153,7 @@ public class FileUtil {
         List<String> uniquePathParts = uniquePathSubstrings(paths);
         return uniquePathParts.stream()
                               .filter(part -> comparePath.toString().contains(part)
-                                              && !part.equals(fileName) && part.contains(File.separator))
+                                      && !part.equals(fileName) && part.contains(File.separator))
                               .findFirst()
                               .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
     }
@@ -397,9 +397,9 @@ public class FileUtil {
     public static Optional<Path> findSingleFileRecursively(String filename, Path rootDirectory) {
         try (Stream<Path> pathStream = Files.walk(rootDirectory)) {
             return pathStream
-                             .filter(Files::isRegularFile)
-                             .filter(f -> f.getFileName().toString().equals(filename))
-                             .findFirst();
+                    .filter(Files::isRegularFile)
+                    .filter(f -> f.getFileName().toString().equals(filename))
+                    .findFirst();
         } catch (UncheckedIOException | IOException ex) {
             LOGGER.error("Error trying to locate the file {} inside the directory {}", filename, rootDirectory, ex);
         }
@@ -606,9 +606,9 @@ public class FileUtil {
         numCharsAfterEllipsis = Math.min(numCharsAfterEllipsis, name.length() - numCharsBeforeEllipsis);
 
         return name.substring(0, numCharsBeforeEllipsis) +
-               ELLIPSIS +
-               name.substring(name.length() - numCharsAfterEllipsis) +
-               extension;
+                ELLIPSIS +
+                name.substring(name.length() - numCharsAfterEllipsis) +
+                extension;
     }
 
     public static boolean isCharLegal(char c) {
