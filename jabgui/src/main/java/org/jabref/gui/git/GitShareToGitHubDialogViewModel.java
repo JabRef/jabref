@@ -124,6 +124,10 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     }
 
     public void setValues() {
+        // TODO: Change this to be in line with proxy preferences
+        //       - [ ] Rewrite from Optional to plain String, because lifecycle ensures that always "something" is in there
+        //       - See "defaults.put(PROXY_HOSTNAME, "");" in org.jabref.logic.preferences.JabRefCliPreferences.JabRefCliPreferences
+        //       - [ ] Write documentation to docs/code-howtos/preferences.md
         repositoryUrl.set(gitPreferences.getRepositoryUrl().orElse(""));
         username.set(gitPreferences.getUsername().orElse(""));
         pat.set(gitPreferences.getPat().orElse(""));
