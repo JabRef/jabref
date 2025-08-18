@@ -63,4 +63,5 @@ module org.jabref.jabsrv {
     requires lsp4j.jsonrpc;
     requires lsp4j.websocket;
     requires lsp4j.websocket.jakarta;
+
 }
