@@ -2480,14 +2480,14 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(gitPreferences.rememberPatProperty(), (_, _, newVal) -> {
             putBoolean(GITHUB_REMEMBER_PAT_KEY, newVal);
             if (!newVal) {
-                deleteGithubPat();
+                deleteGitHubPat();
             }
         });
 
         return gitPreferences;
     }
 
-    private static void deleteGithubPat() {
+    private static void deleteGitHubPat() {
         try (final Keyring keyring = Keyring.create()) {
             keyring.deletePassword("org.jabref", "github");
         } catch (Exception ex) {
