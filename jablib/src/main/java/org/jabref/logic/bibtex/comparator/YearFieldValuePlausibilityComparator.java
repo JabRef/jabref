@@ -65,10 +65,10 @@ public class YearFieldValuePlausibilityComparator extends FieldValuePlausibility
     }
 
     /**
-     * Checks if one or both of the years are empty and returns the correct ComparisonResult
+     * Prevents the years from being empty, so the following logic has non empty values
      *
      * @param leftValue year from the library (or candidate)
-     * @param rightValue year from the fetcher ((or existing record)
+     * @param rightValue year from the fetcher (or existing record)
      * @return ComparisonResult depending on which value is empty: RIGHT_BETTER, LEFT_BETTER, or UNDETERMINED
      */
     private ComparisonResult checkEmptyValues(Optional<Integer> leftValue, Optional<Integer> rightValue) {
