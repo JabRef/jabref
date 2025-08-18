@@ -126,6 +126,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
             throw new JabRefException(Localization.lang("No library file path. Please save the library to a file first."));
         }
 
+        // We don't get a new preference object (and re-use the existing one instead), because of ADR-0016
         String url = gitPreferences.getRepositoryUrl();
         String user = gitPreferences.getUsername();
         String pat = gitPreferences.getPat();
