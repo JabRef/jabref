@@ -2473,20 +2473,26 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(GITHUB_REMOTE_URL_KEY),
                 getBoolean(GITHUB_REMEMBER_PAT_KEY)
         );
+
         EasyBind.listen(gitPreferences.usernameProperty(), (_, _, newVal) -> put(GITHUB_USERNAME_KEY, newVal));
         EasyBind.listen(gitPreferences.patProperty(), (_, _, newVal) -> setGitHubPat(newVal));
         EasyBind.listen(gitPreferences.repositoryUrlProperty(), (_, _, newVal) -> put(GITHUB_REMOTE_URL_KEY, newVal));
         EasyBind.listen(gitPreferences.rememberPatProperty(), (_, _, newVal) -> {
             putBoolean(GITHUB_REMEMBER_PAT_KEY, newVal);
             if (!newVal) {
-                try (final Keyring keyring = Keyring.create()) {
-                    keyring.deletePassword("org.jabref", "github");
-                } catch (Exception ex) {
-                    LOGGER.warn("Unable to remove GitHub credentials", ex);
-                }
+                deleteGithubPat();
             }
         });
+
         return gitPreferences;
+    }
+
+    private static void deleteGithubPat() {
+        try (final Keyring keyring = Keyring.create()) {
+            keyring.deletePassword("org.jabref", "github");
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to remove GitHub credentials", ex);
+        }
     }
 
     private String getGitHubPat() {

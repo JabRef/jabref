@@ -18,7 +18,6 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -42,21 +41,26 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
 
     private final GitShareToGitHubDialogViewModel viewModel;
 
-    private final StateManager stateManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public GitShareToGitHubDialogView(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor, ExternalApplicationsPreferences externalApplicationsPreferences, GitPreferences gitPreferences) {
-        this.stateManager = stateManager;
+    public GitShareToGitHubDialogView(
+            StateManager stateManager,
+            DialogService dialogService,
+            TaskExecutor taskExecutor,
+            ExternalApplicationsPreferences externalApplicationsPreferences,
+            GitPreferences gitPreferences
+    ) {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
 
-        this.setTitle(Localization.lang("Share this library to GitHub"));
-        this.viewModel = new GitShareToGitHubDialogViewModel(gitPreferences, stateManager);
+        this.setTitle(Localization.lang("Share this Library to GitHub"));
+
+        this.viewModel = new GitShareToGitHubDialogViewModel(gitPreferences, stateManager, dialogService, taskExecutor);
 
         ViewLoader.view(this)
                   .load()
@@ -112,18 +116,6 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
 
     @FXML
     private void shareToGitHub() {
-        BackgroundTask.wrap(() -> {
-            viewModel.shareToGitHub();
-            return true;
-        })
-        .onSuccess(result -> {
-            dialogService.showInformationDialogAndWait(
-                    Localization.lang("GitHub Share"),
-                    Localization.lang("Successfully pushed to GitHub.")
-            );
-            this.close();
-        })
-      .onFailure(e -> dialogService.showErrorDialogAndWait(Localization.lang("GitHub share failed"), e.getMessage(), e))
-      .executeWith(taskExecutor);
+        viewModel.shareToGitHub(() -> this.close());
     }
 }

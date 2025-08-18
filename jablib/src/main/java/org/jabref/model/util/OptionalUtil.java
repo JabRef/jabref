@@ -9,10 +9,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import javafx.beans.property.StringProperty;
-
-import org.jabref.model.strings.StringUtil;
-
 public class OptionalUtil {
 
     public static <T, U> boolean equals(Optional<T> left, Optional<U> right, BiPredicate<T, U> equality) {
@@ -72,16 +68,5 @@ public class OptionalUtil {
         } else {
             return otherwise;
         }
-    }
-
-    public static Optional<String> fromStringProperty(StringProperty stringProperty) {
-        if (stringProperty.isEmpty().get()) {
-            return Optional.empty();
-        }
-        String value = stringProperty.get();
-        if (StringUtil.isNullOrEmpty(value)) {
-            return Optional.empty();
-        }
-        return Optional.of(value);
     }
 }

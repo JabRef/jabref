@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
@@ -21,9 +22,11 @@ import org.jabref.logic.git.status.SyncStatus;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.git.util.GitInitService;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.OptionalUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -31,13 +34,15 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-/// This dialog makes the connection to GitHub configurable
-/// We do not go through the JabRef preferences dialog, because need the preferences close to the user
+/// This dialog makes the connection to GitHub configurable.
+/// We do not put it into the JabRef preferences dialog because we want these settings to be close to the user.
 public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     private final StateManager stateManager;
 
     // The preferences stored in JabRef
     private final GitPreferences gitPreferences;
+    private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
 
     // The preferences of this dialog
     private final StringProperty usernameProperty = new SimpleStringProperty("");
@@ -54,9 +59,15 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     private final Validator githubUsernameValidator;
     private final Validator githubPatValidator;
 
-    public GitShareToGitHubDialogViewModel(GitPreferences gitPreferences, StateManager stateManager) {
+    public GitShareToGitHubDialogViewModel(
+            GitPreferences gitPreferences,
+            StateManager stateManager,
+            DialogService dialogService,
+            TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.gitPreferences = gitPreferences;
+        this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
 
         repositoryUrlValidator = new FunctionBasedValidator<>(
                 repositoryUrlProperty,
@@ -75,11 +86,35 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         );
     }
 
-    public void shareToGitHub() throws JabRefException, IOException, GitAPIException {
-        String url = OptionalUtil.fromStringProperty(repositoryUrlProperty).orElse("");
-        String user = OptionalUtil.fromStringProperty(usernameProperty).orElse("");
-        String pat = OptionalUtil.fromStringProperty(patProperty).orElse("");
+    /// @implNote close Is a runnable to make testing easier
+    public void shareToGitHub(Runnable close) {
+        // We store the settings because "Share" implies that the settings should be used as typed
+        // We also have the option to not store the settings permanently: This is implemented in JabRefCliPreferences at the listeners.
+        this.storeSettings();
+        BackgroundTask
+                .wrap(() -> {
+                    this.doShareToGitHub();
+                    return null;
+                })
+                .onSuccess(_ -> {
+                    dialogService.showInformationDialogAndWait(
+                            Localization.lang("GitHub Share"),
+                            Localization.lang("Successfully pushed to GitHub.")
+                    );
+                    close.run();
+                })
+                .onFailure(e ->
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("GitHub Share ailed"),
+                                e.getMessage(),
+                                e
+                        )
+                )
+                .executeWith(taskExecutor);
+    }
 
+    /// Method assumes that settings are stored before.
+    private void doShareToGitHub() throws JabRefException, IOException, GitAPIException {
         Optional<BibDatabaseContext> activeDatabaseOpt = stateManager.getActiveDatabase();
         if (activeDatabaseOpt.isEmpty()) {
             throw new JabRefException(Localization.lang("No library open"));
@@ -90,6 +125,10 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         if (bibFilePathOpt.isEmpty()) {
             throw new JabRefException(Localization.lang("No library file path. Please save the library to a file first."));
         }
+
+        String url = gitPreferences.getRepositoryUrl();
+        String user = gitPreferences.getUsername();
+        String pat = gitPreferences.getPat();
 
         Path bibPath = bibFilePathOpt.get();
 
@@ -113,8 +152,6 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         } else {
             handler.pushCommitsToRemoteRepository();
         }
-
-        storeSettings();
     }
 
     public void setValues() {
@@ -122,9 +159,9 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         //       - [ ] Rewrite from Optional to plain String, because lifecycle ensures that always "something" is in there
         //       - See "defaults.put(PROXY_HOSTNAME, "");" in org.jabref.logic.preferences.JabRefCliPreferences.JabRefCliPreferences
         //       - [ ] Write documentation to docs/code-howtos/preferences.md
-        repositoryUrlProperty.set(gitPreferences.getRepositoryUrl().orElse(""));
-        usernameProperty.set(gitPreferences.getUsername().orElse(""));
-        patProperty.set(gitPreferences.getPat().orElse(""));
+        repositoryUrlProperty.set(gitPreferences.getRepositoryUrl());
+        usernameProperty.set(gitPreferences.getUsername());
+        patProperty.set(gitPreferences.getPat());
         rememberPatProperty.set(gitPreferences.getRememberPat());
     }
 
@@ -152,7 +189,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     }
 
     private Predicate<String> githubHttpsUrlValidator() {
-        return input -> StringUtil.isNotBlank(input) && input.trim().matches("^https://.+");
+        return input -> StringUtil.isNotBlank(input) && URLUtil.isURL(input.trim());
     }
 
     public StringProperty usernameProperty() {

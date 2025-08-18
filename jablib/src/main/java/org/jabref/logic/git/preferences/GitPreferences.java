@@ -1,13 +1,9 @@
 package org.jabref.logic.git.preferences;
 
-import java.util.Optional;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
-import org.jabref.model.util.OptionalUtil;
 
 import org.jspecify.annotations.NonNull;
 
@@ -31,20 +27,20 @@ public class GitPreferences {
         this.username.set(username);
     }
 
-    public Optional<String> getUsername() {
-        return OptionalUtil.fromStringProperty(username);
+    public String getUsername() {
+        return username.get();
     }
 
     public void setPat(@NonNull String pat) {
         this.pat.set(pat);
     }
 
-    public Optional<String> getPat() {
-        return OptionalUtil.fromStringProperty(pat);
+    public String getPat() {
+        return pat.get();
     }
 
-    public Optional<String> getRepositoryUrl() {
-        return OptionalUtil.fromStringProperty(repositoryUrl);
+    public String getRepositoryUrl() {
+        return repositoryUrl.get();
     }
 
     public void setRepositoryUrl(@NonNull String repositoryUrl) {
