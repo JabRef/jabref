@@ -75,7 +75,7 @@ public abstract class AbstractQueryTransformer {
         String term = query.term();
         String field = NO_EXPLICIT_FIELD;
         if (query.field().isPresent()) {
-            field = String.valueOf(query.field().get()).toLowerCase();
+            field = String.valueOf(query.field().get().getName()).toLowerCase();
         }
         switch (field) {
             case "author" -> {
@@ -184,7 +184,7 @@ public abstract class AbstractQueryTransformer {
     }
 
     protected String createKeyValuePair(String fieldAsString, String term) {
-        return createKeyValuePair(fieldAsString, term, ":");
+        return createKeyValuePair(fieldAsString, term, "=");
     }
 
     protected String createKeyValuePair(String fieldAsString, String term, String separator) {

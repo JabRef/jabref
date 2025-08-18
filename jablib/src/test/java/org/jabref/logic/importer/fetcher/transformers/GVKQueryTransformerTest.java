@@ -2,9 +2,11 @@ package org.jabref.logic.importer.fetcher.transformers;
 
 import java.util.Optional;
 
+import org.jabref.logic.search.query.SearchQueryVisitor;
+import org.jabref.model.search.query.BaseQueryNode;
+import org.jabref.model.search.query.SearchQuery;
+
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -41,8 +43,9 @@ class GVKQueryTransformerTest extends InfixTransformerTest<GVKQueryTransformer> 
     @Test
     public void convertYearField() throws QueryNodeParseException {
         String queryString = "year:2018";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
+        SearchQuery searchQuery = new SearchQuery(queryString);
+        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
+        Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);
 
         Optional<String> expected = Optional.of("pica.erj=2018");
         assertEquals(expected, query);
