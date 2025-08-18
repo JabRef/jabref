@@ -3,9 +3,11 @@ package org.jabref.logic.importer.fetcher.transformers;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.logic.search.query.SearchQueryVisitor;
+import org.jabref.model.search.query.BaseQueryNode;
+import org.jabref.model.search.query.SearchQuery;
+
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -46,8 +48,9 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
         IEEEQueryTransformer transformer = getTransformer();
 
         String queryString = "journal:Nature";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        transformer.transformLuceneQuery(luceneQuery);
+        SearchQuery searchQuery = new SearchQuery(queryString);
+        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
+        getTransformer().transformSearchQuery(searchQueryList);
 
         assertEquals(Optional.of("Nature"), transformer.getJournal());
     }
@@ -61,8 +64,9 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
         IEEEQueryTransformer transformer = getTransformer();
 
         String queryString = "year:2021";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        transformer.transformLuceneQuery(luceneQuery);
+        SearchQuery searchQuery = new SearchQuery(queryString);
+        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
+        getTransformer().transformSearchQuery(searchQueryList);
 
         assertEquals(Optional.of(2021), transformer.getStartYear());
         assertEquals(Optional.of(2021), transformer.getEndYear());
@@ -74,8 +78,9 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
         IEEEQueryTransformer transformer = getTransformer();
 
         String queryString = "year-range:2018-2021";
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        transformer.transformLuceneQuery(luceneQuery);
+        SearchQuery searchQuery = new SearchQuery(queryString);
+        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
+        getTransformer().transformSearchQuery(searchQueryList);
 
         assertEquals(Optional.of(2018), transformer.getStartYear());
         assertEquals(Optional.of(2021), transformer.getEndYear());
@@ -92,8 +97,9 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
     @ParameterizedTest
     @MethodSource("getTitleTestData")
     void stopWordRemoval(String expected, String queryString) throws QueryNodeParseException {
-        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> result = getTransformer().transformLuceneQuery(luceneQuery);
-        assertEquals(Optional.ofNullable(expected), result);
+        SearchQuery searchQuery = new SearchQuery(queryString);
+        BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
+        Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);
+        assertEquals(Optional.ofNullable(expected), query);
     }
 }
