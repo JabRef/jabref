@@ -34,7 +34,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-/// This dialog makes the connection to GitHub configurable.
+/// "Preferences" dialog for sharing library to GitHub.
 /// We do not put it into the JabRef preferences dialog because we want these settings to be close to the user.
 public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     private final StateManager stateManager;
@@ -86,7 +86,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         );
     }
 
-    /// @implNote close Is a runnable to make testing easier
+    /// @implNote `close` Is a runnable to make testing easier
     public void shareToGitHub(Runnable close) {
         // We store the settings because "Share" implies that the settings should be used as typed
         // We also have the option to not store the settings permanently: This is implemented in JabRefCliPreferences at the listeners.
@@ -105,7 +105,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
                 })
                 .onFailure(e ->
                         dialogService.showErrorDialogAndWait(
-                                Localization.lang("GitHub Share failed"),
+                                Localization.lang("GitHub share failed"),
                                 e.getMessage(),
                                 e
                         )
@@ -128,7 +128,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
 
         // We don't get a new preference object (and re-use the existing one instead), because of ADR-0016
 
-        // TODO: Read remove from the git configuration - and only prompt for a repository if tre is none
+        // TODO: Read remove from the git configuration - and only prompt for a repository if there is none
         String url = gitPreferences.getRepositoryUrl();
         String user = gitPreferences.getUsername();
         String pat = gitPreferences.getPat();
