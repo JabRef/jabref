@@ -787,7 +787,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(GITHUB_PAT_KEY, "");
         defaults.put(GITHUB_USERNAME_KEY, "");
         defaults.put(GITHUB_REMOTE_URL_KEY, "");
-        defaults.put(GITHUB_REMEMBER_PAT_KEY, Boolean.FALSE);
+        defaults.put(GITHUB_REMEMBER_PAT_KEY, false);
         // endregion
     }
 
