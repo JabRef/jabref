@@ -184,7 +184,7 @@ public abstract class AbstractQueryTransformer {
     }
 
     protected String createKeyValuePair(String fieldAsString, String term) {
-        return createKeyValuePair(fieldAsString, term, "=");
+        return createKeyValuePair(fieldAsString, term, ":");
     }
 
     protected String createKeyValuePair(String fieldAsString, String term, String separator) {
