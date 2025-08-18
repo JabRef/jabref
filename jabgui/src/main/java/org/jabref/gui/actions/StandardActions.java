@@ -225,7 +225,6 @@ public enum StandardActions implements Action {
     GIT_COMMIT(Localization.lang("Commit")),
     GIT_SHARE(Localization.lang("Share this library to GitHub"));
 
-
     private String text;
     private final String description;
     private final Optional<JabRefIcon> icon;
