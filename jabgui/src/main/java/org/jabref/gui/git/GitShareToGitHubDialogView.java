@@ -14,7 +14,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -67,7 +66,18 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
 
         this.setTitle(Localization.lang("Share this Library to GitHub"));
 
-        ControlHelper.setAction(shareButton, this.getDialogPane(), _ -> shareToGitHub());
+        // See "javafx.md"
+        this.setResultConverter(button -> {
+            if (button != ButtonType.CANCEL) {
+                // We do not want to use "OK", but we want to use a custom text instead.
+                // JavaFX does not allow to alter the text of the "OK" button.
+                // Therefore, we used another button type.
+                // Since we have only two buttons, we can check for non-cancel here.
+                shareToGitHub();
+            }
+            return null;
+        });
+
         patHelpTooltip.setText(
                 Localization.lang("Click to open GitHub Personal Access Token documentation")
         );
