@@ -25,8 +25,7 @@ public final class GitInitService {
         Optional<Path> outerRoot = GitHandler.findRepositoryRoot(expectedRoot);
         if (outerRoot.isPresent() && !outerRoot.get().equals(expectedRoot)) {
             throw new JabRefException(
-                    Localization.lang("This library is inside another Git repository") + "\n" +
-                    Localization.lang("To sync this library independently, move it into its own folder (one library per repo) and try again.")
+                    Localization.lang("This library is inside another Git repository\nTo sync this library independently, move it into its own folder (one library per repo) and try again.")
             );
         }
 
