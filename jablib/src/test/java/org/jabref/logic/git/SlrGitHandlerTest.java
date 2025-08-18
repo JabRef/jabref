@@ -6,10 +6,13 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jabref.logic.git.util.NoopGitSystemReader;
+
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.internal.storage.file.WindowCache;
 import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.storage.file.WindowCacheConfig;
+import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +32,7 @@ class SlrGitHandlerTest {
 
     @BeforeEach
     void setUpGitHandler() {
+        SystemReader.setInstance(new NoopGitSystemReader());
         gitHandler = new SlrGitHandler(repositoryPath);
         gitHandler.initIfNeeded();
     }
