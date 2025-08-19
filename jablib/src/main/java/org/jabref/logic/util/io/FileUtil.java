@@ -281,6 +281,7 @@ public class FileUtil {
             try {
                 return Optional.of(path.toRealPath());
             } catch (IOException e) {
+                LOGGER.warn("Could not resolve real path for {}", path, e);
                 return Optional.empty();
             }
         } else {
