@@ -14,8 +14,8 @@ import org.jvnet.hk2.annotations.Service;
 public class TypstFormatter implements CAYWFormatter {
 
     @Override
-    public String getFormatName() {
-        return "typst";
+    public List<String> getFormatNames() {
+        return List.of("typst", "typ");
     }
 
     @Override
@@ -24,13 +24,12 @@ public class TypstFormatter implements CAYWFormatter {
     }
 
     @Override
-    public String format(CAYWQueryParams queryParams, List<CAYWEntry> cawEntries) {
-        List<BibEntry> bibEntries = cawEntries.stream()
-                                              .map(CAYWEntry::bibEntry)
-                                              .toList();
-
+    public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
+        List<BibEntry> bibEntries = caywEntries.stream()
+                                               .map(CAYWEntry::bibEntry)
+                                               .toList();
         return bibEntries.stream()
-                         .map(entry -> "@" + entry.getCitationKey().orElse(""))
-                         .collect(Collectors.joining(" "));
+                         .map(bibEntry -> "@" + bibEntry.getCitationKey().orElse(""))
+                         .collect(Collectors.joining(", "));
     }
 }

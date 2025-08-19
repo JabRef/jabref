@@ -9,9 +9,13 @@ import jakarta.ws.rs.core.MediaType;
 
 public interface CAYWFormatter {
 
-    String getFormatName();
+    List<String> getFormatNames();
+
+    default String getFormatName() {
+        return getFormatNames().get(0);
+    }
 
     MediaType getMediaType();
 
-    String format(CAYWQueryParams caywQueryParams, List<CAYWEntry> cawEntries);
+    String format(CAYWQueryParams caywQueryParams, List<CAYWEntry> caywEntries);
 }

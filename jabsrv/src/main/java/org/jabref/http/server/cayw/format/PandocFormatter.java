@@ -12,10 +12,9 @@ import org.jvnet.hk2.annotations.Service;
 
 @Service
 public class PandocFormatter implements CAYWFormatter {
-
     @Override
-    public String getFormatName() {
-        return "pandoc";
+    public List<String> getFormatNames() {
+        return List.of("pandoc", "markdown");
     }
 
     @Override
@@ -24,13 +23,21 @@ public class PandocFormatter implements CAYWFormatter {
     }
 
     @Override
-    public String format(CAYWQueryParams queryParams, List<CAYWEntry> cawEntries) {
-        List<BibEntry> bibEntries = cawEntries.stream()
-                                              .map(CAYWEntry::bibEntry)
-                                              .toList();
-
-        return bibEntries.stream()
-                         .map(entry -> "[@"+ entry.getCitationKey().orElse("") + "]")
-                         .collect(Collectors.joining(" "));
+    public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
+        String command = queryParams.getCommand();
+        List<BibEntry> bibEntries = caywEntries.stream()
+                                               .map(CAYWEntry::bibEntry)
+                                               .toList();
+        // Handle "parencite" command with square brackets
+        if ("parencite".equalsIgnoreCase(command)) {
+            return bibEntries.stream()
+                             .map(bibEntry -> "[@" + bibEntry.getCitationKey().orElse("") + "]")
+                             .collect(Collectors.joining(""));
+        } else {
+            // Default: bare @key format with semicolon separator
+            return bibEntries.stream()
+                             .map(bibEntry -> "@" + bibEntry.getCitationKey().orElse(""))
+                             .collect(Collectors.joining("; "));
+        }
     }
 }

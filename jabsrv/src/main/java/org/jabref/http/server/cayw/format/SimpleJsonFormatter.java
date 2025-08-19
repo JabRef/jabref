@@ -13,7 +13,6 @@ import org.jvnet.hk2.annotations.Service;
 
 @Service
 public class SimpleJsonFormatter implements CAYWFormatter {
-
     private final Gson gson;
 
     public SimpleJsonFormatter() {
@@ -21,8 +20,8 @@ public class SimpleJsonFormatter implements CAYWFormatter {
     }
 
     @Override
-    public String getFormatName() {
-        return "simple-json";
+    public List<String> getFormatNames() {
+        return List.of("simple-json");
     }
 
     @Override
@@ -31,10 +30,10 @@ public class SimpleJsonFormatter implements CAYWFormatter {
     }
 
     @Override
-    public String format(CAYWQueryParams queryParams, List<CAYWEntry> cawEntries) {
-        List<SimpleJson> simpleJsons = cawEntries.stream()
-                                                 .map(caywEntry -> SimpleJson.fromBibEntry(caywEntry.bibEntry()))
-                                                 .toList();
+    public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
+        List<SimpleJson> simpleJsons = caywEntries.stream()
+                                                  .map(caywEntry -> SimpleJson.fromBibEntry(caywEntry.bibEntry()))
+                                                  .toList();
         return gson.toJson(simpleJsons);
     }
 }

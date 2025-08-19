@@ -9,7 +9,6 @@ import org.jvnet.hk2.annotations.Service;
 
 @Service
 public class FormatterService {
-
     private static final String DEFAULT_FORMATTER = "biblatex";
     private final Map<String, CAYWFormatter> formatters;
 
@@ -17,20 +16,25 @@ public class FormatterService {
         this.formatters = new HashMap<>();
         registerFormatter(new SimpleJsonFormatter());
         registerFormatter(new BibLatexFormatter());
+        registerFormatter(new NatbibFormatter());
         registerFormatter(new LatexFormatter());
-        registerFormatter(new CiteFormatter());
-        registerFormatter(new nabbingFormatter());
-        registerFormatter(new MMDFormatter());
+        registerFormatter(new CitepFormatter());
+        registerFormatter(new MmdFormatter());
         registerFormatter(new PandocFormatter());
         registerFormatter(new TypstFormatter());
-        registerFormatter(new SimpleJsonFormatter());
     }
 
     public void registerFormatter(CAYWFormatter formatter) {
-        formatters.putIfAbsent(formatter.getFormatName(), formatter);
+        for (String name : formatter.getFormatNames()) {
+            formatters.putIfAbsent(name.toLowerCase(), formatter);
+        }
     }
 
     public CAYWFormatter getFormatter(CAYWQueryParams queryParams) {
-        return formatters.getOrDefault(queryParams.getFormat().toLowerCase(), formatters.get(DEFAULT_FORMATTER));
+        String format = queryParams.getFormat();
+        if (format == null) {
+            return formatters.get(DEFAULT_FORMATTER);
+        }
+        return formatters.getOrDefault(format.toLowerCase(), formatters.get(DEFAULT_FORMATTER));
     }
 }

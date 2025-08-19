@@ -11,11 +11,11 @@ import jakarta.ws.rs.core.MediaType;
 import org.jvnet.hk2.annotations.Service;
 
 @Service
-public class LatexFormatter implements CAYWFormatter {
+public class NatbibFormatter implements CAYWFormatter {
 
     @Override
     public List<String> getFormatNames() {
-        return List.of("latex", "tex");
+        return List.of("natbib", "nat");
     }
 
     @Override
@@ -25,13 +25,29 @@ public class LatexFormatter implements CAYWFormatter {
 
     @Override
     public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
-        String command = queryParams.getCommand() != null ? queryParams.getCommand() : "autocite";
+        String command = queryParams.getCommand();
+        if (command == null) {
+            command = "citep";
+        }
+
+        command = mapToNatbibCommand(command);
+
         List<BibEntry> bibEntries = caywEntries.stream()
                                                .map(CAYWEntry::bibEntry)
                                                .toList();
+
         return "\\%s{%s}".formatted(command,
                 bibEntries.stream()
                           .map(entry -> entry.getCitationKey().orElse(""))
                           .collect(Collectors.joining(",")));
+    }
+
+    private String mapToNatbibCommand(String command) {
+        return switch (command) {
+            case "author" -> "citeauthor";
+            case "textcite" -> "citet";
+            case "year" -> "citeyear";
+            default -> command;
+        };
     }
 }

@@ -11,11 +11,11 @@ import jakarta.ws.rs.core.MediaType;
 import org.jvnet.hk2.annotations.Service;
 
 @Service
-public class LatexFormatter implements CAYWFormatter {
+public class CitepFormatter implements CAYWFormatter {
 
     @Override
     public List<String> getFormatNames() {
-        return List.of("latex", "tex");
+        return List.of("citep", "cite");
     }
 
     @Override
@@ -25,13 +25,12 @@ public class LatexFormatter implements CAYWFormatter {
 
     @Override
     public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
-        String command = queryParams.getCommand() != null ? queryParams.getCommand() : "autocite";
         List<BibEntry> bibEntries = caywEntries.stream()
                                                .map(CAYWEntry::bibEntry)
                                                .toList();
-        return "\\%s{%s}".formatted(command,
-                bibEntries.stream()
-                          .map(entry -> entry.getCitationKey().orElse(""))
-                          .collect(Collectors.joining(",")));
+        String joined = bibEntries.stream()
+                                  .map(entry -> entry.getCitationKey().orElse(""))
+                                  .collect(Collectors.joining(","));
+        return "\\citep{" + joined + "}";
     }
 }
