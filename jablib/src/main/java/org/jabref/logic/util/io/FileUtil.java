@@ -258,17 +258,14 @@ public class FileUtil {
         Optional<Path> realFileOpt = tryRealPath(file);
 
         for (Path directory : directories) {
-            Optional<Path> realDirOpt = tryRealPath(directory);
-
-            if (realFileOpt.isPresent() && realDirOpt.isPresent()) {
-                Path realFile = realFileOpt.get();
-                Path realDir = realDirOpt.get();
-                // Avoid directory.relativize() because it breaks on some symlink edge cases.
-                // Instead, resolve to canonical paths and drop the directory’s name elements manually to get a correct relative path.
-                if (realFile.startsWith(realDir)) {
-                    int nameCountToDrop = realDir.getNameCount();
-                    Path relativePart = realFile.subpath(nameCountToDrop, realFile.getNameCount());
-                    return relativePart;
+            if (realFileOpt.isPresent()) {
+                Optional<Path> realDirOpt = tryRealPath(directory);
+                if (realDirOpt.isPresent()) {
+                    Path realFile = realFileOpt.get();
+                    Path realDir = realDirOpt.get();
+                    if (realFile.startsWith(realDir)) {
+                        return realDir.relativize(realFile);
+                    }
                 }
             }
 
