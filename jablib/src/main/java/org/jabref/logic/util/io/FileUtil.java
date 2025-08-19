@@ -258,6 +258,10 @@ public class FileUtil {
         Optional<Path> realFileOpt = tryRealPath(file);
 
         for (Path directory : directories) {
+            if (file.startsWith(directory)) {
+                return directory.relativize(file);
+            }
+
             if (realFileOpt.isPresent()) {
                 Optional<Path> realDirOpt = tryRealPath(directory);
                 if (realDirOpt.isPresent()) {
@@ -267,10 +271,6 @@ public class FileUtil {
                         return realDir.relativize(realFile);
                     }
                 }
-            }
-
-            if (file.startsWith(directory)) {
-                return directory.relativize(file);
             }
         }
         return file;
