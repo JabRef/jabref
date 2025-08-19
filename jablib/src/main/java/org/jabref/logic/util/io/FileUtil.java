@@ -255,7 +255,7 @@ public class FileUtil {
         if (!file.isAbsolute()) {
             return file;
         }
-        Optional<Path> realFileOpt = tryRealPath(file);
+        Optional<Path> realFileOpt = toRealPath(file);
 
         for (Path directory : directories) {
             if (file.startsWith(directory)) {
@@ -263,7 +263,7 @@ public class FileUtil {
             }
 
             if (realFileOpt.isPresent()) {
-                Optional<Path> realDirOpt = tryRealPath(directory);
+                Optional<Path> realDirOpt = toRealPath(directory);
                 if (realDirOpt.isPresent()) {
                     Path realFile = realFileOpt.get();
                     Path realDir = realDirOpt.get();
@@ -276,7 +276,7 @@ public class FileUtil {
         return file;
     }
 
-    private static Optional<Path> tryRealPath(Path path) {
+    private static Optional<Path> toRealPath(Path path) {
         if (Files.exists(path)) {
             try {
                 return Optional.of(path.toRealPath());
