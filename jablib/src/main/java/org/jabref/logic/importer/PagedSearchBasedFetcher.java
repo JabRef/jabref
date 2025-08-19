@@ -35,8 +35,6 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
             return this.performSearchPaged(visitor.visitStart(searchQueryObject.getContext()), pageNumber);
         } catch (ParseCancellationException e) {
             throw new FetcherException("A syntax error occurred during parsing of the query");
-        } catch (NullPointerException e) {
-            throw new FetcherException("The query string or a field in the query is empty");
         }
     }
 

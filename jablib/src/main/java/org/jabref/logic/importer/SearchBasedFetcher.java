@@ -44,8 +44,6 @@ public interface SearchBasedFetcher extends WebFetcher {
             queryNode = visitor.visitStart(searchQueryObject.getContext());
         } catch (ParseCancellationException e) {
             throw new FetcherException("A syntax error occurred during parsing of the query");
-        } catch (NullPointerException e) {
-            throw new FetcherException("The query string or a field is empty");
         }
 
         return this.performSearch(queryNode);
