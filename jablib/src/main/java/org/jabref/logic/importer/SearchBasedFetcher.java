@@ -7,6 +7,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.search.query.SearchQuery;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+
 /**
  * Searches web resources for bibliographic information based on a free-text query.
  * May return multiple search hits.
@@ -27,7 +29,7 @@ public interface SearchBasedFetcher extends WebFetcher {
     /**
      * Looks for hits which are matched by the given free-text query.
      *
-     * @param searchQuery query string that can be parsed into a search.g4 query
+     * @param searchQuery query string that can be parsed into a search query
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
     default List<BibEntry> performSearch(String searchQuery) throws FetcherException {
@@ -40,8 +42,10 @@ public interface SearchBasedFetcher extends WebFetcher {
         BaseQueryNode queryNode;
         try {
             queryNode = visitor.visitStart(searchQueryObject.getContext());
-        } catch (Exception e) {
-            throw new FetcherException("An error occurred when parsing the query");
+        } catch (ParseCancellationException e) {
+            throw new FetcherException("A syntax error occurred during parsing of the query");
+        } catch (NullPointerException e) {
+            throw new FetcherException("The query string or a field is empty");
         }
 
         return this.performSearch(queryNode);

@@ -9,6 +9,8 @@ import org.jabref.model.paging.Page;
 import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.search.query.SearchQuery;
 
+import org.antlr.v4.runtime.misc.ParseCancellationException;
+
 public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
 
     /**
@@ -31,8 +33,10 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
         SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
         try {
             return this.performSearchPaged(visitor.visitStart(searchQueryObject.getContext()), pageNumber);
-        } catch (Exception e) {
-            throw new FetcherException("An error occurred during parsing of the query.");
+        } catch (ParseCancellationException e) {
+            throw new FetcherException("A syntax error occurred during parsing of the query");
+        } catch (NullPointerException e) {
+            throw new FetcherException("The query string or a field in the query is empty");
         }
     }
 
