@@ -498,7 +498,7 @@ class FileUtilTest {
         Path outsideFile = Files.createFile(bibTempDir.resolve("outside.pdf"));
         result.add(Arguments.of(outsideFile, List.of(symlinkDir), outsideFile, "Unrelated file remains absolute"));
 
-        // symlink chain escaping base dir (ignored test case, see #12995 issue comment)
+        // symlink chain escaping base dir (ignored test case, see <https://github.com/JabRef/jabref/issues/12995#issuecomment-3065149862>)
         Path veryPrivate = bibTempDir.resolve("veryprivate");
         Files.createDirectories(veryPrivate);
         Path secretFile = Files.createFile(veryPrivate.resolve("a.pdf"));
