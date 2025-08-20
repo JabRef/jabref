@@ -203,8 +203,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public Observable[] getObservables() {
         List<Observable> observables = new ArrayList<>(Arrays.asList(linkedFile.getObservables()));
+        /*
+        Fix: JavaFX crashes with these 2 options lower while multi-downloading 2 or more files
         observables.add(downloadOngoing);
         observables.add(downloadProgress);
+        */
         observables.add(isAutomaticallyFound);
         return observables.toArray(new Observable[0]);
     }

@@ -7,6 +7,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.copyfiles.CopyMultipleFilesAction;
 import org.jabref.gui.copyfiles.CopySingleFileAction;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
@@ -21,8 +22,6 @@ public class ContextMenuFactory {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final BibDatabaseContext databaseContext;
-    private final ObservableOptionalValue<BibEntry> bibEntry;
-    private final LinkedFilesEditorViewModel viewModel;
     private final SingleContextCommandFactory singleCommandFactory;
     private final MultiContextCommandFactory multiCommandFactory;
 
@@ -36,8 +35,6 @@ public class ContextMenuFactory {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.databaseContext = databaseContext;
-        this.bibEntry = bibEntry;
-        this.viewModel = viewModel;
         this.singleCommandFactory = singleCommandFactory;
         this.multiCommandFactory = multiCommandFactory;
     }
@@ -57,9 +54,32 @@ public class ContextMenuFactory {
 
         menu.getItems().addAll(
                 factory.createMenuItem(
+                        StandardActions.OPEN_FILES,
+                        multiCommandFactory.build(StandardActions.OPEN_FILES, selectedFiles)),
+                factory.createMenuItem(
+                        StandardActions.OPEN_FOLDERS,
+                        multiCommandFactory.build(StandardActions.OPEN_FOLDERS, selectedFiles)),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(
+                        StandardActions.DOWNLOAD_FILES,
+                        multiCommandFactory.build(StandardActions.DOWNLOAD_FILES, selectedFiles)),
+                factory.createMenuItem(
+                        StandardActions.REDOWNLOAD_FILES,
+                        multiCommandFactory.build(StandardActions.REDOWNLOAD_FILES, selectedFiles)),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(
+                        StandardActions.MOVE_FILES_TO_FOLDER,
+                        multiCommandFactory.build(StandardActions.MOVE_FILES_TO_FOLDER, selectedFiles)),
+                factory.createMenuItem(
+                        StandardActions.COPY_FILES_TO_FOLDER,
+                        new CopyMultipleFilesAction(selectedFiles, dialogService, databaseContext, preferences.getFilePreferences())),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(
                         StandardActions.REMOVE_LINKS,
-                        multiCommandFactory.build(StandardActions.REMOVE_LINKS, selectedFiles)
-                )
+                        multiCommandFactory.build(StandardActions.REMOVE_LINKS, selectedFiles)),
+                factory.createMenuItem(
+                        StandardActions.DELETE_FILES,
+                        multiCommandFactory.build(StandardActions.DELETE_FILES, selectedFiles))
         );
 
         return menu;

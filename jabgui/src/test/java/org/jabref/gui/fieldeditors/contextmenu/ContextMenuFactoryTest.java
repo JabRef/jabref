@@ -1,5 +1,8 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
+import java.nio.file.Path;
+import java.util.Optional;
+
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -11,6 +14,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -22,53 +26,54 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ContextMenuFactoryTest {
+class ContextMenuFactoryTest {
 
     private static boolean toolkitInitialized = false;
 
     private DialogService dialogService;
     private GuiPreferences guiPreferences;
+    private FilePreferences filePreferences;
     private BibDatabaseContext databaseContext;
     private ObservableOptionalValue<BibEntry> bibEntry;
     private LinkedFilesEditorViewModel viewModel;
     private ContextMenuFactory factory;
-    private ContextMenuFactory.SingleContextCommandFactory singleCommandFactory;
-    private ContextMenuFactory.MultiContextCommandFactory multiCommandFactory;
 
     @BeforeAll
-    public static void initToolkit() {
+    static void initToolkit() {
         if (!toolkitInitialized) {
             try {
-                Platform.startup(() -> { });
-            } catch (IllegalStateException e) {
-                // Toolkit already initialized by another thread/test
+                Platform.startup(() -> {});
+            } catch (IllegalStateException ignored) {
             }
             toolkitInitialized = true;
         }
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         dialogService = mock(DialogService.class);
         guiPreferences = mock(GuiPreferences.class);
+        filePreferences = mock(FilePreferences.class);
         databaseContext = mock(BibDatabaseContext.class);
         viewModel = mock(LinkedFilesEditorViewModel.class);
 
-        SimpleObjectProperty<BibEntry> bibEntryProperty = new SimpleObjectProperty<>();
-        bibEntry = EasyBind.wrapNullable(bibEntryProperty);
-        bibEntryProperty.set(new BibEntry());
+        when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
 
-        singleCommandFactory = (action, file) ->
+        SimpleObjectProperty<BibEntry> bibEntryProperty = new SimpleObjectProperty<>(new BibEntry());
+        bibEntry = EasyBind.wrapNullable(bibEntryProperty);
+
+        ContextMenuFactory.SingleContextCommandFactory singleCommandFactory = (action, file) ->
                 new ContextAction(action, file, databaseContext, bibEntry, guiPreferences, viewModel);
 
-        multiCommandFactory = (action, files) ->
+        ContextMenuFactory.MultiContextCommandFactory multiCommandFactory = (action, files) ->
                 new MultiContextAction(action, files, databaseContext, bibEntry, guiPreferences, viewModel);
 
         factory = new ContextMenuFactory(
@@ -82,84 +87,89 @@ public class ContextMenuFactoryTest {
         );
     }
 
-    private LinkedFileViewModel mockFileWithLink(String link) {
-        LinkedFile linkedFile = mock(LinkedFile.class);
-        when(linkedFile.isOnlineLink()).thenReturn(false);
-        when(linkedFile.linkProperty()).thenReturn(new SimpleStringProperty(link));
-        when(linkedFile.sourceUrlProperty()).thenReturn(new SimpleStringProperty(""));
+    private LinkedFileViewModel mockLocalExistingFile(String linkName) {
+        LinkedFile lf = mock(LinkedFile.class);
+        when(lf.isOnlineLink()).thenReturn(false);
+        when(lf.linkProperty()).thenReturn(new SimpleStringProperty(linkName));
+        when(lf.sourceUrlProperty()).thenReturn(new SimpleStringProperty(""));
+        when(lf.getSourceUrl()).thenReturn("");
+        when(lf.findIn(eq(databaseContext), eq(filePreferences))).thenReturn(Optional.of(Path.of(linkName)));
 
-        LinkedFileViewModel file = mock(LinkedFileViewModel.class);
-        when(file.getFile()).thenReturn(linkedFile);
-        when(file.isGeneratedNameSameAsOriginal()).thenReturn(false);
-        when(file.isGeneratedPathSameAsOriginal()).thenReturn(false);
+        LinkedFileViewModel vm = mock(LinkedFileViewModel.class);
+        when(vm.getFile()).thenReturn(lf);
+        when(vm.isGeneratedNameSameAsOriginal()).thenReturn(false);
+        when(vm.isGeneratedPathSameAsOriginal()).thenReturn(false);
+        return vm;
+    }
 
-        return file;
+    private boolean hasItemLike(ContextMenu menu, String needleLower) {
+        return menu.getItems().stream().anyMatch(i -> {
+            String t = i.getText();
+            return t != null && t.toLowerCase().contains(needleLower);
+        });
     }
 
     @Test
-    public void createContextMenuForSingleFile() {
-        LinkedFileViewModel file = mockFileWithLink("file1.pdf");
-        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file);
+    void multiMenuHasExpectedItemCount() {
+        LinkedFileViewModel file1 = mockLocalExistingFile("file1.pdf");
+        LinkedFileViewModel file2 = mockLocalExistingFile("file2.pdf");
+        ObservableList<LinkedFileViewModel> sel = FXCollections.observableArrayList(file1, file2);
 
-        ContextMenu menu = factory.createForSelection(files);
+        ContextMenu menu = factory.createForSelection(sel);
         assertNotNull(menu);
-        assertFalse(menu.getItems().isEmpty());
+        assertEquals(11, menu.getItems().size());
     }
 
     @Test
-    public void createContextMenuForMultipleFiles() {
-        LinkedFileViewModel file1 = mockFileWithLink("file1.pdf");
-        LinkedFileViewModel file2 = mockFileWithLink("file2.pdf");
-        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file1, file2);
+    void multiMenuContainsExpectedCommandsByText() {
+        LinkedFileViewModel file1 = mockLocalExistingFile("file1.pdf");
+        LinkedFileViewModel file2 = mockLocalExistingFile("file2.pdf");
+        ObservableList<LinkedFileViewModel> sel = FXCollections.observableArrayList(file1, file2);
 
-        ContextMenu menu = factory.createForSelection(files);
-        assertNotNull(menu);
-        assertEquals(1, menu.getItems().size());
+        ContextMenu menu = factory.createForSelection(sel);
+
+        assertTrue(hasItemLike(menu, "open file"));
+        assertTrue(hasItemLike(menu, "open folder"));
+        assertTrue(hasItemLike(menu, "download"));
+        assertTrue(hasItemLike(menu, "redownload"));
+        assertTrue(hasItemLike(menu, "move file"));
+        assertTrue(hasItemLike(menu, "copy linked file"));
+        assertTrue(hasItemLike(menu, "remove link"));
+        assertTrue(hasItemLike(menu, "delete"));
     }
 
     @Test
-    public void createContextMenuForEmptySelection() {
-        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList();
-        ContextMenu menu = factory.createForSelection(files);
+    void removeLinksInvokesViewModelOnAllSelected() {
+        LinkedFileViewModel file1 = mockLocalExistingFile("file1.pdf");
+        LinkedFileViewModel file2 = mockLocalExistingFile("file2.pdf");
+        ObservableList<LinkedFileViewModel> sel = FXCollections.observableArrayList(file1, file2);
 
-        assertNotNull(menu);
-        assertTrue(menu.getItems().isEmpty());
-    }
-
-    @Test
-    public void removeLinkActionCallsViewModelForSingleFile() {
-        LinkedFileViewModel file = mockFileWithLink("file1.pdf");
-        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file);
-        ContextMenu menu = factory.createForSelection(files);
+        ContextMenu menu = factory.createForSelection(sel);
 
         menu.getItems().stream()
-                .filter(item -> {
-                    String text = item.getText();
-                    return text != null && text.toLowerCase().contains("remove link");
-                })
-                .findFirst()
-                .ifPresent(item -> item.getOnAction().handle(null));
-
-        verify(viewModel).removeFileLink(file);
-    }
-
-    @Test
-    public void removeLinksActionCallsViewModelForAllSelectedFiles() {
-        LinkedFileViewModel file1 = mockFileWithLink("file1.pdf");
-        LinkedFileViewModel file2 = mockFileWithLink("file2.pdf");
-
-        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file1, file2);
-        ContextMenu menu = factory.createForSelection(files);
-
-        menu.getItems().stream()
-                .filter(item -> {
-                    String text = item.getText();
-                    return text != null && text.toLowerCase().contains("remove links");
-                })
-                .findFirst()
-                .ifPresent(item -> item.getOnAction().handle(null));
+            .filter(item -> item.getText() != null && item.getText().toLowerCase().contains("remove links"))
+            .findFirst()
+            .ifPresent(item -> item.getOnAction().handle(null));
 
         verify(viewModel).removeFileLink(file1);
         verify(viewModel).removeFileLink(file2);
+    }
+
+    @Test
+    void copyFilesToFolderShowsDirectoryDialog() {
+        LinkedFileViewModel file1 = mockLocalExistingFile("file1.pdf");
+        LinkedFileViewModel file2 = mockLocalExistingFile("file2.pdf");
+        ObservableList<LinkedFileViewModel> sel = FXCollections.observableArrayList(file1, file2);
+
+        when(dialogService.showDirectorySelectionDialog(any())).thenReturn(Optional.empty());
+
+        ContextMenu menu = factory.createForSelection(sel);
+
+        menu.getItems().stream()
+            .filter(item -> item.getText() != null && item.getText().toLowerCase().contains("copy linked file"))
+            .findFirst()
+            .ifPresent(item -> item.getOnAction().handle(null));
+
+        verify(dialogService).showDirectorySelectionDialog(any());
     }
 }
