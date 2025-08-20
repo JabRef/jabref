@@ -76,7 +76,7 @@ public class AboutDialogView extends BaseDialog<Void> {
 
     @FXML
     private void openGithub() {
-        viewModel.openGithub();
+        viewModel.openGitHub();
     }
 
     @FXML

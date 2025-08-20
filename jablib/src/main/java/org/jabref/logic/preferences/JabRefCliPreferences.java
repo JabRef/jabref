@@ -50,6 +50,7 @@ import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -109,6 +110,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+import org.jabref.model.metadata.UserHostInfo;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.strings.StringUtil;
@@ -426,6 +428,12 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String PUSH_SUBLIME_TEXT_PATH = "sublimeTextPath";
     private static final String PUSH_VSCODE_PATH = "VScodePath";
     private static final String PUSH_CITE_COMMAND = "citeCommand";
+
+    // Git
+    private static final String GITHUB_PAT_KEY = "githubPersonalAccessToken";
+    private static final String GITHUB_USERNAME_KEY = "githubUsername";
+    private static final String GITHUB_REMOTE_URL_KEY = "githubRemoteUrl";
+    private static final String GITHUB_REMEMBER_PAT_KEY = "githubRememberPat";
     // endregion
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
@@ -443,7 +451,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /**
      * Cache variables
      */
-    private String userAndHost;
+    private UserHostInfo userAndHost;
 
     private LibraryPreferences libraryPreferences;
     private DOIPreferences doiPreferences;
@@ -472,6 +480,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
+    private GitPreferences gitPreferences;
 
     /**
      * @implNote The constructor was made public because dependency injection via constructor
@@ -773,6 +782,13 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // WalkThrough
         defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);
+
+        // region: Git preferences
+        defaults.put(GITHUB_PAT_KEY, "");
+        defaults.put(GITHUB_USERNAME_KEY, "");
+        defaults.put(GITHUB_REMOTE_URL_KEY, "");
+        defaults.put(GITHUB_REMEMBER_PAT_KEY, false);
+        // endregion
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -850,7 +866,6 @@ public class JabRefCliPreferences implements CliPreferences {
             }
         });
     }
-
     // endregion
 
 
@@ -1598,7 +1613,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getBoolean(VERSION_CHECK_ENABLED),
                 getPath(PREFS_EXPORT_PATH, getDefaultPath()),
-                getUserAndHost(),
+                userAndHost.getUserHostString(),
                 getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
@@ -1622,11 +1637,11 @@ public class JabRefCliPreferences implements CliPreferences {
         return internalPreferences;
     }
 
-    private String getUserAndHost() {
-        if (StringUtil.isNotBlank(userAndHost)) {
+    private UserHostInfo getUserHostInfo() {
+        if (userAndHost != null) {
             return userAndHost;
         }
-        userAndHost = get(DEFAULT_OWNER) + '-' + OS.getHostName();
+        userAndHost = new UserHostInfo(get(DEFAULT_OWNER), OS.getHostName());
         return userAndHost;
     }
 
@@ -1676,7 +1691,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         filePreferences = new FilePreferences(
-                getInternalPreferences().getUserAndHost(),
+                getUserHostInfo().getUserHostString(),
                 getPath(MAIN_FILE_DIRECTORY, getDefaultPath()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
@@ -2444,5 +2459,72 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(openOfficePreferences.cslBibliographyBodyFormatProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, newValue));
 
         return openOfficePreferences;
+    }
+
+    @Override
+    public GitPreferences getGitPreferences() {
+        if (gitPreferences != null) {
+            return gitPreferences;
+        }
+
+        gitPreferences = new GitPreferences(
+                get(GITHUB_USERNAME_KEY),
+                getGitHubPat(),
+                get(GITHUB_REMOTE_URL_KEY),
+                getBoolean(GITHUB_REMEMBER_PAT_KEY)
+        );
+
+        EasyBind.listen(gitPreferences.usernameProperty(), (_, _, newVal) -> put(GITHUB_USERNAME_KEY, newVal));
+        EasyBind.listen(gitPreferences.patProperty(), (_, _, newVal) -> setGitHubPat(newVal));
+        EasyBind.listen(gitPreferences.repositoryUrlProperty(), (_, _, newVal) -> put(GITHUB_REMOTE_URL_KEY, newVal));
+        EasyBind.listen(gitPreferences.rememberPatProperty(), (_, _, newVal) -> {
+            putBoolean(GITHUB_REMEMBER_PAT_KEY, newVal);
+            if (!newVal) {
+                deleteGitHubPat();
+            }
+        });
+
+        return gitPreferences;
+    }
+
+    private static void deleteGitHubPat() {
+        try (final Keyring keyring = Keyring.create()) {
+            keyring.deletePassword("org.jabref", "github");
+        } catch (Exception ex) {
+            LOGGER.warn("Unable to remove GitHub credentials", ex);
+        }
+    }
+
+    private String getGitHubPat() {
+        if (getBoolean(GITHUB_REMEMBER_PAT_KEY)) {
+            try (final Keyring keyring = Keyring.create()) {
+                return new Password(
+                    keyring.getPassword("org.jabref", "github"),
+                    getInternalPreferences().getUserAndHost())
+                    .decrypt();
+            } catch (PasswordAccessException ex) {
+                LOGGER.warn("No GitHub token stored in keyring");
+            } catch (Exception ex) {
+                LOGGER.warn("Could not read GitHub token from keyring", ex);
+            }
+        }
+        return (String) defaults.get(GITHUB_PAT_KEY);
+    }
+
+    private void setGitHubPat(String pat) {
+        if (getGitPreferences().rememberPatProperty().get()) {
+            try (final Keyring keyring = Keyring.create()) {
+                if (StringUtil.isBlank(pat)) {
+                    keyring.deletePassword("org.jabref", "github");
+                } else {
+                    keyring.setPassword("org.jabref", "github", new Password(
+                            pat.trim(),
+                            getInternalPreferences().getUserAndHost())
+                            .encrypt());
+                }
+            } catch (Exception ex) {
+                LOGGER.warn("Failed to save GitHub token to keyring", ex);
+            }
+        }
     }
 }

@@ -13,7 +13,9 @@ import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.URIish;
+import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -22,6 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GitRevisionLocatorTest {
     private Git git;
+
+    @BeforeEach
+    void setup() {
+        SystemReader.setInstance(new NoopGitSystemReader());
+    }
 
     @AfterEach
     void cleanup() {

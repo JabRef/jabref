@@ -370,6 +370,7 @@ public class IconTheme {
         CONSISTENCY_OPTIONAL_FIELD(MaterialDesignC.CIRCLE_OUTLINE),
         CONSISTENCY_UNKNOWN_FIELD(MaterialDesignH.HELP),
         ABSOLUTE_PATH(MaterialDesignF.FAMILY_TREE),
+        GIT_SYNC(MaterialDesignG.GIT),
         RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE),
         SHORTEN_DOI(MaterialDesignA.ARROW_COLLAPSE_HORIZONTAL);
 
