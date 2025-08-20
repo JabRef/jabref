@@ -21,7 +21,6 @@ import org.jabref.model.entry.LinkedFile;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,9 +49,7 @@ class ContextMenuFactoryTest {
         try {
             Platform.startup(() -> {
             });
-        } catch (
-                IllegalStateException e) {
-            Assertions.assertTrue(true);
+        } catch (IllegalStateException e) {
         }
     }
 
