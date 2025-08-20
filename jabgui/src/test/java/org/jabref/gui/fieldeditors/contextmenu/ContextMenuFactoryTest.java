@@ -50,7 +50,7 @@ class ContextMenuFactoryTest {
     @BeforeAll
     static void initToolkit() throws InterruptedException {
         try {
-            Platform.startup(() -> {});
+            Platform.startup(() -> { });
         } catch (IllegalStateException alreadyStarted) {
             CountDownLatch latch = new CountDownLatch(1);
             assertDoesNotThrow(() -> Platform.runLater(latch::countDown));
