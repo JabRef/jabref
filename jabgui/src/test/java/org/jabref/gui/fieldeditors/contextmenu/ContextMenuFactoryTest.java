@@ -2,6 +2,8 @@ package org.jabref.gui.fieldeditors.contextmenu;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,11 +48,13 @@ class ContextMenuFactoryTest {
     private ContextMenuFactory factory;
 
     @BeforeAll
-    static void initToolkit() {
+    static void initToolkit() throws InterruptedException {
         try {
-            Platform.startup(() -> {
-            });
-        } catch (IllegalStateException e) {
+            Platform.startup(() -> {});
+        } catch (IllegalStateException alreadyStarted) {
+            CountDownLatch latch = new CountDownLatch(1);
+            assertDoesNotThrow(() -> Platform.runLater(latch::countDown));
+            assertTrue(latch.await(1, TimeUnit.SECONDS), "JavaFX Platform should be running");
         }
     }
 
