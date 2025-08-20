@@ -22,9 +22,8 @@ import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -197,7 +196,7 @@ class MultiContextActionTest {
     }
 
     @Test
-    void executeOpenFoldersWithMultipleFilesDoesNotThrow() {
+    void executeOpenFoldersWithMultipleFiles() {
         ObservableList<LinkedFileViewModel> sel = FXCollections.observableArrayList(
                 vmLocalExisting("dir1/a.pdf"),
                 vmLocalExisting("dir1/b.pdf"),
@@ -206,17 +205,17 @@ class MultiContextActionTest {
 
         MultiContextAction action = make(StandardActions.OPEN_FOLDERS, sel);
         assertTrue(action.executableProperty().get());
-        assertDoesNotThrow(action::execute);
+        action.execute();
     }
 
     @Test
-    void executeDownloadFilesDoesNotThrowWithMixedSelection() {
+    void executeDownloadFilesWithMixedSelection() {
         ObservableList<LinkedFileViewModel> sel = FXCollections.observableArrayList(
                 vmOnline(), vmLocalExisting("a.pdf")
         );
 
         MultiContextAction action = make(StandardActions.DOWNLOAD_FILES, sel);
         assertTrue(action.executableProperty().get());
-        assertDoesNotThrow(action::execute);
+        action.execute();
     }
 }

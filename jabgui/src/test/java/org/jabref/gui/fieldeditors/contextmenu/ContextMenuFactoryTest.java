@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
-import org.junit.jupiter.api.Assertions;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -22,6 +21,7 @@ import org.jabref.model.entry.LinkedFile;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,8 +37,6 @@ import static org.mockito.Mockito.when;
 
 class ContextMenuFactoryTest {
 
-    private static boolean toolkitInitialized = false;
-
     private DialogService dialogService;
     private GuiPreferences guiPreferences;
     private FilePreferences filePreferences;
@@ -49,12 +47,12 @@ class ContextMenuFactoryTest {
 
     @BeforeAll
     static void initToolkit() {
-        if (!toolkitInitialized) {
-            Assertions.assertDoesNotThrow(() -> {
-                Platform.startup(() -> {
-                });
-            }, "Unexpected exception");
-            toolkitInitialized = true;
+        try {
+            Platform.startup(() -> {
+            });
+        } catch (
+                IllegalStateException e) {
+            Assertions.assertTrue(true);
         }
     }
 
