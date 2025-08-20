@@ -67,8 +67,9 @@ public class CopyMultipleFilesAction extends SimpleCommand {
             Path dst = targetDir.resolve(src.getFileName());
 
             if (Files.exists(dst) && Files.isDirectory(dst)) {
+                IOException ex = new IOException("Destination is a directory: " + dst);
                 dialogService.showErrorDialogAndWait(
-                        Localization.lang("Cannot copy '%0' to '%1'", src, dst));
+                        Localization.lang("Cannot copy '%0' to '%1'", src, dst), ex);
                 continue;
             }
 

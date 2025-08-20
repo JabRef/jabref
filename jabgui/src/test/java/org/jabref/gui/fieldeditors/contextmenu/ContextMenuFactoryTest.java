@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import org.junit.jupiter.api.Assertions;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -49,10 +50,10 @@ class ContextMenuFactoryTest {
     @BeforeAll
     static void initToolkit() {
         if (!toolkitInitialized) {
-            try {
-                Platform.startup(() -> {});
-            } catch (IllegalStateException ignored) {
-            }
+            Assertions.assertDoesNotThrow(() -> {
+                Platform.startup(() -> {
+                });
+            }, "Unexpected exception");
             toolkitInitialized = true;
         }
     }

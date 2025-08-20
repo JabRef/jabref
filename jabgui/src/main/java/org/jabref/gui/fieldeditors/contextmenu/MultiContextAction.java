@@ -87,7 +87,7 @@ public class MultiContextAction extends SimpleCommand {
                                                    .flatMap(Optional::stream)
                                                    .collect(Collectors.groupingBy(p -> {
                                                        Path parent = p.getParent();
-                                                       return (parent != null) ? parent : p;
+                                                       return parent != null ? parent : p;
                                                    }));
 
                 for (Map.Entry<Path, List<Path>> e : byDir.entrySet()) {

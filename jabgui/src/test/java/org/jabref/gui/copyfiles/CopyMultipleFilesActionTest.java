@@ -191,5 +191,4 @@ class CopyMultipleFilesActionTest {
         assertTrue(Files.exists(target.resolve(srcB.getFileName())));
         verify(dialogService, atLeastOnce()).showErrorDialogAndWait(anyString(), any(Throwable.class));
     }
-
 }
