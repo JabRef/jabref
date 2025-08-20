@@ -29,7 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - In case no citation relation information can be fetched, we show the data providers reason. [#13549](https://github.com/JabRef/jabref/pull/13549)
 - When relativizing file names, symlinks are now taken into account. [#12995](https://github.com/JabRef/jabref/issues/12995)
 - We added a new button for shortening the DOI near the DOI field in the general tab when viewing an entry. [#13639](https://github.com/JabRef/jabref/issues/13639)
-- We added BibLaTeX datamodel validation support in order to improve error quality for entries' validation fields. [#13318](https://github.com/JabRef/jabref/issues/13318)
+- We added BibLaTeX datamodel validation support in order to improve error message quality in entries' fields validation. [#13318](https://github.com/JabRef/jabref/issues/13318)
 
 ### Changed
 
