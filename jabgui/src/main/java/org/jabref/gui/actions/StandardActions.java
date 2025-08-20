@@ -224,7 +224,13 @@ public enum StandardActions implements Action {
     GROUP_SUBGROUP_RENAME(Localization.lang("Rename subgroup"), KeyBinding.GROUP_SUBGROUP_RENAME),
     GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group")),
 
-    CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache"));
+    CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache")),
+
+    GIT(Localization.lang("Git"), IconTheme.JabRefIcons.GIT_SYNC),
+    GIT_PULL(Localization.lang("Pull")),
+    GIT_PUSH(Localization.lang("Push")),
+    GIT_COMMIT(Localization.lang("Commit")),
+    GIT_SHARE(Localization.lang("Share this library to GitHub"));
 
     private String text;
     private final String description;
