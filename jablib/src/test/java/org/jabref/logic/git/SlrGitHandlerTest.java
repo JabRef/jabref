@@ -34,6 +34,7 @@ class SlrGitHandlerTest {
     void setUpGitHandler() {
         SystemReader.setInstance(new NoopGitSystemReader());
         gitHandler = new SlrGitHandler(repositoryPath);
+        gitHandler.initIfNeeded();
     }
 
     @AfterEach
