@@ -7,5 +7,6 @@ public enum SyncStatus {
     DIVERGED,
     CONFLICT,
     UNTRACKED,
-    UNKNOWN
+    UNKNOWN,
+    REMOTE_EMPTY
 }
