@@ -15,6 +15,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.MainTable;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferencesDialogView;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.util.URLs;
@@ -49,11 +50,13 @@ public class WalkthroughAction extends SimpleCommand {
     private final LibraryTabContainer frame;
     private final StateManager stateManager;
     private final Stage stage;
+    private final GuiPreferences preferences;
 
-    public WalkthroughAction(Stage stage, LibraryTabContainer frame, StateManager stateManager, String name) {
+    public WalkthroughAction(Stage stage, LibraryTabContainer frame, StateManager stateManager, GuiPreferences preferences, String name) {
         this.stage = stage;
         this.frame = frame;
         this.stateManager = stateManager;
+        this.preferences = preferences;
         this.walkthrough = getWalkthrough(name);
     }
 
@@ -456,7 +459,7 @@ public class WalkthroughAction extends SimpleCommand {
                                         .sideEffect(new OpenLibrarySideEffect(frame, "SearchExamples.bib")))
                 // Step 1b: Ensure initial search settings
                 .addStep(WalkthroughStep.sideEffect(Localization.lang("Prepare search settings"))
-                                        .sideEffect(new EnsureSearchSettingsSideEffect()))
+                                        .sideEffect(new EnsureSearchSettingsSideEffect(preferences.getSearchPreferences())))
                 // Step 2: Introduction
                 .addStep(WalkthroughStep
                         .panel(Localization.lang("Welcome to the search walkthrough"))

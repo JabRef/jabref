@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.walkthrough.WalkthroughAction;
 import org.jabref.logic.l10n.Localization;
 
@@ -16,14 +17,16 @@ public class Walkthroughs extends VBox {
     private final Stage stage;
     private final LibraryTabContainer tabContainer;
     private final StateManager stateManager;
+    private final GuiPreferences preferences;
 
     private final Label header;
     private boolean isScrollEnabled = true;
 
-    public Walkthroughs(Stage stage, LibraryTabContainer tabContainer, StateManager stateManager) {
+    public Walkthroughs(Stage stage, LibraryTabContainer tabContainer, StateManager stateManager, GuiPreferences preferences) {
         this.stage = stage;
         this.tabContainer = tabContainer;
         this.stateManager = stateManager;
+        this.preferences = preferences;
 
         getStyleClass().add("welcome-section");
 
@@ -98,7 +101,7 @@ public class Walkthroughs extends VBox {
         button.setGraphic(icon.getGraphicNode());
         button.getStyleClass().add("quick-settings-button");
         button.setMaxWidth(Double.MAX_VALUE);
-        button.setOnAction(_ -> new WalkthroughAction(stage, tabContainer, stateManager, walkthroughId).execute());
+        button.setOnAction(_ -> new WalkthroughAction(stage, tabContainer, stateManager, preferences, walkthroughId).execute());
         return button;
     }
 }

@@ -1,12 +1,11 @@
 package org.jabref.gui.walkthrough.declarative.sideeffect;
 
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
 
 /// Ensures the search bar starts with unfiltered mode and regex disabled, then restores
@@ -15,12 +14,13 @@ public class EnsureSearchSettingsSideEffect implements WalkthroughSideEffect {
     private final boolean previousRegex;
     private final boolean previousCaseSensitive;
     private final SearchDisplayMode previousDisplayMode;
+    private final SearchPreferences searchPreferences;
 
-    public EnsureSearchSettingsSideEffect() {
-        var preferences = Injector.instantiateModelOrService(GuiPreferences.class).getSearchPreferences();
-        this.previousRegex = preferences.isRegularExpression();
-        this.previousCaseSensitive = preferences.isCaseSensitive();
-        this.previousDisplayMode = preferences.getSearchDisplayMode();
+    public EnsureSearchSettingsSideEffect(SearchPreferences searchPreferences) {
+        this.searchPreferences = searchPreferences;
+        this.previousRegex = searchPreferences.isRegularExpression();
+        this.previousCaseSensitive = searchPreferences.isCaseSensitive();
+        this.previousDisplayMode = searchPreferences.getSearchDisplayMode();
     }
 
     @Override
@@ -30,19 +30,17 @@ public class EnsureSearchSettingsSideEffect implements WalkthroughSideEffect {
 
     @Override
     public boolean forward(@NonNull Walkthrough walkthrough) {
-        var preferences = Injector.instantiateModelOrService(GuiPreferences.class).getSearchPreferences();
-        preferences.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, false);
-        preferences.setSearchFlag(SearchFlags.CASE_SENSITIVE, false);
-        preferences.setSearchDisplayMode(SearchDisplayMode.FLOAT);
+        searchPreferences.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, false);
+        searchPreferences.setSearchFlag(SearchFlags.CASE_SENSITIVE, false);
+        searchPreferences.setSearchDisplayMode(SearchDisplayMode.FLOAT);
         return true;
     }
 
     @Override
     public boolean backward(@NonNull Walkthrough walkthrough) {
-        var preferences = Injector.instantiateModelOrService(GuiPreferences.class).getSearchPreferences();
-        preferences.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, previousRegex);
-        preferences.setSearchFlag(SearchFlags.CASE_SENSITIVE, previousCaseSensitive);
-        preferences.setSearchDisplayMode(previousDisplayMode);
+        searchPreferences.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, previousRegex);
+        searchPreferences.setSearchFlag(SearchFlags.CASE_SENSITIVE, previousCaseSensitive);
+        searchPreferences.setSearchDisplayMode(previousDisplayMode);
         return true;
     }
 

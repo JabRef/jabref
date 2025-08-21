@@ -178,7 +178,7 @@ public class WelcomeTab extends Tab {
 
     private VBox createRightColumn() {
         this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor, themeManager);
-        this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager);
+        this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);
         VBox rightColumn = new VBox(quickSettings, walkthroughs);
         rightColumn.getStyleClass().add("welcome-content-column");
         VBox.setVgrow(quickSettings, Priority.ALWAYS);

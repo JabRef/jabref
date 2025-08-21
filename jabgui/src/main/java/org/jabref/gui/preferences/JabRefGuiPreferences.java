@@ -241,6 +241,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private KeyBindingRepository keyBindingRepository;
     private CopyToPreferences copyToPreferences;
     private NewEntryPreferences newEntryPreferences;
+    private DonationPreferences donationPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -1203,10 +1204,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     public DonationPreferences getDonationPreferences() {
-        DonationPreferences dp = new DonationPreferences(getBoolean(DONATION_NEVER_SHOW), getInt(DONATION_LAST_SHOWN_EPOCH_DAY));
-        EasyBind.listen(dp.neverShowAgainProperty(), (_, _, nv) -> putBoolean(DONATION_NEVER_SHOW, nv));
-        EasyBind.listen(dp.lastShownEpochDayProperty(), (_, _, nv) -> putInt(DONATION_LAST_SHOWN_EPOCH_DAY, nv.intValue()));
-        return dp;
+        if (donationPreferences != null) {
+            return donationPreferences;
+        }
+
+        donationPreferences = new DonationPreferences(getBoolean(DONATION_NEVER_SHOW), getInt(DONATION_LAST_SHOWN_EPOCH_DAY));
+        EasyBind.listen(donationPreferences.neverShowAgainProperty(), (_, _, newValue) -> putBoolean(DONATION_NEVER_SHOW, newValue));
+        EasyBind.listen(donationPreferences.lastShownEpochDayProperty(), (_, _, newValue) -> putInt(DONATION_LAST_SHOWN_EPOCH_DAY, newValue.intValue()));
+        return donationPreferences;
     }
 
     /**
