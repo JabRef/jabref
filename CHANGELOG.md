@@ -102,7 +102,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the tab showing the fulltext search results would appear blank after switching library. [#13241](https://github.com/JabRef/jabref/issues/13241)
 - We fixed an issue where the groups were still displayed after closing all libraries. [#13382](https://github.com/JabRef/jabref/issues/13382)
 - Enhanced field selection logic in the Merge Entries dialog when fetching from DOI to prefer valid years and entry types. [#12549](https://github.com/JabRef/jabref/issues/12549)
-- We fixed an issue where the year was empty on a bibliographic DOI data lookup. [#13673](https://github.com/JabRef/jabref/issues/13673)
+- We fixed an issue where the merge dialog throws an exception upon trying to load an entry with an invalid year field. [#13673](https://github.com/JabRef/jabref/issues/13673)
 
 ### Removed
 
