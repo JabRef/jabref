@@ -102,7 +102,8 @@ GitHub will then automatically assign you.
 5. Refer to our [code how-tos](https://devdocs.jabref.org/code-howtos) if you have questions about your implementation.
 6. Implement and test your changes.
    * Create tests for your changes. Maybe even use [Test-driven Development](https://en.wikipedia.org/wiki/Test-driven_development) to speed up your development.
-   * Create screenshots
+   * Try to create or update [`docs/requirements`](https://devdocs.jabref.org/requirements/) to include a description of the requirement stemming from the issue.
+     Update your code to link to the requirement.
    * Have fun. Learn. Communictate.
 7. Create a [pull request to JabRef main repository](https://github.com/JabRef/jabref/pulls).
    * For an overview on the concept of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
