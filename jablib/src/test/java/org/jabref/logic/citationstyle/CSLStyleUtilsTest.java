@@ -101,7 +101,7 @@ class CSLStyleUtilsTest {
 
     private static Stream<Arguments> styleTestData() {
         return Stream.of(
-                Arguments.of(MODIFIED_IEEE, "IEEE - Bold Author",  "", true, true, false),
+                Arguments.of(MODIFIED_IEEE, "IEEE - Bold Author", "", true, true, false),
                 Arguments.of(MODIFIED_APA, "Modified American Psychological Association 7th edition", "APA", false, true, true),
                 Arguments.of(LITERATURA, "Literatūra", "Literatūra", false, true, true) // Literatūra uses author-date format, so non-numeric
         );
