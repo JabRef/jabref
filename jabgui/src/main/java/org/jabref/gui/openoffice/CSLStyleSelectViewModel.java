@@ -17,12 +17,12 @@ public class CSLStyleSelectViewModel {
     public CSLStyleSelectViewModel(CitationStylePreviewLayout layout) {
         this.layout = layout;
         this.nameProperty.set(layout.getDisplayName());
-        if (layout.getCitationStyle().isInternalStyle()) {
+        if (layout.citationStyle().isInternalStyle()) {
             this.pathProperty.set(Localization.lang("Internal style"));
         } else {
             this.pathProperty.set(layout.getFilePath());
         }
-        this.internalStyleProperty.set(layout.getCitationStyle().isInternalStyle());
+        this.internalStyleProperty.set(layout.citationStyle().isInternalStyle());
     }
 
     public StringProperty nameProperty() {
