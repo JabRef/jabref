@@ -36,6 +36,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -92,6 +93,7 @@ public class JabKit {
         }
     }
 
+    @VisibleForTesting
     static void applyUsageFooters(CommandLine commandLine,
                                   List<Pair<String, String>> inputFormats,
                                   List<Pair<String, String>> outputFormats,
