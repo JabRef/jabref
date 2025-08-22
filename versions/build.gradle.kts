@@ -33,7 +33,7 @@ dependencies.constraints {
 
     api("com.ibm.icu:icu4j:72.0.1!!")
 
-    api("com.dlsc.gemsfx:gemsfx:3.3.5")
+    api("com.dlsc.gemsfx:gemsfx:3.4.2")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.2")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.2")
@@ -114,8 +114,8 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-utils:3.1.1")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.4")
     api("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10")
-    api("org.glassfish.jersey.core:jersey-server:3.1.10")
-    api("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
+    api("org.glassfish.jersey.core:jersey-server:3.1.11")
+    api("org.glassfish.jersey.inject:jersey-hk2:3.1.11")
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.0.1.Final")
