@@ -102,8 +102,6 @@ GitHub will then automatically assign you.
 5. Refer to our [code how-tos](https://devdocs.jabref.org/code-howtos) if you have questions about your implementation.
 6. Implement and test your changes.
    * Create tests for your changes. Maybe even use [Test-driven Development](https://en.wikipedia.org/wiki/Test-driven_development) to speed up your development.
-   * Try to create or update [`docs/requirements`](https://devdocs.jabref.org/requirements/) to include a description of the requirement stemming from the issue.
-     Update your code to link to the requirement.
    * Have fun. Learn. Communictate.
 7. Create a [pull request to JabRef main repository](https://github.com/JabRef/jabref/pulls).
    * For an overview on the concept of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
@@ -112,17 +110,17 @@ GitHub will then automatically assign you.
    * In case your pull request is not yet complete or not yet ready for review, create a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) instead.
 8. Wait for automatic checks to run and bots commenting.
 9. Address the feedback of the automated checks. To find solutions to the most common errors that lead to such failures, check our [FAQ page](https://devdocs.jabref.org/code-howtos/faq).
-10. Wait for feedback of one of the developers. Since this is a hobby project for all of them, this may take a while. You can speed up things by reducing their load. You can, for instance, try out other pull requests, review other pull requests, and answer questions on JabRef in the forum.
-11. Address the feedback of the developer.
-12. Wait for feedback of a second developer.
-13. Address the feedback of the second developer.
-14. After two developers gave their green flag, the pull request will be merged.
+10. Wait for feedback of one of the maintainers. Since this is a hobby project for all of them, this may take a while. You can speed up things by reducing their load. You can, for instance, try out other pull requests, review other pull requests, and answer questions on JabRef in the forum.
+11. Address the feedback of the maintainer. In case your pull request changed something significant, we might ask you to create or update [`docs/requirements`](https://devdocs.jabref.org/requirements/) to include a description of the requirement stemming from the issue - and link that with your implementation.
+12. Wait for feedback of a second maintainer.
+13. Address the feedback of the second maintainer.
+14. After two maintainers gave their green flag, the pull request will be merged.
 
 We view pull requests as a collaborative process.
 Submit a pull request early to enable feedback from the team while you continue working.
-Please also remember to discuss bigger changes early with the core developers to ensure properly spend time and work.
+Please also remember to discuss bigger changes early with the core maintainers to ensure properly spend time and work.
 Some fundamental design decisions can be found within our list of [Architectural Decision Records](https://devdocs.jabref.org/decisions/).
-After a pull request is ready for review, we will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS) approve.
+After a pull request is ready for review, we will discuss improvements with you and agree to merge them once the [maintainers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS) approve.
 
 In case you have any questions, please
 

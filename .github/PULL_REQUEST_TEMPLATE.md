@@ -26,8 +26,7 @@ Keep ALL the items. Replace the dots inside [.] and mark them as follows:
 
 - [x] I own the copyright of the code submitted and I license it under the [MIT license](https://github.com/JabRef/jabref/blob/main/LICENSE)
 - [.] I manually tested changed features in running JabRef (always required)
+- [.] I created tests for changes (if applicable)
 - [.] I added screenshots in the PR description (if change is visible to the user)
-- [.] I described the requirement in [DevDoc's requirements area](https://devdocs.jabref.org/requirements/) and linked my changes accordingly.
 - [.] I described the change in `CHANGELOG.md` in a way that is understandable for the average user (if change is visible to the user)
 - [.] I checked the [documentation](https://docs.jabref.org/): Is the information available and up to date? If not, I created an issue at <https://github.com/JabRef/user-documentation/issues> or, even better, I submitted a pull request to the documentation repository.
-- [.] I created tests for changes (if applicable)
