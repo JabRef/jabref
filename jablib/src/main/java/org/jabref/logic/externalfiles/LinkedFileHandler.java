@@ -211,6 +211,8 @@ public class LinkedFileHandler {
     }
 
     /**
+     * Determines the file name based on the pattern specified in the preferences and valid for the file system.
+     *
      * @param extension The extension of the file. If empty, no extension is added.
      * @return A filename based on the pattern specified in the preferences and valid for the file system.
      */
