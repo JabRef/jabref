@@ -97,11 +97,11 @@ GitHub will then automatically assign you.
 
 1. Follow the steps at [Pre Condition 3: Code on the local machine](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/pre-03-code) to a) create a fork and b) have the fork checked out on your local machine
 2. Ensure that you followed the [steps to set up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/) to have the code running properly in IntelliJ.
-3. Read our [architecture and components](https://devdocs.jabref.org/architecture-and-components).
+3. Read about our [architecture and components](https://devdocs.jabref.org/architecture-and-components).
 4. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
 5. Refer to our [code how-tos](https://devdocs.jabref.org/code-howtos) if you have questions about your implementation.
 6. Implement and test your changes.
-   * Create tests for your changes. Maybe even use [Test-driven Development](https://en.wikipedia.org/wiki/Test-driven_development) to speed up your development.
+   * Create JUnit tests for your changes, apart from manual testing. Maybe even use [Test-driven Development](https://en.wikipedia.org/wiki/Test-driven_development) to speed up your development.
    * Have fun. Learn. Communictate.
 7. Create a [pull request to JabRef main repository](https://github.com/JabRef/jabref/pulls).
    * For an overview on the concept of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
