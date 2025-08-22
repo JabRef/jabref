@@ -58,4 +58,6 @@ public interface GuiPreferences extends CliPreferences {
     KeyBindingRepository getKeyBindingRepository();
 
     NewEntryPreferences getNewEntryPreferences();
+
+    DonationPreferences getDonationPreferences();
 }
