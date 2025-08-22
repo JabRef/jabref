@@ -180,7 +180,7 @@ public class LinkedFileHandler {
         // Since Files.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
         // nonetheless rename files to a new name which just differs by case.
         if (Files.exists(newPath) && !pathsDifferOnlyByCase && !overwriteExistingFile) {
-            LOGGER.debug("The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.", oldPath, newPath);
+            LOGGER.info("The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.", oldPath, newPath);
             return false;
         }
 
