@@ -8,6 +8,8 @@ import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import jakarta.annotation.Nullable;
+
 /**
  * Used for displaying a rendered entry in the UI. Due to historical reasons, "rendering" is called "layout".
  */
@@ -21,10 +23,11 @@ public sealed interface PreviewLayout permits BstPreviewLayout, CitationStylePre
 
     String getName();
 
+    @Nullable
     String getShortTitle();
 
     default boolean containsCaseIndependent(String searchTerm) {
         return this.getDisplayName().toLowerCase(Locale.ROOT).contains(searchTerm.toLowerCase(Locale.ROOT))
-                || this.getShortTitle().toLowerCase(Locale.ROOT).contains(searchTerm.toLowerCase(Locale.ROOT));
+                || (this.getShortTitle() != null && this.getShortTitle().toLowerCase(Locale.ROOT).contains(searchTerm.toLowerCase(Locale.ROOT)));
     }
 }

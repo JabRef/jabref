@@ -7,6 +7,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import jakarta.annotation.Nullable;
+
 public record CitationStylePreviewLayout(
         CitationStyle citationStyle,
         BibEntryTypesManager bibEntryTypesManager) implements PreviewLayout {
@@ -40,7 +42,7 @@ public record CitationStylePreviewLayout(
     }
 
     @Override
-    public String getShortTitle() {
+    public @Nullable String getShortTitle() {
         return citationStyle.getShortTitle();
     }
 }
