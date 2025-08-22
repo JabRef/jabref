@@ -15,21 +15,11 @@ public class AutoRenameFileOnEntryChange {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoRenameFileOnEntryChange.class);
 
     private final FilePreferences filePreferences;
-    private final BibDatabaseContext bibDatabaseContext;
     private final RenamePdfCleanup renamePdfCleanup;
 
     public AutoRenameFileOnEntryChange(BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) {
-        this.bibDatabaseContext = bibDatabaseContext;
         this.filePreferences = filePreferences;
         renamePdfCleanup = new RenamePdfCleanup(false, () -> bibDatabaseContext, filePreferences);
-    }
-
-    public void bindToDatabase() {
-        this.bibDatabaseContext.getDatabase().registerListener(this);
-    }
-
-    public void unbindFromDatabase() {
-        this.bibDatabaseContext.getDatabase().unregisterListener(this);
     }
 
     @Subscribe
