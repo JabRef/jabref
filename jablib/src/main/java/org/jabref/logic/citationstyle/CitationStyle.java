@@ -5,6 +5,8 @@ import java.util.Objects;
 
 import org.jabref.logic.openoffice.style.OOStyle;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Representation of a CitationStyle. Stores its name, the file path and the style itself.
  * This is a pure model class. For loading/parsing functionality, see {@link CSLStyleUtils} and {@link CSLStyleLoader}.
@@ -23,21 +25,21 @@ public class CitationStyle implements OOStyle {
     private final String source;
     private final boolean isInternalStyle;
 
-    public CitationStyle(String filePath, String title, String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, String source, boolean isInternalStyle) {
-        this.filePath = Path.of(Objects.requireNonNull(filePath)).toString(); // wrapping with Path.of takes care of extra slashes in path due to subsequent storage and retrieval (observed on Windows)
-        this.title = Objects.requireNonNull(title);
-        this.shortTitle = Objects.requireNonNull(shortTitle);
+    public CitationStyle(@NonNull String filePath, @NonNull String title, @NonNull String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, @NonNull String source, boolean isInternalStyle) {
+        this.filePath = Path.of(filePath).toString(); // wrapping with Path.of takes care of extra slashes in path due to subsequent storage and retrieval (observed on Windows)
+        this.title = title;
+        this.shortTitle = shortTitle;
         this.isNumericStyle = isNumericStyle;
         this.hasBibliography = hasBibliography;
         this.usesHangingIndent = hasBibliography && usesHangingIndent;
-        this.source = Objects.requireNonNull(source);
+        this.source = source;
         this.isInternalStyle = isInternalStyle;
     }
 
     /**
      * Creates a new citation style with an auto-determined internal/external state.
      */
-    public CitationStyle(String filePath, String title, String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, String source) {
+    public CitationStyle(@NonNull String filePath, @NonNull String title, @NonNull String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, @NonNull String source) {
         this(filePath, title, shortTitle, isNumericStyle, hasBibliography, usesHangingIndent, source, !Path.of(filePath).isAbsolute());
     }
 

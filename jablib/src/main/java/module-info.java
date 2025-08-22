@@ -207,8 +207,6 @@ open module org.jabref.jablib {
     requires java.keyring;
     requires org.freedesktop.dbus;
 
-    requires org.jooq.jool;
-
     // region AI
     requires ai.djl.api;
     requires ai.djl.pytorch_model_zoo;
@@ -238,15 +236,17 @@ open module org.jabref.jablib {
     requires org.apache.lucene.queryparser;
     // endregion
 
+    // region: appdirs
     requires net.harawata.appdirs;
     requires com.sun.jna;
     requires com.sun.jna.platform;
+    // endregion
 
+    // region: jgit
     requires org.eclipse.jgit;
     uses org.eclipse.jgit.transport.SshSessionFactory;
     uses org.eclipse.jgit.lib.Signer;
-
-    requires transitive org.jspecify;
+    // endregion
 
     // region: other libraries (alphabetically)
     requires cuid;
@@ -256,7 +256,8 @@ open module org.jabref.jablib {
     requires kotlin.stdlib;
     requires mslinks;
     requires org.antlr.antlr4.runtime;
+    requires org.jooq.jool;
     requires org.libreoffice.uno;
-    requires org.jetbrains.annotations;
-    // endregion
+    requires transitive org.jspecify;
+   // endregion
 }
