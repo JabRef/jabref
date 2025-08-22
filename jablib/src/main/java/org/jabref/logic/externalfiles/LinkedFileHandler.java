@@ -165,7 +165,14 @@ public class LinkedFileHandler {
             return false;
         }
 
-        String uniqueFileName = FileNameUniqueness.generateUniqueFileName(targetDirectory, suggestedFileName, currentFileName);
+        if (suggestedFileName.equals(FileNameUniqueness.eraseDuplicateMarks(currentFileName))) {
+            // The current file name ends with something like "(1)", "(2)", etc.
+            // and the suggested file name is the same as the current file name without that suffix.
+            // In this case, we do not rename the file, because "only" the suffix number would (maybe) change
+            return false;
+        }
+
+        String uniqueFileName = FileNameUniqueness.generateUniqueFileName(targetDirectory, suggestedFileName);
 
         // If after ensuring uniqueness we got the same name, no need to rename
         if (uniqueFileName.equals(currentFileName)) {
@@ -220,9 +227,8 @@ public class LinkedFileHandler {
     }
 
     public String getSuggestedFileName() {
-        String oldFileName = linkedFile.getLink();
-
-        String extension = FileUtil.getFileExtension(oldFileName).orElse(linkedFile.getFileType());
+        String extension = FileUtil.getFileExtension(linkedFile.getLink())
+                                   .orElse(linkedFile.getFileType());
         return getSuggestedFileName(extension);
     }
 

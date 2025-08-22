@@ -3,14 +3,13 @@ package org.jabref.logic.util.io;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,42 +21,29 @@ public class FileNameUniqueness {
     /**
      * Returns a file name such that it does not match any existing files in targetDirectory
      *
-     * @param targetDirectory The directory in which file name should be unique
+     * @param targetDirectory The directory in which filename should be unique
      * @param fileName        Suggested name for the file
      * @return a file name such that it does not match any existing files in targetDirectory
      */
     public static String getNonOverWritingFileName(Path targetDirectory, String fileName) {
-        return generateUniqueFileName(targetDirectory, fileName, null);
+        return generateUniqueFileName(targetDirectory, fileName);
     }
 
     /**
      * Generates a unique filename in the target directory while taking into account existing files that may be already
      * linked to the same bibliography entry.
      *
-     * @apiNote When auto-renaming files due to bibliography entry changes, this method prevents unnecessary incrementing
-     * of duplicate markers. For example, if "paper (1).pdf" is already linked to the entry and is the correct format,
-     * the method will return "paper (1).pdf" instead of generating "paper (2).pdf".
+     * @param proposedName The proposed name for the file without any patchers for "(1)" etc.
      */
-    public static String generateUniqueFileName(Path targetDirectory, String proposedName, String fileAlreadyInUse) {
-        Optional<String> extensionOptional = FileUtil.getFileExtension(proposedName);
+    public static String generateUniqueFileName(Path targetDirectory, String proposedName) {
+        String fileNameWithoutExtension = FileUtil.getBaseName(proposedName);
 
         // the suffix include the '.' , if extension is present Eg: ".pdf"
-        String extensionSuffix;
-        String fileNameWithoutExtension;
-
-        if (extensionOptional.isPresent()) {
-            extensionSuffix = '.' + extensionOptional.get();
-            fileNameWithoutExtension = proposedName.substring(0, proposedName.lastIndexOf('.'));
-        } else {
-            extensionSuffix = "";
-            fileNameWithoutExtension = proposedName;
-        }
-
-        String newFileName = proposedName;
+        String extensionSuffix = FileUtil.getFileExtension(proposedName).map(ext -> "." + ext).orElse("");
 
         int counter = 1;
-        while (Files.exists(targetDirectory.resolve(newFileName)) &&
-                (fileAlreadyInUse == null || !newFileName.equals(fileAlreadyInUse))) {
+        String newFileName = proposedName;
+        while (Files.exists(targetDirectory.resolve(newFileName))) {
             newFileName = fileNameWithoutExtension +
                     " (" + counter + ")" +
                     extensionSuffix;
