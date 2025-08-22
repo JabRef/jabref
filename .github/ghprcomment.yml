@@ -134,7 +134,7 @@
 
 
     When the pull request is getting integrated into `main`, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) anyway.
-    Thus, the individual commit history will not be visislbe in `main`.
+    Thus, your individual commit history will not be visible in `main`.
 
 
     In future, **please avoid that**. For now, you can continue working.
