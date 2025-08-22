@@ -259,7 +259,6 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
     inputs.dir(layout.projectDirectory.dir("src/main/resources/csl-styles"))
     val cslCatalogJson = layout.buildDirectory.file("generated/resources/citation-style-catalog.json")
     outputs.file(cslCatalogJson)
-    onlyIf {!cslCatalogJson.get().asFile.exists()}
 }
 
 var ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
