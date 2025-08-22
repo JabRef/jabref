@@ -20,15 +20,15 @@ import org.eclipse.lsp4j.services.WorkspaceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LSPServer implements LanguageServer, LanguageClientAware {
+public class LspClientHandler implements LanguageServer, LanguageClientAware {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LSPServer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LspClientHandler.class);
 
     private LanguageClient client;
     private BibtexWorkspaceService workspaceService;
     private BibtexTextDocumentService textDocumentService;
 
-    public LSPServer(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+    public LspClientHandler(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.workspaceService = new BibtexWorkspaceService();
         this.textDocumentService = new BibtexTextDocumentService(cliPreferences, abbreviationRepository);
     }

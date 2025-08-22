@@ -19,6 +19,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 
 import org.eclipse.lsp4j.CompletionItem;
@@ -41,9 +42,12 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
     private static final Range NULL_RANGE = new Range(new Position(0, 0), new Position(0, 0));
     private static final String DIAGNOSTIC_SOURCE = "JabRef";
+
     private final CliPreferences jabRefCliPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
+
     private LanguageClient client;
+    private boolean checkConsistency = true;
 
     public BibtexTextDocumentService(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.jabRefCliPreferences = cliPreferences;
@@ -85,7 +89,9 @@ public class BibtexTextDocumentService implements TextDocumentService {
         } catch (Exception e) {
             Diagnostic parseDiagnostic = new Diagnostic(
                     NULL_RANGE,
-                    "Parse error: " + e.getMessage(),
+                    Localization.lang(
+                            "Failed to parse entries.\nThe following error was encountered:\n%0",
+                            e.getMessage()),
                     DiagnosticSeverity.Error,
                     DIAGNOSTIC_SOURCE
             );
@@ -96,7 +102,10 @@ public class BibtexTextDocumentService implements TextDocumentService {
         List<Diagnostic> diagnostics = new ArrayList<>();
 
         diagnostics.addAll(integrityCheck(bibDatabaseContext, content));
-        diagnostics.addAll(consistencyCheck(bibDatabaseContext, content));
+
+        if (checkConsistency) {
+            diagnostics.addAll(consistencyCheck(bibDatabaseContext, content));
+        }
 
         client.publishDiagnostics(new PublishDiagnosticsParams(uri, diagnostics, version));
     }
@@ -104,7 +113,8 @@ public class BibtexTextDocumentService implements TextDocumentService {
     private List<Diagnostic> consistencyCheck(BibDatabaseContext bibDatabaseContext, String content) {
         List<Diagnostic> diagnostics = new ArrayList<>();
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibDatabaseContext.getEntries(), (_, _) -> { });
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibDatabaseContext.getEntries(), (_, _) -> {
+        });
 
         result.entryTypeToResultMap().forEach((entryType, entryTypeResult) -> {
             Optional<BibEntryType> bibEntryType = new BibEntryTypesManager().enrich(entryType, bibDatabaseContext.getMode());
@@ -117,8 +127,23 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
             entryTypeResult.sortedEntries().forEach(entry -> {
                 requiredFields.forEach(requiredField -> {
-                    if (!entry.hasField(requiredField)) {
-                        diagnostics.add(createGeneralDiagnostic(Localization.lang("required field '%0' is missing", requiredField.getName()), content, entry));
+                    if (entry.getFieldOrAlias(requiredField).isEmpty()) {
+                        diagnostics.add(createGeneralDiagnostic(Localization.lang("Required field \"%0\" is empty.", requiredField.getName()), content, entry));
+                    }
+                });
+            });
+
+            Set<Field> optionalFields = bibEntryType
+                    .map(BibEntryType::getOptionalFields)
+                    .stream()
+                    .flatMap(Collection::stream)
+                    .map(BibField::field)
+                    .collect(Collectors.toSet());
+
+            entryTypeResult.sortedEntries().forEach(entry -> {
+                optionalFields.forEach(optionalField -> {
+                    if (entry.getFieldOrAlias(optionalField).isEmpty()) {
+                        diagnostics.add(createGeneralDiagnostic(Localization.lang("Optional field \"%0\" is empty.", optionalField.getName()), content, entry));
                     }
                 });
             });

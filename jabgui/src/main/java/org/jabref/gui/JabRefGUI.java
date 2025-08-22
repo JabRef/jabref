@@ -33,7 +33,7 @@ import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
 import org.jabref.http.manager.HttpServerManager;
-import org.jabref.languageserver.manager.LanguageServerManager;
+import org.jabref.languageserver.manager.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
@@ -87,7 +87,7 @@ public class JabRefGUI extends Application {
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
-    private static LanguageServerManager languageServerManager;
+    private static LanguageServerController languageServerController;
 
     private Stage mainStage;
 
@@ -158,8 +158,9 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
+        JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
-        Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
+        Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
         Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
 
         IndexManager.clearOldSearchIndices();
@@ -170,8 +171,8 @@ public class JabRefGUI extends Application {
         JabRefGUI.httpServerManager = new HttpServerManager();
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
 
-        JabRefGUI.languageServerManager = new LanguageServerManager();
-        Injector.setModelOrService(LanguageServerManager.class, JabRefGUI.languageServerManager);
+        JabRefGUI.languageServerController = new LanguageServerController(preferences, journalAbbreviationRepository);
+        Injector.setModelOrService(LanguageServerController.class, JabRefGUI.languageServerController);
 
         JabRefGUI.stateManager = new JabRefGuiStateManager();
         Injector.setModelOrService(StateManager.class, stateManager);
@@ -430,7 +431,7 @@ public class JabRefGUI extends Application {
             httpServerManager.start(stateManager, remotePreferences.getHttpServerUri());
         }
         if (remotePreferences.enableLanguageServer()) {
-            languageServerManager.start(preferences, Injector.instantiateModelOrService(JournalAbbreviationRepository.class), remotePreferences.getLanguageServerPort());
+            languageServerController.start(remotePreferences.getLanguageServerPort());
         }
     }
 
@@ -477,7 +478,7 @@ public class JabRefGUI extends Application {
 
             executor.submit(() -> {
                 LOGGER.trace("Shutting down language server manager");
-                languageServerManager.stop();
+                languageServerController.stop();
                 LOGGER.trace("LanguageServerManager shut down");
             });
 

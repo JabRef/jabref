@@ -1,5 +1,6 @@
 package org.jabref.languageserver.manager;
 
+import org.jabref.languageserver.LspLauncher;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 
@@ -7,31 +8,39 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Manages the LanguageServerThread through typical life cycle methods.
-public class LanguageServerManager implements AutoCloseable {
+public class LanguageServerController implements AutoCloseable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LanguageServerManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LanguageServerController.class);
 
-    private LanguageServerThread languageServerThread;
+    private LspLauncher lspLauncher;
+    private final CliPreferences cliPreferences;
+    private final JournalAbbreviationRepository abbreviationRepository;
 
-    public synchronized void start(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository, int port) {
-        if (languageServerThread != null) {
+    public LanguageServerController(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+        this.cliPreferences = cliPreferences;
+        this.abbreviationRepository = abbreviationRepository;
+        LOGGER.debug("LanguageServerManager initialized.");
+    }
+
+    public synchronized void start(int port) {
+        if (lspLauncher != null) {
             LOGGER.warn("Language server manager already started, cannot start again.");
             return;
         }
 
-        languageServerThread = new LanguageServerThread(cliPreferences, abbreviationRepository, port);
+        lspLauncher = new LspLauncher(cliPreferences, abbreviationRepository, port);
         // This enqueues the thread to run in the background
         // The JVM will take care of running it at some point in time in the future
         // Thus, we cannot check directly if it really runs
-        languageServerThread.start();
+        lspLauncher.start();
         LOGGER.debug("Triggered language server start up.");
     }
 
     public synchronized void stop() {
         LOGGER.debug("Stopping language server manager...");
-        if (languageServerThread != null) {
-            languageServerThread.interrupt();
-            languageServerThread = null;
+        if (lspLauncher != null) {
+            lspLauncher.interrupt();
+            lspLauncher = null;
             LOGGER.debug("Language server stopped successfully.");
         } else {
             LOGGER.debug("Language server is not started, nothing to stop.");

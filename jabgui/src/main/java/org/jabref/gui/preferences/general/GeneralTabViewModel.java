@@ -33,10 +33,9 @@ import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.http.manager.HttpServerManager;
-import org.jabref.languageserver.manager.LanguageServerManager;
+import org.jabref.languageserver.manager.LanguageServerController;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
@@ -153,41 +152,21 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         remotePortValidator = new FunctionBasedValidator<>(
                 remotePortProperty,
-                input -> {
-                    try {
-                        int portNumber = Integer.parseInt(remotePortProperty().getValue());
-                        return RemoteUtil.isUserPort(portNumber);
-                    } catch (NumberFormatException ex) {
-                        return false;
-                    }
-                },
+                RemoteUtil::isStringUserPort,
                 ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Remote operation"),
                         Localization.lang("You must enter an integer value in the interval 1025-65535"))));
+
         httpPortValidator = new FunctionBasedValidator<>(
                 httpPortProperty,
-                input -> {
-                    try {
-                        int portNumber = Integer.parseInt(httpPortProperty().getValue());
-                        return RemoteUtil.isUserPort(portNumber);
-                    } catch (NumberFormatException ex) {
-                        return false;
-                    }
-                },
+                RemoteUtil::isStringUserPort,
                 ValidationMessage.error("%s".formatted(Localization.lang("You must enter an integer value in the interval 1025-65535"))));
 
         languageServerPortValidator = new FunctionBasedValidator<>(
                 languageServerPortProperty,
-                input -> {
-                    try {
-                        int portNumber = Integer.parseInt(languageServerPortProperty().getValue());
-                        return RemoteUtil.isUserPort(portNumber);
-                    } catch (NumberFormatException ex) {
-                        return false;
-                    }
-                },
-                ValidationMessage.error("%s".formatted(Localization.lang("You must enter an integer value in the interval 1025-65535"))));
+                RemoteUtil::isStringUserPort,
+                ValidationMessage.error(Localization.lang("You must enter an integer value in the interval 1025-65535")));
 
         this.trustStoreManager = new TrustStoreManager(Path.of(preferences.getSSLPreferences().getTruststorePath()));
     }
@@ -340,15 +319,15 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             httpServerManager.stop();
         }
 
-        LanguageServerManager languageServerManager = Injector.instantiateModelOrService(LanguageServerManager.class);
-        // stop in all cases, because the port might have changed
-        languageServerManager.stop();
+        LanguageServerController languageServerController = Injector.instantiateModelOrService(LanguageServerController.class);
+        // stop in all cases, because the port might have changed (or other settings that can't be easily tracked https://github.com/JabRef/jabref/pull/13697#discussion_r2285997003)
+        languageServerController.stop();
         if (enableLanguageServerProperty.getValue()) {
             remotePreferences.setEnableLanguageServer(true);
-            languageServerManager.start(preferences, Injector.instantiateModelOrService(JournalAbbreviationRepository.class), remotePreferences.getLanguageServerPort());
+            languageServerController.start(remotePreferences.getLanguageServerPort());
         } else {
             remotePreferences.setEnableLanguageServer(false);
-            languageServerManager.stop();
+            languageServerController.stop();
         }
 
         trustStoreManager.flush();
