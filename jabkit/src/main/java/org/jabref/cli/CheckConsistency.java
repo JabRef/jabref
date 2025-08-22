@@ -42,6 +42,8 @@ class CheckConsistency implements Callable<Integer> {
 
     @Override
     public Integer call() {
+        ArgumentProcessor.showBanner(sharedOptions.porcelain);
+
         Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
                 inputFile,
                 "bibtex",

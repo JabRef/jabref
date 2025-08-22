@@ -43,6 +43,8 @@ class GenerateBibFromAux implements Runnable {
 
     @Override
     public void run() {
+        ArgumentProcessor.showBanner(sharedOptions.porcelain);
+
         Optional<ParserResult> pr = ArgumentProcessor.importFile(
                 inputFile,
                 "bibtex",

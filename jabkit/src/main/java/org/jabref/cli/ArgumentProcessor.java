@@ -70,7 +70,7 @@ public class ArgumentProcessor implements Runnable {
 
     @Override
     public void run() {
-        System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
+        showBanner(sharedOptions.porcelain);
     }
 
     /**
@@ -205,6 +205,12 @@ public class ArgumentProcessor implements Runnable {
         return exporterFactory.getExporters().stream()
                               .map(format -> new Pair<>(format.getName(), format.getId()))
                               .toList();
+    }
+
+    static void showBanner(boolean porcelain) {
+        if (!porcelain) {
+            System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
+        }
     }
 
     public static class SharedOptions {

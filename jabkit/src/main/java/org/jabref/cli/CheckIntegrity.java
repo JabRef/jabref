@@ -26,6 +26,8 @@ class CheckIntegrity implements Runnable {
 
     @Override
     public void run() {
+        ArgumentProcessor.showBanner(sharedOptions.porcelain);
+
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Checking integrity of '%0'.", inputFile));
             System.out.flush();

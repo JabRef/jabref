@@ -50,6 +50,8 @@ public class Convert implements Runnable {
 
     @Override
     public void run() {
+        ArgumentProcessor.showBanner(sharedOptions.porcelain);
+
         Optional<ParserResult> parserResult = ArgumentProcessor.importFile(inputFile, inputFormat, argumentProcessor.cliPreferences, sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));

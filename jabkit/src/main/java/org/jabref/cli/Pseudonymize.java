@@ -48,6 +48,8 @@ public class Pseudonymize implements Runnable {
 
     @Override
     public void run() {
+        ArgumentProcessor.showBanner(sharedOptions.porcelain);
+
         Path inputPath = Path.of(inputFile);
         String fileName = FileUtil.getBaseName(inputFile);
         Path pseudoBibPath = resolveOutputPath(outputFile, inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
