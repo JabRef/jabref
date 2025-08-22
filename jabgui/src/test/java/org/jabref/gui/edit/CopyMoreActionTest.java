@@ -14,11 +14,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.CitationCommandString;
+import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -86,9 +86,9 @@ class CopyMoreActionTest {
         keywords.add(keyword);
         abstracts.add(abstractText);
 
-        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
-        when(externalApplicationsPreferences.getCiteCommand()).thenReturn(new CitationCommandString("\\cite{", ",", "}"));
-        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
+        PushToApplicationPreferences pushToApplicationPreferences = mock(PushToApplicationPreferences.class);
+        when(pushToApplicationPreferences.getCiteCommand()).thenReturn(new CitationCommandString("\\cite{", ",", "}"));
+        when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
     }
 
     @Test
@@ -156,7 +156,7 @@ class CopyMoreActionTest {
     @ParameterizedTest
     @MethodSource("getTestParams")
     void executeWithNoValue(StandardActions action, Consumer<BibEntry> remover, String expectedNoneMessage, String ignoredWarning) {
-        BibEntry modified = (BibEntry) entry.clone();
+        BibEntry modified = new BibEntry(entry);
         remover.accept(modified);
         ObservableList<BibEntry> entries = FXCollections.observableArrayList(modified);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entries));
@@ -173,7 +173,7 @@ class CopyMoreActionTest {
     @ParameterizedTest
     @MethodSource("getTestParams")
     void executeOnPartialSuccess(StandardActions action, Consumer<BibEntry> remover, String ignoredNone, String expectedWarning) {
-        BibEntry modified = (BibEntry) entry.clone();
+        BibEntry modified = new BibEntry(entry);
         remover.accept(modified);
         ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(modified, entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));

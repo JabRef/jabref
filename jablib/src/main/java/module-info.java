@@ -103,9 +103,17 @@ open module org.jabref.jablib {
     exports org.jabref.logic.shared.event;
     exports org.jabref.logic.citation;
     exports org.jabref.logic.crawler;
-    exports org.jabref.logic.git;
     exports org.jabref.logic.pseudonymization;
     exports org.jabref.logic.citation.repository;
+    exports org.jabref.logic.git;
+    exports org.jabref.logic.git.conflicts;
+    exports org.jabref.logic.git.io;
+    exports org.jabref.logic.git.merge;
+    exports org.jabref.logic.git.model;
+    exports org.jabref.logic.git.status;
+    exports org.jabref.logic.command;
+    exports org.jabref.logic.git.util;
+    exports org.jabref.logic.git.preferences;
 
     requires java.base;
 
@@ -249,5 +257,6 @@ open module org.jabref.jablib {
     requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
+    requires org.jetbrains.annotations;
     // endregion
 }

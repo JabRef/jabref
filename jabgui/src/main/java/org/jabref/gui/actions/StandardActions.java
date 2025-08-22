@@ -19,6 +19,7 @@ public enum StandardActions implements Action {
     COPY_KEY_AND_LINK(Localization.lang("Copy citation key and link"), KeyBinding.COPY_CITATION_KEY_AND_LINK),
     COPY_CITATION_HTML(Localization.lang("Copy citation (html)"), KeyBinding.COPY_PREVIEW),
     COPY_CITATION_TEXT(Localization.lang("Copy citation (text)")),
+    COPY_CITATION_MARKDOWN(Localization.lang("Copy citation (markdown)")),
     COPY_CITATION_PREVIEW(Localization.lang("Copy preview"), KeyBinding.COPY_PREVIEW),
     COPY_FIELD_CONTENT(Localization.lang("Copy field content")),
     COPY_FIELD_AUTHOR(Localization.lang("Author")),
@@ -187,6 +188,7 @@ public enum StandardActions implements Action {
     OPEN_FACEBOOK("Facebook", Localization.lang("Opens JabRef's Facebook page"), IconTheme.JabRefIcons.FACEBOOK),
     OPEN_LINKEDIN("LinkedIn", Localization.lang("Opens JabRef's LinkedIn page"), IconTheme.JabRefIcons.LINKEDIN),
     OPEN_MASTODON("Mastodon", Localization.lang("Opens JabRef's Mastodon page"), IconTheme.JabRefIcons.MASTODON),
+    OPEN_PRIVACY_POLICY("Privacy policy", Localization.lang("Opens JabRef's privacy policy"), IconTheme.JabRefIcons.BOOK),
     OPEN_BLOG(Localization.lang("Blog"), Localization.lang("Opens JabRef's blog"), IconTheme.JabRefIcons.BLOG),
     OPEN_DEV_VERSION_LINK(Localization.lang("Development version"), Localization.lang("Opens a link where the current development version can be downloaded")),
     OPEN_CHANGELOG(Localization.lang("View change log"), Localization.lang("See what has been changed in the JabRef versions")),
@@ -221,7 +223,13 @@ public enum StandardActions implements Action {
     GROUP_SUBGROUP_RENAME(Localization.lang("Rename subgroup"), KeyBinding.GROUP_SUBGROUP_RENAME),
     GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group")),
 
-    CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache"));
+    CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache")),
+
+    GIT(Localization.lang("Git"), IconTheme.JabRefIcons.GIT_SYNC),
+    GIT_PULL(Localization.lang("Pull")),
+    GIT_PUSH(Localization.lang("Push")),
+    GIT_COMMIT(Localization.lang("Commit")),
+    GIT_SHARE(Localization.lang("Share this library to GitHub"));
 
     private String text;
     private final String description;

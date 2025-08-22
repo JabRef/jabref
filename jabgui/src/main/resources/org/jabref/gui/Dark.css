@@ -62,6 +62,9 @@
     -js-summary-text-color: derive(-fx-light-text-color, 70%);
     -js-summary-text-color-selected: derive( -fx-dark-text-color, 70%);
 
+    -jr-ai-message-user: derive(-jr-theme, -50%);
+    -jr-ai-message-ai: derive(-jr-theme, -75%);
+
     -jr-match-1-odd: -jr-row-odd-background;
     -jr-match-1-even: -jr-row-even-background;
     -jr-match-1-text-color: -fx-mid-text-color;
@@ -138,6 +141,11 @@
 
 .table-view .groupColumnBackground {
     -fx-stroke: -jr-gray-3;
+}
+
+.code-area {
+    -fx-background-color: -jr-background-alt;
+    -fx-text-fill: -fx-mid-text-color;
 }
 
 .code-area .lineno {

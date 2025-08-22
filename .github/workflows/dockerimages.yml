@@ -3,6 +3,7 @@ name: Docker Images
 on:
   pull_request:
     paths:
+      - '.dockerignore'
       - '.github/workflows/dockerimages.yml'
       - 'Dockerfile.*'
   push:
@@ -51,6 +52,19 @@ jobs:
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+      - name: Fetch all history for all tags and branches
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v3.2.1
+        with:
+          versionSpec: "5.x"
+      - name: Run GitVersion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v3.2.1
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -63,3 +77,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           file: Dockerfile.${{ matrix.component }}
+          build-args: |
+            VERSION=${{ steps.gitversion.outputs.AssemblySemVer }}
+            VERSION_INFO=${{ steps.gitversion.outputs.InformationalVersion }}

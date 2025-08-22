@@ -19,7 +19,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Manages the loading of CitationStyles from both internal resources and external files.
  */
-public class CSLStyleLoader {
+public record CSLStyleLoader(
+        OpenOfficePreferences openOfficePreferences) {
     public static final String DEFAULT_STYLE = "ieee.csl";
 
     private static final String STYLES_ROOT = "/csl-styles";
@@ -28,8 +29,6 @@ public class CSLStyleLoader {
     private static final List<CitationStyle> EXTERNAL_STYLES = new ArrayList<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleLoader.class);
-
-    private final OpenOfficePreferences openOfficePreferences;
 
     public CSLStyleLoader(@NonNull OpenOfficePreferences openOfficePreferences) {
         this.openOfficePreferences = openOfficePreferences;
@@ -53,7 +52,7 @@ public class CSLStyleLoader {
                               .filter(style -> DEFAULT_STYLE.equals(style.getFilePath()))
                               .findFirst()
                               .orElseGet(() -> CSLStyleUtils.createCitationStyleFromFile(DEFAULT_STYLE)
-                                                            .orElse(new CitationStyle("", "Empty", false, false, false, "", true)));
+                                                            .orElse(new CitationStyle("", "Empty", "Empty", false, false, false, "", true)));
     }
 
     /**
@@ -78,6 +77,7 @@ public class CSLStyleLoader {
                 for (Map<String, Object> info : styleInfoList) {
                     String path = (String) info.get("path");
                     String title = (String) info.get("title");
+                    String shortTitle = (String) info.get("shortTitle");
                     boolean isNumeric = (boolean) info.get("isNumeric");
                     boolean hasBibliography = (boolean) info.get("hasBibliography");
                     boolean usesHangingIndent = (boolean) info.get("usesHangingIndent");
@@ -87,7 +87,7 @@ public class CSLStyleLoader {
                     try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
                         if (styleStream != null) {
                             String source = new String(styleStream.readAllBytes());
-                            CitationStyle style = new CitationStyle(path, title, isNumeric, hasBibliography, usesHangingIndent, source, true);
+                            CitationStyle style = new CitationStyle(path, title, shortTitle, isNumeric, hasBibliography, usesHangingIndent, source, true);
                             INTERNAL_STYLES.add(style);
                         }
                     } catch (IOException e) {

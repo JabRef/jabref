@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DialogEvent;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
@@ -11,6 +12,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -86,11 +88,16 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
         link.textProperty().bindBidirectional(viewModel.linkProperty());
         fileType.valueProperty().bindBidirectional(viewModel.selectedExternalFileTypeProperty());
         sourceUrl.textProperty().bindBidirectional(viewModel.sourceUrlProperty());
+
+        this.setOnShown(this::onDialogShow);
     }
 
     @FXML
     private void openBrowseDialog(ActionEvent event) {
         viewModel.openBrowseDialog();
-        link.requestFocus();
+    }
+
+    private void onDialogShow(DialogEvent event) {
+        UiTaskExecutor.runInJavaFXThread(link::requestFocus);
     }
 }

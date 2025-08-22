@@ -8,6 +8,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -25,6 +26,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
 
     private final UndoManager undoManager;
     private final StateManager stateManager;
+    private final ShortenDOIFormatter shortenDOIFormatter;
 
     public DoiIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider,
                                         FieldCheckers fieldCheckers,
@@ -36,7 +38,8 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
         super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        configure(true, true);
+        this.shortenDOIFormatter = new ShortenDOIFormatter();
+        configure(true, true, true);
     }
 
     @Override
@@ -67,6 +70,21 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
     @Override
     public void openExternalLink() {
         identifier.get().map(DOI::asString)
-                  .ifPresent(s -> NativeDesktop.openCustomDoi(s, preferences, dialogService));
+                .ifPresent(s -> NativeDesktop.openCustomDoi(s, preferences, dialogService));
+    }
+
+    @Override
+    public void shortenID() {
+        entry.getField(field).ifPresent(doi -> {
+            String shortenedDOI = shortenDOIFormatter.format(doi);
+            entry.setField(field, shortenedDOI);
+            if (shortenedDOI.equals(doi)) {
+                LOGGER.info("DOI is already shortened");
+                dialogService.notify(Localization.lang("DOI is already shortened"));
+            } else {
+            LOGGER.info("Shortened DOI: {} to {}", doi, shortenedDOI);
+            dialogService.notify(Localization.lang("Shortened DOI to: %0", shortenedDOI));
+            }
+        });
     }
 }

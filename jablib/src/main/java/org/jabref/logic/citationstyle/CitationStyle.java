@@ -16,15 +16,17 @@ public class CitationStyle implements OOStyle {
 
     private final String filePath;
     private final String title;
+    private final String shortTitle;
     private final boolean isNumericStyle;
     private final boolean hasBibliography;
     private final boolean usesHangingIndent;
     private final String source;
     private final boolean isInternalStyle;
 
-    public CitationStyle(String filePath, String title, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, String source, boolean isInternalStyle) {
+    public CitationStyle(String filePath, String title, String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, String source, boolean isInternalStyle) {
         this.filePath = Path.of(Objects.requireNonNull(filePath)).toString(); // wrapping with Path.of takes care of extra slashes in path due to subsequent storage and retrieval (observed on Windows)
         this.title = Objects.requireNonNull(title);
+        this.shortTitle = Objects.requireNonNull(shortTitle);
         this.isNumericStyle = isNumericStyle;
         this.hasBibliography = hasBibliography;
         this.usesHangingIndent = hasBibliography && usesHangingIndent;
@@ -35,12 +37,16 @@ public class CitationStyle implements OOStyle {
     /**
      * Creates a new citation style with an auto-determined internal/external state.
      */
-    public CitationStyle(String filePath, String title, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, String source) {
-        this(filePath, title, isNumericStyle, hasBibliography, usesHangingIndent, source, !Path.of(filePath).isAbsolute());
+    public CitationStyle(String filePath, String title, String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, String source) {
+        this(filePath, title, shortTitle, isNumericStyle, hasBibliography, usesHangingIndent, source, !Path.of(filePath).isAbsolute());
     }
 
     public String getTitle() {
         return title;
+    }
+
+    public String getShortTitle() {
+        return shortTitle;
     }
 
     public boolean isNumericStyle() {

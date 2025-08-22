@@ -180,13 +180,13 @@ public class CopyMoreAction extends SimpleCommand {
 
     private void copyCiteKey() {
         doCopyKey(keys -> {
-            CitationCommandString citeCommand = preferences.getExternalApplicationsPreferences().getCiteCommand();
+            CitationCommandString citeCommand = preferences.getPushToApplicationPreferences().getCiteCommand();
             return citeCommand.prefix() + String.join(citeCommand.delimiter(), keys) + citeCommand.suffix();
         });
     }
 
     private void copyKey() {
-        doCopyKey(keys -> String.join(preferences.getExternalApplicationsPreferences().getCiteCommand().delimiter(), keys));
+        doCopyKey(keys -> String.join(preferences.getPushToApplicationPreferences().getCiteCommand().delimiter(), keys));
     }
 
     private void copyKeyAndTitle() {

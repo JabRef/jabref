@@ -13,6 +13,12 @@ on:
     # run on each Monday
     - cron: '2 3 * * 1'
   workflow_dispatch:
+    inputs:
+      tagbuild:
+        description: 'Trigger a full maven central release'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   actions: write
@@ -30,10 +36,11 @@ concurrency:
 jobs:
   publish:
     name: jablib
-    runs-on: ubuntu-22.04
+    if: github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-latest
     steps:
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: 'true'
@@ -61,7 +68,6 @@ jobs:
       - name: Use cache
         uses: actions/cache@v4
         with:
-          lookup-only: true
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
@@ -96,5 +102,13 @@ jobs:
           file ${{ steps.secring.outputs.filePath }}
           md5sum ${{ steps.secring.outputs.filePath }}
       - name: publishAllPublicationsToMavenCentralRepository
-        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="${{ steps.istagbuild.outputs.tagbuild }}" :jablib:publishAllPublicationsToMavenCentralRepository
+        # Different version at maven centrl: 6.0-SNAPSHOT - and not 6.0.23234-SNAPSHOT
+        # We need to manually trigger a full maven central release - to avoid 6.0-alpha3 being published as 6.0 on maven central.
+        run: |
+          if [[ "${{ github.event.inputs.tagbuild }}" == "true" ]]; then
+            tagbuild="true"
+          else
+            tagbuild="false"
+          fi
+          ./gradlew -PprojVersion="${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="$tagbuild" :jablib:publishAllPublicationsToMavenCentralRepository
       # endregion

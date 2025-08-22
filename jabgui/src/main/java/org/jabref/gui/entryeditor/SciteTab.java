@@ -4,13 +4,18 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
@@ -65,13 +70,24 @@ public class SciteTab extends EntryEditorTab {
             sciteResultsPane.getChildren().clear();
             switch (status) {
                 case IN_PROGRESS ->
-                        sciteResultsPane.add(progressIndicator, 0, 0);
+                        onSciteLookUp();
                 case FOUND ->
                         viewModel.getCurrentResult().ifPresent(result -> sciteResultsPane.add(getTalliesPane(result), 0, 0));
                 case ERROR ->
                         sciteResultsPane.add(getErrorPane(), 0, 0);
+                case DOI_MISSING ->
+                        onDoiMissing();
+                case DOI_LOOK_UP ->
+                        onDoiLookUp();
+                case DOI_LOOK_UP_ERROR ->
+                        onDoiLookUpError();
             }
         });
+    }
+
+    private void onDoiLookUpError() {
+        onDoiMissing();
+        dialogService.notify(Localization.lang("No DOI found."));
     }
 
     @Override
@@ -82,6 +98,70 @@ public class SciteTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         viewModel.bindToEntry(entry);
+    }
+
+    private void onSciteLookUp() {
+        sciteResultsPane.getChildren().clear();
+
+        VBox vBox = new VBox();
+        vBox.getChildren().add(progressIndicator);
+        vBox.setStyle("-fx-alignment: center;");
+
+        sciteResultsPane.add(vBox, 0, 0);
+
+        GridPane.setHalignment(vBox, HPos.CENTER);
+        GridPane.setValignment(vBox, VPos.CENTER);
+
+        GridPane.setHgrow(vBox, Priority.ALWAYS);
+        GridPane.setVgrow(vBox, Priority.ALWAYS);
+    }
+
+    private void onDoiLookUp() {
+        sciteResultsPane.getChildren().clear();
+
+        Label label = new Label(Localization.lang("Looking up DOI..."));
+
+        VBox vBox = new VBox();
+        vBox.getChildren().add(progressIndicator);
+        vBox.getChildren().add(label);
+        vBox.setSpacing(2d);
+        vBox.setStyle("-fx-alignment: center;");
+
+        sciteResultsPane.add(vBox, 0, 0);
+
+        GridPane.setHalignment(vBox, HPos.CENTER);
+        GridPane.setValignment(vBox, VPos.CENTER);
+
+        GridPane.setHgrow(vBox, Priority.ALWAYS);
+        GridPane.setVgrow(vBox, Priority.ALWAYS);
+    }
+
+    private void onDoiMissing() {
+        sciteResultsPane.getChildren().clear();
+
+        Label label = new Label(Localization.lang("The selected entry doesn't have a DOI linked to it."));
+        Hyperlink link = new Hyperlink(Localization.lang("Look up a DOI and try again."));
+        link.setOnAction(doiLookUp());
+
+        HBox hBox = new HBox();
+        hBox.getChildren().add(label);
+        hBox.getChildren().add(link);
+        hBox.setSpacing(2d);
+        hBox.setStyle("-fx-alignment: center;");
+
+        sciteResultsPane.add(hBox, 0, 0);
+
+        GridPane.setHalignment(hBox, HPos.CENTER);
+        GridPane.setValignment(hBox, VPos.CENTER);
+
+        GridPane.setHgrow(hBox, Priority.ALWAYS);
+        GridPane.setVgrow(hBox, Priority.ALWAYS);
+    }
+
+    private EventHandler<ActionEvent> doiLookUp() {
+        return actionEvent -> {
+            viewModel.lookUpDoi(currentEntry);
+        };
     }
 
     private VBox getErrorPane() {

@@ -11,11 +11,12 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
@@ -218,7 +219,7 @@ public class StudyRepository {
      *     <li>Update the remote tracking branches of the work and search branch</li>
      * </ol>
      */
-    public void persist(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException {
+    public void persist(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException, JabRefException {
         updateWorkAndSearchBranch();
 
         gitHandler.checkoutBranch(SEARCH_BRANCH);
@@ -237,6 +238,8 @@ public class StudyRepository {
             updateRemoteSearchAndWorkBranch();
         } catch (GitAPIException e) {
             LOGGER.error("Updating remote repository failed", e);
+        } catch (JabRefException e) {
+            LOGGER.error("Missing Git credentials", e);
         }
     }
 
@@ -244,7 +247,7 @@ public class StudyRepository {
      * Update the remote tracking branches of the work and search branches
      * The currently checked out branch is not changed if the method is executed successfully
      */
-    private void updateRemoteSearchAndWorkBranch() throws IOException, GitAPIException {
+    private void updateRemoteSearchAndWorkBranch() throws IOException, GitAPIException, JabRefException {
         String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();
 
         // update remote search branch
@@ -431,7 +434,7 @@ public class StudyRepository {
                     .withSaveOrder(context.getMetaData().getSaveOrder().map(SelfContainedSaveOrder::of).orElse(SaveOrder.getDefaultSaveOrder()))
                     .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+            BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
                     preferences.getFieldPreferences(),
