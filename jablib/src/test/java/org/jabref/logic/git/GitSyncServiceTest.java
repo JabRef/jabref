@@ -1,7 +1,6 @@
 package org.jabref.logic.git;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,9 +13,8 @@ import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
 import org.jabref.logic.git.model.MergeResult;
 import org.jabref.logic.git.util.GitHandlerRegistry;
+import org.jabref.logic.git.util.NoopGitSystemReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -32,6 +30,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.URIish;
+import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -120,6 +119,8 @@ class GitSyncServiceTest {
      */
     @BeforeEach
     void aliceBobSimple(@TempDir Path tempDir) throws Exception {
+        SystemReader.setInstance(new NoopGitSystemReader());
+
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
@@ -180,10 +181,8 @@ class GitSyncServiceTest {
         aliceGit.fetch().setRemote("origin").call();
 
         String actualContent = Files.readString(library);
-        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(Reader.of(actualContent));
-        context = new BibDatabaseContext(parsed.getDatabase(), parsed.getMetaData());
+        context = BibDatabaseContext.of(actualContent, importFormatPreferences);
         context.setDatabasePath(library);
-
         // Debug hint: Show the created git graph on the command line
         //   git log --graph --oneline --decorate --all --reflog
     }
@@ -293,9 +292,7 @@ class GitSyncServiceTest {
         aliceGit.fetch().setRemote("origin").call();
 
         String actualContent = Files.readString(library);
-        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(Reader.of(actualContent));
-        context = new BibDatabaseContext(parsed.getDatabase(), parsed.getMetaData());
-        context.setDatabasePath(library);
+        context = BibDatabaseContext.of(actualContent, importFormatPreferences);
 
         // Setup mock conflict resolver
         GitConflictResolverStrategy resolver = mock(GitConflictResolverStrategy.class);
