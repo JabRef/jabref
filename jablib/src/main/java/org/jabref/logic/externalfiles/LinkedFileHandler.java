@@ -194,7 +194,11 @@ public class LinkedFileHandler {
         }
 
         // Update path
-        linkedFile.setLink(FileUtil.relativize(newPath, databaseContext, filePreferences).toString());
+        if (newPath.isAbsolute()) {
+            linkedFile.setLink(FileUtil.relativize(newPath, databaseContext, filePreferences).toString());
+        } else {
+            linkedFile.setLink(newPath.toString());
+        }
 
         return true;
     }
