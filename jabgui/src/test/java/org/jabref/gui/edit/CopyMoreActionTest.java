@@ -3,7 +3,8 @@ package org.jabref.gui.edit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,6 +27,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
@@ -98,447 +102,121 @@ class CopyMoreActionTest {
         verify(dialogService, times(0)).notify(any(String.class));
     }
 
-    @Test
-    void executeCopyTitleWithNoTitle() {
-        BibEntry entryWithNoTitle = (BibEntry) entry.clone();
-        entryWithNoTitle.clearField(StandardField.TITLE);
-        ObservableList<BibEntry> entriesWithNoTitles = FXCollections.observableArrayList(entryWithNoTitle);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoTitles));
+    static Stream<Arguments> getTestParams() {
+        // Given is a list with 2 entries with 1 with an undefined field
+        return Stream.of(
+                Arguments.of(StandardActions.COPY_TITLE,
+                        (Consumer<BibEntry>) entry -> entry.clearField(StandardField.TITLE),
+                        Localization.lang("None of the selected entries have titles."),
+                        Localization.lang("Warning: %0 out of %1 entries have undefined title.", "1", "2")),
 
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoTitles);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
+                Arguments.of(StandardActions.COPY_KEY,
+                        (Consumer<BibEntry>) BibEntry::clearCiteKey,
+                        Localization.lang("None of the selected entries have citation keys."),
+                        Localization.lang("Warning: %0 out of %1 entries have undefined citation key.", "1", "2")),
+
+                Arguments.of(StandardActions.COPY_DOI,
+                        (Consumer<BibEntry>) entry -> entry.clearField(StandardField.DOI),
+                        Localization.lang("None of the selected entries have DOIs."),
+                        Localization.lang("Warning: %0 out of %1 entries have undefined DOIs.", "1", "2")),
+
+                Arguments.of(StandardActions.COPY_FIELD_AUTHOR,
+                        (Consumer<BibEntry>) entry -> entry.clearField(StandardField.AUTHOR),
+                        Localization.lang("None of the selected entries have %0.", "Author"),
+                        Localization.lang("Warning: %0 out of %1 entries have undefined %2.", "1", "2", "Author")),
+
+                Arguments.of(StandardActions.COPY_FIELD_JOURNAL,
+                        (Consumer<BibEntry>) entry -> {
+                            entry.clearField(StandardField.JOURNAL);
+                            entry.clearField(StandardField.JOURNALTITLE);
+                        },
+                        Localization.lang("None of the selected entries have %0.", "Journal"),
+                        Localization.lang("Warning: %0 out of %1 entries have undefined %2.", "1", "2", "Journal")),
+
+                Arguments.of(StandardActions.COPY_FIELD_DATE,
+                        (Consumer<BibEntry>) entry -> {
+                            entry.clearField(StandardField.DATE);
+                            entry.clearField(StandardField.YEAR);
+                        },
+                        Localization.lang("None of the selected entries have %0.", "Date"),
+                        Localization.lang("Warning: %0 out of %1 entries have undefined %2.", "1", "2", "Date")),
+
+                Arguments.of(StandardActions.COPY_FIELD_KEYWORDS,
+                        (Consumer<BibEntry>) entry -> entry.clearField(StandardField.KEYWORDS),
+                        Localization.lang("None of the selected entries have %0.", "Keywords"),
+                        Localization.lang("Warning: %0 out of %1 entries have undefined %2.", "1", "2", "Keywords")),
+
+                Arguments.of(StandardActions.COPY_FIELD_ABSTRACT,
+                        (Consumer<BibEntry>) entry -> entry.clearField(StandardField.ABSTRACT),
+                        Localization.lang("None of the selected entries have %0.", "Abstract"),
+                        Localization.lang("Warning: %0 out of %1 entries have undefined %2.", "1", "2", "Abstract"))
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("getTestParams")
+    void executeWithNoValue(StandardActions action, Consumer<BibEntry> remover, String expectedNoneMessage, String ignoredWarning) {
+        BibEntry modified = (BibEntry) entry.clone();
+        remover.accept(modified);
+        ObservableList<BibEntry> entries = FXCollections.observableArrayList(modified);
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entries));
+
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
+        when(stateManager.getSelectedEntries()).thenReturn(entries);
+        copyMoreAction = new CopyMoreAction(action, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have titles."));
+        verify(dialogService, times(1)).notify(expectedNoneMessage);
     }
 
-    @Test
-    void executeCopyTitleOnPartialSuccess() {
-        BibEntry entryWithNoTitle = (BibEntry) entry.clone();
-        entryWithNoTitle.clearField(StandardField.TITLE);
-        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoTitle, entry);
+    @ParameterizedTest
+    @MethodSource("getTestParams")
+    void executeOnPartialSuccess(StandardActions action, Consumer<BibEntry> remover, String ignoredNone, String expectedWarning) {
+        BibEntry modified = (BibEntry) entry.clone();
+        remover.accept(modified);
+        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(modified, entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
 
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
         when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
+        copyMoreAction = new CopyMoreAction(action, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
-        String copiedTitles = String.join("\n", titles);
-        verify(clipBoardManager, times(1)).setContent(copiedTitles);
-        verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined title.",
-                Integer.toString(mixedEntries.size() - titles.size()), Integer.toString(mixedEntries.size())));
+        String expectedClipboard = expectedClipboardString(action);
+        verify(clipBoardManager, times(1)).setContent(expectedClipboard);
+        verify(dialogService, times(1)).notify(expectedWarning);
     }
 
-    @Test
-    void executeCopyTitleOnSuccess() {
-        ObservableList<BibEntry> entriesWithTitles = FXCollections.observableArrayList(entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithTitles));
+    @ParameterizedTest
+    @MethodSource("getTestParams")
+    void executeOnSuccess(StandardActions action, Consumer<BibEntry> remover, String ignoredNone, String ignoredWarning) {
+        ObservableList<BibEntry> entries = FXCollections.observableArrayList(entry);
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entries));
 
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithTitles);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(databaseContext));
+        when(stateManager.getSelectedEntries()).thenReturn(entries);
+        copyMoreAction = new CopyMoreAction(action, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
-        String copiedTitles = String.join("\n", titles);
-        verify(clipBoardManager, times(1)).setContent(copiedTitles);
+        String expectedClipboard = expectedClipboardString(action);
+        verify(clipBoardManager, times(1)).setContent(expectedClipboard);
         verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
-                JabRefDialogService.shortenDialogMessage(copiedTitles)));
+                JabRefDialogService.shortenDialogMessage(expectedClipboard)));
     }
 
-    @Test
-    void executeCopyKeyWithNoKey() {
-        BibEntry entryWithNoKey = (BibEntry) entry.clone();
-        entryWithNoKey.clearCiteKey();
-        ObservableList<BibEntry> entriesWithNoKeys = FXCollections.observableArrayList(entryWithNoKey);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoKeys));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoKeys);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have citation keys."));
-    }
-
-    @Test
-    void executeCopyKeyOnPartialSuccess() {
-        BibEntry entryWithNoKey = (BibEntry) entry.clone();
-        entryWithNoKey.clearCiteKey();
-        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoKey, entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        String copiedKeys = String.join("\n", keys);
-        verify(clipBoardManager, times(1)).setContent(copiedKeys);
-        verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined citation key.",
-                Integer.toString(mixedEntries.size() - titles.size()), Integer.toString(mixedEntries.size())));
-    }
-
-    @Test
-    void executeCopyKeyOnSuccess() {
-        ObservableList<BibEntry> entriesWithKeys = FXCollections.observableArrayList(entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithKeys));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithKeys);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        String copiedKeys = String.join("\n", keys);
-        verify(clipBoardManager, times(1)).setContent(copiedKeys);
-        verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
-                JabRefDialogService.shortenDialogMessage(copiedKeys)));
-    }
-
-    @Test
-    void executeCopyDoiWithNoDoi() {
-        BibEntry entryWithNoDoi = (BibEntry) entry.clone();
-        entryWithNoDoi.clearField(StandardField.DOI);
-        ObservableList<BibEntry> entriesWithNoDois = FXCollections.observableArrayList(entryWithNoDoi);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoDois));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoDois);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have DOIs."));
-    }
-
-    @Test
-    void executeCopyDoiOnPartialSuccess() {
-        BibEntry entryWithNoDoi = (BibEntry) entry.clone();
-        entryWithNoDoi.clearField(StandardField.DOI);
-        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoDoi, entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        String copiedDois = String.join("\n", dois);
-        verify(clipBoardManager, times(1)).setContent(copiedDois);
-        verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined DOIs.",
-                Integer.toString(mixedEntries.size() - titles.size()), Integer.toString(mixedEntries.size())));
-    }
-
-    @Test
-    void executeCopyDoiOnSuccess() {
-        ObservableList<BibEntry> entriesWithDois = FXCollections.observableArrayList(entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithDois));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithDois);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        String copiedDois = String.join("\n", dois);
-        verify(clipBoardManager, times(1)).setContent(copiedDois);
-        verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
-                JabRefDialogService.shortenDialogMessage(copiedDois)));
-    }
-
-    @Test
-    void executeCopyAuthorWithNoAuthor() {
-        BibEntry entryWithNoAuthor = (BibEntry) entry.clone();
-        entryWithNoAuthor.clearField(StandardField.AUTHOR);
-        ObservableList<BibEntry> entriesWithNoAuthors = FXCollections.observableArrayList(entryWithNoAuthor);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoAuthors));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoAuthors);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_AUTHOR, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "Author"));
-    }
-
-    @Test
-    void executeCopyAuthorOnPartialSuccess() {
-        BibEntry entryWithNoAuthor = (BibEntry) entry.clone();
-        entryWithNoAuthor.clearField(StandardField.AUTHOR);
-        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoAuthor, entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_AUTHOR, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        StringJoiner authorsJoiner = new StringJoiner("\n");
-        for (String author : authors) {
-            authorsJoiner.add(author);
-        }
-        String copiedAuthors = authorsJoiner.toString();
-        verify(clipBoardManager, times(1)).setContent(copiedAuthors);
-        verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
-                Integer.toString(mixedEntries.size() - authors.size()), Integer.toString(mixedEntries.size()), "Author"));
-    }
-
-    @Test
-    void executeCopyAuthorOnSuccess() {
-        ObservableList<BibEntry> entriesWithAuthors = FXCollections.observableArrayList(entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithAuthors));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithAuthors);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_AUTHOR, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        StringJoiner authorsJoiner = new StringJoiner("\n");
-        for (String author : authors) {
-            authorsJoiner.add(author);
-        }
-        String copiedAuthors = authorsJoiner.toString();
-        verify(clipBoardManager, times(1)).setContent(copiedAuthors);
-        verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
-                JabRefDialogService.shortenDialogMessage(copiedAuthors)));
-    }
-
-    @Test
-    void executeCopyJournalWithNoJournal() {
-        BibEntry entryWithNoJournal = (BibEntry) entry.clone();
-        entryWithNoJournal.clearField(StandardField.JOURNAL);
-        entryWithNoJournal.clearField(StandardField.JOURNALTITLE);
-        ObservableList<BibEntry> entriesWithNoJournals = FXCollections.observableArrayList(entryWithNoJournal);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoJournals));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoJournals);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_JOURNAL, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "Journal"));
-    }
-
-    @Test
-    void executeCopyJournalOnPartialSuccess() {
-        BibEntry entryWithNoJournal = (BibEntry) entry.clone();
-        entryWithNoJournal.clearField(StandardField.JOURNAL);
-        entryWithNoJournal.clearField(StandardField.JOURNALTITLE);
-        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoJournal, entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_JOURNAL, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        StringJoiner journalsJoiner = new StringJoiner("\n");
-        for (String journal : journals) {
-            journalsJoiner.add(journal);
-        }
-        String copiedJournals = journalsJoiner.toString();
-        verify(clipBoardManager, times(1)).setContent(copiedJournals);
-        verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
-                Integer.toString(mixedEntries.size() - journals.size()), Integer.toString(mixedEntries.size()), "Journal"));
-    }
-
-    @Test
-    void executeCopyJournalOnSuccess() {
-        ObservableList<BibEntry> entriesWithJournals = FXCollections.observableArrayList(entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithJournals));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithJournals);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_JOURNAL, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        StringJoiner journalsJoiner = new StringJoiner("\n");
-        for (String journal : journals) {
-            journalsJoiner.add(journal);
-        }
-        String copiedJournals = journalsJoiner.toString();
-        verify(clipBoardManager, times(1)).setContent(copiedJournals);
-        verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
-                JabRefDialogService.shortenDialogMessage(copiedJournals)));
-    }
-
-    @Test
-    void executeCopyDateWithNoDate() {
-        BibEntry entryWithNoDate = (BibEntry) entry.clone();
-        entryWithNoDate.clearField(StandardField.DATE);
-        entryWithNoDate.clearField(StandardField.YEAR);
-        ObservableList<BibEntry> entriesWithNoDates = FXCollections.observableArrayList(entryWithNoDate);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoDates));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoDates);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_DATE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "Date"));
-    }
-
-    @Test
-    void executeCopyDateOnPartialSuccess() {
-        BibEntry entryWithNoDate = (BibEntry) entry.clone();
-        entryWithNoDate.clearField(StandardField.DATE);
-        entryWithNoDate.clearField(StandardField.YEAR);
-        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoDate, entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_DATE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        StringJoiner datesJoiner = new StringJoiner("\n");
-        for (String date : dates) {
-            datesJoiner.add(date);
-        }
-        String copiedDates = datesJoiner.toString();
-        verify(clipBoardManager, times(1)).setContent(copiedDates);
-        verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
-                Integer.toString(mixedEntries.size() - dates.size()), Integer.toString(mixedEntries.size()), "Date"));
-    }
-
-    @Test
-    void executeCopyDateOnSuccess() {
-        ObservableList<BibEntry> entriesWithDates = FXCollections.observableArrayList(entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithDates));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithDates);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_DATE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        StringJoiner datesJoiner = new StringJoiner("\n");
-        for (String date : dates) {
-            datesJoiner.add(date);
-        }
-        String copiedDates = datesJoiner.toString();
-        verify(clipBoardManager, times(1)).setContent(copiedDates);
-        verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
-                JabRefDialogService.shortenDialogMessage(copiedDates)));
-    }
-
-    @Test
-    void executeCopyKeywordsWithNoKeywords() {
-        BibEntry entryWithNoKeywords = (BibEntry) entry.clone();
-        entryWithNoKeywords.clearField(StandardField.KEYWORDS);
-        ObservableList<BibEntry> entriesWithNoKeywords = FXCollections.observableArrayList(entryWithNoKeywords);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoKeywords));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoKeywords);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_KEYWORDS, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "Keywords"));
-    }
-
-    @Test
-    void executeCopyKeywordsOnPartialSuccess() {
-        BibEntry entryWithNoKeywords = (BibEntry) entry.clone();
-        entryWithNoKeywords.clearField(StandardField.KEYWORDS);
-        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoKeywords, entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_KEYWORDS, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        StringJoiner keywordsJoiner = new StringJoiner("\n");
-        for (String keyword : keywords) {
-            keywordsJoiner.add(keyword);
-        }
-        String copiedKeywords = keywordsJoiner.toString();
-        verify(clipBoardManager, times(1)).setContent(copiedKeywords);
-        verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
-                Integer.toString(mixedEntries.size() - keywords.size()), Integer.toString(mixedEntries.size()), "Keywords"));
-    }
-
-    @Test
-    void executeCopyKeywordsOnSuccess() {
-        ObservableList<BibEntry> entriesWithKeywords = FXCollections.observableArrayList(entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithKeywords));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithKeywords);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_KEYWORDS, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        StringJoiner keywordsJoiner = new StringJoiner("\n");
-        for (String keyword : keywords) {
-            keywordsJoiner.add(keyword);
-        }
-        String copiedKeywords = keywordsJoiner.toString();
-        verify(clipBoardManager, times(1)).setContent(copiedKeywords);
-        verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
-                JabRefDialogService.shortenDialogMessage(copiedKeywords)));
-    }
-
-    @Test
-    void executeCopyAbstractWithNoAbstract() {
-        BibEntry entryWithNoAbstract = (BibEntry) entry.clone();
-        entryWithNoAbstract.clearField(StandardField.ABSTRACT);
-        ObservableList<BibEntry> entriesWithNoAbstracts = FXCollections.observableArrayList(entryWithNoAbstract);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoAbstracts));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithNoAbstracts);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_ABSTRACT, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "Abstract"));
-    }
-
-    @Test
-    void executeCopyAbstractOnPartialSuccess() {
-        BibEntry entryWithNoAbstract = (BibEntry) entry.clone();
-        entryWithNoAbstract.clearField(StandardField.ABSTRACT);
-        ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoAbstract, entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(mixedEntries);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_ABSTRACT, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        StringJoiner abstractsJoiner = new StringJoiner("\n");
-        for (String abstractText : abstracts) {
-            abstractsJoiner.add(abstractText);
-        }
-        String copiedAbstracts = abstractsJoiner.toString();
-        verify(clipBoardManager, times(1)).setContent(copiedAbstracts);
-        verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
-                Integer.toString(mixedEntries.size() - abstracts.size()), Integer.toString(mixedEntries.size()), "Abstract"));
-    }
-
-    @Test
-    void executeCopyAbstractOnSuccess() {
-        ObservableList<BibEntry> entriesWithAbstracts = FXCollections.observableArrayList(entry);
-        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithAbstracts));
-
-        when(stateManager.getActiveDatabase()).thenReturn(Optional.ofNullable(databaseContext));
-        when(stateManager.getSelectedEntries()).thenReturn(entriesWithAbstracts);
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_ABSTRACT, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
-        copyMoreAction.execute();
-
-        StringJoiner abstractsJoiner = new StringJoiner("\n");
-        for (String abstractText : abstracts) {
-            abstractsJoiner.add(abstractText);
-        }
-        String copiedAbstracts = abstractsJoiner.toString();
-        verify(clipBoardManager, times(1)).setContent(copiedAbstracts);
-        verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
-                JabRefDialogService.shortenDialogMessage(copiedAbstracts)));
+    private String expectedClipboardString(StandardActions action) {
+        return String.join("\n", switch (action) {
+            case COPY_TITLE -> titles;
+            case COPY_KEY -> keys;
+            case COPY_DOI -> dois;
+            case COPY_FIELD_AUTHOR -> authors;
+            case COPY_FIELD_JOURNAL -> journals;
+            case COPY_FIELD_DATE -> dates;
+            case COPY_FIELD_KEYWORDS -> keywords;
+            case COPY_FIELD_ABSTRACT -> abstracts;
+            default ->
+                    throw new IllegalArgumentException("Unhandled action: " + action);
+        });
     }
 }
