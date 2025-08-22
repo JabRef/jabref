@@ -218,7 +218,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, preferences.getFilePreferences());
-        autoRenameFileOnEntryChange.bindToDatabase();
+        coarseChangeFilter.registerListener(autoRenameFileOnEntryChange);
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, getIndexManager(), selectedGroupsProperty(), searchQueryProperty, resultSizeProperty());
@@ -723,7 +723,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         if (autoRenameFileOnEntryChange != null) {
-            autoRenameFileOnEntryChange.unbindFromDatabase();
+            coarseChangeFilter.unregisterListener(autoRenameFileOnEntryChange);
         }
 
         // clean up the groups map
