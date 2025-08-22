@@ -1,6 +1,5 @@
 package org.jabref.languageserver;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -85,7 +83,7 @@ public class BibtexTextDocumentService implements TextDocumentService {
     private void handleDiagnostics(String uri, String content, int version) {
         BibDatabaseContext bibDatabaseContext;
         try {
-            bibDatabaseContext = new BibtexParser(jabRefCliPreferences.getImportFormatPreferences()).parse(StringReader.of(content)).getDatabaseContext();
+            bibDatabaseContext = BibDatabaseContext.of(content, jabRefCliPreferences.getImportFormatPreferences());
         } catch (Exception e) {
             Diagnostic parseDiagnostic = new Diagnostic(
                     NULL_RANGE,

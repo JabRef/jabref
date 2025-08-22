@@ -123,7 +123,7 @@ public class AboutDialogViewModel extends AbstractViewModel {
         openWebsite(URLs.LIBRARIES_URL);
     }
 
-    public void openGithub() {
+    public void openGitHub() {
         openWebsite(URLs.GITHUB_URL);
     }
 

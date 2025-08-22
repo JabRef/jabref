@@ -10,6 +10,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.internal.storage.file.WindowCache;
 import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.storage.file.WindowCacheConfig;
+import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ class GitHandlerRegistryTest {
 
     @BeforeEach
     void setUp() {
+        SystemReader.setInstance(new NoopGitSystemReader());
         registry = new GitHandlerRegistry();
     }
 

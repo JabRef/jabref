@@ -87,6 +87,7 @@ public class CitationStyleCatalogGenerator {
                                                             Path relativePath = STYLES_ROOT.toAbsolutePath().relativize(stylePath.toAbsolutePath());
                                                             info.put("path", relativePath.toString());
                                                             info.put("title", style.getTitle());
+                                                            info.put("shortTitle", style.getShortTitle());
                                                             info.put("isNumeric", style.isNumericStyle());
                                                             info.put("hasBibliography", style.hasBibliography());
                                                             info.put("usesHangingIndent", style.usesHangingIndent());
