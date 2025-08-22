@@ -52,7 +52,7 @@ public class HelpOutputTest {
     }
 
     @Test
-    public void testExportFormatFooterShownOnlyForCommandsWithOutputOption() {
+    public void exportFormatFooterShownOnlyForCommandsWithOutputOption() {
         List<Pair<String, String>> inputFormats = ArgumentProcessor.getAvailableImportFormats(preferences);
         List<Pair<String, String>> outputFormats = ArgumentProcessor.getAvailableExportFormats(preferences);
         Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(
