@@ -35,11 +35,10 @@ public class AutoRenameFileOnEntryChange {
         }
 
         BibEntry entry = event.getBibEntry();
+        LOGGER.debug("Field changed for entry {}: {}", entry.getCitationKey().orElse("defaultCitationKey"), event.getField().getName());
         if (entry.getFiles().isEmpty()) {
             return;
         }
         renamePdfCleanup.cleanup(entry);
-
-        LOGGER.info("Field changed for entry {}: {}", entry.getCitationKey().orElse("defaultCitationKey"), event.getField().getName());
     }
 }
