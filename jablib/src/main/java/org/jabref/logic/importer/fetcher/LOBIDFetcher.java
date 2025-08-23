@@ -46,7 +46,7 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
     /**
      * Gets the query URL
      *
-     * @param queryNode the list that contains the parsed nodes
+     * @param queryNode the first parsed node
      * @param pageNumber  the number of the page indexed from 0
      * @return URL
      */
