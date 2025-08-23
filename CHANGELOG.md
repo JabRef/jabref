@@ -97,7 +97,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We excluded specific fields (e.g., `comment`, `pdf`, `sortkey`) from the consistency check to reduce false positives [#13131](https://github.com/JabRef/jabref/issues/13131)
 - We fixed an issue where moved or renamed linked files in the file directory were not automatically relinked by the “search for unlinked files” feature. [#13264](https://github.com/JabRef/jabref/issues/13264)
 - We fixed an issue with proxy setup in the absence of a password. [#12412](https://github.com/JabRef/jabref/issues/12412)
-- We fixed an issue with the targets of "copy to". [#13739](https://github.com/JabRef/jabref/pull/13739)
+- We fixed an issue with the targets of "copy to". [#13741](https://github.com/JabRef/jabref/pull/13741)
 - We fixed an issue where the tab showing the fulltext search results was not displayed. [#12865](https://github.com/JabRef/jabref/issues/12865)
 - We fixed an issue showing an empty tooltip in maintable. [#11681](https://github.com/JabRef/jabref/issues/11681)
 - We fixed an issue displaying a warning if a file to open is not found. [#13430](https://github.com/JabRef/jabref/pull/13430)
