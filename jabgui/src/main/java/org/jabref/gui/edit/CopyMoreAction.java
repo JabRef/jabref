@@ -61,20 +61,20 @@ public class CopyMoreAction extends SimpleCommand {
         }
 
         switch (action) {
-            case COPY_TITLE ->
-                    copyTitle();
-            case COPY_KEY ->
+            case COPY_CITATION_KEY ->
                     copyKey();
-            case COPY_CITE_KEY ->
+            case COPY_AS_CITE_COMMAND ->
                     copyCiteKey();
-            case COPY_KEY_AND_TITLE ->
+            case COPY_CITATION_KEY_AND_TITLE ->
                     copyKeyAndTitle();
-            case COPY_KEY_AND_LINK ->
+            case COPY_CITATION_KEY_AND_LINK ->
                     copyKeyAndLink();
             case COPY_DOI, COPY_DOI_URL ->
                     copyDoi();
             case COPY_FIELD_AUTHOR ->
                     copyField(StandardField.AUTHOR, Localization.lang("Author"));
+            case COPY_FIELD_TITLE ->
+                    copyField(StandardField.TITLE, Localization.lang("Title"));
             case COPY_FIELD_JOURNAL ->
                     copyField(StandardField.JOURNAL, Localization.lang("Journal"));
             case COPY_FIELD_DATE ->
@@ -88,32 +88,6 @@ public class CopyMoreAction extends SimpleCommand {
         }
     }
 
-    private void copyTitle() {
-        List<BibEntry> selectedBibEntries = stateManager.getSelectedEntries();
-
-        List<String> titles = selectedBibEntries.stream()
-                                                .filter(bibEntry -> bibEntry.getTitle().isPresent())
-                                                .map(bibEntry -> LatexToUnicodeAdapter.format(bibEntry.getTitle().get()))
-                                                .collect(Collectors.toList());
-
-        if (titles.isEmpty()) {
-            dialogService.notify(Localization.lang("None of the selected entries have titles."));
-            return;
-        }
-
-        final String copiedTitles = String.join("\n", titles);
-        clipBoardManager.setContent(copiedTitles);
-
-        if (titles.size() == selectedBibEntries.size()) {
-            // All entries had titles.
-            dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                    JabRefDialogService.shortenDialogMessage(copiedTitles)));
-        } else {
-            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined title.",
-                    Integer.toString(selectedBibEntries.size() - titles.size()), Integer.toString(selectedBibEntries.size())));
-        }
-    }
-
     private void copyDoi() {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
@@ -122,12 +96,12 @@ public class CopyMoreAction extends SimpleCommand {
             copyDoiList(entries.stream()
                                .filter(entry -> entry.getDOI().isPresent())
                                .map(entry -> entry.getDOI().get().getURIAsASCIIString())
-                               .collect(Collectors.toList()), entries.size());
+                               .toList(), entries.size());
         } else {
             copyDoiList(entries.stream()
                                .filter(entry -> entry.getDOI().isPresent())
                                .map(entry -> entry.getDOI().get().asString())
-                               .collect(Collectors.toList()), entries.size());
+                               .toList(), entries.size());
         }
     }
 
@@ -157,7 +131,7 @@ public class CopyMoreAction extends SimpleCommand {
         List<String> keys = entries.stream()
                                    .filter(entry -> entry.getCitationKey().isPresent())
                                    .map(entry -> entry.getCitationKey().get())
-                                   .collect(Collectors.toList());
+                                   .toList();
 
         if (keys.isEmpty()) {
             dialogService.notify(Localization.lang("None of the selected entries have citation keys."));
@@ -283,7 +257,7 @@ public class CopyMoreAction extends SimpleCommand {
                                                      .filter(bibEntry -> bibEntry.getFieldOrAlias(field).isPresent())
                                                      .map(bibEntry -> LatexToUnicodeAdapter.format(bibEntry.getFieldOrAlias(field).orElse("")))
                                                      .filter(value -> !value.isEmpty())
-                                                     .collect(Collectors.toList());
+                                                     .toList();
 
         if (fieldValues.isEmpty()) {
             dialogService.notify(Localization.lang("None of the selected entries have %0.", fieldDisplayName));

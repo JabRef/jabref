@@ -95,7 +95,7 @@ class CopyMoreActionTest {
     void executeOnFail() {
         when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
-        copyMoreAction = new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
+        copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
@@ -105,12 +105,12 @@ class CopyMoreActionTest {
     static Stream<Arguments> getTestParams() {
         // Given is a list with 2 entries with 1 with an undefined field
         return Stream.of(
-                Arguments.of(StandardActions.COPY_TITLE,
+                Arguments.of(StandardActions.COPY_FIELD_TITLE,
                         (Consumer<BibEntry>) entry -> entry.clearField(StandardField.TITLE),
                         Localization.lang("None of the selected entries have titles."),
                         Localization.lang("Warning: %0 out of %1 entries have undefined title.", "1", "2")),
 
-                Arguments.of(StandardActions.COPY_KEY,
+                Arguments.of(StandardActions.COPY_CITATION_KEY,
                         (Consumer<BibEntry>) BibEntry::clearCiteKey,
                         Localization.lang("None of the selected entries have citation keys."),
                         Localization.lang("Warning: %0 out of %1 entries have undefined citation key.", "1", "2")),
@@ -207,8 +207,8 @@ class CopyMoreActionTest {
 
     private String expectedClipboardString(StandardActions action) {
         return String.join("\n", switch (action) {
-            case COPY_TITLE -> titles;
-            case COPY_KEY -> keys;
+            case COPY_FIELD_TITLE -> titles;
+            case COPY_CITATION_KEY -> keys;
             case COPY_DOI -> dois;
             case COPY_FIELD_AUTHOR -> authors;
             case COPY_FIELD_JOURNAL -> journals;
