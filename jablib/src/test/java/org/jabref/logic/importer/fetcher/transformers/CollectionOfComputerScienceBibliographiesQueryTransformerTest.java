@@ -41,7 +41,7 @@ class CollectionOfComputerScienceBibliographiesQueryTransformerTest extends Infi
     @Override
     @Test
     public void convertYearField() throws ParseCancellationException {
-        String queryString = "year:2018";
+        String queryString = "year=2018";
         SearchQuery searchQuery = new SearchQuery(queryString);
         BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
         Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);

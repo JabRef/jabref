@@ -72,20 +72,7 @@ public class SearchQueryVisitor extends SearchBaseVisitor<BaseQueryNode> {
 
     @Override
     public BaseQueryNode visitComparison(SearchParser.ComparisonContext ctx) {
-        if (ctx.operator() != null) {
-            int operator = ctx.operator().getStart().getType();
-            if (operator == SearchParser.NEQUAL
-                    || operator == SearchParser.NCEQUAL
-                    || operator == SearchParser.NEEQUAL
-                    || operator == SearchParser.NCEEQUAL
-                    || operator == SearchParser.NREQUAL
-                    || operator == SearchParser.NCREEQUAL) {
-                return null;
-            }
-        }
         String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());
-
-        // if not regex, escape the backslashes, because the highlighter uses regex
 
         // unfielded terms, check the search bar flags
         if (ctx.FIELD() == null) {
@@ -114,6 +101,20 @@ public class SearchQueryVisitor extends SearchBaseVisitor<BaseQueryNode> {
 
         if ("any".equals(field)) {
             return new SearchQueryNode(Optional.empty(), term);
+        }
+
+        if (ctx.operator() != null) {
+            int operator = ctx.operator().getStart().getType();
+            if (operator == SearchParser.NEQUAL
+                    || operator == SearchParser.NCEQUAL
+                    || operator == SearchParser.NEEQUAL
+                    || operator == SearchParser.NCEEQUAL
+                    || operator == SearchParser.NREQUAL
+                    || operator == SearchParser.NCREEQUAL) {
+                // All of these will be treated as !=
+                SearchQueryNode negatedNode = new SearchQueryNode(Optional.of(FieldFactory.parseField(field)), term);
+                return new NotNode(negatedNode);
+            }
         }
         return new SearchQueryNode(Optional.of(FieldFactory.parseField(field)), term);
     }
