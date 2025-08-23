@@ -1,48 +1,36 @@
 package org.jabref.languageserver;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
-import org.jabref.logic.integrity.IntegrityCheck;
+import org.jabref.languageserver.util.LspConsistencyCheck;
+import org.jabref.languageserver.util.LspDiagnosticUtil;
+import org.jabref.languageserver.util.LspIntegrityCheck;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryType;
-import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.BibField;
-import org.jabref.model.entry.field.Field;
 
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
 import org.eclipse.lsp4j.Diagnostic;
-import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.DidChangeTextDocumentParams;
 import org.eclipse.lsp4j.DidCloseTextDocumentParams;
 import org.eclipse.lsp4j.DidOpenTextDocumentParams;
 import org.eclipse.lsp4j.DidSaveTextDocumentParams;
-import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.PublishDiagnosticsParams;
-import org.eclipse.lsp4j.Range;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
 
 public class BibtexTextDocumentService implements TextDocumentService {
 
-    private static final Range NULL_RANGE = new Range(new Position(0, 0), new Position(0, 0));
-    private static final String DIAGNOSTIC_SOURCE = "JabRef";
-
     private final CliPreferences jabRefCliPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
+    private final LspIntegrityCheck lspIntegrityCheck;
+    private final LspConsistencyCheck lspConsistencyCheck;
 
     private LanguageClient client;
     private boolean checkConsistency = true;
@@ -50,6 +38,8 @@ public class BibtexTextDocumentService implements TextDocumentService {
     public BibtexTextDocumentService(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.jabRefCliPreferences = cliPreferences;
         this.abbreviationRepository = abbreviationRepository;
+        this.lspIntegrityCheck = new LspIntegrityCheck(cliPreferences, abbreviationRepository);
+        this.lspConsistencyCheck = new LspConsistencyCheck();
     }
 
     public void setClient(LanguageClient client) {
@@ -85,117 +75,21 @@ public class BibtexTextDocumentService implements TextDocumentService {
         try {
             bibDatabaseContext = BibDatabaseContext.of(content, jabRefCliPreferences.getImportFormatPreferences());
         } catch (Exception e) {
-            Diagnostic parseDiagnostic = new Diagnostic(
-                    NULL_RANGE,
-                    Localization.lang(
-                            "Failed to parse entries.\nThe following error was encountered:\n%0",
-                            e.getMessage()),
-                    DiagnosticSeverity.Error,
-                    DIAGNOSTIC_SOURCE
-            );
+            Diagnostic parseDiagnostic = LspDiagnosticUtil.createGeneralDiagnostic(Localization.lang(
+                    "Failed to parse entries.\nThe following error was encountered:\n%0",
+                    e.getMessage()));
             client.publishDiagnostics(new PublishDiagnosticsParams(uri, List.of(parseDiagnostic), version));
             return;
         }
 
         List<Diagnostic> diagnostics = new ArrayList<>();
 
-        diagnostics.addAll(integrityCheck(bibDatabaseContext, content));
+        diagnostics.addAll(lspIntegrityCheck.check(bibDatabaseContext, content));
 
         if (checkConsistency) {
-            diagnostics.addAll(consistencyCheck(bibDatabaseContext, content));
+            diagnostics.addAll(lspConsistencyCheck.check(bibDatabaseContext, content));
         }
 
         client.publishDiagnostics(new PublishDiagnosticsParams(uri, diagnostics, version));
-    }
-
-    private List<Diagnostic> consistencyCheck(BibDatabaseContext bibDatabaseContext, String content) {
-        List<Diagnostic> diagnostics = new ArrayList<>();
-        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibDatabaseContext.getEntries(), (_, _) -> {
-        });
-
-        result.entryTypeToResultMap().forEach((entryType, entryTypeResult) -> {
-            Optional<BibEntryType> bibEntryType = new BibEntryTypesManager().enrich(entryType, bibDatabaseContext.getMode());
-            Set<Field> requiredFields = bibEntryType
-                    .map(BibEntryType::getRequiredFields)
-                    .stream()
-                    .flatMap(Collection::stream)
-                    .flatMap(orFields -> orFields.getFields().stream())
-                    .collect(Collectors.toSet());
-
-            entryTypeResult.sortedEntries().forEach(entry -> {
-                requiredFields.forEach(requiredField -> {
-                    if (entry.getFieldOrAlias(requiredField).isEmpty()) {
-                        diagnostics.add(createGeneralDiagnostic(Localization.lang("Required field \"%0\" is empty.", requiredField.getName()), content, entry));
-                    }
-                });
-            });
-
-            Set<Field> optionalFields = bibEntryType
-                    .map(BibEntryType::getOptionalFields)
-                    .stream()
-                    .flatMap(Collection::stream)
-                    .map(BibField::field)
-                    .collect(Collectors.toSet());
-
-            entryTypeResult.sortedEntries().forEach(entry -> {
-                optionalFields.forEach(optionalField -> {
-                    if (entry.getFieldOrAlias(optionalField).isEmpty()) {
-                        diagnostics.add(createGeneralDiagnostic(Localization.lang("Optional field \"%0\" is empty.", optionalField.getName()), content, entry));
-                    }
-                });
-            });
-        });
-
-        return diagnostics;
-    }
-
-    private List<Diagnostic> integrityCheck(BibDatabaseContext bibDatabaseContext, String content) {
-        IntegrityCheck integrityCheck = new IntegrityCheck(
-                bibDatabaseContext,
-                jabRefCliPreferences.getFilePreferences(),
-                jabRefCliPreferences.getCitationKeyPatternPreferences(),
-                abbreviationRepository,
-                true
-        );
-
-        return bibDatabaseContext.getEntries().stream().flatMap(entry -> integrityCheck.checkEntry(entry).stream().map(message -> {
-            if (entry.getField(message.field()).isPresent()) {
-                return createFieldDiagnostic(message.message(), message.field(), content, entry);
-            } else {
-                return createGeneralDiagnostic(message.message(), content, entry);
-            }
-        })).toList();
-    }
-
-    private Diagnostic createFieldDiagnostic(String message, Field field, String content, BibEntry entry) {
-        return new Diagnostic(findTextRange(content, entry.getField(field).get()), message, DiagnosticSeverity.Warning, DIAGNOSTIC_SOURCE);
-    }
-
-    private Diagnostic createGeneralDiagnostic(String message, String content, BibEntry entry) {
-        return new Diagnostic(findTextRange(content, entry.getCitationKey().orElse("")), message, DiagnosticSeverity.Warning, DIAGNOSTIC_SOURCE);
-    }
-
-    private static Range findTextRange(String content, String searchText) {
-        int startOffset = content.indexOf(searchText);
-        if (startOffset == -1) {
-            return NULL_RANGE;
-        }
-        int endOffset = startOffset + searchText.length();
-        return new Range(offsetToPosition(content, startOffset), offsetToPosition(content, endOffset));
-    }
-
-    private static Position offsetToPosition(String content, int offset) {
-        int line = 0;
-        int col = 0;
-        for (int i = 0; i < offset; i++) {
-            if (content.charAt(i) == '\n') {
-                line++;
-                col = 0;
-            } else {
-                col++;
-            }
-        }
-        return new Position(line, col);
     }
 }
