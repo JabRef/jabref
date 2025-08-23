@@ -20,7 +20,7 @@ jobs:
     if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - name: Run linkspector

@@ -204,6 +204,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String INCLUDE_CROSS_REFERENCES = "includeCrossReferences";
     private static final String ASK_FOR_INCLUDING_CROSS_REFERENCES = "askForIncludingCrossReferences";
 
+    // region Donation preferences
+    private static final String DONATION_NEVER_SHOW = "donationNeverShow";
+    private static final String DONATION_LAST_SHOWN_EPOCH_DAY = "donationLastShownEpochDay";
+    // endregion
+
     // region NewEntryPreferences
     private static final String CREATE_ENTRY_APPROACH = "latestApproach";
     private static final String CREATE_ENTRY_EXPAND_RECOMMENDED = "typesRecommendedExpanded";
@@ -236,6 +241,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private KeyBindingRepository keyBindingRepository;
     private CopyToPreferences copyToPreferences;
     private NewEntryPreferences newEntryPreferences;
+    private DonationPreferences donationPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -377,6 +383,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         defaults.put(ASK_FOR_INCLUDING_CROSS_REFERENCES, Boolean.TRUE);
         defaults.put(INCLUDE_CROSS_REFERENCES, Boolean.FALSE);
+
+        // region donation defaults
+        defaults.put(DONATION_NEVER_SHOW, Boolean.FALSE);
+        defaults.put(DONATION_LAST_SHOWN_EPOCH_DAY, -1);
+        // endregion
 
         // region NewEntryUnifierPreferences
         defaults.put(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(NewEntryDialogTab.CHOOSE_ENTRY_TYPE));
@@ -1190,6 +1201,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(newEntryPreferences.latestInterpretParserProperty(), (_, _, newValue) -> put(CREATE_ENTRY_INTERPRET_PARSER_NAME, newValue));
 
         return newEntryPreferences;
+    }
+
+    public DonationPreferences getDonationPreferences() {
+        if (donationPreferences != null) {
+            return donationPreferences;
+        }
+
+        donationPreferences = new DonationPreferences(getBoolean(DONATION_NEVER_SHOW), getInt(DONATION_LAST_SHOWN_EPOCH_DAY));
+        EasyBind.listen(donationPreferences.neverShowAgainProperty(), (_, _, newValue) -> putBoolean(DONATION_NEVER_SHOW, newValue));
+        EasyBind.listen(donationPreferences.lastShownEpochDayProperty(), (_, _, newValue) -> putInt(DONATION_LAST_SHOWN_EPOCH_DAY, newValue.intValue()));
+        return donationPreferences;
     }
 
     /**

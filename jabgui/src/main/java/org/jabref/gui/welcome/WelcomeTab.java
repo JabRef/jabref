@@ -7,21 +7,26 @@ import java.io.Reader;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.frame.FileHistoryMenu;
@@ -29,10 +34,12 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.URLs;
-import org.jabref.gui.walkthrough.WalkthroughAction;
+import org.jabref.gui.welcome.components.DonationProvider;
 import org.jabref.gui.welcome.components.QuickSettings;
+import org.jabref.gui.welcome.components.Walkthroughs;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -44,6 +51,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,8 +71,16 @@ public class WelcomeTab extends Tab {
     private final TaskExecutor taskExecutor;
     private final FileHistoryMenu fileHistoryMenu;
     private final BuildInfo buildInfo;
+    private final Stage stage;
+    private final WorkspacePreferences workspacePreferences;
+    private final ThemeManager themeManager;
+    private Walkthroughs walkthroughs;
 
-    public WelcomeTab(LibraryTabContainer tabContainer,
+    private QuickSettings quickSettings;
+    private final DonationProvider donationProvider;
+
+    public WelcomeTab(Stage stage,
+                      LibraryTabContainer tabContainer,
                       GuiPreferences preferences,
                       AiService aiService,
                       DialogService dialogService,
@@ -75,7 +91,9 @@ public class WelcomeTab extends Tab {
                       ClipBoardManager clipBoardManager,
                       TaskExecutor taskExecutor,
                       FileHistoryMenu fileHistoryMenu,
-                      BuildInfo buildInfo) {
+                      BuildInfo buildInfo,
+                      WorkspacePreferences workspacePreferences,
+                      ThemeManager themeManager) {
         super(Localization.lang("Welcome"));
         setClosable(true);
         this.tabContainer = tabContainer;
@@ -90,27 +108,30 @@ public class WelcomeTab extends Tab {
         this.taskExecutor = taskExecutor;
         this.fileHistoryMenu = fileHistoryMenu;
         this.buildInfo = buildInfo;
+        this.stage = stage;
+        this.workspacePreferences = workspacePreferences;
+        this.themeManager = themeManager;
         this.recentLibrariesBox = new VBox();
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
-        VBox mainContainer = new VBox(createTopTitles(), createColumnsContainer(), createCommunityBox());
-        mainContainer.getStyleClass().add("welcome-main-container");
+        Node titles = createTopTitles();
+        Node communityBox = createCommunityBox();
+        ScrollPane columnsScroll = createColumnsContainerScrollable();
 
-        VBox container = new VBox();
-        container.getChildren().add(mainContainer);
-        VBox.setVgrow(mainContainer, Priority.ALWAYS);
+        VBox mainStack = new VBox(titles, columnsScroll, communityBox);
+        mainStack.getStyleClass().add("welcome-main-container");
+        VBox.setVgrow(columnsScroll, Priority.ALWAYS);
+
+        VBox container = new VBox(mainStack);
         container.setAlignment(Pos.CENTER);
 
-        setContent(container);
-    }
+        StackPane rootPane = new StackPane(container);
+        setContent(rootPane);
 
-    private Button createWalkthroughButton(String text, IconTheme.JabRefIcons icon, String walkthroughId) {
-        Button button = new Button(Localization.lang(text));
-        button.setGraphic(icon.getGraphicNode());
-        button.getStyleClass().add("quick-settings-button");
-        button.setMaxWidth(Double.MAX_VALUE);
-        button.setOnAction(_ -> new WalkthroughAction(walkthroughId).execute());
-        return button;
+        donationProvider = new DonationProvider(rootPane, preferences, dialogService);
+        donationProvider.showIfNeeded();
+
+        setOnClosed(_ -> donationProvider.cleanUp());
     }
 
     private VBox createTopTitles() {
@@ -118,23 +139,32 @@ public class WelcomeTab extends Tab {
         welcomeLabel.getStyleClass().add("welcome-label");
         Label descriptionLabel = new Label(Localization.lang("Stay on top of your literature"));
         descriptionLabel.getStyleClass().add("welcome-description-label");
-        VBox topTitles = new VBox();
+        VBox topTitles = new VBox(welcomeLabel, descriptionLabel);
         topTitles.getStyleClass().add("welcome-top-titles");
-        topTitles.getChildren().addAll(welcomeLabel, descriptionLabel);
         return topTitles;
     }
 
-    private HBox createColumnsContainer() {
+    private ScrollPane createColumnsContainerScrollable() {
+        GridPane grid = new GridPane();
+        grid.getStyleClass().add("welcome-columns-container");
+
         VBox leftColumn = createLeftColumn();
+        GridPane.setHgrow(leftColumn, Priority.ALWAYS);
+
         VBox rightColumn = createRightColumn();
-        HBox columnsContainer = new HBox();
-        columnsContainer.getStyleClass().add("welcome-columns-container");
-        leftColumn.getStyleClass().add("welcome-left-column");
-        rightColumn.getStyleClass().add("welcome-right-column");
-        HBox.setHgrow(leftColumn, Priority.ALWAYS);
-        HBox.setHgrow(rightColumn, Priority.ALWAYS);
-        columnsContainer.getChildren().addAll(leftColumn, rightColumn);
-        return columnsContainer;
+        GridPane.setHgrow(rightColumn, Priority.ALWAYS);
+
+        Runnable applyLayout = () -> updateColumnsLayout(grid, leftColumn, rightColumn, grid.getWidth());
+        grid.widthProperty().addListener((_, _, _) -> applyLayout.run());
+        applyLayout.run();
+
+        ScrollPane scrollPane = new ScrollPane(grid);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.getStyleClass().add("welcome-columns-scroll");
+        scrollPane.setStyle("-fx-background-color: transparent;"); // Using class selector is insufficient to prevent background from turning white on click.
+        return scrollPane;
     }
 
     private VBox createLeftColumn() {
@@ -147,45 +177,42 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createRightColumn() {
-        VBox rightColumn = new VBox(new QuickSettings(), createWalkthroughBox());
+        this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor, themeManager);
+        this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);
+        VBox rightColumn = new VBox(quickSettings, walkthroughs);
         rightColumn.getStyleClass().add("welcome-content-column");
+        VBox.setVgrow(quickSettings, Priority.ALWAYS);
+        VBox.setVgrow(walkthroughs, Priority.ALWAYS);
         return rightColumn;
     }
 
-    private VBox createWalkthroughBox() {
-        Label header = new Label(Localization.lang("Walkthroughs"));
-        header.getStyleClass().add("welcome-header-label");
+    private void updateColumnsLayout(@NonNull GridPane grid,
+                                     @NonNull VBox leftColumn,
+                                     @NonNull VBox rightColumn,
+                                     double availableWidth) {
+        grid.getChildren().clear();
+        grid.getColumnConstraints().clear();
 
-        VBox walkthroughsContainer = new VBox();
-        walkthroughsContainer.getStyleClass().add("walkthroughs-container");
-
-        Button mainFileDirWalkthroughButton = createWalkthroughButton(
-                "Set main file directory",
-                IconTheme.JabRefIcons.FOLDER,
-                "mainFileDirectory"
-        );
-
-        Button entryTableWalkthroughButton = createWalkthroughButton(
-                "Customize entry table",
-                IconTheme.JabRefIcons.TOGGLE_GROUPS,
-                "customizeEntryTable"
-        );
-
-        walkthroughsContainer.getChildren().addAll(mainFileDirWalkthroughButton, entryTableWalkthroughButton);
-
-        return createVBoxContainer(header, walkthroughsContainer);
-    }
-
-    private VBox createCommunityBox() {
-        Label header = new Label(Localization.lang("Community"));
-        header.getStyleClass().add("welcome-header-label");
-        FlowPane iconLinksContainer = createIconLinksContainer();
-        HBox textLinksContainer = createTextLinksContainer();
-        HBox versionContainer = createVersionContainer();
-        VBox container = new VBox();
-        container.getStyleClass().add("welcome-community-content");
-        container.getChildren().addAll(iconLinksContainer, textLinksContainer, versionContainer);
-        return createVBoxContainer(header, container);
+        double threshold = 48 * workspacePreferences.getMainFontSize();
+        if (availableWidth < threshold) {
+            grid.getStyleClass().add("compact");
+            ColumnConstraints single = new ColumnConstraints();
+            single.setPercentWidth(100);
+            grid.getColumnConstraints().add(single);
+            grid.add(leftColumn, 0, 0);
+            grid.add(rightColumn, 0, 1);
+            quickSettings.disableScroll();
+            walkthroughs.disableScroll();
+        } else {
+            grid.getStyleClass().remove("compact");
+            ColumnConstraints half = new ColumnConstraints();
+            half.setPercentWidth(50);
+            grid.getColumnConstraints().addAll(half, half);
+            grid.add(leftColumn, 0, 0);
+            grid.add(rightColumn, 1, 0);
+            quickSettings.enableScroll();
+            walkthroughs.enableScroll();
+        }
     }
 
     private VBox createWelcomeStartBox() {
@@ -271,11 +298,16 @@ public class WelcomeTab extends Tab {
         fileHistoryMenu.setDisable(true);
     }
 
-    private VBox createVBoxContainer(Node... nodes) {
-        VBox box = new VBox();
-        box.getStyleClass().add("welcome-section");
-        box.getChildren().addAll(nodes);
-        return box;
+    private VBox createCommunityBox() {
+        Label header = new Label(Localization.lang("Community"));
+        header.getStyleClass().add("welcome-header-label");
+        FlowPane iconLinksContainer = createIconLinksContainer();
+        HBox textLinksContainer = createTextLinksContainer();
+        HBox versionContainer = createVersionContainer();
+        VBox container = new VBox();
+        container.getStyleClass().add("welcome-community-content");
+        container.getChildren().addAll(iconLinksContainer, textLinksContainer, versionContainer);
+        return createVBoxContainer(header, container);
     }
 
     private FlowPane createIconLinksContainer() {
@@ -334,5 +366,12 @@ public class WelcomeTab extends Tab {
         versionLabel.getStyleClass().add("welcome-community-version-text");
         container.getChildren().add(versionLabel);
         return container;
+    }
+
+    private VBox createVBoxContainer(Node... nodes) {
+        VBox box = new VBox();
+        box.getStyleClass().add("welcome-section");
+        box.getChildren().addAll(nodes);
+        return box;
     }
 }
