@@ -6,7 +6,7 @@ import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.search.query.SearchQuery;
 
-import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,7 +40,7 @@ class ZbMathQueryTransformerTest extends InfixTransformerTest<ZbMathQueryTransfo
 
     @Override
     @Test
-    public void convertYearField() throws QueryNodeParseException {
+    public void convertYearField() throws ParseCancellationException {
         String queryString = "year=2015";
         SearchQuery searchQuery = new SearchQuery(queryString);
         BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
@@ -51,7 +51,7 @@ class ZbMathQueryTransformerTest extends InfixTransformerTest<ZbMathQueryTransfo
 
     @Override
     @Test
-    public void convertYearRangeField() throws QueryNodeParseException {
+    public void convertYearRangeField() throws ParseCancellationException {
         String queryString = "year-range=2012-2015";
         SearchQuery searchQuery = new SearchQuery(queryString);
         BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
