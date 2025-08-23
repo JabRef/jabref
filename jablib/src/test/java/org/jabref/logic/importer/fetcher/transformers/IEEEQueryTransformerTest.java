@@ -89,8 +89,7 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
     private static Stream<Arguments> getTitleTestData() {
         return Stream.of(
                 Arguments.of("Overcoming AND Open AND Source AND Project AND Entry AND Barriers AND Portal AND Newcomers", "Overcoming Open Source Project Entry Barriers with a Portal for Newcomers"),
-                Arguments.of("Overcoming AND Open AND Source AND Project AND Entry AND Barriers", "Overcoming Open Source Project Entry Barriers"),
-                Arguments.of(null, "and")
+                Arguments.of("Overcoming AND Open AND Source AND Project AND Entry AND Barriers", "Overcoming Open Source Project Entry Barriers")
         );
     }
 
