@@ -1,10 +1,9 @@
 package org.jabref.gui.maintable;
 
-import java.util.Optional;
-
 import javax.swing.undo.UndoManager;
 
-import javafx.collections.ObservableList;
+import javafx.beans.binding.Bindings;
+import javafx.collections.ListChangeListener;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -125,44 +124,45 @@ public class RightClickMenu {
                                          LibraryTab libraryTab,
                                          ImportHandler importHandler) {
         Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);
+        copyToMenu.disableProperty().bind(
+                Bindings.size(stateManager.getOpenDatabases()).lessThan(2)
+        );
 
-        ObservableList<BibDatabaseContext> openDatabases = stateManager.getOpenDatabases();
+        Runnable rebuildMenu = () -> {
+            copyToMenu.getItems().clear();
+            BibDatabaseContext sourceDatabaseContext = libraryTab.getBibDatabaseContext();
 
-        BibDatabaseContext sourceDatabaseContext = libraryTab.getBibDatabaseContext();
+            for (BibDatabaseContext targetDatabaseContext : stateManager.getOpenDatabases()) {
+                if (targetDatabaseContext == sourceDatabaseContext) {
+                    continue;
+                }
+                String targetDatabaseName;
 
-        Optional<String> sourceDatabaseName = libraryTab
-                .getBibDatabaseContext().getDatabasePath().stream()
-                .flatMap(path -> FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), path).stream())
-                .findFirst();
-
-        if (!openDatabases.isEmpty()) {
-            openDatabases.forEach(bibDatabaseContext -> {
-                Optional<String> destinationPath = Optional.empty();
-                String destinationDatabaseName = "";
-
-                if (bibDatabaseContext.getDatabasePath().isPresent()) {
-                    Optional<String> uniqueFilePathFragment = FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), bibDatabaseContext.getDatabasePath().get());
-                    if (uniqueFilePathFragment.equals(sourceDatabaseName)) {
-                        return;
-                    }
-                    if (uniqueFilePathFragment.isPresent()) {
-                        destinationDatabaseName = uniqueFilePathFragment.get();
-                    }
-                } else if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
-                    destinationDatabaseName = bibDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
+                if (targetDatabaseContext.getDatabasePath().isPresent()) {
+                    targetDatabaseName = FileUtil.getUniquePathFragment(
+                            stateManager.getAllDatabasePaths(),
+                            targetDatabaseContext.getDatabasePath().get()
+                    ).orElse(Localization.lang("untitled"));
+                } else if (targetDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
+                    targetDatabaseName = targetDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
                 } else {
-                    destinationDatabaseName = destinationPath.orElse(Localization.lang("untitled"));
+                    targetDatabaseName = Localization.lang("untitled");
                 }
 
-                copyToMenu.getItems().addAll(
+                copyToMenu.getItems().add(
                         factory.createCustomMenuItem(
                                 StandardActions.COPY_TO,
-                                new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, bibDatabaseContext),
-                                destinationDatabaseName
+                                new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+                                        importHandler, sourceDatabaseContext, targetDatabaseContext),
+                                targetDatabaseName
                         )
                 );
-            });
-        }
+            }
+        };
+
+        // EasyBind.subscribe() is not available for lists, therefore "manually" triggering rebuild and subscribing
+        rebuildMenu.run();
+        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> rebuildMenu.run());
 
         return copyToMenu;
     }
