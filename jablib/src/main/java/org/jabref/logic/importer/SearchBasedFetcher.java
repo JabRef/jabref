@@ -38,8 +38,11 @@ public interface SearchBasedFetcher extends WebFetcher {
         }
 
         SearchQuery searchQueryObject = new SearchQuery(searchQuery);
-        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
+        if (!searchQueryObject.isValid()) {
+           throw new FetcherException("The query is not valid");
+        }
         BaseQueryNode queryNode;
+        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
         try {
             queryNode = visitor.visitStart(searchQueryObject.getContext());
         } catch (ParseCancellationException e) {
