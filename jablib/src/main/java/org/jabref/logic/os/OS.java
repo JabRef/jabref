@@ -3,8 +3,10 @@ package org.jabref.logic.os;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -25,9 +27,11 @@ public class OS {
     // No LOGGER may be initialized directly
     // Otherwise, org.jabref.Launcher.addLogToDisk will fail, because tinylog's properties are frozen
 
-    public static final String NEWLINE = System.lineSeparator();
     public static final String APP_DIR_APP_NAME = "jabref";
     public static final String APP_DIR_APP_AUTHOR = "org.jabref";
+
+    public static final String NEWLINE = System.lineSeparator();
+    public static final List<Charset> ENCODINGS = Charset.availableCharsets().values().stream().distinct().toList();
 
     // https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/SystemUtils.html
     private static final String OS_NAME = System.getProperty("os.name", "unknown").toLowerCase(Locale.ROOT);
@@ -86,7 +90,8 @@ public class OS {
                 try {
                     ShellLink link = new ShellLink(texworksLinkPath);
                     return link.resolveTarget();
-                } catch (IOException | ShellLinkException e) {
+                } catch (IOException |
+                        ShellLinkException e) {
                     // Static logger instance cannot be used. See the class comment.
                     Logger logger = LoggerFactory.getLogger(OS.class);
                     logger.warn("Error while reading .lnk file for TeXworks", e);

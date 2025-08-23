@@ -19,7 +19,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
@@ -121,7 +120,7 @@ public class FileUtil {
         if (nameWithoutExtension.length() > MAXIMUM_FILE_NAME_LENGTH) {
             Optional<String> extension = getFileExtension(fileName);
             String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0));
-            LOGGER.info("Truncated the too long filename '%s' (%d characters) to '%s'.".formatted(fileName, fileName.length(), shortName));
+            LOGGER.info("Truncated the too long filename '{}' ({}} characters) to '{}'.", fileName, fileName.length(), shortName);
             return extension.map(s -> shortName + "." + s).orElse(shortName);
         }
 
@@ -136,7 +135,7 @@ public class FileUtil {
      *
      * @param path      the path to add the extension to
      * @param extension the extension to add
-     * @return the with the modified file name
+     * @return the modified file name
      */
     public static Path addExtension(Path path, String extension) {
         return path.resolveSibling(path.getFileName() + extension);
@@ -145,7 +144,7 @@ public class FileUtil {
     /**
      * Looks for the unique directory, if any, different to the provided paths
      *
-     * @param paths List of paths as Strings
+     * @param paths       List of paths as Strings
      * @param comparePath The to be tested path
      */
     public static Optional<String> getUniquePathDirectory(List<String> paths, Path comparePath) {
@@ -154,7 +153,7 @@ public class FileUtil {
         List<String> uniquePathParts = uniquePathSubstrings(paths);
         return uniquePathParts.stream()
                               .filter(part -> comparePath.toString().contains(part)
-                                              && !part.equals(fileName) && part.contains(File.separator))
+                                      && !part.equals(fileName) && part.contains(File.separator))
                               .findFirst()
                               .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
     }
@@ -162,7 +161,7 @@ public class FileUtil {
     /**
      * Looks for the shortest unique path of the in a list of paths
      *
-     * @param paths List of paths as Strings
+     * @param paths       List of paths as Strings
      * @param comparePath The to be shortened path
      */
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
@@ -220,7 +219,7 @@ public class FileUtil {
      * @param pathToSourceFile      Path Source file
      * @param pathToDestinationFile Path Destination file
      * @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
-     * @return boolean Whether the copy succeeded, or was stopped due to the file already existing.
+     * @return boolean Whether the copy succeeded or was stopped due to the file already existing.
      */
     public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
         // Check if the file already exists.
@@ -256,13 +255,38 @@ public class FileUtil {
         if (!file.isAbsolute()) {
             return file;
         }
+        Optional<Path> realFileOpt = toRealPath(file);
 
         for (Path directory : directories) {
             if (file.startsWith(directory)) {
                 return directory.relativize(file);
             }
+
+            if (realFileOpt.isPresent()) {
+                Optional<Path> realDirOpt = toRealPath(directory);
+                if (realDirOpt.isPresent()) {
+                    Path realFile = realFileOpt.get();
+                    Path realDir = realDirOpt.get();
+                    if (realFile.startsWith(realDir)) {
+                        return realDir.relativize(realFile);
+                    }
+                }
+            }
         }
         return file;
+    }
+
+    private static Optional<Path> toRealPath(Path path) {
+        if (Files.exists(path)) {
+            try {
+                return Optional.of(path.toRealPath());
+            } catch (IOException e) {
+                LOGGER.warn("Could not resolve real path for {}", path, e);
+                return Optional.empty();
+            }
+        } else {
+            return Optional.of(path.toAbsolutePath());
+        }
     }
 
     /**
@@ -285,7 +309,7 @@ public class FileUtil {
         List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
 
         return entries.stream()
-                      .map(entry -> {
+                      .peek(entry -> {
                           if (entry.hasField(StandardField.FILE)) {
                               List<LinkedFile> updatedLinkedFiles = entry.getFiles().stream().map(linkedFile -> {
                                   if (!linkedFile.isOnlineLink()) {
@@ -296,7 +320,6 @@ public class FileUtil {
                               }).toList();
                               entry.setFiles(updatedLinkedFiles);
                           }
-                          return entry;
                       }).toList();
     }
 
@@ -314,7 +337,7 @@ public class FileUtil {
         return bes.stream()
                   .flatMap(entry -> entry.getFiles().stream())
                   .flatMap(file -> file.findIn(fileDirs).stream())
-                  .collect(Collectors.toList());
+                  .toList();
     }
 
     /**
@@ -344,8 +367,8 @@ public class FileUtil {
     /**
      * Determines directory name provided by an entry in a database
      *
-     * @param database        the database, where the entry is located
-     * @param entry           the entry to which the directory should be linked to
+     * @param database             the database, where the entry is located
+     * @param entry                the entry to which the directory should be linked to
      * @param directoryNamePattern the dirname pattern
      * @return a suggested dirName
      */
@@ -372,11 +395,11 @@ public class FileUtil {
     public static Optional<Path> findSingleFileRecursively(String filename, Path rootDirectory) {
         try (Stream<Path> pathStream = Files.walk(rootDirectory)) {
             return pathStream
-                             .filter(Files::isRegularFile)
-                             .filter(f -> f.getFileName().toString().equals(filename))
-                             .findFirst();
+                    .filter(Files::isRegularFile)
+                    .filter(f -> f.getFileName().toString().equals(filename))
+                    .findFirst();
         } catch (UncheckedIOException | IOException ex) {
-            LOGGER.error("Error trying to locate the file {} inside the directory {}", filename, rootDirectory);
+            LOGGER.error("Error trying to locate the file {} inside the directory {}", filename, rootDirectory, ex);
         }
         return Optional.empty();
     }
@@ -412,9 +435,8 @@ public class FileUtil {
     /**
      * Converts a relative filename to an absolute one, if necessary.
      *
-     * @param fileName the filename (e.g., a .pdf file), may contain path separators
+     * @param fileName  the filename (e.g., a .pdf file), may contain path separators
      * @param directory the directory which should be search starting point
-     *
      * @return an empty optional if the file does not exist, otherwise, the absolute path
      */
     public static Optional<Path> find(String fileName, Path directory) {
@@ -506,10 +528,9 @@ public class FileUtil {
     /**
      * Detect illegal characters in given filename.
      *
-     * @see org.jabref.logic.util.io.FileNameCleaner#cleanFileName
-     *
      * @param fileName the fileName to detect
      * @return Boolean whether there is an illegal name.
+     * @see org.jabref.logic.util.io.FileNameCleaner#cleanFileName
      */
     public static boolean detectBadFileName(String fileName) {
         // fileName could be a path, we want to check the fileName only (and don't care about the path)
@@ -517,7 +538,7 @@ public class FileUtil {
         //         but a perfectly legal one in the path at this position
         try {
             fileName = Path.of(fileName).getFileName().toString();
-        } catch (InvalidPathException e) {
+        } catch (InvalidPathException _) {
             // in case the internal method cannot parse the path, it is surely illegal
             return true;
         }
@@ -581,9 +602,9 @@ public class FileUtil {
         numCharsAfterEllipsis = Math.min(numCharsAfterEllipsis, name.length() - numCharsBeforeEllipsis);
 
         return name.substring(0, numCharsBeforeEllipsis) +
-               ELLIPSIS +
-               name.substring(name.length() - numCharsAfterEllipsis) +
-               extension;
+                ELLIPSIS +
+                name.substring(name.length() - numCharsAfterEllipsis) +
+                extension;
     }
 
     public static boolean isCharLegal(char c) {
