@@ -6,7 +6,7 @@ import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.search.query.SearchQuery;
 
-import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,13 +15,13 @@ public abstract class YearRangeByFilteringQueryTransformerTest<T extends YearRan
 
     @Override
     @Test
-    public void convertYearRangeField() throws QueryNodeParseException {
+    public void convertYearRangeField() throws ParseCancellationException {
         YearRangeByFilteringQueryTransformer transformer = getTransformer();
 
-        String queryString = "year-range:2018-2021";
+        String queryString = "year-range=2018-2021";
         SearchQuery searchQuery = new SearchQuery(queryString);
         BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
-        Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);
+        Optional<String> query = transformer.transformSearchQuery(searchQueryList);
 
         // The API does not support querying for a year range
         // The implementation of the fetcher filters the results manually

@@ -6,7 +6,7 @@ import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.search.query.SearchQuery;
 
-import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,8 +40,8 @@ class JstorQueryTransformerTest extends InfixTransformerTest<JstorQueryTransform
 
     @Override
     @Test
-    public void convertYearField() throws QueryNodeParseException {
-        String queryString = "year:2018";
+    public void convertYearField() throws ParseCancellationException {
+        String queryString = "year=2018";
         SearchQuery searchQuery = new SearchQuery(queryString);
         BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
         Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);
@@ -50,8 +50,8 @@ class JstorQueryTransformerTest extends InfixTransformerTest<JstorQueryTransform
 
     @Override
     @Test
-    public void convertYearRangeField() throws QueryNodeParseException {
-        String queryString = "year-range:2018-2021";
+    public void convertYearRangeField() throws ParseCancellationException {
+        String queryString = "year-range=2018-2021";
         SearchQuery searchQuery = new SearchQuery(queryString);
         BaseQueryNode searchQueryList = new SearchQueryVisitor(searchQuery.getSearchFlags()).visitStart(searchQuery.getContext());
         Optional<String> query = getTransformer().transformSearchQuery(searchQueryList);
