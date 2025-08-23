@@ -54,7 +54,8 @@ public class CitationStyleCatalogGenerator {
         try {
             // JBang's gradle plugin has a strange path handling. If "application->run" is started from the IDE, the path ends with "jabgui"
             Path root = Path.of(".").toAbsolutePath().normalize();
-            if (root.getFileName().toString().startsWith("jab")) {
+            String rootFilename = root.getFileName().toString();
+            if (!"jabref".equalsIgnoreCase(rootFilename) && rootFilename.startsWith("jab")) {
                 LOGGER.info("Running from IDE, adjusting path to styles root");
                 root = root.getParent();
             }
