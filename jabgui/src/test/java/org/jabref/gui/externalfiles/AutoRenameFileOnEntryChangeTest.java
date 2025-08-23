@@ -66,7 +66,7 @@ class AutoRenameFileOnEntryChangeTest {
 
         bibDatabaseContext.getDatabase().insertEntry(entry);
         AutoRenameFileOnEntryChange autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, guiPreferences.getFilePreferences());
-        autoRenameFileOnEntryChange.bindToDatabase();
+        bibDatabaseContext.getDatabase().registerListener(autoRenameFileOnEntryChange);
 
         // Update citation-key when author/year changes
         bibDatabaseContext.getDatabase().registerListener(new Object() {
