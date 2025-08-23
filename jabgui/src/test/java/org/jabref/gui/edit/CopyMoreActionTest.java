@@ -107,8 +107,8 @@ class CopyMoreActionTest {
         return Stream.of(
                 Arguments.of(StandardActions.COPY_FIELD_TITLE,
                         (Consumer<BibEntry>) entry -> entry.clearField(StandardField.TITLE),
-                        Localization.lang("None of the selected entries have titles."),
-                        Localization.lang("Warning: %0 out of %1 entries have undefined title.", "1", "2")),
+                        Localization.lang("None of the selected entries have %0.", "Title"),
+                        Localization.lang("Warning: %0 out of %1 entries have undefined %2.", "1", "2", "Title")),
 
                 Arguments.of(StandardActions.COPY_CITATION_KEY,
                         (Consumer<BibEntry>) BibEntry::clearCiteKey,
