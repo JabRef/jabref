@@ -57,10 +57,10 @@ public class LspConsistencyCheck {
                     .filter(allReportedFields::contains)
                     .collect(Collectors.toSet());
 
-            optionalFields.forEach(requiredField -> {
+            optionalFields.forEach(optionalField -> {
                 entryTypeResult.sortedEntries().forEach(entry -> {
-                    if (entry.getFieldOrAlias(requiredField).isEmpty()) {
-                        diagnostics.add(LspDiagnosticUtil.createGeneralEntryDiagnostic(Localization.lang("Optional field \"%0\" is empty.", requiredField.getName()), content, entry));
+                    if (entry.getFieldOrAlias(optionalField).isEmpty()) {
+                        diagnostics.add(LspDiagnosticUtil.createGeneralEntryDiagnostic(Localization.lang("Optional field \"%0\" is empty.", optionalField.getName()), content, entry));
                     }
                 });
             });
