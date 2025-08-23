@@ -179,12 +179,14 @@ public class LinkedFileHandler {
             return false;
         }
 
+        LOGGER.debug("Renaming file {} to {}", currentFileName, uniqueFileName);
         return renameToName(uniqueFileName, false);
     }
 
     public boolean renameToName(String targetFileName, boolean overwriteExistingFile) throws IOException {
         Optional<Path> oldFile = linkedFile.findIn(databaseContext, filePreferences);
         if (oldFile.isEmpty()) {
+            LOGGER.debug("No file found for linked file {}", linkedFile);
             return false;
         }
 
@@ -211,6 +213,7 @@ public class LinkedFileHandler {
             return false;
         }
 
+        LOGGER.debug("Renaming file {} to {}", oldPath, newPath);
         if (Files.exists(newPath) && !pathsDifferOnlyByCase && overwriteExistingFile) {
             Files.createDirectories(newPath.getParent());
             LOGGER.debug("Overwriting existing file {}", newPath);
