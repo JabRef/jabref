@@ -48,7 +48,7 @@ public class RenamePdfCleanup implements CleanupJob {
                     changed = true;
                 }
             } catch (IOException exception) {
-                LOGGER.error("Error while renaming file {}", file.getLink(), exception);
+                LOGGER.error("Error while renaming file {}", file.getLink());
             }
         }
 
