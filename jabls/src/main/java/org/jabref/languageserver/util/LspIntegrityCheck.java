@@ -11,7 +11,7 @@ import org.eclipse.lsp4j.Diagnostic;
 
 public class LspIntegrityCheck {
 
-    private static final boolean ALLOWINTEGEREDITION = true;
+    private static final boolean ALLOW_INTEGER_EDITION = true;
 
     private final CliPreferences cliPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
