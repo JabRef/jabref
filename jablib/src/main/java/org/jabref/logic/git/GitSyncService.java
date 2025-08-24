@@ -226,27 +226,5 @@ public class GitSyncService {
             }
         }
     }
-
-    public boolean commitLocalChanges(Path bibFilePath, String commitMessage, boolean amend) throws IOException, GitAPIException, JabRefException {
-        Optional<Path> repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);
-        if (repoRootOpt.isEmpty()) {
-            throw new JabRefException("Commit aborted: Path is not inside a Git repository.");
-        }
-        GitHandler gitHandler = gitHandlerRegistry.get(repoRootOpt.get());
-
-        GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
-        if (!status.tracking()) {
-            throw new JabRefException("Commit aborted: The file is not under Git version control.");
-        }
-        if (status.conflict()) {
-            throw new JabRefException("Commit aborted: Local repository has unresolved merge conflicts.");
-        }
-
-        String message = commitMessage != null && !commitMessage.isBlank()
-                ? commitMessage
-                : "Commit changes";
-
-        return gitHandler.createCommitOnCurrentBranch(message, amend);
-    }
 }
 
