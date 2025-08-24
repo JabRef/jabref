@@ -2,8 +2,6 @@ package org.jabref.model.entry;
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -87,17 +85,20 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
                           .orElse("");
     }
 
-    /**
-     * Returns the keyword string with all unescaped occurrences of the given hierarchical delimiter escaped.
+    /*
+     * Used for BibTex export, where we need to escape the delimiter with \
+     */
+    public String getSubchainAsStringWithEscaping(Character delimiter) {
+        return getEscaped(delimiter) +
+                getChild().map(child -> " " + DEFAULT_HIERARCHICAL_DELIMITER + " " + child.getSubchainAsStringWithEscaping(DEFAULT_HIERARCHICAL_DELIMITER))
+                          .orElse("");
+    }
+
+    /*
      * This ensures that delimiters within keyword values are not misinterpreted as separators.
      */
-    // TODO: This method needs refactoring, Expected :keyword\,one > sub
-    //  Actual   :keyword,one ----> it is eating the delimiter up
-    public String getEscaped(Character hierarchicalDelimiter) {
-        String escapedDelimiter = Pattern.quote(String.valueOf(hierarchicalDelimiter));
-        Pattern pattern = Pattern.compile("(?<!\\\\)" + escapedDelimiter);
-        Matcher matcher = pattern.matcher(keyword);
-        return matcher.replaceAll("\\" + hierarchicalDelimiter);
+    private String getEscaped(Character delimiter) {
+        return keyword.replace(delimiter.toString(), "\\" + delimiter);
     }
     /**
      * Gets the keyword of this node in the chain.
