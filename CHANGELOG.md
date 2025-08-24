@@ -75,6 +75,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We introduced walkthrough functionality [#12664](https://github.com/JabRef/jabref/issues/12664)
 - The Welcome tab now has a responsive layout. [#12664](https://github.com/JabRef/jabref/issues/12664)
 - We introduced a donation prompt in the Welcome tab. [#12664](https://github.com/JabRef/jabref/issues/12664)
+- We changed the web-search fetchers to use an ANTLR based parser instead of lucene parser [#13607](https://github.com/JabRef/jabref/issues/13607)
 
 ### Fixed
 
