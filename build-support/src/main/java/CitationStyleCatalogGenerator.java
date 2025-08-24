@@ -68,7 +68,7 @@ public class CitationStyleCatalogGenerator {
             List<CitationStyle> styles = discoverStyles(stylesRoot);
 
             Path catalogPath = root.resolve(CATALOG_PATH);
-            generateCatalog(styles, catalogPath);
+            generateCatalog(styles, stylesRoot, catalogPath);
         } catch (IOException e) {
             LOGGER.error("Error generating citation style catalog", e);
         }
@@ -84,14 +84,14 @@ public class CitationStyleCatalogGenerator {
         }
     }
 
-    private static void generateCatalog(List<CitationStyle> styles, Path catalogPath) throws IOException {
+    private static void generateCatalog(List<CitationStyle> styles, Path stylesRoot, Path catalogPath) throws IOException {
         // Create a JSON representation of the styles
         ObjectMapper mapper = new ObjectMapper();
         List<Map<String, Object>> styleInfoList = styles.stream()
                                                         .map(style -> {
                                                             Map<String, Object> info = new HashMap<>();
                                                             Path stylePath = Path.of(style.getFilePath());
-                                                            Path relativePath = STYLES_ROOT.toAbsolutePath().relativize(stylePath.toAbsolutePath());
+                                                            Path relativePath = stylesRoot.toAbsolutePath().relativize(stylePath.toAbsolutePath());
                                                             info.put("path", relativePath.toString());
                                                             info.put("title", style.getTitle());
                                                             info.put("shortTitle", style.getShortTitle());
