@@ -6,7 +6,14 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jabref.logic.git.util.NoopGitSystemReader;
+
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.internal.storage.file.WindowCache;
+import org.eclipse.jgit.lib.RepositoryCache;
+import org.eclipse.jgit.storage.file.WindowCacheConfig;
+import org.eclipse.jgit.util.SystemReader;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -20,11 +27,23 @@ class SlrGitHandlerTest {
 
     @TempDir
     Path repositoryPath;
+
     private SlrGitHandler gitHandler;
 
     @BeforeEach
     void setUpGitHandler() {
+        SystemReader.setInstance(new NoopGitSystemReader());
         gitHandler = new SlrGitHandler(repositoryPath);
+        gitHandler.initIfNeeded();
+    }
+
+    @AfterEach
+    void cleanUp() {
+        // Required by JGit
+        // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-2765437816 for details
+        RepositoryCache.clear();
+        // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-3095957214
+        WindowCache.reconfigure(new WindowCacheConfig());
     }
 
     @Test

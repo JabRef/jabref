@@ -1,7 +1,6 @@
 package org.jabref.logic.git;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,21 +12,25 @@ import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
 import org.jabref.logic.git.model.MergeResult;
+import org.jabref.logic.git.util.GitHandlerRegistry;
+import org.jabref.logic.git.util.NoopGitSystemReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.internal.storage.file.WindowCache;
 import org.eclipse.jgit.lib.ConfigConstants;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.PersonIdent;
+import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.URIish;
+import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,16 +46,21 @@ import static org.mockito.Mockito.when;
 
 class GitSyncServiceTest {
     private Path library;
-    private Path remoteDir;
+
+    // Class variables for debugging purposes
     private Path aliceDir;
     private Path bobDir;
+    private Path remoteDir;
+
     private Git aliceGit;
     private Git bobGit;
     private Git remoteGit;
+
     private ImportFormatPreferences importFormatPreferences;
     private GitConflictResolverStrategy gitConflictResolverStrategy;
     private GitSemanticMergeExecutor mergeExecutor;
     private BibDatabaseContext context;
+    private GitHandlerRegistry gitHandlerRegistry;
 
     // These are setup by aliceBobSetting
     private RevCommit baseCommit;
@@ -111,11 +119,14 @@ class GitSyncServiceTest {
      */
     @BeforeEach
     void aliceBobSimple(@TempDir Path tempDir) throws Exception {
+        SystemReader.setInstance(new NoopGitSystemReader());
+
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         gitConflictResolverStrategy = mock(GitConflictResolverStrategy.class);
         mergeExecutor = new GitSemanticMergeExecutorImpl(importFormatPreferences);
+        gitHandlerRegistry = new GitHandlerRegistry();
 
         // create fake remote repo
         remoteDir = tempDir.resolve("remote.git");
@@ -170,10 +181,8 @@ class GitSyncServiceTest {
         aliceGit.fetch().setRemote("origin").call();
 
         String actualContent = Files.readString(library);
-        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(Reader.of(actualContent));
-        context = new BibDatabaseContext(parsed.getDatabase(), parsed.getMetaData());
+        context = BibDatabaseContext.of(actualContent, importFormatPreferences);
         context.setDatabasePath(library);
-
         // Debug hint: Show the created git graph on the command line
         //   git log --graph --oneline --decorate --all --reflog
     }
@@ -189,12 +198,16 @@ class GitSyncServiceTest {
         if (remoteGit != null) {
             remoteGit.close();
         }
+        // Required by JGit
+        // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-2765437816 for details
+        RepositoryCache.clear();
+        // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-3095957214
+        WindowCache.reconfigure(new WindowCacheConfig());
     }
 
     @Test
     void pullTriggersSemanticMergeWhenNoConflicts() throws Exception {
-        GitHandler gitHandler = new GitHandler(library.getParent());
-        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolverStrategy, mergeExecutor);
+        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandlerRegistry, gitConflictResolverStrategy, mergeExecutor);
         MergeResult result = syncService.fetchAndMerge(context, library);
 
         assertTrue(result.isSuccessful());
@@ -217,8 +230,7 @@ class GitSyncServiceTest {
 
     @Test
     void pushTriggersMergeAndPushWhenNoConflicts() throws Exception {
-        GitHandler gitHandler = new GitHandler(library.getParent());
-        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolverStrategy, mergeExecutor);
+        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandlerRegistry, gitConflictResolverStrategy, mergeExecutor);
         syncService.push(context, library);
 
         String pushedContent = GitFileReader
@@ -240,7 +252,7 @@ class GitSyncServiceTest {
     }
 
     @Test
-    void mergeConflictOnSameFieldTriggersDialogAndUsesUserResolution(@TempDir Path tempDir) throws Exception {
+    void mergeConflictOnSameFieldTriggersDialogAndUsesUserResolution() throws Exception {
         Path bobLibrary = bobDir.resolve("library.bib");
         String bobEntry = """
               @article{b,
@@ -280,9 +292,7 @@ class GitSyncServiceTest {
         aliceGit.fetch().setRemote("origin").call();
 
         String actualContent = Files.readString(library);
-        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(Reader.of(actualContent));
-        context = new BibDatabaseContext(parsed.getDatabase(), parsed.getMetaData());
-        context.setDatabasePath(library);
+        context = BibDatabaseContext.of(actualContent, importFormatPreferences);
 
         // Setup mock conflict resolver
         GitConflictResolverStrategy resolver = mock(GitConflictResolverStrategy.class);
@@ -296,8 +306,7 @@ class GitSyncServiceTest {
             return List.of(resolved);
         });
 
-        GitHandler handler = new GitHandler(aliceDir);
-        GitSyncService service = new GitSyncService(importFormatPreferences, handler, resolver, mergeExecutor);
+        GitSyncService service = new GitSyncService(importFormatPreferences, gitHandlerRegistry, resolver, mergeExecutor);
         MergeResult result = service.fetchAndMerge(context, library);
 
         assertTrue(result.isSuccessful());

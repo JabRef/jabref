@@ -96,6 +96,11 @@ public final class BstPreviewLayout implements PreviewLayout {
     }
 
     @Override
+    public String getShortTitle() {
+        return name;
+    }
+
+    @Override
     public String getText() {
         return source;
     }

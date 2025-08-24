@@ -14,7 +14,7 @@
   message: >
     JUnit tests of `jablib` are failing.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
+    To see the test output, locate "Source Code Tests / Unit tests (pull_request)" and click on it.
 
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
@@ -24,7 +24,7 @@
   message: >
     JUnit tests of `jabkit` are failing.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
+    To see the test output, locate "Source Code Tests / Unit tests (pull_request)" and click on it.
 
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
@@ -34,7 +34,7 @@
   message: >
     JUnit tests of `jabsrv` are failing.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
+    To see the test output, locate "Source Code Tests / Unit tests (pull_request)" and click on it.
 
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
@@ -45,7 +45,7 @@
     Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
     We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Tests / Checkstyle (pull_request)" and click on it.
+    To see the test output, locate "Source Code Tests / Checkstyle (pull_request)" and click on it.
 
 
     In case of issues with the import order, double check that you [activated Auto Import](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#enable-proper-import-cleanup).
@@ -60,7 +60,7 @@
     Your code currently does not meet JabRef's code guidelines.
     We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Tests / OpenRewrite (pull_request)" and click on it.
+    To see the test output, locate "Source Code Tests / OpenRewrite (pull_request)" and click on it.
 
 
     The issues found can be **automatically fixed**.
@@ -71,7 +71,7 @@
     Your code currently does not meet JabRef's code guidelines.
     We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
-    To see the test output, locate "Tests / Modernizer (pull_request)" and click on it.
+    To see the test output, locate "Source Code Tests / Modernizer (pull_request)" and click on it.
 
 
     Please fix the detected errors, commit, and push.
@@ -130,7 +130,10 @@
     Hey, we noticed that you **force-pushed** your changes.
     Force pushing is a bad practice when working together on a project (mainly because it is [not supported well by GitHub itself](https://github.com/orgs/community/discussions/3478)).
     Commits are lost and comments on commits lose their context, thus making it harder to review changes.
-    At the end, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) anyway before being merged into the `main` branch.
+
+
+    When the pull request is getting integrated into `main`, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) anyway.
+    Thus, your individual commit history will not be visible in `main`.
 
 
     In future, **please avoid that**. For now, you can continue working.

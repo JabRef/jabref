@@ -31,8 +31,9 @@
         // Install java.
         // See https://github.com/devcontainers/features/tree/main/src/java#options for details.
         "ghcr.io/devcontainers/features/java:1": {
-            "version": "24.0.1-amzn",
-            "installGradle": false,
+            "version": "24.0.2-amzn",
+            "installGradle": true,
+            "gradleVersion": "8.14.3",
             "jdkDistro": "Corretto"
         }
     }
