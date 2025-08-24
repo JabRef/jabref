@@ -19,6 +19,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,8 @@ class SemanticConflictDetectorTest {
 
     @BeforeEach
     void setup(@TempDir Path tempDir) throws Exception {
+        SystemReader.setInstance(new NoopGitSystemReader());
+
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 class FileUtilTest {
 
     @TempDir
-    static Path bibTempDir;
+    private static Path bibTempDir;
 
     private final Path nonExistingTestPath = Path.of("nonExistingTestPath");
     private Path existingTestFile;
@@ -54,11 +54,11 @@ class FileUtilTest {
 
         existingTestFile = subDir.resolve("existingTestFile.txt");
         Files.createFile(existingTestFile);
-        Files.write(existingTestFile, "existingTestFile.txt".getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+        Files.writeString(existingTestFile, "existingTestFile.txt");
 
         otherExistingTestFile = subDir.resolve("otherExistingTestFile.txt");
         Files.createFile(otherExistingTestFile);
-        Files.write(otherExistingTestFile, "otherExistingTestFile.txt".getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+        Files.writeString(otherExistingTestFile, "otherExistingTestFile.txt");
     }
 
     @Test
@@ -222,16 +222,16 @@ class FileUtilTest {
     @Test
     @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Assumed path separator is /")
     void uniquePathSubstrings() {
-       List<String> paths = List.of("C:/uniquefile.bib",
-               "C:/downloads/filename.bib",
-               "C:/mypaper/bib/filename.bib",
-               "C:/external/mypaper/bib/filename.bib",
-               "");
+        List<String> paths = List.of("C:/uniquefile.bib",
+                "C:/downloads/filename.bib",
+                "C:/mypaper/bib/filename.bib",
+                "C:/external/mypaper/bib/filename.bib",
+                "");
         List<String> uniqPath = List.of("uniquefile.bib",
-              "downloads/filename.bib",
-              "C:/mypaper/bib/filename.bib",
-              "external/mypaper/bib/filename.bib",
-              "");
+                "downloads/filename.bib",
+                "C:/mypaper/bib/filename.bib",
+                "external/mypaper/bib/filename.bib",
+                "");
 
         List<String> result = FileUtil.uniquePathSubstrings(paths);
         assertEquals(uniqPath, result);
@@ -446,6 +446,72 @@ class FileUtilTest {
         } else {
             assertTrue(FileUtil.detectBadFileName(fileName));
         }
+    }
+
+    @ParameterizedTest
+    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
+    @MethodSource
+    void relativizeSymlinks(Path file, List<Path> directories, Path expected, String message) {
+        if (message.startsWith("IGNORED")) {
+            org.junit.jupiter.api.Assumptions.assumeTrue(false, message);
+        }
+        Path result = FileUtil.relativize(file, directories);
+        assertEquals(expected, result, message);
+    }
+
+    /// Tests for issue <https://github.com/JabRef/jabref/issues/12995>
+    static Stream<Arguments> relativizeSymlinks() throws IOException {
+        List<Arguments> result = new ArrayList<>();
+
+        Path realDir = bibTempDir.resolve("realDir");
+        Files.createDirectories(realDir);
+
+        // symlinkDir -> realDir
+        // realDir/simple.pdf
+        Path simpleFile = Files.createFile(realDir.resolve("simple.pdf"));
+        Path symlinkDir = bibTempDir.resolve("symlinkDir");
+        Files.createSymbolicLink(symlinkDir, realDir);
+        result.add(Arguments.of(simpleFile, List.of(symlinkDir), Path.of("simple.pdf"), "Simple symlink resolves to relative"));
+
+        // chainLink1 -> chainLink2 -> chainReal
+        // chainReal/chained.pdf
+        Path chainReal = bibTempDir.resolve("chainReal");
+        Files.createDirectories(chainReal);
+        Path chainedFile = Files.createFile(chainReal.resolve("chained.pdf"));
+        Path chainLink2 = bibTempDir.resolve("chainLink2");
+        Files.createSymbolicLink(chainLink2, chainReal);
+        Path chainLink1 = bibTempDir.resolve("chainLink1");
+        Files.createSymbolicLink(chainLink1, chainLink2);
+        result.add(Arguments.of(chainedFile, List.of(chainLink1), Path.of("chained.pdf"), "Chained symlink resolves to relative"));
+
+        // realDir/nestedLink -> realDir/nested
+        // realDir/nested/nested.pdf
+        Path nestedDir = realDir.resolve("nested");
+        Files.createDirectories(nestedDir);
+        Path nestedFile = Files.createFile(nestedDir.resolve("nested.pdf"));
+        Path nestedSymlink = realDir.resolve("nestedLink");
+        Files.createSymbolicLink(nestedSymlink, nestedDir);
+        result.add(Arguments.of(nestedFile, List.of(nestedSymlink), Path.of("nested.pdf"), "Nested symlink resolves to relative"));
+
+        // symlinkDir -> realDir
+        // outside.pdf
+        Path outsideFile = Files.createFile(bibTempDir.resolve("outside.pdf"));
+        result.add(Arguments.of(outsideFile, List.of(symlinkDir), outsideFile, "Unrelated file remains absolute"));
+
+        // symlink chain escaping base dir (ignored test case, see <https://github.com/JabRef/jabref/issues/12995#issuecomment-3065149862>)
+        Path veryPrivate = bibTempDir.resolve("veryprivate");
+        Files.createDirectories(veryPrivate);
+        Path secretFile = Files.createFile(veryPrivate.resolve("a.pdf"));
+        Path expensive = bibTempDir.resolve("expensive");
+        Files.createSymbolicLink(expensive, veryPrivate);
+        Path things = bibTempDir.resolve("things");
+        Files.createSymbolicLink(things, expensive);
+        Path libDir = bibTempDir.resolve("lib");
+        Files.createDirectories(libDir);
+        Path bibFile = Files.createFile(libDir.resolve("bib.bib"));
+        result.add(Arguments.of(secretFile, List.of(things), secretFile, "IGNORED: Symlink chain escaping base dir (#12995 comment)"));
+
+        return result.stream();
     }
 
     /**
