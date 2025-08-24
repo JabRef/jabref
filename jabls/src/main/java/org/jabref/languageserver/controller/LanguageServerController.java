@@ -1,4 +1,4 @@
-package org.jabref.languageserver.manager;
+package org.jabref.languageserver.controller;
 
 import org.jabref.languageserver.LspLauncher;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
