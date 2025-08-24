@@ -1,5 +1,6 @@
 package org.jabref.gui.git;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -25,6 +26,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class GitCommitDialogViewModel extends AbstractViewModel {
 
@@ -70,46 +72,49 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     public BackgroundTask<Void> commitTask() {
         return BackgroundTask.wrap(() -> {
-            Optional<BibDatabaseContext> activeDatabaseOpt = stateManager.getActiveDatabase();
-            if (activeDatabaseOpt.isEmpty()) {
-                throw new JabRefException(Localization.lang("No library open"));
-            }
-
-            BibDatabaseContext dbContext = activeDatabaseOpt.get();
-            Optional<Path> bibFilePathOpt = dbContext.getDatabasePath();
-            if (bibFilePathOpt.isEmpty()) {
-                throw new JabRefException(Localization.lang("No library file path. Please save the library to a file first."));
-            }
-
-            Path bibFilePath = bibFilePathOpt.get();
-            GitHandlerRegistry registry = new GitHandlerRegistry();
-            Optional<Path> repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);
-            if (repoRootOpt.isEmpty()) {
-                throw new JabRefException(Localization.lang("Commit aborted: Path is not inside a Git repository."));
-            }
-
-            GitHandler gitHandler = registry.get(repoRootOpt.get());
-
-            GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
-            if (!status.tracking()) {
-                throw new JabRefException(Localization.lang("Commit aborted: The file is not under Git version control."));
-            }
-            if (status.conflict()) {
-                throw new JabRefException(Localization.lang("Commit aborted: Local repository has unresolved merge conflicts."));
-            }
-
-            String message = commitMessage.get();
-            if (message == null || message.isBlank()) {
-                message = "Commit changes";
-            }
-
-            boolean committed = gitHandler.createCommitOnCurrentBranch(message, amend.get());
-            if (!committed) {
-                throw new JabRefException(Localization.lang("Nothing to commit."));
-            }
-
+            doCommit();
             return null;
         });
+    }
+
+    private void doCommit() throws JabRefException, GitAPIException, IOException {
+        Optional<BibDatabaseContext> activeDatabaseOpt = stateManager.getActiveDatabase();
+        if (activeDatabaseOpt.isEmpty()) {
+            throw new JabRefException(Localization.lang("No library open"));
+        }
+
+        BibDatabaseContext dbContext = activeDatabaseOpt.get();
+        Optional<Path> bibFilePathOpt = dbContext.getDatabasePath();
+        if (bibFilePathOpt.isEmpty()) {
+            throw new JabRefException(Localization.lang("No library file path. Please save the library to a file first."));
+        }
+
+        Path bibFilePath = bibFilePathOpt.get();
+        GitHandlerRegistry registry = new GitHandlerRegistry();
+        Optional<Path> repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);
+        if (repoRootOpt.isEmpty()) {
+            throw new JabRefException(Localization.lang("Commit aborted: Path is not inside a Git repository."));
+        }
+
+        GitHandler gitHandler = registry.get(repoRootOpt.get());
+
+        GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
+        if (!status.tracking()) {
+            throw new JabRefException(Localization.lang("Commit aborted: The file is not under Git version control."));
+        }
+        if (status.conflict()) {
+            throw new JabRefException(Localization.lang("Commit aborted: Local repository has unresolved merge conflicts."));
+        }
+
+        String message = commitMessage.get();
+        if (message == null || message.isBlank()) {
+            message = "Commit changes";
+        }
+
+        boolean committed = gitHandler.createCommitOnCurrentBranch(message, amend.get());
+        if (!committed) {
+            throw new JabRefException(Localization.lang("Nothing to commit."));
+        }
     }
 
     public StringProperty commitMessageProperty() {
