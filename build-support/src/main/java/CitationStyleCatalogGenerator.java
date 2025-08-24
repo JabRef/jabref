@@ -4,6 +4,7 @@
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS com.fasterxml.jackson.core:jackson-databind:2.17.1
+//DEPS org.jspecify:jspecify:1.0.0
 //DEPS org.slf4j:slf4j-api:2.0.13
 //DEPS org.slf4j:slf4j-simple:2.0.13
 

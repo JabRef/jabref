@@ -75,6 +75,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We made the copy sub menu on the context menu consistent with the copy sub menu at "Edit". [#13280](https://github.com/JabRef/jabref/pull/13280)
 - We improved file exists warning dialog with clearer options and tooltips [#12565](https://github.com/JabRef/jabref/issues/12565)
 - We introduced walkthrough functionality [#12664](https://github.com/JabRef/jabref/issues/12664)
+- The Welcome tab now has a responsive layout. [#12664](https://github.com/JabRef/jabref/issues/12664)
+- We introduced a donation prompt in the Welcome tab. [#12664](https://github.com/JabRef/jabref/issues/12664)
 
 ### Fixed
 
