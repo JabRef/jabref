@@ -219,19 +219,17 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         return Optional.empty();
     }
 
-    public void prevPage() {
+    public void goToPrevPage() {
         if (hasPrevPage()) {
             currentPageProperty.set(currentPageProperty.get() - 1);
             updatePagedEntries();
-            updateTotalPages();
         }
     }
 
-    public void nextPage() {
+    public void goToNextPage() {
         if (hasNextPage()) {
             currentPageProperty.set(currentPageProperty.get() + 1);
             updatePagedEntries();
-            updateTotalPages();
         }
     }
 
