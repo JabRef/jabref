@@ -1,6 +1,5 @@
 package org.jabref.logic.git.model;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
@@ -13,7 +12,7 @@ public final class PullResult implements GitOperationResult {
     private PullResult(boolean isSuccessful, boolean noop, List<BibEntry> mergedEntries) {
         this.isSuccessful = isSuccessful;
         this.noop = noop;
-        this.mergedEntries = mergedEntries == null ? Collections.emptyList() : mergedEntries;
+        this.mergedEntries = mergedEntries == null ? List.of() : mergedEntries;
     }
 
     public static PullResult merged(List<BibEntry> mergedEntries) {
@@ -21,11 +20,11 @@ public final class PullResult implements GitOperationResult {
     }
 
     public static PullResult noopUpToDate() {
-        return new PullResult(true, true, Collections.emptyList());
+        return new PullResult(true, true, List.of());
     }
 
     public static PullResult noopAhead() {
-        return new PullResult(true, true, Collections.emptyList());
+        return new PullResult(true, true, List.of());
     }
 
     @Override

@@ -21,7 +21,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -69,7 +68,7 @@ public class GitSemanticMergeExecutorTest {
         assertEquals(1, patches.size(), "There should be exactly one entry patched");
         Map<Field, String> smithPatch = patches.get("Smith2020");
         assertEquals("New Title", smithPatch.get(StandardField.TITLE), "Title should be updated to 'New Title'");
-        assertTrue(plan.newEntries().isEmpty(), "No new entries expected");
+        assertEquals(List.of(), plan.newEntries(), "No new entries expected");
 
         String mergedContent = Files.readString(tempFile);
         BibDatabaseContext mergedContext = BibDatabaseContext.of(mergedContent, preferences);

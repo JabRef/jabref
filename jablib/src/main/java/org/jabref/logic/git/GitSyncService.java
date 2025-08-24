@@ -2,7 +2,6 @@ package org.jabref.logic.git;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -91,7 +90,7 @@ public class GitSyncService {
 
             if (status.syncStatus() == SyncStatus.BEHIND) {
                 gitHandler.fastForwardTo(remoteCommit);
-                return PullResult.merged(Collections.emptyList());
+                return PullResult.merged(List.of());
             }
 
             // 2. Perform semantic merge

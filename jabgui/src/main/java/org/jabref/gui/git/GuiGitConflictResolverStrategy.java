@@ -59,7 +59,7 @@ public class GuiGitConflictResolverStrategy implements GitConflictResolverStrate
             Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
-            throw new RuntimeException(e.getCause());
+            throw new IllegalStateException("Failed to execute supplier on FX thread", e);
         }
     }
 }

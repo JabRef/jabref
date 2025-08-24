@@ -69,7 +69,7 @@ public class GitPushAction extends SimpleCommand {
 
         GitHandlerRegistry registry = Injector.instantiateModelOrService(GitHandlerRegistry.class);
         GitStatusViewModel gitStatusViewModel =
-                GitStatusViewModel.fromPathAndContext(stateManager, registry, bibFilePath, activeDatabase);
+                GitStatusViewModel.fromPathAndContext(stateManager, taskExecutor, registry, bibFilePath);
 
         BackgroundTask
                 .wrap(() -> doPush(activeDatabase, bibFilePath, gitStatusViewModel, registry))
@@ -86,7 +86,7 @@ public class GitPushAction extends SimpleCommand {
                         );
                     }
                 })
-                .onFailure(ex -> showPushError(ex))
+                .onFailure(this::showPushError)
                 .executeWith(taskExecutor);
     }
 

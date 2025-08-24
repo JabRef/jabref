@@ -209,7 +209,7 @@ public class SemanticConflictDetector {
                 continue;
             }
 
-            // Case 3： Base exists — generate patches that apply only where local kept the base value
+            // Case 3: Base exists — generate patches that apply only where local kept the base value
             if (baseEntry != null) {
                 Map<Field, String> patch = computeFieldPatch(baseEntry, localEntry, remoteEntry);
                 if (!patch.isEmpty()) {

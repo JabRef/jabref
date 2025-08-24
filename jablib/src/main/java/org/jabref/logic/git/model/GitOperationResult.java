@@ -1,5 +1,7 @@
 package org.jabref.logic.git.model;
 
+import org.jspecify.annotations.NonNull;
+
 public sealed interface GitOperationResult permits PullResult, PushResult {
 
     enum Operation {
@@ -7,6 +9,7 @@ public sealed interface GitOperationResult permits PullResult, PushResult {
         PUSH
     }
 
+    @NonNull
     Operation operation();
 
     boolean isSuccessful();

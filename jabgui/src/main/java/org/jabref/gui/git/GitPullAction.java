@@ -71,7 +71,7 @@ public class GitPullAction extends SimpleCommand {
         Path bibFilePath = bibFilePathOpt.get();
 
         GitHandlerRegistry registry = Injector.instantiateModelOrService(GitHandlerRegistry.class);
-        GitStatusViewModel gitStatusViewModel = GitStatusViewModel.fromPathAndContext(stateManager, registry, bibFilePath, activeDatabase);
+        GitStatusViewModel gitStatusViewModel = GitStatusViewModel.fromPathAndContext(stateManager, taskExecutor, registry, bibFilePath);
 
         BackgroundTask
                 .wrap(() -> doPull(activeDatabase, bibFilePath, stateManager, registry))
