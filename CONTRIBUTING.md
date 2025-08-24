@@ -118,7 +118,7 @@ GitHub will then automatically assign you.
 
 We view pull requests as a collaborative process.
 Submit a pull request early to enable feedback from the team while you continue working.
-Please also remember to discuss bigger changes early with the core maintainers to ensure properly spend time and work.
+Please also remember to discuss bigger changes early with the core maintainers to ensure more fruitful investment of time and work, and lesser friction in acceptance later.
 Some fundamental design decisions can be found within our list of [Architectural Decision Records](https://devdocs.jabref.org/decisions/).
 After a pull request is ready for review, we will discuss improvements with you and agree to merge them once the [maintainers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS) approve.
 
