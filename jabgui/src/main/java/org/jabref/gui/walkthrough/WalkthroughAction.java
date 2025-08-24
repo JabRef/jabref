@@ -314,6 +314,7 @@ public class WalkthroughAction extends SimpleCommand {
                 new WindowEffect(HighlightEffect.PING),
                 new WindowEffect(mainResolver, HighlightEffect.FULL_SCREEN_DARKEN)
         );
+        // FIXME: Reduce the amount of the typing that's needed to going to the next step of the walkthrough
         String groupName = Localization.lang("Research Papers");
         String addGroup = Localization.lang("Add group");
         String addSelectedEntries = Localization.lang("Add selected entries to this group");
@@ -414,6 +415,7 @@ public class WalkthroughAction extends SimpleCommand {
                         .trigger(Trigger.onClick())
                         .position(TooltipPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
+                // TODO: Add drag and drop for the Walkthrough
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Right-click on your group"))
                         .content(new TextBlock(Localization.lang("Now right-click on your \"%0\" group to open the context menu.", groupName)))
