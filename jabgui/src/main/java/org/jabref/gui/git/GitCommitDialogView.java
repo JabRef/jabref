@@ -44,7 +44,7 @@ public class GitCommitDialogView extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         setTitle(Localization.lang("Git Commit"));
-        this.viewModel = new GitCommitDialogViewModel(stateManager, dialogService, preferences, taskExecutor);
+        this.viewModel = new GitCommitDialogViewModel(stateManager, dialogService, taskExecutor);
 
         commitMessage.textProperty().bindBidirectional(viewModel.commitMessageProperty());
         commitMessage.setPromptText(Localization.lang("Enter commit message here"));

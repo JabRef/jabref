@@ -11,7 +11,6 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.status.GitStatusChecker;
@@ -31,7 +30,6 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
 
     private final StringProperty commitMessage = new SimpleStringProperty("");
@@ -42,11 +40,9 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     public GitCommitDialogViewModel(
             StateManager stateManager,
             DialogService dialogService,
-            GuiPreferences preferences,
             TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
-        this.preferences = preferences;
         this.taskExecutor = taskExecutor;
 
         this.commitMessageValidator = new FunctionBasedValidator<>(
@@ -89,17 +85,17 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
             GitHandlerRegistry registry = new GitHandlerRegistry();
             Optional<Path> repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);
             if (repoRootOpt.isEmpty()) {
-                throw new JabRefException("Commit aborted: Path is not inside a Git repository.");
+                throw new JabRefException(Localization.lang("Commit aborted: Path is not inside a Git repository."));
             }
 
             GitHandler gitHandler = registry.get(repoRootOpt.get());
 
             GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
             if (!status.tracking()) {
-                throw new JabRefException("Commit aborted: The file is not under Git version control.");
+                throw new JabRefException(Localization.lang("Commit aborted: The file is not under Git version control."));
             }
             if (status.conflict()) {
-                throw new JabRefException("Commit aborted: Local repository has unresolved merge conflicts.");
+                throw new JabRefException(Localization.lang("Commit aborted: Local repository has unresolved merge conflicts."));
             }
 
             String message = commitMessage.get();
