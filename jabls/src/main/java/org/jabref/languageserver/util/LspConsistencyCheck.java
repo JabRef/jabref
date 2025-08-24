@@ -62,7 +62,7 @@ public class LspConsistencyCheck {
 
             optionalFields.forEach(optionalField -> entryTypeResult.sortedEntries().forEach(entry -> {
                 if (entry.getFieldOrAlias(optionalField).isEmpty()) {
-                    LspDiagnosticBuilder diagnosticBuilder = LspDiagnosticBuilder.create(Localization.lang("Required field \"%0\" is empty.", optionalField.getName()));
+                    LspDiagnosticBuilder diagnosticBuilder = LspDiagnosticBuilder.create(Localization.lang("Optional field \"%0\" is empty.", optionalField.getName()));
                     diagnosticBuilder.setContent(content);
                     diagnosticBuilder.setEntry(entry);
                     diagnostics.add(diagnosticBuilder.build());

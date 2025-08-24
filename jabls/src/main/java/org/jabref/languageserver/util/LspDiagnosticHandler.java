@@ -1,12 +1,15 @@
 package org.jabref.languageserver.util;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import org.jabref.languageserver.ExtensionSettings;
 import org.jabref.languageserver.LspClientHandler;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -22,16 +25,16 @@ import org.slf4j.LoggerFactory;
 public class LspDiagnosticHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LspDiagnosticHandler.class);
+    private static final int NO_VERSION = -1;
 
     private final CliPreferences jabRefCliPreferences;
     private final LspIntegrityCheck lspIntegrityCheck;
     private final LspConsistencyCheck lspConsistencyCheck;
     private final LspClientHandler clientHandler;
-
-    private LanguageClient client;
-
     private final Map<String, List<Diagnostic>> integrityDiagnosticsCache;
     private final Map<String, List<Diagnostic>> consistencyDiagnosticsCache;
+
+    private LanguageClient client;
 
     public LspDiagnosticHandler(LspClientHandler clientHandler, CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.clientHandler = clientHandler;
@@ -56,14 +59,14 @@ public class LspDiagnosticHandler {
     }
 
     public void publishDiagnostics(LanguageClient client, String uri, List<Diagnostic> diagnostics) {
-        publishDiagnostics(client, uri, -1, diagnostics);
+        publishDiagnostics(client, uri, NO_VERSION, diagnostics);
     }
 
     private List<Diagnostic> computeDiagnostics(String content, String uri) {
         BibDatabaseContext bibDatabaseContext;
         try {
             bibDatabaseContext = BibDatabaseContext.of(content, jabRefCliPreferences.getImportFormatPreferences());
-        } catch (Exception e) {
+        } catch (JabRefException e) {
             Diagnostic parseDiagnostic = LspDiagnosticBuilder.create(Localization.lang(
                     "Failed to parse entries.\nThe following error was encountered:\n%0",
                     e.getMessage())).setSeverity(DiagnosticSeverity.Error).build();
@@ -92,9 +95,11 @@ public class LspDiagnosticHandler {
     }
 
     public void refreshDiagnostics(LanguageClient client) {
-        for (String uri : Stream.concat(integrityDiagnosticsCache.keySet().stream(), consistencyDiagnosticsCache.keySet().stream()).distinct().toList()) {
+        Set<String> allUris = new HashSet<>(integrityDiagnosticsCache.keySet());
+        allUris.addAll(consistencyDiagnosticsCache.keySet());
+        allUris.forEach(uri -> {
             List<Diagnostic> diagnostics = getFinalDiagnosticsList(uri);
             publishDiagnostics(client, uri, diagnostics);
-        }
+        });
     }
 }

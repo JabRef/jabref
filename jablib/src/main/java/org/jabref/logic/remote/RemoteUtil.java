@@ -13,7 +13,7 @@ public class RemoteUtil {
         try {
             int portNumber = Integer.parseInt(portString);
             return isUserPort(portNumber);
-        } catch (NumberFormatException numberFormatException) {
+        } catch (NumberFormatException e) {
             return false;
         }
     }
