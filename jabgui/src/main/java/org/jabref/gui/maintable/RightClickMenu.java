@@ -2,8 +2,6 @@ package org.jabref.gui.maintable;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.binding.Bindings;
-import javafx.collections.ListChangeListener;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -14,6 +12,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.edit.CopyTo;
@@ -125,44 +124,39 @@ public class RightClickMenu {
                                          ImportHandler importHandler) {
         Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);
         copyToMenu.disableProperty().bind(
-                Bindings.size(stateManager.getOpenDatabases()).lessThan(2)
+                ActionHelper.needsMultipleDatabases(stateManager).not()
         );
 
-        Runnable rebuildMenu = () -> {
-            copyToMenu.getItems().clear();
-            BibDatabaseContext sourceDatabaseContext = libraryTab.getBibDatabaseContext();
+        // Menu is created on each right-click, thus we can always assume that the list of open databases is up-to-date
 
-            for (BibDatabaseContext targetDatabaseContext : stateManager.getOpenDatabases()) {
-                if (targetDatabaseContext == sourceDatabaseContext) {
-                    continue;
-                }
-                String targetDatabaseName;
+        BibDatabaseContext sourceDatabaseContext = libraryTab.getBibDatabaseContext();
 
-                if (targetDatabaseContext.getDatabasePath().isPresent()) {
-                    targetDatabaseName = FileUtil.getUniquePathFragment(
-                            stateManager.getAllDatabasePaths(),
-                            targetDatabaseContext.getDatabasePath().get()
-                    ).orElse(Localization.lang("untitled"));
-                } else if (targetDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
-                    targetDatabaseName = targetDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
-                } else {
-                    targetDatabaseName = Localization.lang("untitled");
-                }
-
-                copyToMenu.getItems().add(
-                        factory.createCustomMenuItem(
-                                StandardActions.COPY_TO,
-                                new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
-                                        importHandler, sourceDatabaseContext, targetDatabaseContext),
-                                targetDatabaseName
-                        )
-                );
+        for (BibDatabaseContext targetDatabaseContext : stateManager.getOpenDatabases()) {
+            if (targetDatabaseContext == sourceDatabaseContext) {
+                continue;
             }
-        };
+            String targetDatabaseName;
 
-        // EasyBind.subscribe() is not available for lists, therefore "manually" triggering rebuild and subscribing
-        rebuildMenu.run();
-        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> rebuildMenu.run());
+            if (targetDatabaseContext.getDatabasePath().isPresent()) {
+                targetDatabaseName = FileUtil.getUniquePathFragment(
+                        stateManager.getAllDatabasePaths(),
+                        targetDatabaseContext.getDatabasePath().get()
+                ).orElse(Localization.lang("untitled"));
+            } else if (targetDatabaseContext.getLocation() == DatabaseLocation.SHARED) {
+                targetDatabaseName = targetDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";
+            } else {
+                targetDatabaseName = Localization.lang("untitled");
+            }
+
+            copyToMenu.getItems().add(
+                    factory.createCustomMenuItem(
+                            StandardActions.COPY_TO,
+                            new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+                                    importHandler, sourceDatabaseContext, targetDatabaseContext),
+                            targetDatabaseName
+                    )
+            );
+        }
 
         return copyToMenu;
     }
