@@ -27,7 +27,7 @@ public class LspIntegrityCheck {
                 cliPreferences.getFilePreferences(),
                 cliPreferences.getCitationKeyPatternPreferences(),
                 abbreviationRepository,
-                ALLOWINTEGEREDITION
+                ALLOW_INTEGER_EDITION
         );
 
         return bibDatabaseContext.getEntries().stream().flatMap(entry -> integrityCheck.checkEntry(entry).stream().map(message -> {

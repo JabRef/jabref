@@ -19,9 +19,9 @@ public class BibtexWorkspaceService implements WorkspaceService {
 
     private LanguageClient client;
 
-    public BibtexWorkspaceService(LspClientHandler clientHandler, LspDiagnosticHandler lspClientHandler) {
+    public BibtexWorkspaceService(LspClientHandler clientHandler, LspDiagnosticHandler diagnosticHandler) {
         this.clientHandler = clientHandler;
-        this.diagnosticHandler = lspClientHandler;
+        this.diagnosticHandler = diagnosticHandler;
     }
 
     // Todo: handle event
