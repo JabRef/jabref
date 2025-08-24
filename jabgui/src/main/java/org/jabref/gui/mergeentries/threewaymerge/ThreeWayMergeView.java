@@ -215,7 +215,7 @@ public class ThreeWayMergeView extends VBox {
         if (primary != null) {
             return new BibEntry(primary);
         }
-        BibEntry placeholder = (peer != null && peer.getType() != null)
+        BibEntry placeholder = peer != null && peer.getType() != null
                 ? new BibEntry(peer.getType())
                 : new BibEntry();
         if (peer != null) {

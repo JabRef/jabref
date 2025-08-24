@@ -245,7 +245,7 @@ public class SemanticConflictDetector {
               .forEach(field -> {
                   String baseValue = base.getField(field).orElse(null);
                   String remoteValue = remote.getField(field).orElse(null);
-                  String localValue = (local == null) ? null : local.getField(field).orElse(null);
+                  String localValue = local == null ? null : local.getField(field).orElse(null);
 
                   if (Objects.equals(baseValue, remoteValue)) {
                       return;
