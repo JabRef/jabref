@@ -17,6 +17,7 @@ import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 
 import org.eclipse.lsp4j.Diagnostic;
+import org.eclipse.lsp4j.DiagnosticSeverity;
 
 public class LspConsistencyCheck {
 
@@ -41,13 +42,15 @@ public class LspConsistencyCheck {
                     .flatMap(orFields -> orFields.getFields().stream())
                     .collect(Collectors.toSet());
 
-            entryTypeResult.sortedEntries().forEach(entry -> {
-                requiredFields.forEach(requiredField -> {
-                    if (entry.getFieldOrAlias(requiredField).isEmpty()) {
-                        diagnostics.add(LspDiagnosticUtil.createGeneralEntryDiagnostic(Localization.lang("Required field \"%0\" is empty.", requiredField.getName()), content, entry));
-                    }
-                });
-            });
+            entryTypeResult.sortedEntries().forEach(entry -> requiredFields.forEach(requiredField -> {
+                if (entry.getFieldOrAlias(requiredField).isEmpty()) {
+                    LspDiagnosticBuilder diagnosticBuilder = LspDiagnosticBuilder.create(Localization.lang("Required field \"%0\" is empty.", requiredField.getName()));
+                    diagnosticBuilder.setSeverity(DiagnosticSeverity.Error);
+                    diagnosticBuilder.setContent(content);
+                    diagnosticBuilder.setEntry(entry);
+                    diagnostics.add(diagnosticBuilder.build());
+                }
+            }));
 
             Set<Field> optionalFields = bibEntryType
                     .map(BibEntryType::getOptionalFields)
@@ -57,13 +60,14 @@ public class LspConsistencyCheck {
                     .filter(allReportedFields::contains)
                     .collect(Collectors.toSet());
 
-            optionalFields.forEach(optionalField -> {
-                entryTypeResult.sortedEntries().forEach(entry -> {
-                    if (entry.getFieldOrAlias(optionalField).isEmpty()) {
-                        diagnostics.add(LspDiagnosticUtil.createGeneralEntryDiagnostic(Localization.lang("Optional field \"%0\" is empty.", optionalField.getName()), content, entry));
-                    }
-                });
-            });
+            optionalFields.forEach(optionalField -> entryTypeResult.sortedEntries().forEach(entry -> {
+                if (entry.getFieldOrAlias(optionalField).isEmpty()) {
+                    LspDiagnosticBuilder diagnosticBuilder = LspDiagnosticBuilder.create(Localization.lang("Required field \"%0\" is empty.", optionalField.getName()));
+                    diagnosticBuilder.setContent(content);
+                    diagnosticBuilder.setEntry(entry);
+                    diagnostics.add(diagnosticBuilder.build());
+                }
+            }));
         });
 
         return diagnostics;

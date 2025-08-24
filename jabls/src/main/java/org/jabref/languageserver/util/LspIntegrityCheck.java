@@ -11,6 +11,8 @@ import org.eclipse.lsp4j.Diagnostic;
 
 public class LspIntegrityCheck {
 
+    private static final boolean ALLOWINTEGEREDITION = true;
+
     private final CliPreferences cliPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
 
@@ -25,14 +27,14 @@ public class LspIntegrityCheck {
                 cliPreferences.getFilePreferences(),
                 cliPreferences.getCitationKeyPatternPreferences(),
                 abbreviationRepository,
-                true
+                ALLOWINTEGEREDITION
         );
 
         return bibDatabaseContext.getEntries().stream().flatMap(entry -> integrityCheck.checkEntry(entry).stream().map(message -> {
             if (entry.getField(message.field()).isPresent()) {
-                return LspDiagnosticUtil.createFieldDiagnostic(message.message(), message.field(), content, entry);
+                return LspDiagnosticBuilder.create(message.message()).setField(message.field()).setContent(content).setEntry(entry).build();
             } else {
-                return LspDiagnosticUtil.createGeneralEntryDiagnostic(message.message(), content, entry);
+                return LspDiagnosticBuilder.create(message.message()).setContent(content).setEntry(entry).build();
             }
         })).toList();
     }

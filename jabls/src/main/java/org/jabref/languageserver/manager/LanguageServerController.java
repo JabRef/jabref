@@ -7,7 +7,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Manages the LanguageServerThread through typical life cycle methods.
+/// Manages the LspLauncher through typical life cycle methods.
 public class LanguageServerController implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LanguageServerController.class);
@@ -19,12 +19,12 @@ public class LanguageServerController implements AutoCloseable {
     public LanguageServerController(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.cliPreferences = cliPreferences;
         this.abbreviationRepository = abbreviationRepository;
-        LOGGER.debug("LanguageServerManager initialized.");
+        LOGGER.debug("LanguageServerController initialized.");
     }
 
     public synchronized void start(int port) {
         if (lspLauncher != null) {
-            LOGGER.warn("Language server manager already started, cannot start again.");
+            LOGGER.warn("Language server controller already started, cannot start again.");
             return;
         }
 
@@ -37,7 +37,7 @@ public class LanguageServerController implements AutoCloseable {
     }
 
     public synchronized void stop() {
-        LOGGER.debug("Stopping language server manager...");
+        LOGGER.debug("Stopping language server controller...");
         if (lspLauncher != null) {
             lspLauncher.interrupt();
             lspLauncher = null;
@@ -49,7 +49,7 @@ public class LanguageServerController implements AutoCloseable {
 
     @Override
     public void close() {
-        LOGGER.debug("Closing Language server manager...");
+        LOGGER.debug("Closing Language server controller...");
         stop();
     }
 }
