@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
@@ -125,6 +126,9 @@ public class RightClickMenu {
                                          LibraryTab libraryTab,
                                          ImportHandler importHandler) {
         Menu copyToMenu = factory.createMenu(StandardActions.COPY_TO);
+        copyToMenu.disableProperty().bind(
+                Bindings.size(stateManager.getOpenDatabases()).lessThan(2)
+        );
 
         ObservableList<BibDatabaseContext> openDatabases = stateManager.getOpenDatabases();
 
@@ -167,7 +171,7 @@ public class RightClickMenu {
         return copyToMenu;
     }
 
-    private static Menu createCopySubMenu(ActionFactory factory,
+    public static Menu createCopySubMenu(ActionFactory factory,
                                           DialogService dialogService,
                                           StateManager stateManager,
                                           GuiPreferences preferences,
@@ -177,14 +181,17 @@ public class RightClickMenu {
         Menu copySpecialMenu = factory.createMenu(StandardActions.COPY_MORE);
 
         copySpecialMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
-                factory.createMenuItem(StandardActions.COPY_KEY, new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
-                factory.createMenuItem(StandardActions.COPY_CITE_KEY, new CopyMoreAction(StandardActions.COPY_CITE_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
-                factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new CopyMoreAction(StandardActions.COPY_KEY_AND_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
-                factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new CopyMoreAction(StandardActions.COPY_KEY_AND_LINK, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
+                createCopyFieldContentSubMenu(factory, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(StandardActions.COPY_CITATION_KEY, new CopyMoreAction(StandardActions.COPY_CITATION_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
+                factory.createMenuItem(StandardActions.COPY_AS_CITE_COMMAND, new CopyMoreAction(StandardActions.COPY_AS_CITE_COMMAND, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
+                factory.createMenuItem(StandardActions.COPY_CITATION_KEY_AND_TITLE, new CopyMoreAction(StandardActions.COPY_CITATION_KEY_AND_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
+                factory.createMenuItem(StandardActions.COPY_CITATION_KEY_AND_LINK, new CopyMoreAction(StandardActions.COPY_CITATION_KEY_AND_LINK, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
+                new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.COPY_DOI, new CopyMoreAction(StandardActions.COPY_DOI, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
                 factory.createMenuItem(StandardActions.COPY_DOI_URL, new CopyMoreAction(StandardActions.COPY_DOI_URL, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
-                new SeparatorMenuItem()
+                new SeparatorMenuItem(),
+                factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences))
         );
 
         // the submenu will behave dependent on what style is currently selected (citation/preview)
@@ -203,6 +210,26 @@ public class RightClickMenu {
                 factory.createMenuItem(StandardActions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences)));
 
         return copySpecialMenu;
+    }
+
+    static Menu createCopyFieldContentSubMenu(ActionFactory factory,
+                                                      DialogService dialogService,
+                                                      StateManager stateManager,
+                                                      ClipBoardManager clipBoardManager,
+                                                      GuiPreferences preferences,
+                                                      JournalAbbreviationRepository abbreviationRepository) {
+        Menu copyFieldContentMenu = factory.createMenu(StandardActions.COPY_FIELD_CONTENT);
+
+        copyFieldContentMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.COPY_FIELD_AUTHOR, new CopyMoreAction(StandardActions.COPY_FIELD_AUTHOR, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
+                factory.createMenuItem(StandardActions.COPY_FIELD_TITLE, new CopyMoreAction(StandardActions.COPY_FIELD_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
+                factory.createMenuItem(StandardActions.COPY_FIELD_JOURNAL, new CopyMoreAction(StandardActions.COPY_FIELD_JOURNAL, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
+                factory.createMenuItem(StandardActions.COPY_FIELD_DATE, new CopyMoreAction(StandardActions.COPY_FIELD_DATE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
+                factory.createMenuItem(StandardActions.COPY_FIELD_KEYWORDS, new CopyMoreAction(StandardActions.COPY_FIELD_KEYWORDS, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
+                factory.createMenuItem(StandardActions.COPY_FIELD_ABSTRACT, new CopyMoreAction(StandardActions.COPY_FIELD_ABSTRACT, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository))
+        );
+
+        return copyFieldContentMenu;
     }
 
     private static Menu createSendSubMenu(ActionFactory factory,

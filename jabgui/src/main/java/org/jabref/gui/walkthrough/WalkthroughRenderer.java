@@ -37,7 +37,7 @@ public class WalkthroughRenderer {
         titleContainer.getStyleClass().add("walkthrough-title-container");
         MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);
         titleFlow.getStyleClass().add("walkthrough-tooltip-title");
-        titleFlow.setMarkdown("## " + Localization.lang(step.title()));
+        titleFlow.setMarkdown(step.title());
         titleContainer.getChildren().add(titleFlow);
 
         VBox contentContainer = createContent(step, walkthrough, beforeNavigate);
@@ -68,7 +68,7 @@ public class WalkthroughRenderer {
         titleContainer.getStyleClass().add("walkthrough-title-container");
         MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);
         titleFlow.getStyleClass().add("walkthrough-title");
-        titleFlow.setMarkdown("## " + Localization.lang(step.title()));
+        titleFlow.setMarkdown(step.title());
         titleContainer.getChildren().add(titleFlow);
 
         VBox contentContainer = createContent(step, walkthrough, beforeNavigate);
@@ -105,7 +105,7 @@ public class WalkthroughRenderer {
 
         MarkdownTextFlow textFlow = new MarkdownTextFlow(container);
         textFlow.getStyleClass().add("walkthrough-text-content");
-        textFlow.setMarkdown(Localization.lang(textBlock.text()));
+        textFlow.setMarkdown(textBlock.text());
 
         container.getChildren().add(textFlow);
         return container;
@@ -120,7 +120,7 @@ public class WalkthroughRenderer {
         StackPane textContainer = new StackPane();
         MarkdownTextFlow infoFlow = new MarkdownTextFlow(textContainer);
         infoFlow.getStyleClass().add("walkthrough-info-text");
-        infoFlow.setMarkdown(Localization.lang(infoBlock.text()));
+        infoFlow.setMarkdown(infoBlock.text());
         textContainer.getChildren().add(infoFlow);
 
         HBox.setHgrow(textContainer, Priority.ALWAYS);
