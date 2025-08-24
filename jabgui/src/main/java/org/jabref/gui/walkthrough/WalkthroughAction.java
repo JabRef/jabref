@@ -314,8 +314,7 @@ public class WalkthroughAction extends SimpleCommand {
                 new WindowEffect(HighlightEffect.PING),
                 new WindowEffect(mainResolver, HighlightEffect.FULL_SCREEN_DARKEN)
         );
-        // FIXME: Reduce the amount of the typing that's needed to going to the next step of the walkthrough
-        String groupName = Localization.lang("Research Papers");
+        String groupName = Localization.lang("Research");
         String addGroup = Localization.lang("Add group");
         String addSelectedEntries = Localization.lang("Add selected entries to this group");
 
