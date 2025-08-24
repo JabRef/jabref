@@ -183,6 +183,12 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 // region: Sharing of the library
+                factory.createSubMenu(StandardActions.REMOTE_DB,
+                        factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService)),
+                        factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))),
+                // endregion
+
+                new SeparatorMenuItem(),
 
                 // TODO: Should be only enabled if not yet shared.
                 factory.createSubMenu(StandardActions.GIT,
@@ -190,13 +196,6 @@ public class MainMenu extends MenuBar {
                         new SeparatorMenuItem(),
                         factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),
-
-                factory.createSubMenu(StandardActions.REMOTE_DB,
-                        factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService)),
-                        factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))),
-
-                // endregion
-
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(frame, dialogService)),

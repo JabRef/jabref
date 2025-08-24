@@ -1,5 +1,6 @@
 package org.jabref.gui.git;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
@@ -8,6 +9,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 
@@ -54,6 +56,11 @@ public class GitCommitDialogView extends BaseDialog<Void> {
                 viewModel.commit(() -> this.close());
             }
             return null;
+        });
+
+        Platform.runLater(() -> {
+            visualizer.setDecoration(new IconValidationDecorator());
+            visualizer.initVisualization(viewModel.commitMessageValidation(), commitMessage, true);
         });
     }
 }
