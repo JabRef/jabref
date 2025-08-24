@@ -1,5 +1,7 @@
 package org.jabref.languageserver;
 
+import com.google.gson.JsonObject;
+
 public class ExtensionSettings {
     private boolean consistencyCheck;
     private boolean integrityCheck;
@@ -34,7 +36,7 @@ public class ExtensionSettings {
         this.integrityCheck = other.integrityCheck;
     }
 
-    public void copyFromJsonObject(com.google.gson.JsonObject json) {
+    public void copyFromJsonObject(JsonObject json) {
         if (json.has("jabref") && json.get("jabref").isJsonObject()) {
             json = json.getAsJsonObject("jabref");
         }
