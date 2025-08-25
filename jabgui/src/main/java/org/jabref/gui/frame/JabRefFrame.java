@@ -711,7 +711,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         public CloseOthersDatabaseAction(LibraryTab libraryTab) {
             this.libraryTab = libraryTab;
-            this.executable.bind(ActionHelper.needsMultipleDatabases(tabbedPane));
+            this.executable.bind(ActionHelper.needsMultipleDatabases(stateManager));
         }
 
         @Override
