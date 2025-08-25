@@ -3,6 +3,7 @@ package org.jabref.gui.welcome.components;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
@@ -100,12 +101,14 @@ public class QuickSettings extends VBox {
     }
 
     private ScrollPane createScrollPane(VBox contentPane) {
-        ScrollPane newScrollPane = new ScrollPane(contentPane);
-        newScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        newScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        newScrollPane.setFitToWidth(true);
-        newScrollPane.getStyleClass().add("quick-settings-scroll-pane");
-        return newScrollPane;
+        ScrollPane scrollPane = new ScrollPane(contentPane);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setFitToWidth(true);
+        scrollPane.getStyleClass().add("quick-settings-scroll-pane");
+        scrollPane.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+        return scrollPane;
     }
 
     private Button createButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
