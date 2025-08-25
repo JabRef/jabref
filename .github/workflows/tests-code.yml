@@ -48,7 +48,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 24.0.1
-          distribution: 'zulu'
+          distribution: 'correto'
       - name: Run checkstyle reporter
         uses: dbelyaev/action-checkstyle@master
         with:
@@ -87,7 +87,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 24.0.1
-          distribution: 'zulu'
+          distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -121,7 +121,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 24.0.1
-          distribution: 'zulu'
+          distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -238,7 +238,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 24.0.1
-          distribution: 'zulu'
+          distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -273,7 +273,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 24.0.1
-          distribution: 'zulu'
+          distribution: 'correto'
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -321,7 +321,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 24.0.1
-          distribution: 'zulu'
+          distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -370,7 +370,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 24.0.1
-          distribution: 'zulu'
+          distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -408,7 +408,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 24.0.1
-          distribution: 'zulu'
+          distribution: 'correto'
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -469,7 +469,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 24.0.1
-          distribution: 'zulu'
+          distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -514,7 +514,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 24.0.1
-          distribution: 'zulu'
+          distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew traceRequirements
