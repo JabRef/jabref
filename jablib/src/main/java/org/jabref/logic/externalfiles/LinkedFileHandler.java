@@ -14,6 +14,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -179,7 +180,7 @@ public class LinkedFileHandler {
         // Since Files.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
         // nonetheless rename files to a new name which just differs by case.
         if (Files.exists(newPath) && !pathsDifferOnlyByCase && !overwriteExistingFile) {
-            LOGGER.debug("The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.", oldPath, newPath);
+            LOGGER.info("The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.", oldPath, newPath);
             return false;
         }
 
@@ -193,7 +194,11 @@ public class LinkedFileHandler {
         }
 
         // Update path
-        linkedFile.setLink(FileUtil.relativize(newPath, databaseContext, filePreferences).toString());
+        if (newPath.isAbsolute()) {
+            linkedFile.setLink(FileUtil.relativize(newPath, databaseContext, filePreferences).toString());
+        } else {
+            linkedFile.setLink(newPath.toString());
+        }
 
         return true;
     }
@@ -206,12 +211,16 @@ public class LinkedFileHandler {
     }
 
     /**
+     * Determines the file name based on the pattern specified in the preferences and valid for the file system.
+     *
      * @param extension The extension of the file. If empty, no extension is added.
      * @return A filename based on the pattern specified in the preferences and valid for the file system.
      */
-    public String getSuggestedFileName(String extension) {
+    public String getSuggestedFileName(@NonNull String extension) {
         String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).trim();
         if ((targetFileName.isEmpty() || "-".equals(targetFileName)) && linkedFile.isOnlineLink()) {
+            // "-" is part of the default pattern (org.jabref.logic.FilePreferences.DEFAULT_FILENAME_PATTERNS) and is returned if no fields have been replaced.
+            // All other patterns are not yet handled. See <https://github.com/jabref/jabref/issues/13735> for a sketch of a solution.
             String oldFileName = linkedFile.getLink();
             int lastSlashIndex = oldFileName.lastIndexOf('/');
             if (lastSlashIndex >= 0 && lastSlashIndex < oldFileName.length() - 1) {

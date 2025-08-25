@@ -1752,6 +1752,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
     -fx-font-family: "Arial";
+    -fx-text-fill: -jr-gray-3;
 }
 
 .welcome-no-recent-label {
@@ -1778,14 +1779,22 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 2.667em 2em;
 }
 
+.welcome-columns-container,
+.welcome-columns-container:focus,
+.welcome-columns-scroll,
+.welcome-columns-scroll:focus {
+    -fx-background-color: transparent;
+}
+
 .welcome-top-titles {
     -fx-spacing: 0.833em;
-    -fx-alignment: left;
+    -fx-alignment: top-left;
     -fx-padding: 0 0 1.667em 0;
 }
 
 .welcome-columns-container {
-    -fx-spacing: 3.333em;
+    -fx-hgap: 2.083em;
+    -fx-vgap: 2.083em;
     -fx-alignment: top-center;
 }
 
@@ -1851,9 +1860,67 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-family: "Arial";
 }
 
+/* donation toast */
+.donation-toast {
+    -fx-background-color: -jr-background-alt;
+    -fx-background-radius: 0.8333333333em;
+    -fx-padding: 0.8333em 1em;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.075), 20, 0.25, 0, 6);
+    -fx-alignment: center-left;
+    -fx-border-color: derive(-jr-base, -10%);
+    -fx-border-radius: 0.8333333333em;
+    -fx-max-height: 4em;
+    -fx-spacing: 1.16667em;
+}
+
+.donation-toast .label {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.donation-toast-title {
+    -fx-font-size: 1.0em;
+    -fx-font-weight: bold;
+}
+
+.donation-toast-desc {
+    -fx-font-size: 0.92em;
+}
+
+.donation-toast-text {
+    -fx-spacing: 2;
+}
+
+.donation-btn-primary,
+.donation-btn-secondary,
+.donation-btn-ghost {
+    -fx-padding: 0.5em 1em;
+    -fx-background-radius: 0.5em;
+    -fx-border-radius: 0.5em;
+}
+
+.donation-btn-primary {
+    -fx-background-color: -jr-primary;
+}
+
+.donation-btn-secondary {
+    -fx-background-color: derive(-fx-control-inner-background, -6%);
+}
+
+.donation-btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-gray-1;
+    -fx-stroke-width: 0;
+    -fx-border-width: 0
+}
+
+.donation-btn-ghost:hover {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-gray-2;
+}
+
 /* AboutDialog */
 #aboutDialog .about-heading {
-    -fx-font-size: 30;
+    -fx-font-size: 2.40em;
     -fx-text-fill: -jr-theme;
 }
 
@@ -1866,12 +1933,12 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #aboutDialog .dev-heading {
-    -fx-font-size: 18;
+    -fx-font-size: 1.44em;
     -fx-padding: -10 0 0 0;
 }
 
 #aboutDialog .sub-heading {
-    -fx-font-size: 18;
+    -fx-font-size: 1.44em;
     -fx-padding: 0.312em;
 }
 
@@ -2584,17 +2651,16 @@ journalInfo .grid-cell-b {
 
 
 /* Quick Settings */
-
 .quick-settings-container,
 .walkthroughs-container {
-    -fx-spacing: 0.6667em;
+    -fx-spacing: 0.3333em;
     -fx-alignment: top-left;
 }
 
+.walkthroughs-scroll-pane,
 .quick-settings-scroll-pane {
-    -fx-max-height: 13.333em; /* item-size * 4 + gap * 3 = (0.0833 * 2 + 0.833 * 2 + 1) * 4 + 0.667 * 3 */
-    -fx-min-height: 13.333em;
-    -fx-pref-height: 13.333em;
+    -fx-max-height: 12em;
+    -fx-pref-height: 12em;
 }
 
 .quick-settings-button {
@@ -2659,7 +2725,7 @@ journalInfo .grid-cell-b {
     -fx-border-width: 0.0625em;
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;
-    -fx-effect: dropshadow(three-pass-box , rgba(0,0,0,0.1) , 0.125em, 0.0 , 0 , 0.0625em );
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 0.125em, 0.0, 0, 0.0625em);
     -fx-border-color: -jr-wf-border-color;
 }
 
@@ -2836,12 +2902,10 @@ journalInfo .grid-cell-b {
     -fx-max-width: infinity;
 }
 
-.walkthrough-tooltip-title,
-.walkthrough-title,
-.walkthrough-tooltip-title .markdown-h2,
-.walkthrough-title .markdown-h2 {
-    -fx-text-fill: -jr-theme;
-    -fx-fill: -jr-theme;
+.walkthrough-tooltip-title > *,
+.walkthrough-title > * {
+    -fx-text-fill: -jr-theme!important;
+    -fx-fill: -jr-theme!important;
     -fx-font-weight: bold;
     -fx-font-size: 1.75em;
     -fx-line-spacing: -0.25em;
@@ -2876,7 +2940,7 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-text-content {
-    -fx-text-fill: -jr-gray-3;
+    -fx-text-fill: -fx-text-base-color;
     -fx-font-size: 1.2em;
     -fx-line-spacing: 0.5em;
 }

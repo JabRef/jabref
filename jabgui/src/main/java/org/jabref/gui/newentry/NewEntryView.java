@@ -74,6 +74,9 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
 public class NewEntryView extends BaseDialog<BibEntry> {
+    private static final String BIBTEX_REGEX = "^@([A-Za-z]+)\\{,";
+    private static final String LINE_BREAK = "\n";
+
     private NewEntryViewModel viewModel;
 
     private final NewEntryDialogTab initialApproach;
@@ -164,6 +167,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     approach = NewEntryDialogTab.ENTER_IDENTIFIER;
                     interpretText.setText(clipboardText);
                     interpretText.selectAll();
+                } else if (clipboardText.split(LINE_BREAK)[0].matches(BIBTEX_REGEX)) {
+                    approach = NewEntryDialogTab.SPECIFY_BIBTEX;
                 } else {
                     approach = preferences.getLatestApproach();
                 }
@@ -288,7 +293,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     Tooltip.uninstall(idText, idTextTooltip);
                 }
             });
-            
+
             idText.setText(ClipBoardManager.getContents().trim());
             idText.selectAll();
 
