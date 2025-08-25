@@ -23,6 +23,14 @@ public class URLs {
     public static final String GROBID_DOC = "https://docs.jabref.org/collect/newentryfromplaintext#grobid";
     public static final String ENTRY_TABLE_COLUMNS_DOC = "https://docs.jabref.org/advanced/main-window";
 
+    // Walkthroughs URLs
+    public static final String GROUPS_DOC = "https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups";
+    public static final String SEARCH_WITH_IN_LIBRARY_DOC = "https://docs.jabref.org/finding-sorting-and-cleaning-entries/search";
+    public static final String MANAGE_ASSOCIATED_FILES_DOC = "https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks";
+    public static final String LINK_EXTERNAL_FILE_WALKTHROUGH_EXAMPLE_PDF = "https://nutritionandmetabolism.biomedcentral.com/counter/pdf/10.1186/1743-7075-3-2.pdf";
+    public static final String ADD_PDF_DOC = "https://docs.jabref.org/collect/add-pdfs-to-an-entry";
+    public static final String FIND_UNLINKED_FILES_DOC = "https://docs.jabref.org/collect/findunlinkedfiles";
+    
     // AboutDialogViewModel URLs
     public static final String HOMEPAGE_URL = "https://www.jabref.org";
     public static final String DONATION_URL = "https://donations.jabref.org";
