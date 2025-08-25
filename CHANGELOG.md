@@ -78,6 +78,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We introduced walkthrough functionality [#12664](https://github.com/JabRef/jabref/issues/12664)
 - The Welcome tab now has a responsive layout. [#12664](https://github.com/JabRef/jabref/issues/12664)
 - We introduced a donation prompt in the Welcome tab. [#12664](https://github.com/JabRef/jabref/issues/12664)
+- We changed to syntax for the websearch to the one of the main search bar. [#13607](https://github.com/JabRef/jabref/issues/13607)
 
 ### Fixed
 
