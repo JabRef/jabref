@@ -98,6 +98,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private String columnSearchTerm;
     private boolean citationMergeMode = false;
 
+    /// There is one maintable instance per library tab
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
                      LibraryTabContainer tabContainer,
