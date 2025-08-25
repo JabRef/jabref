@@ -218,6 +218,7 @@ public class ThreeWayMergeView extends VBox {
         BibEntry placeholder = peer != null && peer.getType() != null
                 ? new BibEntry(peer.getType())
                 : new BibEntry();
+        // peer may be null: reused from above ternary check but not guaranteed
         if (peer != null) {
             peer.getCitationKey().ifPresent(placeholder::setCitationKey);
         }

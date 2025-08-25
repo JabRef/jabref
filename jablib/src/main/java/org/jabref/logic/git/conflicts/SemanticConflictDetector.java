@@ -310,10 +310,10 @@ public class SemanticConflictDetector {
         Set<Field> overlap = new LinkedHashSet<>(left.getFields());
         overlap.retainAll(right.getFields());
         overlap.removeIf(SemanticConflictDetector::isMetaField);
-        for (Field f : overlap) {
-            String lv = left.getField(f).orElse(null);
-            String rv = right.getField(f).orElse(null);
-            if (!Objects.equals(lv, rv)) {
+        for (Field overlappingField : overlap) {
+            String leftFieldValue = left.getField(overlappingField).orElse(null);
+            String rightFieldValue = right.getField(overlappingField).orElse(null);
+            if (!Objects.equals(leftFieldValue, rightFieldValue)) {
                 return true;
             }
         }

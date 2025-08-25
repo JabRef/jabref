@@ -45,7 +45,7 @@ public class GitStatusViewModel extends AbstractViewModel {
         this.taskExecutor = taskExecutor;
         this.handlerRegistry = handlerRegistry;
 
-        stateManager.activeDatabaseProperty().addListener((obs, oldDb, newDb) -> {
+        stateManager.activeDatabaseProperty().addListener((_, _, newDb) -> {
             if ((newDb != null) && newDb.isPresent() && newDb.get().getDatabasePath().isPresent()) {
                 Path path = newDb.get().getDatabasePath().get();
                 refresh(path);
