@@ -45,7 +45,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 24.0.2
           distribution: 'correto'
@@ -84,7 +84,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 24.0.2
           distribution: 'correto'
@@ -118,7 +118,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 24.0.2
           distribution: 'correto'
@@ -235,7 +235,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v5
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 24.0.2
           distribution: 'correto'
@@ -270,7 +270,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 24.0.2
           distribution: 'correto'
@@ -318,7 +318,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 24.0.2
           distribution: 'correto'
@@ -367,7 +367,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 24.0.2
           distribution: 'correto'
@@ -405,7 +405,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 24.0.2
           distribution: 'correto'
@@ -466,7 +466,7 @@ jobs:
           show-progress: 'false'
       - name: Set up JDK
         if: github.ref == 'refs/heads/main'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 24.0.2
           distribution: 'correto'
@@ -511,7 +511,7 @@ jobs:
         with:
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 24.0.2
           distribution: 'correto'
