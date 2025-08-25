@@ -211,11 +211,16 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.YEAR, "2024")
                 .withField(StandardField.PUBLISHER, "publisher");
+        // Entry added to check for alphabetical ordering of citation keys
         BibEntry fifth = new BibEntry(StandardEntryType.InProceedings, "fifth")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.LOCATION, "location")
+                .withField(StandardField.YEAR, "2024");
+        BibEntry sixth = new BibEntry(StandardEntryType.InProceedings, "sixth")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.YEAR, "2024");
 
-        List<BibEntry> bibEntriesList = List.of(first, second, third, fourth, fifth);
+        List<BibEntry> bibEntriesList = List.of(first, second, third, fourth, fifth, sixth);
         BibDatabase bibDatabase = new BibDatabase();
         bibDatabase.insertEntries(bibEntriesList);
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
@@ -234,8 +239,9 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 | ------------- | ------------ | -------- | ----- | --------- |
                 | Article       | first        | -        | o     | -         |
                 | Article       | second       | -        | -     | ?         |
-                | InProceedings | fifth        | -        | -     | -         |
+                | InProceedings | fifth        | o        | -     | -         |
                 | InProceedings | fourth       | -        | -     | o         |
+                | InProceedings | sixth        | -        | -     | -         |
                 | InProceedings | third        | o        | o     | -         |
 
                 | Symbol | Meaning                   |
