@@ -41,7 +41,7 @@ public class SemanticMergerTest {
         BibDatabaseContext localDatabaseContext = BibDatabaseContext.of(local, importFormatPreferences);
         BibDatabaseContext remoteDatabaseContext = BibDatabaseContext.of(remote, importFormatPreferences);
 
-        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseDatabaseContext, remoteDatabaseContext);
+        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseDatabaseContext, localDatabaseContext, remoteDatabaseContext);
         SemanticMerger.applyMergePlan(localDatabaseContext, plan);
 
         BibEntry patched = localDatabaseContext.getDatabase().getEntryByCitationKey("a").orElseThrow();

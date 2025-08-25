@@ -11,7 +11,7 @@ import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
-import org.jabref.logic.git.model.MergeResult;
+import org.jabref.logic.git.model.PullResult;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.git.util.NoopGitSystemReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -208,7 +208,7 @@ class GitSyncServiceTest {
     @Test
     void pullTriggersSemanticMergeWhenNoConflicts() throws Exception {
         GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandlerRegistry, gitConflictResolverStrategy, mergeExecutor);
-        MergeResult result = syncService.fetchAndMerge(context, library);
+        PullResult result = syncService.fetchAndMerge(context, library);
 
         assertTrue(result.isSuccessful());
         String merged = Files.readString(library);
@@ -307,11 +307,16 @@ class GitSyncServiceTest {
         });
 
         GitSyncService service = new GitSyncService(importFormatPreferences, gitHandlerRegistry, resolver, mergeExecutor);
-        MergeResult result = service.fetchAndMerge(context, library);
+        PullResult result = service.fetchAndMerge(context, library);
 
         assertTrue(result.isSuccessful());
-        String content = Files.readString(library);
-        assertTrue(content.contains("alice-c + bob-c"));
+        List<BibEntry> merged = result.getMergedEntries();
+        BibEntry entryC = merged.stream()
+                                .filter(entry -> "c".equals(entry.getCitationKey().orElse("")))
+                                .findFirst()
+                                .orElseThrow(() -> new AssertionError("Entry 'c' not found in merged result"));
+
+        assertEquals("alice-c + bob-c", entryC.getField(StandardField.AUTHOR).orElse(""));
         verify(resolver).resolveConflicts(anyList());
     }
 

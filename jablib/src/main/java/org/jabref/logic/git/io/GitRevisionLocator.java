@@ -23,11 +23,11 @@ public class GitRevisionLocator {
     public RevisionTriple locateMergeCommits(Git git) throws GitAPIException, IOException, JabRefException {
         Repository repo = git.getRepository();
 
-        ObjectId headId = repo.resolve("HEAD");
+        ObjectId headId = repo.resolve("HEAD^{commit}");
         assert headId != null : "Local HEAD commit is missing.";
 
         String trackingBranch = new BranchConfig(repo.getConfig(), repo.getBranch()).getTrackingBranch();
-        ObjectId remoteId = trackingBranch != null ? repo.resolve(trackingBranch) : null;
+        ObjectId remoteId = trackingBranch != null ? repo.resolve(trackingBranch + "^{commit}") : null;
         assert remoteId != null : "Remote tracking branch is missing.";
 
         try (RevWalk walk = new RevWalk(git.getRepository())) {
@@ -48,5 +48,25 @@ public class GitRevisionLocator {
             walk.markStart(b);
             return walk.next();
         }
+    }
+
+    public static boolean isAncestor(Repository repo, ObjectId maybeAncestor, ObjectId commit) throws IOException {
+        try (RevWalk revWalk = new RevWalk(repo)) {
+            RevCommit a = revWalk.parseCommit(maybeAncestor);
+            RevCommit b = revWalk.parseCommit(commit);
+            return revWalk.isMergedInto(a, b);
+        }
+    }
+
+    public static RevCommit fastBase(Repository repo, RevCommit local, RevCommit remote) throws IOException {
+        try (RevWalk revWalk = new RevWalk(repo)) {
+            if (revWalk.isMergedInto(remote, local)) {
+                return remote;
+            }
+            if (revWalk.isMergedInto(local, remote)) {
+                return local;
+            }
+        }
+        return findMergeBase(repo, local, remote);
     }
 }

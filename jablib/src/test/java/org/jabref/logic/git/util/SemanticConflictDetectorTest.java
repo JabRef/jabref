@@ -865,6 +865,7 @@ class SemanticConflictDetectorTest {
                 doi = {xyz},
             }
         """;
+        String local = base;
         String remote = """
             @article{b,
                 author = {author-b},
@@ -877,11 +878,13 @@ class SemanticConflictDetectorTest {
         """;
 
         RevCommit baseCommit = writeAndCommit(base, "base", alice);
+        RevCommit localCommit = writeAndCommit(base, "local", alice);
         RevCommit remoteCommit = writeAndCommit(remote, "remote", bob);
         BibDatabaseContext baseDatabaseContext = parse(baseCommit);
+        BibDatabaseContext localDatabaseContext = parse(localCommit);
         BibDatabaseContext remoteDatabaseContext = parse(remoteCommit);
 
-        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseDatabaseContext, remoteDatabaseContext);
+        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseDatabaseContext, localDatabaseContext, remoteDatabaseContext);
 
         assertEquals(1, plan.fieldPatches().size());
         assertTrue(plan.fieldPatches().containsKey("b"));
@@ -898,6 +901,7 @@ class SemanticConflictDetectorTest {
                 doi = {xya},
             }
         """;
+        String local = base;
         String remote = """
             @article{a,
                 author = {Test Author},
@@ -907,11 +911,13 @@ class SemanticConflictDetectorTest {
         """;
 
         RevCommit baseCommit = writeAndCommit(base, "base", alice);
+        RevCommit localCommit = writeAndCommit(base, "local", alice);
         RevCommit remoteCommit = writeAndCommit(remote, "remote", bob);
         BibDatabaseContext baseDatabaseContext = parse(baseCommit);
+        BibDatabaseContext localDatabaseContext = parse(localCommit);
         BibDatabaseContext remoteDatabaseContext = parse(remoteCommit);
 
-        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseDatabaseContext, remoteDatabaseContext);
+        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseDatabaseContext, localDatabaseContext, remoteDatabaseContext);
 
         assertEquals(1, plan.fieldPatches().size());
         Map<Field, String> patch = plan.fieldPatches().get("a");
