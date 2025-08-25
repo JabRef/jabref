@@ -44,6 +44,7 @@ import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
+import org.jabref.gui.externalfiles.AutoRenameFileOnEntryChange;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -130,6 +131,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private FileAnnotationCache annotationCache;
     private MainTable mainTable;
     private DatabaseNotification databaseNotificationPane;
+    private AutoRenameFileOnEntryChange autoRenameFileOnEntryChange;
 
     // Indicates whether the tab is loading data using a dataloading task
     // The constructors take care to the right true/false assignment during start.
@@ -245,6 +247,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.bibDatabaseContext.getMetaData().registerListener(this);
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferences));
+
+        autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, preferences.getFilePreferences());
+        coarseChangeFilter.registerListener(autoRenameFileOnEntryChange);
 
         aiService.setupDatabase(bibDatabaseContext);
 
@@ -717,6 +722,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         if (tableModel != null) {
             tableModel.unbind();
+        }
+
+        if (autoRenameFileOnEntryChange != null) {
+            coarseChangeFilter.unregisterListener(autoRenameFileOnEntryChange);
         }
 
         // clean up the groups map
