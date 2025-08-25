@@ -53,10 +53,6 @@ public class KeywordList implements Iterable<Keyword> {
 
         KeywordList keywordList = new KeywordList();
 
-        for (char d : delimiter.toString().toCharArray()) {
-            keywordString = keywordString.replace(d, ',');
-        }
-
         StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
         while (tok.hasMoreTokens()) {
             String chain = tok.nextToken();

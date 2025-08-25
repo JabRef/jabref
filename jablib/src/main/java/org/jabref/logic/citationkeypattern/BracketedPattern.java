@@ -165,7 +165,7 @@ public class BracketedPattern {
      */
     public String expand(BibEntry bibentry, BibDatabase database) {
         Objects.requireNonNull(bibentry);
-        Character keywordDelimiter = ';';
+        String keywordDelimiter = ";";
         return expand(bibentry, keywordDelimiter, database);
     }
 
@@ -177,7 +177,7 @@ public class BracketedPattern {
      * @param database         The database to use for string-lookups and cross-refs. May be null.
      * @return The expanded pattern. The empty string is returned, if it could not be expanded.
      */
-    public String expand(BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
+    public String expand(BibEntry bibentry, String keywordDelimiter, BibDatabase database) {
         Objects.requireNonNull(bibentry);
         return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);
     }
@@ -191,7 +191,7 @@ public class BracketedPattern {
      * @param database         The database for field resolving. May be null.
      * @return The expanded pattern. Not null.
      */
-    public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+    public static String expandBrackets(String pattern, String keywordDelimiter, BibEntry entry, BibDatabase database) {
         Objects.requireNonNull(pattern);
         Objects.requireNonNull(entry);
         return expandBrackets(pattern, expandBracketContent(keywordDelimiter, entry, database));
@@ -206,7 +206,7 @@ public class BracketedPattern {
      * @param database         The {@link BibDatabase} for field resolving. May be null.
      * @return a function accepting a bracketed expression and returning the result of expanding it
      */
-    public static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+    public static Function<String, String> expandBracketContent(String keywordDelimiter, BibEntry entry, BibDatabase database) {
         return (String bracket) -> {
             List<String> fieldParts = parseFieldAndModifiers(bracket);
             // check whether there is a modifier on the end such as
@@ -259,7 +259,7 @@ public class BracketedPattern {
     /**
      * Returns the content enclosed between brackets, including enclosed quotes, and excluding the paired enclosing brackets.
      * There may be brackets in it.
-     * Intended to be used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a [
+     * Intended to be used by {@link BracketedPattern#expandBrackets(String, String, BibEntry, BibDatabase)} when a [
      * is encountered, and has been consumed, by the {@code StringTokenizer}.
      *
      * @param pattern   pattern used by {@code expandBrackets}, used for logging
@@ -302,7 +302,7 @@ public class BracketedPattern {
 
     /**
      * Appends the content between, and including, two \" to the provided <code>StringBuilder</code>. Intended to be
-     * used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a \" is
+     * used by {@link BracketedPattern#expandBrackets(String, String, BibEntry, BibDatabase)} when a \" is
      * encountered by the StringTokenizer.
      *
      * @param stringBuilder the <code>StringBuilder</code> to which tokens will be appended
@@ -326,7 +326,7 @@ public class BracketedPattern {
      * @param database         The database to use for field resolving. May be null.
      * @return String containing the evaluation result. Empty string if the pattern cannot be resolved.
      */
-    public static String getFieldValue(BibEntry entry, String pattern, Character keywordDelimiter, BibDatabase database) {
+    public static String getFieldValue(BibEntry entry, String pattern, String keywordDelimiter, BibDatabase database) {
         try {
             if (pattern.startsWith("auth") || pattern.startsWith("pureauth")) {
                 // result the author
@@ -481,7 +481,15 @@ public class BracketedPattern {
             } else if (pattern.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(pattern.substring(7));
-                KeywordList separatedKeywords = entry.getResolvedKeywords(keywordDelimiter, database);
+                // KeywordList separatedKeywords = entry.getResolvedKeywords(keywordDelimiter, database);
+
+                Optional<String> keywordsContent = entry.getResolvedFieldOrAlias(StandardField.KEYWORDS, database);
+
+                for (char d : keywordDelimiter.toCharArray()) {
+                    keywordsContent = keywordsContent.map(content -> content.replace(d, ','));
+                }
+                KeywordList separatedKeywords = keywordsContent.map(content -> KeywordList.parse(content, ',')).orElse(new KeywordList());
+
                 if (separatedKeywords.size() < num) {
                     // not enough keywords
                     return "";
@@ -497,7 +505,14 @@ public class BracketedPattern {
                 } else {
                     num = Integer.MAX_VALUE;
                 }
-                KeywordList separatedKeywords = entry.getResolvedKeywords(keywordDelimiter, database);
+//                KeywordList separatedKeywords = entry.getResolvedKeywords(keywordDelimiter, database);
+                Optional<String> keywordsContent = entry.getResolvedFieldOrAlias(StandardField.KEYWORDS, database);
+
+                for (char d : keywordDelimiter.toCharArray()) {
+                    keywordsContent = keywordsContent.map(content -> content.replace(d, ','));
+                }
+                KeywordList separatedKeywords = keywordsContent.map(content -> KeywordList.parse(content, ',')).orElse(new KeywordList());
+
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
                 for (Keyword keyword : separatedKeywords) {

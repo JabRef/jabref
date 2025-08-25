@@ -19,12 +19,12 @@ public class AutoLinkPreferences {
     private final ObjectProperty<CitationKeyDependency> citationKeyDependency;
     private final StringProperty regularExpression;
     private final BooleanProperty askAutoNamingPdfs;
-    private final ReadOnlyObjectProperty<Character> keywordSeparator;
+    private final ReadOnlyObjectProperty<String> keywordSeparator;
 
     public AutoLinkPreferences(CitationKeyDependency citationKeyDependency,
                                String regularExpression,
                                boolean askAutoNamingPdfs,
-                               ObjectProperty<Character> keywordSeparatorProperty) {
+                               ObjectProperty<String> keywordSeparatorProperty) {
         this.citationKeyDependency = new SimpleObjectProperty<>(citationKeyDependency);
         this.regularExpression = new SimpleStringProperty(regularExpression);
         this.askAutoNamingPdfs = new SimpleBooleanProperty(askAutoNamingPdfs);
@@ -37,7 +37,7 @@ public class AutoLinkPreferences {
     public AutoLinkPreferences(CitationKeyDependency citationKeyDependency,
                                String regularExpression,
                                boolean askAutoNamingPdfs,
-                               Character keywordSeparator) {
+                               String keywordSeparator) {
         this.citationKeyDependency = new SimpleObjectProperty<>(citationKeyDependency);
         this.regularExpression = new SimpleStringProperty(regularExpression);
         this.askAutoNamingPdfs = new SimpleBooleanProperty(askAutoNamingPdfs);
@@ -80,7 +80,7 @@ public class AutoLinkPreferences {
         this.askAutoNamingPdfs.set(askAutoNamingPdfs);
     }
 
-    public Character getKeywordSeparator() {
+    public String getKeywordSeparator() {
         return keywordSeparator.getValue();
     }
 }
