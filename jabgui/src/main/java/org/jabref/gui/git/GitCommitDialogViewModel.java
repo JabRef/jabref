@@ -56,7 +56,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     public void commit(Runnable onSuccess) {
         commitTask()
-                .onSuccess(ignore -> {
+                .onSuccess(_-> {
                     dialogService.notify(Localization.lang("Committed successfully"));
                     onSuccess.run();
                 })
@@ -108,10 +108,11 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
         String message = commitMessage.get();
         if (message == null || message.isBlank()) {
-            message = "Commit changes";
+            message = Localization.lang("Update references");
         }
 
         boolean committed = gitHandler.createCommitOnCurrentBranch(message, amend.get());
+        // TODO: Replace control-flow-by-exception with a proper control structure
         if (!committed) {
             throw new JabRefException(Localization.lang("Nothing to commit."));
         }
