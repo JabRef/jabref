@@ -13,6 +13,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,9 +76,16 @@ public record CSLStyleLoader(
             if (!styleInfoList.isEmpty()) {
                 int styleCount = styleInfoList.size();
                 for (Map<String, Object> info : styleInfoList) {
+                    @NonNull
                     String path = (String) info.get("path");
+                    @NonNull
                     String title = (String) info.get("title");
+                    @Nullable
                     String shortTitle = (String) info.get("shortTitle");
+                    if (shortTitle == null) {
+                        LOGGER.error("JabRef added support of shortTitle in August, 2025. Please execute './gradlew jablib:clean jablib:build' to update the citation style cache.");
+                        shortTitle = title;
+                    }
                     boolean isNumeric = (boolean) info.get("isNumeric");
                     boolean hasBibliography = (boolean) info.get("hasBibliography");
                     boolean usesHangingIndent = (boolean) info.get("usesHangingIndent");

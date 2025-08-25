@@ -262,15 +262,13 @@ class BibEntryWriterTest {
 
     @Test
     void roundTripWithPrependingNewlines() throws Exception {
-        String bibtexEntry = """
-                \r
-                @Article{test,
-                  Author                   = {Foo Bar},
-                  Journal                  = {International Journal of Something},
-                  Note                     = {some note},
-                  Number                   = {1}
-                }
-                """.replace("\n", OS.NEWLINE);
+        // Keep this as string concatenation; we are testing different line breaks here
+        String bibtexEntry = "\r\n@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
+                "}" + OS.NEWLINE;
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -281,13 +279,13 @@ class BibEntryWriterTest {
     @Test
     void roundTripWithKeepsCRLFLineBreakStyle() throws Exception {
         String bibtexEntry = """
-                @Article{test,\r
-                  Author                   = {Foo Bar},\r
-                  Journal                  = {International Journal of Something},\r
-                  Note                     = {some note},\r
-                  Number                   = {1}\r
-                }\r
-                """.replace("\n", OS.NEWLINE);
+                @Article{test,
+                  Author                   = {Foo Bar},
+                  Journal                  = {International Journal of Something},
+                  Note                     = {some note},
+                  Number                   = {1}
+                }
+                """.replace("\n", "\r\n");
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
         // need to reconfigure writer to use "\r\n"
@@ -306,7 +304,7 @@ class BibEntryWriterTest {
                   Note                     = {some note},
                   Number                   = {1}
                 }
-                """.replace("\n", OS.NEWLINE);
+                """;
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
         // need to reconfigure writer to use "\n"
@@ -412,15 +410,13 @@ class BibEntryWriterTest {
 
     @Test
     void roundTripWithAppendedNewlines() throws Exception {
-        String bibtexEntry = """
-                @Article{test,
-                  Author                   = {Foo Bar},
-                  Journal                  = {International Journal of Something},
-                  Number                   = {1},
-                  Note                     = {some note}
-                }
-
-                """.replace("\n", OS.NEWLINE);
+        // Keep this as string concatenation; we are testing different line breaks here
+        String bibtexEntry = "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
+                "  Note                     = {some note}" + OS.NEWLINE +
+                "}\n\n";
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -433,15 +429,13 @@ class BibEntryWriterTest {
 
     @Test
     void roundTripNormalizesNewLines() throws Exception {
-        String bibtexEntry = """
-                @Article{test,
-                  Author                   = {Foo Bar},\r
-                  Journal                  = {International Journal of Something},
-                  Number                   = {1},
-                  Note                     = {some note}\r
-                }
-
-                """.replace("\n", OS.NEWLINE);
+        // keep this as string concatenation; we are testing MIXED line breaks here
+        String bibtexEntry = "@Article{test,\n" +
+                "  Author                   = {Foo Bar},\r\n" +
+                "  Journal                  = {International Journal of Something},\n" +
+                "  Number                   = {1},\n" +
+                "  Note                     = {some note}\r\n" +
+                "}\n\n";
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
