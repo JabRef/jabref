@@ -194,7 +194,7 @@ recipeList:
 #  - org.openrewrite.staticanalysis.UseJavaStyleArrayDeclarations
   - org.openrewrite.staticanalysis.UseLambdaForFunctionalInterface
 #  - org.openrewrite.staticanalysis.UseListSort
-#  - org.openrewrite.staticanalysis.UseObjectNotifyAll
+  - org.openrewrite.staticanalysis.UseObjectNotifyAll
   - org.openrewrite.staticanalysis.UseStandardCharset
   - org.openrewrite.staticanalysis.UseStringReplace
   - org.openrewrite.staticanalysis.UseSystemLineSeparator

@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -79,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -113,7 +113,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -149,7 +149,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -165,7 +165,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -203,7 +203,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -233,7 +233,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -265,7 +265,7 @@ jobs:
         module: [jablib, jabkit, jabsrv, jabgui]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -305,7 +305,7 @@ jobs:
         run: scripts/after-failure.sh
 
   tests-windows:
-    name: "Unit tests (Windows) – ${{ matrix.module }}"
+    name: "Unit tests (Windows)"
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.repository_owner == 'JabRef')
     runs-on: windows-latest
     strategy:
@@ -313,7 +313,7 @@ jobs:
         module: [jablib]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -362,7 +362,7 @@ jobs:
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -400,7 +400,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -460,7 +460,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
         if: github.ref == 'refs/heads/main'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -507,7 +507,7 @@ jobs:
     name: "Validate requirement coverage"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - name: Set up JDK
@@ -527,7 +527,7 @@ jobs:
     name: "Validate Gradle Wrapper"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - uses: gradle/actions/wrapper-validation@v4

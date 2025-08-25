@@ -4,34 +4,35 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 
-import org.jabref.gui.walkthrough.declarative.NavigationPredicate;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
+import org.jabref.gui.walkthrough.declarative.Trigger;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
-import org.jabref.gui.walkthrough.declarative.effect.MultiWindowHighlight;
+import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
 import org.jabref.gui.walkthrough.declarative.effect.WindowEffect;
 import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record TooltipStep(
-        @NonNull String title,
-        @NonNull List<WalkthroughRichTextBlock> content,
-        @NonNull NodeResolver resolverValue,
-        @Nullable String continueButtonTextValue,
-        @Nullable String skipButtonTextValue,
-        @Nullable String backButtonTextValue,
-        @Nullable NavigationPredicate navigationPredicateValue,
-        @NonNull TooltipPosition position,
-        @Nullable Double widthValue,
-        @Nullable Double heightValue,
-        @Nullable MultiWindowHighlight highlightValue,
-        @Nullable WindowResolver activeWindowResolverValue
-) implements WalkthroughStep {
+public record TooltipStep(@NonNull String title,
+                          @NonNull List<WalkthroughRichTextBlock> content,
+                          @NonNull NodeResolver resolverValue,
+                          @Nullable String continueButtonTextValue,
+                          @Nullable String skipButtonTextValue,
+                          @Nullable String backButtonTextValue,
+                          @Nullable Trigger triggerValue,
+                          @NonNull TooltipPosition position,
+                          @Nullable Double widthValue,
+                          @Nullable Double heightValue,
+                          @Nullable WalkthroughEffect highlightValue,
+                          @Nullable WindowResolver activeWindowResolverValue,
+                          boolean showQuitButtonValue,
+                          @NonNull QuitButtonPosition quitButtonPositionValue) implements VisibleComponent {
+    public static final double DEFAULT_WIDTH = 384;
 
     @Override
-    public Optional<NodeResolver> resolver() {
+    public Optional<NodeResolver> nodeResolver() {
         return Optional.of(resolverValue);
     }
 
@@ -51,28 +52,38 @@ public record TooltipStep(
     }
 
     @Override
-    public Optional<NavigationPredicate> navigationPredicate() {
-        return Optional.ofNullable(navigationPredicateValue);
+    public Optional<Trigger> trigger() {
+        return Optional.ofNullable(triggerValue);
     }
 
     @Override
-    public OptionalDouble width() {
-        return widthValue != null ? OptionalDouble.of(widthValue) : OptionalDouble.empty();
+    public OptionalDouble maxWidth() {
+        return widthValue != null ? OptionalDouble.of(widthValue) : OptionalDouble.of(DEFAULT_WIDTH);
     }
 
     @Override
-    public OptionalDouble height() {
+    public OptionalDouble maxHeight() {
         return heightValue != null ? OptionalDouble.of(heightValue) : OptionalDouble.empty();
     }
 
     @Override
-    public Optional<MultiWindowHighlight> highlight() {
+    public Optional<WalkthroughEffect> highlight() {
         return Optional.ofNullable(highlightValue);
     }
 
     @Override
-    public Optional<WindowResolver> activeWindowResolver() {
+    public Optional<WindowResolver> windowResolver() {
         return Optional.ofNullable(activeWindowResolverValue);
+    }
+
+    @Override
+    public boolean showQuitButton() {
+        return showQuitButtonValue;
+    }
+
+    @Override
+    public QuitButtonPosition quitButtonPosition() {
+        return quitButtonPositionValue;
     }
 
     public static Builder builder(@NonNull String title) {
@@ -86,12 +97,14 @@ public record TooltipStep(
         private @Nullable String continueButtonText;
         private @Nullable String skipButtonText;
         private @Nullable String backButtonText;
-        private @Nullable NavigationPredicate navigationPredicate;
+        private @Nullable Trigger trigger;
         private TooltipPosition position = TooltipPosition.AUTO;
         private @Nullable Double width;
         private @Nullable Double height;
-        private @Nullable MultiWindowHighlight highlight;
+        private @Nullable WalkthroughEffect highlight;
         private @Nullable WindowResolver activeWindowResolver;
+        private boolean showQuitButton = true;
+        private QuitButtonPosition quitButtonPosition = QuitButtonPosition.AUTO;
 
         private Builder(@NonNull String title) {
             this.title = title;
@@ -127,8 +140,13 @@ public record TooltipStep(
             return this;
         }
 
-        public Builder navigation(@NonNull NavigationPredicate navigationPredicate) {
-            this.navigationPredicate = navigationPredicate;
+        public Builder trigger(@NonNull Trigger trigger) {
+            this.trigger = trigger;
+            return this;
+        }
+
+        public Builder trigger(Trigger.@NonNull Builder triggerBuilder) {
+            this.trigger = triggerBuilder.build();
             return this;
         }
 
@@ -147,13 +165,13 @@ public record TooltipStep(
             return this;
         }
 
-        public Builder highlight(@NonNull MultiWindowHighlight highlight) {
+        public Builder highlight(@NonNull WalkthroughEffect highlight) {
             this.highlight = highlight;
             return this;
         }
 
         public Builder highlight(@NonNull WindowEffect effect) {
-            return highlight(new MultiWindowHighlight(effect));
+            return highlight(new WalkthroughEffect(effect));
         }
 
         public Builder highlight(@NonNull HighlightEffect effect) {
@@ -162,6 +180,16 @@ public record TooltipStep(
 
         public Builder activeWindow(@NonNull WindowResolver activeWindowResolver) {
             this.activeWindowResolver = activeWindowResolver;
+            return this;
+        }
+
+        public Builder showQuitButton(boolean showQuitButton) {
+            this.showQuitButton = showQuitButton;
+            return this;
+        }
+
+        public Builder quitButtonPosition(@NonNull QuitButtonPosition quitButtonPosition) {
+            this.quitButtonPosition = quitButtonPosition;
             return this;
         }
 
@@ -175,12 +203,14 @@ public record TooltipStep(
                     continueButtonText,
                     skipButtonText,
                     backButtonText,
-                    navigationPredicate,
+                    trigger,
                     position,
                     width,
                     height,
                     highlight,
-                    activeWindowResolver);
+                    activeWindowResolver,
+                    showQuitButton,
+                    quitButtonPosition);
         }
     }
 }
