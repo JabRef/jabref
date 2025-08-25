@@ -6,10 +6,12 @@ import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -68,6 +70,9 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @FXML private CheckBox showEntryInformation;
     @FXML private CodeArea bibTeXData;
     @FXML private VBox bibTeXDataBox;
+    @FXML private Button nextPageButton;
+    @FXML private Button prevPageButton;
+    @FXML private Label statusLabel;
 
     private final BackgroundTask<ParserResult> task;
     private final BibDatabaseContext database;
@@ -228,16 +233,96 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         initBibTeX();
         if (searchBasedFetcher != null) {
             updatePageUI();
+            setupPaginationBindings();
         }
     }
+
+    private void setupPaginationBindings() {
+        BooleanProperty loading = viewModel.loadingProperty();
+        BooleanProperty initialLoadComplete = viewModel.initialLoadCompleteProperty();
+
+        BooleanBinding isOnLastPage = Bindings.createBooleanBinding(() -> {
+            int currentPage = viewModel.currentPageProperty().get();
+            int totalPages = viewModel.totalPagesProperty().get();
+            return currentPage >= totalPages - 1;
+        }, viewModel.currentPageProperty(), viewModel.totalPagesProperty());
+
+        BooleanBinding isPagedFetcher = Bindings.createBooleanBinding(() ->
+            searchBasedFetcher instanceof PagedSearchBasedFetcher
+        );
+
+        // Disable: during loading OR when on the last page for non-paged fetchers
+        // OR when the initial load is not complete for paged fetchers
+        nextPageButton.disableProperty().bind(
+            loading.or(isOnLastPage.and(isPagedFetcher.not()))
+               .or(isPagedFetcher.and(initialLoadComplete.not()))
+        );
+        prevPageButton.disableProperty().bind(loading.or(viewModel.currentPageProperty().isEqualTo(0)));
+
+        prevPageButton.textProperty().bind(
+            Bindings.when(loading)
+                .then("< " + Localization.lang("Loading..."))
+                .otherwise("< " + Localization.lang("Previous"))
+        );
+
+        nextPageButton.textProperty().bind(
+            Bindings.when(loading)
+                .then(Localization.lang("Loading...") + " >")
+                .otherwise(
+                    Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
+                        .then(Localization.lang("Loading initial entries..."))
+                        .otherwise(
+                            Bindings.when(isOnLastPage)
+                                .then(
+                                    Bindings.when(isPagedFetcher)
+                                        .then(Localization.lang("Load More") + " >>")
+                                        .otherwise(Localization.lang("No more entries"))
+                                )
+                                .otherwise(Localization.lang("Next") + " >")
+                        )
+            )
+        );
+
+        statusLabel.textProperty().bind(
+            Bindings.when(loading)
+                .then(Localization.lang("Fetching more entries..."))
+                .otherwise(
+                    Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
+                        .then(Localization.lang("Loading initial results..."))
+                        .otherwise(
+                            Bindings.when(isOnLastPage)
+                                .then(
+                                    Bindings.when(isPagedFetcher)
+                                        .then(Localization.lang("Click 'Load More' to fetch additional entries"))
+                                        .otherwise(Bindings.createStringBinding(() -> {
+                                            int totalEntries = viewModel.getAllEntries().size();
+                                            return totalEntries > 0 ?
+                                                Localization.lang("All %0 entries loaded", String.valueOf(totalEntries)) :
+                                                Localization.lang("No entries available");
+                                        }, viewModel.getAllEntries()))
+                                )
+                                .otherwise("")
+                        )
+                )
+        );
+
+        loading.addListener((obs, oldVal, newVal) -> {
+            getDialogPane().getScene().setCursor(newVal ? Cursor.WAIT : Cursor.DEFAULT);
+        });
+
+        isOnLastPage.addListener((_, oldVal, newVal) -> {
+            if (newVal && !oldVal) {
+                statusLabel.getStyleClass().add("info-message");
+            } else if (!newVal && oldVal) {
+                statusLabel.getStyleClass().remove("info-message");
+            }
+        });
+}
 
     private void updatePageUI() {
         pageNumberLabel.textProperty().bind(Bindings.createStringBinding(() -> {
             int totalPages = viewModel.totalPagesProperty().get();
             int currentPage = viewModel.currentPageProperty().get() + 1;
-            if (searchBasedFetcher instanceof PagedSearchBasedFetcher && currentPage == totalPages) {
-                return Localization.lang("Fetching...");
-            }
             if (totalPages != 0) {
                 return Localization.lang("%0 of %1", currentPage, totalPages);
             }
@@ -296,6 +381,16 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         viewModel.getCheckedEntries().addAll(viewModel.getAllEntries());
     }
 
+    private boolean isOnLastPageAndPagedFetcher() {
+        if (!(searchBasedFetcher instanceof PagedSearchBasedFetcher)) {
+            return false;
+        }
+
+        int currentPage = viewModel.currentPageProperty().get();
+        int totalPages = viewModel.totalPagesProperty().get();
+        return currentPage >= totalPages - 1;
+    }
+
     @FXML
     private void onPrevPage() {
         viewModel.goToPrevPage();
@@ -304,7 +399,11 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void onNextPage() {
-        viewModel.goToNextPage();
+        if (isOnLastPageAndPagedFetcher()) {
+            viewModel.fetchMoreEntriesFromLastPage();
+        } else {
+            viewModel.goToNextPage();
+        }
         restoreCheckedEntries();
     }
 

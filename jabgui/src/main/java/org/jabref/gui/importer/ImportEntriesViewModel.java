@@ -66,6 +66,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final IntegerProperty currentPageProperty = new SimpleIntegerProperty(0);
     private final IntegerProperty totalPagesProperty = new SimpleIntegerProperty(0);
     private final BooleanProperty loading = new SimpleBooleanProperty(false);
+    private final BooleanProperty initialLoadComplete = new SimpleBooleanProperty(false);
     private final ObservableList<BibEntry> pagedEntries = FXCollections.observableArrayList();
     private final ObservableSet<BibEntry> checkedEntries = FXCollections.observableSet();
     private final ObservableList<BibEntry> allEntries = FXCollections.observableArrayList();
@@ -110,13 +111,19 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             loadEntries(entries);
             updatePagedEntries();
             updateTotalPages();
+            initialLoadComplete.set(true);
             if (entries.isEmpty()) {
                 task.updateMessage(Localization.lang("No entries corresponding to given query"));
             }
         }).onFailure(ex -> {
             LOGGER.error("Error importing", ex);
+            initialLoadComplete.set(true);
             dialogService.showErrorDialogAndWait(ex);
         }).executeWith(taskExecutor);
+    }
+
+    public BooleanProperty initialLoadCompleteProperty() {
+        return initialLoadComplete;
     }
 
     public String getMessage() {
@@ -219,6 +226,13 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         return Optional.empty();
     }
 
+    public void fetchMoreEntriesFromLastPage() {
+        if (fetcher instanceof PagedSearchBasedFetcher pagedFetcher && !loading.get()) {
+            loading.set(true);
+            fetchMoreEntries(pagedFetcher);
+        }
+    }
+
     public void goToPrevPage() {
         if (hasPrevPage()) {
             currentPageProperty.set(currentPageProperty.get() - 1);
@@ -264,12 +278,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             pagedEntries.setAll(allEntries);
             return;
         }
-        if (!loadingProperty().get()
-                && fetcher instanceof PagedSearchBasedFetcher pagedFetcher
-                && (currentPageProperty.get() + 1) * PAGE_SIZE >= allEntries.size()) {
-            loading.set(true);
-            fetchMoreEntries(pagedFetcher);
-        }
 
         int fromIdx = currentPageProperty.get() * PAGE_SIZE;
         int toIdx = Math.min(fromIdx + PAGE_SIZE, allEntries.size());
@@ -288,6 +296,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                         updateTotalPages();
                     } else {
                         LOGGER.warn("No new entries fetched from {} for page {}", fetcher.getName(), currentPageProperty.get() + 2);
+                        dialogService.notify(Localization.lang("No new entries found from %0", fetcher.getName()));
                     }
                     loading.set(false);
                 })
