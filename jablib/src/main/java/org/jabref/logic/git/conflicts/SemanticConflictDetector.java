@@ -313,7 +313,7 @@ public class SemanticConflictDetector {
         for (Field overlappingField : overlap) {
             String leftFieldValue = left.getField(overlappingField).orElse(null);
             String rightFieldValue = right.getField(overlappingField).orElse(null);
-            if (!Objects.equals(leftFieldValue, rightFieldValue)) {
+            if (!leftFieldValue.equals(rightFieldValue)) {
                 return true;
             }
         }
