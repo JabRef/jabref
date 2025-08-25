@@ -10,9 +10,9 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.MarcXmlParser;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /// Fetcher for [Bibliotheksverbund Bayern (BVB)](https://www.bib-bvb.de/)
 public class BvbFetcher implements SearchBasedParserFetcher {
@@ -30,12 +30,12 @@ public class BvbFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(QueryNode query) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
         uriBuilder.addParameter("version", "1.1");
         uriBuilder.addParameter("recordSchema", "marcxml");
         uriBuilder.addParameter("operation", "searchRetrieve");
-        uriBuilder.addParameter("query", new DefaultQueryTransformer().transformLuceneQuery(query).orElse(""));
+        uriBuilder.addParameter("query", new DefaultQueryTransformer().transformSearchQuery(query).orElse(""));
         uriBuilder.addParameter("maximumRecords", "30");
         return uriBuilder.build().toURL();
     }

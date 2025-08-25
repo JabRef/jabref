@@ -71,7 +71,8 @@ public class DOABFetcherTest {
                                 .withField(StandardField.LANGUAGE, "English")
                                 .withField(StandardField.KEYWORDS, "Religion, thema EDItEUR::Q Philosophy and Religion::QR Religion and beliefs::QRM Christianity::QRMF Christianity: sacred texts and revered writings::QRMF1 Bibles::QRMF13 New Testaments")
                                 .withField(StandardField.PUBLISHER, "Brill"),
-                        "Four Kingdom Motifs before and beyond the Book of Daniel"
+                        "\"Four Kingdom Motifs before and beyond the Book of Daniel\""
+                        // The title needs to be in quotes in order for and to be parsed correctly here
                 ),
                 Arguments.of(
                         new BibEntry(StandardEntryType.Book)
@@ -98,7 +99,8 @@ public class DOABFetcherTest {
                                 .withField(StandardField.LANGUAGE, "English")
                                 .withField(StandardField.KEYWORDS, "agile, structural equation modelling, information technology, success, models, strategic alignment, complexity, waterfall, project management, quantitative, Agile software development, Change management, Deliverable, Exploratory factor analysis, South Africa, thema EDItEUR::U Computing and Information Technology::UB Information technology: general topics")
                                 .withField(StandardField.PUBLISHER, "AOSIS"),
-                        "The symbiosis between information system project complexity and information system project success"
+                        "\"The symbiosis between information system project complexity and information system project success\""
+                        // The title needs to be in quotes in order for and to be parsed correctly here
                 )
         );
     }

@@ -8,19 +8,17 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fileformat.ACMPortalParser;
+import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
-import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @FetcherTest
@@ -62,10 +60,11 @@ class ACMPortalFetcherTest {
     }
 
     @Test
-    void getURLForQuery() throws MalformedURLException, URISyntaxException, QueryNodeParseException {
+    void getURLForQuery() throws MalformedURLException, URISyntaxException {
         String testQuery = "test query url";
-        SyntaxParser parser = new StandardSyntaxParser();
-        URL url = fetcher.getURLForQuery(parser.parse(testQuery, NO_EXPLICIT_FIELD));
+        SearchQuery searchQueryObject = new SearchQuery(testQuery);
+        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
+        URL url = fetcher.getURLForQuery(visitor.visitStart(searchQueryObject.getContext()));
         String expected = "https://dl.acm.org/action/doSearch?AllField=test%20query%20url";
         assertEquals(expected, url.toString());
     }

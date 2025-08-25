@@ -19,9 +19,9 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class CollectionOfComputerScienceBibliographiesFetcher implements SearchBasedParserFetcher {
 
@@ -34,9 +34,9 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode query) throws URISyntaxException, MalformedURLException {
         return new URIBuilder(BASIC_SEARCH_URL)
-                .addParameter("query", new CollectionOfComputerScienceBibliographiesQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""))
+                .addParameter("query", new CollectionOfComputerScienceBibliographiesQueryTransformer().transformSearchQuery(query).orElse(""))
                 .addParameter("sort", "score")
                 .build()
                 .toURL();

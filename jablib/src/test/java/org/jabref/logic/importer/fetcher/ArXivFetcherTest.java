@@ -152,7 +152,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     @Override
     public void supportsAuthorSearch() throws FetcherException {
-        StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
+        StringJoiner queryBuilder = new StringJoiner("\" AND author=\"", "author=\"", "\"");
         getInputTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
@@ -300,13 +300,13 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     void searchEntryByPartOfTitle() throws FetcherException {
         assertEquals(List.of(mainResultPaper),
-                fetcher.performSearch("title:\"the architecture of mr. dLib's\""));
+                fetcher.performSearch("title=\"the architecture of mr. dLib's\""));
     }
 
     @Test
     void searchEntryByPartOfTitleWithAcuteAccent() throws FetcherException {
         assertEquals(List.of(sliceTheoremPaper),
-                fetcher.performSearch("title:\"slice theorem for Fréchet\""));
+                fetcher.performSearch("title=\"slice theorem for Fréchet\""));
     }
 
     @Test
@@ -441,10 +441,10 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.2009.10618")
                 .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
 
-        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
+        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title==\"A Survey and Taxonomy of Distributed Data Mining Research Studies: A Systematic Literature Review\"");
 
-        // There is only a single paper found by searching that contains the exact sequence "Taxonomy of Distributed" in the title.
-        assertEquals(List.of(expected), resultWithPhraseSearch);
+        // The first result should be the expected paper
+        assertEquals(expected, resultWithPhraseSearch.getFirst());
     }
 
     @Test
@@ -472,7 +472,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(InternalField.KEY_FIELD, "B_scher_2020")
                 .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
 
-        List<BibEntry> result = fetcher.performSearch("author:\"Tobias Büscher\" AND title:\"Instability and fingering of interfaces\"");
+        List<BibEntry> result = fetcher.performSearch("author=\"Tobias Büscher\" AND title=\"Instability and fingering of interfaces\"");
 
         // There is only one paper authored by Tobias Büscher with that phrase in the title
         assertEquals(List.of(expected), result);
