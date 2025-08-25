@@ -28,9 +28,9 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.paging.Page;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -179,9 +179,9 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     }
 
     @Override
-    public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
+    public Page<BibEntry> performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException {
         ScholarQueryTransformer queryTransformer = new ScholarQueryTransformer();
-        String transformedQuery = queryTransformer.transformLuceneQuery(luceneQuery).orElse("");
+        String transformedQuery = queryTransformer.transformSearchQuery(queryNode).orElse("");
 
         obtainAndModifyCookie();
 

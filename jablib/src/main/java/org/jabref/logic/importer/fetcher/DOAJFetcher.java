@@ -21,12 +21,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -184,9 +184,9 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        DOAJFetcher.addPath(uriBuilder, new DefaultLuceneQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
+        DOAJFetcher.addPath(uriBuilder, new DefaultLuceneQueryTransformer().transformSearchQuery(queryNode).orElse(""));
         // Number of results
         uriBuilder.addParameter("pageSize", "30");
         // Page (not needed so far)
