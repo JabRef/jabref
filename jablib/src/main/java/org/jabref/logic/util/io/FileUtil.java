@@ -135,7 +135,7 @@ public class FileUtil {
      *
      * @param path      the path to add the extension to
      * @param extension the extension to add
-     * @return the with the modified file name
+     * @return the modified file name
      */
     public static Path addExtension(Path path, String extension) {
         return path.resolveSibling(path.getFileName() + extension);

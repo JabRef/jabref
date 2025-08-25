@@ -2104,7 +2104,7 @@ public class JabRefCliPreferences implements CliPreferences {
         searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) _ ->
                 putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT)));
         EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (_, _, newValue) -> putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));
-        EasyBind.listen(searchPreferences.keepSearchStingProperty(), (_, _, newValue) -> putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));
+        EasyBind.listen(searchPreferences.keepSearchStringProperty(), (_, _, newValue) -> putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));
         EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (_, _, _) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
         EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));
         EasyBind.listen(searchPreferences.getSearchWindowWidthProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_WIDTH, searchPreferences.getSearchWindowWidth()));
