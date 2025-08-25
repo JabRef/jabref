@@ -47,7 +47,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 24.0.1
+          java-version: 24.0.2
           distribution: 'correto'
       - name: Run checkstyle reporter
         uses: dbelyaev/action-checkstyle@master
@@ -86,7 +86,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 24.0.1
+          java-version: 24.0.2
           distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -120,7 +120,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 24.0.1
+          java-version: 24.0.2
           distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -237,7 +237,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 24.0.1
+          java-version: 24.0.2
           distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -272,7 +272,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 24.0.1
+          java-version: 24.0.2
           distribution: 'correto'
       - name: Generate JBang cache key
         id: cache-key
@@ -320,7 +320,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 24.0.1
+          java-version: 24.0.2
           distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -369,7 +369,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 24.0.1
+          java-version: 24.0.2
           distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -407,7 +407,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 24.0.1
+          java-version: 24.0.2
           distribution: 'correto'
       - name: Generate JBang cache key
         id: cache-key
@@ -468,7 +468,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: actions/setup-java@v4
         with:
-          java-version: 24.0.1
+          java-version: 24.0.2
           distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -513,7 +513,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 24.0.1
+          java-version: 24.0.2
           distribution: 'correto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
