@@ -41,11 +41,11 @@ public class WalkthroughRenderer {
         titleContainer.getChildren().add(titleFlow);
 
         VBox contentContainer = createContent(step, walkthrough, beforeNavigate);
-        contentContainer.getStyleClass().add("walkthrough-tooltip-content");
+        contentContainer.getStyleClass().add("walkthrough-content");
         VBox.setVgrow(contentContainer, Priority.ALWAYS);
 
         HBox actionsContainer = createActions(step, walkthrough, beforeNavigate);
-        actionsContainer.getStyleClass().add("walkthrough-tooltip-actions");
+        actionsContainer.getStyleClass().add("walkthrough-actions");
 
         step.maxHeight().ifPresent(tooltip::setMaxHeight);
         step.maxWidth().ifPresent(tooltip::setMaxWidth);

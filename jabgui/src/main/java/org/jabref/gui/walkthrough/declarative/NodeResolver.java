@@ -6,7 +6,6 @@ import java.util.function.Predicate;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
@@ -19,6 +18,7 @@ import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.logic.l10n.Localization;
 
 import com.google.common.collect.Streams;
+import com.sun.javafx.scene.NodeHelper;
 import com.sun.javafx.scene.control.LabeledText;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -33,55 +33,87 @@ public interface NodeResolver {
     /// @return an optional containing the found node, or empty if not found
     Optional<Node> resolve(@NonNull Scene scene);
 
-    /// Creates a resolver that finds a node by CSS selector.
+    /// Creates a resolver that finds a node by CSS selector. The returned node is
+    /// guaranteed to be visible.
     ///
     /// @param selector the CSS selector to find the node
     /// @return a resolver that finds the node by selector
     static NodeResolver selector(@NonNull String selector) {
-        return scene -> Optional.ofNullable(scene.lookup(selector));
+        return scene -> scene.getRoot().lookupAll(selector).stream().filter(NodeHelper::isTreeVisible).findFirst();
     }
 
-    /// Creates a resolver that finds a node by its fx:id.
+    /// Creates a resolver that finds a node by its fx:id. The returned node is
+    /// guaranteed to be visible.
     ///
     /// @param fxId the fx:id of the node
     /// @return a resolver that finds the node by fx:id
     static NodeResolver fxId(@NonNull String fxId) {
-        return scene -> Optional.ofNullable(scene.lookup("#" + fxId));
+        return selector("#" + fxId);
     }
 
-    /// Creates a resolver that finds a button by its graphic.
+    /// Creates a resolver that finds a button by its graphic. The returned button is
+    /// guaranteed to be visible.
     ///
     /// @param glyph the graphic of the button
     /// @return a resolver that finds the button by graphic
     static NodeResolver buttonWithGraphic(IconTheme.JabRefIcons glyph) {
-        // .icon-button, .button selector is not used, because lookupAll doesn't support multiple selectors
-        return scene -> Streams.concat(scene.getRoot().lookupAll(".button").stream(),
-                                       scene.getRoot().lookupAll(".icon-button").stream())
-                               .filter(node -> {
-                                   if (!(node instanceof ButtonBase button)) {
-                                       return false;
-                                   }
-                                   Node graphic = button.getGraphic();
-                                   return (graphic instanceof JabRefIconView jabRefIconView) && jabRefIconView.getGlyph() == glyph ||
-                                           (graphic instanceof FontIcon fontIcon) && fontIcon.getIconCode() == glyph.getIkon();
-                               })
-                               .findFirst();
+        return scene -> Streams
+                // .icon-button, .button selector is not used, because lookupAll doesn't support multiple selectors
+                .concat(scene.getRoot().lookupAll(".button").stream(),
+                        scene.getRoot().lookupAll(".icon-button").stream())
+                .filter(node -> {
+                    if (!(node instanceof ButtonBase button) || !NodeHelper.isTreeVisible(button)) {
+                        return false;
+                    }
+                    Node graphic = button.getGraphic();
+                    return (graphic instanceof JabRefIconView jabRefIconView) && jabRefIconView.getGlyph() == glyph ||
+                            (graphic instanceof FontIcon fontIcon) && fontIcon.getIconCode() == glyph.getIkon();
+                })
+                .findFirst();
     }
 
-    /// Creates a resolver that finds a node by a predicate.
+    /// Creates a resolver that finds a node by a predicate. The returned node is
+    /// guaranteed to be visible.
     ///
     /// @param predicate the predicate to match the node
     /// @return a resolver that finds the node matching the predicate
     static NodeResolver predicate(@NonNull Predicate<Node> predicate) {
-        return scene -> Optional.ofNullable(findNode(scene.getRoot(), predicate));
+        return scene -> Optional.ofNullable(findNode(scene.getRoot(),
+                node -> NodeHelper.isTreeVisible(node) && predicate.test(node)));
     }
 
-    /// Creates a resolver that finds a button by its StandardAction.
+    /// Creates a resolver that finds a button by its StandardAction. The button is
+    /// matched by its tooltip text or button text. The returned button is guaranteed to
+    /// be visible.
     ///
     /// @param action the StandardAction associated with the button
     /// @return a resolver that finds the button by action
     static NodeResolver action(@NonNull StandardActions action) {
-        return scene -> Optional.ofNullable(findNodeByAction(scene, action));
+        return scene -> Optional.ofNullable(findNode(scene.getRoot(), node -> {
+            if (!(node instanceof ButtonBase button) || !NodeHelper.isTreeVisible(button)) {
+                return false;
+            }
+
+            if (button.getTooltip() != null) {
+                String tooltipText = button.getTooltip().getText();
+                if (tooltipText != null && tooltipText.equals(action.getText())) {
+                    return true;
+                }
+            }
+
+            if (button.getStyleClass().contains("icon-button")) {
+                String actionText = action.getText();
+                if (button.getTooltip() != null && button.getTooltip().getText() != null) {
+                    String tooltipText = button.getTooltip().getText();
+                    if (tooltipText.startsWith(actionText) || tooltipText.contains(actionText)) {
+                        return true;
+                    }
+                }
+                return button.getText() != null && button.getText().equals(actionText);
+            }
+
+            return false;
+        }));
     }
 
     /// Creates a resolver that finds a button by its button type, assuming the node
@@ -95,14 +127,20 @@ public interface NodeResolver {
                 .map(node -> node instanceof DialogPane pane ? pane.lookupButton(buttonType) : null);
     }
 
-    /// Creates a resolver that finds a node by selector first, then predicate.
+    /// Creates a resolver that finds a node by selector first, then matches text
+    /// content in the node and the node's LabeledText children. The returned node is
+    /// guaranteed to be visible.
     ///
     /// @param selector    the style class to match
     /// @param textMatcher predicate to match text content in LabeledText children
     /// @return a resolver that finds the node by style class and text content
     static NodeResolver selectorWithText(@NonNull String selector, @NonNull Predicate<String> textMatcher) {
-        return scene -> scene.getRoot().lookupAll(selector).stream().filter(
-                node -> textMatcher.test(node.toString()) || node.lookupAll(".text").stream().anyMatch(child -> {
+        return scene -> scene
+                .getRoot()
+                .lookupAll(selector)
+                .stream()
+                .filter(NodeHelper::isTreeVisible)
+                .filter(node -> textMatcher.test(node.toString()) || node.lookupAll(".text").stream().anyMatch(child -> {
                             if (child instanceof LabeledText text) {
                                 String textContent = text.getText();
                                 return textContent != null && textMatcher.test(textContent);
@@ -127,39 +165,13 @@ public interface NodeResolver {
             }
 
             return menu.getItems().stream()
+                       .filter(item -> NodeHelper.isTreeVisible(item.getStyleableNode()))
                        .filter(item -> Optional
                                .ofNullable(item.getText())
                                .map(str -> str.contains(Localization.lang(key)))
                                .orElse(false))
                        .map(MenuItem::getStyleableNode).findFirst();
         };
-    }
-
-    @Nullable
-    private static Node findNodeByAction(@NonNull Scene scene, @NonNull StandardActions action) {
-        return findNode(scene.getRoot(), node -> {
-            if (node instanceof Button button) {
-                if (button.getTooltip() != null) {
-                    String tooltipText = button.getTooltip().getText();
-                    if (tooltipText != null && tooltipText.equals(action.getText())) {
-                        return true;
-                    }
-                }
-
-                if (button.getStyleClass().contains("icon-button")) {
-                    String actionText = action.getText();
-                    if (button.getTooltip() != null && button.getTooltip().getText() != null) {
-                        String tooltipText = button.getTooltip().getText();
-                        if (tooltipText.startsWith(actionText) || tooltipText.contains(actionText)) {
-                            return true;
-                        }
-                    }
-
-                    return button.getText() != null && button.getText().equals(actionText);
-                }
-            }
-            return false;
-        });
     }
 
     @Nullable
