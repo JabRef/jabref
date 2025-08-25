@@ -44,6 +44,8 @@ class Fetch implements Runnable {
 
     @Override
     public void run() {
+        ArgumentProcessor.showBanner(sharedOptions.porcelain);
+
         Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(
                 argumentProcessor.cliPreferences.getImportFormatPreferences(),
                 argumentProcessor.cliPreferences.getImporterPreferences());
