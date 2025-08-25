@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,13 +51,37 @@ public class KeywordList implements Iterable<Keyword> {
         Objects.requireNonNull(hierarchicalDelimiter);
 
         KeywordList keywordList = new KeywordList();
+        List<String> hierarchy = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+        boolean isEscaping = false;
 
-        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
-        while (tok.hasMoreTokens()) {
-            String chain = tok.nextToken();
-            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
-            keywordList.add(chainRoot);
+        for (int i = 0; i < keywordString.length(); i++) {
+            char currentChar = keywordString.charAt(i);
+
+            if (isEscaping && currentChar == delimiter) { // we only escape the keyword delimiter
+                currentToken.append(currentChar);
+                isEscaping = false;
+            } else if (currentChar == '\\') {
+                isEscaping = true;
+            } else if (currentChar == hierarchicalDelimiter) {
+                hierarchy.add(currentToken.toString().trim());
+                currentToken.setLength(0);
+            } else if (currentChar == delimiter) {
+                hierarchy.add(currentToken.toString());
+                currentToken.setLength(0);
+                keywordList.add(Keyword.of(hierarchy.toArray(new String[0])));
+                hierarchy.clear();
+            } else {
+                currentToken.append(currentChar);
+            }
         }
+
+        // Handle the final token
+        if (!currentToken.isEmpty() || !hierarchy.isEmpty()) {
+            hierarchy.add(currentToken.toString().trim());
+            keywordList.add(Keyword.of(hierarchy.toArray(new String[0])));
+        }
+
         return keywordList;
     }
 
@@ -76,6 +99,12 @@ public class KeywordList implements Iterable<Keyword> {
     public static String serialize(List<Keyword> keywords, Character delimiter) {
         return keywords.stream().map(Keyword::get).collect(Collectors.joining(delimiter.toString()));
     }
+
+    // This method serializes Keywords supporting escaping of the delimiter for BibTeX Serialization (Issue #12810, #12532)
+    public String bibtexSerialize(Character delimiter) {
+        return keywordChains.stream().map(keyword -> keyword.getSubchainAsStringWithEscaping(delimiter)).collect(Collectors.joining(delimiter.toString() + " "));
+    }
+
 
     public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
         KeywordList keywordListA = parse(keywordStringA, delimiter);
