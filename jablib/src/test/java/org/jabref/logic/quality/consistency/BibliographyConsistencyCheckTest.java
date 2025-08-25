@@ -271,7 +271,6 @@ class BibliographyConsistencyCheckTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PUBLISHER, "publisher");
-
         BibEntry third = new BibEntry(StandardEntryType.InProceedings, "third")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.LOCATION, "location")
@@ -292,14 +291,14 @@ class BibliographyConsistencyCheckTest {
         bibDatabase.insertEntries(bibEntriesList);
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
+        BibliographyConsistencyCheck.Result expectedArticle = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
 
         BibliographyConsistencyCheck.EntryTypeResult articleResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
-        BibliographyConsistencyCheck.EntryTypeResult inProceedingsResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER, StandardField.LOCATION, StandardField.YEAR), List.of(fifth, fourth, sixth, third));
+        BibliographyConsistencyCheck.EntryTypeResult expectedInProceedings = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER, StandardField.LOCATION, StandardField.YEAR), List.of(fifth, fourth, sixth, third));
         BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(
                 StandardEntryType.Article, articleResult,
-                StandardEntryType.InProceedings, inProceedingsResult
+                StandardEntryType.InProceedings, expectedInProceedings
         ));
-        assertEquals(expected, result);
+        assertEquals(expected, expectedArticle);
     }
 }
