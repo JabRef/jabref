@@ -79,7 +79,7 @@ public interface NodeResolver {
     /// @return a resolver that finds the node matching the predicate
     static NodeResolver predicate(@NonNull Predicate<Node> predicate) {
         return scene -> Optional.ofNullable(findNode(scene.getRoot(),
-                (node) -> NodeHelper.isTreeVisible(node) && predicate.test(node)));
+                node -> NodeHelper.isTreeVisible(node) && predicate.test(node)));
     }
 
     /// Creates a resolver that finds a button by its StandardAction. The button is
