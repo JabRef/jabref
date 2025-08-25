@@ -1779,13 +1779,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 2.667em 2em;
 }
 
-.welcome-columns-container,
-.welcome-columns-container:focus,
-.welcome-columns-scroll,
-.welcome-columns-scroll:focus {
-    -fx-background-color: transparent;
-}
-
 .welcome-top-titles {
     -fx-spacing: 0.833em;
     -fx-alignment: top-left;
@@ -2655,12 +2648,6 @@ journalInfo .grid-cell-b {
 .walkthroughs-container {
     -fx-spacing: 0.3333em;
     -fx-alignment: top-left;
-}
-
-.walkthroughs-scroll-pane,
-.quick-settings-scroll-pane {
-    -fx-max-height: 12em;
-    -fx-pref-height: 12em;
 }
 
 .quick-settings-button {

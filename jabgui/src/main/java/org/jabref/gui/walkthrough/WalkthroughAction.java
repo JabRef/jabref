@@ -414,7 +414,6 @@ public class WalkthroughAction extends SimpleCommand {
                         .trigger(Trigger.onClick())
                         .position(TooltipPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
-                // TODO: Add drag and drop for the Walkthrough
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Right-click on your group"))
                         .content(new TextBlock(Localization.lang("Now right-click on your \"%0\" group to open the context menu.", groupName)))
