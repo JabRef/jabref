@@ -35,8 +35,8 @@ public class WalkthroughOverlay {
     private final Map<Window, WindowOverlay> overlays = new HashMap<>();
     private final Stage stage;
     private final Walkthrough walkthrough;
-    private final WalkthroughHighlighter walkthroughHighlighter;
-    private final WalkthroughReverter walkthroughReverter;
+    private final WalkthroughHighlighter highlighter;
+    private final WalkthroughReverter reverter;
     private final SideEffectExecutor sideEffectExecutor;
 
     private @Nullable WalkthroughScroller scroller;
@@ -48,10 +48,10 @@ public class WalkthroughOverlay {
     public WalkthroughOverlay(Stage stage, Walkthrough walkthrough) {
         this.stage = stage;
         this.walkthrough = walkthrough;
-        this.walkthroughHighlighter = new WalkthroughHighlighter();
+        this.highlighter = new WalkthroughHighlighter();
+        this.highlighter.setOnBackgroundClick(this::showQuitConfirmationAndQuit);
         this.sideEffectExecutor = new SideEffectExecutor();
-        this.walkthroughReverter = new WalkthroughReverter(walkthrough, stage, sideEffectExecutor);
-        this.walkthroughHighlighter.setOnBackgroundClick(this::showQuitConfirmationAndQuit);
+        this.reverter = new WalkthroughReverter(walkthrough, stage, sideEffectExecutor);
     }
 
     public void show(@NonNull WalkthroughStep step) {
@@ -67,7 +67,7 @@ public class WalkthroughOverlay {
                 } else {
                     LOGGER.error("Failed to execute side effect: {}", sideEffect.description());
                     LOGGER.warn("Side effect failed for step: {}", title);
-                    revertToPreviousStep();
+                    reverter.findAndUndo();
                 }
             }
             case VisibleComponent component -> {
@@ -83,8 +83,8 @@ public class WalkthroughOverlay {
 
     public void detachAll() {
         cleanUp();
-        walkthroughReverter.revertAll();
-        walkthroughHighlighter.detachAll();
+        reverter.revertAll();
+        highlighter.detachAll();
         overlays.values().forEach(WindowOverlay::detach);
         overlays.clear();
     }
@@ -114,7 +114,7 @@ public class WalkthroughOverlay {
             displayWalkthroughStep(result);
         } else {
             LOGGER.error("Failed to resolve node for step '{}'. Reverting.", walkthrough.getCurrentStep().title());
-            revertToPreviousStep();
+            reverter.findAndUndo();
         }
         resolver = null;
     }
@@ -134,7 +134,7 @@ public class WalkthroughOverlay {
             this.scroller = new WalkthroughScroller(resolvedNode);
         }
 
-        walkthroughHighlighter.applyHighlight(
+        highlighter.applyHighlight(
                 component.highlight().orElse(null),
                 resolvedWindow.getScene(),
                 resolvedNode);
@@ -146,11 +146,7 @@ public class WalkthroughOverlay {
             case PanelStep panel -> overlay.showPanel(panel, resolvedNode, this::prepareForNavigation);
         }
 
-        walkthroughReverter.attach(resolvedWindow, resolvedNode);
-    }
-
-    private void revertToPreviousStep() {
-        walkthroughReverter.findAndUndo();
+        reverter.attach(resolvedWindow, resolvedNode);
     }
 
     private void cleanUp() {
@@ -160,7 +156,7 @@ public class WalkthroughOverlay {
             resolver = null;
         }
 
-        walkthroughReverter.detach();
+        reverter.detach();
         if (scroller != null) {
             scroller.cleanup();
             scroller = null;
@@ -189,7 +185,7 @@ public class WalkthroughOverlay {
     ///
     /// So the current hack is we will hide [WindowOverlay] so that they won't get hacked restored.
     private void prepareForNavigation() {
-        walkthroughReverter.detach();
+        reverter.detach();
         hide();
     }
 }

@@ -3,6 +3,7 @@ package org.jabref.gui.welcome.components;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -88,12 +89,14 @@ public class Walkthroughs extends VBox {
     }
 
     private ScrollPane createScrollPane(VBox content) {
-        ScrollPane newScrollPane = new ScrollPane(content);
-        newScrollPane.setFitToWidth(true);
-        newScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        newScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        newScrollPane.getStyleClass().add("walkthroughs-scroll-pane");
-        return newScrollPane;
+        ScrollPane scrollPane = new ScrollPane(content);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.getStyleClass().add("walkthroughs-scroll-pane");
+        scrollPane.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+        return scrollPane;
     }
 
     private Button createWalkthroughButton(String text, IconTheme.JabRefIcons icon, String walkthroughId) {

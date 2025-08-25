@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 public class WalkthroughResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughResolver.class);
     private static final Duration RESOLVE_TIMEOUT = Duration.millis(2_500);
+private static final Duration NODE_IDLE_TIMEOUT = Duration.millis(250);
 
     private final WindowResolver windowResolver;
     private final @Nullable NodeResolver nodeResolver;
@@ -33,8 +34,10 @@ public class WalkthroughResolver {
     private @Nullable Runnable windowListenerCleanup;
     private @Nullable ChangeListener<Scene> sceneListener;
     private @Nullable RecursiveChildrenListener recursiveChildrenListener;
-    private @Nullable DelayedExecution delayedExecution;
     private WalkthroughUtils.@Nullable DebouncedInvalidationListener debouncedNodeFinder;
+
+    private @Nullable DelayedExecution timeout;
+    private @Nullable DelayedExecution nodeIdleTimeout;
 
     /// Creates a [WalkthroughResolver] that attempts to identify the window and the
     /// node from the
@@ -68,11 +71,11 @@ public class WalkthroughResolver {
     }
 
     public void startResolution() {
-        delayedExecution = new DelayedExecution(RESOLVE_TIMEOUT, () -> {
+        timeout = new DelayedExecution(RESOLVE_TIMEOUT, () -> {
             LOGGER.error("Walkthrough resolution timed out.");
             finish(new WalkthroughResult(null, null));
         });
-        delayedExecution.start();
+        timeout.start();
 
         windowResolver.resolve().ifPresentOrElse(
                 this::handleWindowResolved,
@@ -128,6 +131,7 @@ public class WalkthroughResolver {
 
     private void listenForNodeInScene(Window window, Scene scene, NodeResolver resolver) {
         debouncedNodeFinder = WalkthroughUtils.debounced(new InvalidationListener() {
+            private @Nullable Node node = null;
             private boolean handled = false;
 
             @Override
@@ -137,11 +141,25 @@ public class WalkthroughResolver {
                 }
 
                 Optional<Node> node = resolver.resolve(scene);
-                if (node.isPresent()) {
+                if (node.isEmpty()) {
+                    return;
+                }
+                if (this.node == node.get()) {
+                    return;
+                }
+                this.node = node.get();
+                if (nodeIdleTimeout != null) {
+                    nodeIdleTimeout.cancel();
+                }
+                // If a new node is resolved after listening, wait for a short period of time to see if it stays the same.
+                LOGGER.info("Node resolved, waiting for it to stay the same: {}", node.get());
+                nodeIdleTimeout = new DelayedExecution(NODE_IDLE_TIMEOUT, () -> {
+                    LOGGER.info("Node idle timeout. The node has stayed the same: {}", node.get());
                     handled = true;
                     detachChildrenListener();
-                    finish(new WalkthroughResult(window, node.get()));
-                }
+                    finish(new WalkthroughResult(window, this.node));
+                });
+                nodeIdleTimeout.start();
             }
         });
 
@@ -155,10 +173,15 @@ public class WalkthroughResolver {
     }
 
     public void cancel() {
-        if (delayedExecution != null) {
-            delayedExecution.cancel();
-            delayedExecution = null;
+        if (timeout != null) {
+            timeout.cancel();
+            timeout = null;
         }
+        if (nodeIdleTimeout != null) {
+            nodeIdleTimeout.cancel();
+            nodeIdleTimeout = null;
+        }
+        sceneListener = null;
         if (windowListenerCleanup != null) {
             windowListenerCleanup.run();
             windowListenerCleanup = null;
