@@ -1752,6 +1752,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
     -fx-font-family: "Arial";
+    -fx-text-fill: -jr-gray-3;
 }
 
 .welcome-no-recent-label {
@@ -1778,14 +1779,22 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 2.667em 2em;
 }
 
+.welcome-columns-container,
+.welcome-columns-container:focus,
+.welcome-columns-scroll,
+.welcome-columns-scroll:focus {
+    -fx-background-color: transparent;
+}
+
 .welcome-top-titles {
     -fx-spacing: 0.833em;
-    -fx-alignment: left;
+    -fx-alignment: top-left;
     -fx-padding: 0 0 1.667em 0;
 }
 
 .welcome-columns-container {
-    -fx-spacing: 3.333em;
+    -fx-hgap: 2.083em;
+    -fx-vgap: 2.083em;
     -fx-alignment: top-center;
 }
 
@@ -1851,9 +1860,67 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-family: "Arial";
 }
 
+/* donation toast */
+.donation-toast {
+    -fx-background-color: -jr-background-alt;
+    -fx-background-radius: 0.8333333333em;
+    -fx-padding: 0.8333em 1em;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.075), 20, 0.25, 0, 6);
+    -fx-alignment: center-left;
+    -fx-border-color: derive(-jr-base, -10%);
+    -fx-border-radius: 0.8333333333em;
+    -fx-max-height: 4em;
+    -fx-spacing: 1.16667em;
+}
+
+.donation-toast .label {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.donation-toast-title {
+    -fx-font-size: 1.0em;
+    -fx-font-weight: bold;
+}
+
+.donation-toast-desc {
+    -fx-font-size: 0.92em;
+}
+
+.donation-toast-text {
+    -fx-spacing: 2;
+}
+
+.donation-btn-primary,
+.donation-btn-secondary,
+.donation-btn-ghost {
+    -fx-padding: 0.5em 1em;
+    -fx-background-radius: 0.5em;
+    -fx-border-radius: 0.5em;
+}
+
+.donation-btn-primary {
+    -fx-background-color: -jr-primary;
+}
+
+.donation-btn-secondary {
+    -fx-background-color: derive(-fx-control-inner-background, -6%);
+}
+
+.donation-btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-gray-1;
+    -fx-stroke-width: 0;
+    -fx-border-width: 0
+}
+
+.donation-btn-ghost:hover {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-gray-2;
+}
+
 /* AboutDialog */
 #aboutDialog .about-heading {
-    -fx-font-size: 30;
+    -fx-font-size: 2.40em;
     -fx-text-fill: -jr-theme;
 }
 
@@ -1866,12 +1933,12 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #aboutDialog .dev-heading {
-    -fx-font-size: 18;
+    -fx-font-size: 1.44em;
     -fx-padding: -10 0 0 0;
 }
 
 #aboutDialog .sub-heading {
-    -fx-font-size: 18;
+    -fx-font-size: 1.44em;
     -fx-padding: 0.312em;
 }
 
@@ -2584,17 +2651,16 @@ journalInfo .grid-cell-b {
 
 
 /* Quick Settings */
-
 .quick-settings-container,
 .walkthroughs-container {
-    -fx-spacing: 0.6667em;
+    -fx-spacing: 0.3333em;
     -fx-alignment: top-left;
 }
 
+.walkthroughs-scroll-pane,
 .quick-settings-scroll-pane {
-    -fx-max-height: 13.333em; /* item-size * 4 + gap * 3 = (0.0833 * 2 + 0.833 * 2 + 1) * 4 + 0.667 * 3 */
-    -fx-min-height: 13.333em;
-    -fx-pref-height: 13.333em;
+    -fx-max-height: 12em;
+    -fx-pref-height: 12em;
 }
 
 .quick-settings-button {
@@ -2659,7 +2725,7 @@ journalInfo .grid-cell-b {
     -fx-border-width: 0.0625em;
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;
-    -fx-effect: dropshadow(three-pass-box , rgba(0,0,0,0.1) , 0.125em, 0.0 , 0 , 0.0625em );
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 0.125em, 0.0, 0, 0.0625em);
     -fx-border-color: -jr-wf-border-color;
 }
 
@@ -2811,47 +2877,45 @@ journalInfo .grid-cell-b {
     -fx-background-color: transparent;
 }
 
+.walkthrough-spotlight {
+    /* -jr-blue-gray-4 with 75% Alpha */
+    -fx-fill: rgba(34, 47, 62, 0.75);
+}
+
+.walkthrough-ping {
+    /* -jr-accent with 75% Alpha */
+    -fx-fill: rgba(163, 183, 230, 0.75);
+}
+
+.walkthrough-darken {
+    /* -jr-blue-gray-4 with 75% Alpha */
+    -fx-fill: rgba(34, 47, 62, 0.75);
+}
+
 /* Tooltip Content */
 .walkthrough-tooltip-content-container {
-    -fx-spacing: 0.75em;
-    -fx-padding: 1em;
-}
-
-.walkthrough-tooltip-title {
-    -fx-text-fill: -jr-theme;
-    -fx-font-size: 1.4em;
-    -fx-font-weight: bold;
-}
-
-.walkthrough-tooltip-content {
-    -fx-spacing: 0.5em;
-}
-
-.walkthrough-tooltip-actions {
-    -fx-spacing: 0;
-}
-
-.walkthrough-panel {
-    -fx-background-color: -jr-white;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
-    -fx-padding: 1em;
     -fx-spacing: 1em;
+    -fx-padding: 1em;
 }
 
-.walkthrough-title {
-    -fx-text-fill: -jr-theme;
-    -fx-font-size: 3em;
+.walkthrough-title-container {
+    -fx-max-width: infinity;
+}
+
+.walkthrough-tooltip-title > *,
+.walkthrough-title > * {
+    -fx-text-fill: -jr-theme!important;
+    -fx-fill: -jr-theme!important;
     -fx-font-weight: bold;
-}
-
-.walkthrough-side-panel-vertical .walkthrough-title,
-.walkthrough-side-panel-horizontal .walkthrough-title {
-    -fx-font-size: 2em;
+    -fx-font-size: 1.75em;
+    -fx-line-spacing: -0.25em;
 }
 
 .walkthrough-side-panel-vertical,
 .walkthrough-side-panel-horizontal {
+    -fx-spacing: 1em;
     -fx-padding: 2em;
+    -fx-background-color: derive(-jr-gray-1, 40%);
 }
 
 .walkthrough-side-panel-vertical {
@@ -2867,59 +2931,58 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-content {
-    -fx-spacing: 0.8em;
+    -fx-spacing: 1.5em;
 }
 
-.walkthrough-step-counter {
-    -fx-background-color: -jr-base;
-    -fx-text-fill: -jr-gray-3;
-    -fx-font-size: 1em;
-    -fx-background-radius: 100;
-    -fx-padding: 0.25em 0.75em;
-    -fx-alignment: center;
+/* Text content containers and flows */
+.walkthrough-text-container {
+    -fx-max-width: infinity;
 }
 
 .walkthrough-text-content {
-    -fx-text-fill: -jr-gray-3;
+    -fx-text-fill: -fx-text-base-color;
     -fx-font-size: 1.2em;
-    -fx-wrap-text: true;
-    -fx-alignment: baseline-left;
+    -fx-line-spacing: 0.5em;
 }
 
+/* Info block styling */
 .walkthrough-info-container {
     -fx-border-color: -jr-theme;
-    -fx-border-width: 0 0 0 1;
+    -fx-border-width: 0 0 0 0.15em;
     -fx-padding: 0 0 0 0.75em;
-    -fx-spacing: 0.25em;
-    -fx-alignment: center-left;
+    -fx-spacing: 0.5em;
+    -fx-alignment: top-left;
 }
 
 .walkthrough-info-container .ikonli-font-icon {
     -fx-icon-color: -jr-theme;
-    -fx-font-size: 1.2em;
+    /* 20px is used, since using em seems to lead infinite icon size growth */
+    -fx-icon-size: 20px;
+    /* Center align icon with the text */
+    -fx-translate-y: -0.05em;
 }
 
-.walkthrough-info-container label {
+.walkthrough-info-text {
     -fx-text-fill: -jr-theme;
     -fx-font-size: 1.2em;
-    -fx-wrap-text: true;
-    -fx-alignment: center-left;
+    -fx-line-spacing: 0.5em;
 }
 
+/* Action buttons */
 .walkthrough-actions {
     -fx-spacing: 0;
 }
 
 .walkthrough-right-actions {
-    -fx-spacing: 4;
+    -fx-spacing: 0.5em;
 }
 
 .walkthrough-continue-button {
     -fx-background-color: -jr-theme;
     -fx-text-fill: -jr-white;
     -fx-font-size: 1.1em;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
     -fx-padding: 0.25em 0.5em;
 }
 
@@ -2928,9 +2991,9 @@ journalInfo .grid-cell-b {
     -fx-text-fill: -jr-theme;
     -fx-font-size: 1.1em;
     -fx-border-color: -jr-theme;
-    -fx-border-width: 0.5;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
+    -fx-border-width: 0.08em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
     -fx-padding: 0.25em 0.5em;
 }
 
@@ -2938,15 +3001,49 @@ journalInfo .grid-cell-b {
     -fx-background-color: transparent;
     -fx-text-fill: -jr-theme;
     -fx-font-size: 1.1em;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
     -fx-padding: 0.25em 0.5em;
 }
 
+.walkthrough-quit-button {
+    -fx-background-color: -jr-gray-1;
+    -fx-border-color: transparent;
+    /* For easy clipping */
+    -fx-padding: 0.5em;
+    -fx-min-width: 2em;
+    -fx-min-height: 2em;
+    -fx-pref-width: 2em;
+    -fx-pref-height: 2em;
+    -fx-max-width: 2em;
+    -fx-max-height: 2em;
+}
+
+.walkthrough-quit-button:hover {
+    -fx-background-color: derive(-jr-gray-1, -20%);
+}
+
+.walkthrough-quit-button:pressed {
+    -fx-background-color: derive(-jr-gray-1, 30%);
+}
+
+.walkthrough-quit-button .glyph-icon,
+.walkthrough-quit-button .ikonli-font-icon {
+    -fx-icon-color: -jr-theme;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.2em;
+}
+
+.walkthrough-fullscreen-content {
+    -fx-padding: 0.1875em;
+    -fx-spacing: 1em;
+    -fx-max-width: 48em;
+    -fx-fill-width: true;
+}
 
 /* Markdown styles */
 .markdown-textflow {
-    -fx-line-spacing: 2;
     -fx-text-alignment: left;
 }
 

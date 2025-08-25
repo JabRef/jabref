@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extends AbstractEditorViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseIdentifierEditorViewModel.class);
     protected BooleanProperty isInvalidIdentifier = new SimpleBooleanProperty();
+    protected final BooleanProperty canShortenIdentifier = new SimpleBooleanProperty(false);
     protected final BooleanProperty identifierLookupInProgress = new SimpleBooleanProperty(false);
     protected final BooleanProperty canLookupIdentifier = new SimpleBooleanProperty(true);
     protected final BooleanProperty canFetchBibliographyInformationById = new SimpleBooleanProperty();
@@ -61,10 +62,11 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
      * show/hide certain UI elements for certain identifier editors.
      * <p>
      * <b>NOTE: This method MUST be called by all the implementation view models in their principal constructor</b>
-     * */
-    protected final void configure(boolean canFetchBibliographyInformationById, boolean canLookupIdentifier) {
+     */
+    protected final void configure(boolean canFetchBibliographyInformationById, boolean canLookupIdentifier, boolean canShortenIdentifier) {
         this.canLookupIdentifier.set(canLookupIdentifier);
         this.canFetchBibliographyInformationById.set(canFetchBibliographyInformationById);
+        this.canShortenIdentifier.set(canShortenIdentifier);
     }
 
     protected Optional<T> updateIdentifier() {
@@ -87,6 +89,14 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         } else {
             dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", fetcher.getName()), Localization.lang("Error occurred %0", exception.getCause().getMessage()));
         }
+    }
+
+    public BooleanProperty canShortenIdentifierProperty() {
+        return canShortenIdentifier;
+    }
+
+    public boolean getCanShortenIdentifier() {
+        return canShortenIdentifierProperty().get();
     }
 
     public BooleanProperty canFetchBibliographyInformationByIdProperty() {
@@ -138,6 +148,10 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
                     }
                 }
         );
+    }
+
+    public void shortenID() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Shortening of identifiers is not supported by this identifier editor.");
     }
 
     @Override

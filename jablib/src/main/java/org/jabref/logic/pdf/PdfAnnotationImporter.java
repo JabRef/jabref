@@ -61,7 +61,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                 }
             }
         } catch (IOException e) {
-            LOGGER.error("Failed to read file '%s'.".formatted(path), e);
+            LOGGER.error("Failed to read file '{}'.", path, e);
         }
         return annotationsList;
     }
@@ -78,7 +78,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             if (!Arrays.asList(FileAnnotationType.values()).contains(FileAnnotationType.valueOf(annotation.getSubtype()))) {
                 return false;
             }
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             LOGGER.debug("Could not parse the FileAnnotation {} into any known FileAnnotationType. It was {}.", annotation, annotation.getSubtype());
         }
         return true;
@@ -93,7 +93,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
             try {
                 COSArray boundingBoxes = (COSArray) annotation.getCOSObject().getDictionaryObject(COSName.getPDFName("QuadPoints"));
                 annotation.setContents(new TextExtractor(page, boundingBoxes).extractMarkedText());
-            } catch (IOException e) {
+            } catch (IOException _) {
                 annotation.setContents("JabRef: Could not extract any marked text!");
             }
         }
@@ -106,17 +106,17 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         Objects.requireNonNull(path);
 
         if (!path.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-            LOGGER.warn("File '%s' does not end with .pdf!".formatted(path));
+            LOGGER.warn("File '{}' does not end with .pdf!", path);
             return false;
         }
 
         if (!Files.exists(path)) {
-            LOGGER.warn("File '%s' does not exist!".formatted(path));
+            LOGGER.warn("File '{}' does not exist!", path);
             return false;
         }
 
         if (!Files.isRegularFile(path) || !Files.isReadable(path)) {
-            LOGGER.warn("File '%s' is not readable!".formatted(path));
+            LOGGER.warn("File '{}' is not readable!", path);
             return false;
         }
 

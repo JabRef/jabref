@@ -68,8 +68,13 @@ class CheckConsistency implements Callable<Integer> {
             }
         });
 
+        return writeCheckResult(result, databaseContext);
+    }
+
+    private int writeCheckResult(BibliographyConsistencyCheck.Result result, BibDatabaseContext databaseContext) {
         Writer writer = new OutputStreamWriter(System.out);
         BibliographyConsistencyCheckResultWriter checkResultWriter;
+
         if ("txt".equalsIgnoreCase(outputFormat)) {
             checkResultWriter = new BibliographyConsistencyCheckResultTxtWriter(
                     result,
