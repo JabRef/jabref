@@ -13,7 +13,7 @@ class RemotePreferencesTest {
 
     @BeforeEach
     void setUp() {
-        preferences = new RemotePreferences(1000, true, 3000, false);
+        preferences = new RemotePreferences(1000, true, 3000, false, false, 2087);
     }
 
     @Test

@@ -89,6 +89,12 @@
         <TextField fx:id="httpServerPort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
     </HBox>
 
+    <Label styleClass="sectionHeader" text="%Language Server" />
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <CheckBox fx:id="enableLanguageServer" text="%Enable Language Server on port" />
+        <TextField fx:id="languageServerPort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
+    </HBox>
+
     <Label styleClass="sectionHeader" text="%Libraries"/>
     <GridPane hgap="10.0" vgap="4.0">
         <columnConstraints>

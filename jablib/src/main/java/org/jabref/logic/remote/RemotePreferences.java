@@ -27,11 +27,16 @@ public class RemotePreferences {
     private final IntegerProperty httpPort;
     private final BooleanProperty enableHttpServer;
 
-    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer) {
+    private final BooleanProperty enableLanguageServer;
+    private final IntegerProperty languageServerPort;
+
+    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer, boolean enableLanguageServer, int languageServerPort) {
         this.port = new SimpleIntegerProperty(port);
         this.useRemoteServer = new SimpleBooleanProperty(useRemoteServer);
         this.httpPort = new SimpleIntegerProperty(httpPort);
         this.enableHttpServer = new SimpleBooleanProperty(enableHttpServer);
+        this.enableLanguageServer = new SimpleBooleanProperty(enableLanguageServer);
+        this.languageServerPort = new SimpleIntegerProperty(languageServerPort);
     }
 
     public int getPort() {
@@ -88,6 +93,34 @@ public class RemotePreferences {
 
     public void setEnableHttpServer(boolean enableHttpServer) {
         this.enableHttpServer.setValue(enableHttpServer);
+    }
+
+    public int getLanguageServerPort() {
+        return languageServerPort.getValue();
+    }
+
+    public IntegerProperty languageServerPortProperty() {
+        return languageServerPort;
+    }
+
+    public void setLanguageServerPort(int languageServerPort) {
+        this.languageServerPort.setValue(languageServerPort);
+    }
+
+    public boolean isDifferentLanguageServerPort(int otherLanguageServerPort) {
+        return getLanguageServerPort() != otherLanguageServerPort;
+    }
+
+    public boolean enableLanguageServer() {
+        return enableLanguageServer.getValue();
+    }
+
+    public BooleanProperty enableLanguageServerProperty() {
+        return enableLanguageServer;
+    }
+
+    public void setEnableLanguageServer(boolean enableLanguageServer) {
+        this.enableLanguageServer.setValue(enableLanguageServer);
     }
 
     /// Gets the IP address where both the remote server and the http server are listening.

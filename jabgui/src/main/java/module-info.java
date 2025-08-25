@@ -1,6 +1,6 @@
 open module org.jabref {
     requires org.jabref.jablib;
-
+    requires org.jabref.jabls;
     requires org.jabref.jabsrv;
 
     // Swing

@@ -20,10 +20,11 @@ dependencies {
     // implementation("org.openjfx:javafx-fxml")
     // implementation("org.openjfx:javafx-graphics")
 
+    implementation(project(":jabls"))
+    implementation(project(":jabsrv"))
+
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
-
-    implementation(project(":jabsrv"))
 
     implementation("com.pixelduke:fxthemes")
 
