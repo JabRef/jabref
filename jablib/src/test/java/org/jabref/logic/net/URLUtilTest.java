@@ -119,10 +119,10 @@ class URLUtilTest {
 
     @Test
     void urlStartingWithWww() throws MalformedURLException {
-        // URLs starting with www. should be prefixed with http://
+        // URLs starting with www. should be prefixed with https://
         URL result = URLUtil.create("www.example.com");
         assertNotNull(result);
-        assertEquals("http://www.example.com", result.toString());
+        assertEquals("https://www.example.com", result.toString());
     }
 
     @Test

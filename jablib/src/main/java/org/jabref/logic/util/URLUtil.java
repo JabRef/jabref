@@ -112,9 +112,9 @@ public class URLUtil {
 
         String trimmedUrl = url.trim();
 
-        // Add http:// prefix to URLs starting with www. to make them absolute
+        // Add https:// prefix to URLs starting with www. to make them absolute
         if (trimmedUrl.startsWith("www.")) {
-            trimmedUrl = "http://" + trimmedUrl;
+            trimmedUrl = "https://" + trimmedUrl;
         }
 
         try {
