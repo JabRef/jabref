@@ -4,6 +4,7 @@ import org.jabref.languageserver.LspLauncher;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,9 +13,10 @@ public class LanguageServerController implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LanguageServerController.class);
 
-    private LspLauncher lspLauncher;
     private final CliPreferences cliPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
+
+    @Nullable private LspLauncher lspLauncher;
 
     public LanguageServerController(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.cliPreferences = cliPreferences;

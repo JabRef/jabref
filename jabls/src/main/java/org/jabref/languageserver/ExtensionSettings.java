@@ -31,11 +31,6 @@ public class ExtensionSettings {
         return integrityCheck;
     }
 
-    public void copyFromOther(ExtensionSettings other) {
-        this.consistencyCheck = other.consistencyCheck;
-        this.integrityCheck = other.integrityCheck;
-    }
-
     public void copyFromJsonObject(JsonObject json) {
         if (json.has("jabref") && json.get("jabref").isJsonObject()) {
             json = json.getAsJsonObject("jabref");
