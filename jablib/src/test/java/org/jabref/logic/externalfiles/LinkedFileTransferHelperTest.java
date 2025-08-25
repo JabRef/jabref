@@ -383,7 +383,7 @@ class LinkedFileTransferHelperTest {
         Path globalLatexDir = tempDir.resolve("global_latex");
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
-        when(filePreferences.getMainFileDirectory()).thenReturn(java.util.Optional.of(globalLatexDir));
+        when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(globalLatexDir));
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
 
         Files.createDirectories(targetDir);
