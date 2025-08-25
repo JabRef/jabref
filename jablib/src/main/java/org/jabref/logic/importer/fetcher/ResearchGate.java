@@ -203,7 +203,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
     /**
      * This method is used to send complex queries using fielded search.
      *
-     * @param queryNode the first node from the Search.g4 parser
+     * @param queryNode the first node from the search parser
      * @return a list of {@link BibEntry}, which are matched by the query (maybe empty)
      * @throws FetcherException if the ResearchGate refuses to serve the page
      */
