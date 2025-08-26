@@ -16,6 +16,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,8 +153,8 @@ public class LinkedFileTransferHelper {
      * @return true if the path was updated, false otherwise
      */
     private static boolean adjustPathForReachableFile(
-        LinkedFile linkedFile,
-        Path relativePath
+        @NonNull LinkedFile linkedFile,
+        @NonNull Path relativePath
     ) {
         // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
         String newLink = relativePath.toString();
