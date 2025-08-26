@@ -156,17 +156,12 @@ public class LinkedFileTransferHelper {
         Path relativePath
     ) {
         // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
-        try {
-            String newLink = relativePath.toString();
-            String currentLink = linkedFile.getLink();
-
-            if (!currentLink.equals(newLink)) {
-                linkedFile.setLink(newLink);
-                LOGGER.debug("Adjusted path for reachable file: {} -> {}", currentLink, newLink);
-                return true;
-            }
-        } catch (Exception e) {
-            LOGGER.warn("Failed to adjust path for file {}: {}", linkedFile.getLink(), e.getMessage(), e);
+        String newLink = relativePath.toString();
+        String currentLink = linkedFile.getLink();
+        if (!currentLink.equals(newLink)) {
+            linkedFile.setLink(newLink);
+            LOGGER.debug("Adjusted path for reachable file: {} -> {}", currentLink, newLink);
+            return true;
         }
         return false;
     }
