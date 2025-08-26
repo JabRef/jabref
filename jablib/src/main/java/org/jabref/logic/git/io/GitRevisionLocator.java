@@ -57,16 +57,4 @@ public class GitRevisionLocator {
             return revWalk.isMergedInto(a, b);
         }
     }
-
-    public static RevCommit fastBase(Repository repo, RevCommit local, RevCommit remote) throws IOException {
-        try (RevWalk revWalk = new RevWalk(repo)) {
-            if (revWalk.isMergedInto(remote, local)) {
-                return remote;
-            }
-            if (revWalk.isMergedInto(local, remote)) {
-                return local;
-            }
-        }
-        return findMergeBase(repo, local, remote);
-    }
 }
