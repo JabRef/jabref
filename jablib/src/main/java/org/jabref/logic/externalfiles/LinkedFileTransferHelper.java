@@ -54,7 +54,7 @@ public class LinkedFileTransferHelper {
             List<LinkedFile> linkedFiles = new ArrayList<>();
 
             for (LinkedFile linkedFile : entry.getFiles()) {
-                if (linkedFile == null || linkedFile.getLink().isEmpty()) {
+                if (linkedFile.getLink().isEmpty()) {
                   linkedFiles.add(linkedFile);
                   continue;
                 }
