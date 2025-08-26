@@ -155,5 +155,19 @@ class ClipboardContentGeneratorTest {
         String actual = markdown.getString();
         assertEquals(expected, actual);
     }
+
+    @Test
+    void processCslMarkdownAsMarkdown() {
+        // This test documents the native citeproc-java Markdown output compared to Flexmark conversion
+        String citationMd = "[1]  " + OS.NEWLINE +
+                "B. Smith, B. Jones, and J. Williams, \"Title of the test entry,\" *BibTeX Journal*, vol. 34, no. 3, pp. 45--67, Jul. 2016.";
+
+        String expected = citationMd + OS.NEWLINE + citationMd + OS.NEWLINE;
+
+        ClipboardContent markdown = ClipboardContentGenerator.processMarkdown(List.of(citationMd, citationMd));
+        String actual = markdown.getString();
+
+        assertEquals(expected, actual);
+    }
 }
 

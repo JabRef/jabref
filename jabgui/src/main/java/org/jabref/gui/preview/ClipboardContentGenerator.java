@@ -123,25 +123,43 @@ public class ClipboardContentGenerator {
     }
 
     /**
-     * Insert each citation into HTML.
-     * convert HTML to markdown using flexmark.
-    */
+     * Converts a list of citations to Markdown.
+     *
+     * Behavior:
+     * - If the citations appear to be HTML (e.g., CSL HTML output), convert via Flexmark (HTML -> Markdown).
+     * - Otherwise, assume the citations are already Markdown (e.g., CSL Markdown output) and just join them.
+     */
     @VisibleForTesting
     static ClipboardContent processMarkdown(List<String> citations) {
-        String result = "<!DOCTYPE html>" + OS.NEWLINE +
-                "<html>" + OS.NEWLINE +
-                "   <head>" + OS.NEWLINE +
-                "      <meta charset=\"utf-8\">" + OS.NEWLINE +
-                "   </head>" + OS.NEWLINE +
-                "   <body>" + OS.NEWLINE + OS.NEWLINE;
+        boolean looksLikeHtml = citations.stream().anyMatch(s -> (s != null) && s.contains("<") && s.contains(">"));
 
-        result += String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
-        result += OS.NEWLINE +
-                "   </body>" + OS.NEWLINE +
-                "</html>" + OS.NEWLINE;
+        String markdown;
+        if (looksLikeHtml) {
+            // Existing behavior: wrap HTML and use Flexmark to convert to Markdown
+            String result = "<!DOCTYPE html>" + OS.NEWLINE +
+                    "<html>" + OS.NEWLINE +
+                    "   <head>" + OS.NEWLINE +
+                    "      <meta charset=\"utf-8\">" + OS.NEWLINE +
+                    "   </head>" + OS.NEWLINE +
+                    "   <body>" + OS.NEWLINE + OS.NEWLINE;
 
-        FlexmarkHtmlConverter converter = FlexmarkHtmlConverter.builder().build();
-        String markdown = converter.convert(result);
+            result += String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
+            result += OS.NEWLINE +
+                    "   </body>" + OS.NEWLINE +
+                    "</html>" + OS.NEWLINE;
+
+            FlexmarkHtmlConverter converter = FlexmarkHtmlConverter.builder().build();
+            markdown = converter.convert(result);
+        } else {
+            // Assume already Markdown (e.g., citeproc-java's "markdown" output)
+            // Join entries with a single newline between them
+            markdown = String.join(OS.NEWLINE, citations);
+        }
+
+        // Ensure trailing newline at end for consistency with other output formats/tests
+        if (!markdown.endsWith(OS.NEWLINE)) {
+            markdown = markdown + OS.NEWLINE;
+        }
 
         ClipboardContent content = new ClipboardContent();
         content.putString(markdown);
