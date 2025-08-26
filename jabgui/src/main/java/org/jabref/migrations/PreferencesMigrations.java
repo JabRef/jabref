@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -25,6 +26,7 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -65,6 +67,7 @@ public class PreferencesMigrations {
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
         removeCommentsFromCustomEditorTabs(preferences);
+        addICORERankingFieldToGeneralTab(preferences);
         upgradeResolveBibTeXStringsFields(preferences);
     }
 
@@ -556,6 +559,37 @@ public class PreferencesMigrations {
                 LOGGER.error("Unable to open key store", ex);
             }
         }
+    }
+
+    static void addICORERankingFieldToGeneralTab(GuiPreferences preferences) {
+        Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
+        Set<Field> currentGeneralPrefs = entryEditorPrefs.get("General");
+
+        Set<Field> expectedGeneralPrefs = Set.of(
+            StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT,
+            StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER,
+            StandardField.TIMESTAMP,
+
+            SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.QUALITY, SpecialField.RANKING,
+            SpecialField.READ_STATUS, SpecialField.RELEVANCE
+        );
+
+        if (!currentGeneralPrefs.equals(expectedGeneralPrefs)) {
+            return;
+        }
+
+        entryEditorPrefs.put(
+                "General",
+                Set.of(
+                        StandardField.DOI, StandardField.ICORERANKING, StandardField.CROSSREF, StandardField.KEYWORDS,
+                        StandardField.EPRINT, StandardField.URL, StandardField.FILE, StandardField.GROUPS,
+                        StandardField.OWNER, StandardField.TIMESTAMP,
+
+                        SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.QUALITY, SpecialField.RANKING,
+                        SpecialField.READ_STATUS, SpecialField.RELEVANCE
+                )
+        );
+        preferences.getEntryEditorPreferences().setEntryEditorTabList(entryEditorPrefs);
     }
 
     /**

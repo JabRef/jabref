@@ -9,7 +9,7 @@ public record ConferenceEntry(
         String acronym,
         String rank
 ) {
-    private final static String URL_PREFIX = "https://portal.core.edu.au/conf-ranks/";
+    private static final String URL_PREFIX = "https://portal.core.edu.au/conf-ranks/";
 
     public String getICOREURL() {
         return URL_PREFIX + id;

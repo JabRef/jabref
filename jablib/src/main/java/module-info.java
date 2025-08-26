@@ -113,6 +113,8 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.status;
     exports org.jabref.logic.command;
     exports org.jabref.logic.git.util;
+    exports org.jabref.logic.icore;
+    exports org.jabref.model.icore;
 
     requires java.base;
 
