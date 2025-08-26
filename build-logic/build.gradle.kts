@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     implementation("com.adarshr:gradle-test-logger-plugin:4.0.0")
-    implementation("com.autonomousapps:dependency-analysis-gradle-plugin:2.19.0")
+    implementation("com.autonomousapps:dependency-analysis-gradle-plugin:3.0.0")
     implementation("com.github.andygoossens:gradle-modernizer-plugin:1.11.0")
     implementation("org.gradlex:extra-java-module-info:1.13")
     implementation("org.gradlex:java-module-dependencies:1.9.2")

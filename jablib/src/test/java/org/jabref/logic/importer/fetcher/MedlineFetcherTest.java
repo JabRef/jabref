@@ -180,14 +180,14 @@ class MedlineFetcherTest {
 
     @Test
     void withLuceneQueryAuthorDate() throws FetcherException {
-        List<BibEntry> entryList = fetcher.performSearch("author:vigmond AND year:2021");
+        List<BibEntry> entryList = fetcher.performSearch("author=vigmond AND year=2021");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(18, entryList.size());
     }
 
     @Test
     void withLuceneQueryAuthorDateRange() throws FetcherException {
-        List<BibEntry> entryList = fetcher.performSearch("author:vigmond AND year-range:2020-2021");
+        List<BibEntry> entryList = fetcher.performSearch("author=vigmond AND year-range=2020-2021");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(28, entryList.size());
     }
