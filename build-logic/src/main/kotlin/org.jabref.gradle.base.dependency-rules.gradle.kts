@@ -236,7 +236,11 @@ extraJavaModuleInfo {
     }
     module("org.apache.pdfbox:pdfbox-io", "org.apache.pdfbox.io")
     module("org.apache.velocity:velocity-engine-core", "velocity.engine.core")
-    module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit")
+    module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit") {
+        exportAllPackages()
+        requires("org.slf4j")
+        uses("org.eclipse.jgit.lib.SignerFactory")
+    }
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
     module("org.fxmisc.wellbehaved:wellbehavedfx", "wellbehavedfx") {
         exportAllPackages()

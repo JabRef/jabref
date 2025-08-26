@@ -12,7 +12,7 @@ val pdfbox = "3.0.5"
 
 dependencies {
     api(platform("ai.djl:bom:0.33.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.2.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.3.0"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
     api("dev.langchain4j:langchain4j-hugging-face")
@@ -33,7 +33,7 @@ dependencies.constraints {
 
     api("com.ibm.icu:icu4j:72.0.1!!")
 
-    api("com.dlsc.gemsfx:gemsfx:3.3.5")
+    api("com.dlsc.gemsfx:gemsfx:3.4.2")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.2")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.2")
@@ -114,8 +114,8 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-utils:3.1.1")
     api("org.glassfish.jaxb:jaxb-runtime:4.0.4")
     api("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10")
-    api("org.glassfish.jersey.core:jersey-server:3.1.10")
-    api("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
+    api("org.glassfish.jersey.core:jersey-server:3.1.11")
+    api("org.glassfish.jersey.inject:jersey-hk2:3.1.11")
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.0.1.Final")
@@ -134,7 +134,7 @@ dependencies.constraints {
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
     api("org.libreoffice:unoloader:24.8.4")
-    api("org.mockito:mockito-core:5.18.0")
+    api("org.mockito:mockito-core:5.19.0")
     api("org.ow2.asm:asm:9.8")
     api("org.postgresql:postgresql:42.7.7")
     api("org.slf4j:jul-to-slf4j:2.0.17")

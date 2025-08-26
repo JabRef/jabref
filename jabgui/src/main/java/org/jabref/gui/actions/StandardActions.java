@@ -12,15 +12,21 @@ public enum StandardActions implements Action {
 
     COPY_TO(Localization.lang("Copy to")),
     COPY_MORE(Localization.lang("Copy") + "..."),
-    COPY_TITLE(Localization.lang("Copy title"), KeyBinding.COPY_TITLE),
-    COPY_KEY(Localization.lang("Copy citation key"), KeyBinding.COPY_CITATION_KEY),
-    COPY_CITE_KEY(Localization.lang("Copy citation key with configured cite command"), KeyBinding.COPY_CITE_CITATION_KEY),
-    COPY_KEY_AND_TITLE(Localization.lang("Copy citation key and title"), KeyBinding.COPY_CITATION_KEY_AND_TITLE),
-    COPY_KEY_AND_LINK(Localization.lang("Copy citation key and link"), KeyBinding.COPY_CITATION_KEY_AND_LINK),
+    COPY_CITATION_KEY(Localization.lang("Copy citation key"), KeyBinding.COPY_CITATION_KEY),
+    COPY_AS_CITE_COMMAND(Localization.lang("Copy citation key with configured cite command"), KeyBinding.COPY_CITE_CITATION_KEY),
+    COPY_CITATION_KEY_AND_TITLE(Localization.lang("Copy citation key and title"), KeyBinding.COPY_CITATION_KEY_AND_TITLE),
+    COPY_CITATION_KEY_AND_LINK(Localization.lang("Copy citation key and link"), KeyBinding.COPY_CITATION_KEY_AND_LINK),
     COPY_CITATION_HTML(Localization.lang("Copy citation (html)"), KeyBinding.COPY_PREVIEW),
     COPY_CITATION_TEXT(Localization.lang("Copy citation (text)")),
     COPY_CITATION_MARKDOWN(Localization.lang("Copy citation (markdown)")),
     COPY_CITATION_PREVIEW(Localization.lang("Copy preview"), KeyBinding.COPY_PREVIEW),
+    COPY_FIELD_CONTENT(Localization.lang("Copy field content")),
+    COPY_FIELD_AUTHOR(Localization.lang("Author")),
+    COPY_FIELD_TITLE(Localization.lang("Title"), KeyBinding.COPY_TITLE),
+    COPY_FIELD_JOURNAL(Localization.lang("Journal")),
+    COPY_FIELD_DATE(Localization.lang("Date")),
+    COPY_FIELD_KEYWORDS(Localization.lang("Keywords")),
+    COPY_FIELD_ABSTRACT(Localization.lang("Abstract")),
     EXPORT_TO_CLIPBOARD(Localization.lang("Export to clipboard"), IconTheme.JabRefIcons.EXPORT_TO_CLIPBOARD),
     EXPORT_SELECTED_TO_CLIPBOARD(Localization.lang("Export selected entries to clipboard"), IconTheme.JabRefIcons.EXPORT_TO_CLIPBOARD),
     COPY(Localization.lang("Copy"), IconTheme.JabRefIcons.COPY, KeyBinding.COPY),
@@ -217,7 +223,13 @@ public enum StandardActions implements Action {
     GROUP_SUBGROUP_RENAME(Localization.lang("Rename subgroup"), KeyBinding.GROUP_SUBGROUP_RENAME),
     GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group")),
 
-    CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache"));
+    CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache")),
+
+    GIT(Localization.lang("Git"), IconTheme.JabRefIcons.GIT_SYNC),
+    GIT_PULL(Localization.lang("Pull")),
+    GIT_PUSH(Localization.lang("Push")),
+    GIT_COMMIT(Localization.lang("Commit")),
+    GIT_SHARE(Localization.lang("Share this library to GitHub"));
 
     private String text;
     private final String description;
