@@ -219,7 +219,7 @@ public class ThreeWayMergeView extends VBox {
                 ? new BibEntry(peer.getType())
                 : new BibEntry();
         if (peer != null) {
-            peer.getCitationKey().ifPresent(placeholder::setCitationKey);
+            peer.getCitationKey().ifPresent(placeholder::withCitationKey);
         }
         return placeholder;
     }

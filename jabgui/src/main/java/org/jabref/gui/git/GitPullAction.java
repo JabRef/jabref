@@ -2,7 +2,6 @@ package org.jabref.gui.git;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -143,7 +142,7 @@ public class GitPullAction extends SimpleCommand {
     }
 
     private void replaceWithMergedEntries(List<BibEntry> mergedEntries, BibDatabaseContext databaseContext) throws IOException, JabRefException {
-        List<BibEntry> currentEntries = new ArrayList<>(databaseContext.getDatabase().getEntries());
+        List<BibEntry> currentEntries = List.copyOf(databaseContext.getDatabase().getEntries());
         for (BibEntry entry : currentEntries) {
             databaseContext.getDatabase().removeEntry(entry);
         }

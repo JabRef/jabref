@@ -3,6 +3,7 @@ package org.jabref.gui.git;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -37,7 +38,7 @@ public class GuiGitConflictResolverStrategy implements GitConflictResolverStrate
         return resolved;
     }
 
-    private static <T> T callOnFxAndWait(java.util.concurrent.Callable<T> supplier) {
+    private static <T> T callOnFxAndWait(Callable<T> supplier) {
         if (Platform.isFxApplicationThread()) {
             try {
                 return supplier.call();
