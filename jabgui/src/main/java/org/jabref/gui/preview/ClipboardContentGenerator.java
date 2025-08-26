@@ -46,7 +46,7 @@ public class ClipboardContentGenerator {
             return switch (outputFormat) {
                 case HTML -> processHtml(citations);
                 case TEXT -> processText(citations);
-                case MARKDOWN -> processMarkdown(citations);
+                case MARKDOWN -> processMarkdown(citations, true);
             };
         } else {
             // if it is not a citation style take care of the preview
@@ -131,29 +131,46 @@ public class ClipboardContentGenerator {
      */
     @VisibleForTesting
     static ClipboardContent processMarkdown(List<String> citations) {
-        boolean looksLikeHtml = citations.stream().anyMatch(s -> (s != null) && s.contains("<") && s.contains(">"));
+        // Default behavior (non-CSL-aware): detect HTML vs Markdown by content
+        return processMarkdown(citations, false);
+    }
 
+    /**
+     * Converts a list of citations to Markdown.
+     *
+     * If fromCitationStyle is true, we assume the list items are already Markdown (produced by citeproc-java with
+     * output format MARKDOWN) and simply join them with new lines. Otherwise, we fall back to HTML detection and
+     * Flexmark-based conversion when needed.
+     */
+    @VisibleForTesting
+    static ClipboardContent processMarkdown(List<String> citations, boolean fromCitationStyle) {
         String markdown;
-        if (looksLikeHtml) {
-            // Existing behavior: wrap HTML and use Flexmark to convert to Markdown
-            String result = "<!DOCTYPE html>" + OS.NEWLINE +
-                    "<html>" + OS.NEWLINE +
-                    "   <head>" + OS.NEWLINE +
-                    "      <meta charset=\"utf-8\">" + OS.NEWLINE +
-                    "   </head>" + OS.NEWLINE +
-                    "   <body>" + OS.NEWLINE + OS.NEWLINE;
-
-            result += String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
-            result += OS.NEWLINE +
-                    "   </body>" + OS.NEWLINE +
-                    "</html>" + OS.NEWLINE;
-
-            FlexmarkHtmlConverter converter = FlexmarkHtmlConverter.builder().build();
-            markdown = converter.convert(result);
-        } else {
-            // Assume already Markdown (e.g., citeproc-java's "markdown" output)
-            // Join entries with a single newline between them
+        if (fromCitationStyle) {
             markdown = String.join(OS.NEWLINE, citations);
+        } else {
+            boolean looksLikeHtml = citations.stream().anyMatch(s -> (s != null) && s.contains("<") && s.contains(">"));
+
+            if (looksLikeHtml) {
+                // Existing behavior: wrap HTML and use Flexmark to convert to Markdown
+                String result = "<!DOCTYPE html>" + OS.NEWLINE +
+                        "<html>" + OS.NEWLINE +
+                        "   <head>" + OS.NEWLINE +
+                        "      <meta charset=\"utf-8\">" + OS.NEWLINE +
+                        "   </head>" + OS.NEWLINE +
+                        "   <body>" + OS.NEWLINE + OS.NEWLINE;
+
+                result += String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
+                result += OS.NEWLINE +
+                        "   </body>" + OS.NEWLINE +
+                        "</html>" + OS.NEWLINE;
+
+                FlexmarkHtmlConverter converter = FlexmarkHtmlConverter.builder().build();
+                markdown = converter.convert(result);
+            } else {
+                // Assume already Markdown (e.g., citeproc-java's "markdown" output)
+                // Join entries with a single newline between them
+                markdown = String.join(OS.NEWLINE, citations);
+            }
         }
 
         // Ensure trailing newline at end for consistency with other output formats/tests
