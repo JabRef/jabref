@@ -1,5 +1,6 @@
 package org.jabref.gui.consistency;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -11,16 +12,19 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class ConsistencyCheckAction extends SimpleCommand {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckAction.class);
     Supplier<LibraryTab> tabSupplier;
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -48,11 +52,12 @@ public class ConsistencyCheckAction extends SimpleCommand {
     public void execute() {
         Task<BibliographyConsistencyCheck.Result> task = new Task<>() {
             @Override
-            public BibliographyConsistencyCheck.Result call() throws Exception {
-
+            public BibliographyConsistencyCheck.Result call() {
                 Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
                 if (databaseContext.isEmpty()) {
-                    throw new JabRefException("No library present.");
+                    LOGGER.debug("Consistency check invoked with no library opened.");
+                    dialogService.notify(Localization.lang("No library opened."));
+                    return new BibliographyConsistencyCheck.Result(Collections.emptyMap());
                 }
 
                 BibDatabaseContext bibContext = databaseContext.get();
