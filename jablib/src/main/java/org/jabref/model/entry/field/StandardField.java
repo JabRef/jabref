@@ -134,12 +134,13 @@ public enum StandardField implements Field {
     XREF("xref", FieldProperty.SINGLE_ENTRY_LINK),
 
     // JabRef-specific fields
-    GROUPS("groups"),
-    OWNER("owner"),
     CITATIONCOUNT("citationcount"),
-    TIMESTAMP("timestamp", FieldProperty.DATE),
     CREATIONDATE("creationdate", FieldProperty.DATE),
-    MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
+    GROUPS("groups"),
+    ICORERANKING("icoreranking"),
+    MODIFICATIONDATE("modificationdate", FieldProperty.DATE),
+    OWNER("owner"),
+    TIMESTAMP("timestamp", FieldProperty.DATE);
 
     public static final Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
 

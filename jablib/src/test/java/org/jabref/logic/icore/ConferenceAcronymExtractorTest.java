@@ -60,7 +60,7 @@ public class ConferenceAcronymExtractorTest {
     }
 
     @Test
-    void extractReturnsEmptyforEmptyParentheses() {
+    void extractReturnsEmptyForEmptyParentheses() {
         String input = "Input with empty () parentheses";
         Optional<String> result = extract(input);
 
