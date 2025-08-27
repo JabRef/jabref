@@ -4,9 +4,9 @@ on:
   pull_request:
   push:
     paths:
-     - '*'
+     - '**'
     tags:
-      - '*'
+      - '**'
   schedule:
     # Run on each Monday
     # Additional run in addition to the other events, because some resources could have changes
