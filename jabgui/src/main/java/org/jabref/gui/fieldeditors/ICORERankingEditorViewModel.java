@@ -82,7 +82,7 @@ public class ICORERankingEditorViewModel extends AbstractEditorViewModel {
             entry.setField(field, conference.get().rank());
             matchedConference = conference.get();
         } else {
-            entry.setField(field, Localization.lang("Not found"));
+            entry.setField(field, Localization.lang("not found"));
         }
     }
 
@@ -92,7 +92,7 @@ public class ICORERankingEditorViewModel extends AbstractEditorViewModel {
                 NativeDesktop.openBrowser(matchedConference.getICOREURL(), preferences.getExternalApplicationsPreferences());
             } catch (IOException e) {
                 LOGGER.error("Error opening external link in browser", e);
-                dialogService.showErrorDialogAndWait(Localization.lang("Could not open website"), e);
+                dialogService.showErrorDialogAndWait(Localization.lang("Could not open website."), e);
             }
         }
     }
