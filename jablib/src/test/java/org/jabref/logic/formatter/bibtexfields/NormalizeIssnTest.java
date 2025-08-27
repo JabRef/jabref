@@ -2,8 +2,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class NormalizeISSNTest {
 
@@ -15,8 +14,8 @@ class NormalizeISSNTest {
     }
 
     @Test
-    void assMissingDashToIssn() {
-        assertEquals("0123-4567",formatISSN.format("01234567"));
+    void addMissingDashToIssn() {
+        assertEquals("0123-4567", formatISSN.format("01234567"));
     }
 
     @Test
@@ -26,7 +25,7 @@ class NormalizeISSNTest {
 
     @Test
     void emptyOrNullReturnsSame() {
-        assertEquals("",formatISSN.format(""));
-        assertNull(formatISSN.format(null));
+        assertEquals("", formatISSN.format(""));
+        assertThrows(NullPointerException.class, () -> formatISSN.format(null));
     }
 }
