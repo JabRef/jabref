@@ -12,7 +12,7 @@ val pdfbox = "3.0.5"
 
 dependencies {
     api(platform("ai.djl:bom:0.33.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.2.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.3.0"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
     api("dev.langchain4j:langchain4j-hugging-face")
@@ -134,7 +134,7 @@ dependencies.constraints {
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
     api("org.libreoffice:unoloader:24.8.4")
-    api("org.mockito:mockito-core:5.18.0")
+    api("org.mockito:mockito-core:5.19.0")
     api("org.ow2.asm:asm:9.8")
     api("org.postgresql:postgresql:42.7.7")
     api("org.slf4j:jul-to-slf4j:2.0.17")
