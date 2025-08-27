@@ -1,6 +1,6 @@
 package org.jabref.gui.consistency;
 
-import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -57,7 +57,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
                 if (databaseContext.isEmpty()) {
                     LOGGER.debug("Consistency check invoked with no library opened.");
                     dialogService.notify(Localization.lang("No library open"));
-                    return new BibliographyConsistencyCheck.Result(Collections.emptyMap());
+                    return new BibliographyConsistencyCheck.Result(Map.of());
                 }
 
                 BibDatabaseContext bibContext = databaseContext.get();
