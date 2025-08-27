@@ -385,13 +385,6 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      io.github.stefanbratanov:jvm-openai
-Project: JVM OpenAI
-URL:     https://github.com/StefanBratanov/jvm-openai
-Licence: Apache-2.0
-```
-
-```yaml
 Id:      io.github.thibaultmeyer:cuid
 Project: CUID Java
 URL:     https://github.com/thibaultmeyer/cuid-java
@@ -860,7 +853,6 @@ eu.lestard:doc-annotations:0.2
 info.debatty:java-string-similarity:2.0.0
 io.github.adr:e-adr:2.0.0-SNAPSHOT
 io.github.java-diff-utils:java-diff-utils:4.15
-io.github.stefanbratanov:jvm-openai:0.11.0
 io.github.thibaultmeyer:cuid:2.0.3
 io.zonky.test:embedded-postgres:2.1.0
 io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8:17.4.0

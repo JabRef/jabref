@@ -61,7 +61,7 @@ Chosen option: mix of "Use a hand-crafted RAG" and "Use a third-party Java libra
 Third-party libraries provide excellent resources for connecting to an LLM or extracting text from PDF files. For RAG,
 we mostly used all the machinery provided by `langchain4j`, but there were moments that should be hand-crafted:
 
-* **LLM connection**: due to <https://github.com/langchain4j/langchain4j/issues/1454> (<https://github.com/InAnYan/jabref/issues/77>) this was delegated to another library `jvm-openai`.
+* **LLM connection**: initially delegated to `jvm-openai` due to <https://github.com/langchain4j/langchain4j/issues/1454>, but now uses langchain4j's native OpenAI integration for better consistency and features.
 * **Embedding generation**: due to <https://github.com/langchain4j/langchain4j/issues/1492> (<https://github.com/InAnYan/jabref/issues/79>),
   this was delegated to another library `djl`.
 * **Indexing**: `langchain4j` is just a bunch of useful tools, but we still have to orchestrate when indexing should
