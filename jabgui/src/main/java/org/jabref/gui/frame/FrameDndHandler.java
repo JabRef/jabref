@@ -107,8 +107,7 @@ public class FrameDndHandler {
             if (hasEntries(dragboard)) {
                 List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries().stream()
                                                          .map(BibEntry::new).toList();
-                BibDatabaseContext sourceContext = stateManager.getActiveDatabase().orElse(null);
-                destinationLibraryTab.dropEntry(entryCopies, sourceContext);
+                destinationLibraryTab.dropEntry(entryCopies);
             } else if (hasGroups(dragboard)) {
                 dropGroups(dragboard, destinationLibraryTab);
             }
@@ -215,8 +214,7 @@ public class FrameDndHandler {
         // add groupTreeNodeToCopy to the parent-- in the first run that will the source/main GroupTreeNode
         GroupTreeNode copiedNode = parent.addSubgroup(groupTreeNodeToCopy.copyNode().getGroup());
         // add all entries of a groupTreeNode to the new library.
-        BibDatabaseContext sourceContext = stateManager.getActiveDatabase().orElse(null);
-        destinationLibraryTab.dropEntry(groupTreeNodeToCopy.getEntriesInGroup(allEntries), sourceContext);
+        destinationLibraryTab.dropEntry(groupTreeNodeToCopy.getEntriesInGroup(allEntries));
         // List of all children of groupTreeNodeToCopy
         List<GroupTreeNode> children = groupTreeNodeToCopy.getChildren();
 

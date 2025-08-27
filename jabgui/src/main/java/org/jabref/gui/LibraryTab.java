@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import javax.sound.sampled.Clip;
 import javax.swing.undo.UndoManager;
 
 import javafx.animation.PauseTransition;
@@ -852,16 +853,13 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (entriesToAdd.isEmpty()) {
             return;
         }
-        BibDatabaseContext sourceContext = clipBoardManager.getSourceBibDatabaseContext().orElse(null);
-        copyEntriesWithFeedback(entriesToAdd, sourceContext);
+        copyEntriesWithFeedback(entriesToAdd);
     }
 
-    private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd, BibDatabaseContext sourceBibDatabaseContext) {
+    private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd) {
         final List<BibEntry> finalEntriesToAdd = entriesToAdd;
 
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(finalEntriesToAdd.size());
-
-        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, finalEntriesToAdd, tracker);
 
         tracker.setOnFinish(() -> {
             int importedCount = tracker.getImportedCount();
@@ -880,12 +878,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 dialogService.notify(Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped",
                     String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
             }
-            if (sourceBibDatabaseContext != null) {
+            clipBoardManager.getSourceBibDatabaseContext().ifPresent(sourceBibDatabaseContext -> {
                 LinkedFileTransferHelper
                     .adjustLinkedFilesForTarget(sourceBibDatabaseContext,
                         bibDatabaseContext, preferences.getFilePreferences());
-            }
+            });
         });
+
+        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, finalEntriesToAdd, tracker);
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
@@ -903,8 +903,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    public void dropEntry(List<BibEntry> entriesToAdd, BibDatabaseContext sourceBibDatabaseContext) {
-        copyEntriesWithFeedback(entriesToAdd, sourceBibDatabaseContext);
+    public void dropEntry(List<BibEntry> entriesToAdd) {
+        copyEntriesWithFeedback(entriesToAdd);
     }
 
     public void cutEntry() {
