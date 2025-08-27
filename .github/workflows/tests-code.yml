@@ -468,6 +468,7 @@ jobs:
         uses: tj-actions/changed-files@v45
         with:
           files: |
+            .github/workflows/tests-code.yml
             jablib/src/main/java/**/*.java
 
       - name: Build ${{ matrix.launcher }} launcher including changed classes
