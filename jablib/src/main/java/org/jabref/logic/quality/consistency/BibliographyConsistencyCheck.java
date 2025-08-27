@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -141,7 +140,7 @@ public class BibliographyConsistencyCheck {
             Set<Field> filteredFieldsInAnyEntry = filterExcludedFields(fieldsInAnyEntry);
             Set<Field> filteredFieldsInAllEntries = filterExcludedFields(fieldsInAllEntries);
 
-            Set<Field> differingFields = new LinkedHashSet<>(filteredFieldsInAnyEntry);
+            Set<Field> differingFields = new HashSet<>(filteredFieldsInAnyEntry);
             differingFields.removeAll(filteredFieldsInAllEntries);
             assert fieldsInAllEntries != null;
 
@@ -151,15 +150,13 @@ public class BibliographyConsistencyCheck {
                                                                  .filter(def -> def.getType().equals(entryType))
                                                                  .findFirst();
 
-            Set<Field> requiredFields = new LinkedHashSet<>();
-            typeDefOpt.ifPresent(typeDef -> {
-                requiredFields.addAll(
+            Set<Field> requiredFields = typeDefOpt.map(typeDef ->
                         typeDef.getRequiredFields().stream()
                                .flatMap(orFields -> orFields.getFields().stream())
                                .collect(Collectors.toSet())
-                );
-            });
+                ).orElse(Set.of());
 
+            // This is the "real" difference we are looking for: fields that are present in some entries but not in all
             for (Field req : requiredFields) {
                 if (filteredFieldsInAnyEntry.contains(req) && !filteredFieldsInAllEntries.contains(req)) {
                     differingFields.add(req);
@@ -167,6 +164,7 @@ public class BibliographyConsistencyCheck {
             }
 
             Set<BibEntry> entries = entryTypeToEntriesMap.get(entryType);
+            assert entries != null;
             if (entries == null || entries.size() <= 1 || differingFields.isEmpty()) {
                 continue;
             }
