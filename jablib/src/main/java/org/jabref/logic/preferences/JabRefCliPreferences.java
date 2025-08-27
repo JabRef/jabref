@@ -61,7 +61,7 @@ import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
-import org.jabref.logic.importer.fetcher.SpringerFetcher;
+import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
@@ -520,7 +520,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(SEARCH_WINDOW_DIVIDER_POS, 0.5);
         defaults.put(SEARCH_CATALOGS, convertListToString(List.of(
                 ACMPortalFetcher.FETCHER_NAME,
-                SpringerFetcher.FETCHER_NAME,
+                SpringerNatureWebFetcher.FETCHER_NAME,
                 DBLPFetcher.FETCHER_NAME,
                 IEEE.FETCHER_NAME)));
         defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED.name());
@@ -2322,7 +2322,7 @@ public class JabRefCliPreferences implements CliPreferences {
         keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);
         keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);
         keys.put(ScienceDirect.FETCHER_NAME, buildInfo.scienceDirectApiKey);
-        keys.put(SpringerFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
+        keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
         // SpringerLink uses the same key and fetcher name as SpringerFetcher
 
         return keys;
