@@ -434,7 +434,7 @@ jobs:
     if: github.ref != 'refs/heads/main'
     strategy:
       matrix:
-        launcher: [JabKitLauncher, JabLsLauncher, JabServLauncher]
+        launcher: [JabKitLauncher, JabLsLauncher, JabSrvLauncher]
     steps:
       - name: Checkout source
         uses: actions/checkout@v5
