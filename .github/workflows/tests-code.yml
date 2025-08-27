@@ -475,7 +475,7 @@ jobs:
         run: |
           # We modify the JBang scripts directly to avoid issues with relative paths
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
-            echo "//SOURCES $f" >> ".jbang/${{ matrix.launcher }}.java"
+            echo "//SOURCES ../$f" >> ".jbang/${{ matrix.launcher }}.java"
           done
           jbang build --fresh ".jbang/${{ matrix.launcher }}.java"
 
