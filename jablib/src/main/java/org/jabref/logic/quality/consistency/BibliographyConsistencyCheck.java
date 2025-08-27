@@ -2,6 +2,7 @@ package org.jabref.logic.quality.consistency;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -117,11 +118,11 @@ public class BibliographyConsistencyCheck {
      */
     public Result check(BibDatabaseContext bibContext, BiConsumer<Integer, Integer> entriesGroupingProgress) {
         // collects fields existing in any entry, scoped by entry type
-        Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new LinkedHashMap<>();
+        Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new HashMap<>();
         // collects fields existing in all entries, scoped by entry type
-        Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap = new LinkedHashMap<>();
+        Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap = new HashMap<>();
         // collects entries of the same type
-        Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap = new LinkedHashMap<>();
+        Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap = new HashMap<>();
 
         collectEntriesIntoMaps(bibContext, entryTypeToFieldsInAnyEntryMap, entryTypeToFieldsInAllEntriesMap, entryTypeToEntriesMap);
 
