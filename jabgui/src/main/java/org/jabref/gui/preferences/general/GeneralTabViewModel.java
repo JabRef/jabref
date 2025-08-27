@@ -33,6 +33,7 @@ import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.http.manager.HttpServerManager;
+import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.l10n.Language;
@@ -84,6 +85,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty shouldAskForIncludingCrossReferencesProperty = new SimpleBooleanProperty();
     private final BooleanProperty hideTabBarProperty = new SimpleBooleanProperty();
+    private final BooleanProperty donationNeverShowProperty = new SimpleBooleanProperty();
 
     private final ListProperty<BibDatabaseMode> bibliographyModeListProperty = new SimpleListProperty<>();
     private final ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty = new SimpleObjectProperty<>();
@@ -111,6 +113,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableHttpServerProperty = new SimpleBooleanProperty();
     private final StringProperty httpPortProperty = new SimpleStringProperty("");
     private final Validator httpPortValidator;
+    private final Validator languageServerPortValidator;
+    private final BooleanProperty enableLanguageServerProperty = new SimpleBooleanProperty();
+    private final StringProperty languageServerPortProperty = new SimpleStringProperty("");
     private final TrustStoreManager trustStoreManager;
 
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -148,29 +153,22 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         remotePortValidator = new FunctionBasedValidator<>(
                 remotePortProperty,
-                input -> {
-                    try {
-                        int portNumber = Integer.parseInt(remotePortProperty().getValue());
-                        return RemoteUtil.isUserPort(portNumber);
-                    } catch (NumberFormatException ex) {
-                        return false;
-                    }
-                },
+                RemoteUtil::isStringUserPort,
                 ValidationMessage.error("%s > %s %n %n %s".formatted(
                         Localization.lang("Network"),
                         Localization.lang("Remote operation"),
                         Localization.lang("You must enter an integer value in the interval 1025-65535"))));
+
         httpPortValidator = new FunctionBasedValidator<>(
                 httpPortProperty,
-                input -> {
-                    try {
-                        int portNumber = Integer.parseInt(httpPortProperty().getValue());
-                        return RemoteUtil.isUserPort(portNumber);
-                    } catch (NumberFormatException ex) {
-                        return false;
-                    }
-                },
+                RemoteUtil::isStringUserPort,
                 ValidationMessage.error("%s".formatted(Localization.lang("You must enter an integer value in the interval 1025-65535"))));
+
+        languageServerPortValidator = new FunctionBasedValidator<>(
+                languageServerPortProperty,
+                RemoteUtil::isStringUserPort,
+                ValidationMessage.error(Localization.lang("You must enter an integer value in the interval 1025-65535")));
+
         this.trustStoreManager = new TrustStoreManager(Path.of(preferences.getSSLPreferences().getTruststorePath()));
     }
 
@@ -180,6 +178,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public ValidationStatus httpPortValidationStatus() {
         return httpPortValidator.getValidationStatus();
+    }
+
+    public ValidationStatus languageServerPortValidationStatus() {
+        return languageServerPortValidator.getValidationStatus();
     }
 
     @Override
@@ -210,6 +212,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());
         shouldAskForIncludingCrossReferencesProperty.setValue(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences());
         hideTabBarProperty.setValue(workspacePreferences.shouldHideTabBar());
+        donationNeverShowProperty.setValue(preferences.getDonationPreferences().isNeverShowAgain());
 
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
         selectedBiblatexModeProperty.setValue(libraryPreferences.getDefaultBibDatabaseMode());
@@ -225,6 +228,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         enableHttpServerProperty.setValue(remotePreferences.enableHttpServer());
         httpPortProperty.setValue(String.valueOf(remotePreferences.getHttpPort()));
+
+        enableLanguageServerProperty.setValue(remotePreferences.enableLanguageServer());
+        languageServerPortProperty.setValue(String.valueOf(remotePreferences.getLanguageServerPort()));
     }
 
     @Override
@@ -256,6 +262,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());
         preferences.getCopyToPreferences().setShouldAskForIncludingCrossReferences(shouldAskForIncludingCrossReferencesProperty.getValue());
         workspacePreferences.setHideTabBar(confirmHideTabBarProperty().getValue());
+        preferences.getDonationPreferences().setNeverShowAgain(donationNeverShowProperty.getValue());
 
         libraryPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
 
@@ -297,6 +304,12 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             }
         });
 
+        getPortAsInt(languageServerPortProperty.getValue()).ifPresent(newPort -> {
+            if (remotePreferences.isDifferentLanguageServerPort(newPort)) {
+                remotePreferences.setLanguageServerPort(newPort);
+            }
+        });
+
         HttpServerManager httpServerManager = Injector.instantiateModelOrService(HttpServerManager.class);
         // stop in all cases, because the port might have changed
         httpServerManager.stop();
@@ -307,6 +320,17 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         } else {
             remotePreferences.setEnableHttpServer(false);
             httpServerManager.stop();
+        }
+
+        LanguageServerController languageServerController = Injector.instantiateModelOrService(LanguageServerController.class);
+        // stop in all cases, because the port might have changed (or other settings that can't be easily tracked https://github.com/JabRef/jabref/pull/13697#discussion_r2285997003)
+        languageServerController.stop();
+        if (enableLanguageServerProperty.getValue()) {
+            remotePreferences.setEnableLanguageServer(true);
+            languageServerController.start(remotePreferences.getLanguageServerPort());
+        } else {
+            remotePreferences.setEnableLanguageServer(false);
+            languageServerController.stop();
         }
 
         trustStoreManager.flush();
@@ -330,6 +354,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         if (enableHttpServerProperty.getValue()) {
             validator.addValidators(httpPortValidator);
+        }
+
+        if (enableLanguageServerProperty.getValue()) {
+            validator.addValidators(languageServerPortValidator);
         }
 
         if (fontOverrideProperty.getValue()) {
@@ -423,6 +451,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return this.hideTabBarProperty;
     }
 
+    public BooleanProperty donationNeverShowProperty() {
+        return this.donationNeverShowProperty;
+    }
+
     public ListProperty<BibDatabaseMode> biblatexModeListProperty() {
         return this.bibliographyModeListProperty;
     }
@@ -468,6 +500,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty httpPortProperty() {
         return httpPortProperty;
+    }
+
+    public BooleanProperty enableLanguageServerProperty() {
+        return enableLanguageServerProperty;
+    }
+
+    public StringProperty languageServerPortProperty() {
+        return languageServerPortProperty;
     }
 
     public void openBrowser() {
