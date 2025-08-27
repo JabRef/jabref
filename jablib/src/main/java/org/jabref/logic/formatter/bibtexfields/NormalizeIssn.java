@@ -1,16 +1,16 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import java.util.Objects;
+
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.ISSN;
-
-import java.util.Objects;
 
 public class NormalizeIssn extends Formatter {
 
     @Override
     public String getName() {
-        return Localization.lang( "Normalize ISSN");
+        return Localization.lang("Normalize ISSN");
     }
 
     @Override
