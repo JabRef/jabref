@@ -26,7 +26,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditorViewModel.class);
 
     private final ListProperty<Keyword> keywordListProperty;
-    private final String keywordSeparator;
+    private final Character keywordSeparator;
     private final SuggestionProvider<?> suggestionProvider;
 
     public KeywordsEditorViewModel(Field field,
@@ -49,15 +49,11 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
     }
 
     private String serializeKeywords(List<Keyword> keywords) {
-        return KeywordList.serialize(keywords, ',');
+        return KeywordList.serialize(keywords, keywordSeparator);
     }
 
     private List<Keyword> parseKeywords(String newText) {
-        for (char d : keywordSeparator.toCharArray()) {
-            newText = newText.replace(d, ',');
-        }
-
-        return KeywordList.parse(newText, ',').stream().toList();
+        return KeywordList.parse(newText, keywordSeparator).stream().toList();
     }
 
     public ListProperty<Keyword> keywordListProperty() {
@@ -98,7 +94,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
         return suggestions;
     }
 
-    public String getKeywordSeparator() {
+    public Character getKeywordSeparator() {
         return keywordSeparator;
     }
 }

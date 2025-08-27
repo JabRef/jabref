@@ -27,7 +27,7 @@ public class CitationKeyPatternPreferences {
     private final StringProperty unwantedCharacters = new SimpleStringProperty();
     private final ObjectProperty<GlobalCitationKeyPatterns> keyPatterns = new SimpleObjectProperty<>();
     private final String defaultPattern;
-    private final ReadOnlyObjectProperty<String> keywordDelimiter;
+    private final ReadOnlyObjectProperty<Character> keywordDelimiter;
 
     public CitationKeyPatternPreferences(boolean shouldAvoidOverwriteCiteKey,
                                          boolean shouldWarnBeforeOverwriteCiteKey,
@@ -38,7 +38,7 @@ public class CitationKeyPatternPreferences {
                                          String unwantedCharacters,
                                          GlobalCitationKeyPatterns keyPatterns,
                                          String defaultPattern,
-                                         ReadOnlyObjectProperty<String> keywordDelimiter) {
+                                         ReadOnlyObjectProperty<Character> keywordDelimiter) {
 
         this.shouldAvoidOverwriteCiteKey.set(shouldAvoidOverwriteCiteKey);
         this.shouldWarnBeforeOverwriteCiteKey.set(shouldWarnBeforeOverwriteCiteKey);
@@ -63,7 +63,7 @@ public class CitationKeyPatternPreferences {
                                          String unwantedCharacters,
                                          GlobalCitationKeyPatterns keyPatterns,
                                          String defaultPattern,
-                                         String keywordDelimiter) {
+                                         Character keywordDelimiter) {
 
         this(shouldAvoidOverwriteCiteKey,
                 shouldWarnBeforeOverwriteCiteKey,
@@ -177,7 +177,7 @@ public class CitationKeyPatternPreferences {
         return defaultPattern;
     }
 
-    public String getKeywordDelimiter() {
+    public Character getKeywordDelimiter() {
         return keywordDelimiter.get();
     }
 }

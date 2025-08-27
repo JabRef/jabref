@@ -4,21 +4,21 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 public class BibEntryPreferences {
-    private final ObjectProperty<String> keywordSeparator;
+    private final ObjectProperty<Character> keywordSeparator;
 
-    public BibEntryPreferences(String keywordSeparator) {
+    public BibEntryPreferences(Character keywordSeparator) {
         this.keywordSeparator = new SimpleObjectProperty<>(keywordSeparator);
     }
 
-    public String getKeywordSeparator() {
+    public Character getKeywordSeparator() {
         return keywordSeparator.get();
     }
 
-    public ObjectProperty<String> keywordSeparatorProperty() {
+    public ObjectProperty<Character> keywordSeparatorProperty() {
         return keywordSeparator;
     }
 
-    public void setKeywordSeparator(String keywordSeparator) {
+    public void setKeywordSeparator(Character keywordSeparator) {
         this.keywordSeparator.set(keywordSeparator);
     }
 }

@@ -1573,7 +1573,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         bibEntryPreferences = new BibEntryPreferences(
-                get(KEYWORD_SEPARATOR)
+                get(KEYWORD_SEPARATOR).charAt(0)
         );
 
         EasyBind.listen(bibEntryPreferences.keywordSeparatorProperty(), (_, _, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue)));

@@ -14,9 +14,9 @@ public class XmpPreferences {
 
     private final BooleanProperty useXmpPrivacyFilter;
     private final ObservableSet<Field> xmpPrivacyFilter;
-    private final ObjectProperty<String> keywordSeparator;
+    private final ObjectProperty<Character> keywordSeparator;
 
-    public XmpPreferences(boolean useXmpPrivacyFilter, Set<Field> xmpPrivacyFilter, ObjectProperty<String> keywordSeparator) {
+    public XmpPreferences(boolean useXmpPrivacyFilter, Set<Field> xmpPrivacyFilter, ObjectProperty<Character> keywordSeparator) {
         this.useXmpPrivacyFilter = new SimpleBooleanProperty(useXmpPrivacyFilter);
         this.xmpPrivacyFilter = FXCollections.observableSet(xmpPrivacyFilter);
         this.keywordSeparator = keywordSeparator;
@@ -38,7 +38,7 @@ public class XmpPreferences {
         return xmpPrivacyFilter;
     }
 
-    public String getKeywordSeparator() {
+    public Character getKeywordSeparator() {
         return keywordSeparator.getValue();
     }
 }
