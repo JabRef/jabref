@@ -28,14 +28,14 @@ We aim for checking JBang scripts in PRs and on `main`.
 
 ## Decision Drivers
 
-* Fast detection of issues at all JBang files
-* Easy CI pipeline
+- Fast detection of issues at all JBang files
+- Easy CI pipeline
 
 ## Considered Options
 
-* Have JBang script have all changed classes of `jablib` included directly.
-* Use jitpack
-* Temporary `-SNAPSHOT.jar`
+- Have JBang script have all changed classes of `jablib` included directly
+- Use jitpack
+-Temporary `-SNAPSHOT.jar`
 
 ## Decision Outcome
 
@@ -43,14 +43,14 @@ Chosen option: "Have JBang script have all changed classes of `jablib` included 
 
 ## Pros and Cons of the Options
 
-### Have JBang script have all changed classes of `jablib` included directly.
+### Have JBang script have all changed classes of `jablib` included directly
 
 - `org.jabref:jablib:6.0-SNAPSHOT` provides non-modified classes
 - modified classes are included using JBang's `//SOURCES` directive.
 
 [tj-actions/changed-files](https://github.com/marketplace/actions/changed-files) can be used.
 
-* Good, because least effort
+- Good, because least effort
 
 ### Use jitpack
 
