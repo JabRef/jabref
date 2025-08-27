@@ -467,12 +467,10 @@ jobs:
         uses: tj-actions/changed-files@v45
         with:
           files: |
-            .github/workflows/tests-code.yml
             jablib/src/main/java/**/*.java
 
       - name: Build ${{ matrix.launcher }} launcher including changed classes
         shell: bash
-        if: steps.changed-jablib-files.outputs.any_changed == 'true'
         run: |
           WRAPPER="$(mktemp --suffix=.java)"
           cp .jbang/${{ matrix.launcher }}.java "$WRAPPER"
