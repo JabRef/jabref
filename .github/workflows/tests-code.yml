@@ -394,7 +394,7 @@ jobs:
           DBMS: "postgresql"
 
   jbang:
-    name: JBang
+    name: JBang (main)
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
@@ -429,7 +429,7 @@ jobs:
       - run: jbang build --fresh .jbang/JabSrvLauncher.java
 
   jbang-pr:
-    name: JBang
+    name: JBang (PR)
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     strategy:
@@ -471,11 +471,11 @@ jobs:
 
       - name: Build ${{ matrix.launcher }} launcher including changed classes
         shell: bash
+        # We always run, because changes in jabls, jabsrv also could cause JBang to fail
         run: |
+          # We modify the JBang scripts directly to avoid issues with relative paths
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
-            if [[ $f == *.java ]]; then
-              echo "//SOURCES $f" >> ".jbang/${{ matrix.launcher }}.java"
-            fi
+            echo "//SOURCES $f" >> ".jbang/${{ matrix.launcher }}.java"
           done
           jbang build --fresh ".jbang/${{ matrix.launcher }}.java"
 
