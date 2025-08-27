@@ -34,7 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for finding CSL-Styles based on their short title (e.g. apa instead of "american psychological association"). [#13728](https://github.com/JabRef/jabref/pull/13728)
 
 ### Changed
-
+- We changed `ISSNCleanup` into `NormalizeIssn` a `ISSN` formatter. [#13748](https://github.com/JabRef/jabref/issues/13748)
 - We changed Citation Relations tab and gave tab panes more descriptive titles and tooltips. [#13619](https://github.com/JabRef/jabref/issues/13619)
 - We changed the name from Open AI Provider to Open AI (or API compatible). [#13585](https://github.com/JabRef/jabref/issues/13585)
 - We improved the citations relations caching by implementing an offline storage. [#11189](https://github.com/JabRef/jabref/issues/11189)
