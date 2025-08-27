@@ -211,7 +211,6 @@ open module org.jabref.jablib {
     requires ai.djl.api;
     requires ai.djl.pytorch_model_zoo;
     requires ai.djl.tokenizers;
-    requires jvm.openai;
     requires langchain4j;
     requires langchain4j.core;
     requires langchain4j.google.ai.gemini;
