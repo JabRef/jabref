@@ -472,14 +472,12 @@ jobs:
       - name: Build ${{ matrix.launcher }} launcher including changed classes
         shell: bash
         run: |
-          WRAPPER="$(mktemp --suffix=.java)"
-          cp .jbang/${{ matrix.launcher }}.java "$WRAPPER"
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
             if [[ $f == *.java ]]; then
-              echo "//SOURCES $f" >> "$WRAPPER"
+              echo "//SOURCES $f" >> ".jbang/${{ matrix.launcher }}.java"
             fi
           done
-          jbang build --fresh "$WRAPPER"
+          jbang build --fresh ".jbang/${{ matrix.launcher }}.java"
 
   codecoverage:
     if: false
