@@ -125,11 +125,15 @@ public class BibliographyConsistencyCheck {
 
         collectEntriesIntoMaps(bibContext, entryTypeToFieldsInAnyEntryMap, entryTypeToFieldsInAllEntriesMap, entryTypeToEntriesMap);
 
+        List<BibEntryType> entryTypeDefinitions;
+        if (bibContext.getMode() == BibDatabaseMode.BIBLATEX) {
+            entryTypeDefinitions = BiblatexEntryTypeDefinitions.ALL;
+        } else {
+            entryTypeDefinitions = BibtexEntryTypeDefinitions.ALL;
+        }
+
+        // Use LinkedHashMap to preserve the order of Bib*EntryTypeDefinitions.ALL
         Map<EntryType, EntryTypeResult> resultMap = new LinkedHashMap<>();
-        BibDatabaseMode mode = bibContext.getMode();
-        List<BibEntryType> entryTypeDefinitions = (mode == BibDatabaseMode.BIBLATEX)
-                ? BiblatexEntryTypeDefinitions.ALL
-                : BibtexEntryTypeDefinitions.ALL;
 
         int counter = 0;
         for (Map.Entry<EntryType, Set<Field>> mapEntry : entryTypeToFieldsInAnyEntryMap.entrySet()) {
