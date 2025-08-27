@@ -31,8 +31,8 @@ public class LspDiagnosticHandler {
     private final LspIntegrityCheck lspIntegrityCheck;
     private final LspConsistencyCheck lspConsistencyCheck;
     private final LspClientHandler clientHandler;
-    private final Map<String, List<Diagnostic>> integrityDiagnosticsCache; // Maps file URIs to the according list of integrity diagnostics
-    private final Map<String, List<Diagnostic>> consistencyDiagnosticsCache; // Maps file URIs to the according list of consistency diagnostics
+    private final Map<String, List<Diagnostic>> integrityDiagnosticsCache; // Maps file URIs to the corresponding list of integrity diagnostics
+    private final Map<String, List<Diagnostic>> consistencyDiagnosticsCache; // Maps file URIs to the corresponding list of consistency diagnostics
 
     private LanguageClient client;
 
