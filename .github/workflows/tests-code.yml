@@ -393,7 +393,6 @@ jobs:
           CI: "true"
           DBMS: "postgresql"
 
-
   jbang:
     name: JBang
     runs-on: ubuntu-latest
