@@ -56,7 +56,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
                 Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
                 if (databaseContext.isEmpty()) {
                     LOGGER.debug("Consistency check invoked with no library opened.");
-                    dialogService.notify(Localization.lang("No library opened."));
+                    dialogService.notify(Localization.lang("No library open"));
                     return new BibliographyConsistencyCheck.Result(Collections.emptyMap());
                 }
 
