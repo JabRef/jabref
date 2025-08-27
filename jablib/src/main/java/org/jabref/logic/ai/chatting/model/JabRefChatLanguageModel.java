@@ -60,7 +60,7 @@ public class JabRefChatLanguageModel implements ChatModel, AutoCloseable {
         }
 
         switch (aiPreferences.getAiProvider()) {
-            case OPEN_AI -> langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
+            case OPEN_AI -> langchainChatModel = Optional.of(new ChatGptModel(aiPreferences));
 
             case GPT4ALL-> langchainChatModel = Optional.of(new Gpt4AllModel(aiPreferences, httpClient));
 

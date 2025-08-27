@@ -15,6 +15,9 @@ public class AiDefaultPreferences {
         GPT_4(AiProvider.OPEN_AI, "gpt-4", 8192),
         GPT_4_TURBO(AiProvider.OPEN_AI, "gpt-4-turbo", 128000),
         GPT_3_5_TURBO(AiProvider.OPEN_AI, "gpt-3.5-turbo", 16385),
+        // ChatGPT o1 models (reasoning models)
+        CHATGPT_O1_PREVIEW(AiProvider.OPEN_AI, "o1-preview", 128000),
+        CHATGPT_O1_MINI(AiProvider.OPEN_AI, "o1-mini", 128000),
         OPEN_MISTRAL_NEMO(AiProvider.MISTRAL_AI, "open-mistral-nemo", 128000),
         OPEN_MISTRAL_7B(AiProvider.MISTRAL_AI, "open-mistral-7b", 32000),
         // "mixtral" is not a typo.
