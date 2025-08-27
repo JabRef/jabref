@@ -3,8 +3,8 @@ name: Publish to maven central
 on:
   pull_request:
   push:
-    paths:
-     - '**'
+    branches:
+      - main
     tags:
       - '**'
   schedule:
