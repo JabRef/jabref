@@ -852,10 +852,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (entriesToAdd.isEmpty()) {
             return;
         }
-        copyEntriesWithFeedback(entriesToAdd);
+        BibDatabaseContext sourceContext = clipBoardManager.getSourceBibDatabaseContext().orElse(null);
+        copyEntriesWithFeedback(entriesToAdd, sourceContext);
     }
 
-    private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd) {
+    private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd, BibDatabaseContext sourceBibDatabaseContext) {
         final List<BibEntry> finalEntriesToAdd = entriesToAdd;
 
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(finalEntriesToAdd.size());
@@ -879,10 +880,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 dialogService.notify(Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped",
                     String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
             }
-            clipBoardManager.getSourceBibDatabaseContext().ifPresent(sourceBibDatabaseContext ->
+            if (sourceBibDatabaseContext != null) {
                 LinkedFileTransferHelper
                     .adjustLinkedFilesForTarget(sourceBibDatabaseContext,
-                        bibDatabaseContext, preferences.getFilePreferences()));
+                        bibDatabaseContext, preferences.getFilePreferences());
+            }
         });
     }
 
@@ -901,8 +903,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    public void dropEntry(List<BibEntry> entriesToAdd) {
-        copyEntriesWithFeedback(entriesToAdd);
+    public void dropEntry(List<BibEntry> entriesToAdd, BibDatabaseContext sourceBibDatabaseContext) {
+        copyEntriesWithFeedback(entriesToAdd, sourceBibDatabaseContext);
     }
 
     public void cutEntry() {
