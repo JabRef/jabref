@@ -24,7 +24,7 @@ public class LspConsistencyCheck {
     public List<Diagnostic> check(BibDatabaseContext bibDatabaseContext, String content) {
         List<Diagnostic> diagnostics = new ArrayList<>();
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibDatabaseContext.getEntries(), (_, _) -> {
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibDatabaseContext, (_, _) -> {
         });
 
         List<Field> allReportedFields = result.entryTypeToResultMap().values().stream()
