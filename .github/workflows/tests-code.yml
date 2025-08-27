@@ -394,9 +394,8 @@ jobs:
           DBMS: "postgresql"
 
   jbang:
-    name: JBang
+    name: JBang (main)
     runs-on: ubuntu-latest
-    # JBang scripts depend on main-SNAPSHOT; thus, we can only test fully when main is updated
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout source
@@ -426,7 +425,59 @@ jobs:
       - run: jbang build .jbang/CheckoutPR.java
       - run: jbang build .jbang/CloneJabRef.java
       - run: jbang build --fresh .jbang/JabKitLauncher.java
+      - run: jbang build --fresh .jbang/JabLsLauncher.java
       - run: jbang build --fresh .jbang/JabSrvLauncher.java
+
+  jbang-pr:
+    name: JBang (PR)
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        launcher: [JabKitLauncher, JabLsLauncher, JabSrvLauncher]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 24
+          distribution: 'corretto'
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+
+      - name: Detect changed jablib classes
+        id: changed-jablib-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            jablib/src/main/java/**/*.java
+
+      - name: Build ${{ matrix.launcher }} launcher including changed classes
+        shell: bash
+        # We always run, because changes in jabls, jabsrv also could cause JBang to fail
+        run: |
+          # We modify the JBang scripts directly to avoid issues with relative paths
+          for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
+            echo "//SOURCES $f" >> ".jbang/${{ matrix.launcher }}.java"
+          done
+          jbang build --fresh ".jbang/${{ matrix.launcher }}.java"
 
   codecoverage:
     if: false
