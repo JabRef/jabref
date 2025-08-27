@@ -460,8 +460,6 @@ jobs:
             jbang-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
-      - run: jbang build .jbang/CheckoutPR.java
-      - run: jbang build .jbang/CloneJabRef.java
 
       - name: Detect changed jablib classes
         id: changed-jablib-files
