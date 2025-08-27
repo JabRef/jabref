@@ -205,3 +205,8 @@
     /* -jr-accent with 75% Alpha */
     -fx-fill: rgba(37, 86, 82, 0.75);
 }
+
+.walkthrough-tooltip .border {
+    /* -jr-background-alt. Variable is not used because the variable cannot be properly resolved and lead to transparent fill. */
+    -fx-fill: #151924 !important;
+}

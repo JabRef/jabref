@@ -2886,7 +2886,8 @@ journalInfo .grid-cell-b {
 
 .walkthrough-tooltip .border {
     /* The arrow of the PopOver. Need to override the default `.popover > .border` (https://github.com/controlsfx/controlsfx/blob/194b10bb948389bf18c463006adcec7c92ca6403/controlsfx/src/main/resources/org/controlsfx/control/popover.css#L8) */
-    -fx-fill: -jr-background-alt!important;
+    /* -jr-background-alt. Variable is not used because the variable cannot be properly resolved and lead to transparent fill. */
+    -fx-fill: #f3f3f3 !important;
 }
 
 .walkthrough-tooltip-content-container {
