@@ -1,7 +1,7 @@
 package org.jabref.logic.quality.consistency;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -72,30 +72,25 @@ public class BibliographyConsistencyCheck {
                      .collect(Collectors.toSet());
     }
 
-    /**
-     *
-     * @param entries entries to analyze
-     * @param differingFields fields that are present in some entries but not in all
-     * @param fieldsInAllEntries fields that are present in all entries
-     * @return a list of entries that present at least one of the differing fields
-     */
+    /// Filters the given entries to those that violate consistency:
+    ///
+    /// - Fields not set (but set in other entries of the same type)
+    /// - Required fields not set
+    ///
+    /// Additionally, the entries are sorted
     @VisibleForTesting
-    List<BibEntry> filterEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> fieldsInAllEntries) {
-        for (Field field : differingFields) {
-            if (!fieldsInAllEntries.contains(field)) {
-                return new ArrayList<>(entries);
-            }
-        }
-        List<BibEntry> filteredEntries = new ArrayList<>();
-        for (BibEntry entry : entries) {
-            Set<Field> entryFields = filterExcludedFields(entry.getFields());
-            boolean hasDifferingField = differingFields.stream()
-                                                       .anyMatch(entryFields::contains);
-            if (hasDifferingField) {
-                filteredEntries.add(entry);
-            }
-        }
-        return filteredEntries;
+    List<BibEntry> filterAndSortEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> requiredFields) {
+        return entries.stream()
+                      .filter(entry ->
+                              // This removes entries that have all differing fields set (could be confusing to the user)
+                              !Collections.disjoint(entry.getFields(), differingFields)
+                                      // This ensures that all entries with missing required fields are included
+                                      || !entry.getFields().containsAll(requiredFields))
+                      .sorted(new FieldComparatorStack<>(List.of(
+                              new BibEntryByCitationKeyComparator(),
+                              new BibEntryByFieldsComparator()
+                      )))
+                      .toList();
     }
 
     public record Result(Map<EntryType, EntryTypeResult> entryTypeToResultMap) {
@@ -142,10 +137,9 @@ public class BibliographyConsistencyCheck {
             Set<Field> fieldsInAnyEntry = mapEntry.getValue();
             Set<Field> fieldsInAllEntries = entryTypeToFieldsInAllEntriesMap.get(entryType);
             Set<Field> filteredFieldsInAnyEntry = filterExcludedFields(fieldsInAnyEntry);
-            Set<Field> filteredFieldsInAllEntries = filterExcludedFields(fieldsInAllEntries);
 
             Set<Field> differingFields = new HashSet<>(filteredFieldsInAnyEntry);
-            differingFields.removeAll(filteredFieldsInAllEntries);
+            differingFields.removeAll(fieldsInAllEntries);
             assert fieldsInAllEntries != null;
 
             differingFields.removeAll(fieldsInAllEntries);
@@ -160,13 +154,6 @@ public class BibliographyConsistencyCheck {
                                .collect(Collectors.toSet())
                 ).orElse(Set.of());
 
-            // This is the "real" difference we are looking for: fields that are present in some entries but not in all
-            for (Field req : requiredFields) {
-                if (filteredFieldsInAnyEntry.contains(req) && !filteredFieldsInAllEntries.contains(req)) {
-                    differingFields.add(req);
-                }
-            }
-
             Set<BibEntry> entries = entryTypeToEntriesMap.get(entryType);
             assert entries != null;
             assert entries.size() != 1; // Either there is no entry with different fields or more than one
@@ -174,13 +161,8 @@ public class BibliographyConsistencyCheck {
                 continue;
             }
 
-            List<BibEntry> sortedEntries = filterEntriesWithFieldDifferences(entries, differingFields, fieldsInAllEntries);
-
+            List<BibEntry> sortedEntries = filterAndSortEntriesWithFieldDifferences(entries, differingFields, requiredFields);
             if (!sortedEntries.isEmpty()) {
-                sortedEntries.sort(new FieldComparatorStack<>(List.of(
-                        new BibEntryByCitationKeyComparator(),
-                        new BibEntryByFieldsComparator()
-                )));
                 resultMap.put(entryType, new EntryTypeResult(differingFields, sortedEntries));
             }
         }

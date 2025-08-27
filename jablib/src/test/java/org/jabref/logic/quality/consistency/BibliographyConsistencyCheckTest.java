@@ -170,10 +170,10 @@ class BibliographyConsistencyCheckTest {
     }
 
     @Test
-    void unsetFieldsReported() {
+    void unsetRequriedFieldsReported() {
         BibEntry withDate = new BibEntry(StandardEntryType.Online)
                 .withCitationKey("withDate")
-                .withField(StandardField.DATE, "date")
+                .withField(StandardField.DATE, "date") // Required in BibLaTeX
                 .withField(StandardField.URLDATE, "urldate");
         BibEntry withoutDate = new BibEntry(StandardEntryType.Online)
                 .withCitationKey("withoutDate")
@@ -253,11 +253,9 @@ class BibliographyConsistencyCheckTest {
         entries.add(entry4);
         entries.add(entry5);
 
-        Set<Field> fieldsInAllEntries = Set.of(StandardField.AUTHOR);
-
         BibliographyConsistencyCheck check = new BibliographyConsistencyCheck();
 
-        List<BibEntry> result = check.filterEntriesWithFieldDifferences(entries, differingFields, fieldsInAllEntries);
+        List<BibEntry> result = check.filterAndSortEntriesWithFieldDifferences(entries, differingFields, Set.of(StandardField.AUTHOR, StandardField.TITLE, StandardField.PAGES, StandardField.PDF));
         List<BibEntry> expected = List.of(entry1, entry2, entry3, entry4, entry5);
 
         assertEquals(Set.copyOf(expected), Set.copyOf(result));
