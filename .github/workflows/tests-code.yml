@@ -478,7 +478,9 @@ jobs:
           WRAPPER="$(mktemp --suffix=.java)"
           cp .jbang/${{ matrix.launcher }}.java "$WRAPPER"
           for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
-            echo "//SOURCES $f" >> "$WRAPPER"
+            if [[ $f == *.java ]]; then
+              echo "//SOURCES $f" >> "$WRAPPER"
+            fi
           done
           jbang build --fresh "$WRAPPER"
 
