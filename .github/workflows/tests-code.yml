@@ -425,6 +425,7 @@ jobs:
       - run: jbang build .jbang/CheckoutPR.java
       - run: jbang build .jbang/CloneJabRef.java
       - run: jbang build --fresh .jbang/JabKitLauncher.java
+      - run: jbang build --fresh .jbang/JabLsLauncher.java
       - run: jbang build --fresh .jbang/JabSrvLauncher.java
 
   jbang-pr:
