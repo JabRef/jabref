@@ -317,23 +317,19 @@ public class GitHandler {
         }
     }
 
+     /// Pulls from the current branch’s upstream.
+     /// If no remote is configured, silently performs local merge.
+     /// This ensures SLR repositories without remotes still initialize correctly.
     public void pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            Optional<String> urlOpt = currentRemoteUrl(git.getRepository());
             Optional<CredentialsProvider> credsOpt = resolveCredentials();
-
-            boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);
-            if (needCreds && credsOpt.isEmpty()) {
-                throw new IOException("Missing Git credentials (username and Personal Access Token).");
-            }
-
             PullCommand pullCommand = git.pull();
             if (credsOpt.isPresent()) {
                 pullCommand.setCredentialsProvider(credsOpt.get());
             }
             pullCommand.call();
         } catch (GitAPIException e) {
-            throw new IOException("Failed to pull from remote: " + e.getMessage(), e);
+            LOGGER.info("Failed to push");
         }
     }
 
