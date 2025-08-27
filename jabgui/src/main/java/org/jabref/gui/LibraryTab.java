@@ -860,6 +860,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(finalEntriesToAdd.size());
 
+        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, finalEntriesToAdd, tracker);
+
         tracker.setOnFinish(() -> {
             int importedCount = tracker.getImportedCount();
             int skippedCount = tracker.getSkippedCount();
@@ -877,14 +879,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 dialogService.notify(Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped",
                     String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
             }
+            clipBoardManager.getSourceBibDatabaseContext().ifPresent(sourceBibDatabaseContext ->
+                LinkedFileTransferHelper
+                    .adjustLinkedFilesForTarget(sourceBibDatabaseContext,
+                        bibDatabaseContext, preferences.getFilePreferences()));
         });
-
-        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, finalEntriesToAdd, tracker);
-
-        clipBoardManager.getSourceBibDatabaseContext().ifPresent(sourceBibDatabaseContext ->
-            tracker.setOnFinish(() -> LinkedFileTransferHelper
-                .adjustLinkedFilesForTarget(sourceBibDatabaseContext,
-                    bibDatabaseContext, preferences.getFilePreferences())));
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
@@ -903,7 +902,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void dropEntry(List<BibEntry> entriesToAdd) {
-        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
+        copyEntriesWithFeedback(entriesToAdd);
     }
 
     public void cutEntry() {

@@ -83,12 +83,10 @@ public class EditAction extends SimpleCommand {
 
                 switch (action) {
                     case COPY -> {
-                        Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
                         clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
                         tabSupplier.get().copyEntry();
                     }
                     case CUT -> {
-                        Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
                         clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
                         tabSupplier.get().cutEntry();
                     }
