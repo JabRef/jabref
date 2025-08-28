@@ -8,7 +8,6 @@ import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TabPane;
 
 import org.jabref.gui.StateManager;
 import org.jabref.logic.preferences.CliPreferences;
@@ -38,8 +37,8 @@ public class ActionHelper {
         return BooleanExpression.booleanExpression(binding);
     }
 
-    public static BooleanExpression needsMultipleDatabases(TabPane tabbedPane) {
-        return Bindings.size(tabbedPane.getTabs()).greaterThan(1);
+    public static BooleanExpression needsMultipleDatabases(StateManager stateManager) {
+        return Bindings.size(stateManager.getOpenDatabases()).greaterThan(1);
     }
 
     public static BooleanExpression needsStudyDatabase(StateManager stateManager) {

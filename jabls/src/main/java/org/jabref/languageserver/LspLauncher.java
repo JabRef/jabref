@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 
@@ -17,32 +18,35 @@ import org.eclipse.lsp4j.services.LanguageClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LSPLauncher {
+public class LspLauncher extends Thread {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LSPLauncher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LspLauncher.class);
 
-    private ServerSocket serverSocket;
-    private ExecutorService threadPool;
+    private final CliPreferences cliPreferences;
+    private final JournalAbbreviationRepository abbreviationRepository;
+    private final ExecutorService threadPool;
+
+    private final int port;
     private volatile boolean running;
-    private CliPreferences cliPreferences;
-    private JournalAbbreviationRepository abbreviationRepository;
+    private ServerSocket serverSocket;
 
-    public void run(CliPreferences cliPreferences) {
-        run(cliPreferences, new JournalAbbreviationRepository());
-    }
-
-    public void run(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+    public LspLauncher(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository, int port) {
         this.cliPreferences = cliPreferences;
         this.abbreviationRepository = abbreviationRepository;
-        start(2087);
+        this.threadPool = Executors.newCachedThreadPool();
+        this.port = port;
+        this.setName("JabLs - JabRef Language Server on: " + port);
     }
 
-    public void start(int port) {
+    public LspLauncher(CliPreferences cliPreferences, int port) {
+        this(cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getJournalAbbreviationPreferences()), port);
+    }
+
+    @Override
+    public void run() {
+        running = true;
         try {
             serverSocket = new ServerSocket(port);
-            threadPool = Executors.newCachedThreadPool();
-            running = true;
-
             threadPool.execute(() -> {
                 LOGGER.info("LSP Server listening on port {}...", port);
                 while (running) {
@@ -65,15 +69,15 @@ public class LSPLauncher {
     }
 
     private void handleClient(Socket socket) {
-        LSPServer server = new LSPServer(cliPreferences, abbreviationRepository);
-        LOGGER.debug("LSP server started.");
+        LspClientHandler clientHandler = new LspClientHandler(cliPreferences, abbreviationRepository);
+        LOGGER.debug("LSP clientHandler started.");
         try (socket; // socket should be closed on error
              InputStream in = socket.getInputStream();
              OutputStream out = socket.getOutputStream()) {
-            Launcher<LanguageClient> launcher = org.eclipse.lsp4j.launch.LSPLauncher.createServerLauncher(server, in, out, Executors.newCachedThreadPool(), Function.identity());
-            LOGGER.debug("LSP server launched.");
-            server.connect(launcher.getRemoteProxy());
-            LOGGER.debug("LSP server connected.");
+            Launcher<LanguageClient> launcher = org.eclipse.lsp4j.launch.LSPLauncher.createServerLauncher(clientHandler, in, out, Executors.newCachedThreadPool(), Function.identity());
+            LOGGER.debug("LSP clientHandler launched.");
+            clientHandler.connect(launcher.getRemoteProxy());
+            LOGGER.debug("LSP clientHandler connected.");
             launcher.startListening().get();
         } catch (Throwable e) {
             LOGGER.error("Error in handleClient", e);
@@ -82,8 +86,8 @@ public class LSPLauncher {
         }
     }
 
-    public void shutdown() {
-        running = false;
+    @Override
+    public void interrupt() {
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();
@@ -94,6 +98,11 @@ public class LSPLauncher {
         } catch (IOException e) {
             LOGGER.error("Error during LSP shutdown", e);
         }
+        running = false;
         LOGGER.info("LSP Server shutdown.");
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }

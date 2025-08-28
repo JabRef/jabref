@@ -48,6 +48,7 @@ import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
@@ -447,7 +448,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void updateTabBarVisible() {
-        if (preferences.getWorkspacePreferences().shouldHideTabBar() && stateManager.getOpenDatabases().size() <= 1) {
+        // When WelcomeTab is open, the tabbar should be visible
+        if (preferences.getWorkspacePreferences().shouldHideTabBar() && tabbedPane.getTabs().size() <= 1) {
             if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
                 tabbedPane.getStyleClass().add("hide-tab-bar");
             }
@@ -507,7 +509,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 clipBoardManager,
                 taskExecutor,
                 fileHistory,
-                Injector.instantiateModelOrService(BuildInfo.class)
+                Injector.instantiateModelOrService(BuildInfo.class),
+                preferences.getWorkspacePreferences(),
+                Injector.instantiateModelOrService(ThemeManager.class)
         );
         tabbedPane.getTabs().add(welcomeTab);
         tabbedPane.getSelectionModel().select(welcomeTab);
@@ -707,7 +711,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         public CloseOthersDatabaseAction(LibraryTab libraryTab) {
             this.libraryTab = libraryTab;
-            this.executable.bind(ActionHelper.needsMultipleDatabases(tabbedPane));
+            this.executable.bind(ActionHelper.needsMultipleDatabases(stateManager));
         }
 
         @Override

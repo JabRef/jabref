@@ -1752,6 +1752,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
     -fx-font-family: "Arial";
+    -fx-text-fill: -jr-head-fg;
 }
 
 .welcome-no-recent-label {
@@ -1785,7 +1786,8 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .welcome-columns-container {
-    -fx-spacing: 3.333em;
+    -fx-hgap: 2.083em;
+    -fx-vgap: 2.083em;
     -fx-alignment: top-center;
 }
 
@@ -1849,6 +1851,64 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 0.9em;
     -fx-text-fill: -jr-gray-2;
     -fx-font-family: "Arial";
+}
+
+/* donation toast */
+.donation-toast {
+    -fx-background-color: -jr-background-alt;
+    -fx-background-radius: 0.8333333333em;
+    -fx-padding: 0.8333em 1em;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.075), 20, 0.25, 0, 6);
+    -fx-alignment: center-left;
+    -fx-border-color: derive(-jr-base, -10%);
+    -fx-border-radius: 0.8333333333em;
+    -fx-max-height: 4em;
+    -fx-spacing: 1.16667em;
+}
+
+.donation-toast .label {
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.donation-toast-title {
+    -fx-font-size: 1.0em;
+    -fx-font-weight: bold;
+}
+
+.donation-toast-desc {
+    -fx-font-size: 0.92em;
+}
+
+.donation-toast-text {
+    -fx-spacing: 2;
+}
+
+.donation-btn-primary,
+.donation-btn-secondary,
+.donation-btn-ghost {
+    -fx-padding: 0.5em 1em;
+    -fx-background-radius: 0.5em;
+    -fx-border-radius: 0.5em;
+}
+
+.donation-btn-primary {
+    -fx-background-color: -jr-primary;
+}
+
+.donation-btn-secondary {
+    -fx-background-color: derive(-fx-control-inner-background, -6%);
+}
+
+.donation-btn-ghost {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-gray-1;
+    -fx-stroke-width: 0;
+    -fx-border-width: 0
+}
+
+.donation-btn-ghost:hover {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-gray-2;
 }
 
 /* AboutDialog */
@@ -2584,17 +2644,10 @@ journalInfo .grid-cell-b {
 
 
 /* Quick Settings */
-
 .quick-settings-container,
 .walkthroughs-container {
-    -fx-spacing: 0.6667em;
+    -fx-spacing: 0.3333em;
     -fx-alignment: top-left;
-}
-
-.quick-settings-scroll-pane {
-    -fx-max-height: 13.333em; /* item-size * 4 + gap * 3 = (0.0833 * 2 + 0.833 * 2 + 1) * 4 + 0.667 * 3 */
-    -fx-min-height: 13.333em;
-    -fx-pref-height: 13.333em;
 }
 
 .quick-settings-button {
@@ -2659,7 +2712,7 @@ journalInfo .grid-cell-b {
     -fx-border-width: 0.0625em;
     -fx-border-radius: 0.25em;
     -fx-background-radius: 0.25em;
-    -fx-effect: dropshadow(three-pass-box , rgba(0,0,0,0.1) , 0.125em, 0.0 , 0 , 0.0625em );
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 0.125em, 0.0, 0, 0.0625em);
     -fx-border-color: -jr-wf-border-color;
 }
 
@@ -2828,6 +2881,16 @@ journalInfo .grid-cell-b {
 
 /* Tooltip Content */
 .walkthrough-tooltip-content-container {
+    -fx-background-color: -jr-background-alt;
+}
+
+.walkthrough-tooltip .border {
+    /* The arrow of the PopOver. Need to override the default `.popover > .border` (https://github.com/controlsfx/controlsfx/blob/194b10bb948389bf18c463006adcec7c92ca6403/controlsfx/src/main/resources/org/controlsfx/control/popover.css#L8) */
+    /* -jr-background-alt. Variable is not used because the variable cannot be properly resolved and lead to transparent fill. */
+    -fx-fill: #f3f3f3 !important;
+}
+
+.walkthrough-tooltip-content-container {
     -fx-spacing: 1em;
     -fx-padding: 1em;
 }
@@ -2836,12 +2899,10 @@ journalInfo .grid-cell-b {
     -fx-max-width: infinity;
 }
 
-.walkthrough-tooltip-title,
-.walkthrough-title,
-.walkthrough-tooltip-title .markdown-h2,
-.walkthrough-title .markdown-h2 {
-    -fx-text-fill: -jr-theme;
-    -fx-fill: -jr-theme;
+.walkthrough-tooltip-title > *,
+.walkthrough-title > * {
+    -fx-text-fill: -jr-theme!important;
+    -fx-fill: -jr-theme!important;
     -fx-font-weight: bold;
     -fx-font-size: 1.75em;
     -fx-line-spacing: -0.25em;
@@ -2851,7 +2912,7 @@ journalInfo .grid-cell-b {
 .walkthrough-side-panel-horizontal {
     -fx-spacing: 1em;
     -fx-padding: 2em;
-    -fx-background-color: derive(-jr-gray-1, 40%);
+    -fx-background-color: -jr-background-alt;
 }
 
 .walkthrough-side-panel-vertical {
@@ -2876,7 +2937,7 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-text-content {
-    -fx-text-fill: -jr-gray-3;
+    -fx-text-fill: -fx-text-base-color;
     -fx-font-size: 1.2em;
     -fx-line-spacing: 0.5em;
 }
@@ -2943,7 +3004,7 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-quit-button {
-    -fx-background-color: -jr-gray-1;
+    -fx-background-color: -jr-base;
     -fx-border-color: transparent;
     /* For easy clipping */
     -fx-padding: 0.5em;
@@ -2956,11 +3017,11 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-quit-button:hover {
-    -fx-background-color: derive(-jr-gray-1, -20%);
+    -fx-background-color: derive(-jr-base, -20%);
 }
 
 .walkthrough-quit-button:pressed {
-    -fx-background-color: derive(-jr-gray-1, 30%);
+    -fx-background-color: derive(-jr-base, 30%);
 }
 
 .walkthrough-quit-button .glyph-icon,

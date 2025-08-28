@@ -25,12 +25,12 @@ public class GitPullViewModel extends AbstractViewModel {
     public MergeResult pull() throws IOException, GitAPIException, JabRefException {
         Optional<BibDatabaseContext> databaseContextOpt = gitStatusViewModel.getDatabaseContext();
         if (databaseContextOpt.isEmpty()) {
-            throw new JabRefException(Localization.lang("Cannot pull: No active BibDatabaseContext."));
+            throw new JabRefException(Localization.lang("No library selected"));
         }
 
         BibDatabaseContext localBibDatabaseContext = databaseContextOpt.get();
         Path bibFilePath = localBibDatabaseContext.getDatabasePath().orElseThrow(() ->
-                new JabRefException(Localization.lang("Cannot pull: .bib file path missing in BibDatabaseContext."))
+                new JabRefException(Localization.lang("Cannot pull: Please save the library to a file first."))
         );
 
         MergeResult result = syncService.fetchAndMerge(localBibDatabaseContext, bibFilePath);

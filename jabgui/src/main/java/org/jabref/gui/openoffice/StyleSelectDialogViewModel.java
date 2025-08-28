@@ -139,7 +139,7 @@ public class StyleSelectDialogViewModel {
                 }
             } else if ("CSL Styles".equals(tabText)) {
                 if (selectedCslLayoutProperty.get() != null) {
-                    return selectedCslLayoutProperty.get().getCitationStyle();
+                    return selectedCslLayoutProperty.get().citationStyle();
                 }
             }
         }
