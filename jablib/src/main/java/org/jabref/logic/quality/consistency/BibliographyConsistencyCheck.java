@@ -127,7 +127,7 @@ public class BibliographyConsistencyCheck {
             entryTypeDefinitions = BibtexEntryTypeDefinitions.ALL;
         }
 
-        // Use LinkedHashMap to preserve the order of Bib*EntryTypeDefinitions.ALL
+        // Use LinkedHashMap to preserve the order of Bib(tex|latex)EntryTypeDefinitions.ALL
         Map<EntryType, EntryTypeResult> resultMap = new LinkedHashMap<>();
 
         int counter = 0;
@@ -195,7 +195,7 @@ public class BibliographyConsistencyCheck {
                 }
 
                 entryTypeToEntriesMap
-                        .computeIfAbsent(entryType, _ -> new java.util.LinkedHashSet<>())
+                        .computeIfAbsent(entryType, _ -> new HashSet<>())
                         .add(entry);
             }
         }

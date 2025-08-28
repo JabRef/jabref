@@ -22,18 +22,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class SpringerLinkTest {
+class SpringerNatureFullTextFetcherTest {
 
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
-    private SpringerLink finder;
+    private SpringerNatureFullTextFetcher finder;
     private BibEntry entry;
 
     @BeforeEach
     void setUp() {
         Optional<String> apiKey = Optional.of(new BuildInfo().springerNatureAPIKey);
-        when(importerPreferences.getApiKey(SpringerLink.FETCHER_NAME)).thenReturn(apiKey);
+        when(importerPreferences.getApiKey(SpringerNatureFullTextFetcher.FETCHER_NAME)).thenReturn(apiKey);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        finder = new SpringerLink(importerPreferences);
+        finder = new SpringerNatureFullTextFetcher(importerPreferences);
         entry = new BibEntry();
     }
 
