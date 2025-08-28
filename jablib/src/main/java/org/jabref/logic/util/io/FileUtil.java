@@ -159,7 +159,7 @@ public class FileUtil {
     }
 
     /**
-     * Looks for the shortest unique path of the in a list of paths
+     * Looks for the shortest unique path of in a list of paths
      *
      * @param paths       List of paths as Strings
      * @param comparePath The to be shortened path
