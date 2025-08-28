@@ -214,16 +214,6 @@ public class WelcomeTab extends Tab {
             grid.add(leftColumn, 0, 0);
             grid.add(rightColumn, 1, 0);
         }
-//
-//        Node parent = getContent() != null ? getContent().getParent() : null;
-//        if (parent != null) {
-//            double parentHeight = parent.getBoundsInParent().getHeight();
-//            double topTitleHeight = main.getChildren().get(0).getBoundsInParent().getHeight();
-//            double communityLinksHeight = main.getChildren().get(2).getBoundsInParent().getHeight();
-//            double space = main.getSpacing() * 2 + main.getPadding().getTop() + main.getPadding().getBottom();
-//            double requiredHeight = topTitleHeight + communityLinksHeight + leftColumn.getBoundsInParent().getHeight() + space;
-//            scrollNeeded = parentHeight < requiredHeight;
-//        }
 
         if (!scrollNeeded) {
             if (!(main.getChildren().get(1) instanceof GridPane)) {

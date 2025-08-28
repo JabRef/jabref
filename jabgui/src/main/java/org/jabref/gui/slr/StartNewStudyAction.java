@@ -64,7 +64,9 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
         // The GitHandler is already called to initialize the repository with one single commit "Initial commit".
         // The "Initial commit" should also contain the created YAML.
         // Thus, we append to that commit.
-        new GitHandler(studyRepositoryRoot).createCommitOnCurrentBranch("Initial commit", true);
+        GitHandler gitHandler = new GitHandler(studyRepositoryRoot);
+        gitHandler.initIfNeeded();
+        gitHandler.createCommitOnCurrentBranch("Initial commit", true);
     }
 
     @Override

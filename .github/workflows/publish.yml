@@ -2,15 +2,14 @@ name: Publish to maven central
 
 on:
   pull_request:
-    paths:
-     - .github/workflows/publish.yml
   push:
-    paths:
-     - .github/workflows/publish.yml
+    branches:
+      - main
     tags:
-      - '*'
+      - '**'
   schedule:
-    # run on each Monday
+    # Run on each Monday
+    # Additional run in addition to the other events, because some resources could have changes
     - cron: '2 3 * * 1'
   workflow_dispatch:
     inputs:
@@ -34,9 +33,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.changed.outputs.any_changed }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Detect changed jablib classes or workflow
+        id: changed
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            jablib/src/main/java/**/*.java
+            .github/workflows/publish.yml
+
   publish:
     name: jablib
-    if: github.repository == 'JabRef/jabref'
+    needs: detect_changes
+    if: >
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (needs.detect_changes.outputs.changed == 'true' &&
+        ((github.event_name == 'push' && github.repository == 'JabRef/jabref') ||
+         (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'JabRef/jabref'))
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Fetch all history for all tags and branches
