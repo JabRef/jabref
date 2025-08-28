@@ -258,9 +258,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         });
     }
 
-    private static void addChangedInformation(StringBuilder text, String fileName) {
+    private static void addChangedInformation(StringBuilder text) {
         text.append("\n");
-        text.append(Localization.lang("Library '%0' has changed.", fileName));
+        text.append(Localization.lang("The library has been modified."));
     }
 
     private static void addModeInfo(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
@@ -417,7 +417,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
             // Changed information (tooltip)
             if (isChanged && !isAutosaveEnabled) {
-                addChangedInformation(toolTipText, fileName);
+                addChangedInformation(toolTipText);
             }
 
             // Unique path fragment
@@ -433,7 +433,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
             addModeInfo(toolTipText, bibDatabaseContext);
             if ((databaseLocation == DatabaseLocation.LOCAL) && bibDatabaseContext.getDatabase().hasEntries()) {
-                addChangedInformation(toolTipText, Localization.lang("untitled"));
+                addChangedInformation(toolTipText);
             }
         }
 
