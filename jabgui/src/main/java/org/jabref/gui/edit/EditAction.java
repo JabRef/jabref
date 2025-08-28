@@ -7,7 +7,6 @@ import javax.swing.undo.UndoManager;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.web.WebView;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
