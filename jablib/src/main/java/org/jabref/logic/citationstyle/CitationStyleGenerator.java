@@ -51,7 +51,6 @@ public class CitationStyleGenerator {
         return generateBibliography(bibEntries, style, CitationStyleOutputFormat.HTML, context, entryTypesManager).getFirst();
     }
 
-
     /**
      * Generates a bibliography list based on a given list of entries, .csl style source content and output format with a given {@link BibDatabaseContext}.
      *
@@ -76,5 +75,4 @@ public class CitationStyleGenerator {
                     e.getLocalizedMessage());
         }
     }
-
 }
