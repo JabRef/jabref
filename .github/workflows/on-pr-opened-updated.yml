@@ -165,9 +165,7 @@ jobs:
     name: Remove label "status: changes-required"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - run: gh issue edit ${{ github.event.pull_request.number }} --remove-label "status: changes-required"
-
+      - run: gh issue --repo ${{ github.repository }} edit ${{ github.event.pull_request.number }} --remove-label "status: changes-required"
   upload-pr-number:
     if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
