@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 public class ConferenceRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConferenceRepository.class);
     private static final String ICORE_RANK_DATA_FILE = "/icore/ICORE2023.csv";
+    private static final double FUZZY_SEARCH_THRESHOLD = 0.9;
+    private static final StringSimilarity MATCHER = new StringSimilarity();
 
     private final Map<String, ConferenceEntry> acronymToConference = new HashMap<>();
     private final Map<String, ConferenceEntry> titleToConference = new HashMap<>();
@@ -43,7 +45,7 @@ public class ConferenceRepository {
         loadConferenceDataFromInputStream(inputStream);
     }
 
-    // Constructor to allow loading in test data
+    /// Constructor to allow loading in test data
     public ConferenceRepository(InputStream testFileInputStream) throws JabRefException {
         loadConferenceDataFromInputStream(testFileInputStream);
     }
@@ -93,14 +95,12 @@ public class ConferenceRepository {
     public Optional<ConferenceEntry> getConferenceFromBookTitle(String bookTitle) {
         String query = bookTitle.strip().toLowerCase();
 
-        // Lucky path
         ConferenceEntry conference = titleToConference.get(query);
         if (conference != null) {
             return Optional.of(conference);
         }
 
         String bestMatch = fuzzySearchConferenceTitles(query);
-
         if (bestMatch.isEmpty()) {
             return Optional.empty();
         }
@@ -111,7 +111,7 @@ public class ConferenceRepository {
     }
 
     /**
-     * Searches all conference titles for the given query string using {@link StringSimilarity#similarity} as a matcher.
+     * Searches all conference titles for the given query string using {@link StringSimilarity#similarity} as a MATCHER.
      * <p>
      * The threshold for matching is set at 0.9. This function will always return the conference title with the highest
      * similarity rating.
@@ -122,11 +122,9 @@ public class ConferenceRepository {
     private String fuzzySearchConferenceTitles(String query) {
         String bestMatch = "";
         double bestSimilarity = 0.0;
-        final double FUZZY_SEARCH_THRESHOLD = 0.9;
-        StringSimilarity matcher = new StringSimilarity();
 
         for (String conferenceTitle : titleToConference.keySet()) {
-            double similarity = matcher.similarity(query, conferenceTitle);
+            double similarity = MATCHER.similarity(query, conferenceTitle);
             if (similarity >= FUZZY_SEARCH_THRESHOLD && similarity > bestSimilarity) {
                 bestMatch = conferenceTitle;
                 bestSimilarity = similarity;

@@ -11,13 +11,11 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.icore.ConferenceRepository;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -32,10 +30,8 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
     @FXML private Button visitICOREConferencePageButton;
 
     @Inject private DialogService dialogService;
-    @Inject private TaskExecutor taskExecutor;
-    @Inject private GuiPreferences preferences;
     @Inject private UndoManager undoManager;
-    @Inject private StateManager stateManager;
+    @Inject private GuiPreferences preferences;
     @Inject private ConferenceRepository conferenceRepository;
 
     private Optional<BibEntry> entry = Optional.empty();
@@ -54,10 +50,8 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
                 field,
                 suggestionProvider,
                 fieldCheckers,
-                taskExecutor,
                 dialogService,
                 undoManager,
-                stateManager,
                 preferences,
                 conferenceRepository
         );
@@ -70,6 +64,7 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
         visitICOREConferencePageButton.setTooltip(
                 new Tooltip(Localization.lang("Visit ICORE conference page"))
         );
+        visitICOREConferencePageButton.disableProperty().bind(textField.textProperty().isEmpty());
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }

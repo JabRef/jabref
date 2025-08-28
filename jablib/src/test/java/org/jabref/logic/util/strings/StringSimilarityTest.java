@@ -1,11 +1,9 @@
 package org.jabref.logic.util.strings;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StringSimilarityTest {
     private final double EPSILON_SIMILARITY = 0.00001;
@@ -27,67 +25,19 @@ class StringSimilarityTest {
             "abcdef, ab, true", // no empty strings and similarity == threshold (4)
             "abcdef, a, false" // no empty string sand similarity > threshold (4)
     })
-    void stringSimilarity(String a, String b, String expectedResult) {
+    void isSimilar(String a, String b, String expectedResult) {
         assertEquals(Boolean.valueOf(expectedResult), similarityChecker.isSimilar(a, b));
     }
 
-    @Test
-    void similarityReturnsOneForExactStrings() {
-        String a = "abcdef";
-        String b = "abcdef";
-        double expectedResult = 1.0;
-        double similarity = similarityChecker.similarity(a, b);
-
-        assertEquals(expectedResult, similarity, EPSILON_SIMILARITY);
-    }
-
-    @Test
-    void similarityReturnsZeroForNonMatchingStrings() {
-        String a = "abcdef";
-        String b = "uvwxyz";
-        double expectedResult = 0.0;
-        double similarity = similarityChecker.similarity(a, b);
-
-        assertEquals(expectedResult, similarity, EPSILON_SIMILARITY);
-    }
-
-    @Test
-    void similarityReturnsValueBetweenZeroAndOneForSimilarStrings() {
-        String a = "abc";
-        String b = "abcdefgh";
-        double exactMatch = 1.0;
-        double similarity = similarityChecker.similarity(a, b);
-
-        assertTrue(similarity >= EPSILON_SIMILARITY && similarity < exactMatch);
-    }
-
-    @Test
-    void similarityReturnsOneForEmptyStrings() {
-        String a = "";
-        String b = "";
-        double expectedResult = 1.0;
-        double similarity = similarityChecker.similarity(a, b);
-
-        assertEquals(expectedResult, similarity, EPSILON_SIMILARITY);
-    }
-
-    @Test
-    void similarityReturnsZeroWhenOneStringIsEmpty() {
-        String a = "abcdef";
-        String b = "";
-        double expectedResult = 0.0;
-        double similarity = similarityChecker.similarity(a, b);
-
-        assertEquals(expectedResult, similarity, EPSILON_SIMILARITY);
-    }
-
-    @Test
-    void similarityIsCaseInsensitive() {
-        String a = "abcdef";
-        String b = "ABCDEF";
-        double expectedResult = 1.0;
-        double similarity = similarityChecker.similarity(a, b);
-
-        assertEquals(expectedResult, similarity, EPSILON_SIMILARITY);
+    @ParameterizedTest(name = "\"{0}\" should match \"{1}\" with similarity rating of \"{2}\".")
+    @CsvSource({
+            "abcdef, abcdef, 1.0",  // same strings should match perfectly
+            "abcdef, uvwxyz, 0.0",  // different strings should not match at all
+            "'', '', 1.0",          // empty string should match perfectly
+            "abcdef, '', 0.0",      // should not match at all with one empty string
+            "abcdef, ABCDEF, 1.0"   // same string should match perfectly regardless of case
+    })
+    void stringSimilarity(String a, String b, String expectedResult) {
+        assertEquals(Double.parseDouble(expectedResult), similarityChecker.similarity(a, b), EPSILON_SIMILARITY);
     }
 }

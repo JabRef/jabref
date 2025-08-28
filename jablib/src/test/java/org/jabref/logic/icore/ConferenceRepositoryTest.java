@@ -6,12 +6,11 @@ import java.util.Optional;
 import org.jabref.logic.JabRefException;
 import org.jabref.model.icore.ConferenceEntry;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ConferenceRepositoryTest {
     private static final String TEST_DATA_FILE = "ICORETestData.csv";
@@ -23,104 +22,46 @@ public class ConferenceRepositoryTest {
         TEST_REPO = new ConferenceRepository(inputStream);
     }
 
-    @AfterAll
-    static void teardownRepo() {
-        TEST_REPO = null;
+    @ParameterizedTest(name = "Acronym \"{0}\" should match conference \"{2}\" in test repo")
+    @CsvSource({
+            // testAcronym, expectedId, expectedTitle, expectedAcronym, expectedRank
+            "HCOMP, 2264, AAAI Conference on Human Computation and Crowdsourcing, HCOMP, B",    // exact match
+            "BBBBB,,,,",    // no match found in conference data
+            "'',,,,"        // empty string should return empty
+    })
+    void getConferenceFromAcronym(
+            String testAcronym,
+            String expectedId,
+            String expectedTitle,
+            String expectedAcronym,
+            String expectedRank
+    ) {
+        Optional<ConferenceEntry> expectedResult = Optional.ofNullable(expectedId)
+                .map(_ -> new ConferenceEntry(expectedId, expectedTitle.toLowerCase(), expectedAcronym, expectedRank));
+
+        assertEquals(expectedResult, TEST_REPO.getConferenceFromAcronym(testAcronym));
     }
 
-    @Test
-    void getConferenceFromAcronymReturnsConferenceForExactMatch() {
-        Optional<ConferenceEntry> conference = TEST_REPO.getConferenceFromAcronym("HCOMP");
-        ConferenceEntry expectedResult = new ConferenceEntry(
-                "2264",
-                "AAAI Conference on Human Computation and Crowdsourcing".toLowerCase(),
-                "HCOMP",
-                "B"
-        );
+    @ParameterizedTest(name = "Booktitle \"{0}\" should match conference \"{2}\"")
+    @CsvSource({
+        // testBookTitle, expectedId, expectedTitle, expectedAcronym, expectedRank
+        "AAAI Conference on Human Computation and Crowdsourcing, 2264, AAAI Conference on Human Computation and Crowdsourcing, HCOMP, B", // exact match
+        "asdjkhasd,,,,",   // no match in conference data
+        "'',,,,",          // empty string should return empty
+        "2nd AAAI Conference on Human Computation and Crowdsourcing,2264,AAAI Conference on Human Computation and Crowdsourcing,HCOMP,B", // fuzzy match above threshold
+        "International AAAI Conference on Human Computation and Crowdsourcing,,,,", // fuzzy match below threshold
+        "Conference with similarity ADC,9,Conference With Similarity ABC,SERA,C"    // highest similarity result in fuzzy match
+    })
+    void getConferenceFromBookTitle(
+            String testBookTitle,
+            String expectedId,
+            String expectedTitle,
+            String expectedAcronym,
+            String expectedRank
+    ) {
+        Optional<ConferenceEntry> expectedResult = Optional.ofNullable(expectedId)
+                .map(_ -> new ConferenceEntry(expectedId, expectedTitle.toLowerCase(), expectedAcronym, expectedRank));
 
-        assertTrue(conference.isPresent());
-        assertEquals(expectedResult, conference.get());
-    }
-
-    @Test
-    void getConferenceFromAcronymReturnsEmptyForNoMatch() {
-        Optional<ConferenceEntry> conference = TEST_REPO.getConferenceFromAcronym("BBBBB");
-
-        assertTrue(conference.isEmpty());
-    }
-
-    @Test
-    void getConferenceFromAcronymReturnsEmptyForEmptyString() {
-        Optional<ConferenceEntry> conference = TEST_REPO.getConferenceFromAcronym("");
-
-        assertTrue(conference.isEmpty());
-    }
-
-    @Test
-    void getConferenceFromBookTitleReturnsConferenceForExactMatch() {
-        String bookTitle = "AAAI Conference on Human Computation and Crowdsourcing";
-        Optional<ConferenceEntry> conference = TEST_REPO.getConferenceFromBookTitle(bookTitle);
-        ConferenceEntry expectedResult = new ConferenceEntry(
-                "2264",
-                "AAAI Conference on Human Computation and Crowdsourcing".toLowerCase(),
-                "HCOMP",
-                "B"
-        );
-
-        assertTrue(conference.isPresent());
-        assertEquals(expectedResult, conference.get());
-    }
-
-    @Test
-    void getConferenceFromBookTitleReturnsEmptyForNoMatch() {
-        Optional<ConferenceEntry> conference = TEST_REPO.getConferenceFromBookTitle("asdjkhasd");
-
-        assertTrue(conference.isEmpty());
-    }
-
-    @Test
-    void getConferenceFromBookTitleReturnsEmptyForEmptyString() {
-        Optional<ConferenceEntry> conference = TEST_REPO.getConferenceFromBookTitle("");
-
-        assertTrue(conference.isEmpty());
-    }
-
-    @Test
-    void getConferenceFromBookTitleReturnsConferenceForFuzzyMatchAboveThreshold() {
-        // String similarity > 0.9
-        String bookTitle = "2nd AAAI Conference on Human Computation and Crowdsourcing";
-        Optional<ConferenceEntry> conference = TEST_REPO.getConferenceFromBookTitle(bookTitle);
-        ConferenceEntry expectedResult = new ConferenceEntry(
-                "2264",
-                "AAAI Conference on Human Computation and Crowdsourcing".toLowerCase(),
-                "HCOMP",
-                "B"
-        );
-
-        assertTrue(conference.isPresent());
-        assertEquals(expectedResult, conference.get());
-    }
-
-    @Test
-    void getConferenceFromBookTitleReturnsEmptyForFuzzyMatchBelowThreshold() {
-        String bookTitle = "International AAAI Conference on Human Computation and Crowdsourcing";
-        Optional<ConferenceEntry> conference = TEST_REPO.getConferenceFromBookTitle(bookTitle);
-
-        assertTrue(conference.isEmpty());
-    }
-
-    @Test
-    void getConferenceFromBookTitleReturnConferenceWithHigherSimilarity() {
-        String bookTitle = "Conference with similarity ADC";
-        Optional<ConferenceEntry> conference = TEST_REPO.getConferenceFromBookTitle(bookTitle);
-        ConferenceEntry expectedResult = new ConferenceEntry(
-                "9",
-                "Conference With Similarity ABC".toLowerCase(),
-                "SERA",
-                "C"
-        );
-
-        assertTrue(conference.isPresent());
-        assertEquals(expectedResult, conference.get());
+        assertEquals(expectedResult, TEST_REPO.getConferenceFromBookTitle(testBookTitle));
     }
 }
