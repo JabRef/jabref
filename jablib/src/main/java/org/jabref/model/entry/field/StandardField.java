@@ -137,7 +137,7 @@ public enum StandardField implements Field {
 
     CITATIONCOUNT("citationcount"),
     GROUPS("groups"),
-    ICORERANKING("icoreranking"),
+    ICORERANKING("icore"),
     OWNER("owner"),
 
     // Timestamp-realted
