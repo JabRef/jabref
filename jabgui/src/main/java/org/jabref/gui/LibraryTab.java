@@ -399,10 +399,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 tabTitle.append('*');
             }
 
-            // Filename
             Path databasePath = file.get();
-            String fileName = databasePath.getFileName().toString();
-            tabTitle.append(fileName);
+            tabTitle.append(databasePath.getFileName().toString());
+            Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
+            uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
             toolTipText.append(databasePath.toAbsolutePath());
 
             if (databaseLocation == DatabaseLocation.SHARED) {
@@ -419,10 +419,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             if (isChanged && !isAutosaveEnabled) {
                 addChangedInformation(toolTipText);
             }
-
-            // Unique path fragment
-            Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
-            uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append('*');
