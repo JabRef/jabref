@@ -78,6 +78,5 @@ public class CSLAdapter {
             cslInstance.setOutputFormat(newFormat.getFormat());
             format = newFormat;
         }
-        cslInstance.setConvertLinks(true);
     }
 }
