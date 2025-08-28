@@ -8,7 +8,11 @@ on:
   pull_request:
   merge_group:
   workflow_dispatch:
-
+  # Re-run JBang tests after the SNAPSHOT is updated
+  workflow_run:
+    workflows: ["Publish to maven central"]
+    types:
+      - completed
 env:
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
