@@ -865,7 +865,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             int skippedCount = tracker.getSkippedCount();
 
             String targetName = bibDatabaseContext.getDatabasePath()
-                .map(path -> path.getFileName().toString())
+                .flatMap(path -> FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), path))
                 .orElse(Localization.lang("target library"));
 
             if (importedCount == entriesToAdd.size()) {
