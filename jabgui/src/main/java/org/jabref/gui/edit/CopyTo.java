@@ -108,12 +108,14 @@ public class CopyTo extends SimpleCommand {
             } else {
                 dialogService.notify(Localization.lang(partialMessage, String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
             }
+            if (sourceDatabaseContext != null) {
+                LinkedFileTransferHelper
+                    .adjustLinkedFilesForTarget(sourceDatabaseContext,
+                        targetDatabaseContext, filePreferences);
+            }
         });
 
         importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd, tracker);
-        tracker.setOnFinish(() -> LinkedFileTransferHelper
-          .adjustLinkedFilesForTarget(sourceDatabaseContext, targetDatabaseContext, filePreferences)
-        );
     }
 
     public Optional<BibEntry> getCrossRefEntry(BibEntry bibEntryToCheck, BibDatabaseContext sourceDatabaseContext) {

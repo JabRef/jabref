@@ -816,6 +816,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void copyEntry() {
+        clipBoardManager.setSourceBibDatabaseContext(this.getBibDatabaseContext());
         int entriesCopied = doCopyEntry(getSelectedEntries());
         if (entriesCopied >= 0) {
             dialogService.notify(Localization.lang("Copied %0 entry(s)", entriesCopied));
@@ -908,6 +909,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void cutEntry() {
+        clipBoardManager.setSourceBibDatabaseContext(this.getBibDatabaseContext());
         int entriesCopied = doCopyEntry(getSelectedEntries());
         int entriesDeleted = doDeleteEntry(StandardActions.CUT, mainTable.getSelectedEntries());
 

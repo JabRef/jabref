@@ -30,15 +30,13 @@ public class EditAction extends SimpleCommand {
     private final StandardActions action;
     private final StateManager stateManager;
     private final UndoManager undoManager;
-    private final ClipBoardManager clipBoardManager;
 
     public EditAction(StandardActions action, Supplier<LibraryTab> tabSupplier, StateManager stateManager,
-                      UndoManager undoManager, ClipBoardManager clipBoardManager) {
+                      UndoManager undoManager) {
         this.action = action;
         this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
-        this.clipBoardManager = clipBoardManager;
 
         if (action == StandardActions.PASTE) {
             this.executable.bind(ActionHelper.needsDatabase(stateManager));
@@ -82,11 +80,9 @@ public class EditAction extends SimpleCommand {
 
                 switch (action) {
                     case COPY -> {
-                        clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
                         tabSupplier.get().copyEntry();
                     }
                     case CUT -> {
-                        clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
                         tabSupplier.get().cutEntry();
                     }
                     case PASTE -> tabSupplier.get().pasteEntry();
