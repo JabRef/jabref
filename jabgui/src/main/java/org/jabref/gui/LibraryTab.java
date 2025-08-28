@@ -103,6 +103,7 @@ import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -856,7 +857,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         copyEntriesWithFeedback(entriesToAdd, sourceBibDatabaseContext);
     }
 
-    private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd, BibDatabaseContext sourceBibDatabaseContext) {
+    private void copyEntriesWithFeedback(@NonNull List<BibEntry> entriesToAdd, @Nullable BibDatabaseContext sourceBibDatabaseContext) {
         final List<BibEntry> finalEntriesToAdd = entriesToAdd;
 
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(finalEntriesToAdd.size());
