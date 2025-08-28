@@ -1,32 +1,22 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class NormalizeISSNTest {
 
     private final NormalizeIssn formatISSN = new NormalizeIssn();
 
-    @Test
-    void returnValidIssnUnchanged() {
-        assertEquals("0123-4567", formatISSN.format("0123-4567"));
-    }
-
-    @Test
-    void addMissingDashToIssn() {
-        assertEquals("0123-4567", formatISSN.format("01234567"));
-    }
-
-    @Test
-    void leavesInvalidInputUnchanged() {
-        assertEquals("Banana", formatISSN.format("Banana"));
-    }
-
-    @Test
-    void emptyOrNullReturnsSame() {
-        assertEquals("", formatISSN.format(""));
-        assertThrows(NullPointerException.class, () -> formatISSN.format(null));
+    @ParameterizedTest
+    @CsvSource({
+            "0123-4567, 0123-4567",
+            "01234567, 0123-4567",
+            "Banana, Banana",
+            "'',''"
+    })
+    void testIssnFormatting(String input, String expected) {
+        assertEquals(expected, formatISSN.format(input));
     }
 }

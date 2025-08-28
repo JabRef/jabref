@@ -86,9 +86,11 @@ public class Formatters {
                 new LatexCleanupFormatter(),
                 new MinifyNameListFormatter(),
                 new NormalizeDateFormatter(),
+                new NormalizeIssn(),
                 new NormalizeMonthFormatter(),
                 new NormalizeNamesFormatter(),
                 new NormalizePagesFormatter(),
+                new NormalizeUnicodeFormatter(),
                 new OrdinalsToSuperscriptFormatter(),
                 new RemoveEnclosingBracesFormatter(),
                 new RemoveWordEnclosingAndOuterEnclosingBracesFormatter(),
@@ -97,10 +99,8 @@ public class Formatters {
                 new EscapeAmpersandsFormatter(),
                 new EscapeDollarSignFormatter(),
                 new ShortenDOIFormatter(),
-                new NormalizeUnicodeFormatter(),
                 new ReplaceUnicodeLigaturesFormatter(),
-                new UnprotectTermsFormatter(),
-                new NormalizeIssn()
+                new UnprotectTermsFormatter()
         );
     }
 

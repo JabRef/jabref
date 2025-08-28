@@ -1,10 +1,10 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Objects;
-
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.ISSN;
+
+import org.jspecify.annotations.NonNull;
 
 public class NormalizeIssn extends Formatter {
 
@@ -19,8 +19,7 @@ public class NormalizeIssn extends Formatter {
     }
 
     @Override
-    public String format(String value) {
-        Objects.requireNonNull(value);
+    public String format(@NonNull String value) {
         if (value.isBlank()) {
             return value;
         }
