@@ -20,13 +20,13 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import com.google.common.annotations.VisibleForTesting;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,12 +207,12 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(getBaseURL().toURI());
         BiodiversityLibraryTransformer transformer = new BiodiversityLibraryTransformer();
         uriBuilder.addParameter("op", "PublicationSearch");
         uriBuilder.addParameter("searchtype", "C");
-        uriBuilder.addParameter("searchterm", transformer.transformLuceneQuery(luceneQuery).orElse(""));
+        uriBuilder.addParameter("searchterm", transformer.transformSearchQuery(query).orElse(""));
         return uriBuilder.build().toURL();
     }
 }
