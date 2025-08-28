@@ -1,0 +1,15 @@
+name: Label PRs with "status: changes-requested"
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  label-changes-required:
+    if: github.event.review.state == 'changes_requested'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add "status: changes-required" label
+        run: gh issue --repo ${{ github.repository }} edit ${{ github.event.pull_request.number }} --add-label "status: changes-required"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
