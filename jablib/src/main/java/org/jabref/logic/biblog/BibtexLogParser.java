@@ -3,7 +3,6 @@ package org.jabref.logic.biblog;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -28,13 +27,10 @@ public class BibtexLogParser {
     private static final String MULTI_INVALID_FIELD_PREFIX = "field - one of '";
 
     public List<BibWarning> parseBiblog(@NonNull Path blgFilePath) throws IOException {
-        List<BibWarning> warnings = new ArrayList<>();
-        List<String> lines = Files.readAllLines(blgFilePath);
-        for (String line : lines) {
-            Optional<BibWarning> potentialWarning = parseWarningLine(line);
-            potentialWarning.ifPresent(warnings::add);
-        }
-        return warnings;
+        return Files.lines(blgFilePath)
+                    .map(this::parseWarningLine)
+                    .flatMap(Optional::stream)
+                    .toList();
     }
 
     /// Parses a single line from a .blg file to identify a warning.
