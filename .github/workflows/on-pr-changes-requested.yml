@@ -1,4 +1,4 @@
-name: Label PRs with "status: changes-requested"
+name: Adapt PR status labels
 
 on:
   pull_request_review:
@@ -9,7 +9,10 @@ jobs:
     if: github.event.review.state == 'changes_requested'
     runs-on: ubuntu-latest
     steps:
-      - name: Add "status: changes-required" label
-        run: gh issue --repo ${{ github.repository }} edit ${{ github.event.pull_request.number }} --add-label "status: changes-required"
+      - name: Adapt labels
+        run: |
+          gh issue --repo ${{ github.repository }} edit ${{ github.event.pull_request.number }} --remove-label "status: ready-for-review"
+          gh issue --repo ${{ github.repository }} edit ${{ github.event.pull_request.number }} --remove-label "status: awaiting-second-review"
+          gh issue --repo ${{ github.repository }} edit ${{ github.event.pull_request.number }} --add-label "status: changes-required"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
