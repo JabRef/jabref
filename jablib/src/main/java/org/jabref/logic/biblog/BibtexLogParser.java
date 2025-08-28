@@ -45,11 +45,9 @@ public class BibtexLogParser {
     ///     `[Log line] > WARN - Datamodel: [entry type] entry '[entryKey]' ([fileName]): [message]`
     ///     For example: `Biber.pm:123> WARN - Datamodel: article entry 'Scholey_2013' (file.bib): Invalid field 'journal'`
     ///
-    /// **Parameters:**
-    /// * `line` - The single line from the .blg file to parse.
+    /// @param line The single line from the .blg file to parse.
     ///
-    /// **Returns:**
-    /// * An `Optional` containing a `BibWarning` if a match is found, or an empty `Optional` otherwise.
+    /// @returns An `Optional` containing a `BibWarning` if a match is found, or an empty `Optional` otherwise.
     Optional<BibWarning> parseWarningLine(String line) {
         Matcher bibtexMatcher = BIBTEX_WARNING_PATTERN.matcher(line);
         if (bibtexMatcher.find()) {
