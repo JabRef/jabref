@@ -1,16 +1,17 @@
 name: Publish to maven central
 
 on:
-  pull_request:
+  # On releases
   push:
-    branches:
-      - main
     tags:
       - '**'
-  schedule:
-    # Run on each Monday
-    # Additional run in addition to the other events, because some resources could have changes
-    - cron: '2 3 * * 1'
+
+  # Called by the JBang testing jobs to ensure that SNAPSHOT is uptodate
+  workflow_call:
+    secrets:
+      KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64:
+        required: true
+
   workflow_dispatch:
     inputs:
       tagbuild:
@@ -18,6 +19,11 @@ on:
         required: false
         default: false
         type: boolean
+
+  # Additional run in addition to the other events, because some resources could have changes
+  schedule:
+    # Run on each Monday
+    - cron: '2 3 * * 1'
 
 permissions:
   actions: write
@@ -56,7 +62,8 @@ jobs:
       github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
       (needs.detect_changes.outputs.changed == 'true' &&
-        ((github.event_name == 'push' && github.repository == 'JabRef/jabref') ||
+        ((github.event_name == 'workflow_call' && github.repository == 'JabRef/jabref') ||
+         (github.event_name == 'push' && github.repository == 'JabRef/jabref') ||
          (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'JabRef/jabref'))
       )
     runs-on: ubuntu-latest
