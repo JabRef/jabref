@@ -8,10 +8,6 @@ on:
 
   # Called by the JBang testing jobs to ensure that SNAPSHOT is uptodate
   workflow_call:
-    inputs:
-      pr_head_repo:
-        type: string
-        required: true
     secrets:
       KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64:
         required: true
@@ -66,7 +62,7 @@ jobs:
       github.event_name == 'schedule' ||
       github.event_name == 'workflow_dispatch' ||
       (needs.detect_changes.outputs.changed == 'true' &&
-        ((github.event_name == 'workflow_call' && github.repository == 'JabRef/jabref' && inputs.pr_head_repo == 'JabRef/jabref') ||
+        ((github.event_name == 'workflow_call' && github.repository == 'JabRef/jabref') ||
          (github.event_name == 'push' && github.repository == 'JabRef/jabref') ||
          (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'JabRef/jabref'))
       )
