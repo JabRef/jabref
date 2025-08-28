@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -452,7 +452,7 @@ class FileUtilTest {
     @Test
     @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
     void simpleRelativizeSymlinks() throws IOException {
-        Path realDir = bibTempDir.resolve("realDir");
+        Path realDir = bibTempDir.resolve("realDir_" + UUID.randomUUID());
         Files.createDirectories(realDir);
 
         Path simpleFile = Files.createFile(realDir.resolve("simple.pdf"));
@@ -466,7 +466,7 @@ class FileUtilTest {
     @Test
     @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
     void chainedRelativizeSymlinks() throws IOException {
-        Path chainReal = bibTempDir.resolve("chainReal");
+        Path chainReal = bibTempDir.resolve("chainReal_" + UUID.randomUUID());
         Files.createDirectories(chainReal);
 
         Path chainedFile = Files.createFile(chainReal.resolve("chained.pdf"));
@@ -482,7 +482,7 @@ class FileUtilTest {
     @Test
     @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
     void nestedRelativizeSymlinks() throws IOException {
-        Path realDir = bibTempDir.resolve("realDir");
+        Path realDir = bibTempDir.resolve("realDir_" + UUID.randomUUID());
         Files.createDirectories(realDir);
 
         Path nestedDir = realDir.resolve("nested");
@@ -498,7 +498,7 @@ class FileUtilTest {
     @Test
     @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
     void unrelatedFileRemainsAbsolute() throws IOException {
-        Path realDir = bibTempDir.resolve("realDir");
+        Path realDir = bibTempDir.resolve("realDir_" + UUID.randomUUID());
         Files.createDirectories(realDir);
         Path symlinkDir = bibTempDir.resolve("symlinkDir");
         Files.createSymbolicLink(symlinkDir, realDir);
