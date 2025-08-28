@@ -26,9 +26,6 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  # required for publish.yml
-  actions: write
-  contents: read
   pull-requests: write
 
 jobs:
