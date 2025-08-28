@@ -39,7 +39,7 @@ public interface NodeResolver {
     /// @param selector the CSS selector to find the node
     /// @return a resolver that finds the node by selector
     static NodeResolver selector(@NonNull String selector) {
-        return scene -> scene.getRoot().lookupAll(selector).stream().filter(NodeHelper::isTreeVisible).findFirst();
+        return scene -> scene.getRoot().lookupAll(selector).stream().filter(NodeResolver::isVisible).findFirst();
     }
 
     /// Creates a resolver that finds a node by its fx:id. The returned node is
@@ -62,7 +62,7 @@ public interface NodeResolver {
                 .concat(scene.getRoot().lookupAll(".button").stream(),
                         scene.getRoot().lookupAll(".icon-button").stream())
                 .filter(node -> {
-                    if (!(node instanceof ButtonBase button) || !NodeHelper.isTreeVisible(button)) {
+                    if (!(node instanceof ButtonBase button) || !NodeResolver.isVisible(button)) {
                         return false;
                     }
                     Node graphic = button.getGraphic();
@@ -79,7 +79,7 @@ public interface NodeResolver {
     /// @return a resolver that finds the node matching the predicate
     static NodeResolver predicate(@NonNull Predicate<Node> predicate) {
         return scene -> Optional.ofNullable(findNode(scene.getRoot(),
-                node -> NodeHelper.isTreeVisible(node) && predicate.test(node)));
+                node -> NodeResolver.isVisible(node) && predicate.test(node)));
     }
 
     /// Creates a resolver that finds a button by its StandardAction. The button is
@@ -90,7 +90,7 @@ public interface NodeResolver {
     /// @return a resolver that finds the button by action
     static NodeResolver action(@NonNull StandardActions action) {
         return scene -> Optional.ofNullable(findNode(scene.getRoot(), node -> {
-            if (!(node instanceof ButtonBase button) || !NodeHelper.isTreeVisible(button)) {
+            if (!(node instanceof ButtonBase button) || !NodeResolver.isVisible(button)) {
                 return false;
             }
 
@@ -165,7 +165,7 @@ public interface NodeResolver {
             }
 
             return menu.getItems().stream()
-                       .filter(item -> NodeHelper.isTreeVisible(item.getStyleableNode()))
+                       .filter(item -> NodeResolver.isVisible(item.getStyleableNode()))
                        .filter(item -> Optional
                                .ofNullable(item.getText())
                                .map(str -> str.contains(Localization.lang(key)))
@@ -190,5 +190,9 @@ public interface NodeResolver {
         }
 
         return null;
+    }
+
+    private static boolean isVisible(@Nullable Node node) {
+        return node != null && NodeHelper.isTreeVisible(node);
     }
 }

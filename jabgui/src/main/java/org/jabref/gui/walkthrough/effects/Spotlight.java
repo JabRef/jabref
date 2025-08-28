@@ -15,6 +15,7 @@ import javafx.util.Duration;
 
 import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -76,10 +77,10 @@ public final class Spotlight extends BaseWindowEffect {
         );
 
         InvalidationListener updater = _ -> updateOverlayShape();
-        hole.xProperty().addListener(updater);
-        hole.yProperty().addListener(updater);
-        hole.widthProperty().addListener(updater);
-        hole.heightProperty().addListener(updater);
+        subscriptions.add(EasyBind.listen(hole.xProperty(), updater));
+        subscriptions.add(EasyBind.listen(hole.yProperty(), updater));
+        subscriptions.add(EasyBind.listen(hole.widthProperty(), updater));
+        subscriptions.add(EasyBind.listen(hole.heightProperty(), updater));
 
         transitionAnimation.setOnFinished(_ -> {
             if (this.node != null) {
@@ -88,11 +89,6 @@ public final class Spotlight extends BaseWindowEffect {
             this.node = newNode;
             setupListeners(this.node);
             updateLayout();
-
-            hole.xProperty().removeListener(updater);
-            hole.yProperty().removeListener(updater);
-            hole.widthProperty().removeListener(updater);
-            hole.heightProperty().removeListener(updater);
         });
 
         transitionAnimation.play();
@@ -104,6 +100,7 @@ public final class Spotlight extends BaseWindowEffect {
 
     @Override
     public void detach() {
+        super.detach();
         if (node == null) {
             throw new IllegalStateException("Spotlight is not attached to any node.");
         }
@@ -111,7 +108,6 @@ public final class Spotlight extends BaseWindowEffect {
             transitionAnimation.stop();
             transitionAnimation = null;
         }
-        super.detach();
         Shape overlayShape = this.overlayShape;
         if (overlayShape != null && overlayShape.getParent() instanceof Pane parentPane) {
             parentPane.getChildren().remove(overlayShape);

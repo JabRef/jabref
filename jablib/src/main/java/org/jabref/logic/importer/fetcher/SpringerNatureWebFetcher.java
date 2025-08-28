@@ -37,10 +37,10 @@ import org.slf4j.LoggerFactory;
  *
  * @see <a href="https://dev.springernature.com/">API documentation</a> for more details
  */
-public class SpringerFetcher implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
+public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Springer";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringerNatureWebFetcher.class);
 
     private static final String API_URL = "https://api.springernature.com/meta/v1/json";
     // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
@@ -48,7 +48,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher, Customiza
 
     private final ImporterPreferences importerPreferences;
 
-    public SpringerFetcher(ImporterPreferences importerPreferences) {
+    public SpringerNatureWebFetcher(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
     }
 
