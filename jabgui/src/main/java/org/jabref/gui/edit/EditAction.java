@@ -78,12 +78,8 @@ public class EditAction extends SimpleCommand {
                 // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea
 
                 switch (action) {
-                    case COPY -> {
-                        tabSupplier.get().copyEntry();
-                    }
-                    case CUT -> {
-                        tabSupplier.get().cutEntry();
-                    }
+                    case COPY -> tabSupplier.get().copyEntry();
+                    case CUT -> tabSupplier.get().cutEntry();
                     case PASTE -> tabSupplier.get().pasteEntry();
                     case DELETE_ENTRY -> tabSupplier.get().deleteEntry();
                     case UNDO -> {
