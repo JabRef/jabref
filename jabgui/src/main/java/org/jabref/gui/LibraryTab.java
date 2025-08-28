@@ -611,7 +611,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
      * Ask if the user really wants to close the given database.
      * Offers to save or discard the changes -- or return to the library
      *
-     * @return <code>true</code> if the user choose to close the database
+     * @return <code>true</code> if the user chooses to close the database
      */
     private boolean confirmClose() {
         // Database could not have been changed, since it is still loading
