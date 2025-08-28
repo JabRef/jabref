@@ -456,7 +456,7 @@ class FileUtilTest {
         Files.createDirectories(realDir);
 
         Path simpleFile = Files.createFile(realDir.resolve("simple.pdf"));
-        Path symlinkDir = bibTempDir.resolve("symlinkDir");
+        Path symlinkDir = bibTempDir.resolve("symlinkDir_" + UUID.randomUUID());
         Files.createSymbolicLink(symlinkDir, realDir);
 
         Path result = FileUtil.relativize(simpleFile, List.of(symlinkDir));
@@ -470,9 +470,9 @@ class FileUtilTest {
         Files.createDirectories(chainReal);
 
         Path chainedFile = Files.createFile(chainReal.resolve("chained.pdf"));
-        Path chainLink2 = bibTempDir.resolve("chainLink2");
+        Path chainLink2 = bibTempDir.resolve("chainLink2_" + UUID.randomUUID());
         Files.createSymbolicLink(chainLink2, chainReal);
-        Path chainLink1 = bibTempDir.resolve("chainLink1");
+        Path chainLink1 = bibTempDir.resolve("chainLink1_" + UUID.randomUUID());
         Files.createSymbolicLink(chainLink1, chainLink2);
 
         Path result = FileUtil.relativize(chainedFile, List.of(chainLink1));
@@ -485,10 +485,10 @@ class FileUtilTest {
         Path realDir = bibTempDir.resolve("realDir_" + UUID.randomUUID());
         Files.createDirectories(realDir);
 
-        Path nestedDir = realDir.resolve("nested");
+        Path nestedDir = realDir.resolve("nested_" + UUID.randomUUID());
         Files.createDirectories(nestedDir);
         Path nestedFile = Files.createFile(nestedDir.resolve("nested.pdf"));
-        Path nestedSymlink = realDir.resolve("nestedLink");
+        Path nestedSymlink = realDir.resolve("nestedLink_" + UUID.randomUUID());
         Files.createSymbolicLink(nestedSymlink, nestedDir);
 
         Path result = FileUtil.relativize(nestedFile, List.of(nestedSymlink));
@@ -500,7 +500,7 @@ class FileUtilTest {
     void unrelatedFileRemainsAbsolute() throws IOException {
         Path realDir = bibTempDir.resolve("realDir_" + UUID.randomUUID());
         Files.createDirectories(realDir);
-        Path symlinkDir = bibTempDir.resolve("symlinkDir");
+        Path symlinkDir = bibTempDir.resolve("symlinkDir_" + UUID.randomUUID());
         Files.createSymbolicLink(symlinkDir, realDir);
 
         Path outsideFile = Files.createFile(bibTempDir.resolve("outside.pdf"));
