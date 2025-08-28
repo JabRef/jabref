@@ -51,14 +51,6 @@ public class CitationStyleGenerator {
         return generateBibliography(bibEntries, style, CitationStyleOutputFormat.HTML, context, entryTypesManager).getFirst();
     }
 
-    /**
-     * Generates a bibliography list in Markdown format based on a given list of entries and .csl style source content with a default {@link BibDatabaseContext}.
-     */
-    protected static String generateBibliographyMarkdown(List<BibEntry> bibEntries, String style, BibEntryTypesManager entryTypesManager) {
-        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(bibEntries));
-        context.setMode(BibDatabaseMode.BIBLATEX);
-        return generateBibliography(bibEntries, style, CitationStyleOutputFormat.MARKDOWN, context, entryTypesManager).getFirst();
-    }
 
     /**
      * Generates a bibliography list based on a given list of entries, .csl style source content and output format with a given {@link BibDatabaseContext}.
@@ -85,10 +77,4 @@ public class CitationStyleGenerator {
         }
     }
 
-    /**
-     * Generates a bibliography list in Markdown format based on a given list of entries, .csl style source content and a given {@link BibDatabaseContext}.
-     */
-    public static List<String> generateBibliographyMarkdown(List<BibEntry> bibEntries, String style, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) {
-        return generateBibliography(bibEntries, style, CitationStyleOutputFormat.MARKDOWN, databaseContext, entryTypesManager);
-    }
 }

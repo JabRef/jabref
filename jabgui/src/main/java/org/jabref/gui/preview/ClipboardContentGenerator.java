@@ -23,11 +23,10 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
-import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 public class ClipboardContentGenerator {
 
-    private PreviewPreferences previewPreferences;
+    private final PreviewPreferences previewPreferences;
     private final LayoutFormatterPreferences layoutFormatterPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
 
@@ -46,7 +45,7 @@ public class ClipboardContentGenerator {
             return switch (outputFormat) {
                 case HTML -> processHtml(citations);
                 case TEXT -> processText(citations);
-                case MARKDOWN -> processMarkdown(citations, true);
+                case MARKDOWN -> processMarkdown(citations);
             };
         } else {
             // if it is not a citation style take care of the preview
@@ -123,55 +122,17 @@ public class ClipboardContentGenerator {
     }
 
     /**
-     * Converts a list of citations to Markdown.
+     * Joins each citation using the platform-specific newline into a single Markdown string (from citeproc) and copies it to the clipboard.
+     * <p>
+     * A trailing newline is appended if missing to keep the behavior consistent with other output formats
+     * and to satisfy tests expecting a newline-terminated string.
      *
-     * Behavior:
-     * - If the citations appear to be HTML (e.g., CSL HTML output), convert via Flexmark (HTML -> Markdown).
-     * - Otherwise, assume the citations are already Markdown (e.g., CSL Markdown output) and just join them.
+     * @param citations the list of already-formatted citation strings to be combined as Markdown
+     * @return clipboard content containing the Markdown representation in its plain string flavor
      */
     @VisibleForTesting
     static ClipboardContent processMarkdown(List<String> citations) {
-        // Default behavior (non-CSL-aware): detect HTML vs Markdown by content
-        return processMarkdown(citations, false);
-    }
-
-    /**
-     * Converts a list of citations to Markdown.
-     *
-     * If fromCitationStyle is true, we assume the list items are already Markdown (produced by citeproc-java with
-     * output format MARKDOWN) and simply join them with new lines. Otherwise, we fall back to HTML detection and
-     * Flexmark-based conversion when needed.
-     */
-    @VisibleForTesting
-    static ClipboardContent processMarkdown(List<String> citations, boolean fromCitationStyle) {
-        String markdown;
-        if (fromCitationStyle) {
-            markdown = String.join(OS.NEWLINE, citations);
-        } else {
-            boolean looksLikeHtml = citations.stream().anyMatch(s -> (s != null) && s.contains("<") && s.contains(">"));
-
-            if (looksLikeHtml) {
-                // Existing behavior: wrap HTML and use Flexmark to convert to Markdown
-                String result = "<!DOCTYPE html>" + OS.NEWLINE +
-                        "<html>" + OS.NEWLINE +
-                        "   <head>" + OS.NEWLINE +
-                        "      <meta charset=\"utf-8\">" + OS.NEWLINE +
-                        "   </head>" + OS.NEWLINE +
-                        "   <body>" + OS.NEWLINE + OS.NEWLINE;
-
-                result += String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
-                result += OS.NEWLINE +
-                        "   </body>" + OS.NEWLINE +
-                        "</html>" + OS.NEWLINE;
-
-                FlexmarkHtmlConverter converter = FlexmarkHtmlConverter.builder().build();
-                markdown = converter.convert(result);
-            } else {
-                // Assume already Markdown (e.g., citeproc-java's "markdown" output)
-                // Join entries with a single newline between them
-                markdown = String.join(OS.NEWLINE, citations);
-            }
-        }
+        String markdown = String.join(OS.NEWLINE, citations);
 
         // Ensure trailing newline at end for consistency with other output formats/tests
         if (!markdown.endsWith(OS.NEWLINE)) {
