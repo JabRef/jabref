@@ -11,6 +11,14 @@ on:
     secrets:
       KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64:
         required: true
+      KOPPOR_SIGNING_KEYID:
+        required: true
+      KOPPOR_SIGNING_PASSWORD:
+        required: true
+      KOPPOR_MAVENCENTRALUSERNAME:
+        required: true
+      KOPPOR_MAVENCENTRALPASSWORD:
+        required: true
 
   workflow_dispatch:
     inputs:
