@@ -64,13 +64,13 @@ public sealed abstract class BaseWindowEffect permits Spotlight, FullScreenDarke
             setupWindowListeners(scene.getWindow());
         }
 
-        node.sceneProperty().addListener((_, _, newScene) -> {
+        subscriptions.add(EasyBind.listen(node.sceneProperty(), (_, _, newScene) -> {
             if (newScene != null) {
                 subscriptions.add(EasyBind.listen(newScene.widthProperty(), debouncedUpdater));
                 subscriptions.add(EasyBind.listen(newScene.heightProperty(), debouncedUpdater));
                 setupWindowListeners(newScene.getWindow());
             }
-        });
+        }));
     }
 
     protected void setupPaneListeners() {
