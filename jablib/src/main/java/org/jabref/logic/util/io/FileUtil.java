@@ -158,7 +158,7 @@ public class FileUtil {
     /// @param paths       List of paths as Strings
     /// @param comparePath The to be shortened path
     ///
-    /// @return Shortest unique path frament (if exists) - Optional.empty() if the paths are disjoint
+    /// @return Shortest unique path fragment (if exists) - Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
                                           .filter(part -> comparePath.toString().contains(part))
