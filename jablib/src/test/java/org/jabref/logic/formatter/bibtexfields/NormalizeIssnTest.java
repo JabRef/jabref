@@ -16,7 +16,7 @@ class NormalizeISSNTest {
             "Banana, Banana",
             "'',''"
     })
-    void testIssnFormatting(String input, String expected) {
+    void issnFormatting(String input, String expected) {
         assertEquals(expected, formatISSN.format(input));
     }
 }
