@@ -253,7 +253,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
-            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
+            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ ->
                     updateTabTitle(changedProperty.getValue()));
         });
     }
