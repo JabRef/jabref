@@ -858,9 +858,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     private void copyEntriesWithFeedback(@NonNull List<BibEntry> entriesToAdd, @Nullable BibDatabaseContext sourceBibDatabaseContext) {
-        final List<BibEntry> finalEntriesToAdd = entriesToAdd;
-
-        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(finalEntriesToAdd.size());
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(entriesToAdd.size());
 
         tracker.setOnFinish(() -> {
             int importedCount = tracker.getImportedCount();
@@ -870,7 +868,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 .map(path -> path.getFileName().toString())
                 .orElse(Localization.lang("target library"));
 
-            if (importedCount == finalEntriesToAdd.size()) {
+            if (importedCount == entriesToAdd.size()) {
                 dialogService.notify(Localization.lang("Pasted %0 entry(s) to %1",
               String.valueOf(importedCount), targetName));
             } else if (importedCount == 0) {
@@ -886,7 +884,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
         });
 
-        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, finalEntriesToAdd, tracker);
+        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd, tracker);
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
