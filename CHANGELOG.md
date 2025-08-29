@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We fixed an issue where "Print preview" would throw a `NullPointerException` if no printers were available. [#13708](https://github.com/JabRef/jabref/issues/13708)
 - We added the option to enable the language server in the preferences. [#13697](https://github.com/JabRef/jabref/pull/13697)
 - We introduced an option in Preferences under (under Linked files -> Linked file name conventions) to automatically rename linked files when an entry data changes. [#11316](https://github.com/JabRef/jabref/issues/11316)
 - We added tooltips (on hover) for 'Library-specific file directory', 'User-specific file directory' and 'LaTeX file directory' fields of the library properties window. [#12269](https://github.com/JabRef/jabref/issues/12269)
