@@ -19,6 +19,10 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/BibLatexFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/NatbibFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/MMDFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/PandocFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/TypstFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/CAYWFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/FormatterService.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/SimpleJsonFormatter.java
