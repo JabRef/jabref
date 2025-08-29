@@ -28,7 +28,7 @@ class CAYWResourceTest extends ServerTest {
             @Override protected void configure() {
                 SrvStateManager mockSrv = Mockito.mock(SrvStateManager.class);
                 BibEntry bibEntry = new BibEntry();
-                bibEntry.setCitationKey("Author2025test");
+                bibEntry.setCitationKey("Author2023test");
                 Mockito.when(mockSrv.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(bibEntry));
                 bind(mockSrv).to(SrvStateManager.class);
             }

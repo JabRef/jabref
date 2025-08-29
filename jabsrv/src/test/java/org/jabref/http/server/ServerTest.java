@@ -84,7 +84,7 @@ public abstract class ServerTest extends JerseyTest {
         });
     }
 
-    protected void addPreferencesToResourceConfig(ResourceConfig resourceConfig) {
+    protected void addFormatterServiceToResourceConfig(ResourceConfig resourceConfig) {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
@@ -93,7 +93,7 @@ public abstract class ServerTest extends JerseyTest {
         });
     }
 
-    protected void addFormatterServiceToResourceConfig(ResourceConfig resourceConfig) {
+    protected void addPreferencesToResourceConfig(ResourceConfig resourceConfig) {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
