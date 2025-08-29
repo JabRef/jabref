@@ -36,6 +36,8 @@ public class GenerateCitationKeys implements Runnable {
 
     @Override
     public void run() {
+        ArgumentProcessor.showBanner(sharedOptions.porcelain);
+
         Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
                 inputFile,
                 "bibtex",
