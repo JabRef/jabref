@@ -111,7 +111,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
                     Node icon = event.getIcon().getGraphicNode();
                     heading.setText(event.getDisplayText());
                     heading.getStyleClass().setAll(event.getStyleClass());
-                    event.getStackTrace().ifPresentOrElse((text) -> {
+                    event.getStackTrace().ifPresentOrElse(text -> {
                         stacktrace.setText(text);
                         stacktrace.setVisible(true);
                         stacktrace.setManaged(true);
