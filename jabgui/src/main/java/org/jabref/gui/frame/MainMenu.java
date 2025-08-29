@@ -38,6 +38,8 @@ import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
 import org.jabref.gui.git.GitCommitAction;
+import org.jabref.gui.git.GitPullAction;
+import org.jabref.gui.git.GitPushAction;
 import org.jabref.gui.git.GitShareToGitHubAction;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.ErrorConsoleAction;
@@ -180,10 +182,11 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 // region: Sharing of the library
-
                 // TODO: Should be only enabled if not yet shared.
                 factory.createSubMenu(StandardActions.GIT,
                         factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(dialogService, stateManager)),
+                        factory.createMenuItem(StandardActions.GIT_PULL, new GitPullAction(dialogService, stateManager, preferences, taskExecutor)),
+                        factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(dialogService, stateManager, preferences, taskExecutor)),
                         new SeparatorMenuItem(),
                         factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),
