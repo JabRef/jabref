@@ -37,6 +37,7 @@ import org.jabref.gui.exporter.WriteMetadataToLinkedPdfsAction;
 import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
+import org.jabref.gui.git.GitCommitAction;
 import org.jabref.gui.git.GitShareToGitHubAction;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.ErrorConsoleAction;
@@ -182,6 +183,8 @@ public class MainMenu extends MenuBar {
 
                 // TODO: Should be only enabled if not yet shared.
                 factory.createSubMenu(StandardActions.GIT,
+                        factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(dialogService, stateManager)),
+                        new SeparatorMenuItem(),
                         factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
                 ),
 
