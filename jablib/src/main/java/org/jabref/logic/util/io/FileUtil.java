@@ -141,29 +141,24 @@ public class FileUtil {
         return path.resolveSibling(path.getFileName() + extension);
     }
 
-    /**
-     * Looks for the unique directory, if any, different to the provided paths
-     *
-     * @param paths       List of paths as Strings
-     * @param comparePath The to be tested path
-     */
+    /// Looks for the shortest unique path of the parent directory in the list of paths
+    /// @param paths       List of paths as Strings
+    /// @param comparePath The to be tested path
+    ///
+    /// @return Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathDirectory(List<String> paths, Path comparePath) {
-        String fileName = comparePath.getFileName().toString();
-
-        List<String> uniquePathParts = uniquePathSubstrings(paths);
-        return uniquePathParts.stream()
-                              .filter(part -> comparePath.toString().contains(part)
-                                      && !part.equals(fileName) && part.contains(File.separator))
-                              .findFirst()
-                              .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
+        // Difference to getUniquePathFragment: We want the parent directory, so we cut off the last path fragment
+        return getUniquePathFragment(paths, comparePath)
+                .filter(part -> part.contains(File.separator))
+                .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
     }
 
-    /**
-     * Looks for the shortest unique path of the in a list of paths
-     *
-     * @param paths       List of paths as Strings
-     * @param comparePath The to be shortened path
-     */
+    /// Looks for the shortest unique path in the list of paths
+    ///
+    /// @param paths       List of paths as Strings
+    /// @param comparePath The to be shortened path
+    ///
+    /// @return Shortest unique path fragment (if exists) - Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
                                           .filter(part -> comparePath.toString().contains(part))
