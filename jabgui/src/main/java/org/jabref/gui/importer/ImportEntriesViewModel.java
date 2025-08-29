@@ -125,9 +125,11 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(preferences.getFieldPreferences());
         try {
-            new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, selectedDb.getValue().getMode());
+            // Force reformatting so the displayed BibTeX is consistently formatted
+            new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, selectedDb.getValue().getMode(), true);
         } catch (IOException ioException) {
-            return "";
+            // In case of error, fall back to the original parsed serialization if available
+            return entry.getParsedSerialization();
         }
         return writer.toString();
     }

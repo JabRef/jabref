@@ -8,11 +8,7 @@ on:
   pull_request:
   merge_group:
   workflow_dispatch:
-  # Re-run JBang tests after the SNAPSHOT is updated
-  workflow_run:
-    workflows: ["Publish to maven central"]
-    types:
-      - completed
+
 env:
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
@@ -26,6 +22,9 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
+  # required for publish.yml
+  actions: write
+  contents: read
   pull-requests: write
 
 jobs:
@@ -397,9 +396,20 @@ jobs:
           CI: "true"
           DBMS: "postgresql"
 
+  publish:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/publish.yml
+    secrets:
+      KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64: ${{ secrets.KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64 }}
+      KOPPOR_SIGNING_KEYID: ${{ secrets.KOPPOR_SIGNING_KEYID }}
+      KOPPOR_SIGNING_PASSWORD: ${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+      KOPPOR_MAVENCENTRALUSERNAME: ${{ secrets.KOPPOR_MAVENCENTRALUSERNAME }}
+      KOPPOR_MAVENCENTRALPASSWORD: ${{ secrets.KOPPOR_MAVENCENTRALPASSWORD }}
+
   jbang:
     name: JBang (main)
     runs-on: ubuntu-latest
+    needs: publish
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout source
@@ -435,6 +445,7 @@ jobs:
   jbang-pr:
     name: JBang (PR)
     runs-on: ubuntu-latest
+    # does not need publish, because the JBang scripts are modified
     if: github.ref != 'refs/heads/main'
     strategy:
       fail-fast: false
