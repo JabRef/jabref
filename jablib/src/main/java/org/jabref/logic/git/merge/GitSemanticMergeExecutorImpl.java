@@ -5,9 +5,11 @@ import java.nio.file.Path;
 
 import org.jabref.logic.git.conflicts.SemanticConflictDetector;
 import org.jabref.logic.git.io.GitFileWriter;
-import org.jabref.logic.git.model.MergeResult;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.metadata.MetaData;
 
 public class GitSemanticMergeExecutorImpl implements GitSemanticMergeExecutor {
 
@@ -18,16 +20,21 @@ public class GitSemanticMergeExecutorImpl implements GitSemanticMergeExecutor {
     }
 
     @Override
-    public MergeResult merge(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote, Path bibFilePath) throws IOException {
+    public MergePlan merge(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote, Path bibFilePath) throws IOException {
         // 1. extract merge plan from base -> remote
-        MergePlan plan = SemanticConflictDetector.extractMergePlan(base, remote);
+        MergePlan plan = SemanticConflictDetector.extractMergePlan(base, local, remote);
+
+        BibDatabaseContext working = new BibDatabaseContext(new BibDatabase(), new MetaData());
+        for (BibEntry entry : local.getDatabase().getEntries()) {
+            working.getDatabase().insertEntry(new BibEntry(entry));
+        }
 
         // 2. apply remote changes to local
-        SemanticMerger.applyMergePlan(local, plan);
+        SemanticMerger.applyMergePlan(working, plan);
 
         // 3. write back merged content
-        GitFileWriter.write(bibFilePath, local, importFormatPreferences);
+        GitFileWriter.write(bibFilePath, working, importFormatPreferences);
 
-        return MergeResult.success();
+        return plan;
     }
 }
