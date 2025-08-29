@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -30,13 +31,13 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.support.BibEntryAssert;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -60,13 +61,13 @@ class ArgumentProcessorTest {
         when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferences.getSearchPreferences()).thenReturn(new SearchPreferences(
-                SearchDisplayMode.FILTER,
-                EnumSet.noneOf(SearchFlags.class),
-                false,
-                false,
-                0,
-                0,
-                0));
+                                                                                  SearchDisplayMode.FILTER,
+                                                                                  EnumSet.noneOf(SearchFlags.class),
+                                                                                  false,
+                                                                                  false,
+                                                                                  0,
+                                                                                  0,
+                                                                                  0));
 
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
         commandLine = new CommandLine(argumentProcessor);
@@ -74,16 +75,22 @@ class ArgumentProcessorTest {
 
     @Test
     void auxImport(@TempDir Path tempDir) throws URISyntaxException {
-        String fullBib = Path.of(ArgumentProcessorTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
-        String auxFile = Path.of(ArgumentProcessorTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
+        URL originUrl = ArgumentProcessorTest.class.getResource("origin.bib");
+        assertNotNull(originUrl, "Test resource origin.bib not found on classpath");
+        String fullBib = Path.of(originUrl.toURI()).toAbsolutePath().toString();
+
+        URL auxUrl = ArgumentProcessorTest.class.getResource("paper.aux");
+        assertNotNull(auxUrl, "Test resource paper.aux not found on classpath");
+        String auxFile = Path.of(auxUrl.toURI()).toAbsolutePath().toString();
 
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
 
         List<String> args = List.of("generate-bib-from-aux", "--aux", auxFile, "--input", fullBib, "--output", outputBib.toString());
 
-        commandLine.execute(args.toArray(String[]::new));
+        int rc = commandLine.execute(args.toArray(String[]::new));
+        assertEquals(0, rc, "CLI returned non-zero exit code for auxImport: " + rc);
 
-        assertTrue(Files.exists(outputBib));
+        assertTrue(Files.exists(outputBib), "Expected output bib to exist: " + outputBib);
     }
 
     @Test
@@ -92,9 +99,8 @@ class ArgumentProcessorTest {
         String originBibFile = originBib.toAbsolutePath().toString();
 
         Path expectedBib = Path.of(
-                Objects.requireNonNull(ArgumentProcessorTest.class.getResource("ArgumentProcessorTestExportMatches.bib"))
-                       .toURI()
-        );
+                                   Objects.requireNonNull(ArgumentProcessorTest.class.getResource("ArgumentProcessorTestExportMatches.bib"))
+                                          .toURI());
 
         BibtexImporter bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
         List<BibEntry> expectedEntries = bibtexImporter.importDatabase(expectedBib).getDatabase().getEntries();
@@ -103,9 +109,10 @@ class ArgumentProcessorTest {
 
         List<String> args = List.of("search", "--debug", "--query", "author=Einstein", "--input", originBibFile, "--output", outputBib.toString());
 
-        commandLine.execute(args.toArray(String[]::new));
+        int rc = commandLine.execute(args.toArray(String[]::new));
+        assertEquals(0, rc, "CLI returned non-zero exit code for search: " + rc);
 
-        assertTrue(Files.exists(outputBib));
+        assertTrue(Files.exists(outputBib), "Expected output bib to exist: " + outputBib);
         BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);
     }
 
@@ -117,7 +124,7 @@ class ArgumentProcessorTest {
         Path outputHtml = tempDir.resolve("output.html").toAbsolutePath();
         String outputHtmlFile = outputHtml.toAbsolutePath().toString();
 
-        when(importerPreferences.getCustomImporters()) .thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
 
         SaveOrder saveOrder = new SaveOrder(SaveOrder.OrderType.TABLE, List.of());
         ExportPreferences exportPreferences = new ExportPreferences(".html", tempDir, saveOrder, List.of());
@@ -129,13 +136,13 @@ class ArgumentProcessorTest {
 
         List<String> args = List.of("convert", "--input", originBibFile, "--input-format", "bibtex", "--output", outputHtmlFile, "--output-format", "tablerefsabsbib");
 
-        commandLine.execute(args.toArray(String[]::new));
+        int rc = commandLine.execute(args.toArray(String[]::new));
+        assertEquals(0, rc, "CLI returned non-zero exit code for convert: " + rc);
 
-        assertTrue(Files.exists(outputHtml));
+        assertTrue(Files.exists(outputHtml), "Expected output html to exist: " + outputHtml);
     }
 
     @Test
-    @Disabled("Does not work in this branch, but we did not touch it. TODO: Fix this")
     void checkConsistency() throws URISyntaxException {
         Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
@@ -143,16 +150,19 @@ class ArgumentProcessorTest {
         List<String> args = List.of("check-consistency", "--input", testBibFile, "--output-format", "txt");
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent, true));
+        PrintStream originalOut = System.out;
+        try {
+            System.setOut(new PrintStream(outContent, true));
 
-        int executionResult = commandLine.execute(args.toArray(String[]::new));
+            int executionResult = commandLine.execute(args.toArray(String[]::new));
 
-        String output = outContent.toString();
-        assertTrue(output.contains("Checking consistency for entry type 1 of 1\n"));
-        assertTrue(output.contains("Consistency check completed"));
-        assertEquals(0, executionResult);
-
-        System.setOut(System.out);
+            String output = outContent.toString();
+            assertTrue(output.contains("Checking consistency for entry type 1 of 1\n"), "Unexpected stdout:\n" + output);
+            assertTrue(output.contains("Consistency check completed"), "Unexpected stdout:\n" + output);
+            assertEquals(0, executionResult, "Non-zero exit code for check-consistency: " + executionResult + "\nstdout:\n" + output);
+        } finally {
+            System.setOut(originalOut);
+        }
     }
 
     @Test
@@ -164,14 +174,17 @@ class ArgumentProcessorTest {
         List<String> args = List.of("check-consistency", "--input", testBibFile, "--porcelain");
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
+        PrintStream originalOut = System.out;
+        try {
+            System.setOut(new PrintStream(outContent, true));
 
-        int executionResult = commandLine.execute(args.toArray(String[]::new));
+            int executionResult = commandLine.execute(args.toArray(String[]::new));
 
-        String output = outContent.toString();
-        assertEquals("", output);
-        assertEquals(0, executionResult);
-
-        System.setOut(System.out);
+            String output = outContent.toString();
+            assertEquals("", output.trim(), "Unexpected stdout for porcelain check; content:\n" + output);
+            assertEquals(0, executionResult, "Non-zero exit code for check-consistency --porcelain: " + executionResult + "\nstdout:\n" + output);
+        } finally {
+            System.setOut(originalOut);
+        }
     }
 }
