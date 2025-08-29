@@ -2143,47 +2143,69 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* ErrorConsole */
-
 #errorConsole .list-content {
-    -fx-padding: 0.625em;
+    -fx-padding: 0em;
 }
 
 #errorConsole .info-section {
-    -fx-padding: 0.625em;
-    -fx-background-color: -fx-background;
+    -fx-graphic-text-gap: 0.8em;
+    -fx-font-size: 1.1em;
+    -fx-line-spacing: 0.2em;
+    -fx-padding: 0.6em 1em;
+    -fx-background-color: -jr-transparent-accent;
 }
 
-#errorConsole .info-section .glyph-icon {
-    -fx-font-size: 24.0;
+#errorConsole .button-bar {
+    -fx-padding: 1em 0em 0em 0em;
+}
+
+#errorConsole .error-console-cell {
+    -fx-padding: 0.6em 1em;
+}
+
+#errorConsole .error-console-cell HBox {
+    -fx-spacing: 0.8em;
+}
+
+#errorConsole .message-box {
+    -fx-spacing: 0.5em;
+}
+
+#errorConsole .info-section .glyph-icon,
+#errorConsole .exception .glyph-icon,
+#errorConsole .output .glyph-icon,
+#errorConsole .log .glyph-icon
+{
+    -fx-font-size: 1.5em;
 }
 
 #errorConsole .exception .glyph-icon {
-    -fx-font-size: 18.0;
-    -fx-fill: -jr-error;
+    -fx-icon-color: -jr-error;
 }
 
 #errorConsole .output .glyph-icon {
-    -fx-font-size: 18.0;
-    -fx-fill: -jr-warn;
+    -fx-icon-color: -jr-warn;
 }
 
 #errorConsole .log .glyph-icon {
-    -fx-font-size: 18.0;
-    -fx-fill: -jr-info;
+    -fx-icon-color: -jr-info;
 }
 
-#errorConsole .custom-buttons {
-    -fx-padding: 0.312em;
+/* Poor readability on -jr-accent. See: https://webaim.org/resources/contrastchecker/?fcolor=9E4C00&bcolor=A3B7E6 */
+#errorConsole .error-console-cell:selected .exception .glyph-icon {
+    -fx-icon-color: derive(-jr-error, -50%);
 }
 
-#errorConsole .exception {
-    -fx-text-fill: -fx-text-base-color;
+#errorConsole .error-console-cell:selected .output .glyph-icon {
+    -fx-icon-color: derive(-jr-warn, -50%);
 }
 
-#errorConsole .output {
-    -fx-text-fill: -fx-text-base-color;
+#errorConsole .error-console-cell:selected .log .glyph-icon {
+    -fx-icon-color: derive(-jr-info, -50%);
 }
 
+#errorConsole .exception,
+#errorConsole .output,
 #errorConsole .log {
     -fx-text-fill: -fx-text-base-color;
 }
