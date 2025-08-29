@@ -19,6 +19,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
+import scala.annotation.meta.field;
+
 import static com.google.common.collect.Sets.union;
 
 /// Detects semantic merge conflicts between base, local, and remote.
@@ -221,17 +223,16 @@ public class SemanticConflictDetector {
         return new MergePlan(fieldPatches, newEntries);
     }
 
-    /**
-     * Compares base and remote and constructs a patch at the field level. null == the field is deleted.
-     * - Apply remote change when local kept base value (including deletions: null);
-     * - If both sides changed to the same value, no patch needed;
-     * - Fallback: if a divergence is still observed, do not override local; skip this field,
-     *
-     * @param base base version
-     * @param local local version
-     * @param remote remote version
-     * @return A map from field to new value
-     */
+    /// Compares base and remote and constructs a patch at the field level. null == the field is deleted.
+    ///
+    /// - Apply remote change when local kept base value (including deletions: null);
+    /// - If both sides changed to the same value, no patch needed;
+    /// - Fallback: if a divergence is still observed, do not override local; skip this field,
+    ///
+    /// @param base base version
+    /// @param local local version
+    /// @param remote remote version
+    /// @return A map from field to new value
     private static Map<Field, String> computeFieldPatch(BibEntry base, BibEntry local, BibEntry remote) {
         Map<Field, String> patch = new LinkedHashMap<>();
 

@@ -109,6 +109,7 @@ public class GitSyncService {
         }
     }
 
+    /// @param baseCommitOpt Optional base commit (empty if TODO)
     public PullResult performSemanticMerge(Git git,
                                             Optional<RevCommit> baseCommitOpt,
                                             RevCommit remoteCommit,
@@ -139,7 +140,9 @@ public class GitSyncService {
 
         // 2. Conflict detection
         List<ThreeWayEntryConflict> conflicts = SemanticConflictDetector.detectConflicts(base, local, remote);
-
+        // At this stage, there are "patches" which are clear, and patches which are "unclear", because there are conflicting changes
+        // if the set of "unclear" patches (i.e., conflicting changes), resolve them, which makes them to "clear" patches
+        // Rough idea: Have a merge plan containing "resolvedMergedPlan" and "conflictingChangs" - and turn the conflictingChagnes to resolvedMergePlan - "ConflicitingMergePlan" - and the (existing) MergePlan
         BibDatabaseContext localPrime;
         if (conflicts.isEmpty()) {
             localPrime = local;
@@ -151,8 +154,13 @@ public class GitSyncService {
             if (resolved.isEmpty()) {
                 throw new JabRefException("Merge aborted: Conflict resolution was canceled or denied.");
             }
+            // TODO: Replace this by dertermining a merge plan
             localPrime = GitMergeUtil.replaceEntries(local, resolved);
         }
+
+        // At this place, the merge paln is clear - and does not have any conflicts (because if there are unresolved conflicts, whe throw a JabRefException)
+        // We need to do a merge commit
+        // TODO: Create merge commit - contents: current disk contents - parent: baseCommitOpt and remoteCommit
 
         return PullResult.merged(localPrime.getDatabase().getEntries());
     }
