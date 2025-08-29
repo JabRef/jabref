@@ -96,7 +96,7 @@ public class ErrorConsoleView extends BaseDialog<Void> {
                 message = new VBox();
                 message.setAlignment(Pos.CENTER_LEFT);
                 message.getChildren().setAll(heading, stacktrace);
-                message.getStyleClass().add("message-box"); // Add this style class
+                message.getStyleClass().add("message-box");
                 setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
                 getStyleClass().add("error-console-cell");
             }
