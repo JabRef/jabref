@@ -15,10 +15,11 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 public class GitFileWriter {
-    private static final ConcurrentHashMap<Path, Object> FILELOCKS = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Path, Object> FILE_LOCKS = new ConcurrentHashMap<>();
 
+    /// @implNote this should be in sync with {@link org.jabref.gui.exporter.SaveDatabaseAction#saveDatabase}
     public static void write(Path file, BibDatabaseContext bibDatabaseContext, ImportFormatPreferences importPrefs) throws IOException {
-        Object lock = FILELOCKS.computeIfAbsent(file.toAbsolutePath().normalize(), key -> new Object());
+        Object lock = FILE_LOCKS.computeIfAbsent(file.toAbsolutePath().normalize(), _ -> new Object());
 
         SelfContainedSaveConfiguration saveConfiguration = new SelfContainedSaveConfiguration();
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
