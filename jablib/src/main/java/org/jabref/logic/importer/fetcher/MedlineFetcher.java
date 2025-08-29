@@ -33,9 +33,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -187,10 +187,10 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     }
 
     @Override
-    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
+    public List<BibEntry> performSearch(BaseQueryNode queryNode) throws FetcherException {
         List<BibEntry> entryList;
         MedlineQueryTransformer transformer = new MedlineQueryTransformer();
-        Optional<String> transformedQuery = transformer.transformLuceneQuery(luceneQuery);
+        Optional<String> transformedQuery = transformer.transformSearchQuery(queryNode);
 
         if (transformedQuery.isEmpty() || transformedQuery.get().isBlank()) {
             return List.of();

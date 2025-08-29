@@ -130,7 +130,10 @@
     Hey, we noticed that you **force-pushed** your changes.
     Force pushing is a bad practice when working together on a project (mainly because it is [not supported well by GitHub itself](https://github.com/orgs/community/discussions/3478)).
     Commits are lost and comments on commits lose their context, thus making it harder to review changes.
-    At the end, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) anyway before being merged into the `main` branch.
+
+
+    When the pull request is getting integrated into `main`, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) anyway.
+    Thus, your individual commit history will not be visible in `main`.
 
 
     In future, **please avoid that**. For now, you can continue working.

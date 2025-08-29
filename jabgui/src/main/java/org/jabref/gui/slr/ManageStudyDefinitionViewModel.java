@@ -28,7 +28,7 @@ import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
-import org.jabref.logic.importer.fetcher.SpringerFetcher;
+import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
@@ -48,7 +48,7 @@ public class ManageStudyDefinitionViewModel {
     private static final Set<String> DEFAULT_SELECTION = Set.of(
             ACMPortalFetcher.FETCHER_NAME,
             IEEE.FETCHER_NAME,
-            SpringerFetcher.FETCHER_NAME,
+            SpringerNatureWebFetcher.FETCHER_NAME,
             DBLPFetcher.FETCHER_NAME);
 
     private final StringProperty title = new SimpleStringProperty();

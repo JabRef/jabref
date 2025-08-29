@@ -116,7 +116,7 @@ class CompositeSearchBasedFetcherTest {
         when(importerPreferences.getApiKey(eq(SemanticScholarCitationFetcher.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.semanticScholarApiKey));
         when(importerPreferences.getApiKey(eq(BiodiversityLibrary.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.biodiversityHeritageApiKey));
         when(importerPreferences.getApiKey(eq(ScienceDirect.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.scienceDirectApiKey));
-        when(importerPreferences.getApiKey(eq(SpringerFetcher.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.springerNatureAPIKey));
+        when(importerPreferences.getApiKey(eq(SpringerNatureWebFetcher.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.springerNatureAPIKey));
         when(importerPreferences.getApiKey(eq(IEEE.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.ieeeAPIKey));
 
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
@@ -130,7 +130,7 @@ class CompositeSearchBasedFetcherTest {
                 new ZbMATH(importFormatPreferences),
                 new GoogleScholar(importFormatPreferences),
                 new DBLPFetcher(importFormatPreferences),
-                new SpringerFetcher(importerPreferences),
+                new SpringerNatureWebFetcher(importerPreferences),
                 new CrossRef(),
                 new CiteSeer(),
                 new DOAJFetcher(importFormatPreferences),
