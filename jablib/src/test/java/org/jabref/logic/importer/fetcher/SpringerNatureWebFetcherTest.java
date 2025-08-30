@@ -27,15 +27,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
+class SpringerNatureWebFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
-    SpringerFetcher fetcher;
+    SpringerNatureWebFetcher fetcher;
 
     @BeforeEach
     void setUp() {
         BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
-        fetcher = new SpringerFetcher(importerPreferences);
+        fetcher = new SpringerNatureWebFetcher(importerPreferences);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importerPreferences.getApiKey(fetcher.getName())).thenReturn(Optional.of(buildInfo.springerNatureAPIKey));
     }
@@ -159,7 +159,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
                         }""";
 
         JSONObject jsonObject = new JSONObject(jsonString);
-        BibEntry bibEntry = SpringerFetcher.parseSpringerJSONtoBibtex(jsonObject);
+        BibEntry bibEntry = SpringerNatureWebFetcher.parseSpringerJSONtoBibtex(jsonObject);
         assertEquals(Optional.of("1992"), bibEntry.getField(StandardField.YEAR));
         assertEquals(Optional.of("5"), bibEntry.getField(StandardField.NUMBER));
         assertEquals(Optional.of("#sep#"), bibEntry.getField(StandardField.MONTH));

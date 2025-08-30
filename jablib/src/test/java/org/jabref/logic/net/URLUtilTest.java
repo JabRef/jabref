@@ -118,9 +118,18 @@ class URLUtilTest {
     }
 
     @Test
-    void uriMissingScheme() {
+    void urlStartingWithWww() throws MalformedURLException {
+        // URLs starting with www. should be prefixed with https://
+        URL result = URLUtil.create("www.example.com");
+        assertNotNull(result);
+        assertEquals("https://www.example.com", result.toString());
+    }
+
+    @Test
+    void uriMissingSchemeAndNotStartingWithWww() {
+        // URLs not starting with www. and without a scheme should still throw an exception
         MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
-                URLUtil.create("www.example.com"));
+                URLUtil.create("example.com"));
         assertTrue(exception.getMessage().contains("not absolute"));
     }
 
