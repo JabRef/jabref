@@ -2,11 +2,12 @@ package org.jabref.cli;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -30,6 +31,7 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.support.BibEntryAssert;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -37,7 +39,6 @@ import org.mockito.Answers;
 import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -52,6 +53,23 @@ class ArgumentProcessorTest {
 
     private CommandLine commandLine;
 
+    @BeforeAll
+    static void checkTestResources() {
+        String[] required = new String[] {"origin.bib", "paper.aux", "ArgumentProcessorTestExportMatches.bib"};
+        StringBuilder missing = new StringBuilder();
+        for (String res : required) {
+            if (ArgumentProcessorTest.class.getResource(res) == null) {
+                if (missing.length() > 0) {
+                    missing.append(", ");
+                }
+                missing.append(res);
+            }
+        }
+        if (missing.length() > 0) {
+            throw new IllegalStateException("Required test resources missing from classpath: " + missing);
+        }
+    }
+
     @BeforeEach()
     void setup() {
         when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
@@ -60,37 +78,40 @@ class ArgumentProcessorTest {
         when(preferences.getExportPreferences()).thenReturn(exportPreferences);
         when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
-        when(preferences.getSearchPreferences()).thenReturn(new SearchPreferences(
-                                                                                  SearchDisplayMode.FILTER,
-                                                                                  EnumSet.noneOf(SearchFlags.class),
-                                                                                  false,
-                                                                                  false,
-                                                                                  0,
-                                                                                  0,
-                                                                                  0));
+        when(preferences.getSearchPreferences()).thenReturn(new SearchPreferences(SearchDisplayMode.FILTER, EnumSet.noneOf(SearchFlags.class), false, false, 0, 0, 0));
 
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
         commandLine = new CommandLine(argumentProcessor);
     }
 
     @Test
-    void auxImport(@TempDir Path tempDir) throws URISyntaxException {
-        URL originUrl = ArgumentProcessorTest.class.getResource("origin.bib");
-        assertNotNull(originUrl, "Test resource origin.bib not found on classpath");
-        String fullBib = Path.of(originUrl.toURI()).toAbsolutePath().toString();
+    void auxImport(@TempDir Path tempDir) throws IOException {
+        try (InputStream originIs = ArgumentProcessorTest.class.getResourceAsStream("origin.bib");
+             InputStream auxIs = ArgumentProcessorTest.class.getResourceAsStream("paper.aux")) {
+            if (originIs == null || auxIs == null) {
+                throw new IllegalStateException("Required test resources are missing from classpath");
+            }
 
-        URL auxUrl = ArgumentProcessorTest.class.getResource("paper.aux");
-        assertNotNull(auxUrl, "Test resource paper.aux not found on classpath");
-        String auxFile = Path.of(auxUrl.toURI()).toAbsolutePath().toString();
+            Path fullBib = tempDir.resolve("origin.bib");
+            Files.copy(originIs, fullBib, StandardCopyOption.REPLACE_EXISTING);
 
-        Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
+            Path auxFilePath = tempDir.resolve("paper.aux");
+            Files.copy(auxIs, auxFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-        List<String> args = List.of("generate-bib-from-aux", "--aux", auxFile, "--input", fullBib, "--output", outputBib.toString());
+            Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
 
-        int rc = commandLine.execute(args.toArray(String[]::new));
-        assertEquals(0, rc, "CLI returned non-zero exit code for auxImport: " + rc);
+            List<String> args = List.of("generate-bib-from-aux", "--aux", auxFilePath.toString(), "--input", fullBib.toString(), "--output", outputBib.toString());
 
-        assertTrue(Files.exists(outputBib), "Expected output bib to exist: " + outputBib);
+            int rc = commandLine.execute(args.toArray(String[]::new));
+            assertEquals(0, rc, "CLI returned non-zero exit code for auxImport: " + rc);
+
+            assertTrue(Files.exists(outputBib), "Expected output bib to exist: " + outputBib);
+
+            // Validate the produced bib can be parsed and contains at least one entry
+            BibtexImporter importer = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
+            List<BibEntry> entries = importer.importDatabase(outputBib).getDatabase().getEntries();
+            assertTrue(entries != null && !entries.isEmpty(), "Expected output bib to contain at least one entry");
+        }
     }
 
     @Test
