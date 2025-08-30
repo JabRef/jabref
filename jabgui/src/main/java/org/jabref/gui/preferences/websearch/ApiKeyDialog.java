@@ -22,7 +22,6 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class ApiKeyDialog extends FXDialog {
-    /// The length at which the status message is shown after testing the API key
     public static final Duration STATUS_DURATION = Duration.seconds(5);
 
     @FXML private TextField apiKeyField;
