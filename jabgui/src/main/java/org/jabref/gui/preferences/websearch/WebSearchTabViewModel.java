@@ -169,17 +169,17 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
             }
             boolean isEnabled = enabledCatalogs.contains(fetcher.getName());
             boolean isCustomizable = customizableFetcherNames.contains(fetcher.getName());
-            FetcherViewModel vm = new FetcherViewModel(fetcher, isEnabled, isCustomizable);
+            FetcherViewModel fetcherViewModel = new FetcherViewModel(fetcher, isEnabled, isCustomizable);
             if (isCustomizable) {
                 savedApiKeys.stream()
                             .filter(apiKey -> apiKey.getName().equals(fetcher.getName()))
                             .findFirst()
                             .ifPresent(apiKey -> {
-                                vm.apiKeyProperty().set(apiKey.getKey());
-                                vm.useCustomApiKeyProperty().set(apiKey.shouldUse());
+                                fetcherViewModel.apiKeyProperty().set(apiKey.getKey());
+                                fetcherViewModel.useCustomApiKeyProperty().set(apiKey.shouldUse());
                             });
             }
-            fetchers.add(vm);
+            fetchers.add(fetcherViewModel);
         }
 
         apikeyPersistAvailableProperty.setValue(OS.isKeyringAvailable());
@@ -211,11 +211,11 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                 fetchers.stream()
                         .filter(FetcherViewModel::isEnabled)
                         .map(FetcherViewModel::getName)
-                .collect(Collectors.toList()));
+                        .toList());
 
         List<FetcherApiKey> apiKeysToStore = fetchers.stream()
                                                      .filter(FetcherViewModel::isCustomizable)
-                                                     .map(vm -> new FetcherApiKey(vm.getName(), vm.shouldUseCustomApiKey(), vm.getApiKey()))
+                                                     .map(fetcherViewModel -> new FetcherApiKey(fetcherViewModel.getName(), fetcherViewModel.shouldUseCustomApiKey(), fetcherViewModel.getApiKey()))
                                                      .toList();
 
         importerPreferences.setPersistCustomKeys(apikeyPersistProperty.get());
@@ -308,6 +308,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
             try {
                 URLDownload urlDownload = new URLDownload(testUrlWithoutApiKey + apiKey);
+                // The HEAD request cannot be used because its response is not 200 (maybe 404 or 596...).
                 int statusCode = ((HttpURLConnection) urlDownload.getSource().openConnection()).getResponseCode();
                 return (statusCode >= 200) && (statusCode < 300);
             } catch (IOException | UnirestException e) {

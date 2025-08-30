@@ -56,7 +56,7 @@ public class ApiKeyDialog extends FXDialog {
             okButton.disableProperty().bind(apiKeyValid.not());
         }
 
-        apiKeyField.textProperty().addListener((obs, oldValue, newValue) -> {
+        apiKeyField.textProperty().addListener((_, _, newValue) -> {
             apiKeyValid.set(newValue.isEmpty());
             testButton.setGraphic(null);
             testButton.setText(Localization.lang("Test connection"));
