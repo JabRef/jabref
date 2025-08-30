@@ -77,8 +77,8 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     private final BackgroundTask<ParserResult> task;
     private final BibDatabaseContext database;
     private ImportEntriesViewModel viewModel;
-    private final SearchBasedFetcher searchBasedFetcher;
-    private final String query;
+    private final Optional<SearchBasedFetcher> searchBasedFetcher;
+    private final Optional<String> query;
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
@@ -97,7 +97,12 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
      * @param task     the task executed for parsing the selected files(s).
      */
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
-        this(database, task, null, null);
+        this.database = database;
+        this.task = task;
+        this.searchBasedFetcher = Optional.empty();
+        this.query = Optional.empty();
+
+        initializeDialog();
     }
 
     /**
@@ -112,32 +117,10 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, SearchBasedFetcher fetcher, String query) {
         this.database = database;
         this.task = task;
-        this.searchBasedFetcher = fetcher;
-        this.query = query;
+        this.searchBasedFetcher = Optional.of(fetcher);
+        this.query = Optional.of(query);
 
-        ViewLoader.view(this)
-                  .load()
-                  .setAsDialogPane(this);
-
-        boolean showPagination = (searchBasedFetcher != null) && (query != null);
-        paginationBox.setVisible(showPagination);
-        paginationBox.setManaged(showPagination);
-
-        BooleanBinding booleanBind = Bindings.isEmpty(entriesListView.getCheckModel().getCheckedItems());
-        Button btn = (Button) this.getDialogPane().lookupButton(importButton);
-        btn.disableProperty().bind(booleanBind);
-
-        downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldDownloadLinkedFiles());
-
-        setResultConverter(button -> {
-            if (button == importButton) {
-                viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
-            } else {
-                dialogService.notify(Localization.lang("Import canceled"));
-            }
-
-            return false;
-        });
+        initializeDialog();
     }
 
     @FXML
@@ -231,10 +214,35 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         totalItems.textProperty().bind(Bindings.size(viewModel.getAllEntries()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
         initBibTeX();
-        if (searchBasedFetcher != null) {
+        if (searchBasedFetcher.isPresent()) {
             updatePageUI();
             setupPaginationBindings();
         }
+    }
+
+    private void initializeDialog() {
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
+
+        paginationBox.setVisible(searchBasedFetcher.isPresent());
+        paginationBox.setManaged(searchBasedFetcher.isPresent());
+
+        BooleanBinding booleanBind = Bindings.isEmpty(entriesListView.getCheckModel().getCheckedItems());
+        Button btn = (Button) this.getDialogPane().lookupButton(importButton);
+        btn.disableProperty().bind(booleanBind);
+
+        downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldDownloadLinkedFiles());
+
+        setResultConverter(button -> {
+            if (button == importButton) {
+                viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
+            } else {
+                dialogService.notify(Localization.lang("Import canceled"));
+            }
+
+            return false;
+        });
     }
 
     private void setupPaginationBindings() {
@@ -248,7 +256,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         }, viewModel.currentPageProperty(), viewModel.totalPagesProperty());
 
         BooleanBinding isPagedFetcher = Bindings.createBooleanBinding(() ->
-            searchBasedFetcher instanceof PagedSearchBasedFetcher
+            searchBasedFetcher.isPresent() && searchBasedFetcher.get() instanceof PagedSearchBasedFetcher
         );
 
         // Disable: during loading OR when on the last page for non-paged fetchers
@@ -306,7 +314,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                 )
         );
 
-        loading.addListener((obs, oldVal, newVal) -> {
+        loading.addListener((_, _, newVal) -> {
             getDialogPane().getScene().setCursor(newVal ? Cursor.WAIT : Cursor.DEFAULT);
         });
 
@@ -382,7 +390,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     }
 
     private boolean isOnLastPageAndPagedFetcher() {
-        if (!(searchBasedFetcher instanceof PagedSearchBasedFetcher)) {
+        if (searchBasedFetcher.isEmpty() || !(searchBasedFetcher.get() instanceof PagedSearchBasedFetcher)) {
             return false;
         }
 
@@ -400,7 +408,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @FXML
     private void onNextPage() {
         if (isOnLastPageAndPagedFetcher()) {
-            viewModel.fetchMoreEntriesFromLastPage();
+            viewModel.fetchMoreEntries();
         } else {
             viewModel.goToNextPage();
         }

@@ -70,8 +70,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final ObservableList<BibEntry> pagedEntries = FXCollections.observableArrayList();
     private final ObservableSet<BibEntry> checkedEntries = FXCollections.observableSet();
     private final ObservableList<BibEntry> allEntries = FXCollections.observableArrayList();
-    private final SearchBasedFetcher fetcher;
-    private final String query;
+    private final Optional<SearchBasedFetcher> fetcher;
+    private final Optional<String> query;
 
     /**
      * @param databaseContext the database to import into
@@ -86,8 +86,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                                   StateManager stateManager,
                                   BibEntryTypesManager entryTypesManager,
                                   FileUpdateMonitor fileUpdateMonitor,
-                                  SearchBasedFetcher fetcher,
-                                  String query) {
+                                  Optional<SearchBasedFetcher> fetcher,
+                                  Optional<String> query) {
         this.taskExecutor = taskExecutor;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
@@ -226,13 +226,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         return Optional.empty();
     }
 
-    public void fetchMoreEntriesFromLastPage() {
-        if (fetcher instanceof PagedSearchBasedFetcher pagedFetcher && !loading.get()) {
-            loading.set(true);
-            fetchMoreEntries(pagedFetcher);
-        }
-    }
-
     public void goToPrevPage() {
         if (hasPrevPage()) {
             currentPageProperty.set(currentPageProperty.get() - 1);
@@ -269,7 +262,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     }
 
     private boolean isFromWebSearch() {
-        return fetcher != null && query != null;
+        return fetcher.isPresent() && query.isPresent();
     }
 
     private void updatePagedEntries() {
@@ -284,31 +277,36 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         pagedEntries.setAll(allEntries.subList(fromIdx, toIdx));
     }
 
-    private void fetchMoreEntries(PagedSearchBasedFetcher pagedFetcher) {
-        BackgroundTask<ArrayList<BibEntry>> fetchTask = BackgroundTask
-                .wrap(() -> {
-                    LOGGER.info("Fetching entries from {} for page {}", fetcher.getName(), currentPageProperty.get() + 2);
-                    return new ArrayList<>(pagedFetcher.performSearchPaged(query, currentPageProperty.get() + 1).getContent());
-                })
-                .onSuccess(newEntries -> {
-                    if (newEntries != null && !newEntries.isEmpty()) {
-                        allEntries.addAll(newEntries);
-                        updateTotalPages();
-                    } else {
-                        LOGGER.warn("No new entries fetched from {} for page {}", fetcher.getName(), currentPageProperty.get() + 2);
-                        dialogService.notify(Localization.lang("No new entries found from %0", fetcher.getName()));
-                    }
-                    loading.set(false);
-                })
-                .onFailure(exception -> {
-                    loading.set(false);
-                    dialogService.showErrorDialogAndWait(
-                            Localization.lang("Error fetching entries"),
-                            Localization.lang("An error occurred while fetching entries from %0: %1",
-                                    fetcher.getName(), exception.getMessage())
-                    );
-                });
+    public void fetchMoreEntries() {
+        if (fetcher.isPresent() &&
+            fetcher.get() instanceof PagedSearchBasedFetcher pagedFetcher &&
+            query.isPresent() && !loading.get()) {
+            loading.set(true);
+            BackgroundTask<ArrayList<BibEntry>> fetchTask = BackgroundTask
+                    .wrap(() -> {
+                        LOGGER.info("Fetching entries from {} for page {}", fetcher.get().getName(), currentPageProperty.get() + 2);
+                        return new ArrayList<>(pagedFetcher.performSearchPaged(query.get(), currentPageProperty.get() + 1).getContent());
+                    })
+                    .onSuccess(newEntries -> {
+                        if (newEntries != null && !newEntries.isEmpty()) {
+                            allEntries.addAll(newEntries);
+                            updateTotalPages();
+                        } else {
+                            LOGGER.warn("No new entries fetched from {} for page {}", fetcher.get().getName(), currentPageProperty.get() + 2);
+                            dialogService.notify(Localization.lang("No new entries found from %0", fetcher.get().getName()));
+                        }
+                        loading.set(false);
+                    })
+                    .onFailure(exception -> {
+                        loading.set(false);
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Error fetching entries"),
+                                Localization.lang("An error occurred while fetching entries from %0: %1",
+                                        fetcher.get().getName(), exception.getMessage())
+                        );
+                    });
 
-        fetchTask.executeWith(taskExecutor);
+            fetchTask.executeWith(taskExecutor);
+        }
     }
 }
