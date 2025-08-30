@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -399,6 +400,49 @@ class LinkedFileTransferHelperTest {
         List<Path> fileDirectories = targetContext.getFileDirectories(filePreferences);
         assertEquals(1, fileDirectories.size());
         assertTrue(fileDirectories.getFirst().toString().contains("global_latex"));
+    }
+
+    // endregion
+
+    // region adjustOrCopyLinkedFilesOnTransfer disabled tests
+
+    @Test
+    void shouldReturnEmptySetWhenLinkedFileTransferDisabled(@TempDir Path tempDir) throws Exception {
+        sourceDir = tempDir.resolve("source");
+        targetDir = tempDir.resolve("target");
+
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(false);
+
+        Files.createDirectories(sourceDir);
+        Files.createDirectories(targetDir);
+
+        testFile = sourceDir.resolve("sourcefiles/test.pdf");
+        Files.createDirectories(testFile.getParent());
+        Files.createFile(testFile);
+
+        sourceContext = new BibDatabaseContext(new BibDatabase());
+        sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
+        targetContext = new BibDatabaseContext(new BibDatabase());
+        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+
+        sourceEntry = new BibEntry();
+        LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
+
+        sourceEntry.setFiles(List.of(linkedFile));
+        targetEntry = new BibEntry(sourceEntry);
+        targetEntry.setFiles(List.of(linkedFile));
+
+        sourceContext.getDatabase().insertEntry(sourceEntry);
+        targetContext.getDatabase().insertEntry(targetEntry);
+
+        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
+            filePreferences);
+
+        Path expectedFile = targetDir.resolve("sourcefiles/test.pdf");
+
+        assertTrue(returnedEntries.isEmpty());
+        assertFalse(Files.exists(expectedFile));
     }
 
     // endregion
