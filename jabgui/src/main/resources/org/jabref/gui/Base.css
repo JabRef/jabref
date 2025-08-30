@@ -405,13 +405,18 @@ TextFlow > .tooltip-text-monospaced {
     -fx-text-fill: -fx-text-base-color;
 }
 
-
 .button {
     -fx-background-color: transparent;
     -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.23); */
     -fx-border-width: 0.062em;
     -fx-border-radius: 0.25em;
     -fx-padding: 0.5em 1em 0.5em 1em;
+}
+
+.dialog-pane .button-bar .button {
+    -fx-min-width: 6em;
+    -fx-pref-width: 6em;
+    -fx-max-width: 6em;
 }
 
 .menu-button > .label {
