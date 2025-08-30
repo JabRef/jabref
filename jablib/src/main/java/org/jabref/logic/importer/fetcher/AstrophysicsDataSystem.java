@@ -136,11 +136,6 @@ public class AstrophysicsDataSystem
     }
 
     @Override
-    public Optional<HelpFile> getHelpPage() {
-        return Optional.of(HelpFile.FETCHER_ADS);
-    }
-
-    @Override
     public Parser getParser() {
         return new BibtexParser(preferences);
     }
