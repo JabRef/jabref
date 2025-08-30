@@ -20,7 +20,6 @@
          <CheckBox fx:id="cleanUpDOI" text="%Move DOIs from 'note' field and 'URL' field to 'DOI' field and remove http prefix" />
          <CheckBox fx:id="cleanUpEprint" text="%Move preprint information from 'URL' field and 'journal' field to the 'eprint' field" />
          <CheckBox fx:id="cleanUpURL" text="%Move URL in 'note' field to 'URL' field" />
-         <CheckBox fx:id="cleanUpISSN" text="%Reformat ISSN" />
          <CheckBox fx:id="cleanUpBiblatex" text="%Convert to biblatex format (e.g., store publication date in date field)" />
          <CheckBox fx:id="cleanUpBibtex" text="%Convert to BibTeX format (e.g., store publication date in year and month fields)" />
          <CheckBox fx:id="cleanUpTimestampToCreationDate" text="%Convert timestamp field to field 'creationdate'" />
@@ -45,9 +44,9 @@
          </VBox>
          <CheckBox fx:id="cleanUpDeletedFiles" text="Remove links to non existent files" />
       </VBox>
-            <FieldFormatterCleanupsPanel fx:id="formatterCleanupsPanel" />
- <padding>
-    <Insets bottom="10.0" left="15.0" right="10.0" top="10.0" />
- </padding>
+    <FieldFormatterCleanupsPanel fx:id="formatterCleanupsPanel" />
+    <padding>
+        <Insets bottom="10.0" left="15.0" right="10.0" top="10.0" />
+    </padding>
 
 </fx:root>

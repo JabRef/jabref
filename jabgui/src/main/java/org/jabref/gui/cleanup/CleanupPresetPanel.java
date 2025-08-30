@@ -28,7 +28,6 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpDOI;
     @FXML private CheckBox cleanUpEprint;
     @FXML private CheckBox cleanUpURL;
-    @FXML private CheckBox cleanUpISSN;
     @FXML private CheckBox cleanUpMovePDF;
     @FXML private CheckBox cleanUpMakePathsRelative;
     @FXML private CheckBox cleanUpRenamePDF;
@@ -117,7 +116,6 @@ public class CleanupPresetPanel extends VBox {
         cleanUpTimestampToCreationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
-        cleanUpISSN.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN));
         formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFieldFormatterCleanups().isEnabled());
         formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFieldFormatterCleanups().getConfiguredActions()));
     }
@@ -136,9 +134,6 @@ public class CleanupPresetPanel extends VBox {
         }
         if (cleanUpURL.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_URL);
-        }
-        if (cleanUpISSN.isSelected()) {
-            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         }
         if (cleanUpMakePathsRelative.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE);

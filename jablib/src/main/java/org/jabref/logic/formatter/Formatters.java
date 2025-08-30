@@ -20,6 +20,7 @@ import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import org.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeIssn;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
@@ -85,9 +86,11 @@ public class Formatters {
                 new LatexCleanupFormatter(),
                 new MinifyNameListFormatter(),
                 new NormalizeDateFormatter(),
+                new NormalizeIssn(),
                 new NormalizeMonthFormatter(),
                 new NormalizeNamesFormatter(),
                 new NormalizePagesFormatter(),
+                new NormalizeUnicodeFormatter(),
                 new OrdinalsToSuperscriptFormatter(),
                 new RemoveEnclosingBracesFormatter(),
                 new RemoveWordEnclosingAndOuterEnclosingBracesFormatter(),
@@ -96,7 +99,6 @@ public class Formatters {
                 new EscapeAmpersandsFormatter(),
                 new EscapeDollarSignFormatter(),
                 new ShortenDOIFormatter(),
-                new NormalizeUnicodeFormatter(),
                 new ReplaceUnicodeLigaturesFormatter(),
                 new UnprotectTermsFormatter()
         );
