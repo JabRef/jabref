@@ -11,7 +11,6 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -34,7 +33,6 @@ public class FromAuxDialog extends BaseDialog<Void> {
 
     @Inject private CliPreferences preferences;
     @Inject private DialogService dialogService;
-    @Inject private ThemeManager themeManager;
     @Inject private StateManager stateManager;
 
     private final LibraryTabContainer tabContainer;
@@ -57,8 +55,6 @@ public class FromAuxDialog extends BaseDialog<Void> {
             }
             return null;
         });
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     @FXML
