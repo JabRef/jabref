@@ -83,7 +83,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The Welcome tab now has a responsive layout. [#12664](https://github.com/JabRef/jabref/issues/12664)
 - We introduced a donation prompt in the Welcome tab. [#12664](https://github.com/JabRef/jabref/issues/12664)
 - We changed to syntax for the websearch to the one of the main search bar. [#13607](https://github.com/JabRef/jabref/issues/13607)
-- We improved the for the web search tab in the preferences dialog and the event viewer for debugging.
+- We improved the for the web search tab in the preferences dialog [#13791](https://github.com/JabRef/jabref/pull/13791)
+- We improved the event viewer for debugging [#13783](https://github.com/JabRef/jabref/pull/13783).
 
 ### Fixed
 
