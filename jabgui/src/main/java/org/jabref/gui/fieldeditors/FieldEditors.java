@@ -114,6 +114,8 @@ public class FieldEditors {
             return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {
             return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager, undoAction, redoAction);
+        } else if (field == StandardField.ICORERANKING) {
+            return new ICORERankingEditor(field, suggestionProvider, fieldCheckers);
         } else {
             // There was no specific editor found
 

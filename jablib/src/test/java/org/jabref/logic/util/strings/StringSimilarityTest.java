@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StringSimilarityTest {
+    private final double EPSILON_SIMILARITY = 0.00001;
 
     private StringSimilarity similarityChecker = new StringSimilarity();
 
@@ -24,7 +25,19 @@ class StringSimilarityTest {
             "abcdef, ab, true", // no empty strings and similarity == threshold (4)
             "abcdef, a, false" // no empty string sand similarity > threshold (4)
     })
-    void stringSimilarity(String a, String b, String expectedResult) {
+    void isSimilar(String a, String b, String expectedResult) {
         assertEquals(Boolean.valueOf(expectedResult), similarityChecker.isSimilar(a, b));
+    }
+
+    @ParameterizedTest(name = "\"{0}\" should match \"{1}\" with similarity rating of \"{2}\".")
+    @CsvSource({
+            "abcdef, abcdef, 1.0",  // same strings should match perfectly
+            "abcdef, uvwxyz, 0.0",  // different strings should not match at all
+            "'', '', 1.0",          // empty string should match perfectly
+            "abcdef, '', 0.0",      // should not match at all with one empty string
+            "abcdef, ABCDEF, 1.0"   // same string should match perfectly regardless of case
+    })
+    void stringSimilarity(String a, String b, String expectedResult) {
+        assertEquals(Double.parseDouble(expectedResult), similarityChecker.similarity(a, b), EPSILON_SIMILARITY);
     }
 }
