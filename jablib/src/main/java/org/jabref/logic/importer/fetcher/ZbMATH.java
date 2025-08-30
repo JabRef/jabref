@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
@@ -45,6 +46,11 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
     @Override
     public String getName() {
         return "zbMATH";
+    }
+
+    @Override
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_ZBMATH);
     }
 
     @Override

@@ -231,9 +231,4 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     public String getName() {
         return "ISIDORE";
     }
-
-    @Override
-    public Optional<HelpFile> getHelpPage() {
-        return Optional.of(HelpFile.FETCHER_ISIDORE);
-    }
 }
