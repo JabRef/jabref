@@ -1,0 +1,27 @@
+name: On PR comment
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  add-label:
+    if: >
+      github.repository_owner == 'JabRef' &&
+      github.event.issue.pull_request &&
+      (github.event.comment.user.login == 'callixtus' ||
+       github.event.comment.user.login == 'koppor' ||
+       github.event.comment.user.login == 'siedlerchr' ||
+       github.event.comment.user.login == 'subhramit')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Add label
+        run: |
+          gh issue edit ${{ github.event.issue.number }} \
+            --repo ${{ github.repository }} \
+            --add-label "status: changes-required"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
