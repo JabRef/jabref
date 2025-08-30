@@ -24,7 +24,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
@@ -48,7 +47,6 @@ public class ErrorConsoleView extends BaseDialog<Void> {
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
     @Inject private KeyBindingRepository keyBindingRepository;
-    @Inject private ThemeManager themeManager;
 
     public ErrorConsoleView() {
         this.setTitle(Localization.lang("Event log"));
@@ -61,8 +59,6 @@ public class ErrorConsoleView extends BaseDialog<Void> {
         ControlHelper.setAction(copyLogButton, getDialogPane(), event -> copyLog());
         ControlHelper.setAction(clearLogButton, getDialogPane(), event -> clearLog());
         ControlHelper.setAction(createIssueButton, getDialogPane(), event -> createIssue());
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     @FXML

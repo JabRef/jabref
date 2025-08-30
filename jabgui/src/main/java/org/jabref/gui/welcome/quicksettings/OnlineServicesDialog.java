@@ -10,7 +10,6 @@ import javafx.scene.layout.VBox;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.slr.StudyCatalogItem;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.gui.welcome.quicksettings.viewmodel.OnlineServicesDialogViewModel;
@@ -33,9 +32,8 @@ public class OnlineServicesDialog extends FXDialog {
     private OnlineServicesDialogViewModel viewModel;
     private final GuiPreferences preferences;
 
-    public OnlineServicesDialog(GuiPreferences preferences, ThemeManager themeManager) {
+    public OnlineServicesDialog(GuiPreferences preferences) {
         super(AlertType.NONE, Localization.lang("Configure web search services"), true);
-        themeManager.updateFontStyle(this.getDialogPane().getScene());
 
         this.preferences = preferences;
 
