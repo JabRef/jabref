@@ -30,7 +30,8 @@ public class EditAction extends SimpleCommand {
     private final StateManager stateManager;
     private final UndoManager undoManager;
 
-    public EditAction(StandardActions action, Supplier<LibraryTab> tabSupplier, StateManager stateManager, UndoManager undoManager) {
+    public EditAction(StandardActions action, Supplier<LibraryTab> tabSupplier, StateManager stateManager,
+                      UndoManager undoManager) {
         this.action = action;
         this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
