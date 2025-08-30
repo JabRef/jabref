@@ -46,7 +46,7 @@ public class LinkedFileTransferHelper {
         FilePreferences filePreferences
     ) {
         if (!filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()) {
-            return Collections.emptySet();
+            return Set.of();
         }
 
         Set<BibEntry> modifiedEntries = new HashSet<>();
