@@ -22,7 +22,6 @@ public class CAYWQueryParams {
     private String clipboard;
 
     @QueryParam("command")
-    @DefaultValue("autocite")
     private String command;
 
     @QueryParam("minimize")
@@ -46,8 +45,8 @@ public class CAYWQueryParams {
     @QueryParam("application")
     private String application;
 
-    public String getCommand() {
-        return command;
+    public Optional<String> getCommand() {
+        return Optional.ofNullable(command);
     }
 
     public boolean isClipboard() {

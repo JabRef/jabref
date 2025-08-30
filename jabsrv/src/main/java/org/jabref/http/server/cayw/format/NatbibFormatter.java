@@ -12,12 +12,11 @@ import jakarta.ws.rs.core.MediaType;
 import org.jvnet.hk2.annotations.Service;
 
 @Service
-public class BibLatexFormatter implements CAYWFormatter {
+public class NatbibFormatter implements CAYWFormatter {
 
     private final String defaultCommand;
 
-    public BibLatexFormatter(String defaultCommand) {
-        super();
+    public NatbibFormatter(String defaultCommand) {
         this.defaultCommand = defaultCommand;
     }
 
@@ -31,8 +30,8 @@ public class BibLatexFormatter implements CAYWFormatter {
         String command = queryParams.getCommand().orElse(defaultCommand);
 
         List<BibEntry> bibEntries = caywEntries.stream()
-                .map(CAYWEntry::bibEntry)
-                .toList();
+                                               .map(CAYWEntry::bibEntry)
+                                               .toList();
 
         return "\\%s{%s}".formatted(command,
                 bibEntries.stream()
