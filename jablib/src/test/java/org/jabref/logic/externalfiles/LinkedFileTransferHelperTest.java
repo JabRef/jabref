@@ -40,6 +40,7 @@ class LinkedFileTransferHelperTest {
         targetDir = tempDir.resolve("source");
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(sourceDir);
         Files.createDirectories(targetDir);
@@ -85,6 +86,7 @@ class LinkedFileTransferHelperTest {
         targetDir = tempDir.resolve("target/sourcefiles");
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(sourceDir);
         Files.createDirectories(targetDir);
@@ -130,6 +132,7 @@ class LinkedFileTransferHelperTest {
         targetDir = tempDir.resolve("target");
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(sourceDir);
         Files.createDirectories(targetDir);
@@ -178,6 +181,7 @@ class LinkedFileTransferHelperTest {
         targetDir = tempDir.resolve("target");
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(sourceDir);
         Files.createDirectories(targetDir);
@@ -227,6 +231,7 @@ class LinkedFileTransferHelperTest {
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         when(filePreferences.getMainFileDirectory()).thenReturn(java.util.Optional.of(globalLatexDir));
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(targetDir);
         Files.createDirectories(globalLatexDir);
@@ -259,6 +264,7 @@ class LinkedFileTransferHelperTest {
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(targetDir);
         Files.createDirectories(librarySpecificDir);
@@ -293,6 +299,7 @@ class LinkedFileTransferHelperTest {
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(targetDir);
         Files.createDirectories(userSpecificDir);
@@ -328,6 +335,7 @@ class LinkedFileTransferHelperTest {
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(targetDir);
         Files.createDirectories(librarySpecificDir);
@@ -358,6 +366,7 @@ class LinkedFileTransferHelperTest {
 
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(targetDir);
         Files.createDirectories(librarySpecificDir);
@@ -386,6 +395,7 @@ class LinkedFileTransferHelperTest {
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         when(filePreferences.getMainFileDirectory()).thenReturn(Optional.of(globalLatexDir));
         when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldAdjustOrCopyLinkedFilesOnTransfer()).thenReturn(true);
 
         Files.createDirectories(targetDir);
         Files.createDirectories(globalLatexDir);
