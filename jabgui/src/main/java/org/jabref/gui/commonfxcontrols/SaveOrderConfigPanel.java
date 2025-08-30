@@ -32,7 +32,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
 public class SaveOrderConfigPanel extends VBox {
-
     @FXML private RadioButton exportInSpecifiedOrder;
     @FXML private RadioButton exportInTableOrder;
     @FXML private RadioButton exportInOriginalOrder;
