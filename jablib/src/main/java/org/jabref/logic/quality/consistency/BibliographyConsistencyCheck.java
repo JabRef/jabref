@@ -183,14 +183,13 @@ public class BibliographyConsistencyCheck {
 
                 Set<Field> filteredFields = filterExcludedFields(entry.getFields());
 
+                entryTypeToFieldsInAllEntriesMap
+                        .computeIfAbsent(entryType, _ -> new HashSet<>(filteredFields))
+                        .retainAll(filteredFields);
+
                 entryTypeToFieldsInAnyEntryMap
                         .computeIfAbsent(entryType, _ -> new HashSet<>())
                         .addAll(filteredFields);
-                if (entryTypeToFieldsInAllEntriesMap.containsKey(entryType)) {
-                    entryTypeToFieldsInAllEntriesMap.get(entryType).retainAll(filteredFields);
-                } else {
-                    entryTypeToFieldsInAllEntriesMap.put(entryType, new HashSet<>(filteredFields));
-                }
 
                 entryTypeToEntriesMap
                         .computeIfAbsent(entryType, _ -> new HashSet<>())
