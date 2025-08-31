@@ -142,8 +142,6 @@ public class BibliographyConsistencyCheck {
             differingFields.removeAll(fieldsInAllEntries);
             assert fieldsInAllEntries != null;
 
-            differingFields.removeAll(fieldsInAllEntries);
-
             Optional<BibEntryType> typeDefOpt = entryTypeDefinitions.stream()
                                                                  .filter(def -> def.getType().equals(entryType))
                                                                  .findFirst();
