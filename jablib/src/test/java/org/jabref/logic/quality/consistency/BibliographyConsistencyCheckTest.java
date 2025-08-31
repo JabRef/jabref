@@ -197,6 +197,7 @@ class BibliographyConsistencyCheckTest {
 
     @Test
     void unsetFieldsReportedInBibtexMode() {
+        // "Online" is unknown in BibTeX, thus "date" should be reported as inconsistent (set only in one entry)
         BibEntry withDate = new BibEntry(StandardEntryType.Online)
                 .withCitationKey("withDate")
                 .withField(StandardField.DATE, "date")
@@ -213,8 +214,10 @@ class BibliographyConsistencyCheckTest {
         bibContext.setMode(BibDatabaseMode.BIBTEX);
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
                 .check(bibContext, (_, _) -> { });
+        BibliographyConsistencyCheck.EntryTypeResult typeResult =
+                result.entryTypeToResultMap().get(StandardEntryType.Online);
 
-        assertEquals(Map.of(), result.entryTypeToResultMap());
+        assertEquals(List.of(withDate), typeResult.sortedEntries().stream().toList());
     }
 
     @Test

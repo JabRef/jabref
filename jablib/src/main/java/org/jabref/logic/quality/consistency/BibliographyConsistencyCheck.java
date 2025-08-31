@@ -178,23 +178,21 @@ public class BibliographyConsistencyCheck {
         };
 
         for (BibEntry entry : entries) {
-            if (typeSet.contains(entry.getType())) {
-                EntryType entryType = entry.getType();
+            EntryType entryType = entry.getType();
 
-                Set<Field> filteredFields = filterExcludedFields(entry.getFields());
+            Set<Field> filteredFields = filterExcludedFields(entry.getFields());
 
-                entryTypeToFieldsInAllEntriesMap
-                        .computeIfAbsent(entryType, _ -> new HashSet<>(filteredFields))
-                        .retainAll(filteredFields);
+            entryTypeToFieldsInAllEntriesMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>(filteredFields))
+                    .retainAll(filteredFields);
 
-                entryTypeToFieldsInAnyEntryMap
-                        .computeIfAbsent(entryType, _ -> new HashSet<>())
-                        .addAll(filteredFields);
+            entryTypeToFieldsInAnyEntryMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>())
+                    .addAll(filteredFields);
 
-                entryTypeToEntriesMap
-                        .computeIfAbsent(entryType, _ -> new HashSet<>())
-                        .add(entry);
-            }
+            entryTypeToEntriesMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>())
+                    .add(entry);
         }
     }
 }
