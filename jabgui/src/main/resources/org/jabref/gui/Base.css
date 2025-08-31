@@ -3181,3 +3181,7 @@ journalInfo .grid-cell-b {
 .edit-field-content-pane .grid-pane .label {
     -fx-min-width: 3.5em;
 }
+
+.automatic-field-editor .button-bar .button:default {
+    -fx-min-width: 12em;
+}
