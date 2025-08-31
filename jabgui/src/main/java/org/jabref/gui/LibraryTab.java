@@ -1,15 +1,9 @@
 package org.jabref.gui;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-import java.util.stream.Collectors;
-
-import javax.swing.undo.UndoManager;
-
+import com.airhacks.afterburner.injection.Injector;
+import com.google.common.eventbus.Subscribe;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -32,7 +26,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Duration;
-
+import org.controlsfx.control.NotificationPane;
+import org.controlsfx.control.action.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
@@ -44,7 +39,6 @@ import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.AutoRenameFileOnEntryChange;
-import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -62,7 +56,6 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.command.CommandSelectionTab;
-import org.jabref.logic.externalfiles.LinkedFileTransferHelper;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -95,16 +88,20 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.FileUpdateMonitor;
-
-import com.airhacks.afterburner.injection.Injector;
-import com.google.common.eventbus.Subscribe;
-import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.Subscription;
-import org.controlsfx.control.NotificationPane;
-import org.controlsfx.control.action.Action;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.undo.UndoManager;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Collectors;
+
+import static org.jabref.gui.util.CopyUtil.copyEntriesWithFeedback;
 
 /**
  * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
@@ -849,40 +846,19 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         if (entriesToAdd.isEmpty()) {
             return;
         }
+        // Now, the BibEntries to add are known
+        // The definitive insertion needs to happen now.
         BibDatabaseContext sourceBibDatabaseContext = clipBoardManager.getSourceBibDatabaseContext().orElse(null);
-        copyEntriesWithFeedback(entriesToAdd, sourceBibDatabaseContext);
-    }
-
-    private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd, BibDatabaseContext sourceBibDatabaseContext) {
-        final List<BibEntry> finalEntriesToAdd = entriesToAdd;
-
-        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(finalEntriesToAdd.size());
-
-        tracker.setOnFinish(() -> {
-            int importedCount = tracker.getImportedCount();
-            int skippedCount = tracker.getSkippedCount();
-
-            String targetName = bibDatabaseContext.getDatabasePath()
-                .map(path -> path.getFileName().toString())
-                .orElse(Localization.lang("target library"));
-
-            if (importedCount == finalEntriesToAdd.size()) {
-                dialogService.notify(Localization.lang("Pasted %0 entry(s) to %1",
-              String.valueOf(importedCount), targetName));
-            } else if (importedCount == 0) {
-                dialogService.notify(Localization.lang("No entry was pasted to %0", targetName));
-            } else {
-                dialogService.notify(Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped",
-                    String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
-            }
-            if (sourceBibDatabaseContext != null) {
-                LinkedFileTransferHelper
-                    .adjustLinkedFilesForTarget(sourceBibDatabaseContext,
-                        bibDatabaseContext, preferences.getFilePreferences());
-            }
-        });
-
-        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, finalEntriesToAdd, tracker);
+        copyEntriesWithFeedback(
+            sourceBibDatabaseContext,
+            entriesToAdd,
+            bibDatabaseContext,
+            Localization.lang("Pasted %0 entry(s) to %1"),
+            Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped"),
+            dialogService,
+            preferences.getFilePreferences(),
+            importHandler
+            );
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
@@ -900,8 +876,17 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    public void dropEntry(List<BibEntry> entriesToAdd, BibDatabaseContext sourceBibDatabaseContext) {
-        copyEntriesWithFeedback(entriesToAdd, sourceBibDatabaseContext);
+    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd) {
+        copyEntriesWithFeedback(
+            sourceBibDatabaseContext,
+            entriesToAdd,
+            bibDatabaseContext,
+            Localization.lang("Moved %0 entry(s) to %1"),
+            Localization.lang("Moved %0 entry(s) to %1. %2 were skipped"),
+            dialogService,
+            preferences.getFilePreferences(),
+            importHandler
+            );
     }
 
     public void cutEntry() {

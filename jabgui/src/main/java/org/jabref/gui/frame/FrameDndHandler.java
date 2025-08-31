@@ -1,11 +1,6 @@
 package org.jabref.gui.frame;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
+import com.tobiasdiez.easybind.EasyBind;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
@@ -14,7 +9,6 @@ import javafx.scene.control.skin.TabPaneSkin;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -24,10 +18,14 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
-
-import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class FrameDndHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(FrameDndHandler.class);
@@ -108,7 +106,7 @@ public class FrameDndHandler {
                 List<BibEntry> entryCopies = stateManager.getLocalDragboard().getBibEntries().stream()
                                                          .map(BibEntry::new).toList();
                 BibDatabaseContext sourceBibDatabaseContext = stateManager.getActiveDatabase().orElse(null);
-                destinationLibraryTab.dropEntry(entryCopies, sourceBibDatabaseContext);
+                destinationLibraryTab.dropEntry(sourceBibDatabaseContext, entryCopies);
             } else if (hasGroups(dragboard)) {
                 dropGroups(dragboard, destinationLibraryTab);
             }
@@ -215,7 +213,7 @@ public class FrameDndHandler {
         // add groupTreeNodeToCopy to the parent-- in the first run that will the source/main GroupTreeNode
         GroupTreeNode copiedNode = parent.addSubgroup(groupTreeNodeToCopy.copyNode().getGroup());
         // add all entries of a groupTreeNode to the new library.
-        destinationLibraryTab.dropEntry(groupTreeNodeToCopy.getEntriesInGroup(allEntries), stateManager.getActiveDatabase().get());
+        destinationLibraryTab.dropEntry(stateManager.getActiveDatabase().get(), groupTreeNodeToCopy.getEntriesInGroup(allEntries));
         // List of all children of groupTreeNodeToCopy
         List<GroupTreeNode> children = groupTreeNodeToCopy.getChildren();
 

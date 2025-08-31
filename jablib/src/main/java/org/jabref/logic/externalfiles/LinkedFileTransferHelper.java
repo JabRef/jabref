@@ -1,5 +1,14 @@
 package org.jabref.logic.externalfiles;
 
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -9,16 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import org.jabref.logic.FilePreferences;
-import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
-
-import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class LinkedFileTransferHelper {
 
@@ -62,6 +61,7 @@ public class LinkedFileTransferHelper {
                   continue;
                 }
 
+                // In case the file wasn't found at the source or the target - just re-use the existing link
                 Optional<Path> sourcePathOpt = linkedFile.findIn(sourceContext, filePreferences);
                 Optional<Path> targetPrimaryOpt = getPrimaryPath(targetContext, filePreferences);
 

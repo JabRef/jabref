@@ -1,19 +1,8 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-import javax.swing.undo.CompoundEdit;
-import javax.swing.undo.UndoManager;
-
+import com.airhacks.afterburner.injection.Injector;
+import com.google.common.annotations.VisibleForTesting;
 import javafx.scene.input.TransferMode;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
@@ -59,11 +48,19 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
-
-import com.airhacks.afterburner.injection.Injector;
-import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.undo.CompoundEdit;
+import javax.swing.undo.UndoManager;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 import static org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult.BREAK;
 
@@ -250,9 +247,20 @@ public class ImportHandler {
         importEntryWithDuplicateCheck(bibDatabaseContext, entry, BREAK, new EntryImportHandlerTracker());
     }
 
+    /**
+     * Imports an entry into the database with duplicate checking and handling.
+     * Creates a copy of the entry for processing - the original entry parameter is not modified.
+     * The copied entry may be modified during cleanup and duplicate handling.
+     *
+     * @param bibDatabaseContext the database context to import into
+     * @param entry the entry to import (original will not be modified)
+     * @param decision the duplicate resolution strategy to apply
+     * @param tracker tracks the import status of the entry
+     */
     private void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
         // The original entry should not be modified
-        BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
+        BibEntry entryCopy = new BibEntry(entry);
+        BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entryCopy);
 
         BackgroundTask.wrap(() -> findDuplicate(bibDatabaseContext, entryToInsert))
                       .onFailure(e -> {
@@ -280,10 +288,8 @@ public class ImportHandler {
 
     @VisibleForTesting
     BibEntry cleanUpEntry(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
-        // The original entry should not be modified
-        BibEntry entryCopy = new BibEntry(entry);
         ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
-        return cleanup.doPostCleanup(entryCopy);
+        return cleanup.doPostCleanup(entry);
     }
 
     public Optional<BibEntry> findDuplicate(BibDatabaseContext bibDatabaseContext, BibEntry entryToCheck) {
