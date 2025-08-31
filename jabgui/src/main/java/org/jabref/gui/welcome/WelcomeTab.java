@@ -34,9 +34,9 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.URLs;
+import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 import org.jabref.gui.welcome.components.DonationProvider;
 import org.jabref.gui.welcome.components.QuickSettings;
 import org.jabref.gui.welcome.components.Walkthroughs;
@@ -73,9 +73,9 @@ public class WelcomeTab extends Tab {
     private final BuildInfo buildInfo;
     private final Stage stage;
     private final WorkspacePreferences workspacePreferences;
-    private final ThemeManager themeManager;
-    private Walkthroughs walkthroughs;
 
+    private final VBox main;
+    private Walkthroughs walkthroughs;
     private QuickSettings quickSettings;
     private final DonationProvider donationProvider;
 
@@ -92,8 +92,7 @@ public class WelcomeTab extends Tab {
                       TaskExecutor taskExecutor,
                       FileHistoryMenu fileHistoryMenu,
                       BuildInfo buildInfo,
-                      WorkspacePreferences workspacePreferences,
-                      ThemeManager themeManager) {
+                      WorkspacePreferences workspacePreferences) {
         super(Localization.lang("Welcome"));
         setClosable(true);
         this.tabContainer = tabContainer;
@@ -110,19 +109,14 @@ public class WelcomeTab extends Tab {
         this.buildInfo = buildInfo;
         this.stage = stage;
         this.workspacePreferences = workspacePreferences;
-        this.themeManager = themeManager;
         this.recentLibrariesBox = new VBox();
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
-        Node titles = createTopTitles();
-        Node communityBox = createCommunityBox();
-        ScrollPane columnsScroll = createColumnsContainerScrollable();
+        main = new VBox(createTopTitles(), new VBox(), createCommunityBox());
+        main.getStyleClass().add("welcome-main-container");
+        initializeColumns();
 
-        VBox mainStack = new VBox(titles, columnsScroll, communityBox);
-        mainStack.getStyleClass().add("welcome-main-container");
-        VBox.setVgrow(columnsScroll, Priority.ALWAYS);
-
-        VBox container = new VBox(mainStack);
+        VBox container = new VBox(main);
         container.setAlignment(Pos.CENTER);
 
         StackPane rootPane = new StackPane(container);
@@ -144,7 +138,7 @@ public class WelcomeTab extends Tab {
         return topTitles;
     }
 
-    private ScrollPane createColumnsContainerScrollable() {
+    private void initializeColumns() {
         GridPane grid = new GridPane();
         grid.getStyleClass().add("welcome-columns-container");
 
@@ -154,17 +148,24 @@ public class WelcomeTab extends Tab {
         VBox rightColumn = createRightColumn();
         GridPane.setHgrow(rightColumn, Priority.ALWAYS);
 
-        Runnable applyLayout = () -> updateColumnsLayout(grid, leftColumn, rightColumn, grid.getWidth());
-        grid.widthProperty().addListener((_, _, _) -> applyLayout.run());
-        applyLayout.run();
+        WalkthroughUtils.DebouncedRunnable updater = WalkthroughUtils.debounced(() -> updateColumnsLayout(grid, leftColumn, rightColumn, grid.getWidth()));
 
-        ScrollPane scrollPane = new ScrollPane(grid);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.getStyleClass().add("welcome-columns-scroll");
-        scrollPane.setStyle("-fx-background-color: transparent;"); // Using class selector is insufficient to prevent background from turning white on click.
-        return scrollPane;
+        grid.localToSceneTransformProperty().addListener(_ -> updater.run());
+        grid.layoutBoundsProperty().addListener(_ -> updater.run());
+        contentProperty().addListener((_, _, newContent) -> {
+            if (newContent == null) {
+                return;
+            }
+            newContent.boundsInParentProperty().addListener(_ -> updater.run());
+            newContent.parentProperty().addListener((_, _, newParent) -> {
+                if (newParent == null) {
+                    return;
+                }
+                newParent.boundsInParentProperty().addListener(_ -> updater.run());
+            });
+        });
+        VBox.setVgrow(grid, Priority.ALWAYS);
+        updater.run();
     }
 
     private VBox createLeftColumn() {
@@ -177,12 +178,10 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createRightColumn() {
-        this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor, themeManager);
+        this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor);
         this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);
         VBox rightColumn = new VBox(quickSettings, walkthroughs);
         rightColumn.getStyleClass().add("welcome-content-column");
-        VBox.setVgrow(quickSettings, Priority.ALWAYS);
-        VBox.setVgrow(walkthroughs, Priority.ALWAYS);
         return rightColumn;
     }
 
@@ -193,6 +192,7 @@ public class WelcomeTab extends Tab {
         grid.getChildren().clear();
         grid.getColumnConstraints().clear();
 
+        boolean scrollNeeded = false;
         double threshold = 48 * workspacePreferences.getMainFontSize();
         if (availableWidth < threshold) {
             grid.getStyleClass().add("compact");
@@ -201,8 +201,7 @@ public class WelcomeTab extends Tab {
             grid.getColumnConstraints().add(single);
             grid.add(leftColumn, 0, 0);
             grid.add(rightColumn, 0, 1);
-            quickSettings.disableScroll();
-            walkthroughs.disableScroll();
+            scrollNeeded = true;
         } else {
             grid.getStyleClass().remove("compact");
             ColumnConstraints half = new ColumnConstraints();
@@ -210,9 +209,28 @@ public class WelcomeTab extends Tab {
             grid.getColumnConstraints().addAll(half, half);
             grid.add(leftColumn, 0, 0);
             grid.add(rightColumn, 1, 0);
+        }
+
+        if (!scrollNeeded) {
+            if (!(main.getChildren().get(1) instanceof GridPane)) {
+                main.getChildren().set(1, grid);
+            }
             quickSettings.enableScroll();
             walkthroughs.enableScroll();
+            return;
         }
+
+        ScrollPane scrollPane = new ScrollPane(grid);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.getStyleClass().add("welcome-columns-scroll");
+        scrollPane.setStyle("-fx-background-color: transparent;"); // Using class selector is insufficient to prevent background from turning white on click.
+        if (!(main.getChildren().get(1) instanceof ScrollPane)) {
+            main.getChildren().set(1, scrollPane);
+        }
+        quickSettings.disableScroll();
+        walkthroughs.disableScroll();
     }
 
     private VBox createWelcomeStartBox() {

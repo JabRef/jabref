@@ -50,6 +50,12 @@ class FileFieldParserTest {
                         List.of(),
                         ""
                 ),
+                
+                // URL starting with www. (without protocol)
+                Arguments.of(
+                        List.of(new LinkedFile("A test", URLUtil.create("https://www.yahoo.com/abc/cde.htm"), "URL")),
+                        "A test:www.yahoo.com/abc/cde.htm:URL"
+                ),
 
                 // correct input
                 Arguments.of(

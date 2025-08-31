@@ -3,12 +3,12 @@ package org.jabref.gui.welcome.components;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.welcome.quicksettings.EntryTableConfigurationDialog;
 import org.jabref.gui.welcome.quicksettings.LargeLibraryOptimizationDialog;
 import org.jabref.gui.welcome.quicksettings.MainFileDirectoryDialog;
@@ -23,15 +23,13 @@ public class QuickSettings extends VBox {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
-    private final ThemeManager themeManager;
     private final Label header;
     private boolean isScrollEnabled = true;
 
-    public QuickSettings(GuiPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor, ThemeManager themeManager) {
+    public QuickSettings(GuiPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-        this.themeManager = themeManager;
 
         getStyleClass().add("welcome-section");
 
@@ -100,12 +98,14 @@ public class QuickSettings extends VBox {
     }
 
     private ScrollPane createScrollPane(VBox contentPane) {
-        ScrollPane newScrollPane = new ScrollPane(contentPane);
-        newScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        newScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        newScrollPane.setFitToWidth(true);
-        newScrollPane.getStyleClass().add("quick-settings-scroll-pane");
-        return newScrollPane;
+        ScrollPane scrollPane = new ScrollPane(contentPane);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setFitToWidth(true);
+        scrollPane.getStyleClass().add("quick-settings-scroll-pane");
+        scrollPane.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+        return scrollPane;
     }
 
     private Button createButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
@@ -118,26 +118,26 @@ public class QuickSettings extends VBox {
     }
 
     private void showMainFileDirectoryDialog() {
-        dialogService.showCustomDialogAndWait(new MainFileDirectoryDialog(preferences, dialogService, themeManager));
+        dialogService.showCustomDialogAndWait(new MainFileDirectoryDialog(preferences, dialogService));
     }
 
     private void showThemeDialog() {
-        dialogService.showCustomDialogAndWait(new ThemeDialog(preferences, dialogService, themeManager));
+        dialogService.showCustomDialogAndWait(new ThemeDialog(preferences, dialogService));
     }
 
     private void showLargeLibraryOptimizationDialog() {
-        dialogService.showCustomDialogAndWait(new LargeLibraryOptimizationDialog(preferences, themeManager));
+        dialogService.showCustomDialogAndWait(new LargeLibraryOptimizationDialog(preferences));
     }
 
     private void showPushApplicationConfigurationDialog() {
-        dialogService.showCustomDialogAndWait(new PushApplicationDialog(preferences, dialogService, taskExecutor, themeManager));
+        dialogService.showCustomDialogAndWait(new PushApplicationDialog(preferences, dialogService, taskExecutor));
     }
 
     private void showOnlineServicesConfigurationDialog() {
-        dialogService.showCustomDialogAndWait(new OnlineServicesDialog(preferences, themeManager));
+        dialogService.showCustomDialogAndWait(new OnlineServicesDialog(preferences));
     }
 
     private void showEntryTableConfigurationDialog() {
-        dialogService.showCustomDialogAndWait(new EntryTableConfigurationDialog(preferences, themeManager));
+        dialogService.showCustomDialogAndWait(new EntryTableConfigurationDialog(preferences));
     }
 }

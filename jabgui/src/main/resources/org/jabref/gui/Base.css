@@ -405,13 +405,18 @@ TextFlow > .tooltip-text-monospaced {
     -fx-text-fill: -fx-text-base-color;
 }
 
-
 .button {
     -fx-background-color: transparent;
     -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.23); */
     -fx-border-width: 0.062em;
     -fx-border-radius: 0.25em;
     -fx-padding: 0.5em 1em 0.5em 1em;
+}
+
+.dialog-pane .button-bar .button {
+    -fx-min-width: 6em;
+    -fx-pref-width: 6em;
+    -fx-max-width: 6em;
 }
 
 .menu-button > .label {
@@ -1752,7 +1757,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
     -fx-font-family: "Arial";
-    -fx-text-fill: -jr-gray-3;
+    -fx-text-fill: -jr-head-fg;
 }
 
 .welcome-no-recent-label {
@@ -1777,13 +1782,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-spacing: 2.333em;
     -fx-alignment: center;
     -fx-padding: 2.667em 2em;
-}
-
-.welcome-columns-container,
-.welcome-columns-container:focus,
-.welcome-columns-scroll,
-.welcome-columns-scroll:focus {
-    -fx-background-color: transparent;
 }
 
 .welcome-top-titles {
@@ -2150,47 +2148,69 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* ErrorConsole */
-
 #errorConsole .list-content {
-    -fx-padding: 0.625em;
+    -fx-padding: 0em;
 }
 
 #errorConsole .info-section {
-    -fx-padding: 0.625em;
-    -fx-background-color: -fx-background;
+    -fx-graphic-text-gap: 0.8em;
+    -fx-font-size: 1.1em;
+    -fx-line-spacing: 0.2em;
+    -fx-padding: 0.6em 1em;
+    -fx-background-color: -jr-transparent-accent;
 }
 
-#errorConsole .info-section .glyph-icon {
-    -fx-font-size: 24.0;
+#errorConsole .button-bar {
+    -fx-padding: 1em 0em 0em 0em;
+}
+
+#errorConsole .error-console-cell {
+    -fx-padding: 0.6em 1em;
+}
+
+#errorConsole .error-console-cell HBox {
+    -fx-spacing: 0.8em;
+}
+
+#errorConsole .message-box {
+    -fx-spacing: 0.5em;
+}
+
+#errorConsole .info-section .glyph-icon,
+#errorConsole .exception .glyph-icon,
+#errorConsole .output .glyph-icon,
+#errorConsole .log .glyph-icon
+{
+    -fx-font-size: 1.5em;
 }
 
 #errorConsole .exception .glyph-icon {
-    -fx-font-size: 18.0;
-    -fx-fill: -jr-error;
+    -fx-icon-color: -jr-error;
 }
 
 #errorConsole .output .glyph-icon {
-    -fx-font-size: 18.0;
-    -fx-fill: -jr-warn;
+    -fx-icon-color: -jr-warn;
 }
 
 #errorConsole .log .glyph-icon {
-    -fx-font-size: 18.0;
-    -fx-fill: -jr-info;
+    -fx-icon-color: -jr-info;
 }
 
-#errorConsole .custom-buttons {
-    -fx-padding: 0.312em;
+/* Poor readability on -jr-accent. See: https://webaim.org/resources/contrastchecker/?fcolor=9E4C00&bcolor=A3B7E6 */
+#errorConsole .error-console-cell:selected .exception .glyph-icon {
+    -fx-icon-color: derive(-jr-error, -50%);
 }
 
-#errorConsole .exception {
-    -fx-text-fill: -fx-text-base-color;
+#errorConsole .error-console-cell:selected .output .glyph-icon {
+    -fx-icon-color: derive(-jr-warn, -50%);
 }
 
-#errorConsole .output {
-    -fx-text-fill: -fx-text-base-color;
+#errorConsole .error-console-cell:selected .log .glyph-icon {
+    -fx-icon-color: derive(-jr-info, -50%);
 }
 
+#errorConsole .exception,
+#errorConsole .output,
 #errorConsole .log {
     -fx-text-fill: -fx-text-base-color;
 }
@@ -2657,12 +2677,6 @@ journalInfo .grid-cell-b {
     -fx-alignment: top-left;
 }
 
-.walkthroughs-scroll-pane,
-.quick-settings-scroll-pane {
-    -fx-max-height: 12em;
-    -fx-pref-height: 12em;
-}
-
 .quick-settings-button {
     -fx-background-color: derive(-jr-base, 10%);
     -fx-border-color: -jr-gray-1;
@@ -2894,6 +2908,16 @@ journalInfo .grid-cell-b {
 
 /* Tooltip Content */
 .walkthrough-tooltip-content-container {
+    -fx-background-color: -jr-background-alt;
+}
+
+.walkthrough-tooltip .border {
+    /* The arrow of the PopOver. Need to override the default `.popover > .border` (https://github.com/controlsfx/controlsfx/blob/194b10bb948389bf18c463006adcec7c92ca6403/controlsfx/src/main/resources/org/controlsfx/control/popover.css#L8) */
+    /* -jr-background-alt. Variable is not used because the variable cannot be properly resolved and lead to transparent fill. */
+    -fx-fill: #f3f3f3 !important;
+}
+
+.walkthrough-tooltip-content-container {
     -fx-spacing: 1em;
     -fx-padding: 1em;
 }
@@ -2915,7 +2939,7 @@ journalInfo .grid-cell-b {
 .walkthrough-side-panel-horizontal {
     -fx-spacing: 1em;
     -fx-padding: 2em;
-    -fx-background-color: derive(-jr-gray-1, 40%);
+    -fx-background-color: -jr-background-alt;
 }
 
 .walkthrough-side-panel-vertical {
@@ -3007,7 +3031,7 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-quit-button {
-    -fx-background-color: -jr-gray-1;
+    -fx-background-color: -jr-base;
     -fx-border-color: transparent;
     /* For easy clipping */
     -fx-padding: 0.5em;
@@ -3020,11 +3044,11 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-quit-button:hover {
-    -fx-background-color: derive(-jr-gray-1, -20%);
+    -fx-background-color: derive(-jr-base, -20%);
 }
 
 .walkthrough-quit-button:pressed {
-    -fx-background-color: derive(-jr-gray-1, 30%);
+    -fx-background-color: derive(-jr-base, 30%);
 }
 
 .walkthrough-quit-button .glyph-icon,
