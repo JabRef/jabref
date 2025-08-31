@@ -70,7 +70,7 @@ public class AutomaticFieldEditorDialog extends BaseDialog<String> {
 
     @FXML
     public void initialize() {
-        viewModel = new AutomaticFieldEditorViewModel(selectedEntries, database, undoManager, stateManager);
+        viewModel = new AutomaticFieldEditorViewModel(database, undoManager, stateManager);
 
         for (AutomaticFieldEditorTab tabModel : viewModel.getFieldEditorTabs()) {
             NotificationPaneAdapter notificationPane = new NotificationPaneAdapter(tabModel.getContent());

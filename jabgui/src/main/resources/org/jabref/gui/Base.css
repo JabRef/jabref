@@ -3157,3 +3157,27 @@ journalInfo .grid-cell-b {
     -fx-border-color: -jr-error;
     -fx-border-width: 1px;
 }
+
+/* Automatic Field Editor */
+.edit-field-content-pane {
+    -fx-padding: 0em 1em;
+    -fx-spacing: 1em;
+}
+
+.edit-field-content-pane .text-field {
+    -fx-padding: 0.5625em 0.75em;
+}
+
+.edit-field-content-pane .actions {
+    -fx-spacing: 0.75em;
+    -fx-alignment: BASELINE_LEFT;
+}
+
+.edit-field-content-pane .grid-pane {
+    -fx-hgap: 0.75em;
+    -fx-vgap: 0.75em;
+}
+
+.edit-field-content-pane .grid-pane .label {
+    -fx-min-width: 3.5em;
+}
