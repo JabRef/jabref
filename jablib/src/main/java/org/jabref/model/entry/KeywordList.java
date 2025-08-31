@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,6 +21,7 @@ import org.jabref.model.strings.StringUtil;
 public class KeywordList implements Iterable<Keyword> {
 
     private final List<Keyword> keywordChains;
+    private boolean spaceAfterDelimiter;
 
     public KeywordList() {
         keywordChains = new ArrayList<>();
@@ -55,6 +57,8 @@ public class KeywordList implements Iterable<Keyword> {
         StringBuilder currentToken = new StringBuilder();
         boolean isEscaping = false;
 
+        keywordList.spaceAfterDelimiter = keywordString.contains(delimiter + " ");
+
         for (int i = 0; i < keywordString.length(); i++) {
             char currentChar = keywordString.charAt(i);
 
@@ -85,6 +89,26 @@ public class KeywordList implements Iterable<Keyword> {
         return keywordList;
     }
 
+    public static KeywordList oldParse(String keywordString, Character delimiter, Character hierarchicalDelimiter) {
+        if (StringUtil.isBlank(keywordString)) {
+            return new KeywordList();
+        }
+
+        Objects.requireNonNull(delimiter);
+        Objects.requireNonNull(hierarchicalDelimiter);
+
+        KeywordList keywordList = new KeywordList();
+        keywordList.spaceAfterDelimiter = keywordString.contains(delimiter + " ");
+
+        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
+        while (tok.hasMoreTokens()) {
+            String chain = tok.nextToken();
+            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
+            keywordList.add(chainRoot);
+        }
+        return keywordList;
+    }
+
     /**
      * Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
      *
@@ -102,9 +126,10 @@ public class KeywordList implements Iterable<Keyword> {
 
     // This method serializes Keywords supporting escaping of the delimiter for BibTeX Serialization (Issue #12810, #12532)
     public String bibtexSerialize(Character delimiter) {
-        return keywordChains.stream().map(keyword -> keyword.getSubchainAsStringWithEscaping(delimiter)).collect(Collectors.joining(delimiter.toString() + " "));
+        // If the keywords contain ", " (as in PubMed records) we keep the space.
+        String joiner = spaceAfterDelimiter ? delimiter + " " : delimiter.toString();
+        return keywordChains.stream().map(keyword -> keyword.getSubchainAsStringWithEscaping(delimiter)).collect(Collectors.joining(joiner));
     }
-
 
     public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
         KeywordList keywordListA = parse(keywordStringA, delimiter);
