@@ -53,7 +53,7 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
     }
 
     /**
-     * Convert a JSONObject obtained from <a href="http://api.springer.com/metadata/json">http://api.springer.com/metadata/json</a> to a BibEntry
+     * Convert a JSONObject obtained from <a href="https://dev.springernature.com/docs/api-endpoints/metadata-api/?source=jabref">the Metadata API</a> to a BibEntry
      *
      * @param springerJsonEntry the JSONObject from search results
      * @return the converted BibEntry
