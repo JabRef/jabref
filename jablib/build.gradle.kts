@@ -420,7 +420,8 @@ tasks.test {
     jvmArgs = listOf(
         "-javaagent:${mockitoAgent.asPath}",
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
-        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io"
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        "--enable-native-access=com.sun.jna"
     )
 }
 
