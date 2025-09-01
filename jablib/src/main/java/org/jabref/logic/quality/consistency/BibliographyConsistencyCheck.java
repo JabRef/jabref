@@ -33,14 +33,6 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class BibliographyConsistencyCheck {
 
-    private static final Set<EntryType> BIBLATEX_TYPES = BiblatexEntryTypeDefinitions.ALL.stream()
-            .map(BibEntryType::getType)
-            .collect(Collectors.toSet());
-
-    private static final Set<EntryType> BIBTEX_TYPES = BibtexEntryTypeDefinitions.ALL.stream()
-            .map(BibEntryType::getType)
-            .collect(Collectors.toSet());
-
     private static final Set<Field> EXPLICITLY_EXCLUDED_FIELDS = Set.of(
             InternalField.KEY_FIELD, // Citation key
             StandardField.KEY,
@@ -142,8 +134,6 @@ public class BibliographyConsistencyCheck {
             differingFields.removeAll(fieldsInAllEntries);
             assert fieldsInAllEntries != null;
 
-            differingFields.removeAll(fieldsInAllEntries);
-
             Optional<BibEntryType> typeDefOpt = entryTypeDefinitions.stream()
                                                                  .filter(def -> def.getType().equals(entryType))
                                                                  .findFirst();
@@ -174,30 +164,22 @@ public class BibliographyConsistencyCheck {
         BibDatabaseMode mode = bibContext.getMode();
         List<BibEntry> entries = bibContext.getEntries();
 
-        Set<EntryType> typeSet = switch (mode) {
-            case BIBLATEX -> BIBLATEX_TYPES;
-            case BIBTEX -> BIBTEX_TYPES;
-        };
-
         for (BibEntry entry : entries) {
-            if (typeSet.contains(entry.getType())) {
-                EntryType entryType = entry.getType();
+            EntryType entryType = entry.getType();
 
-                Set<Field> filteredFields = filterExcludedFields(entry.getFields());
+            Set<Field> filteredFields = filterExcludedFields(entry.getFields());
 
-                entryTypeToFieldsInAnyEntryMap
-                        .computeIfAbsent(entryType, _ -> new HashSet<>())
-                        .addAll(filteredFields);
-                if (entryTypeToFieldsInAllEntriesMap.containsKey(entryType)) {
-                    entryTypeToFieldsInAllEntriesMap.get(entryType).retainAll(filteredFields);
-                } else {
-                    entryTypeToFieldsInAllEntriesMap.put(entryType, new HashSet<>(filteredFields));
-                }
+            entryTypeToFieldsInAllEntriesMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>(filteredFields))
+                    .retainAll(filteredFields);
 
-                entryTypeToEntriesMap
-                        .computeIfAbsent(entryType, _ -> new HashSet<>())
-                        .add(entry);
-            }
+            entryTypeToFieldsInAnyEntryMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>())
+                    .addAll(filteredFields);
+
+            entryTypeToEntriesMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>())
+                    .add(entry);
         }
     }
 }
