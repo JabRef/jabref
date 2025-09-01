@@ -90,7 +90,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     }
 
     public List<String> getColumnNames() {
-        List<String> result = new ArrayList<>(allReportedFields.size() + 2);
+        List<String> result = new ArrayList<>(allReportedFields.size() + 2); // there are two extra columns
         result.add("Entry Type");
         result.add("CitationKey");
         allReportedFields.forEach(field-> result.add(field.getDisplayName().trim()));
