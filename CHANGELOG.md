@@ -84,6 +84,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - The Welcome tab now has a responsive layout. [#12664](https://github.com/JabRef/jabref/issues/12664)
 - We introduced a donation prompt in the Welcome tab. [#12664](https://github.com/JabRef/jabref/issues/12664)
 - We changed to syntax for the websearch to the one of the main search bar. [#13607](https://github.com/JabRef/jabref/issues/13607)
+- We improved the for the web search tab in the preferences dialog [#13791](https://github.com/JabRef/jabref/pull/13791)
+- We improved the event viewer for debugging [#13783](https://github.com/JabRef/jabref/pull/13783).
 
 ### Fixed
 
@@ -118,6 +120,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where "Copy to" was enabled even if no other library was opened. [#13280](https://github.com/JabRef/jabref/pull/13280)
 - We fixed an issue where the groups were still displayed after closing all libraries. [#13382](https://github.com/JabRef/jabref/issues/13382)
 - Enhanced field selection logic in the Merge Entries dialog when fetching from DOI to prefer valid years and entry types. [#12549](https://github.com/JabRef/jabref/issues/12549)
+- We fixed an issue where theme or font size are not respected for all dialogs [#13558](https://github.com/JabRef/jabref/issues/13558)
 - We removed unnecessary spacing and margin in the AutomaticFieldEditor. [#13792](https://github.com/JabRef/jabref/pull/13792)
 
 ### Removed

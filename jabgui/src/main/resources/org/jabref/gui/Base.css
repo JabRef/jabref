@@ -83,6 +83,7 @@
     -jr-info: -jr-light-green;
     -jr-warn: -jr-orange;
     -jr-error: -jr-light-red;
+    -jr-success: -jr-green;
 
     /* Color for the small group view indicator for the number of hits */
     -jr-group-hits-bg: derive(-jr-sidepane-background, -50%);
@@ -1357,11 +1358,6 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-fill: -jr-warn;
 }
 
-.info-message {
-    -fx-fill: -jr-info;
-    -fx-text-fill: -jr-info;
-}
-
 .warning-message {
     -fx-fill: -jr-warn;
     -fx-text-fill: -jr-warn;
@@ -2502,6 +2498,51 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 2;
 }
 
+/* WebSearchTab */
+.fetcher-list-cell {
+    -fx-padding: 0.3em 0.6em;
+    -fx-alignment: center-left;
+    -fx-spacing: 0.5em;
+}
+
+.fetcher-list-cell:nth-child(odd) {
+    -fx-background-color: -jr-row-odd-background;
+}
+
+.fetcher-list-cell .label {
+    -fx-font-size: 100%;
+}
+
+.fetcher-list-cell .configure-button {
+    -fx-padding: 0.25em 0.5em;
+    -fx-background-color: -fx-control-inner-background;
+    -fx-text-fill: -fx-mid-text-color;
+}
+
+#testButton {
+    -fx-padding: 0.25em 0.5em;
+}
+
+#testButton.success {
+    -fx-text-fill: -jr-success;
+}
+
+#testButton.success .glyph-icon {
+    -fx-icon-color: -jr-success;
+}
+
+#testButton.error {
+    -fx-text-fill: -jr-error;
+}
+
+#testButton.error .glyph-icon {
+    -fx-icon-color: -jr-error;
+}
+
+.api-key-dialog-content {
+    -fx-padding: 1em;
+}
+
 /* CitationRelationsTab */
 
 #citationRelationsTab .addEntryButton {
@@ -3158,6 +3199,11 @@ journalInfo .grid-cell-b {
     -fx-border-width: 1px;
 }
 
+.checkbox-flowpane {
+    -fx-hgap: 1.5em;
+    -fx-vgap: 0.8em;
+}
+  
 /* Automatic Field Editor */
 .edit-field-content-pane {
     -fx-padding: 0em 1em;
