@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root spacing="10.0" type="VBox"
-         xmlns="http://javafx.com/ja\vafx" xmlns:fx="http://javafx.com/fxml"
+         xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.libraryproperties.constants.ConstantsPropertiesView">
     <HBox alignment="BOTTOM_LEFT" spacing="8.0">
         <Label styleClass="sectionHeader" text="%String constants"/>
