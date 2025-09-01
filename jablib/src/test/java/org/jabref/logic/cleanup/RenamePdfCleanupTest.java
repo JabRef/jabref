@@ -65,6 +65,11 @@ class RenamePdfCleanupTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         cleanup.cleanup(entry);
 
+        /* This special handling is for Windows. Window file system is case-insensitive,
+        so renaming "toot.tmp" to "Toot.tmp" would overwrite the original file.
+        Therefore, the file is renamed to `Toot (1).tmp` in Windows. Prior to testing,
+        delete `AppData/Local/Temp/junit-*` folders, as the test doesn't clean up the
+        renamed file and could potentially interfere with subsequent test runs. */
         assertTrue(Pattern.matches("^:Toot(?:\\s+\\(\\d+\\))?\\.tmp:$",
                 entry.getField(StandardField.FILE).get()));
     }
