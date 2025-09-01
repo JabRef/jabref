@@ -20,6 +20,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
@@ -33,13 +34,18 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class BibliographyConsistencyCheck {
 
-    private static final Set<EntryType> BIBLATEX_TYPES = BiblatexEntryTypeDefinitions.ALL.stream()
-            .map(BibEntryType::getType)
-            .collect(Collectors.toSet());
+    // private static final Set<EntryType> BIBLATEX_TYPES = BiblatexEntryTypeDefinitions.ALL.stream()
+            // .map(BibEntryType::getType)
+            // .collect(Collectors.toSet());
 
-    private static final Set<EntryType> BIBTEX_TYPES = BibtexEntryTypeDefinitions.ALL.stream()
-            .map(BibEntryType::getType)
-            .collect(Collectors.toSet());
+    private static final Set<BibEntryType> BIBLATEX_TYPES = new HashSet<>(new BibEntryTypesManager()
+            .getAllTypes(BibDatabaseMode.BIBLATEX));
+
+    // private static final Set<EntryType> BIBTEX_TYPES = BibtexEntryTypeDefinitions.ALL.stream()
+            // .map(BibEntryType::getType)
+            // .collect(Collectors.toSet());
+    private static final Set<BibEntryType> BIBTEX_TYPES = new HashSet<>(new BibEntryTypesManager()
+            .getAllTypes(BibDatabaseMode.BIBTEX));
 
     private static final Set<Field> EXPLICITLY_EXCLUDED_FIELDS = Set.of(
             InternalField.KEY_FIELD, // Citation key
@@ -174,7 +180,7 @@ public class BibliographyConsistencyCheck {
         BibDatabaseMode mode = bibContext.getMode();
         List<BibEntry> entries = bibContext.getEntries();
 
-        Set<EntryType> typeSet = switch (mode) {
+        Set<BibEntryType> typeSet = switch (mode) {
             case BIBLATEX -> BIBLATEX_TYPES;
             case BIBTEX -> BIBTEX_TYPES;
         };
