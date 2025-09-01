@@ -117,7 +117,7 @@ class CopyMultipleFilesActionTest {
     }
 
     @Test
-    void copiesAllSelectedFilesToChosenDirectory() {
+    void copiesAllSelectedFilesToChosenDirectory(@TempDir Path tmpDir) {
         Path target = tmpDir.resolve("dest");
         ObservableList<LinkedFileViewModel> sel = FXCollections.observableArrayList(
                 vmLocal(srcA),
