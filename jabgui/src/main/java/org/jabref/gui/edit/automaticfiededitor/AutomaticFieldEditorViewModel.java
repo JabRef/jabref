@@ -1,7 +1,5 @@
 package org.jabref.gui.edit.automaticfiededitor;
 
-import java.util.List;
-
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.FXCollections;
@@ -14,7 +12,6 @@ import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContent
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.BibEntry;
 
 public class AutomaticFieldEditorViewModel extends AbstractViewModel {
     public static final String NAMED_COMPOUND_EDITS = "EDIT_FIELDS";
@@ -23,7 +20,7 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
 
     private final UndoManager undoManager;
 
-    public AutomaticFieldEditorViewModel(List<BibEntry> selectedEntries, BibDatabase database, UndoManager undoManager, StateManager stateManager) {
+    public AutomaticFieldEditorViewModel(BibDatabase database, UndoManager undoManager, StateManager stateManager) {
         this.undoManager = undoManager;
         fieldEditorTabs.addAll(
                 new EditFieldContentTabView(database, stateManager),
