@@ -526,11 +526,11 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public void showCustomDialog(BaseDialog<?> aboutDialogView) {
-        if (aboutDialogView.getOwner() == null) {
-            aboutDialogView.initOwner(mainWindow);
+    public void showCustomDialog(BaseDialog<?> dialogView) {
+        if (dialogView.getOwner() == null) {
+            dialogView.initOwner(mainWindow);
         }
-        aboutDialogView.show();
+        dialogView.show();
     }
 
     @Override
