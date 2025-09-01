@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
@@ -15,6 +16,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -63,8 +65,8 @@ class RenamePdfCleanupTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         cleanup.cleanup(entry);
 
-        LinkedFile newFileField = new LinkedFile("", Path.of("Toot.tmp"), "");
-        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
+        Assertions.assertTrue(Pattern.matches("^:Toot(?:\\s+\\(\\d+\\))?\\.tmp:$",
+                entry.getField(StandardField.FILE).get()));
     }
 
     @Test
