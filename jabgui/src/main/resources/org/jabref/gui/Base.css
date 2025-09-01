@@ -3202,6 +3202,7 @@ journalInfo .grid-cell-b {
 .checkbox-flowpane {
     -fx-hgap: 1.5em;
     -fx-vgap: 0.8em;
+}
   
 /* Automatic Field Editor */
 .edit-field-content-pane {
