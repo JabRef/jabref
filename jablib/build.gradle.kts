@@ -431,25 +431,30 @@ jmh {
     zip64  = true
 }
 
+val testSourceSet = sourceSets["test"]
+
 tasks.register<Test>("fetcherTest") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
         includeTags("FetcherTest")
     }
-
     maxParallelForks = 1
 }
 
 tasks.register<Test>("databaseTest") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
         includeTags("DatabaseTest")
     }
-
     testLogging {
         // set options for log level LIFECYCLE
         events("FAILED")
         exceptionFormat = TestExceptionFormat.FULL
     }
-
     maxParallelForks = 1
 }
 
