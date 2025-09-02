@@ -4,12 +4,14 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Optional;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.RemoveDigitsFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveRedundantSpacesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ReplaceTabsBySpaceFormater;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
@@ -50,6 +52,11 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
     @Override
     public String getName() {
         return "Collection of Computer Science Bibliographies";
+    }
+
+    @Override
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_COLLECTION_OF_COMPUTER_SCIENCE_BIBLIOGRAPHIES);
     }
 
     @Override

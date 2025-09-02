@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,7 +45,6 @@ import org.slf4j.LoggerFactory;
 public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialogViewModel.class);
-    private static final int EXTRA_COLUMNS_COUNT = 2;
 
     private final BibliographyConsistencyCheck.Result result;
     private final DialogService dialogService;
@@ -54,7 +52,6 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     private final BibEntryTypesManager entryTypesManager;
 
     private final List<Field> allReportedFields;
-    private final int columnCount;
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
     private final StringProperty selectedEntryType = new SimpleStringProperty();
 
@@ -72,7 +69,6 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
                                   .sorted(Comparator.comparing(Field::getName))
                                   .distinct()
                                   .toList();
-        this.columnCount = getColumnNames().size();
 
         result.entryTypeToResultMap().entrySet().stream()
               .sorted(Comparator.comparing(entry -> entry.getKey().getName()))
@@ -93,8 +89,8 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         return tableData;
     }
 
-    public Set<String> getColumnNames() {
-        Set<String> result = LinkedHashSet.newLinkedHashSet(columnCount + EXTRA_COLUMNS_COUNT);
+    public List<String> getColumnNames() {
+        List<String> result = new ArrayList<>(allReportedFields.size() + 2); // there are two extra columns
         result.add("Entry Type");
         result.add("CitationKey");
         allReportedFields.forEach(field-> result.add(field.getDisplayName().trim()));
@@ -138,7 +134,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     }
 
     private List<String> getFindingsAsList(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
-        List<String> result = new ArrayList<>(columnCount + EXTRA_COLUMNS_COUNT);
+        List<String> result = new ArrayList<>(allReportedFields.size() + 2);
         result.add(entryType);
         result.add(bibEntry.getCitationKey().orElse(""));
         allReportedFields.forEach(field ->
