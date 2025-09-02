@@ -104,7 +104,6 @@ class ArgumentProcessorTest {
 
             assertTrue(Files.exists(outputBib), "Expected output bib to exist: " + outputBib);
 
-            // Validate the produced bib can be parsed and contains at least one entry
             BibtexImporter importer = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
             List<BibEntry> entries = importer.importDatabase(outputBib).getDatabase().getEntries();
             assertTrue(entries != null && !entries.isEmpty(), "Expected output bib to contain at least one entry");
