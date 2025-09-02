@@ -53,11 +53,28 @@ public class KeywordList implements Iterable<Keyword> {
 
         KeywordList keywordList = new KeywordList();
 
-        for (char d : delimiter.toString().toCharArray()) {
-            keywordString = keywordString.replace(d, ',');
+        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
+        while (tok.hasMoreTokens()) {
+            String chain = tok.nextToken();
+            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
+            keywordList.add(chainRoot);
+        }
+        return keywordList;
+    }
+
+    public static KeywordList parseMultipleDelimiter(String keywordString, String delimiter, Character hierarchicalDelimiter) {
+        if (StringUtil.isBlank(keywordString)) {
+            return new KeywordList();
         }
 
-        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
+        Objects.requireNonNull(delimiter);
+        Objects.requireNonNull(hierarchicalDelimiter);
+
+        KeywordList keywordList = new KeywordList();
+        for (char d:delimiter.toCharArray()) {
+            keywordString = keywordString.replace(d, ',');
+        }
+        StringTokenizer tok = new StringTokenizer(keywordString, ",");
         while (tok.hasMoreTokens()) {
             String chain = tok.nextToken();
             Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
@@ -75,6 +92,10 @@ public class KeywordList implements Iterable<Keyword> {
      */
     public static KeywordList parse(String keywordString, Character delimiter) {
         return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
+    }
+
+    public static KeywordList parseMultipleDelimeter(String keywordString, String delimiter) {
+        return parseMultipleDelimiter(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
     }
 
     public static String serialize(List<Keyword> keywords, Character delimiter) {
