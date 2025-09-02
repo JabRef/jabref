@@ -111,6 +111,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final TabPane tabbedPane = new TabPane();
     private final EntryEditor entryEditor;
     private final ObjectProperty<PanelMode> panelMode = new SimpleObjectProperty<>(PanelMode.MAIN_TABLE);
+    private Runnable autoCompleterChangedListener;
 
     // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
     private Subscription horizontalDividerSubscription;
@@ -402,6 +403,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 }
                 stateManager.searchResultSize(SearchType.NORMAL_SEARCH).bind(libraryTab.resultSizeProperty());
                 globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
+
+
+                // Listen for auto-completer changes after real context is loaded
+                libraryTab.setAutoCompleterChangedListener(() -> globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter()));
 
                 // [impl->req~maintable.focus~1]
                 Platform.runLater(() -> libraryTab.getMainTable().requestFocus());
