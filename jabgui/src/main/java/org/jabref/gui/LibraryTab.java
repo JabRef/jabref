@@ -260,7 +260,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         });
     }
 
-    public void setAutoCompleterChangedListener(Runnable listener) {
+    public void setAutoCompleterChangedListener(@NonNull Runnable listener) {
         this.autoCompleterChangedListener = listener;
     }
 
