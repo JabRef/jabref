@@ -2710,6 +2710,10 @@ journalInfo .grid-cell-b {
     -fx-border-color: transparent;
 }
 
+.add-certificate {
+    -fx-pref-width: 17em;
+    -fx-min-width: 17em;
+}
 
 /* Quick Settings */
 .quick-settings-container,
