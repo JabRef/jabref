@@ -404,7 +404,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.searchResultSize(SearchType.NORMAL_SEARCH).bind(libraryTab.resultSizeProperty());
                 globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
 
-
                 // Listen for auto-completer changes after real context is loaded
                 libraryTab.setAutoCompleterChangedListener(() -> globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter()));
 
