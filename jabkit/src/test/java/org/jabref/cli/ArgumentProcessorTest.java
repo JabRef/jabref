@@ -54,7 +54,7 @@ class ArgumentProcessorTest {
     private CommandLine commandLine;
 
     @BeforeAll
-    static void checkTestResources() {
+    static void checkTestResources() throws IOException {
         String[] required = new String[] {"origin.bib", "paper.aux", "ArgumentProcessorTestExportMatches.bib"};
         StringBuilder missing = new StringBuilder();
         for (String res : required) {
@@ -66,7 +66,7 @@ class ArgumentProcessorTest {
             }
         }
         if (missing.length() > 0) {
-            throw new IllegalStateException("Required test resources missing from classpath: " + missing);
+            throw new IOException("Required test resources missing from classpath: " + missing);
         }
     }
 
@@ -89,7 +89,7 @@ class ArgumentProcessorTest {
         try (InputStream originIs = ArgumentProcessorTest.class.getResourceAsStream("origin.bib");
              InputStream auxIs = ArgumentProcessorTest.class.getResourceAsStream("paper.aux")) {
             if (originIs == null || auxIs == null) {
-                throw new IllegalStateException("Required test resources are missing from classpath");
+                throw new IOException("Required test resources are missing from classpath");
             }
 
             Path fullBib = tempDir.resolve("origin.bib");
