@@ -122,6 +122,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - Enhanced field selection logic in the Merge Entries dialog when fetching from DOI to prefer valid years and entry types. [#12549](https://github.com/JabRef/jabref/issues/12549)
 - We fixed an issue where theme or font size are not respected for all dialogs [#13558](https://github.com/JabRef/jabref/issues/13558)
 - We removed unnecessary spacing and margin in the AutomaticFieldEditor. [#13792](https://github.com/JabRef/jabref/pull/13792)
+- We fixed an issue where global search auto-completion only worked after switching tabs, it now initializes with the real database context right after a library loads. (https://github.com/JabRef/jabref/issues/11428)
 
 ### Removed
 
