@@ -34,11 +34,7 @@ import javafx.scene.text.Text;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.fieldeditors.contextmenu.ContextAction;
 import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory;
-import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory.MultiContextCommandFactory;
-import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory.SingleContextCommandFactory;
-import org.jabref.gui.fieldeditors.contextmenu.MultiContextAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
@@ -116,7 +112,16 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 taskExecutor,
                 fieldCheckers,
                 preferences,
-                undoManager);
+                undoManager
+        );
+
+        this.contextMenuFactory = new ContextMenuFactory(
+                dialogService,
+                preferences,
+                databaseContext,
+                bibEntry,
+                viewModel
+        );
 
         new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
@@ -302,31 +307,21 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
         if (event.getButton() == MouseButton.PRIMARY && (event.getClickCount() == 2)) {
-            linkedFile.open(); // Double-click: open file
+            linkedFile.open();
         } else if (activeContextMenu != null && event.getButton() == MouseButton.PRIMARY) {
-            activeContextMenu.hide(); // Hide context menu if left-click
+            activeContextMenu.hide();
             activeContextMenu = null;
         } else if (event.getButton() == MouseButton.SECONDARY) {
             if (activeContextMenu != null) {
-                activeContextMenu.hide(); // Hide any existing context menu
+                activeContextMenu.hide();
                 activeContextMenu = null;
             }
 
-            SingleContextCommandFactory contextCommandFactory = (action, file) ->
-                    new ContextAction(action, file, databaseContext, bibEntry, preferences, viewModel);
-
-            MultiContextCommandFactory multiContextCommandFactory = (action, files) ->
-                    new MultiContextAction(action, files, databaseContext, bibEntry, preferences, viewModel);
-
-            contextMenuFactory = new ContextMenuFactory(
-                    dialogService,
-                    preferences,
-                    databaseContext,
-                    bibEntry,
-                    viewModel,
-                    contextCommandFactory,
-                    multiContextCommandFactory
+            ContextMenu menu = contextMenuFactory.createForSelection(
+                    listView.getSelectionModel().getSelectedItems()
             );
+            menu.show(listView, event.getScreenX(), event.getScreenY());
+            activeContextMenu = menu;
 
             ContextMenu contextMenu = contextMenuFactory.createForSelection(listView.getSelectionModel().getSelectedItems());
             contextMenu.show(listView, event.getScreenX(), event.getScreenY());

@@ -1,14 +1,13 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
+import java.util.List;
+import java.util.Objects;
+
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.copyfiles.CopyMultipleFilesAction;
-import org.jabref.gui.copyfiles.CopySingleFileAction;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -21,101 +20,42 @@ public class ContextMenuFactory {
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
-    private final BibDatabaseContext databaseContext;
-    private final SingleContextCommandFactory singleCommandFactory;
-    private final MultiContextCommandFactory multiCommandFactory;
+
+    private final List<ContextMenuBuilder> strategies;
 
     public ContextMenuFactory(DialogService dialogService,
                               GuiPreferences preferences,
                               BibDatabaseContext databaseContext,
                               ObservableOptionalValue<BibEntry> bibEntry,
-                              LinkedFilesEditorViewModel viewModel,
-                              SingleContextCommandFactory singleCommandFactory,
-                              MultiContextCommandFactory multiCommandFactory) {
-        this.dialogService = dialogService;
-        this.preferences = preferences;
-        this.databaseContext = databaseContext;
-        this.singleCommandFactory = singleCommandFactory;
-        this.multiCommandFactory = multiCommandFactory;
+                              LinkedFilesEditorViewModel viewModel) {
+
+        this.dialogService = Objects.requireNonNull(dialogService);
+        this.preferences = Objects.requireNonNull(preferences);
+        BibDatabaseContext dbContext = Objects.requireNonNull(databaseContext);
+        ObservableOptionalValue<BibEntry> currentEntry = Objects.requireNonNull(bibEntry);
+        LinkedFilesEditorViewModel editorViewModel = Objects.requireNonNull(viewModel);
+
+        this.strategies = List.of(
+                new SingleSelectionMenuBuilder(dbContext, currentEntry, this.preferences, editorViewModel),
+                new MultiSelectionMenuBuilder(dbContext, currentEntry, this.preferences, editorViewModel)
+        );
     }
 
-    public ContextMenu createForSelection(ObservableList<LinkedFileViewModel> selectedFiles) {
-        if (selectedFiles.size() > 1) {
-            return createContextMenuForMultiFile(selectedFiles);
-        } else if (!selectedFiles.isEmpty()) {
-            return createContextMenuForFile(selectedFiles.getFirst());
+    public ContextMenu createForSelection(ObservableList<LinkedFileViewModel> selection) {
+        if (selection == null || selection.isEmpty()) {
+            return new ContextMenu();
         }
-        return new ContextMenu();
-    }
 
-    private ContextMenu createContextMenuForMultiFile(ObservableList<LinkedFileViewModel> selectedFiles) {
+        ContextMenuBuilder builder = strategies.stream()
+                                               .filter(s -> s.supports(selection))
+                                               .findFirst()
+                                               .orElseThrow(() -> new IllegalStateException(
+                                                       "No menu strategy for selection size = " + selection.size()));
+
+        List<MenuItem> items = builder.buildMenu(selection);
+
         ContextMenu menu = new ContextMenu();
-        ActionFactory factory = new ActionFactory();
-
-        menu.getItems().addAll(
-                factory.createMenuItem(
-                        StandardActions.OPEN_FILES,
-                        multiCommandFactory.build(StandardActions.OPEN_FILES, selectedFiles)),
-                factory.createMenuItem(
-                        StandardActions.OPEN_FOLDERS,
-                        multiCommandFactory.build(StandardActions.OPEN_FOLDERS, selectedFiles)),
-                new SeparatorMenuItem(),
-                factory.createMenuItem(
-                        StandardActions.DOWNLOAD_FILES,
-                        multiCommandFactory.build(StandardActions.DOWNLOAD_FILES, selectedFiles)),
-                factory.createMenuItem(
-                        StandardActions.REDOWNLOAD_FILES,
-                        multiCommandFactory.build(StandardActions.REDOWNLOAD_FILES, selectedFiles)),
-                new SeparatorMenuItem(),
-                factory.createMenuItem(
-                        StandardActions.MOVE_FILES_TO_FOLDER,
-                        multiCommandFactory.build(StandardActions.MOVE_FILES_TO_FOLDER, selectedFiles)),
-                factory.createMenuItem(
-                        StandardActions.COPY_FILES_TO_FOLDER,
-                        new CopyMultipleFilesAction(selectedFiles, dialogService, databaseContext, preferences.getFilePreferences())),
-                new SeparatorMenuItem(),
-                factory.createMenuItem(
-                        StandardActions.REMOVE_LINKS,
-                        multiCommandFactory.build(StandardActions.REMOVE_LINKS, selectedFiles)),
-                factory.createMenuItem(
-                        StandardActions.DELETE_FILES,
-                        multiCommandFactory.build(StandardActions.DELETE_FILES, selectedFiles))
-        );
-
+        menu.getItems().addAll(items);
         return menu;
-    }
-
-    private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
-        ContextMenu menu = new ContextMenu();
-        ActionFactory factory = new ActionFactory();
-
-        menu.getItems().addAll(
-                factory.createMenuItem(StandardActions.EDIT_FILE_LINK, singleCommandFactory.build(StandardActions.EDIT_FILE_LINK, linkedFile)),
-                new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.OPEN_FILE, singleCommandFactory.build(StandardActions.OPEN_FILE, linkedFile)),
-                factory.createMenuItem(StandardActions.OPEN_FOLDER, singleCommandFactory.build(StandardActions.OPEN_FOLDER, linkedFile)),
-                new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.DOWNLOAD_FILE, singleCommandFactory.build(StandardActions.DOWNLOAD_FILE, linkedFile)),
-                factory.createMenuItem(StandardActions.RENAME_FILE_TO_PATTERN, singleCommandFactory.build(StandardActions.RENAME_FILE_TO_PATTERN, linkedFile)),
-                factory.createMenuItem(StandardActions.RENAME_FILE_TO_NAME, singleCommandFactory.build(StandardActions.RENAME_FILE_TO_NAME, linkedFile)),
-                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER, singleCommandFactory.build(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile)),
-                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, singleCommandFactory.build(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile)),
-                factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences())),
-                factory.createMenuItem(StandardActions.REDOWNLOAD_FILE, singleCommandFactory.build(StandardActions.REDOWNLOAD_FILE, linkedFile)),
-                factory.createMenuItem(StandardActions.REMOVE_LINK, singleCommandFactory.build(StandardActions.REMOVE_LINK, linkedFile)),
-                factory.createMenuItem(StandardActions.DELETE_FILE, singleCommandFactory.build(StandardActions.DELETE_FILE, linkedFile))
-        );
-
-        return menu;
-    }
-
-    @FunctionalInterface
-    public interface SingleContextCommandFactory {
-        ContextAction build(StandardActions action, LinkedFileViewModel file);
-    }
-
-    @FunctionalInterface
-    public interface MultiContextCommandFactory {
-        MultiContextAction build(StandardActions action, ObservableList<LinkedFileViewModel> selectedFiles);
     }
 }
