@@ -32,12 +32,6 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class BibliographyConsistencyCheck {
 
-    private static final Set<EntryType> BIBLATEX_TYPES = new HashSet<>(new BibEntryTypesManager()
-            .getAllTypes(BibDatabaseMode.BIBLATEX)).stream().map(e -> e.getType()).collect(Collectors.toSet());
-
-    private static final Set<EntryType> BIBTEX_TYPES = new HashSet<>(new BibEntryTypesManager()
-            .getAllTypes(BibDatabaseMode.BIBTEX)).stream().map(e -> e.getType()).collect(Collectors.toSet());
-
     private static final Set<Field> EXPLICITLY_EXCLUDED_FIELDS = Set.of(
             InternalField.KEY_FIELD, // Citation key
             StandardField.KEY,
@@ -59,6 +53,12 @@ public class BibliographyConsistencyCheck {
             StandardField.CREATIONDATE,
             StandardField.MODIFICATIONDATE
     );
+
+    private static final Set<EntryType> BIBLATEX_TYPES = new HashSet<>(new BibEntryTypesManager()
+            .getAllTypes(BibDatabaseMode.BIBLATEX)).stream().map(e -> e.getType()).collect(Collectors.toSet());
+
+    private static final Set<EntryType> BIBTEX_TYPES = new HashSet<>(new BibEntryTypesManager()
+            .getAllTypes(BibDatabaseMode.BIBTEX)).stream().map(e -> e.getType()).collect(Collectors.toSet());
 
     private static Set<Field> filterExcludedFields(Collection<Field> fields) {
         return fields.stream()
