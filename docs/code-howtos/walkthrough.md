@@ -42,9 +42,11 @@ All walkthroughs are currently launched from the `Walkthroughs` component, which
 
 ![The "Walkthroughs" section of the Welcome Tab, showing a list of available walkthroughs](../images/walkthroughs.png)
 
-# Quick Settings
+## Quick Settings
 
-Quick Settings is a component of the `WelcomeTab` that allows users to easily modify the most common settings. To change
-the items displayed, see the `org.jabref.gui.welcome.components.QuickSettings` class.
+Since walkthroughs are only supposed to highlight UI components and guide the user through JabRef, quick settings are 
+create so as to provide a convenient entry point for the user to edit the common settings like theme, online services, 
+and main file directory. All the quick settings items are present in the `org.jabref.gui.welcome.components.QuickSettings`
+component, which is visible in the `WelcomeTab`.
 
 ![The 'Quick Settings' section of the Welcome Tab, showing options for main file directory, theme, online settings, etc](../images/quicksettings.png)
