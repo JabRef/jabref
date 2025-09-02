@@ -26,26 +26,17 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
-import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
-import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.annotations.VisibleForTesting;
 
 public class BibliographyConsistencyCheck {
 
-    // private static final Set<EntryType> BIBLATEX_TYPES = BiblatexEntryTypeDefinitions.ALL.stream()
-            // .map(BibEntryType::getType)
-            // .collect(Collectors.toSet());
+    private static final Set<EntryType> BIBLATEX_TYPES = new HashSet<>(new BibEntryTypesManager()
+            .getAllTypes(BibDatabaseMode.BIBLATEX)).stream().map(e -> e.getType()).collect(Collectors.toSet());
 
-    private static final Set<BibEntryType> BIBLATEX_TYPES = new HashSet<>(new BibEntryTypesManager()
-            .getAllTypes(BibDatabaseMode.BIBLATEX));
-
-    // private static final Set<EntryType> BIBTEX_TYPES = BibtexEntryTypeDefinitions.ALL.stream()
-            // .map(BibEntryType::getType)
-            // .collect(Collectors.toSet());
-    private static final Set<BibEntryType> BIBTEX_TYPES = new HashSet<>(new BibEntryTypesManager()
-            .getAllTypes(BibDatabaseMode.BIBTEX));
+    private static final Set<EntryType> BIBTEX_TYPES = new HashSet<>(new BibEntryTypesManager()
+            .getAllTypes(BibDatabaseMode.BIBTEX)).stream().map(e -> e.getType()).collect(Collectors.toSet());
 
     private static final Set<Field> EXPLICITLY_EXCLUDED_FIELDS = Set.of(
             InternalField.KEY_FIELD, // Citation key
@@ -128,9 +119,9 @@ public class BibliographyConsistencyCheck {
 
         List<BibEntryType> entryTypeDefinitions;
         if (bibContext.getMode() == BibDatabaseMode.BIBLATEX) {
-            entryTypeDefinitions = BiblatexEntryTypeDefinitions.ALL;
+            entryTypeDefinitions = new BibEntryTypesManager().getAllTypes(BibDatabaseMode.BIBLATEX).stream().toList();
         } else {
-            entryTypeDefinitions = BibtexEntryTypeDefinitions.ALL;
+            entryTypeDefinitions = new BibEntryTypesManager().getAllTypes(BibDatabaseMode.BIBTEX).stream().toList();
         }
 
         // Use LinkedHashMap to preserve the order of Bib(tex|latex)EntryTypeDefinitions.ALL
@@ -180,7 +171,7 @@ public class BibliographyConsistencyCheck {
         BibDatabaseMode mode = bibContext.getMode();
         List<BibEntry> entries = bibContext.getEntries();
 
-        Set<BibEntryType> typeSet = switch (mode) {
+        Set<EntryType> typeSet = switch (mode) {
             case BIBLATEX -> BIBLATEX_TYPES;
             case BIBTEX -> BIBTEX_TYPES;
         };
