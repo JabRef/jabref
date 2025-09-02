@@ -9,7 +9,6 @@ class FetcherExceptionTest {
 
     @ParameterizedTest
     @CsvSource({
-            // Given example
             "https://api.springernature.com/meta/v1/json?q=anything&api_key=abc&s=1&p=20, https://api.springernature.com/meta/v1/json?q=anything&api_key=[REDACTED]&s=1&p=20",
             "https://api.springernature.com/meta/v1/json?q=anything&API_KEY=abc, https://api.springernature.com/meta/v1/json?q=anything&API_KEY=[REDACTED]",
             "https://api.springernature.com/meta/v1/json?q=anything&apikey=abc123ABC, https://api.springernature.com/meta/v1/json?q=anything&apikey=[REDACTED]",
