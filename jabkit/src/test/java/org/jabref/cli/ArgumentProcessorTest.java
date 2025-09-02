@@ -86,11 +86,8 @@ class ArgumentProcessorTest {
 
     @Test
     void auxImport(@TempDir Path tempDir) throws IOException {
-        try (InputStream originIs = ArgumentProcessorTest.class.getResourceAsStream("origin.bib");
-             InputStream auxIs = ArgumentProcessorTest.class.getResourceAsStream("paper.aux")) {
-            if (originIs == null || auxIs == null) {
-                throw new IOException("Required test resources are missing from classpath");
-            }
+            InputStream originIs = ArgumentProcessorTest.class.getResourceAsStream("origin.bib");
+            InputStream auxIs = ArgumentProcessorTest.class.getResourceAsStream("paper.aux");
 
             Path fullBib = tempDir.resolve("origin.bib");
             Files.copy(originIs, fullBib, StandardCopyOption.REPLACE_EXISTING);
@@ -111,7 +108,6 @@ class ArgumentProcessorTest {
             BibtexImporter importer = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
             List<BibEntry> entries = importer.importDatabase(outputBib).getDatabase().getEntries();
             assertTrue(entries != null && !entries.isEmpty(), "Expected output bib to contain at least one entry");
-        }
     }
 
     @Test
