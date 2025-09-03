@@ -17,7 +17,6 @@ import org.jabref.logic.bibtex.comparator.BibEntryByCitationKeyComparator;
 import org.jabref.logic.bibtex.comparator.BibEntryByFieldsComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -54,11 +53,18 @@ public class BibliographyConsistencyCheck {
             StandardField.MODIFICATIONDATE
     );
 
-    private static final Set<EntryType> BIBLATEX_TYPES = Set.copyOf(new BibEntryTypesManager()
-            .getAllTypes(BibDatabaseMode.BIBLATEX)).stream().map(BibEntryType::getType).collect(Collectors.toSet());
+    private final BibEntryTypesManager bibEntryTypesManager;
 
-    private static final Set<EntryType> BIBTEX_TYPES = Set.copyOf(new BibEntryTypesManager()
-            .getAllTypes(BibDatabaseMode.BIBTEX)).stream().map(BibEntryType::getType).collect(Collectors.toSet());
+    // Default constructor
+    public BibliographyConsistencyCheck() {
+        this(new BibEntryTypesManager());
+    }
+
+    // Accepting manager constructor
+    @VisibleForTesting
+    BibliographyConsistencyCheck(BibEntryTypesManager bibEntryTypesManager) {
+        this.bibEntryTypesManager = bibEntryTypesManager;
+    }
 
     private static Set<Field> filterExcludedFields(Collection<Field> fields) {
         return fields.stream()
@@ -117,12 +123,10 @@ public class BibliographyConsistencyCheck {
 
         collectEntriesIntoMaps(bibContext, entryTypeToFieldsInAnyEntryMap, entryTypeToFieldsInAllEntriesMap, entryTypeToEntriesMap);
 
-        List<BibEntryType> entryTypeDefinitions;
-        if (bibContext.getMode() == BibDatabaseMode.BIBLATEX) {
-            entryTypeDefinitions = new BibEntryTypesManager().getAllTypes(BibDatabaseMode.BIBLATEX).stream().toList();
-        } else {
-            entryTypeDefinitions = new BibEntryTypesManager().getAllTypes(BibDatabaseMode.BIBTEX).stream().toList();
-        }
+        List<BibEntryType> entryTypeDefinitions = bibEntryTypesManager
+                .getAllTypes(bibContext.getMode())
+                .stream()
+                .toList();
 
         // Use LinkedHashMap to preserve the order of Bib(tex|latex)EntryTypeDefinitions.ALL
         Map<EntryType, EntryTypeResult> resultMap = new LinkedHashMap<>();
@@ -166,7 +170,6 @@ public class BibliographyConsistencyCheck {
     }
 
     private static void collectEntriesIntoMaps(BibDatabaseContext bibContext, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
-        BibDatabaseMode mode = bibContext.getMode();
         List<BibEntry> entries = bibContext.getEntries();
 
         for (BibEntry entry : entries) {
