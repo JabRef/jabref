@@ -6,7 +6,6 @@ import javafx.scene.control.CheckBox;
 
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.gui.welcome.quicksettings.viewmodel.LargeLibraryOptimizationDialogViewModel;
@@ -15,7 +14,6 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class LargeLibraryOptimizationDialog extends FXDialog {
-
     @FXML private CheckBox disableFulltextIndexing;
     @FXML private CheckBox disableCreationDate;
     @FXML private CheckBox disableModificationDate;
@@ -26,9 +24,8 @@ public class LargeLibraryOptimizationDialog extends FXDialog {
     private LargeLibraryOptimizationDialogViewModel viewModel;
     private final GuiPreferences preferences;
 
-    public LargeLibraryOptimizationDialog(GuiPreferences preferences, ThemeManager themeManager) {
+    public LargeLibraryOptimizationDialog(GuiPreferences preferences) {
         super(AlertType.NONE, Localization.lang("Optimize for large libraries"), true);
-        themeManager.updateFontStyle(this.getDialogPane().getScene());
 
         this.preferences = preferences;
 

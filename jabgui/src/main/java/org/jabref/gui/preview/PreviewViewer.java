@@ -248,6 +248,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public void print() {
         PrinterJob job = PrinterJob.createPrinterJob();
+        if (job == null) {
+            LOGGER.warn("PrinterJob.createPrinterJob() returned null; printing not available");
+            dialogService.showErrorDialogAndWait("Could not find an available printer");
+            return;
+        }
         if ((entry == null) || !dialogService.showPrintDialog(job)) {
             return;
         }
