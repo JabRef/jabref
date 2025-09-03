@@ -65,8 +65,6 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
                 new Tooltip(Localization.lang("Visit ICORE conference page"))
         );
         visitICOREConferencePageButton.disableProperty().bind(textField.textProperty().isEmpty());
-
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     @Override

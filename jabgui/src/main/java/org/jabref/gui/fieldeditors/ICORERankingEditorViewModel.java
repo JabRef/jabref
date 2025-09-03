@@ -9,7 +9,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.icore.ConferenceAcronymExtractor;
 import org.jabref.logic.icore.ConferenceRepository;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -56,18 +55,7 @@ public class ICORERankingEditorViewModel extends AbstractEditorViewModel {
             return;
         }
 
-        Optional<ConferenceEntry> conference;
-        Optional<String> acronym = ConferenceAcronymExtractor.extract(bookTitle.get());
-        if (acronym.isPresent()) {
-            conference = repo.getConferenceFromAcronym(acronym.get());
-            if (conference.isPresent()) {
-                entry.setField(field, conference.get().rank());
-                matchedConference = conference.get();
-                return;
-            }
-        }
-
-        conference = repo.getConferenceFromBookTitle(bookTitle.get());
+        Optional<ConferenceEntry> conference = repo.getConferenceFromBookTitle(bookTitle.get());
         if (conference.isPresent()) {
             entry.setField(field, conference.get().rank());
             matchedConference = conference.get();

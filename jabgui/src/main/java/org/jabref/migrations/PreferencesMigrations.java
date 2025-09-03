@@ -566,9 +566,10 @@ public class PreferencesMigrations {
     /**
      * Updates the default preferences for the editor fields under the "General" tab to include the ICORE Ranking Field
      * if it is missing.
-     *<p>
+     * <p>
      * The function first ensures that the current preferences match the previous default (before the ICORE field was added)
      * and only then does the update.
+     * </p>
      *
      * @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
      * @param preferences the user's current preferences

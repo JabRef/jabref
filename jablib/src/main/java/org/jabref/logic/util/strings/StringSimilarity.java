@@ -55,4 +55,46 @@ public class StringSimilarity {
         LOGGER.trace("Longer string: {} Shorter string: {} Similarity: {}", longer, shorter, similarity);
         return similarity;
     }
+
+    /**
+     * Returns the Longest Common Substring (LCS) similarity rating between two strings, ignoring case.
+     * <p>
+     * This function uses the following formula = <code>(length of longest substring) / (length of shorter string)</code>.
+     * The longest common substring is calculated using a space-optimized dynamic programming implementation of the LCS
+     * algorithm found <a href="https://en.wikipedia.org/wiki/Longest_common_substring">on Wikipedia</a>.
+     * </p>
+     */
+    public static double LCSSimilarity(String first, String second) {
+        if (first.isEmpty() && second.isEmpty()) {
+            return 1.0;
+        }
+
+        if (first.isEmpty() || second.isEmpty()) {
+            return 0.0;
+        }
+
+        first = first.toLowerCase();
+        second = second.toLowerCase();
+        int firstLength = first.length();
+        int secondLength = second.length();
+
+        int[] previousMatches = new int[secondLength + 1];
+
+        int longestSubstringLength = 0;
+        for (int i = 1; i <= firstLength; i++) {
+            int[] currentMatches = new int[secondLength + 1];
+            for (int j = 1; j <= secondLength; j++) {
+                if (first.charAt(i - 1) == second.charAt(j - 1)) {
+                    currentMatches[j] = previousMatches[j - 1] + 1;
+                    longestSubstringLength = Math.max(longestSubstringLength, currentMatches[j]);
+                } else {
+                    currentMatches[j] = 0;
+                }
+            }
+
+            // Move the current row's data to the previous row
+            previousMatches = currentMatches;
+        }
+        return (double) longestSubstringLength / Math.min(firstLength, secondLength);
+    }
 }
