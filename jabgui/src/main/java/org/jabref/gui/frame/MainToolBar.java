@@ -28,7 +28,7 @@ import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.push.PushToApplicationCommand;
+import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -47,7 +47,7 @@ import org.controlsfx.control.TaskProgressView;
 
 public class MainToolBar extends ToolBar {
     private final LibraryTabContainer frame;
-    private final PushToApplicationCommand pushToApplicationCommand;
+    private final GuiPushToApplicationCommand pushToApplicationCommand;
     private final GlobalSearchBar globalSearchBar;
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -64,7 +64,7 @@ public class MainToolBar extends ToolBar {
     private Subscription taskProgressSubscription;
 
     public MainToolBar(LibraryTabContainer tabContainer,
-                       PushToApplicationCommand pushToApplicationCommand,
+                       GuiPushToApplicationCommand pushToApplicationCommand,
                        GlobalSearchBar globalSearchBar,
                        DialogService dialogService,
                        StateManager stateManager,
@@ -115,8 +115,8 @@ public class MainToolBar extends ToolBar {
                 rightSpacer,
 
                 new HBox(
-                        factory.createIconButton(StandardActions.CREATE_ENTRY_IMMEDIATE, new NewEntryAction(true, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                        factory.createIconButton(StandardActions.CREATE_ENTRY, new NewEntryAction(false, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                        factory.createIconButton(StandardActions.ADD_ENTRY_IMMEDIATE, new NewEntryAction(true, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                        factory.createIconButton(StandardActions.ADD_ENTRY, new NewEntryAction(false, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                         factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),

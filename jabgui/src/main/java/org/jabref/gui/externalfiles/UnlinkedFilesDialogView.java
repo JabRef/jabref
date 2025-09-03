@@ -36,7 +36,6 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -59,7 +58,6 @@ import jakarta.inject.Inject;
 import org.controlsfx.control.CheckTreeView;
 
 public class UnlinkedFilesDialogView extends BaseDialog<Void> {
-
     private static final String REFRESH_CLASS = "refresh";
 
     @FXML private TextField directoryPathField;
@@ -89,7 +87,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @Inject private UndoManager undoManager;
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
-    @Inject private ThemeManager themeManager;
 
     private final ControlsFxVisualizer validationVisualizer;
     private UnlinkedFilesDialogViewModel viewModel;
@@ -112,8 +109,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
             saveConfiguration();
             return null;
         });
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     @FXML

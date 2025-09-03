@@ -288,7 +288,7 @@ public class IsiImporter extends Importer {
                 }
             }
 
-            if (pages.length() > 0) {
+            if (!pages.isEmpty()) {
                 hm.put(StandardField.PAGES, pages.toString());
             }
 

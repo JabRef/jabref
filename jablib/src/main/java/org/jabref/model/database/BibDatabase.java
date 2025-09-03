@@ -41,6 +41,7 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,16 +189,15 @@ public class BibDatabase {
         insertEntries(entries, EntriesEventSource.LOCAL);
     }
 
-    public synchronized void insertEntries(List<BibEntry> newEntries, EntriesEventSource eventSource) {
-        Objects.requireNonNull(newEntries);
+    public synchronized void insertEntries(@NonNull List<BibEntry> newEntries, EntriesEventSource eventSource) {
+        if (newEntries.isEmpty()) {
+            return;
+        }
+
         for (BibEntry entry : newEntries) {
             entry.registerListener(this);
         }
-        if (newEntries.isEmpty()) {
-            eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
-        } else {
-            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.getFirst(), eventSource));
-        }
+        eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
         entries.addAll(newEntries);
         newEntries.forEach(entry -> {
                     entriesId.put(entry.getId(), entry);
@@ -419,8 +419,7 @@ public class BibDatabase {
      * Resolves any references to strings contained in this field content,
      * if possible.
      */
-    public String resolveForStrings(String content) {
-        Objects.requireNonNull(content, "Content for resolveForStrings must not be null.");
+    public String resolveForStrings(@NonNull String content) {
         return resolveContent(content, new HashSet<>(), new HashSet<>());
     }
 
@@ -484,7 +483,7 @@ public class BibDatabase {
         if (inPlace) {
             resultingEntry = entry;
         } else {
-            resultingEntry = (BibEntry) entry.clone();
+            resultingEntry = new BibEntry(entry);
         }
 
         for (Map.Entry<Field, String> field : resultingEntry.getFieldMap().entrySet()) {

@@ -25,9 +25,9 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -49,9 +49,9 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_HOST);
-        uriBuilder.addParameter("Query", new JstorQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
+        uriBuilder.addParameter("Query", new JstorQueryTransformer().transformSearchQuery(queryNode).orElse(""));
         return uriBuilder.build().toURL();
     }
 

@@ -13,9 +13,11 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.IdentityFormatter;
+import org.jabref.logic.formatter.bibtexfields.ConvertMSCCodesFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
+import org.jabref.logic.formatter.bibtexfields.NormalizeIssn;
 import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
@@ -62,7 +64,9 @@ public class FieldFormatterCleanups {
                 new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()),
                 new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
                 new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
-                new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new ReplaceUnicodeLigaturesFormatter()));
+                new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new ReplaceUnicodeLigaturesFormatter()),
+                new FieldFormatterCleanup(StandardField.KEYWORDS, new ConvertMSCCodesFormatter()),
+                new FieldFormatterCleanup(StandardField.ISSN, new NormalizeIssn()));
 
         List<FieldFormatterCleanup> recommendedBibtexFormatters = new ArrayList<>(DEFAULT_SAVE_ACTIONS);
         recommendedBibtexFormatters.addAll(List.of(

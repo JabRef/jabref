@@ -16,9 +16,9 @@ import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.newentry.NewEntryPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
-import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.push.PushToApplicationPreferences;
 
 public interface GuiPreferences extends CliPreferences {
     CopyToPreferences getCopyToPreferences();
@@ -58,4 +58,6 @@ public interface GuiPreferences extends CliPreferences {
     KeyBindingRepository getKeyBindingRepository();
 
     NewEntryPreferences getNewEntryPreferences();
+
+    DonationPreferences getDonationPreferences();
 }

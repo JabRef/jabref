@@ -74,12 +74,25 @@
     <CheckBox fx:id="confirmDelete" text="%Show confirmation dialog when deleting entries"/>
     <CheckBox fx:id="shouldAskForIncludingCrossReferences" text="%Ask whether to include cross-references when copying to another library"/>
     <CheckBox fx:id="confirmHideTabBar" text="%Hide tab bar when single library is present"/>
+    <CheckBox fx:id="donationNeverShow" text="%Do not show donation prompt again"/>
 
     <Label styleClass="sectionHeader" text="%Single instance" />
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <CheckBox fx:id="remoteServer" text="%Enforce single JabRef instance (and allow remote operations) using port" />
         <TextField fx:id="remotePort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
         <Button fx:id="remoteHelp" prefWidth="20.0" />
+    </HBox>
+
+    <Label styleClass="sectionHeader" text="%HTTP Server" />
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <CheckBox fx:id="enableHttpServer" text="%Enable HTTP Server (e.g., for JabMap) on port" />
+        <TextField fx:id="httpServerPort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <Label styleClass="sectionHeader" text="%Language Server" />
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <CheckBox fx:id="enableLanguageServer" text="%Enable Language Server on port" />
+        <TextField fx:id="languageServerPort" maxWidth="100.0" HBox.hgrow="ALWAYS" />
     </HBox>
 
     <Label styleClass="sectionHeader" text="%Libraries"/>

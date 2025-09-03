@@ -75,7 +75,6 @@ import org.slf4j.LoggerFactory;
 
 @AllowedToUseClassGetResource("JavaFX internally handles the passed URLs properly.")
 public class MainTable extends TableView<BibEntryTableViewModel> {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);
     private static final PseudoClass MATCHING_SEARCH_AND_GROUPS = PseudoClass.getPseudoClass("matching-search-and-groups");
     private static final PseudoClass MATCHING_SEARCH_NOT_GROUPS = PseudoClass.getPseudoClass("matching-search-not-groups");
@@ -99,6 +98,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private String columnSearchTerm;
     private boolean citationMergeMode = false;
 
+    /// There is one maintable instance per library tab
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
                      LibraryTabContainer tabContainer,
@@ -112,7 +112,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      TaskExecutor taskExecutor,
                      ImportHandler importHandler) {
         super();
-
         this.libraryTab = libraryTab;
         this.stateManager = stateManager;
         this.database = Objects.requireNonNull(database);
@@ -324,6 +323,27 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         }
     }
 
+    public void clearAndSelect(List<BibEntry> bibEntries) {
+        // check if entries merged from citation relations tab
+        if (citationMergeMode) {
+            // keep original entry selected and reset citation merge mode
+            this.citationMergeMode = false;
+        } else {
+            // select new entries
+            getSelectionModel().clearSelection();
+            List<BibEntryTableViewModel> entries = bibEntries.stream()
+                                                             .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
+                                                             .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()))
+                                                             .filter(Optional::isPresent)
+                                                             .map(Optional::get)
+                                                             .toList();
+            entries.forEach(entry -> getSelectionModel().select(entry));
+            if (!entries.isEmpty()) {
+                scrollTo(entries.getFirst());
+            }
+        }
+    }
+
     private void scrollToNextMatchCategory() {
         BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();
         if (selectedEntry == null) {
@@ -369,7 +389,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager);
         EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager);
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
-        OpenExternalFileAction openExternalFileActionFileAction = new OpenExternalFileAction(dialogService, stateManager, preferences, taskExecutor);
+        OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor);
         MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager);
         LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(WebFetchers.getIdFetcherForIdentifier(DOI.class), stateManager, undoManager, dialogService, taskExecutor);
 
@@ -422,7 +442,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         event.consume();
                         break;
                     case OPEN_FILE:
-                        openExternalFileActionFileAction.execute();
+                        openSelectedEntriesFilesActionFileAction.execute();
                         event.consume();
                         break;
                     case MERGE_WITH_FETCHED_ENTRY:
@@ -569,6 +589,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
         return model.getViewModelByIndex(database.getDatabase().indexOf(entry));
+    }
+
+    private Optional<BibEntryTableViewModel> findEntryByCitationKey(String citationKey) {
+        return model.getViewModelByCitationKey(citationKey);
     }
 
     public void setCitationMergeMode(boolean citationMerge) {

@@ -23,10 +23,11 @@ concurrency:
 
 jobs:
   cache:
+    if: ${{ github.repository_owner == 'JabRef' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Install TeX Live
         uses: zauguin/install-texlive@v4
         with:
@@ -79,7 +80,7 @@ jobs:
             bibengine: biber
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install TeX Live
         uses: zauguin/install-texlive@v4

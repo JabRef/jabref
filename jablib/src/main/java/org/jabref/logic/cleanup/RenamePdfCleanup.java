@@ -48,7 +48,9 @@ public class RenamePdfCleanup implements CleanupJob {
                     changed = true;
                 }
             } catch (IOException exception) {
-                LOGGER.error("Error while renaming file {}", file.getLink(), exception);
+                // There is no exception logged here, because the stack trace can get very large (and is not helpful)
+                // The only "real" information lost is i) the absolute path of the source file and ii) the absolute path of the target file.
+                LOGGER.error("Error while renaming file {}", file.getLink());
             }
         }
 

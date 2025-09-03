@@ -81,6 +81,15 @@ public class URLUtil {
     /// @param url the String to check for a URL
     /// @return true if `url` contains a valid URL
     public static boolean isURL(String url) {
+        if (url == null || url.trim().isEmpty()) {
+            return false;
+        }
+        
+        // Check if the URL has a protocol (http://, https://, ftp://)
+        if (!URL_PATTERN.matcher(url).matches()) {
+            return false;
+        }
+        
         try {
             create(url);
             return true;
@@ -97,7 +106,29 @@ public class URLUtil {
      * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
      */
     public static URL create(String url) throws MalformedURLException {
-        return createUri(url).toURL();
+        if (url == null || url.trim().isEmpty()) {
+            throw new IllegalArgumentException("URL must not be null or empty.");
+        }
+
+        String trimmedUrl = url.trim();
+
+        // Add https:// prefix to URLs starting with www. to make them absolute
+        if (trimmedUrl.startsWith("www.")) {
+            trimmedUrl = "https://" + trimmedUrl;
+        }
+
+        try {
+            URI parsedUri = new URI(trimmedUrl);
+            if (!parsedUri.isAbsolute()) {
+                throw new MalformedURLException("URI is not absolute: " + url);
+            }
+            if (parsedUri.getScheme() == null || parsedUri.getHost() == null) {
+                throw new MalformedURLException("URI must include both scheme and host: " + url);
+            }
+            return parsedUri.toURL();
+        } catch (URISyntaxException | IllegalArgumentException e) {
+            throw new MalformedURLException("Invalid URI: " + url + " | " + e.getMessage());
+        }
     }
 
     /**

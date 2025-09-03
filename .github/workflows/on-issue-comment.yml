@@ -6,7 +6,7 @@ on:
 
 jobs:
   assign:
-    if: github.repository == 'JabRef/jabref'
+    if: github.repository_owner == 'JabRef'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,7 +17,8 @@ jobs:
         uses: takanome-dev/assign-issue-action@edge
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
-          days_until_unassign: 14
+          # If this is updated, also update the number at unassign-issues.yml
+          days_until_unassign: 21
           maintainers: 'koppor,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan,LinusDietz'
           assigned_comment: |
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
@@ -32,9 +33,10 @@ jobs:
 
             Happy coding! 🚀
           assignment_suggestion_comment: >
-            👋 Hey @{{ handle }}, looks like you’re eager to work on this issue—great! 🎉
-            It also looks like you skipped reading our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), which explains exactly how to participate. No worries, it happens to the best of us.
-            Give it a read, and you’ll discover the ancient wisdom of assigning issues to yourself. Trust me, it’s worth it. 🚀
+            👋 Hey @{{ handle }}, looks like you’re eager to work on this issue — great! 🎉
+            It also looks like you don't know how to assign issues to yourself.
+            Please read our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) to find out how.
+            It will also guide you in other aspects of contributing to JabRef.
       - name: Move issue corresponding column in "Candidates for University Projects"
         uses: m7kvqbe1/github-action-move-issues@main
         if: ${{ steps.assign.outputs.assigned == 'yes' || steps.assign.outputs.unassigned == 'yes' }}

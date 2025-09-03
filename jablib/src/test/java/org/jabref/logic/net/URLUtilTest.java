@@ -1,6 +1,8 @@
 package org.jabref.logic.net;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 
 import org.jabref.logic.util.URLUtil;
 
@@ -8,6 +10,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class URLUtilTest {
@@ -86,5 +91,59 @@ class URLUtilTest {
         String input = "http://example.com/test|file";
         URI uri = URLUtil.createUri(input);
         assertEquals("http://example.com/test%7Cfile", uri.toString());
+    }
+
+    @Test
+    void validUrl() throws MalformedURLException {
+        String input = "http://example.com";
+
+        URL result = URLUtil.create(input);
+        assertNotNull(result);
+        assertNotEquals("", result.toString().trim());
+        assertEquals(input, result.toString());
+    }
+
+    @Test
+    void nullUrl() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                URLUtil.create(null));
+        assertTrue(exception.getMessage().contains("null or empty"));
+    }
+
+    @Test
+    void emptyUrl() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                URLUtil.create("   "));
+        assertTrue(exception.getMessage().contains("null or empty"));
+    }
+
+    @Test
+    void urlStartingWithWww() throws MalformedURLException {
+        // URLs starting with www. should be prefixed with https://
+        URL result = URLUtil.create("www.example.com");
+        assertNotNull(result);
+        assertEquals("https://www.example.com", result.toString());
+    }
+
+    @Test
+    void uriMissingSchemeAndNotStartingWithWww() {
+        // URLs not starting with www. and without a scheme should still throw an exception
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
+                URLUtil.create("example.com"));
+        assertTrue(exception.getMessage().contains("not absolute"));
+    }
+
+    @Test
+    void uriMissingHost() {
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
+                URLUtil.create("mailto:someone@example.com"));
+        assertTrue(exception.getMessage().contains("must include both scheme and host"));
+    }
+
+    @Test
+    void malformedSyntax() {
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
+                URLUtil.create("http://[invalid-url]"));
+        assertTrue(exception.getMessage().contains("Invalid URI"));
     }
 }
