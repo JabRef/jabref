@@ -13,6 +13,7 @@ import org.jabref.model.ChainNode;
  */
 public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
 
+    // Note: {@link org.jabref.model.entry.KeywordList#parse(java.lang.String, java.lang.Character, java.lang.Character) offers configuration, which is not available here
     public static Character DEFAULT_HIERARCHICAL_DELIMITER = '>';
     private final String keyword;
 
@@ -84,9 +85,25 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
                           .orElse("");
     }
 
+    /*
+     * Used for BibTex export, where we need to escape the delimiter with \
+     */
+    public String getSubchainAsStringWithEscaping(Character delimiter) {
+        return getEscaped(delimiter) +
+                getChild().map(child -> " " + DEFAULT_HIERARCHICAL_DELIMITER + " " + child.getSubchainAsStringWithEscaping(DEFAULT_HIERARCHICAL_DELIMITER))
+                          .orElse("");
+    }
+
+    /*
+     * This ensures that delimiters within keyword values are not misinterpreted as separators.
+     */
+    private String getEscaped(Character delimiter) {
+        return keyword.replace(delimiter.toString(), "\\" + delimiter);
+    }
     /**
      * Gets the keyword of this node in the chain.
      */
+
     public String get() {
         return keyword;
     }

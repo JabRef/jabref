@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We implemented escaping of delimiters when parsing KeywordLists [#12810](https://github.com/JabRef/jabref/issues/12810)
 - We fixed an issue where "Print preview" would throw a `NullPointerException` if no printers were available. [#13708](https://github.com/JabRef/jabref/issues/13708)
 - We added the option to enable the language server in the preferences. [#13697](https://github.com/JabRef/jabref/pull/13697)
 - We introduced an option in Preferences under (under Linked files -> Linked file name conventions) to automatically rename linked files when an entry data changes. [#11316](https://github.com/JabRef/jabref/issues/11316)

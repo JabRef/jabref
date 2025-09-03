@@ -842,7 +842,7 @@ public class BibEntry {
         }
 
         // Set new keyword field
-        String newValue = keywords.getAsString(delimiter);
+        String newValue = keywords.bibtexSerialize(delimiter);
         return this.setField(StandardField.KEYWORDS, newValue);
     }
 
@@ -1051,9 +1051,7 @@ public class BibEntry {
                 return storedList.get();
             }
         }
-
-        KeywordList keywords = getField(field)
-                .map(content -> KeywordList.parse(content, keywordSeparator))
+        KeywordList keywords = getField(field).map(content -> KeywordList.parse(content, keywordSeparator))
                 .orElse(new KeywordList());
 
         if (field instanceof StandardField standardField) {

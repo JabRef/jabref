@@ -1,7 +1,12 @@
 package org.jabref.model.entry;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,6 +19,17 @@ class KeywordListTest {
         keywords = new KeywordList();
         keywords.add("keywordOne");
         keywords.add("keywordTwo");
+    }
+
+    private static Stream<Arguments> provideParseKeywordCases() {
+        return Stream.of(
+                Arguments.of("keyword\\,one, keywordTwo", new KeywordList("keyword,one", "keywordTwo")),
+                Arguments.of("keywordOne\\,, keywordTwo", new KeywordList("keywordOne,", "keywordTwo")),
+                Arguments.of("keyword\\\\, keywordTwo", new KeywordList("keyword\\", "keywordTwo")),
+                Arguments.of("keyword\\,one > sub", new KeywordList(Keyword.of("keyword,one", "sub"))),
+                Arguments.of("one\\,two\\,three, four", new KeywordList("one,two,three", "four")),
+                Arguments.of("keywordOne\\\\", new KeywordList("keywordOne\\"))
+        );
     }
 
     @Test
@@ -114,5 +130,22 @@ class KeywordListTest {
     @Test
     void mergeTwoListsOfKeywordsShouldReturnTheKeywordsMerged() {
         assertEquals(new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"), KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ','));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParseKeywordCases")
+    void parseKeywordWithEscapedDelimiterDoesNotSplitKeyword(String input, KeywordList expected) {
+        assertEquals(expected, KeywordList.parse(input, ',', '>'));
+    }
+
+    // TODO: We need to redefine the roundtrip test depending on the context GUI or BibTex,
+    //  we want the user to type in escaping character but see the "clean" String as in:
+    //  keyword1\,keyword2, keyword3 --> "keyword1,keyword2", "keyword3"
+    @ParameterizedTest
+    @MethodSource("provideParseKeywordCases")
+    void roundTripPreservesStructure(String original) {
+        KeywordList parsed = KeywordList.oldParse(original, ',', '>');
+        // We need to test the toString() functionality
+        assertEquals(original, parsed.bibtexSerialize(','));
     }
 }
