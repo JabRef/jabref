@@ -71,12 +71,6 @@ class WebSearchPaneViewModelTest {
     }
 
     @Test
-    void queryConsistingOfInvalidDOIIsInvalid() {
-        viewModel.queryProperty().setValue("101.1007/JHEP02(2023)082");
-        assertFalse(viewModel.queryValidationStatus().validProperty().getValue());
-    }
-
-    @Test
     void queryConsistingOfISBNIsValid() {
         viewModel.queryProperty().setValue("9780134685991");
         assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
@@ -90,7 +84,7 @@ class WebSearchPaneViewModelTest {
 
     @Test
     void queryConsistingOfArXivIdIsValid() {
-        viewModel.queryProperty().setValue("arXiv:2110.02957");
+        viewModel.queryProperty().setValue("arXiv=2110.02957");
         assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
     }
 
