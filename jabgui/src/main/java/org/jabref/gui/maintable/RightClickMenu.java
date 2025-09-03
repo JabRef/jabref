@@ -152,7 +152,7 @@ public class RightClickMenu {
                     factory.createCustomMenuItem(
                             StandardActions.COPY_TO,
                             new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
-                                    importHandler, sourceDatabaseContext, targetDatabaseContext),
+                                    preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext),
                             targetDatabaseName
                     )
             );

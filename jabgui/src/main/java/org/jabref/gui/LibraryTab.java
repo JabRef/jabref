@@ -104,6 +104,8 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.gui.util.CopyUtil.copyEntriesWithFeedback;
+
 /**
  * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
  */
@@ -810,6 +812,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void copyEntry() {
+        clipBoardManager.setSourceBibDatabaseContext(this.getBibDatabaseContext());
         int entriesCopied = doCopyEntry(getSelectedEntries());
         if (entriesCopied >= 0) {
             dialogService.notify(Localization.lang("Copied %0 entry(s)", entriesCopied));
@@ -838,17 +841,27 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void pasteEntry() {
-        List<BibEntry> entriesToAdd;
         String content = ClipBoardManager.getContents();
-        entriesToAdd = importHandler.handleBibTeXData(content);
+        List<BibEntry> entriesToAdd = importHandler.handleBibTeXData(content);
         if (entriesToAdd.isEmpty()) {
             entriesToAdd = handleNonBibTeXStringData(content);
         }
         if (entriesToAdd.isEmpty()) {
             return;
         }
-
-        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
+        // Now, the BibEntries to add are known
+        // The definitive insertion needs to happen now.
+        BibDatabaseContext sourceBibDatabaseContext = clipBoardManager.getSourceBibDatabaseContext().orElse(null);
+        copyEntriesWithFeedback(
+            sourceBibDatabaseContext,
+            entriesToAdd,
+            bibDatabaseContext,
+            Localization.lang("Pasted %0 entry(s) to %1"),
+            Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped"),
+            dialogService,
+            preferences.getFilePreferences(),
+            importHandler
+            );
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
@@ -866,11 +879,21 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-    public void dropEntry(List<BibEntry> entriesToAdd) {
-        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
+    public void dropEntry(BibDatabaseContext sourceBibDatabaseContext, List<BibEntry> entriesToAdd) {
+        copyEntriesWithFeedback(
+            sourceBibDatabaseContext,
+            entriesToAdd,
+            bibDatabaseContext,
+            Localization.lang("Moved %0 entry(s) to %1"),
+            Localization.lang("Moved %0 entry(s) to %1. %2 were skipped"),
+            dialogService,
+            preferences.getFilePreferences(),
+            importHandler
+            );
     }
 
     public void cutEntry() {
+        clipBoardManager.setSourceBibDatabaseContext(this.getBibDatabaseContext());
         int entriesCopied = doCopyEntry(getSelectedEntries());
         int entriesDeleted = doDeleteEntry(StandardActions.CUT, mainTable.getSelectedEntries());
 
