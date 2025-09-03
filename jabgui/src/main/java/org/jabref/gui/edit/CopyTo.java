@@ -97,8 +97,8 @@ public class CopyTo extends SimpleCommand {
             sourceDatabaseContext,
             selectedEntries,
             targetDatabaseContext,
-            Localization.lang("Copied %0 entry(s) to %1, including cross-references"),
-            Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references"),
+            Localization.lang("Copied %0 entry(s) to %1, without cross-references"),
+            Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references"),
             dialogService,
             filePreferences,
             importHandler
