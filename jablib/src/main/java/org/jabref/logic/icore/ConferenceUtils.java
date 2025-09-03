@@ -152,7 +152,7 @@ public class ConferenceUtils {
             right--;
         }
 
-        return (left <= right) ? candidate.substring(left, right + 1) : "";
+        return left <= right ? candidate.substring(left, right + 1) : "";
     }
 
     private static boolean isAcronymDelimiter(char c) {
@@ -165,6 +165,7 @@ public class ConferenceUtils {
      * Normalizes a raw conference title query string into a simplified form suitable for fuzzy matching.
      * <p>
      * The normalization process performs the following steps:
+     * </p>
      * <ol>
      *     <li>Removes all substrings enclosed in parentheses, e.g., {@code "proceedings (ICSE 2022)"} -> {@code "Proceedings"}.</li>
      *     <li>Removes all years of form {@code 19XX} or {@code 20xx} (e.g., {@code 1999}, {@code 2022}) and ordinals in
@@ -175,14 +176,13 @@ public class ConferenceUtils {
      *     <li>Concatenates the remaining tokens into a normalized string without delimiters.</li>
      *     <li>Removes leading false-start tokens like {@code "ofthe"}, {@code "of"}, or {@code "the"}.</li>
      * </ol>
-     * </p>
      * <p>
      * Note that the input is expected to already be lowercased before calling this method.
      * </p>
      * <p>
      * An example:
      * {@code "proceedings of the 3rd international conference on machine learning (icml 2018)"} ->
-     * {@code "internationalconferenceonmachinelearning"}</li>
+     * {@code "internationalconferenceonmachinelearning"}
      * </p>
      *
      * @param input the pre-lowercased raw string to normalize, must not be {@code null}

@@ -124,7 +124,6 @@ public class ConferenceRepository {
         }
 
         Optional<ConferenceEntry> acronymConference = getConferenceFromAcronym(query);
-
         if (acronymConference.isPresent()) {
             return acronymConference;
         }
@@ -199,7 +198,7 @@ public class ConferenceRepository {
                 double levSimilarity = LEVENSHTEIN_MATCHER.similarity(normalizedQuery, conferenceTitle);
                 double LCSSimilarity = StringSimilarity.LCSSimilarity(normalizedQuery, conferenceTitle);
                 double combinedScore = levSimilarity * 0.6 + LCSSimilarity * 0.4;
-                boolean exactSubstringMatch = (Math.abs(LCSSimilarity - 1.0) <= EPSILON);
+                boolean exactSubstringMatch = Math.abs(LCSSimilarity - 1.0) <= EPSILON;
 
                 if (exactSubstringMatch) {
                     return Optional.of(normalizedTitleToConference.get(conferenceTitle));

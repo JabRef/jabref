@@ -28,7 +28,7 @@ public class ConferenceUtilsTest {
         "This open paren ((SERA) is never closed, SERA",                    // Extract acronym from incomplete parentheses
         "Input with empty () parentheses, ",                                // Empty acronym inside parentheses
         "Input with empty (        ) whitespace in parens, ",               // Only whitespace inside parentheses
-        "'', ''"                                                            // Empty string
+        "'', "                                                              // Empty string
     })
     void acronymExtraction(String input, String expectedResult) {
         assertEquals(Optional.ofNullable(expectedResult), extractStringFromParentheses(input));
