@@ -54,11 +54,11 @@ public class BibliographyConsistencyCheck {
             StandardField.MODIFICATIONDATE
     );
 
-    private static final Set<EntryType> BIBLATEX_TYPES = new HashSet<>(new BibEntryTypesManager()
-            .getAllTypes(BibDatabaseMode.BIBLATEX)).stream().map(e -> e.getType()).collect(Collectors.toSet());
+    private static final Set<EntryType> BIBLATEX_TYPES = Set.copyOf(new BibEntryTypesManager()
+            .getAllTypes(BibDatabaseMode.BIBLATEX)).stream().map(BibEntryType::getType).collect(Collectors.toSet());
 
-    private static final Set<EntryType> BIBTEX_TYPES = new HashSet<>(new BibEntryTypesManager()
-            .getAllTypes(BibDatabaseMode.BIBTEX)).stream().map(e -> e.getType()).collect(Collectors.toSet());
+    private static final Set<EntryType> BIBTEX_TYPES = Set.copyOf(new BibEntryTypesManager()
+            .getAllTypes(BibDatabaseMode.BIBTEX)).stream().map(BibEntryType::getType).collect(Collectors.toSet());
 
     private static Set<Field> filterExcludedFields(Collection<Field> fields) {
         return fields.stream()
