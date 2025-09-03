@@ -20,6 +20,8 @@ class Pdf implements Runnable {
 
     @Override
     public void run() {
+        ArgumentProcessor.showBanner(sharedOptions.porcelain);
+
         System.out.println("Specify a subcommand (write-xmp, update).");
     }
 }

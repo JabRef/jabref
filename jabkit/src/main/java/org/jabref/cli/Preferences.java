@@ -40,6 +40,8 @@ class Preferences implements Runnable {
     class PreferencesReset implements Callable<Integer> {
         @Override
         public Integer call() {
+            ArgumentProcessor.showBanner(sharedOptions.porcelain);
+
             try {
                 System.out.println(Localization.lang("Setting all preferences to default values."));
                 argumentProcessor.cliPreferences.clear();
@@ -60,6 +62,8 @@ class Preferences implements Runnable {
 
         @Override
         public Integer call() {
+            ArgumentProcessor.showBanner(sharedOptions.porcelain);
+
             try {
                 argumentProcessor.cliPreferences.importPreferences(inputFile);
                 argumentProcessor.cliPreferences.flush();
@@ -78,6 +82,8 @@ class Preferences implements Runnable {
 
         @Override
         public Integer call() {
+            ArgumentProcessor.showBanner(sharedOptions.porcelain);
+
             try {
                 argumentProcessor.cliPreferences.exportPreferences(outputFile);
             } catch (JabRefException ex) {
