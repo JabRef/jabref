@@ -50,10 +50,12 @@ dependencies {
     testImplementation(project(":test-support"))
     testImplementation("org.mockito:mockito-core")
     testImplementation("net.bytebuddy:byte-buddy")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
 }
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.junit.jupiter.api")
+    requires.add("org.junit.jupiter.params")
     requires.add("org.jabref.testsupport")
     requires.add("org.mockito")
 }

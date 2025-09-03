@@ -31,10 +31,12 @@ import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.support.BibEntryAssert;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.mockito.Answers;
 import picocli.CommandLine;
 
@@ -53,21 +55,17 @@ class ArgumentProcessorTest {
 
     private CommandLine commandLine;
 
-    @BeforeAll
-    static void checkTestResources() throws IOException {
-        String[] required = new String[] {"origin.bib", "paper.aux", "ArgumentProcessorTestExportMatches.bib"};
-        StringBuilder missing = new StringBuilder();
-        for (String res : required) {
-            if (ArgumentProcessorTest.class.getResource(res) == null) {
-                if (missing.length() > 0) {
-                    missing.append(", ");
-                }
-                missing.append(res);
-            }
-        }
-        if (missing.length() > 0) {
-            throw new IOException("Required test resources missing from classpath: " + missing);
-        }
+    /**
+     * Precondition: required test resources must be available on the classpath.
+     *
+     * This is a parameterized test so failures show which specific resource is missing.
+     * Previously this was a @BeforeAll that threw an exception — switching to a test with
+     * an assertion makes the failure visible in the test report.
+     */
+    @ParameterizedTest(name = "Resource {0} is available on classpath")
+    @CsvSource({"origin.bib", "paper.aux", "ArgumentProcessorTestExportMatches.bib"})
+    void checkTestResourcesParam(String resource) {
+        assertNotNull(ArgumentProcessorTest.class.getResource(resource), "Required test resource missing from classpath: " + resource);
     }
 
     @BeforeEach()
@@ -86,27 +84,27 @@ class ArgumentProcessorTest {
 
     @Test
     void auxImport(@TempDir Path tempDir) throws IOException {
-            InputStream originIs = ArgumentProcessorTest.class.getResourceAsStream("origin.bib");
-            InputStream auxIs = ArgumentProcessorTest.class.getResourceAsStream("paper.aux");
+        InputStream originIs = ArgumentProcessorTest.class.getResourceAsStream("origin.bib");
+        InputStream auxIs = ArgumentProcessorTest.class.getResourceAsStream("paper.aux");
 
-            Path fullBib = tempDir.resolve("origin.bib");
-            Files.copy(originIs, fullBib, StandardCopyOption.REPLACE_EXISTING);
+        Path fullBib = tempDir.resolve("origin.bib");
+        Files.copy(originIs, fullBib, StandardCopyOption.REPLACE_EXISTING);
 
-            Path auxFilePath = tempDir.resolve("paper.aux");
-            Files.copy(auxIs, auxFilePath, StandardCopyOption.REPLACE_EXISTING);
+        Path auxFilePath = tempDir.resolve("paper.aux");
+        Files.copy(auxIs, auxFilePath, StandardCopyOption.REPLACE_EXISTING);
 
-            Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
+        Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
 
-            List<String> args = List.of("generate-bib-from-aux", "--aux", auxFilePath.toString(), "--input", fullBib.toString(), "--output", outputBib.toString());
+        List<String> args = List.of("generate-bib-from-aux", "--aux", auxFilePath.toString(), "--input", fullBib.toString(), "--output", outputBib.toString());
 
-            int rc = commandLine.execute(args.toArray(String[]::new));
-            assertEquals(0, rc, "CLI returned non-zero exit code for auxImport: " + rc);
+        int rc = commandLine.execute(args.toArray(String[]::new));
+        assertEquals(0, rc, "CLI returned non-zero exit code for auxImport: " + rc);
 
-            assertTrue(Files.exists(outputBib), "Expected output bib to exist: " + outputBib);
+        assertTrue(Files.exists(outputBib), "Expected output bib to exist: " + outputBib);
 
-            BibtexImporter importer = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
-            List<BibEntry> entries = importer.importDatabase(outputBib).getDatabase().getEntries();
-            assertTrue(entries != null && !entries.isEmpty(), "Expected output bib to contain at least one entry");
+        BibtexImporter importer = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
+        List<BibEntry> entries = importer.importDatabase(outputBib).getDatabase().getEntries();
+        assertTrue(entries != null && !entries.isEmpty(), "Expected output bib to contain at least one entry");
     }
 
     @Test
