@@ -1,10 +1,12 @@
 package org.jabref.gui.maintable;
 
-import com.tobiasdiez.easybind.EasyBind;
+import javax.swing.undo.UndoManager;
+
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -43,7 +45,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.identifier.DOI;
 
-import javax.swing.undo.UndoManager;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class RightClickMenu {
 

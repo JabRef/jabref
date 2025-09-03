@@ -1,5 +1,7 @@
 package org.jabref.gui.util;
 
+import java.util.List;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
@@ -8,9 +10,8 @@ import org.jabref.logic.externalfiles.LinkedFileTransferHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jspecify.annotations.Nullable;
 
-import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 public class CopyUtil {
 

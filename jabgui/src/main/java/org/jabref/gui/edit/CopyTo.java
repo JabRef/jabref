@@ -1,5 +1,9 @@
 package org.jabref.gui.edit;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -10,12 +14,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 import static org.jabref.gui.util.CopyUtil.copyEntriesWithFeedback;
 
