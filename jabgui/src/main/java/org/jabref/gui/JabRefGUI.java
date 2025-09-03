@@ -181,8 +181,8 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.themeManager = new ThemeManager(
                 preferences.getWorkspacePreferences(),
-                fileUpdateMonitor,
-                Runnable::run);
+                fileUpdateMonitor
+        );
         Injector.setModelOrService(ThemeManager.class, themeManager);
 
         JabRefGUI.countingUndoManager = new CountingUndoManager();

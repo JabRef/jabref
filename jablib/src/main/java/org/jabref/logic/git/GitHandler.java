@@ -20,6 +20,8 @@ import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.errors.NoRemoteRepositoryException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryState;
@@ -353,6 +355,16 @@ public class GitHandler {
                 fetchCommand.setCredentialsProvider(credsOpt.get());
             }
             fetchCommand.call();
+        } catch (TransportException e) {
+            Throwable throwable = e;
+            while (throwable != null) {
+                if (throwable instanceof NoRemoteRepositoryException) {
+                    throw new IOException("No repository found at the configured remote. Please check the URL or your token settings.", e);
+                }
+                throwable = throwable.getCause();
+            }
+            String message = e.getMessage();
+            throw new IOException("Failed to fetch from remote: " + (message == null ? "unknown transport error" : message), e);
         } catch (GitAPIException e) {
             throw new IOException("Failed to fetch from remote: " + e.getMessage(), e);
         }

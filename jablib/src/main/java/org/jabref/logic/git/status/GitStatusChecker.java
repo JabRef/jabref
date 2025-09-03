@@ -15,8 +15,6 @@ import org.eclipse.jgit.lib.BranchConfig;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,24 +101,17 @@ public class GitStatusChecker {
             return SyncStatus.UP_TO_DATE;
         }
 
-        try (RevWalk walk = new RevWalk(repo)) {
-            RevCommit localCommit = walk.parseCommit(localHead);
-            RevCommit remoteCommit = walk.parseCommit(remoteHead);
-            RevCommit mergeBase = GitRevisionLocator.findMergeBase(repo, localCommit, remoteCommit);
+        boolean remoteInLocal = GitRevisionLocator.isAncestor(repo, remoteHead, localHead);
+        boolean localInRemote = GitRevisionLocator.isAncestor(repo, localHead, remoteHead);
 
-            boolean ahead = !localCommit.equals(mergeBase);
-            boolean behind = !remoteCommit.equals(mergeBase);
-
-            if (ahead && behind) {
-                return SyncStatus.DIVERGED;
-            } else if (ahead) {
-                return SyncStatus.AHEAD;
-            } else if (behind) {
-                return SyncStatus.BEHIND;
-            } else {
-                LOGGER.debug("Could not determine git sync status. All commits differ or mergeBase is null.");
-                return SyncStatus.UNKNOWN;
-            }
+        if (remoteInLocal && localInRemote) {
+            return SyncStatus.UP_TO_DATE;
+        } else if (remoteInLocal) {
+            return SyncStatus.AHEAD;
+        } else if (localInRemote) {
+            return SyncStatus.BEHIND;
+        } else {
+            return SyncStatus.DIVERGED;
         }
     }
 

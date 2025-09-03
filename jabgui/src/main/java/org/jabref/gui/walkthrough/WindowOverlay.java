@@ -268,7 +268,6 @@ class WindowOverlay {
         Node content = renderer.render(step, walkthrough, beforeNavigate);
         PopOver popover = new PopOver();
         popover.getStyleClass().add("walkthrough-tooltip");
-        popover.getScene().getStylesheets().setAll(window.getScene().getStylesheets()); // NOTE: Hack because ThemeManager cannot consistently apply themes
         popover.setContentNode(content);
         popover.setDetachable(false);
         popover.setCloseButtonEnabled(false);
