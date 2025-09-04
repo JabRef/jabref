@@ -55,7 +55,7 @@ public class BibliographyConsistencyCheck {
 
     private final BibEntryTypesManager bibEntryTypesManager;
 
-    BibliographyConsistencyCheck(org.jabref.logic.preferences.JabRefCliPreferences bibEntryTypesManager) {
+    public BibliographyConsistencyCheck(org.jabref.logic.preferences.JabRefCliPreferences bibEntryTypesManager) {
         this.bibEntryTypesManager = bibEntryTypesManager.getCustomEntryTypesRepository();
     }
 

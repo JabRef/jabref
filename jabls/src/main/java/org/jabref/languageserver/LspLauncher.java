@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageClient;
@@ -22,7 +22,7 @@ public class LspLauncher extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LspLauncher.class);
 
-    private final CliPreferences cliPreferences;
+    private final JabRefCliPreferences jabRefCliPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
     private final ExecutorService threadPool;
 
@@ -30,16 +30,16 @@ public class LspLauncher extends Thread {
     private volatile boolean running;
     private ServerSocket serverSocket;
 
-    public LspLauncher(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository, int port) {
-        this.cliPreferences = cliPreferences;
+    public LspLauncher(JabRefCliPreferences jabRefCliPreferences, JournalAbbreviationRepository abbreviationRepository, int port) {
+        this.jabRefCliPreferences = jabRefCliPreferences;
         this.abbreviationRepository = abbreviationRepository;
         this.threadPool = Executors.newCachedThreadPool();
         this.port = port;
         this.setName("JabLs - JabRef Language Server on: " + port);
     }
 
-    public LspLauncher(CliPreferences cliPreferences, int port) {
-        this(cliPreferences, JournalAbbreviationLoader.loadRepository(cliPreferences.getJournalAbbreviationPreferences()), port);
+    public LspLauncher(JabRefCliPreferences jabRefCliPreferences, int port) {
+        this(jabRefCliPreferences, JournalAbbreviationLoader.loadRepository(jabRefCliPreferences.getJournalAbbreviationPreferences()), port);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class LspLauncher extends Thread {
     }
 
     private void handleClient(Socket socket) {
-        LspClientHandler clientHandler = new LspClientHandler(cliPreferences, abbreviationRepository);
+        LspClientHandler clientHandler = new LspClientHandler(jabRefCliPreferences, abbreviationRepository);
         LOGGER.debug("LSP clientHandler started.");
         try (socket; // socket should be closed on error
              InputStream in = socket.getInputStream();

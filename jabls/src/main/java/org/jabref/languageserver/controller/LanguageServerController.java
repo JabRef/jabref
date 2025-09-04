@@ -2,7 +2,7 @@ package org.jabref.languageserver.controller;
 
 import org.jabref.languageserver.LspLauncher;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -13,13 +13,13 @@ public class LanguageServerController implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LanguageServerController.class);
 
-    private final CliPreferences cliPreferences;
+    private final JabRefCliPreferences jabRefCliPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
 
     @Nullable private LspLauncher lspLauncher;
 
-    public LanguageServerController(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
-        this.cliPreferences = cliPreferences;
+    public LanguageServerController(JabRefCliPreferences jabRefCliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+        this.jabRefCliPreferences = jabRefCliPreferences;
         this.abbreviationRepository = abbreviationRepository;
         LOGGER.debug("LanguageServerController initialized.");
     }
@@ -30,7 +30,7 @@ public class LanguageServerController implements AutoCloseable {
             return;
         }
 
-        lspLauncher = new LspLauncher(cliPreferences, abbreviationRepository, port);
+        lspLauncher = new LspLauncher(jabRefCliPreferences, abbreviationRepository, port);
         // This enqueues the thread to run in the background
         // The JVM will take care of running it at some point in time in the future
         // Thus, we cannot check directly if it really runs

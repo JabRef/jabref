@@ -13,6 +13,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.lsp4j.Diagnostic;
@@ -27,7 +28,7 @@ public class LspDiagnosticHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(LspDiagnosticHandler.class);
     private static final int NO_VERSION = -1;
 
-    private final CliPreferences jabRefCliPreferences;
+    private final JabRefCliPreferences jabRefCliPreferences;
     private final LspIntegrityCheck lspIntegrityCheck;
     private final LspConsistencyCheck lspConsistencyCheck;
     private final LspClientHandler clientHandler;
@@ -36,10 +37,10 @@ public class LspDiagnosticHandler {
 
     private LanguageClient client;
 
-    public LspDiagnosticHandler(LspClientHandler clientHandler, CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+    public LspDiagnosticHandler(LspClientHandler clientHandler, JabRefCliPreferences jabRefCliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.clientHandler = clientHandler;
-        this.jabRefCliPreferences = cliPreferences;
-        this.lspIntegrityCheck = new LspIntegrityCheck(cliPreferences, abbreviationRepository);
+        this.jabRefCliPreferences = jabRefCliPreferences;
+        this.lspIntegrityCheck = new LspIntegrityCheck(jabRefCliPreferences, abbreviationRepository);
         this.lspConsistencyCheck = new LspConsistencyCheck();
         this.integrityDiagnosticsCache = new ConcurrentHashMap<>();
         this.consistencyDiagnosticsCache = new ConcurrentHashMap<>();
@@ -79,7 +80,7 @@ public class LspDiagnosticHandler {
         }
 
         if (clientHandler.getSettings().isConsistencyCheck()) {
-            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(bibDatabaseContext, content));
+            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(bibDatabaseContext, content, jabRefCliPreferences));
             LOGGER.debug("Cached consistency diagnostics for {}", uri);
         }
 
