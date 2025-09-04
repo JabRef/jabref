@@ -55,13 +55,8 @@ public class BibliographyConsistencyCheck {
 
     private final BibEntryTypesManager bibEntryTypesManager;
 
-    // Default constructor
-    public BibliographyConsistencyCheck() {
-        this(new BibEntryTypesManager());
-    }
-
-    BibliographyConsistencyCheck(BibEntryTypesManager bibEntryTypesManager) {
-        this.bibEntryTypesManager = bibEntryTypesManager;
+    BibliographyConsistencyCheck(org.jabref.logic.preferences.JabRefCliPreferences bibEntryTypesManager) {
+        this.bibEntryTypesManager = bibEntryTypesManager.getCustomEntryTypesRepository();
     }
 
     private static Set<Field> filterExcludedFields(Collection<Field> fields) {
