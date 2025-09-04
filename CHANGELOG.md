@@ -126,6 +126,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved consistency in the Add Buttons. [#13791](https://github.com/JabRef/jabref/pull/13791)
 - We fixed an issue where theme or font size are not respected for all dialogs [#13558](https://github.com/JabRef/jabref/issues/13558)
 - We removed unnecessary spacing and margin in the AutomaticFieldEditor. [#13792](https://github.com/JabRef/jabref/pull/13792)
+- We fixed an issue where global search auto-completion only worked after switching tabs. [#11428](https://github.com/JabRef/jabref/issues/11428)
 
 ### Removed
 
