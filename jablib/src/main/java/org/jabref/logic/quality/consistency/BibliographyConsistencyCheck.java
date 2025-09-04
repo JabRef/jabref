@@ -60,8 +60,6 @@ public class BibliographyConsistencyCheck {
         this(new BibEntryTypesManager());
     }
 
-    // Accepting manager constructor
-    @VisibleForTesting
     BibliographyConsistencyCheck(BibEntryTypesManager bibEntryTypesManager) {
         this.bibEntryTypesManager = bibEntryTypesManager;
     }
