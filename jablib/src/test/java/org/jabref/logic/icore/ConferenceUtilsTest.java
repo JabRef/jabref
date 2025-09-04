@@ -1,6 +1,5 @@
 package org.jabref.logic.icore;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -61,18 +60,18 @@ public class ConferenceUtilsTest {
     static Stream<Arguments> generateAcronymCandidateTestData() {
         return Stream.of(
             // Edge cases
-            Arguments.of("", 2, Collections.emptySet()), // Empty string returns empty set
-            Arguments.of("foo", -1, Collections.emptySet()), // Negative cutoff returns empty set
-            Arguments.of("foo", 0, Collections.emptySet()), // Zero cutoff returns empty set
-            Arguments.of("foo", 1, Collections.emptySet()), // Cutoff too small
+            Arguments.of("", 2, Set.of()), // Empty string returns empty set
+            Arguments.of("foo", -1, Set.of()), // Negative cutoff returns empty set
+            Arguments.of("foo", 0, Set.of()), // Zero cutoff returns empty set
+            Arguments.of("foo", 1, Set.of()), // Cutoff too small
             Arguments.of("bar", 3, Set.of("bar")),  // Cutoff same as input length
             Arguments.of("bar", 15, Set.of("bar")),  // Cutoff larger than input length
             Arguments.of("a", 1, Set.of("a")), // Single character
-            Arguments.of("       ", 3, Collections.emptySet()), // Only whitespace in input
+            Arguments.of("       ", 3, Set.of()), // Only whitespace in input
 
             // Basic delimiter cases (space)
             Arguments.of("ACR NYM", 3, Set.of("ACR", "NYM")), // Two acronyms, exact cutoff
-            Arguments.of("ACR NYM", 2, Collections.emptySet()), // Cutoff too small for acronyms
+            Arguments.of("ACR NYM", 2, Set.of()), // Cutoff too small for acronyms
             Arguments.of("ACR NYM", 7, Set.of("ACR NYM", "ACR", "NYM")), // Includes full string for large enough cutoff
             Arguments.of("A B C", 1, Set.of("A", "B", "C")), // Single chars
             Arguments.of("A B C", 3, Set.of("A", "B", "C", "A B", "B C")), // Partial subset combinations
@@ -93,7 +92,7 @@ public class ConferenceUtilsTest {
             Arguments.of("ACRO____", 6, Set.of("ACRO")), // trim delimiter on end
             Arguments.of("____ACRO____", 6, Set.of("ACRO")), // trim delimiter on both sides
             Arguments.of("_,-:.ACRO.:-,_", 6, Set.of("ACRO")), // trim different adjacent delimiters on both sides
-            Arguments.of("' _ : . , ", 9, Collections.emptySet()), // delimiter only string returns empty
+            Arguments.of("' _ : . , ", 9, Set.of()), // delimiter only string returns empty
             Arguments.of("_,-:.ACRO_-NYM.:-,_", 10, Set.of("ACRO_-NYM", "ACRO", "NYM")), // trimming keeps delimiters between acronym but strips other subsets
             Arguments.of("a.b_c:d", 3, Set.of("a.b", "b_c", "c:d", "a", "b", "c", "d")), // interleaved delimiters between valid characters preserves middle-delimiters in subsets
 
