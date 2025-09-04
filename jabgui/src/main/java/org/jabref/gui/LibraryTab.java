@@ -161,6 +161,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private final AiService aiService;
 
+    private Runnable autoCompleterChangedListener;
+
     /**
      * @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
      *                       If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path {@link BibDatabaseContext#getFulltextIndexPath()}.
@@ -258,6 +260,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         });
     }
 
+    public void setAutoCompleterChangedListener(@NonNull Runnable listener) {
+        this.autoCompleterChangedListener = listener;
+    }
+
     private static void addChangedInformation(StringBuilder text) {
         text.append("\n");
         text.append(Localization.lang("The library has been modified."));
@@ -303,7 +309,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         setDatabaseContext(result.getDatabaseContext());
-
+        // Notify listeners that the auto-completer may have changed
+        if (autoCompleterChangedListener != null) {
+            autoCompleterChangedListener.run();
+        }
         LOGGER.trace("loading.set(false);");
         loading.set(false);
         dataLoadingTask = null;

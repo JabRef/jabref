@@ -21,6 +21,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -583,5 +584,21 @@ class FileUtilTest {
     })
     void shortenFileName(String expected, String fileName, Integer maxLength) {
         assertEquals(expected, FileUtil.shortenFileName(fileName, maxLength));
+    }
+
+    @EnabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS)
+    @ParameterizedTest
+    @ValueSource(strings = {"/c/Users/username/Downloads/test.bib",
+            "/cygdrive/c/Users/username/Downloads/test.bib",
+            "/mnt/c/Users/username/Downloads/test.bib"})
+    void convertCygwinPathToWindowsShouldConvertToWindowsFormatWhenRunningOnWindows(String filePath) {
+        assertEquals(Path.of("C:\\\\Users\\\\username\\\\Downloads\\\\test.bib"), FileUtil.convertCygwinPathToWindows(filePath));
+    }
+
+    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Test in others operational systems")
+    @ParameterizedTest
+    @ValueSource(strings = {"/home/username/Downloads/test.bib"})
+    void convertCygwinPathToWindowsShouldReturnOriginalFilePathWhenRunningOnWindows(String filePath) {
+        assertEquals(Path.of(filePath), FileUtil.convertCygwinPathToWindows(filePath));
     }
 }
