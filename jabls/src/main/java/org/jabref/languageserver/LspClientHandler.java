@@ -4,7 +4,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.jabref.languageserver.util.LspDiagnosticHandler;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
@@ -33,9 +33,9 @@ public class LspClientHandler implements LanguageServer, LanguageClientAware {
 
     private LanguageClient client;
 
-    public LspClientHandler(JabRefCliPreferences jabRefCliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+    public LspClientHandler(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.settings = ExtensionSettings.getDefaultSettings();
-        this.diagnosticHandler = new LspDiagnosticHandler(this, jabRefCliPreferences, abbreviationRepository);
+        this.diagnosticHandler = new LspDiagnosticHandler(this, cliPreferences, abbreviationRepository);
         this.workspaceService = new BibtexWorkspaceService(this, diagnosticHandler);
         this.textDocumentService = new BibtexTextDocumentService(diagnosticHandler);
     }

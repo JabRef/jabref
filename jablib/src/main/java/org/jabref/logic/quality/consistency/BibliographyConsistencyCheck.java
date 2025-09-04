@@ -55,8 +55,8 @@ public class BibliographyConsistencyCheck {
 
     private final BibEntryTypesManager bibEntryTypesManager;
 
-    public BibliographyConsistencyCheck(org.jabref.logic.preferences.JabRefCliPreferences bibEntryTypesManager) {
-        this.bibEntryTypesManager = bibEntryTypesManager.getCustomEntryTypesRepository();
+    public BibliographyConsistencyCheck(org.jabref.logic.preferences.CliPreferences cliPreferences) {
+        this.bibEntryTypesManager = cliPreferences.getCustomEntryTypesRepository();
     }
 
     private static Set<Field> filterExcludedFields(Collection<Field> fields) {
