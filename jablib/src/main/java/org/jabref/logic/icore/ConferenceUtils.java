@@ -1,7 +1,6 @@
 package org.jabref.logic.icore;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -30,6 +29,8 @@ public class ConferenceUtils {
             "proceedings", "volume", "part", "papers",
             "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"
     );
+    private static final int MAX_CANDIDATES_THRESHOLD = 50;
+    private static final int DELIMITER_START = -1;
 
     /**
      * Attempts to extract the string enclosed in the first deepest set of parentheses from the given input string.
@@ -92,19 +93,18 @@ public class ConferenceUtils {
      * </p>
      *
      * @param input  the raw string to extract acronym candidates from, must not be {@code null}
-     * @param CUTOFF the maximum allowed length of each candidate substring; candidates longer than this are discarded
+     * @param cutoff the maximum allowed length of each candidate substring; candidates longer than this are discarded
      * @return a set of acronym candidates ordered by descending length and then lexicographically,
      *         or an empty set if no valid candidates are found
      */
-    public static Set<String> generateAcronymCandidates(@NonNull String input, int CUTOFF) {
-        if (input.isEmpty() || CUTOFF <= 0) {
-            return Collections.emptySet();
+    public static Set<String> generateAcronymCandidates(@NonNull String input, int cutoff) {
+        if (input.isEmpty() || cutoff <= 0) {
+            return Set.of();
         }
 
-        final int MAX_CANDIDATES_THRESHOLD = 50;
         List<Integer> bounds = new ArrayList<>();
         // Collect delimiter boundaries: -1 (start), every delimiter index, and input length (end).
-        bounds.add(-1);
+        bounds.add(DELIMITER_START);
         for (int i = 0; i < input.length(); i++) {
             if (isAcronymDelimiter(input.charAt(i))) {
                 bounds.add(i);
@@ -126,7 +126,7 @@ public class ConferenceUtils {
                 int start = bounds.get(i) + 1;
                 int end = bounds.get(j);
                 int len = end - start;
-                if (len > 0 && len <= CUTOFF) {
+                if (len > 0 && len <= cutoff) {
                     String candidate = trimDelimiters(input.substring(start, end));
                     if (!candidate.isEmpty()) {
                         candidates.add(candidate);
