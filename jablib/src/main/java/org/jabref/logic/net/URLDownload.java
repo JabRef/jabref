@@ -382,7 +382,7 @@ public class URLDownload {
             } else if (status >= 400) {
                 // in case of an error, propagate the error message
                 SimpleHttpResponse httpResponse = new SimpleHttpResponse(httpURLConnection);
-                LOGGER.info("{}: {}", FetcherException.getRedactedUrl(this.source), httpResponse);
+                LOGGER.info("{}: {}", FetcherException.getRedactedUrl(this.source.toString()), httpResponse);
                 if (status < 500) {
                     throw new FetcherClientException(this.source, httpResponse);
                 } else {
