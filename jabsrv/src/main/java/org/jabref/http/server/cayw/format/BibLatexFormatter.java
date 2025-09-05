@@ -17,7 +17,6 @@ public class BibLatexFormatter implements CAYWFormatter {
     private final String defaultCommand;
 
     public BibLatexFormatter(String defaultCommand) {
-        super();
         this.defaultCommand = defaultCommand;
     }
 

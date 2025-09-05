@@ -9,9 +9,6 @@ import org.jvnet.hk2.annotations.Service;
 @Service
 public class FormatterService {
 
-    public FormatterService() {
-    }
-
     public CAYWFormatter getFormatter(CAYWQueryParams queryParams) {
         String format = queryParams.getFormat().toLowerCase(Locale.ROOT);
 
