@@ -52,7 +52,7 @@ class CAYWFormattersTest {
     void biblatex_missingKey() {
         BibLatexFormatter formatter = new BibLatexFormatter("autocite");
         String actual = formatter.format(queryParams(null), caywEntries("key1", "", "key3"));
-        assertEquals("\\autocite{key1,key3}", actual); // current implementation
+        assertEquals("\\autocite{key1,key3}", actual);
         assertEquals(MediaType.TEXT_PLAIN_TYPE, formatter.getMediaType());
     }
 
