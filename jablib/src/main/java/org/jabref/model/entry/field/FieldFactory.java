@@ -228,10 +228,10 @@ public class FieldFactory {
      * These are the fields JabRef always displays as default {@link JabRefCliPreferences#setLanguageDependentDefaultValues()}
      * <p>
      * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
-     * separate preferences object
+     * a separate preferences object
      */
     public static List<Field> getDefaultGeneralFields() {
-        List<Field> defaultGeneralFields = new ArrayList<>(Arrays.asList(StandardField.DOI, StandardField.CITATIONCOUNT, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT, StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP));
+        List<Field> defaultGeneralFields = new ArrayList<>(List.of(StandardField.DOI, StandardField.ICORERANKING, StandardField.CITATIONCOUNT, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT, StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP));
         defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));
         return defaultGeneralFields;
     }
