@@ -24,7 +24,13 @@ public class TypstFormatter implements CAYWFormatter {
                                                .toList();
 
         return bibEntries.stream()
-                         .map(entry -> entry.getCitationKey().map("#cite(label(\"%s\"))"::formatted))
+                         .map(entry -> entry.getCitationKey().map(key -> {
+                             if (key.contains("/")) {
+                                 return "#cite(label(\"%s\"))".formatted(key);
+                             } else {
+                                 return "@%s".formatted(key);
+                             }
+                         }))
                          .flatMap(Optional::stream)
                          .collect(Collectors.joining(" "));
     }

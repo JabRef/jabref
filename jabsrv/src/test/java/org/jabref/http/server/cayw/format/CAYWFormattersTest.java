@@ -50,7 +50,6 @@ class CAYWFormattersTest {
 
     @Test
     void biblatex_missingKey() {
-        // If you decide to DROP empties, change formatter + this expectation.
         BibLatexFormatter formatter = new BibLatexFormatter("autocite");
         String actual = formatter.format(queryParams(null), caywEntries("key1", "", "key3"));
         assertEquals("\\autocite{key1,key3}", actual); // current implementation
@@ -83,7 +82,14 @@ class CAYWFormattersTest {
     @Test
     void typst() {
         TypstFormatter formatter = new TypstFormatter();
-        String actual = formatter.format(queryParams(null), caywEntries("key1", "key2/slash"));
-        assertEquals("#cite(label(\"key1\")) #cite(label(\"key2/slash\"))", actual);
+        String actual = formatter.format(queryParams(null), caywEntries("key1", "key2"));
+        assertEquals("@key1 @key2", actual);
+    }
+
+    @Test
+    void typst_slashInKey() {
+        TypstFormatter formatter = new TypstFormatter();
+        String actual = formatter.format(queryParams(null), caywEntries("key1", "key2/slash", "key3"));
+        assertEquals("@key1 #cite(label(\"key2/slash\")) @key3", actual);
     }
 }
