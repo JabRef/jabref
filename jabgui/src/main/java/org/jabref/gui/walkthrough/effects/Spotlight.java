@@ -1,12 +1,10 @@
 package org.jabref.gui.walkthrough.effects;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.beans.value.ChangeListener;
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
@@ -17,6 +15,7 @@ import javafx.util.Duration;
 
 import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -29,19 +28,6 @@ public final class Spotlight extends BaseWindowEffect {
     private volatile @Nullable Shape overlayShape;
     private @Nullable Runnable onClickHandler;
     private @Nullable Timeline transitionAnimation;
-
-    /// Ensure the overlay shape is not updated concurrently. Consider a scenario where
-    /// overlay shape is updated concurrently from two different threads,
-    /// 1. We don't keep track of a new overlay shape is needed. Caller 1 first removed
-    /// the overlay shape, thinking it needs to be removed. Caller 2 then realized no
-    /// shape is present and added a new one.
-    /// 2. Caller 1 continues (after context switch to caller 2) to finish updating the
-    /// overlay shape without knowing that a new overlay shape has been added by caller
-    /// 2.
-    /// 3. Now, we have two overlay shapes in the pane, one from caller 1 and one from
-    /// caller 2. We only have reference to the one from caller 2, but the one from
-    /// caller 1 is still in the pane, leading to unexpected behavior.
-    private final AtomicBoolean isUpdatingOverlayShape = new AtomicBoolean(false);
 
     public Spotlight(@NonNull Pane pane) {
         super(pane);
@@ -90,11 +76,11 @@ public final class Spotlight extends BaseWindowEffect {
                 )
         );
 
-        ChangeListener<Number> changeListener = (_, _, _) -> updateOverlayShape();
-        hole.xProperty().addListener(changeListener);
-        hole.yProperty().addListener(changeListener);
-        hole.widthProperty().addListener(changeListener);
-        hole.heightProperty().addListener(changeListener);
+        InvalidationListener updater = _ -> updateOverlayShape();
+        subscriptions.add(EasyBind.listen(hole.xProperty(), updater));
+        subscriptions.add(EasyBind.listen(hole.yProperty(), updater));
+        subscriptions.add(EasyBind.listen(hole.widthProperty(), updater));
+        subscriptions.add(EasyBind.listen(hole.heightProperty(), updater));
 
         transitionAnimation.setOnFinished(_ -> {
             if (this.node != null) {
@@ -103,11 +89,6 @@ public final class Spotlight extends BaseWindowEffect {
             this.node = newNode;
             setupListeners(this.node);
             updateLayout();
-
-            hole.xProperty().removeListener(changeListener);
-            hole.yProperty().removeListener(changeListener);
-            hole.widthProperty().removeListener(changeListener);
-            hole.heightProperty().removeListener(changeListener);
         });
 
         transitionAnimation.play();
@@ -119,6 +100,7 @@ public final class Spotlight extends BaseWindowEffect {
 
     @Override
     public void detach() {
+        super.detach();
         if (node == null) {
             throw new IllegalStateException("Spotlight is not attached to any node.");
         }
@@ -126,7 +108,6 @@ public final class Spotlight extends BaseWindowEffect {
             transitionAnimation.stop();
             transitionAnimation = null;
         }
-        super.detach();
         Shape overlayShape = this.overlayShape;
         if (overlayShape != null && overlayShape.getParent() instanceof Pane parentPane) {
             parentPane.getChildren().remove(overlayShape);
@@ -138,6 +119,12 @@ public final class Spotlight extends BaseWindowEffect {
     @Override
     protected void updateLayout() {
         if (WalkthroughUtils.cannotPositionNode(node)) {
+            if (overlayShape == null) {
+                // The callee must guarantee the node to be attached is at least visible
+                // in the scene to begin with. If such exception is thrown, it indicates
+                // a bug in the caller side. Consider adjusting WalkthroughResolver.
+                throw new IllegalStateException("Failed to attach the node.");
+            }
             hideEffect();
             return;
         }
@@ -172,10 +159,6 @@ public final class Spotlight extends BaseWindowEffect {
     }
 
     private void updateOverlayShape() {
-        if (isUpdatingOverlayShape.getAndSet(true)) {
-            throw new IllegalStateException("Overlay shape is enjoying an update!");
-        }
-
         int oldIndex;
         if (overlayShape == null || !pane.getChildren().contains(overlayShape)) {
             oldIndex = pane.getChildren().size();
@@ -196,8 +179,6 @@ public final class Spotlight extends BaseWindowEffect {
 
         this.overlayShape = overlayShape;
         this.pane.getChildren().add(oldIndex, this.overlayShape);
-
-        isUpdatingOverlayShape.set(false);
     }
 
     private void handleClick(MouseEvent event) {

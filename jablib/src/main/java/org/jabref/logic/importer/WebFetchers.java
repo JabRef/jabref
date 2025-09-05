@@ -44,8 +44,8 @@ import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScholarArchiveFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SemanticScholar;
-import org.jabref.logic.importer.fetcher.SpringerFetcher;
-import org.jabref.logic.importer.fetcher.SpringerLink;
+import org.jabref.logic.importer.fetcher.SpringerNatureFullTextFetcher;
+import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
@@ -118,7 +118,7 @@ public class WebFetchers {
         set.add(new ACMPortalFetcher());
         // set.add(new GoogleScholar(importFormatPreferences));
         set.add(new DBLPFetcher(importFormatPreferences));
-        set.add(new SpringerFetcher(importerPreferences));
+        set.add(new SpringerNatureWebFetcher(importerPreferences));
         set.add(new CrossRef());
         set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
@@ -209,7 +209,7 @@ public class WebFetchers {
 
         // Publishers
         fetchers.add(new ScienceDirect(importerPreferences));
-        fetchers.add(new SpringerLink(importerPreferences));
+        fetchers.add(new SpringerNatureFullTextFetcher(importerPreferences));
         fetchers.add(new ACS());
         fetchers.add(new ArXivFetcher(importFormatPreferences));
         fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
@@ -232,7 +232,7 @@ public class WebFetchers {
     public static Set<CustomizableKeyFetcher> getCustomizableKeyFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
         Set<CustomizableKeyFetcher> fetchers = new HashSet<>();
         fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
-        fetchers.add(new SpringerFetcher(importerPreferences));
+        fetchers.add(new SpringerNatureWebFetcher(importerPreferences));
         fetchers.add(new ScienceDirect(importerPreferences));
         fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         fetchers.add(new BiodiversityLibrary(importerPreferences));

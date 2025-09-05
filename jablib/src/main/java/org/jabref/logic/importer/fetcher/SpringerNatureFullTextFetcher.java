@@ -26,17 +26,20 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Uses Springer API, see <a href="https://dev.springer.com">https://dev.springer.com</a>
  */
-public class SpringerLink implements FulltextFetcher, CustomizableKeyFetcher {
+public class SpringerNatureFullTextFetcher implements FulltextFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Springer";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpringerLink.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringerNatureFullTextFetcher.class);
 
+    // TODO: Update to the new [fulltext API](https://dev.springernature.com/docs/api-endpoints/fulltext-api/?source=jabref)
+    //       as well as [Open Access API](https://dev.springernature.com/docs/api-endpoints/open-access/?source=jabref)
+    //       Both APIs also [require separate API keys](https://dev.springernature.com/subscription/).
     private static final String API_URL = "https://api.springer.com/meta/v1/json";
     private static final String CONTENT_HOST = "link.springer.com";
 
     private final ImporterPreferences importerPreferences;
 
-    public SpringerLink(ImporterPreferences importerPreferences) {
+    public SpringerNatureFullTextFetcher(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
     }
 

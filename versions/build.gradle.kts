@@ -12,7 +12,7 @@ val pdfbox = "3.0.5"
 
 dependencies {
     api(platform("ai.djl:bom:0.33.0"))
-    api(platform("dev.langchain4j:langchain4j-bom:1.2.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.3.0"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
     api("dev.langchain4j:langchain4j-hugging-face")
@@ -36,7 +36,7 @@ dependencies.constraints {
     api("com.dlsc.gemsfx:gemsfx:3.4.2")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.2")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.2")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
     api("com.fasterxml:aalto-xml:1.3.3")
     api("com.github.eclipse:lsp4j:0.24.0")
     api("com.github.javakeyring:java-keyring:1.0.4")
@@ -134,7 +134,7 @@ dependencies.constraints {
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
     api("org.libreoffice:unoloader:24.8.4")
-    api("org.mockito:mockito-core:5.18.0")
+    api("org.mockito:mockito-core:5.19.0")
     api("org.ow2.asm:asm:9.8")
     api("org.postgresql:postgresql:42.7.7")
     api("org.slf4j:jul-to-slf4j:2.0.17")
