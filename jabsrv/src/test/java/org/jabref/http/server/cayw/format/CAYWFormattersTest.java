@@ -69,7 +69,6 @@ class CAYWFormattersTest {
     void mmd() {
         MMDFormatter formatter = new MMDFormatter();
         String actual = formatter.format(queryParams(null), caywEntries("key1", "key2"));
-        // Whatever your MMD formatter currently emits; adjust expected accordingly.
         assertEquals("[#key1][][#key2][]", actual);
         assertEquals(MediaType.TEXT_PLAIN_TYPE, formatter.getMediaType());
     }
@@ -84,7 +83,7 @@ class CAYWFormattersTest {
     @Test
     void typst() {
         TypstFormatter formatter = new TypstFormatter();
-        String actual = formatter.format(queryParams(null), caywEntries("key1", "key2"));
-        assertEquals("@key1 @key2", actual);
+        String actual = formatter.format(queryParams(null), caywEntries("key1", "key2/slash"));
+        assertEquals("#cite(label(\"key1\")) #cite(label(\"key2/slash\"))", actual);
     }
 }

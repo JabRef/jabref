@@ -15,26 +15,25 @@ public class FormatterService {
     public CAYWFormatter getFormatter(CAYWQueryParams queryParams) {
         String format = queryParams.getFormat().toLowerCase(Locale.ROOT);
 
-        switch (format) {
-            case "natbib":
-            case "latex":
-            case "cite":
-                return new NatbibFormatter("cite");
-            case "citep":
-                return new NatbibFormatter("citep");
-            case "citet":
-                return new NatbibFormatter("citet");
-            case "mmd":
-                return new MMDFormatter();
-            case "pandoc":
-                return new PandocFormatter();
-            case "simple-json":
-                return new SimpleJsonFormatter();
-            case "typst":
-                return new TypstFormatter();
-            case "biblatex":
-            default:
-                return new BibLatexFormatter("autocite");
-        }
+        return switch (format) {
+            case "natbib",
+                 "latex",
+                 "cite" ->
+                    new NatbibFormatter("cite");
+            case "citep" ->
+                    new NatbibFormatter("citep");
+            case "citet" ->
+                    new NatbibFormatter("citet");
+            case "mmd" ->
+                    new MMDFormatter();
+            case "pandoc" ->
+                    new PandocFormatter();
+            case "simple-json" ->
+                    new SimpleJsonFormatter();
+            case "typst" ->
+                    new TypstFormatter();
+            default ->
+                    new BibLatexFormatter("autocite");
+        };
     }
 }
