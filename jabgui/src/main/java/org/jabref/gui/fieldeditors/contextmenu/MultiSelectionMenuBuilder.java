@@ -1,36 +1,45 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.collections.ObservableList;
 import javafx.scene.control.MenuItem;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 
 record MultiSelectionMenuBuilder(
+        DialogService dialogService,
         BibDatabaseContext databaseContext,
         ObservableOptionalValue<BibEntry> bibEntry,
         GuiPreferences preferences,
         LinkedFilesEditorViewModel viewModel
 ) implements ContextMenuBuilder, SelectionChecks {
 
-    MultiSelectionMenuBuilder(BibDatabaseContext databaseContext,
+    MultiSelectionMenuBuilder(DialogService dialogService,
+                              BibDatabaseContext databaseContext,
                               ObservableOptionalValue<BibEntry> bibEntry,
                               GuiPreferences preferences,
                               LinkedFilesEditorViewModel viewModel) {
+        this.dialogService = Objects.requireNonNull(dialogService);
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.bibEntry = Objects.requireNonNull(bibEntry);
         this.preferences = Objects.requireNonNull(preferences);
@@ -44,94 +53,134 @@ record MultiSelectionMenuBuilder(
 
     @Override
     public List<MenuItem> buildMenu(ObservableList<LinkedFileViewModel> selection) {
-        List<MenuItem> items = new ArrayList<>();
+        ActionFactory actionFactory = new ActionFactory();
+        List<MenuItem> menuItems = new ArrayList<>();
 
-        // Open file(s)
-        items.add(batchActionItem(
-                Localization.lang("Open file(s)"),
-                selection,
-                this::isLocalAndExists,
-                StandardActions.OPEN_FILE));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.OPEN_FILE, selection, this::isLocalAndExists));
+        menuItems.add(customBatchItem(actionFactory, StandardActions.OPEN_FOLDER, selection, this::isLocalAndExists,
+                this::openContainingFolders));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.DOWNLOAD_FILE, selection, this::isOnline));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.REDOWNLOAD_FILE, selection, this::hasSourceUrl));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.MOVE_FILE_TO_FOLDER, selection, this::isMovableToDefaultDir));
+        menuItems.add(buildCopyToFolderItem(actionFactory, selection));
+        menuItems.add(customBatchItem(actionFactory, StandardActions.REMOVE_LINKS, selection, ignored -> true,
+                linkedFileViewModels -> linkedFileViewModels.forEach(linkedFileViewModel ->
+                        new ContextAction(StandardActions.REMOVE_LINKS, linkedFileViewModel, databaseContext, bibEntry, preferences, viewModel).execute())));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.DELETE_FILE, selection, this::isLocalAndExists));
 
-        // Open folder(s) — группируем по директориям и выделяем файл
-        items.add(customBatchItem(
-                Localization.lang("Open folder(s)"),
-                selection,
-                this::isLocalAndExists,
-                () -> openContainingFolders(selection)));
-
-        // Download file(s)
-        items.add(batchActionItem(
-                Localization.lang("Download file(s)"),
-                selection,
-                this::isOnline,
-                StandardActions.DOWNLOAD_FILE));
-
-        // Redownload file(s)
-        items.add(batchActionItem(
-                Localization.lang("Redownload file(s)"),
-                selection,
-                this::hasSourceUrl,
-                StandardActions.REDOWNLOAD_FILE));
-
-        // Move file(s) to file directory
-        items.add(batchActionItem(
-                Localization.lang("Move file(s) to file directory"),
-                selection,
-                this::isMovableToDefaultDir,
-                StandardActions.MOVE_FILE_TO_FOLDER));
-
-        // Remove link(s) — доступно всегда при непустом выделении
-        items.add(customBatchItem(
-                Localization.lang("Remove link(s)"),
-                selection,
-                _ -> true,
-                () -> selection.forEach(vm ->
-                        new ContextAction(StandardActions.REMOVE_LINK, vm, databaseContext, bibEntry, preferences, viewModel).execute())));
-
-        // Permanently delete local file(s)
-        items.add(batchActionItem(
-                Localization.lang("Permanently delete local file(s)"),
-                selection,
-                this::isLocalAndExists,
-                StandardActions.DELETE_FILE));
-
-        return items;
+        return menuItems;
     }
 
-    private MenuItem batchActionItem(String text,
+    private MenuItem buildCopyToFolderItem(ActionFactory actionFactory,
+                                           ObservableList<LinkedFileViewModel> selection) {
+        SimpleCommand copyCommand = new SimpleCommand() {
+            {
+                executable.bind(Bindings.createBooleanBinding(
+                        () -> selection.stream().anyMatch(MultiSelectionMenuBuilder.this::isLocalAndExists),
+                        selection));
+            }
+
+            @Override
+            public void execute() {
+                var localLinkedFiles = selection.stream()
+                        .filter(MultiSelectionMenuBuilder.this::isLocalAndExists)
+                        .toList();
+
+                if (localLinkedFiles.isEmpty()) {
+                    return;
+                }
+
+                DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                        .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+                        .build();
+
+                var exportDirectory = dialogService.showDirectorySelectionDialog(directoryDialogConfiguration);
+                if (exportDirectory.isEmpty()) {
+                    return;
+                }
+                Path exportPath = exportDirectory.get();
+
+                int copiedCount = 0;
+                int skippedCount = 0;
+
+                for (LinkedFileViewModel linkedFileViewModel : localLinkedFiles) {
+                    var sourcePath = linkedFileViewModel.getFile().findIn(databaseContext, preferences.getFilePreferences());
+                    if (sourcePath.isEmpty()) {
+                        skippedCount++;
+                        continue;
+                    }
+                    Path source = sourcePath.get();
+                    Path target = exportPath.resolve(source.getFileName());
+
+                    boolean replaceExisting = false;
+
+                    boolean copySucceeded = FileUtil.copyFile(source, target, replaceExisting);
+                    if (copySucceeded) {
+                        copiedCount++;
+                    } else {
+                        skippedCount++;
+                    }
+                }
+
+                if (copiedCount > 0) {
+                    dialogService.notify(Localization.lang("Copied %0 file(s) to %1", copiedCount, exportPath));
+                }
+                if (skippedCount > 0) {
+                    dialogService.showInformationDialogAndWait(
+                            Localization.lang("Copy linked file(s)"),
+                            Localization.lang("%0 file(s) were skipped (already exist or not accessible).", skippedCount));
+                }
+            }
+        };
+
+        return actionFactory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, copyCommand);
+    }
+
+    private MenuItem batchCommandItem(ActionFactory actionFactory,
+                                      StandardActions action,
+                                      ObservableList<LinkedFileViewModel> selection,
+                                      Predicate<LinkedFileViewModel> enablePredicate) {
+
+        SimpleCommand command = new SimpleCommand() {
+            {
+                executable.bind(Bindings.createBooleanBinding(
+                        () -> selection.stream().anyMatch(enablePredicate),
+                        selection));
+            }
+
+            @Override
+            public void execute() {
+                List<LinkedFileViewModel> snapshot = new ArrayList<>(selection);
+                snapshot.stream()
+                        .filter(enablePredicate)
+                        .forEach(linkedFileViewModel ->
+                                new ContextAction(action, linkedFileViewModel, databaseContext, bibEntry, preferences, viewModel).execute());
+            }
+        };
+
+        return actionFactory.createMenuItem(action, command);
+    }
+
+    private MenuItem customBatchItem(ActionFactory actionFactory,
+                                     StandardActions action,
                                      ObservableList<LinkedFileViewModel> selection,
                                      Predicate<LinkedFileViewModel> enablePredicate,
-                                     StandardActions action) {
-        MenuItem menuItem = new MenuItem(text);
-        BooleanBinding enabled = anyMatches(selection, enablePredicate);
-        menuItem.disableProperty().bind(enabled.not());
+                                     Consumer<List<LinkedFileViewModel>> consumer) {
 
-        menuItem.setOnAction(_ -> selection.stream()
-                                           .filter(enablePredicate)
-                                           .forEach(vm -> new ContextAction(action, vm, databaseContext, bibEntry, preferences, viewModel).execute()));
+        SimpleCommand command = new SimpleCommand() {
+            {
+                executable.bind(Bindings.createBooleanBinding(
+                        () -> selection.stream().anyMatch(enablePredicate),
+                        selection));
+            }
 
-        return menuItem;
-    }
+            @Override
+            public void execute() {
+                List<LinkedFileViewModel> snapshot = new ArrayList<>(selection);
+                consumer.accept(snapshot);
+            }
+        };
 
-    private MenuItem customBatchItem(String text,
-                                     ObservableList<LinkedFileViewModel> selection,
-                                     Predicate<LinkedFileViewModel> enablePredicate,
-                                     Runnable action) {
-        MenuItem menuItem = new MenuItem(text);
-        BooleanBinding enabled = anyMatches(selection, enablePredicate);
-        menuItem.disableProperty().bind(enabled.not());
-
-        menuItem.setOnAction(_ -> action.run());
-        return menuItem;
-    }
-
-    private static BooleanBinding anyMatches(ObservableList<LinkedFileViewModel> selection,
-                                             Predicate<LinkedFileViewModel> predicate) {
-        return Bindings.createBooleanBinding(
-                () -> selection.stream().anyMatch(predicate),
-                selection
-        );
-        // Если нужно "disabled, когда все НЕ подходят", просто .not() при биндинге выше.
+        return actionFactory.createMenuItem(action, command);
     }
 }

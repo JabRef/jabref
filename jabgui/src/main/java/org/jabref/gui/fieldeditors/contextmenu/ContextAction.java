@@ -32,6 +32,7 @@ public class ContextAction extends SimpleCommand {
         this.command = command;
         this.linkedFile = linkedFile;
         this.viewModel = viewModel;
+
         Observable entryFieldsObservable = bibEntry.getValue()
                                                    .map(BibEntry::getFieldsObservable)
                                                    .orElse(null);
@@ -73,7 +74,6 @@ public class ContextAction extends SimpleCommand {
                     case REDOWNLOAD_FILE ->
                             Bindings.createBooleanBinding(
                                     () -> !linkedFile.getFile().getSourceUrl().isEmpty(),
-                                    // важно: слушаем sourceUrlProperty, а не linkProperty
                                     nonNullDependencies(
                                             linkedFile.getFile().sourceUrlProperty(),
                                             entryFieldsObservable
@@ -102,30 +102,40 @@ public class ContextAction extends SimpleCommand {
     @Override
     public void execute() {
         switch (command) {
-            case EDIT_FILE_LINK -> linkedFile.edit();
-            case OPEN_FILE, OPEN_FILES -> linkedFile.open();
-            case OPEN_FOLDER, OPEN_FOLDERS -> linkedFile.openFolder();
-            case DOWNLOAD_FILE, DOWNLOAD_FILES -> {
+            case EDIT_FILE_LINK ->
+                    linkedFile.edit();
+            case OPEN_FILE ->
+                    linkedFile.open();
+            case OPEN_FOLDER ->
+                    linkedFile.openFolder();
+            case DOWNLOAD_FILE -> {
                 if (linkedFile.getFile().isOnlineLink()) {
                     linkedFile.download(true);
                 }
             }
-            case REDOWNLOAD_FILE, REDOWNLOAD_FILES -> {
+            case REDOWNLOAD_FILE -> {
                 if (!linkedFile.getFile().getSourceUrl().isEmpty()) {
                     linkedFile.redownload();
                 }
             }
-            case RENAME_FILE_TO_PATTERN -> linkedFile.renameToSuggestion();
-            case RENAME_FILE_TO_NAME -> linkedFile.askForNameAndRename();
-            case MOVE_FILE_TO_FOLDER, MOVE_FILES_TO_FOLDER -> linkedFile.moveToDefaultDirectory();
-            case MOVE_FILE_TO_FOLDER_AND_RENAME -> linkedFile.moveToDefaultDirectoryAndRename();
-            case DELETE_FILE, DELETE_FILES -> viewModel.deleteFile(linkedFile);
-            case REMOVE_LINK, REMOVE_LINKS -> viewModel.removeFileLink(linkedFile);
+            case RENAME_FILE_TO_PATTERN ->
+                    linkedFile.renameToSuggestion();
+            case RENAME_FILE_TO_NAME ->
+                    linkedFile.askForNameAndRename();
+            case MOVE_FILE_TO_FOLDER ->
+                    linkedFile.moveToDefaultDirectory();
+            case MOVE_FILE_TO_FOLDER_AND_RENAME ->
+                    linkedFile.moveToDefaultDirectoryAndRename();
+            case DELETE_FILE ->
+                    viewModel.deleteFile(linkedFile);
+            case REMOVE_LINK,
+                 REMOVE_LINKS ->
+                    viewModel.removeFileLink(linkedFile);
         }
     }
 
-    private static Observable[] nonNullDependencies(Observable... dependencies) {
-        return Arrays.stream(dependencies)
+    private static Observable[] nonNullDependencies(Observable... deps) {
+        return Arrays.stream(deps)
                      .filter(Objects::nonNull)
                      .toArray(Observable[]::new);
     }

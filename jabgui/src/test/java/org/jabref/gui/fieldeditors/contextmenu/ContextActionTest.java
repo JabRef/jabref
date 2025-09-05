@@ -3,7 +3,6 @@ package org.jabref.gui.fieldeditors.contextmenu;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import org.jabref.gui.actions.StandardActions;
@@ -15,203 +14,252 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(ApplicationExtension.class)
 class ContextActionTest {
 
-    private GuiPreferences preferences;
-    private FilePreferences filePreferences;
-    private BibDatabaseContext databaseContext;
-    private LinkedFilesEditorViewModel editorViewModel;
-    private ObservableOptionalValue<BibEntry> bibEntry;
+    @Test
+    void shouldBeExecutableForOpenFileWhenOfflineFileExists() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        ContextAction action = newAction(StandardActions.OPEN_FILE, fileViewModel);
 
-    @BeforeEach
-    void setUp() {
-        preferences = mock(GuiPreferences.class);
-        filePreferences = mock(FilePreferences.class);
-        when(preferences.getFilePreferences()).thenReturn(filePreferences);
-
-        databaseContext = mock(BibDatabaseContext.class);
-        editorViewModel = mock(LinkedFilesEditorViewModel.class);
-
-        var entryProperty = new SimpleObjectProperty<>(new BibEntry());
-        bibEntry = EasyBind.wrapNullable(entryProperty);
-    }
-
-    private LinkedFileViewModel vmLocal(boolean exists,
-                                        boolean genNameSame,
-                                        boolean genPathSame,
-                                        String sourceUrl) {
-        LinkedFile linkedfile = mock(LinkedFile.class);
-        when(linkedfile.isOnlineLink()).thenReturn(false);
-        when(linkedfile.linkProperty()).thenReturn(new SimpleStringProperty("x.pdf"));
-        when(linkedfile.sourceUrlProperty()).thenReturn(new SimpleStringProperty(sourceUrl == null ? "" : sourceUrl));
-        when(linkedfile.getSourceUrl()).thenReturn(sourceUrl == null ? "" : sourceUrl);
-        when(linkedfile.findIn(eq(databaseContext), eq(filePreferences)))
-                .thenReturn(exists ? Optional.of(Path.of("x.pdf")) : Optional.empty());
-
-        LinkedFileViewModel vm = mock(LinkedFileViewModel.class, RETURNS_DEEP_STUBS);
-        when(vm.getFile()).thenReturn(linkedfile);
-        when(vm.isGeneratedNameSameAsOriginal()).thenReturn(genNameSame);
-        when(vm.isGeneratedPathSameAsOriginal()).thenReturn(genPathSame);
-        return vm;
-    }
-
-    private LinkedFileViewModel vmOnline() {
-        LinkedFile linkedfile = mock(LinkedFile.class);
-        when(linkedfile.isOnlineLink()).thenReturn(true);
-        when(linkedfile.linkProperty()).thenReturn(new SimpleStringProperty("http://a"));
-        when(linkedfile.sourceUrlProperty()).thenReturn(new SimpleStringProperty(""));
-        when(linkedfile.getSourceUrl()).thenReturn("");
-
-        LinkedFileViewModel vm = mock(LinkedFileViewModel.class, RETURNS_DEEP_STUBS);
-        when(vm.getFile()).thenReturn(linkedfile);
-        return vm;
-    }
-
-    private ContextAction make(StandardActions action, LinkedFileViewModel vm) {
-        return new ContextAction(action, vm, databaseContext, bibEntry, preferences, editorViewModel);
+        assertTrue(action.isExecutable(), "OPEN_FILE should be executable for an existing offline file");
     }
 
     @Test
-    void openFileEnabledOnlyForLocalExisting() {
-        LinkedFileViewModel vm = vmLocal(true, false, false, "");
-        assertTrue(make(StandardActions.OPEN_FILE, vm).executableProperty().get());
+    void shouldNotBeExecutableForRenameToPatternWhenNameAlreadyMatchesSuggestion() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        when(fileViewModel.isGeneratedNameSameAsOriginal()).thenReturn(true);
 
-        LinkedFileViewModel missing = vmLocal(false, false, false, "");
-        assertFalse(make(StandardActions.OPEN_FILE, missing).executableProperty().get());
+        ContextAction action = newAction(StandardActions.RENAME_FILE_TO_PATTERN, fileViewModel);
 
-        LinkedFileViewModel online = vmOnline();
-        assertFalse(make(StandardActions.OPEN_FILE, online).executableProperty().get());
+        assertFalse(action.isExecutable(),
+                "RENAME_FILE_TO_PATTERN should be disabled when suggested name equals original");
     }
 
     @Test
-    void downloadEnabledOnlyForOnline() {
-        assertTrue(make(StandardActions.DOWNLOAD_FILE, vmOnline()).executableProperty().get());
-        assertFalse(make(StandardActions.DOWNLOAD_FILE, vmLocal(true, false, false, "")).executableProperty().get());
+    void shouldBeExecutableForDownloadWhenFileIsOnlineLink() {
+        LinkedFileViewModel fileViewModel = mockOnlineLinkViewModel("https://host/resource.pdf");
+        ContextAction action = newAction(StandardActions.DOWNLOAD_FILE, fileViewModel);
+
+        assertTrue(action.isExecutable(), "DOWNLOAD_FILE should be executable for online link");
     }
 
     @Test
-    void redownloadEnabledIfSourceUrlPresent() {
-        assertTrue(make(StandardActions.REDOWNLOAD_FILE, vmLocal(true, false, false, "http://src")).executableProperty().get());
-        assertFalse(make(StandardActions.REDOWNLOAD_FILE, vmLocal(true, false, false, "")).executableProperty().get());
+    void shouldNotBeExecutableForMoveToFolderWhenGeneratedPathMatchesOriginal() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        when(fileViewModel.isGeneratedPathSameAsOriginal()).thenReturn(true);
+
+        ContextAction action = newAction(StandardActions.MOVE_FILE_TO_FOLDER, fileViewModel);
+
+        assertFalse(action.isExecutable(),
+                "MOVE_FILE_TO_FOLDER should be disabled when generated path equals original");
     }
 
     @Test
-    void renameToPatternEnabledWhenLocalExistingAndNameDiffers() {
-        assertTrue(make(StandardActions.RENAME_FILE_TO_PATTERN, vmLocal(true, false, false, "")).executableProperty().get());
-        assertFalse(make(StandardActions.RENAME_FILE_TO_PATTERN, vmLocal(true, true, false, "")).executableProperty().get());
-        assertFalse(make(StandardActions.RENAME_FILE_TO_PATTERN, vmLocal(false, false, false, "")).executableProperty().get());
+    void shouldExecuteEditFileLink() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        ContextAction action = newAction(StandardActions.EDIT_FILE_LINK, fileViewModel);
+
+        action.execute();
+
+        verify(fileViewModel).edit();
     }
 
     @Test
-    void moveToFolderEnabledWhenLocalExistingAndPathDiffers() {
-        assertTrue(make(StandardActions.MOVE_FILE_TO_FOLDER, vmLocal(true, false, false, "")).executableProperty().get());
-        assertFalse(make(StandardActions.MOVE_FILE_TO_FOLDER, vmLocal(true, false, true, "")).executableProperty().get());
-        assertFalse(make(StandardActions.MOVE_FILE_TO_FOLDER, vmLocal(false, false, false, "")).executableProperty().get());
+    void shouldExecuteOpenFile() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        ContextAction action = newAction(StandardActions.OPEN_FILE, fileViewModel);
+
+        action.execute();
+
+        verify(fileViewModel).open();
     }
 
     @Test
-    void executeOpenFileCallsViewModelOpen() {
-        LinkedFileViewModel vm = vmLocal(true, false, false, "");
-        make(StandardActions.OPEN_FILE, vm).execute();
-        verify(vm).open();
+    void shouldExecuteOpenFolder() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        ContextAction action = newAction(StandardActions.OPEN_FOLDER, fileViewModel);
+
+        action.execute();
+
+        verify(fileViewModel).openFolder();
     }
 
     @Test
-    void executeOpenFolderCallsViewModelOpenFolder() {
-        LinkedFileViewModel vm = vmLocal(true, false, false, "");
-        make(StandardActions.OPEN_FOLDER, vm).execute();
-        verify(vm).openFolder();
+    void shouldExecuteDownloadOnlyWhenOnlineLink() {
+        LinkedFileViewModel onlineViewModel = mockOnlineLinkViewModel("https://host/file.pdf");
+        ContextAction onlineAction = newAction(StandardActions.DOWNLOAD_FILE, onlineViewModel);
+        onlineAction.execute();
+        verify(onlineViewModel).download(true);
+
+        LinkedFileViewModel offlineViewModel = mockOfflineExistingFileViewModel();
+        ContextAction offlineAction = newAction(StandardActions.DOWNLOAD_FILE, offlineViewModel);
+        offlineAction.execute();
+        verify(offlineViewModel, never()).download(anyBoolean());
     }
 
     @Test
-    void executeDownloadCallsDownloadOnlyForOnline() {
-        LinkedFileViewModel online = vmOnline();
-        make(StandardActions.DOWNLOAD_FILE, online).execute();
-        verify(online).download(true);
+    void shouldExecuteRedownloadOnlyWhenSourceUrlPresent() {
+        LinkedFileViewModel viewModelWithSource = mockOnlineLinkViewModel("https://host/file.pdf");
+        when(viewModelWithSource.getFile().getSourceUrl()).thenReturn("https://host/file.pdf");
+        ContextAction actionWithSource = newAction(StandardActions.REDOWNLOAD_FILE, viewModelWithSource);
+        actionWithSource.execute();
+        verify(viewModelWithSource).redownload();
 
-        LinkedFileViewModel local = vmLocal(true, false, false, "");
-        make(StandardActions.DOWNLOAD_FILE, local).execute();
-        verify(local, never()).download(anyBoolean());
+        LinkedFileViewModel viewModelWithoutSource = mockOnlineLinkViewModel("");
+        when(viewModelWithoutSource.getFile().getSourceUrl()).thenReturn("");
+        ContextAction actionWithoutSource = newAction(StandardActions.REDOWNLOAD_FILE, viewModelWithoutSource);
+        actionWithoutSource.execute();
+        verify(viewModelWithoutSource, never()).redownload();
     }
 
     @Test
-    void executeRedownloadCallsOnlyWhenSourceUrlPresent() {
-        LinkedFileViewModel withSrc = vmLocal(true, false, false, "http://src");
-        make(StandardActions.REDOWNLOAD_FILE, withSrc).execute();
-        verify(withSrc).redownload();
+    void shouldExecuteRenameToSuggestion() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        when(fileViewModel.isGeneratedNameSameAsOriginal()).thenReturn(false);
 
-        LinkedFileViewModel noSrc = vmLocal(true, false, false, "");
-        make(StandardActions.REDOWNLOAD_FILE, noSrc).execute();
-        verify(noSrc, never()).redownload();
+        ContextAction action = newAction(StandardActions.RENAME_FILE_TO_PATTERN, fileViewModel);
+
+        action.execute();
+
+        verify(fileViewModel).renameToSuggestion();
     }
 
     @Test
-    void executeRenameVariants() {
-        LinkedFileViewModel vm = vmLocal(true, false, false, "");
-        make(StandardActions.RENAME_FILE_TO_PATTERN, vm).execute();
-        verify(vm).renameToSuggestion();
+    void shouldExecuteAskForNameAndRename() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        ContextAction action = newAction(StandardActions.RENAME_FILE_TO_NAME, fileViewModel);
 
-        make(StandardActions.RENAME_FILE_TO_NAME, vm).execute();
-        verify(vm).askForNameAndRename();
+        action.execute();
+
+        verify(fileViewModel).askForNameAndRename();
     }
 
     @Test
-    void executeMoveVariants() {
-        LinkedFileViewModel vm = vmLocal(true, false, false, "");
-        make(StandardActions.MOVE_FILE_TO_FOLDER, vm).execute();
-        verify(vm).moveToDefaultDirectory();
+    void shouldExecuteMoveToDefaultDirectory() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        ContextAction action = newAction(StandardActions.MOVE_FILE_TO_FOLDER, fileViewModel);
 
-        make(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, vm).execute();
-        verify(vm).moveToDefaultDirectoryAndRename();
+        action.execute();
+
+        verify(fileViewModel).moveToDefaultDirectory();
     }
 
     @Test
-    void executeDeleteAndRemoveDelegateToEditorViewModel() {
-        LinkedFileViewModel vm = vmLocal(true, false, false, "");
+    void shouldExecuteMoveToDefaultDirectoryAndRename() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        ContextAction action = newAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, fileViewModel);
 
-        make(StandardActions.DELETE_FILE, vm).execute();
-        verify(editorViewModel).deleteFile(vm);
+        action.execute();
 
-        make(StandardActions.REMOVE_LINK, vm).execute();
-        verify(editorViewModel).removeFileLink(vm);
+        verify(fileViewModel).moveToDefaultDirectoryAndRename();
     }
 
     @Test
-    void pluralFormsAreDispatchedToo() {
-        LinkedFileViewModel vm = vmLocal(true, false, false, "http://src");
-        make(StandardActions.OPEN_FILES, vm).execute();
-        verify(vm).open();
+    void shouldExecuteDeleteFile() {
+        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel();
+        LinkedFilesEditorViewModel editorViewModel = mock(LinkedFilesEditorViewModel.class);
 
-        make(StandardActions.OPEN_FOLDERS, vm).execute();
-        verify(vm).openFolder();
+        ContextAction action = newAction(StandardActions.DELETE_FILE, fileViewModel, editorViewModel);
 
-        make(StandardActions.DOWNLOAD_FILES, vmOnline()).execute();
-        verify(vm, never()).download(anyBoolean());
+        action.execute();
 
-        make(StandardActions.REDOWNLOAD_FILES, vm).execute();
-        verify(vm).redownload();
+        verify(editorViewModel).deleteFile(fileViewModel);
+    }
 
-        make(StandardActions.MOVE_FILES_TO_FOLDER, vm).execute();
-        verify(vm).moveToDefaultDirectory();
+    @Test
+    void shouldExecuteRemoveFileLinkForRemoveLinkAndRemoveLinks() {
+        LinkedFileViewModel fileViewModel = mockOnlineLinkViewModel("https://host/x.pdf");
+        LinkedFilesEditorViewModel editorViewModel = mock(LinkedFilesEditorViewModel.class);
 
-        make(StandardActions.DELETE_FILES, vm).execute();
-        verify(editorViewModel).deleteFile(vm);
+        ContextAction removeLinkAction = newAction(StandardActions.REMOVE_LINK, fileViewModel, editorViewModel);
+        ContextAction removeLinksAction = newAction(StandardActions.REMOVE_LINKS, fileViewModel, editorViewModel);
 
-        make(StandardActions.REMOVE_LINKS, vm).execute();
+        removeLinkAction.execute();
+        removeLinksAction.execute();
+
+        verify(editorViewModel, times(2)).removeFileLink(fileViewModel);
+    }
+
+    private static ContextAction newAction(StandardActions actionType, LinkedFileViewModel fileViewModel) {
+        return newAction(actionType, fileViewModel, mock(LinkedFilesEditorViewModel.class));
+    }
+
+    private static ContextAction newAction(StandardActions actionType,
+                                           LinkedFileViewModel fileViewModel,
+                                           LinkedFilesEditorViewModel editorViewModel) {
+        GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
+
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
+        ObservableOptionalValue<BibEntry> bibEntryOptional = mockEmptyBibEntryOptional();
+
+        return new ContextAction(
+                actionType,
+                fileViewModel,
+                databaseContext,
+                bibEntryOptional,
+                guiPreferences,
+                editorViewModel
+        );
+    }
+
+    private static ObservableOptionalValue<BibEntry> mockEmptyBibEntryOptional() {
+        @SuppressWarnings("unchecked")
+        ObservableOptionalValue<BibEntry> optional =
+                (ObservableOptionalValue<BibEntry>) mock(ObservableOptionalValue.class);
+        when(optional.getValue()).thenReturn(Optional.empty());
+        return optional;
+    }
+
+    private static LinkedFileViewModel mockOfflineExistingFileViewModel() {
+        LinkedFile modelLinkedFile = mock(LinkedFile.class, Answers.RETURNS_DEEP_STUBS);
+        when(modelLinkedFile.isOnlineLink()).thenReturn(false);
+        when(modelLinkedFile.findIn(any(BibDatabaseContext.class), any(FilePreferences.class)))
+                .thenReturn(Optional.of(Path.of("dummy.pdf")));
+        when(modelLinkedFile.linkProperty()).thenReturn(new SimpleStringProperty("dummy.pdf"));
+        when(modelLinkedFile.getSourceUrl()).thenReturn("");
+        when(modelLinkedFile.sourceUrlProperty()).thenReturn(new SimpleStringProperty(""));
+
+        LinkedFileViewModel fileViewModel = mock(LinkedFileViewModel.class, Answers.RETURNS_DEEP_STUBS);
+        when(fileViewModel.getFile()).thenReturn(modelLinkedFile);
+        when(fileViewModel.isGeneratedPathSameAsOriginal()).thenReturn(false);
+        when(fileViewModel.isGeneratedNameSameAsOriginal()).thenReturn(false);
+        return fileViewModel;
+    }
+
+    private static LinkedFileViewModel mockOnlineLinkViewModel(String sourceUrl) {
+        String nonNullUrl = sourceUrl == null ? "" : sourceUrl;
+
+        LinkedFile modelLinkedFile = mock(LinkedFile.class, Answers.RETURNS_DEEP_STUBS);
+        when(modelLinkedFile.isOnlineLink()).thenReturn(true);
+        when(modelLinkedFile.findIn(any(BibDatabaseContext.class), any(FilePreferences.class)))
+                .thenReturn(Optional.empty());
+        when(modelLinkedFile.linkProperty()).thenReturn(new SimpleStringProperty("https://host/file.pdf"));
+        when(modelLinkedFile.getSourceUrl()).thenReturn(nonNullUrl);
+        when(modelLinkedFile.sourceUrlProperty()).thenReturn(new SimpleStringProperty(nonNullUrl));
+
+        LinkedFileViewModel fileViewModel = mock(LinkedFileViewModel.class, Answers.RETURNS_DEEP_STUBS);
+        when(fileViewModel.getFile()).thenReturn(modelLinkedFile);
+        when(fileViewModel.isGeneratedPathSameAsOriginal()).thenReturn(false);
+        when(fileViewModel.isGeneratedNameSameAsOriginal()).thenReturn(false);
+        return fileViewModel;
     }
 }

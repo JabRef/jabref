@@ -6,27 +6,34 @@ import java.util.Objects;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.copyfiles.CopySingleFileAction;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 
 record SingleSelectionMenuBuilder(
+        DialogService dialogService,
         BibDatabaseContext databaseContext,
         ObservableOptionalValue<BibEntry> bibEntry,
         GuiPreferences preferences,
-        LinkedFilesEditorViewModel viewModel) implements ContextMenuBuilder, SelectionChecks {
+        LinkedFilesEditorViewModel viewModel
+) implements ContextMenuBuilder, SelectionChecks {
 
-    SingleSelectionMenuBuilder(BibDatabaseContext databaseContext,
+    SingleSelectionMenuBuilder(DialogService dialogService,
+                               BibDatabaseContext databaseContext,
                                ObservableOptionalValue<BibEntry> bibEntry,
                                GuiPreferences preferences,
                                LinkedFilesEditorViewModel viewModel) {
+        this.dialogService = Objects.requireNonNull(dialogService);
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.bibEntry = Objects.requireNonNull(bibEntry);
         this.preferences = Objects.requireNonNull(preferences);
@@ -40,50 +47,60 @@ record SingleSelectionMenuBuilder(
 
     @Override
     public List<MenuItem> buildMenu(ObservableList<LinkedFileViewModel> selection) {
-        LinkedFileViewModel vm = selection.getFirst();
+        LinkedFileViewModel selectedLinkedFile = selection.getFirst();
+        ActionFactory factory = new ActionFactory();
+
         List<MenuItem> items = new ArrayList<>();
 
-        // Open file / folder — всегда доступны, если локальный файл существует
-        if (isLocalAndExists(vm)) {
-            items.add(actionItem(Localization.lang("Open file"),
-                    new ContextAction(StandardActions.OPEN_FILE, vm, databaseContext, bibEntry, preferences, viewModel)));
+        items.add(factory.createMenuItem(
+                StandardActions.EDIT_FILE_LINK,
+                new ContextAction(StandardActions.EDIT_FILE_LINK, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
 
-            items.add(actionItem(Localization.lang("Open folder"),
-                    new ContextAction(StandardActions.OPEN_FOLDER, vm, databaseContext, bibEntry, preferences, viewModel)));
-        }
+        items.add(new SeparatorMenuItem());
 
-        // Download / Redownload — по условию
-        if (isOnline(vm)) {
-            items.add(actionItem(Localization.lang("Download file"),
-                    new ContextAction(StandardActions.DOWNLOAD_FILE, vm, databaseContext, bibEntry, preferences, viewModel)));
-        }
-        if (hasSourceUrl(vm)) {
-            items.add(actionItem(Localization.lang("Redownload file"),
-                    new ContextAction(StandardActions.REDOWNLOAD_FILE, vm, databaseContext, bibEntry, preferences, viewModel)));
-        }
+        items.add(factory.createMenuItem(
+                StandardActions.OPEN_FILE,
+                new ContextAction(StandardActions.OPEN_FILE, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
+        items.add(factory.createMenuItem(
+                StandardActions.OPEN_FOLDER,
+                new ContextAction(StandardActions.OPEN_FOLDER, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
 
-        // Move / Rename / Remove / Delete — примеры базовых действий
-        if (isMovableToDefaultDir(vm)) {
-            items.add(actionItem(Localization.lang("Move file to file directory"),
-                    new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, vm, databaseContext, bibEntry, preferences, viewModel)));
-        }
+        items.add(new SeparatorMenuItem());
 
-        items.add(actionItem(Localization.lang("Rename file to name"),
-                new ContextAction(StandardActions.RENAME_FILE_TO_NAME, vm, databaseContext, bibEntry, preferences, viewModel)));
+        items.add(factory.createMenuItem(
+                StandardActions.DOWNLOAD_FILE,
+                new ContextAction(StandardActions.DOWNLOAD_FILE, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
 
-        items.add(actionItem(Localization.lang("Remove link"),
-                new ContextAction(StandardActions.REMOVE_LINK, vm, databaseContext, bibEntry, preferences, viewModel)));
+        items.add(factory.createMenuItem(
+                StandardActions.RENAME_FILE_TO_PATTERN,
+                new ContextAction(StandardActions.RENAME_FILE_TO_PATTERN, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
+        items.add(factory.createMenuItem(
+                StandardActions.RENAME_FILE_TO_NAME,
+                new ContextAction(StandardActions.RENAME_FILE_TO_NAME, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
 
-        items.add(actionItem(Localization.lang("Permanently delete local file"),
-                new ContextAction(StandardActions.DELETE_FILE, vm, databaseContext, bibEntry, preferences, viewModel)));
+        items.add(factory.createMenuItem(
+                StandardActions.MOVE_FILE_TO_FOLDER,
+                new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
+        items.add(factory.createMenuItem(
+                StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME,
+                new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
+
+        items.add(factory.createMenuItem(
+                StandardActions.COPY_FILE_TO_FOLDER,
+                new CopySingleFileAction(selectedLinkedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences())));
+
+        items.add(factory.createMenuItem(
+                StandardActions.REDOWNLOAD_FILE,
+                new ContextAction(StandardActions.REDOWNLOAD_FILE, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
+
+        items.add(factory.createMenuItem(
+                StandardActions.REMOVE_LINK,
+                new ContextAction(StandardActions.REMOVE_LINK, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
+
+        items.add(factory.createMenuItem(
+                StandardActions.DELETE_FILE,
+                new ContextAction(StandardActions.DELETE_FILE, selectedLinkedFile, databaseContext, bibEntry, preferences, viewModel)));
 
         return items;
-    }
-
-    private static MenuItem actionItem(String text, ContextAction action) {
-        MenuItem mi = new MenuItem(text);
-        mi.disableProperty().bind(action.executableProperty().not());
-        mi.setOnAction(_ -> action.execute());
-        return mi;
     }
 }

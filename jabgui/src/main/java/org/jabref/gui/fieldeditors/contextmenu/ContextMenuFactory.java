@@ -18,10 +18,7 @@ import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 
 public class ContextMenuFactory {
 
-    private final DialogService dialogService;
-    private final GuiPreferences preferences;
-
-    private final List<ContextMenuBuilder> strategies;
+    private final List<ContextMenuBuilder> menuBuilders;
 
     public ContextMenuFactory(DialogService dialogService,
                               GuiPreferences preferences,
@@ -29,28 +26,28 @@ public class ContextMenuFactory {
                               ObservableOptionalValue<BibEntry> bibEntry,
                               LinkedFilesEditorViewModel viewModel) {
 
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.preferences = Objects.requireNonNull(preferences);
-        BibDatabaseContext dbContext = Objects.requireNonNull(databaseContext);
-        ObservableOptionalValue<BibEntry> currentEntry = Objects.requireNonNull(bibEntry);
-        LinkedFilesEditorViewModel editorViewModel = Objects.requireNonNull(viewModel);
+        Objects.requireNonNull(dialogService);
+        Objects.requireNonNull(preferences);
+        Objects.requireNonNull(databaseContext);
+        Objects.requireNonNull(bibEntry);
+        Objects.requireNonNull(viewModel);
 
-        this.strategies = List.of(
-                new SingleSelectionMenuBuilder(dbContext, currentEntry, this.preferences, editorViewModel),
-                new MultiSelectionMenuBuilder(dbContext, currentEntry, this.preferences, editorViewModel)
+        this.menuBuilders = List.of(
+                new SingleSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel),
+                new MultiSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel)
         );
     }
 
-    public ContextMenu createForSelection(ObservableList<LinkedFileViewModel> selection) {
+    public ContextMenu createMenuForSelection(ObservableList<LinkedFileViewModel> selection) {
         if (selection == null || selection.isEmpty()) {
             return new ContextMenu();
         }
 
-        ContextMenuBuilder builder = strategies.stream()
-                                               .filter(s -> s.supports(selection))
-                                               .findFirst()
-                                               .orElseThrow(() -> new IllegalStateException(
-                                                       "No menu strategy for selection size = " + selection.size()));
+        ContextMenuBuilder builder = menuBuilders.stream()
+                                                 .filter(s -> s.supports(selection))
+                                                 .findFirst()
+                                                 .orElseThrow(() -> new IllegalStateException(
+                                                         "No ContextMenuBuilder found for selection (size=" + selection.size() + ")"));
 
         List<MenuItem> items = builder.buildMenu(selection);
 

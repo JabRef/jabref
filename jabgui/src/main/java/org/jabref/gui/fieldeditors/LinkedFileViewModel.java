@@ -203,11 +203,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public Observable[] getObservables() {
         List<Observable> observables = new ArrayList<>(Arrays.asList(linkedFile.getObservables()));
-        /*
-        Fix: JavaFX crashes with these 2 options lower while multi-downloading 2 or more files
-        observables.add(downloadOngoing);
-        observables.add(downloadProgress);
-        */
         observables.add(isAutomaticallyFound);
         return observables.toArray(new Observable[0]);
     }
@@ -445,9 +440,15 @@ public class LinkedFileViewModel extends AbstractViewModel {
             throw new UnsupportedOperationException("In order to download the file, the source url has to be an online link");
         }
 
+        DownloadLinkedFileAction downloadLinkedFileAction = getDownloadLinkedFileAction();
+        downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
+        downloadLinkedFileAction.execute();
+    }
+
+    private DownloadLinkedFileAction getDownloadLinkedFileAction() {
         String fileName = Path.of(linkedFile.getLink()).getFileName().toString();
 
-        DownloadLinkedFileAction downloadLinkedFileAction = new DownloadLinkedFileAction(
+        return new DownloadLinkedFileAction(
                 databaseContext,
                 entry,
                 linkedFile,
@@ -458,8 +459,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 taskExecutor,
                 fileName,
                 true);
-        downloadProgress.bind(downloadLinkedFileAction.downloadProgress());
-        downloadLinkedFileAction.execute();
     }
 
     public void download(boolean keepHtmlLink) {

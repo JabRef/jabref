@@ -5,10 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import javafx.collections.ObservableList;
 
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -23,48 +20,38 @@ interface SelectionChecks {
 
     GuiPreferences preferences();
 
-    default boolean isLocalAndExists(LinkedFileViewModel vm) {
-        return !vm.getFile().isOnlineLink()
-                && vm.getFile().findIn(databaseContext(), preferences().getFilePreferences()).isPresent();
+    default boolean isLocalAndExists(LinkedFileViewModel linkedFileViewModel) {
+        return !linkedFileViewModel.getFile().isOnlineLink()
+                && linkedFileViewModel.getFile().findIn(databaseContext(), preferences().getFilePreferences()).isPresent();
     }
 
-    default boolean isOnline(LinkedFileViewModel vm) {
-        return vm.getFile().isOnlineLink();
+    default boolean isOnline(LinkedFileViewModel linkedFileViewModel) {
+        return linkedFileViewModel.getFile().isOnlineLink();
     }
 
-    default boolean hasSourceUrl(LinkedFileViewModel vm) {
-        return !vm.getFile().getSourceUrl().isEmpty();
+    default boolean hasSourceUrl(LinkedFileViewModel linkedFileViewModel) {
+        return !linkedFileViewModel.getFile().getSourceUrl().isEmpty();
     }
 
-    default boolean isMovableToDefaultDir(LinkedFileViewModel vm) {
-        return isLocalAndExists(vm) && !vm.isGeneratedPathSameAsOriginal();
+    default boolean isMovableToDefaultDir(LinkedFileViewModel linkedFileViewModel) {
+        return isLocalAndExists(linkedFileViewModel) && !linkedFileViewModel.isGeneratedPathSameAsOriginal();
     }
 
-    default boolean allSelectedSatisfy(ObservableList<LinkedFileViewModel> sel,
-                                       Predicate<LinkedFileViewModel> p) {
-        return sel.stream().allMatch(p);
-    }
+    default void openContainingFolders(List<LinkedFileViewModel> linkedFileViewModels) {
+        Map<Path, List<Path>> filesByDirectory = linkedFileViewModels.stream()
+                .map(linkedFileViewModel -> linkedFileViewModel.getFile().findIn(databaseContext(), preferences().getFilePreferences()))
+                .flatMap(Optional::stream)
+                .collect(Collectors.groupingBy(path -> {
+                    Path parent = path.getParent();
+                    return parent != null ? parent : path;
+                }));
 
-    default boolean anySelectedSatisfy(ObservableList<LinkedFileViewModel> sel,
-                                       Predicate<LinkedFileViewModel> p) {
-        return sel.stream().anyMatch(p);
-    }
-
-    default void openContainingFolders(List<LinkedFileViewModel> vms) {
-        Map<Path, List<Path>> byDir = vms.stream()
-                                         .map(vm -> vm.getFile().findIn(databaseContext(), preferences().getFilePreferences()))
-                                         .flatMap(Optional::stream)
-                                         .collect(Collectors.groupingBy(p -> {
-                                             Path parent = p.getParent();
-                                             return parent != null ? parent : p;
-                                         }));
-
-        for (Map.Entry<Path, List<Path>> e : byDir.entrySet()) {
-            Path fileToSelect = e.getValue().getFirst();
+        for (Map.Entry<Path, List<Path>> entry : filesByDirectory.entrySet()) {
+            Path fileToSelect = entry.getValue().getFirst();
             try {
                 NativeDesktop.get().openFolderAndSelectFile(fileToSelect);
-            } catch (IOException ex) {
-                LoggerFactory.getLogger(getClass()).warn("Could not open folder ", ex);
+            } catch (IOException ioException) {
+                LoggerFactory.getLogger(getClass()).warn("Could not open folder ", ioException);
             }
         }
     }
