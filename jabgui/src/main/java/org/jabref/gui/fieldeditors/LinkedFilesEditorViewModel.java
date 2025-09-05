@@ -12,9 +12,11 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -53,6 +55,8 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     private final ListProperty<LinkedFileViewModel> files = new SimpleListProperty<>(FXCollections.observableArrayList(LinkedFileViewModel::getObservables));
     private final BooleanProperty fulltextLookupInProgress = new SimpleBooleanProperty(false);
+    private final BooleanProperty anyDownloadOngoing = new SimpleBooleanProperty(false);
+    private final DoubleProperty maxDownloadProgress = new SimpleDoubleProperty(0.0);
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
@@ -78,6 +82,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 text,
                 LinkedFilesEditorViewModel::getStringRepresentation,
                 this::parseToFileViewModel);
+        wireAggregateDownloadBindings();
     }
 
     private static String getStringRepresentation(List<LinkedFileViewModel> files) {
@@ -93,7 +98,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     /**
      * Creates an instance of {@link LinkedFile} based on the given file.
      * We try to guess the file type and relativize the path against the given file directories.
-     *
      * TODO: Move this method to {@link LinkedFile} as soon as {@link CustomExternalFileType} lives in model.
      */
     public static LinkedFile fromFile(Path file, List<Path> fileDirectories, ExternalApplicationsPreferences externalApplicationsPreferences) {
@@ -102,6 +106,39 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                                                               .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.relativize(file, fileDirectories);
         return new LinkedFile("", relativePath, suggestedFileType.getName());
+    }
+
+    private void wireAggregateDownloadBindings() {
+        Runnable recompute = () -> {
+            anyDownloadOngoing.set(
+                    files.stream().anyMatch(fileViewModel -> fileViewModel.downloadOngoingProperty().get())
+            );
+            maxDownloadProgress.set(
+                    files.stream()
+                         .mapToDouble(fileViewModel -> fileViewModel.downloadProgressProperty().get())
+                         .max()
+                         .orElse(0.0)
+            );
+        };
+
+        for (LinkedFileViewModel fileViewModel : files) {
+            fileViewModel.downloadOngoingProperty().addListener(ignore -> recompute.run());
+            fileViewModel.downloadProgressProperty().addListener(ignore -> recompute.run());
+        }
+
+        files.addListener((javafx.collections.ListChangeListener<LinkedFileViewModel>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (LinkedFileViewModel fileViewModel : change.getAddedSubList()) {
+                        fileViewModel.downloadOngoingProperty().addListener(ignore -> recompute.run());
+                        fileViewModel.downloadProgressProperty().addListener(ignore -> recompute.run());
+                    }
+                }
+            }
+            recompute.run();
+        });
+
+        recompute.run();
     }
 
     private List<LinkedFileViewModel> parseToFileViewModel(String stringValue) {

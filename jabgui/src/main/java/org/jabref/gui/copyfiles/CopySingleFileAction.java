@@ -1,9 +1,13 @@
 package org.jabref.gui.copyfiles;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 
 import org.jabref.gui.DialogService;
@@ -14,52 +18,107 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.util.OptionalUtil;
 
 public class CopySingleFileAction extends SimpleCommand {
 
-    private final LinkedFile linkedFile;
+    private final List<LinkedFile> linkedFiles;
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
 
-    private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) -> path.resolve(file.getFileName());
+    private final BiFunction<Path, Path, Path> resolvePathFilename = (dir, file) -> dir.resolve(file.getFileName());
 
-    public CopySingleFileAction(LinkedFile linkedFile, DialogService dialogService, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
-        this.linkedFile = linkedFile;
+    public CopySingleFileAction(LinkedFile linkedFile,
+                                DialogService dialogService,
+                                BibDatabaseContext databaseContext,
+                                FilePreferences filePreferences) {
+        this(List.of(linkedFile), dialogService, databaseContext, filePreferences);
+    }
+
+    public CopySingleFileAction(Collection<LinkedFile> linkedFiles,
+                                DialogService dialogService,
+                                BibDatabaseContext databaseContext,
+                                FilePreferences filePreferences) {
+        this.linkedFiles = new ArrayList<>(linkedFiles);
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
 
         this.executable.bind(Bindings.createBooleanBinding(
-                () -> !linkedFile.isOnlineLink()
-                        && linkedFile.findIn(databaseContext, this.filePreferences).isPresent(),
-                linkedFile.linkProperty()));
+                () -> this.linkedFiles.stream().anyMatch(this::isLocalExisting),
+                dependencies(this.linkedFiles)));
     }
 
     @Override
     public void execute() {
-        DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+        DirectoryDialogConfiguration cfg = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(filePreferences.getWorkingDirectory())
                 .build();
-        Optional<Path> exportPath = dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
-        exportPath.ifPresent(this::copyFileToDestination);
-    }
 
-    private void copyFileToDestination(Path exportPath) {
-        Optional<Path> fileToExport = linkedFile.findIn(databaseContext, filePreferences);
-        Optional<Path> newPath = OptionalUtil.combine(Optional.of(exportPath), fileToExport, resolvePathFilename);
+        Optional<Path> exportDir = dialogService.showDirectorySelectionDialog(cfg);
+        if (exportDir.isEmpty()) {
+            return;
+        }
 
-        if (newPath.isPresent()) {
-            Path newFile = newPath.get();
-            boolean success = fileToExport.isPresent() && FileUtil.copyFile(fileToExport.get(), newFile, false);
+        int ok = 0;
+        List<String> failed = new ArrayList<>();
+
+        for (LinkedFile lf : linkedFiles) {
+            Optional<Path> srcOpt = lf.findIn(databaseContext, filePreferences);
+            if (srcOpt.isEmpty()) {
+                continue;
+            }
+            Path src = srcOpt.get();
+            Path dst = resolvePathFilename.apply(exportDir.get(), src);
+
+            boolean success = FileUtil.copyFile(src, dst, false);
             if (success) {
-                dialogService.showInformationDialogAndWait(Localization.lang("Copy linked file"), Localization.lang("Successfully copied file to %0.", newPath.map(Path::getParent).map(Path::toString).orElse("")));
+                ok++;
             } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("Copy linked file"), Localization.lang("Could not copy file to %0, maybe the file is already existing?", newPath.map(Path::getParent).map(Path::toString).orElse("")));
+                failed.add(src.getFileName().toString());
+            }
+        }
+
+        String title = Localization.lang("Copy linked file");
+
+        if (linkedFiles.size() == 1) {
+            if (ok == 1) {
+                dialogService.showInformationDialogAndWait(
+                        title,
+                        Localization.lang("Successfully copied file to %0.",
+                                exportDir.map(Path::toString).orElse("")));
+            } else {
+                dialogService.showErrorDialogAndWait(
+                        title,
+                        Localization.lang("Could not copy file to %0, maybe the file is already existing?",
+                                exportDir.map(Path::toString).orElse("")));
             }
         } else {
-            dialogService.showErrorDialogAndWait(Localization.lang("Could not resolve the file %0", fileToExport.map(Path::getParent).map(Path::toString).orElse("")));
+            if (ok > 0 && failed.isEmpty()) {
+                dialogService.showInformationDialogAndWait(
+                        title,
+                        Localization.lang("Successfully copied %0 file(s) to %1.",
+                                Integer.toString(ok),
+                                exportDir.map(Path::toString).orElse("")));
+            } else if (ok > 0) {
+                dialogService.showInformationDialogAndWait(
+                        title,
+                        Localization.lang("Copied %0 file(s). Failed: %1",
+                                Integer.toString(ok),
+                                String.join(", ", failed)));
+            } else {
+                dialogService.showErrorDialogAndWait(
+                        title,
+                        Localization.lang("Could not copy selected file(s)."));
+            }
         }
+    }
+
+    private boolean isLocalExisting(LinkedFile lf) {
+        return !lf.isOnlineLink() && lf.findIn(databaseContext, filePreferences).isPresent();
+    }
+
+    private static Observable[] dependencies(Collection<LinkedFile> files) {
+        return files.stream().map(LinkedFile::linkProperty).toArray(Observable[]::new);
     }
 }
