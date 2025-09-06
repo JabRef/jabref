@@ -115,4 +115,10 @@ class KeywordListTest {
     void mergeTwoListsOfKeywordsShouldReturnTheKeywordsMerged() {
         assertEquals(new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"), KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ','));
     }
+
+    @Test
+    void parseMultipleDelimiter() {
+        assertEquals(new KeywordList("keywordOne", "keywordTwo", "keywordThree"),
+                KeywordList.parseMultipleDelimeter("keywordOne; keywordTwo: keywordThree", ";:"));
+    }
 }
