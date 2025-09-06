@@ -21,12 +21,10 @@ public class ClearContentViewModel {
         this.stateManager = stateManager;
     }
 
-    /** all fields (without internal ones) */
     public Set<Field> getAllFields() {
         return FieldFactory.getAllFieldsWithOutInternal();
     }
 
-    /** only fields that are set in the selected entries */
     public Set<Field> getSetFieldsOnly() {
         List<BibEntry> selected = stateManager.getSelectedEntries();
         Set<Field> setFields = new LinkedHashSet<>();
