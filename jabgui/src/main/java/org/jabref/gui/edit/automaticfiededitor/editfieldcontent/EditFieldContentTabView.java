@@ -24,7 +24,6 @@ import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 
 public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView {
     public Button appendValueButton;
-    public Button clearFieldButton;
     public Button setValueButton;
     @FXML
     private ComboBox<Field> fieldComboBox;
@@ -72,7 +71,6 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
 
         appendValueButton.disableProperty().bind(viewModel.canAppendProperty().not());
         setValueButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not());
-        clearFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not());
         overwriteFieldContentCheckBox.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not());
 
         Platform.runLater(() -> visualizer.initVisualization(viewModel.fieldValidationStatus(), fieldComboBox, true));
@@ -86,11 +84,6 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
     @FXML
     void appendToFieldValue() {
         viewModel.appendToFieldValue();
-    }
-
-    @FXML
-    void clearField() {
-        viewModel.clearSelectedField();
     }
 
     @FXML

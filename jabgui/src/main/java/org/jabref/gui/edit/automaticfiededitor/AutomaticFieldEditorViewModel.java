@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.edit.automaticfiededitor.clearcontent.ClearContentTabView;
 import org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabView;
 import org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentTabView;
 import org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView;
@@ -28,6 +29,7 @@ public class AutomaticFieldEditorViewModel extends AbstractViewModel {
         fieldEditorTabs.addAll(
                 new EditFieldContentTabView(database, stateManager),
                 new CopyOrMoveFieldContentTabView(database, stateManager),
+                new ClearContentTabView(stateManager),
                 new RenameFieldTabView(database, stateManager)
         );
     }
