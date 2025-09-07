@@ -1,10 +1,11 @@
-This shows how to recreate the results generated via Metrics code.
+This shows how to recreate the results generated via Metrics code and Test Metrics.
 
 # Key Metrics:
 ## Code Structure: 
 ### 1. LOC (per file/module)
-### 2. comment density 
-### 3. cyclomatic complexity
+### 2. Comment Density 
+### 3. Cyclomatic Complexity
+### 4. Number of Unit Tests
 
 ## **Modules**:
 |    Module    |    Module    |
@@ -59,4 +60,4 @@ The libraries used were a mixture of **lizard** and **pygount**. Although, the s
 	- Then calculate the comment density, LOC, and cyclomatic complexity
 4. Print results 
 	- Use CSV library to print the list of dictionaries 
-
+5. Run the testMetrics.py file using any python interpreter. Results will be output into the terminal. Current number of tests = 3643
