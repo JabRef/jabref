@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.entry;
 
+import java.util.function.UnaryOperator;
+
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -8,6 +10,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.input.KeyCode;
 
 import org.jabref.gui.actions.ActionFactory;
@@ -54,15 +57,12 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         keywordSeparator.textProperty().bindBidirectional(viewModel.keywordSeparatorProperty());
 
         // Use TextFormatter to limit the length of the Input of keywordSeparator to 1 character only.
-//        UnaryOperator<TextFormatter.Change> singleCharacterFilter = change -> {
-//            if (change.getControlNewText().length() <= 1) {
-//                return change;
-//            }
-//            return null; // null means the change is rejected
-//        };
-//        TextFormatter<String> formatter = new TextFormatter<>(singleCharacterFilter);
+        UnaryOperator<TextFormatter.Change> singleCharacterFilter = change -> {
+            return change;
+        };
+        TextFormatter<String> formatter = new TextFormatter<>(singleCharacterFilter);
 
-//        keywordSeparator.setTextFormatter(formatter);
+        keywordSeparator.setTextFormatter(formatter);
 
         resolveStrings.selectedProperty().bindBidirectional(viewModel.resolveStringsProperty());
 

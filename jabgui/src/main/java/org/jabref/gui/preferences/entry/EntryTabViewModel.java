@@ -66,6 +66,9 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        if (keywordSeparatorProperty.getValue().length() > 1) {
+            bibEntryPreferences.multipleKeywordSeparatorProperty().setValue(keywordSeparatorProperty.getValue());
+        }
         bibEntryPreferences.keywordSeparatorProperty().setValue(keywordSeparatorProperty.getValue().charAt(0));
 
         fieldPreferences.setResolveStrings(resolveStringsProperty.getValue());
