@@ -106,8 +106,7 @@ public class WebSearchPaneViewModel {
                             int line = offendingToken.getLine();
                             int charPositionInLine = offendingToken.getCharPositionInLine() + 1;
 
-                            String errorMessage = "Invalid syntax at line %d, position %d".formatted(line, charPositionInLine);
-                            return ValidationMessage.error(Localization.lang(errorMessage));
+                            return ValidationMessage.error(Localization.lang("Invalid query element '%0' at position %1", line, charPositionInLine));
                         }
 
                         // Fallback for other cancellation reasons
