@@ -83,7 +83,7 @@ class CAYWFormattersTest {
     void typst() {
         TypstFormatter formatter = new TypstFormatter();
         String actual = formatter.format(queryParams(null), caywEntries("key1", "key2"));
-        assertEquals("@key1 @key2", actual);
+        assertEquals("#cite(<key1>) #cite(<key2>)", actual);
     }
 
     @Test
