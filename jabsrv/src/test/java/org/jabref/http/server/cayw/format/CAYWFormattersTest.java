@@ -90,6 +90,6 @@ class CAYWFormattersTest {
     void typst_slashInKey() {
         TypstFormatter formatter = new TypstFormatter();
         String actual = formatter.format(queryParams(null), caywEntries("key1", "key2/slash", "key3"));
-        assertEquals("@key1 #cite(label(\"key2/slash\")) #cite(<key3>)", actual);
+        assertEquals("#cite(<key1>) #cite(label(\"key2/slash\")) #cite(<key3>)", actual);
     }
 }
