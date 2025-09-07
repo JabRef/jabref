@@ -1,13 +1,13 @@
 This shows how to recreate the results generated via Metrics code.
 
-
-## Key Metrics: 
+# Key Metrics:
+## Code Structure: 
 ### 1. LOC (per file/module)
 ### 2. comment density 
 ### 3. cyclomatic complexity
 
 ## **Modules**:
-
+|    Module    |    Module    |
 | ------------- | ------------- |
 | build-logic   | build-support |
 | jabgui        | jabkit        |
