@@ -7,25 +7,32 @@ This shows how to recreate the results generated via Metrics code.
 ### 3. cyclomatic complexity
 
 ## **Modules**:
-#### build-logic
-#### build-support
-#### jabgui
-#### jabkit
-#### jablib
-#### jabls
-#### jabls-cli
-#### jabsrv
-#### jabsrv-cli
-#### test-support
+
+| ------------- | ------------- |
+| build-logic   | build-support |
+| jabgui        | jabkit        |
+| jablib        | jabls         |
+| jabsrv       | jabsrv-cli    |
+
+#### + build-logic
+#### + build-support
+#### + jabgui
+#### + jabkit
+#### + jablib
+#### + jabls
+#### + jabls-cli
+#### + jabsrv
+#### + jabsrv-cli
+#### + test-support
 
 ![The Module Results for code metrics](metrics_1_results.png)
 
-This *modules* were chosen as they contained the 'src' code for major contributions to the project, their file extensions includes: .kts (kotlin), .java, and .css
+These *modules* were chosen as they contained the 'src' code for major contributions to the project, their file extensions includes: .kts (kotlin), .java, and .css
 
 
 ## Library 
 
-The library used were a mixture of **lizard** and **pygount**. Although, the script was written in Python, these libraries support the analysis of many languages via source code from files. 
+The libraries used were a mixture of **lizard** and **pygount**. Although, the script was written in Python, these libraries support the analysis of many languages via source code from files. 
 
 ### Steps to Recreate: 
 
