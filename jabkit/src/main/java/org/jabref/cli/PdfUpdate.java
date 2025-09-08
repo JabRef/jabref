@@ -274,7 +274,7 @@ class PdfUpdate implements Runnable {
         public GitPreferences getGitPreferences() {
             return null;
         }
-    }
+    };
 
     @ParentCommand
     protected Pdf pdf;
