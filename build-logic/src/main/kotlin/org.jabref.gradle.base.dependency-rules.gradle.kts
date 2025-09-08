@@ -297,10 +297,7 @@ extraJavaModuleInfo {
     module("org.eclipse.lsp4j:org.eclipse.lsp4j", "org.eclipse.lsp4j") {
         exportAllPackages()
         requireAllDefinedDependencies()
-        // Note the missing "lsp4j" at the group
-        //mergeJar("org.eclipse:lsp4j")
         requires("com.google.gson")
-
     }
     module("org.eclipse.lsp4j:org.eclipse.lsp4j.debug", "org.eclipse.lsp4j.debug") {
         exportAllPackages()
