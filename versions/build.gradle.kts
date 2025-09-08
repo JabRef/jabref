@@ -11,7 +11,7 @@ val lucene = "10.2.2"
 val pdfbox = "3.0.5"
 
 dependencies {
-    api(platform("ai.djl:bom:0.33.0"))
+    api(platform("ai.djl:bom:0.34.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.3.0"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
