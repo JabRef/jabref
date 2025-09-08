@@ -161,6 +161,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private final AiService aiService;
 
+    private Runnable autoCompleterChangedListener;
+
     /**
      * @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
      *                       If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path {@link BibDatabaseContext#getFulltextIndexPath()}.
@@ -253,14 +255,18 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         Platform.runLater(() -> {
             EasyBind.subscribe(changedProperty, this::updateTabTitle);
-            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
+            stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ ->
                     updateTabTitle(changedProperty.getValue()));
         });
     }
 
-    private static void addChangedInformation(StringBuilder text, String fileName) {
+    public void setAutoCompleterChangedListener(@NonNull Runnable listener) {
+        this.autoCompleterChangedListener = listener;
+    }
+
+    private static void addChangedInformation(StringBuilder text) {
         text.append("\n");
-        text.append(Localization.lang("Library '%0' has changed.", fileName));
+        text.append(Localization.lang("The library has been modified."));
     }
 
     private static void addModeInfo(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
@@ -303,7 +309,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
 
         setDatabaseContext(result.getDatabaseContext());
-
+        // Notify listeners that the auto-completer may have changed
+        if (autoCompleterChangedListener != null) {
+            autoCompleterChangedListener.run();
+        }
         LOGGER.trace("loading.set(false);");
         loading.set(false);
         dataLoadingTask = null;
@@ -399,10 +408,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 tabTitle.append('*');
             }
 
-            // Filename
             Path databasePath = file.get();
-            String fileName = databasePath.getFileName().toString();
-            tabTitle.append(fileName);
+            tabTitle.append(databasePath.getFileName().toString());
+            Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
+            uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
             toolTipText.append(databasePath.toAbsolutePath());
 
             if (databaseLocation == DatabaseLocation.SHARED) {
@@ -417,12 +426,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
             // Changed information (tooltip)
             if (isChanged && !isAutosaveEnabled) {
-                addChangedInformation(toolTipText, fileName);
+                addChangedInformation(toolTipText);
             }
-
-            // Unique path fragment
-            Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
-            uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {
                 tabTitle.append('*');
@@ -433,7 +438,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
             addModeInfo(toolTipText, bibDatabaseContext);
             if ((databaseLocation == DatabaseLocation.LOCAL) && bibDatabaseContext.getDatabase().hasEntries()) {
-                addChangedInformation(toolTipText, Localization.lang("untitled"));
+                addChangedInformation(toolTipText);
             }
         }
 
@@ -615,7 +620,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
      * Ask if the user really wants to close the given database.
      * Offers to save or discard the changes -- or return to the library
      *
-     * @return <code>true</code> if the user choose to close the database
+     * @return <code>true</code> if the user chooses to close the database
      */
     private boolean confirmClose() {
         // Database could not have been changed, since it is still loading
@@ -637,7 +642,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         Optional<ButtonType> response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,
                 Localization.lang("Save before closing"),
-                Localization.lang("Library '%0' has changed.", filename),
+                Localization.lang("Library '%0' has been modified.", filename),
                 saveChanges, discardChanges, returnToLibrary);
 
         if (response.isEmpty()) {

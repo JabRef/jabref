@@ -483,6 +483,8 @@ jobs:
         with:
           files: |
             jablib/src/main/java/**/*.java
+          files_ignore: |
+            jablib/src/main/java/**/*-*.java
 
       - name: Build ${{ matrix.launcher }} launcher including changed classes
         shell: bash
