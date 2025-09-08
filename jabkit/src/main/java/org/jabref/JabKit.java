@@ -306,7 +306,7 @@ public class JabKit {
             BuildInfo buildInfo = new BuildInfo();
             Injector.setModelOrService(BuildInfo.class, buildInfo);
 
-            BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository(bibEntryTypesManager, cliPreferences);
+            BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository(cliPreferences, bibEntryTypesManager);
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);

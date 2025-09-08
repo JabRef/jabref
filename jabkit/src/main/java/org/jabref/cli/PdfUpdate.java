@@ -330,7 +330,7 @@ class PdfUpdate implements Runnable {
                 pdf.argumentProcessor.cliPreferences.getXmpPreferences(),
                 pdf.argumentProcessor.cliPreferences.getFilePreferences(),
                 pdf.argumentProcessor.cliPreferences.getLibraryPreferences().getDefaultBibDatabaseMode(),
-                pdf.argumentProcessor.cliPreferences.getCustomEntryTypesRepository(bibEntryTypesManager, cliPreferences),
+                pdf.argumentProcessor.cliPreferences.getCustomEntryTypesRepository(cliPreferences, bibEntryTypesManager),
                 pdf.argumentProcessor.cliPreferences.getFieldPreferences(),
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 formats.contains("xmp"),
