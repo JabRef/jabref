@@ -201,6 +201,10 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
+    module("io.github.classgraph:classgraph", "io.github.classgraph") {
+        overrideModuleName()
+        exportAllPackages()
+    }
     module("io.github.adr:e-adr", "io.github.adr")
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64", "embedded.postgres.binaries.darwin.amd64")
@@ -232,7 +236,11 @@ extraJavaModuleInfo {
     }
     module("org.apache.pdfbox:pdfbox-io", "org.apache.pdfbox.io")
     module("org.apache.velocity:velocity-engine-core", "velocity.engine.core")
-    module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit")
+    module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit") {
+        exportAllPackages()
+        requires("org.slf4j")
+        uses("org.eclipse.jgit.lib.SignerFactory")
+    }
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
     module("org.fxmisc.wellbehaved:wellbehavedfx", "wellbehavedfx") {
         exportAllPackages()
@@ -285,43 +293,30 @@ extraJavaModuleInfo {
     module("com.github.javaparser:javaparser-symbol-solver-core", "com.github.javaparser.symbolsolver.core")
     module("net.sf.jopt-simple:jopt-simple", "jopt.simple")
 
-    // "com.github.eclipse:org.eclipse.lsp4j", "lsp4j"
-    //   - The name 'org.eclipse.lsp4j' is different than the name derived from the Jar file name 'lsp4j'; turn off 'failOnModifiedDerivedModuleNames' or explicitly allow override via 'overrideModuleName()'
-    //   - Not a module and no mapping defined: lsp4j-0.24.0.jar
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j", "lsp4j") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j", "org.eclipse.lsp4j") {
         exportAllPackages()
         requireAllDefinedDependencies()
-        // Note the missing "lsp4j" at the group
-        mergeJar("com.github.eclipse:lsp4j")
         requires("com.google.gson")
-
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.debug", "lsp4j.debug") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.debug", "org.eclipse.lsp4j.debug") {
         exportAllPackages()
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.generator", "lsp4j.generator") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.generator", "org.eclipse.lsp4j.generator") {
         exportAllPackages()
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc", "lsp4j.jsonrpc") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc", "org.eclipse.lsp4j.jsonrpc") {
         exportAllPackages()
         requires("com.google.gson")
         requires("java.logging")
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "lsp4j.jsonrpc.debug") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "org.eclipse.lsp4j.jsonrpc.debug") {
         exportAllPackages()
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.websocket", "lsp4j.websocket") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket", "org.eclipse.lsp4j.websocket") {
         exportAllPackages()
         requireAllDefinedDependencies()
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "lsp4j.websocket.jakarta") {
-        overrideModuleName()
+    module("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "org.eclipse.lsp4j.websocket.jakarta") {
         exportAllPackages()
         requireAllDefinedDependencies()
     }
@@ -329,8 +324,7 @@ extraJavaModuleInfo {
         overrideModuleName()
         exportAllPackages()
     }
-    module("javax.websocket:javax.websocket-api", "javax.websocket") {
-        overrideModuleName()
+    module("javax.websocket:javax.websocket-api", "javax.websocket.api") {
         exportAllPackages()
     }
     module("org.eclipse.xtend:org.eclipse.xtend", "xtend") {

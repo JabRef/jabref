@@ -8,9 +8,10 @@ import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TabPane;
 
 import org.jabref.gui.StateManager;
+import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.io.FileUtil;
@@ -38,8 +39,8 @@ public class ActionHelper {
         return BooleanExpression.booleanExpression(binding);
     }
 
-    public static BooleanExpression needsMultipleDatabases(TabPane tabbedPane) {
-        return Bindings.size(tabbedPane.getTabs()).greaterThan(1);
+    public static BooleanExpression needsMultipleDatabases(StateManager stateManager) {
+        return Bindings.size(stateManager.getOpenDatabases()).greaterThan(1);
     }
 
     public static BooleanExpression needsStudyDatabase(StateManager stateManager) {
@@ -104,5 +105,22 @@ public class ActionHelper {
     public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {
         return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
                 entries -> entries.anyMatch(entry -> !entry.getFiles().isEmpty())));
+    }
+
+    public static BooleanExpression needsGitRemoteConfigured(StateManager stateManager) {
+        return BooleanExpression.booleanExpression(
+                EasyBind.map(stateManager.activeDatabaseProperty(), contextOptional -> {
+                    if (contextOptional.isPresent()) {
+                        return contextOptional.get().getDatabasePath()
+                                         .map(path -> {
+                                             GitHandler handler = new GitHandlerRegistry().get(path.getParent());
+                                             return handler != null && handler.hasRemote("origin");
+                                         })
+                                         .orElse(false);
+                    } else {
+                        return false;
+                    }
+                })
+        );
     }
 }

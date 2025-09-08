@@ -18,6 +18,7 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
+import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.http.SrvStateManager;
 import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.BackgroundTask;
@@ -103,4 +104,8 @@ public interface StateManager extends SrvStateManager {
     List<AiChatWindow> getAiChatWindows();
 
     BooleanProperty getEditorShowing();
+
+    void setActiveWalkthrough(Walkthrough walkthrough);
+
+    Optional<Walkthrough> getActiveWalkthrough();
 }

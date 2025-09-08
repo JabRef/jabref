@@ -7,6 +7,9 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Optional;
 
+import org.jabref.logic.JabRefException;
+import org.jabref.logic.git.util.NoopGitSystemReader;
+
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -18,6 +21,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.URIish;
+import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +43,8 @@ class GitHandlerTest {
     void setUpGitHandler() throws IOException, GitAPIException, URISyntaxException {
         gitHandler = new GitHandler(repositoryPath);
 
+        SystemReader.setInstance(new NoopGitSystemReader());
+
         try (Git remoteGit = Git.init()
                            .setBare(true)
                            .setDirectory(remoteRepoPath.toFile())
@@ -46,6 +52,8 @@ class GitHandlerTest {
                            .call()) {
             // This ensures the remote repository is initialized and properly closed
         }
+
+        gitHandler.initIfNeeded();
         Path testFile = repositoryPath.resolve("initial.txt");
         Files.writeString(testFile, "init");
 
@@ -111,7 +119,7 @@ class GitHandlerTest {
     }
 
     @Test
-    void fetchOnCurrentBranch() throws IOException, GitAPIException {
+    void fetchOnCurrentBranch() throws IOException, GitAPIException, JabRefException {
         try (Git cloneGit = Git.cloneRepository()
                                .setURI(remoteRepoPath.toUri().toString())
                                .setDirectory(clonePath.toFile())

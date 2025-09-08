@@ -65,6 +65,7 @@
     <CheckBox fx:id="fulltextIndex" text="%Automatically index all linked files for fulltext search"/>
 
     <Label styleClass="sectionHeader" text="%Linked file name conventions"/>
+    <CheckBox fx:id="autoRenameFilesOnChange" text="%Auto rename files if entry changes"/>
     <GridPane hgap="4.0" vgap="4.0">
         <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>

@@ -141,11 +141,13 @@ class JStyleGetCitationMarker {
         // emitAllAuthors == false means use "et al."
         boolean emitAllAuthors = (nAuthors <= maxAuthors) || (maxAuthors == -1);
 
-        int nAuthorsToEmit = emitAllAuthors
-                              ? nAuthors
-                              // If we use "et al." maxAuthorsBeforeEtAl also limits the
-                              // number of authors emitted.
-                              : Math.min(maxAuthorsBeforeEtAl, nAuthors);
+        int nAuthorsToEmit;
+        if (emitAllAuthors) {
+            nAuthorsToEmit = nAuthors;
+        } else {
+            // If we use "et al." maxAuthorsBeforeEtAl also limits the number of authors emitted.
+            nAuthorsToEmit = Math.min(maxAuthorsBeforeEtAl, nAuthors);
+        }
 
         if (nAuthorsToEmit >= 1) {
             stringBuilder.append(style.getAuthorsPartMarkupBefore());

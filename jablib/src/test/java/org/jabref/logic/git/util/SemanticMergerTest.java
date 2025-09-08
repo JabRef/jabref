@@ -11,6 +11,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -27,6 +28,8 @@ public class SemanticMergerTest {
 
     @BeforeEach
     void setup() {
+        SystemReader.setInstance(new NoopGitSystemReader());
+
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
     }
@@ -38,7 +41,7 @@ public class SemanticMergerTest {
         BibDatabaseContext localDatabaseContext = BibDatabaseContext.of(local, importFormatPreferences);
         BibDatabaseContext remoteDatabaseContext = BibDatabaseContext.of(remote, importFormatPreferences);
 
-        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseDatabaseContext, remoteDatabaseContext);
+        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseDatabaseContext, localDatabaseContext, remoteDatabaseContext);
         SemanticMerger.applyMergePlan(localDatabaseContext, plan);
 
         BibEntry patched = localDatabaseContext.getDatabase().getEntryByCitationKey("a").orElseThrow();

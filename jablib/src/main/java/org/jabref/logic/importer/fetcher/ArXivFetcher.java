@@ -45,11 +45,11 @@ import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
+import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -332,13 +332,13 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
      * and modify resulting BibEntries with additional info from the ArXiv-issued DOI
      *
-     * @param luceneQuery the root node of the lucene query
+     * @param queryNode the first search query node
      * @return A list of entries matching the complex query
      */
     @Override
-    public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
+    public Page<BibEntry> performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException {
 
-        Page<BibEntry> result = arXiv.performSearchPaged(luceneQuery, pageNumber);
+        Page<BibEntry> result = arXiv.performSearchPaged(queryNode, pageNumber);
         if (this.doiFetcher == null) {
             return result;
         }
@@ -604,13 +604,13 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         /**
          * Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
          *
-         * @param luceneQuery the root node of the lucene query
+         * @param queryNode the first search node
          * @return A list of entries matching the complex query
          */
         @Override
-        public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
+        public Page<BibEntry> performSearchPaged(BaseQueryNode queryNode, int pageNumber) throws FetcherException {
             ArXivQueryTransformer transformer = new ArXivQueryTransformer();
-            String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
+            String transformedQuery = transformer.transformSearchQuery(queryNode).orElse("");
             List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber)
                     .stream()
                     .map(arXivEntry -> arXivEntry.toBibEntry(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()))

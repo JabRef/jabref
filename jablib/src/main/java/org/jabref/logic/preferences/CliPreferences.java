@@ -14,6 +14,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.git.preferences.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
@@ -114,9 +115,9 @@ public interface CliPreferences {
 
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
 
-    WalkthroughPreferences getWalkthroughPreferences();
-
     OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository);
 
     PushToApplicationPreferences getPushToApplicationPreferences();
+
+    GitPreferences getGitPreferences();
 }

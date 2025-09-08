@@ -1,7 +1,8 @@
 package org.jabref.cli;
 
-import java.io.File;
+import java.nio.file.Path;
 
+import org.jabref.cli.converter.CygWinPathConverter;
 import org.jabref.logic.l10n.Localization;
 
 import static picocli.CommandLine.Command;
@@ -15,11 +16,11 @@ class CheckIntegrity implements Runnable {
     @Mixin
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
-    @Parameters(index = "0", description = "BibTeX file to check", arity = "0..1")
-    private File inputFile;
+    @Parameters(index = "0", converter = CygWinPathConverter.class, description = "BibTeX file to check", arity = "0..1")
+    private Path inputFile;
 
-    @Option(names = {"--input"}, description = "Input BibTeX file")
-    private File inputOption;
+    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file")
+    private Path inputOption;
 
     @Option(names = {"--output-format"}, description = "Output format: txt or csv")
     private String outputFormat = "txt"; // FixMe: Default value?

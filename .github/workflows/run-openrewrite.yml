@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Fetch PR branch
         run: |
@@ -31,10 +31,10 @@ jobs:
           GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
 
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: 24.0.1
-          distribution: 'zulu'
+          java-version: 24
+          distribution: 'corretto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
