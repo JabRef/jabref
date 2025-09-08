@@ -32,9 +32,10 @@ public class ExporterTest {
 
     private static Stream<Object[]> exportFormats() {
         CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
         when(preferences.getExportPreferences().getExportSaveOrder()).thenReturn(SaveOrder.getDefaultSaveOrder());
         when(preferences.getExportPreferences().getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
-        when(preferences.getCustomEntryTypesRepository()).thenReturn(mock(BibEntryTypesManager.class));
+        when(preferences.getCustomEntryTypesRepository(bibEntryTypesManager)).thenReturn(mock(BibEntryTypesManager.class));
 
         ExporterFactory exporterFactory = ExporterFactory.create(preferences);
 

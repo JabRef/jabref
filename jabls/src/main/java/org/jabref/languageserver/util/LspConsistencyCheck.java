@@ -24,7 +24,8 @@ public class LspConsistencyCheck {
 
     public List<Diagnostic> check(BibDatabaseContext bibDatabaseContext, String content, CliPreferences cliPreferences) {
         List<Diagnostic> diagnostics = new ArrayList<>();
-        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck(cliPreferences);
+        BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
+        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck(cliPreferences, bibEntryTypesManager);
         BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibDatabaseContext, (_, _) -> {
         });
 

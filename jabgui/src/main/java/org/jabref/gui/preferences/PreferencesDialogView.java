@@ -17,6 +17,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -39,6 +40,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
+    @Inject private BibEntryTypesManager bibEntryTypesManager;
 
     private PreferencesDialogViewModel viewModel;
     private final Class<? extends PreferencesTab> preferencesTabToSelectClass;
@@ -67,7 +69,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void initialize() {
-        viewModel = new PreferencesDialogViewModel(dialogService, preferences);
+        viewModel = new PreferencesDialogViewModel(dialogService, preferences, bibEntryTypesManager);
 
         preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
 

@@ -87,6 +87,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
@@ -100,6 +101,7 @@ public class MainMenu extends MenuBar {
     private final SidePane sidePane;
     private final GuiPushToApplicationCommand pushToApplicationCommand;
     private final GuiPreferences preferences;
+    private final CliPreferences cliPreferences;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
@@ -117,6 +119,7 @@ public class MainMenu extends MenuBar {
                     SidePane sidePane,
                     GuiPushToApplicationCommand pushToApplicationCommand,
                     GuiPreferences preferences,
+                    CliPreferences cliPreferences,
                     StateManager stateManager,
                     FileUpdateMonitor fileUpdateMonitor,
                     TaskExecutor taskExecutor,
@@ -133,6 +136,7 @@ public class MainMenu extends MenuBar {
         this.sidePane = sidePane;
         this.pushToApplicationCommand = pushToApplicationCommand;
         this.preferences = preferences;
+        this.cliPreferences = cliPreferences;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.taskExecutor = taskExecutor;
@@ -270,7 +274,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, taskExecutor)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, (UiTaskExecutor) taskExecutor, abbreviationRepository)),
-                factory.createMenuItem(StandardActions.CHECK_CONSISTENCY, new ConsistencyCheckAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, (UiTaskExecutor) taskExecutor)),
+                factory.createMenuItem(StandardActions.CHECK_CONSISTENCY, new ConsistencyCheckAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, cliPreferences, entryTypesManager, (UiTaskExecutor) taskExecutor)),
                 factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager)),
 
                 new SeparatorMenuItem(),

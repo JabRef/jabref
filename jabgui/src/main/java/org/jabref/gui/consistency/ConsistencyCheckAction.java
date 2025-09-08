@@ -13,6 +13,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -29,6 +30,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final CliPreferences cliPreferences;
     private final BibEntryTypesManager entryTypesManager;
     private final UiTaskExecutor taskExecutor;
 
@@ -36,12 +38,14 @@ public class ConsistencyCheckAction extends SimpleCommand {
                                   DialogService dialogService,
                                   StateManager stateManager,
                                   GuiPreferences preferences,
+                                  CliPreferences cliPreferences,
                                   BibEntryTypesManager entryTypesManager,
                                   UiTaskExecutor taskExecutor) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.cliPreferences = cliPreferences;
         this.entryTypesManager = entryTypesManager;
         this.taskExecutor = taskExecutor;
 
@@ -62,7 +66,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
 
                 BibDatabaseContext bibContext = databaseContext.get();
 
-                BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck(preferences);
+                BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck(cliPreferences, entryTypesManager);
                 return consistencyCheck.check(bibContext, (count, total) ->
                         UiTaskExecutor.runInJavaFXThread(() -> {
                             updateProgress(count, total);

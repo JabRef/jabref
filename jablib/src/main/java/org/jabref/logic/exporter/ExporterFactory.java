@@ -13,6 +13,7 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
 public class ExporterFactory {
@@ -30,6 +31,7 @@ public class ExporterFactory {
         XmpPreferences xmpPreferences = preferences.getXmpPreferences();
         FieldPreferences fieldPreferences = preferences.getFieldPreferences();
         BibDatabaseMode bibDatabaseMode = preferences.getLibraryPreferences().getDefaultBibDatabaseMode();
+        BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
 
         List<Exporter> exporters = new ArrayList<>();
 
@@ -59,7 +61,7 @@ public class ExporterFactory {
         exporters.add(new ModsExporter());
         exporters.add(new XmpExporter(xmpPreferences));
         exporters.add(new XmpPdfExporter(xmpPreferences));
-        exporters.add(new EmbeddedBibFilePdfExporter(bibDatabaseMode, preferences.getCustomEntryTypesRepository(), fieldPreferences));
+        exporters.add(new EmbeddedBibFilePdfExporter(bibDatabaseMode, preferences.getCustomEntryTypesRepository(bibEntryTypesManager), fieldPreferences));
         exporters.add(new CffExporter());
         exporters.add(new EndnoteXmlExporter(preferences.getBibEntryPreferences()));
 

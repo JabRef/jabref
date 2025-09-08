@@ -56,6 +56,7 @@ import org.jabref.gui.welcome.WelcomeTab;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -87,6 +88,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
 
     private final GuiPreferences preferences;
+    private final CliPreferences cliPreferences;
     private final AiService aiService;
     private final GlobalSearchBar globalSearchBar;
 
@@ -120,6 +122,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        DialogService dialogService,
                        FileUpdateMonitor fileUpdateMonitor,
                        GuiPreferences preferences,
+                       CliPreferences cliPreferences,
                        AiService aiService,
                        StateManager stateManager,
                        CountingUndoManager undoManager,
@@ -130,6 +133,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.preferences = preferences;
+        this.cliPreferences = cliPreferences;
         this.aiService = aiService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
@@ -236,6 +240,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 sidePane,
                 pushToApplicationCommand,
                 preferences,
+                cliPreferences,
                 stateManager,
                 fileUpdateMonitor,
                 taskExecutor,

@@ -69,7 +69,7 @@ public interface CliPreferences {
      */
     SelfContainedSaveConfiguration getSelfContainedExportConfiguration();
 
-    BibEntryTypesManager getCustomEntryTypesRepository();
+    BibEntryTypesManager getCustomEntryTypesRepository(BibEntryTypesManager bibEntryTypesManager);
 
     void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager);
 

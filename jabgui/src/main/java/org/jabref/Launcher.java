@@ -27,6 +27,7 @@ import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
 import org.jabref.migrations.PreferencesMigrations;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -56,6 +57,7 @@ public class Launcher {
         Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
         final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
+        final BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
 
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(
                 args,
@@ -87,7 +89,7 @@ public class Launcher {
             systemExit();
         }
 
-        PreferencesMigrations.runMigrations(preferences);
+        PreferencesMigrations.runMigrations(preferences, bibEntryTypesManager);
 
         PostgreServer postgreServer = new PostgreServer();
         Injector.setModelOrService(PostgreServer.class, postgreServer);

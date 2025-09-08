@@ -42,6 +42,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
@@ -70,6 +71,7 @@ public class JabRefGUI extends Application {
 
     private static List<UiCommand> uiCommands;
     private static GuiPreferences preferences;
+    private static CliPreferences cliPreferences;
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
     private static AiService aiService;
@@ -84,6 +86,7 @@ public class JabRefGUI extends Application {
     private static ClipBoardManager clipBoardManager;
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
+    private static BibEntryTypesManager bibEntryTypesManager;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
@@ -114,6 +117,7 @@ public class JabRefGUI extends Application {
                 dialogService,
                 fileUpdateMonitor,
                 preferences,
+                cliPreferences,
                 aiService,
                 stateManager,
                 countingUndoManager,
@@ -157,7 +161,7 @@ public class JabRefGUI extends Application {
         DirectoryMonitor directoryMonitor = new DirectoryMonitor();
         Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
 
-        BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
+        BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository(bibEntryTypesManager);
         JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);

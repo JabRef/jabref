@@ -54,10 +54,12 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final ObservableList<PreferencesTab> preferenceTabs;
+    private final BibEntryTypesManager bibEntryTypesManager;
 
-    public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences) {
+    public PreferencesDialogViewModel(DialogService dialogService, GuiPreferences preferences, BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.bibEntryTypesManager = bibEntryTypesManager;
 
         // This enables passing unsaved preference values from the AI tab to the "web search" tab.
         AiTab aiTab = new AiTab();
@@ -190,9 +192,9 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                             + Localization.lang("You must restart JabRef for this to come into effect."));
         }
 
-        Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository());
+        Injector.setModelOrService(BibEntryTypesManager.class, preferences.getCustomEntryTypesRepository(bibEntryTypesManager));
         dialogService.notify(Localization.lang("Preferences recorded."));
-    }
+    };
 
     /**
      * Inserts the preference values into the Properties of the ViewModel
