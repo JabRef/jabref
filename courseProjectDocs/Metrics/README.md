@@ -13,7 +13,8 @@ This shows how to recreate the results generated via Metrics code and Test Metri
 | build-logic   | build-support |
 | jabgui        | jabkit        |
 | jablib        | jabls         |
-| jabsrv       | jabsrv-cli    |
+| jabsrv       | jabsrv-cli     |
+| test-suport  |  jabls-cli     |
 
 #### + build-logic
 #### + build-support
@@ -28,7 +29,7 @@ This shows how to recreate the results generated via Metrics code and Test Metri
 
 ![The Module Results for code metrics](metrics_1_results.png)
 
-These *modules* were chosen as they contained the 'src' code for major contributions to the project, their file extensions includes: .kts (kotlin), .java, and .css
+These *modules* were chosen as they contained the 'src' code for major contributions to the project, their file extensions include: .kts, .java, and .css
 
 
 ## Library 
@@ -36,7 +37,9 @@ These *modules* were chosen as they contained the 'src' code for major contribut
 The libraries used were a mixture of **lizard** and **pygount**. Although, the script was written in Python, these libraries support the analysis of many languages via source code from files. 
 
 ### Steps to Recreate: 
-
+#### Prequistes 
+    - pip install lizard
+    - pip install pygount
 1. main() 
 	- Get the root dir path os.path.abs(path(os.curdir))
 	- Get all paths that have 'src' folders, save as a list
