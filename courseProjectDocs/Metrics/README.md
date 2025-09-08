@@ -1,37 +1,5 @@
 This shows how to recreate the results generated via Metrics code and Test Metrics.
 
-# Key Metrics:
-## Code Structure: 
-### 1. LOC (per file/module)
-### 2. Comment Density 
-### 3. Cyclomatic Complexity
-### 4. Number of Unit Tests
-
-## **Modules**:
-|    Module    |    Module    |
-| ------------- | ------------- |
-| build-logic   | build-support |
-| jabgui        | jabkit        |
-| jablib        | jabls         |
-| jabsrv       | jabsrv-cli     |
-| test-suport  |  jabls-cli     |
-
-#### + build-logic
-#### + build-support
-#### + jabgui
-#### + jabkit
-#### + jablib
-#### + jabls
-#### + jabls-cli
-#### + jabsrv
-#### + jabsrv-cli
-#### + test-support
-
-![The Module Results for code metrics](metrics_1_results.png)
-
-These *modules* were chosen as they contained the 'src' code for major contributions to the project, their file extensions include: .kts, .java, and .css
-
-
 ## Library 
 
 The libraries used were a mixture of **lizard** and **pygount**. Although, the script was written in Python, these libraries support the analysis of many languages via source code from files. 
