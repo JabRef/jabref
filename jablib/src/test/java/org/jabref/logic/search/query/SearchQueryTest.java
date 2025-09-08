@@ -59,6 +59,7 @@ public class SearchQueryTest {
             "t~erm",
             "t(erm",
             "term AND",
+            "field:value",
             "field : value",
             "field CONTAINS NOT value",
     })
