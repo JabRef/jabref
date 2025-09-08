@@ -1,17 +1,25 @@
 name: Publish to maven central
 
 on:
-  pull_request:
-    paths:
-     - .github/workflows/publish.yml
+  # On releases
   push:
-    paths:
-     - .github/workflows/publish.yml
     tags:
-      - '*'
-  schedule:
-    # run on each Monday
-    - cron: '2 3 * * 1'
+      - '**'
+
+  # Called by the JBang testing jobs to ensure that SNAPSHOT is uptodate
+  workflow_call:
+    secrets:
+      KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64:
+        required: true
+      KOPPOR_SIGNING_KEYID:
+        required: true
+      KOPPOR_SIGNING_PASSWORD:
+        required: true
+      KOPPOR_MAVENCENTRALUSERNAME:
+        required: true
+      KOPPOR_MAVENCENTRALPASSWORD:
+        required: true
+
   workflow_dispatch:
     inputs:
       tagbuild:
@@ -19,6 +27,11 @@ on:
         required: false
         default: false
         type: boolean
+
+  # Additional run in addition to the other events, because some resources could have changes
+  schedule:
+    # Run on each Monday
+    - cron: '2 3 * * 1'
 
 permissions:
   actions: write
@@ -34,13 +47,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect_changes:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.changed.outputs.any_changed }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Detect changed jablib classes or workflow
+        id: changed
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            jablib/src/main/java/**/*.java
+            .github/workflows/publish.yml
+
   publish:
     name: jablib
-    if: github.repository == 'JabRef/jabref'
+    needs: detect_changes
+    if: >
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (needs.detect_changes.outputs.changed == 'true' &&
+        ((github.event_name == 'workflow_call' && github.repository == 'JabRef/jabref') ||
+         (github.event_name == 'push' && github.repository == 'JabRef/jabref') ||
+         (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'JabRef/jabref'))
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: 'true'
@@ -53,7 +90,7 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
       - name: Setup JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '24'
           distribution: 'corretto'

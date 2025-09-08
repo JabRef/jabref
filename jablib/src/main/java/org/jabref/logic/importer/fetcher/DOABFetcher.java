@@ -5,8 +5,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.StringJoiner;
 
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
@@ -16,13 +18,13 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
  * fetches books from https://www.doabooks.org/ through
@@ -37,9 +39,14 @@ public class DOABFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_DOAB);
+    }
+
+    @Override
+    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(SEARCH_URL);
-        String query = new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("");
+        String query = new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse("");
         // adding quotations for the query for more specified results
         // without the quotation the results returned are not relevant to the query
         query = "\"".concat(query).concat("\"");

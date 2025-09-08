@@ -23,7 +23,6 @@ import org.jabref.gui.consistency.ConsistencyCheckAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
 import org.jabref.gui.duplicationFinder.DuplicateSearch;
-import org.jabref.gui.edit.CopyMoreAction;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.edit.ManageKeywordsAction;
 import org.jabref.gui.edit.OpenBrowserAction;
@@ -32,13 +31,16 @@ import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorAction;
 import org.jabref.gui.entryeditor.OpenEntryEditorAction;
 import org.jabref.gui.entryeditor.PreviewSwitchAction;
 import org.jabref.gui.exporter.ExportCommand;
-import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.exporter.SaveAction;
 import org.jabref.gui.exporter.SaveAllAction;
 import org.jabref.gui.exporter.WriteMetadataToLinkedPdfsAction;
 import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
+import org.jabref.gui.git.GitCommitAction;
+import org.jabref.gui.git.GitPullAction;
+import org.jabref.gui.git.GitPushAction;
+import org.jabref.gui.git.GitShareToGitHubAction;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.help.HelpAction;
@@ -54,13 +56,13 @@ import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
+import org.jabref.gui.maintable.RightClickMenu;
 import org.jabref.gui.mergeentries.BatchEntryMergeWithFetchedDataAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesAction;
 import org.jabref.gui.newentry.NewEntryDialogTab;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
-import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.preview.PreviewControls;
 import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
@@ -78,9 +80,7 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.gui.walkthrough.WalkthroughAction;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -181,9 +181,21 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
+                // region: Sharing of the library
+                // TODO: Should be only enabled if not yet shared.
+                factory.createSubMenu(StandardActions.GIT,
+                        factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(dialogService, stateManager)),
+                        factory.createMenuItem(StandardActions.GIT_PULL, new GitPullAction(dialogService, stateManager, preferences, taskExecutor)),
+                        factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(dialogService, stateManager, preferences, taskExecutor)),
+                        new SeparatorMenuItem(),
+                        factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))
+                ),
+
                 factory.createSubMenu(StandardActions.REMOTE_DB,
                         factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService)),
                         factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))),
+
+                // endregion
 
                 new SeparatorMenuItem(),
 
@@ -201,17 +213,8 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),
-
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),
-                factory.createSubMenu(StandardActions.COPY_MORE,
-                        factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
-                        factory.createMenuItem(StandardActions.COPY_KEY, new CopyMoreAction(StandardActions.COPY_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
-                        factory.createMenuItem(StandardActions.COPY_CITE_KEY, new CopyMoreAction(StandardActions.COPY_CITE_KEY, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
-                        factory.createMenuItem(StandardActions.COPY_KEY_AND_TITLE, new CopyMoreAction(StandardActions.COPY_KEY_AND_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
-                        factory.createMenuItem(StandardActions.COPY_KEY_AND_LINK, new CopyMoreAction(StandardActions.COPY_KEY_AND_LINK, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
-                        factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)),
-                        factory.createMenuItem(StandardActions.EXPORT_SELECTED_TO_CLIPBOARD, new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences))),
-
+                RightClickMenu.createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager)),
 
                 new SeparatorMenuItem(),
@@ -375,12 +378,6 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createSubMenu(StandardActions.WALKTHROUGH_MENU,
-                        factory.createMenuItem(StandardActions.MAIN_FILE_DIRECTORY_WALKTHROUGH, new WalkthroughAction("mainFileDirectory"))
-                ),
-
-                new SeparatorMenuItem(),
-
                 factory.createMenuItem(StandardActions.ERROR_CONSOLE, new ErrorConsoleAction()),
 
                 new SeparatorMenuItem(),
@@ -389,6 +386,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(preferences, dialogService, taskExecutor)),
                 factory.createSubMenu(StandardActions.WEB_MENU,
                         factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction(URLs.WEBPAGE_URL, dialogService, preferences.getExternalApplicationsPreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_PRIVACY_POLICY, new OpenBrowserAction(URLs.PRIVACY_POLICY_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction(URLs.BLOG_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_LINKEDIN, new OpenBrowserAction(URLs.LINKEDIN_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction(URLs.FACEBOOK_URL, dialogService, preferences.getExternalApplicationsPreferences())),
@@ -401,6 +399,8 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction(URLs.CHANGELOG_URL, dialogService, preferences.getExternalApplicationsPreferences()))
                 ),
 
+                new SeparatorMenuItem(),
+
                 factory.createMenuItem(StandardActions.OPEN_WELCOME_TAB, new SimpleCommand() {
                     @Override
                     public void execute() {
@@ -410,7 +410,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
+                factory.createMenuItem(StandardActions.ABOUT, new AboutAction(dialogService))
         );
 
         // @formatter:on

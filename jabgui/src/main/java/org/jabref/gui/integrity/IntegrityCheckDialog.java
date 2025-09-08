@@ -21,7 +21,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
@@ -49,7 +48,6 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     @FXML private VBox dialogVBox;
 
     @Inject private EntryEditor entryEditor;
-    @Inject private ThemeManager themeManager;
     @Inject private StateManager stateManager;
     private final List<IntegrityMessage> messages;
     private final LibraryTab libraryTab;
@@ -58,6 +56,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private TableFilter<IntegrityMessage> tableFilter;
     private BibLogSettingsPane bibLogSettingsPane;
     private final List<IntegrityMessage> blgWarnings = new ArrayList<>();
+
     public IntegrityCheckDialog(List<IntegrityMessage> messages, LibraryTab libraryTab, DialogService dialogService) {
         this.messages = messages;
         this.libraryTab = libraryTab;
@@ -69,8 +68,6 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     private void handleRowClick(IntegrityMessage message, MouseEvent event) {

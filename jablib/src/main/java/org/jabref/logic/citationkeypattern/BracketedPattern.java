@@ -36,6 +36,7 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -187,13 +188,11 @@ public class BracketedPattern {
      *
      * @param pattern          The pattern to expand
      * @param keywordDelimiter The keyword delimiter to use
-     * @param entry            The bibentry to use for expansion
+     * @param entry            The bibEntry to use for expansion
      * @param database         The database for field resolving. May be null.
      * @return The expanded pattern. Not null.
      */
-    public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
-        Objects.requireNonNull(pattern);
-        Objects.requireNonNull(entry);
+    public static String expandBrackets(@NonNull String pattern, Character keywordDelimiter, @NonNull BibEntry entry, BibDatabase database) {
         return expandBrackets(pattern, expandBracketContent(keywordDelimiter, entry, database));
     }
 
@@ -228,8 +227,7 @@ public class BracketedPattern {
      *                              and expanding it
      * @return The expanded pattern. Not null.
      */
-    public static String expandBrackets(String pattern, Function<String, String> bracketContentHandler) {
-        Objects.requireNonNull(pattern);
+    public static String expandBrackets(@NonNull String pattern, Function<String, String> bracketContentHandler) {
         StringBuilder expandedPattern = new StringBuilder();
         pattern = pattern.replace("\\\"", "\u0A17");
         StringTokenizer parsedPattern = new StringTokenizer(pattern, "\\[]\"", true);

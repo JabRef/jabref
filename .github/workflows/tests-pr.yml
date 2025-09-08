@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -97,7 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -127,8 +127,8 @@ jobs:
 
           LINE_COUNT=$(echo "$BOXES" | wc -l)
 
-          if [ "$LINE_COUNT" -ne 7 ]; then
-            echo "❌ Found $LINE_COUNT lines instead of 7 required lines"
+          if [ "$LINE_COUNT" -ne 6 ]; then
+            echo "❌ Found $LINE_COUNT lines instead of 6 required lines"
             exit 1
           fi
 
@@ -142,7 +142,7 @@ jobs:
     if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Check PR body for changelog note
@@ -178,7 +178,7 @@ jobs:
     if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - name: Merge Conflict finder
@@ -189,7 +189,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Check force push

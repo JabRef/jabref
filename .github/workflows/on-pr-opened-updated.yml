@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     if: >
       (github.repository == 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
       !(
         (github.actor == 'dependabot[bot]') ||
         (
@@ -92,7 +93,7 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - name: Assign PR creator to issue
@@ -145,7 +146,7 @@ jobs:
     name: Conflicts with target branch
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - name: Check PR mergeability
@@ -159,6 +160,12 @@ jobs:
           echo "✅ No merge conflicts"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  remove_label:
+    if: github.repository == 'JabRef/jabref'
+    name: Remove label "status: changes-required"
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh issue --repo ${{ github.repository }} edit ${{ github.event.pull_request.number }} --remove-label "status: changes-required"
   upload-pr-number:
     if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest

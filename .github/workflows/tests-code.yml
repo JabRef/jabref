@@ -22,6 +22,9 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
+  # required for publish.yml
+  actions: write
+  contents: read
   pull-requests: write
 
 jobs:
@@ -40,15 +43,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: 24.0.1
-          distribution: 'zulu'
+          java-version: 24
+          distribution: 'corretto'
       - name: Run checkstyle reporter
         uses: dbelyaev/action-checkstyle@master
         with:
@@ -79,15 +82,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: 24.0.1
-          distribution: 'zulu'
+          java-version: 24
+          distribution: 'corretto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -113,15 +116,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: 24.0.1
-          distribution: 'zulu'
+          java-version: 24
+          distribution: 'corretto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -149,7 +152,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -165,7 +168,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -203,7 +206,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -233,12 +236,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: 24.0.1
-          distribution: 'zulu'
+          java-version: 24
+          distribution: 'corretto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -265,15 +268,15 @@ jobs:
         module: [jablib, jabkit, jabsrv, jabgui]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: 24.0.1
-          distribution: 'zulu'
+          java-version: 24
+          distribution: 'corretto'
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -305,7 +308,7 @@ jobs:
         run: scripts/after-failure.sh
 
   tests-windows:
-    name: "Unit tests (Windows) – ${{ matrix.module }}"
+    name: "Unit tests (Windows)"
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.repository_owner == 'JabRef')
     runs-on: windows-latest
     strategy:
@@ -313,15 +316,15 @@ jobs:
         module: [jablib]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: 24.0.1
-          distribution: 'zulu'
+          java-version: 24
+          distribution: 'corretto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -362,15 +365,15 @@ jobs:
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: 24.0.1
-          distribution: 'zulu'
+          java-version: 24
+          distribution: 'corretto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -393,22 +396,32 @@ jobs:
           CI: "true"
           DBMS: "postgresql"
 
+  publish:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/publish.yml
+    secrets:
+      KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64: ${{ secrets.KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64 }}
+      KOPPOR_SIGNING_KEYID: ${{ secrets.KOPPOR_SIGNING_KEYID }}
+      KOPPOR_SIGNING_PASSWORD: ${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+      KOPPOR_MAVENCENTRALUSERNAME: ${{ secrets.KOPPOR_MAVENCENTRALUSERNAME }}
+      KOPPOR_MAVENCENTRALPASSWORD: ${{ secrets.KOPPOR_MAVENCENTRALPASSWORD }}
+
   jbang:
-    name: JBang
+    name: JBang (main)
     runs-on: ubuntu-latest
-    # JBang scripts depend on main-SNAPSHOT; thus, we can only test fully when main is updated
+    needs: publish
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: 24.0.1
-          distribution: 'zulu'
+          java-version: 24
+          distribution: 'corretto'
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -426,7 +439,62 @@ jobs:
       - run: jbang build .jbang/CheckoutPR.java
       - run: jbang build .jbang/CloneJabRef.java
       - run: jbang build --fresh .jbang/JabKitLauncher.java
+      - run: jbang build --fresh .jbang/JabLsLauncher.java
       - run: jbang build --fresh .jbang/JabSrvLauncher.java
+
+  jbang-pr:
+    name: JBang (PR)
+    runs-on: ubuntu-latest
+    # does not need publish, because the JBang scripts are modified
+    if: github.ref != 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        launcher: [JabKitLauncher, JabLsLauncher, JabSrvLauncher]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          java-version: 24
+          distribution: 'corretto'
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+
+      - name: Detect changed jablib classes
+        id: changed-jablib-files
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            jablib/src/main/java/**/*.java
+          files_ignore: |
+            jablib/src/main/java/**/*-*.java
+
+      - name: Build ${{ matrix.launcher }} launcher including changed classes
+        shell: bash
+        # We always run, because changes in jabls, jabsrv also could cause JBang to fail
+        run: |
+          # We modify the JBang scripts directly to avoid issues with relative paths
+          for f in ${{ steps.changed-jablib-files.outputs.all_changed_files }}; do
+            echo "//SOURCES ../$f" >> ".jbang/${{ matrix.launcher }}.java"
+          done
+          jbang build --fresh ".jbang/${{ matrix.launcher }}.java"
 
   codecoverage:
     if: false
@@ -460,16 +528,16 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
         if: github.ref == 'refs/heads/main'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
       - name: Set up JDK
         if: github.ref == 'refs/heads/main'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: 24.0.1
-          distribution: 'zulu'
+          java-version: 24
+          distribution: 'corretto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -507,14 +575,14 @@ jobs:
     name: "Validate requirement coverage"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          java-version: 24.0.1
-          distribution: 'zulu'
+          java-version: 24
+          distribution: 'corretto'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew traceRequirements
@@ -527,7 +595,7 @@ jobs:
     name: "Validate Gradle Wrapper"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - uses: gradle/actions/wrapper-validation@v4
