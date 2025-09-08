@@ -24,6 +24,8 @@ public class SearchQueryTest {
             "NOT (term1 AND term2)",
             "\"term\"",
             "\"term1 term2\"",
+            "termpart1\\ termpart2",
+            "termpart1\\:termpart2",
             "Breitenb{\\\"{u}}cher",
             "K{\\'{a}}lm{\\'{a}}n K{\\'{e}}pes",
             "field = value",
