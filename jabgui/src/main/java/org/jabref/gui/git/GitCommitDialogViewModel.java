@@ -22,6 +22,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
+import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -90,7 +91,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         }
 
         Path bibFilePath = bibFilePathOpt.get();
-        GitHandlerRegistry registry = new GitHandlerRegistry();
+        GitHandlerRegistry registry = Injector.instantiateModelOrService(GitHandlerRegistry.class);
         Optional<Path> repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);
         if (repoRootOpt.isEmpty()) {
             throw new JabRefException(Localization.lang("Commit aborted: Path is not inside a Git repository."));

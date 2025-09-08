@@ -9,6 +9,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.l10n.Localization;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.StoredConfig;
@@ -29,7 +30,7 @@ public final class GitInitService {
             );
         }
 
-        GitHandlerRegistry gitHandlerRegistry = new GitHandlerRegistry();
+        GitHandlerRegistry gitHandlerRegistry = Injector.instantiateModelOrService(GitHandlerRegistry.class);
         GitHandler handler = gitHandlerRegistry.get(expectedRoot);
 
         handler.initIfNeeded();

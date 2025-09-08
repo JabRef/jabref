@@ -28,6 +28,7 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
+import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -134,7 +135,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
 
         GitInitService.initRepoAndSetRemote(bibPath, url);
 
-        GitHandlerRegistry registry = new GitHandlerRegistry();
+        GitHandlerRegistry registry = Injector.instantiateModelOrService(GitHandlerRegistry.class);
         GitHandler handler = registry.get(bibPath.getParent());
 
         handler.setCredentials(user, pat);
