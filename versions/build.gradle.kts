@@ -11,14 +11,14 @@ val lucene = "10.2.2"
 val pdfbox = "3.0.5"
 
 dependencies {
-    api(platform("ai.djl:bom:0.33.0"))
+    api(platform("ai.djl:bom:0.34.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.3.0"))
     api("dev.langchain4j:langchain4j")
     api("dev.langchain4j:langchain4j-google-ai-gemini")
     api("dev.langchain4j:langchain4j-hugging-face")
     api("dev.langchain4j:langchain4j-mistral-ai")
     api("dev.langchain4j:langchain4j-open-ai")
-    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.5.0"))
+    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.6.0"))
 }
 
 dependencies.constraints {
@@ -51,8 +51,8 @@ dependencies.constraints {
     api("com.google.guava:guava:33.4.8-jre")
     api("com.googlecode.plist:dd-plist:1.28")
     api("com.h2database:h2-mvstore:2.3.232")
-    api("com.konghq:unirest-java-core:4.5.0")
-    api("com.konghq:unirest-modules-gson:4.5.0")
+    api("com.konghq:unirest-java-core:4.5.1")
+    api("com.konghq:unirest-modules-gson:4.5.1")
     api("com.pixelduke:fxthemes:1.6.0")
     api("com.squareup.okhttp3:okhttp:5.1.0")
     api("com.squareup.okio:okio-jvm:3.16.0")
@@ -92,7 +92,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-lang3:3.18.0")
     api("org.apache.commons:commons-text:1.13.1")
     api("org.apache.httpcomponents.client5:httpclient5:5.5")
-    api("org.apache.logging.log4j:log4j-to-slf4j:2.25.0")
+    api("org.apache.logging.log4j:log4j-to-slf4j:2.25.1")
     api("org.apache.lucene:lucene-analysis-common:$lucene")
     api("org.apache.lucene:lucene-core:$lucene")
     api("org.apache.lucene:lucene-highlighter:$lucene")

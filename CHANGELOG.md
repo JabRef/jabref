@@ -38,6 +38,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a field for the latest ICORE conference ranking lookup on the General Tab. [#13476](https://github.com/JabRef/jabref/issues/13476)
 - We added BibLaTeX datamodel validation support in order to improve error message quality in entries' fields validation. [#13318](https://github.com/JabRef/jabref/issues/13318)
 - We added support for managing multiple linked files via the entry context menu. [#12567](https://github.com/JabRef/jabref/issues/12567)
+- We added more supported formats of CAYW endpoint of HTTP server. [#13578](https://github.com/JabRef/jabref/issues/13578)
 
 ### Changed
 
@@ -87,8 +88,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We introduced walkthrough functionality [#12664](https://github.com/JabRef/jabref/issues/12664)
 - The Welcome tab now has a responsive layout. [#12664](https://github.com/JabRef/jabref/issues/12664)
 - We introduced a donation prompt in the Welcome tab. [#12664](https://github.com/JabRef/jabref/issues/12664)
-- We changed to syntax for the websearch to the one of the main search bar. [#13607](https://github.com/JabRef/jabref/issues/13607)
-- We improved the for the web search tab in the preferences dialog [#13791](https://github.com/JabRef/jabref/pull/13791)
+- We changed the syntax for the web search to the one of the main search bar. [#13607](https://github.com/JabRef/jabref/issues/13607)
+- We improved nested scrolling for the web search tab in the preferences dialog [#13791](https://github.com/JabRef/jabref/pull/13791)
 - We improved the event viewer for debugging [#13783](https://github.com/JabRef/jabref/pull/13783).
 - We improved "REDACTED" replacement of API key value in web fetcher search URL [#13796](https://github.com/JabRef/jabref/issues/13796)
 
