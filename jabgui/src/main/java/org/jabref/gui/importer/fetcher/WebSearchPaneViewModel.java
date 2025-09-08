@@ -22,20 +22,15 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
-import org.jabref.model.search.ThrowingErrorListener;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.search.SearchLexer;
-import org.jabref.search.SearchParser;
 
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import org.antlr.v4.runtime.BailErrorStrategy;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -87,14 +82,8 @@ public class WebSearchPaneViewModel {
                     }
 
                     try {
-                        SearchLexer lexer = new SearchLexer(CharStreams.fromString(queryText));
-                        lexer.removeErrorListeners(); // no infos on file system
-                        lexer.addErrorListener(ThrowingErrorListener.INSTANCE);
-                        SearchParser parser = new SearchParser(new CommonTokenStream(lexer));
-                        parser.removeErrorListeners(); // no infos on file system
-                        parser.addErrorListener(ThrowingErrorListener.INSTANCE);
-                        parser.setErrorHandler(new BailErrorStrategy()); // ParseCancellationException on parse errors
-                        parser.start();
+                        // The result is ignored because we just check for validity
+                        SearchQuery.getStartContext(queryText);
                         return null;
                     } catch (ParseCancellationException e) {
                         // RecognitionException can point out the exact error
