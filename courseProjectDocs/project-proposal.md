@@ -32,7 +32,7 @@
 #### + jabsrv-cli
 #### + test-support
 
-![The Module Results for code metrics](metrics_1_results.png)
+![The Module Results for code metrics](Metrics/metrics_1_results.png)
 
 These *modules* were chosen as they contained the 'src' code for major contributions to the project, their file extensions include: .kts, .java, and .css
 
