@@ -83,6 +83,13 @@ class WebSearchPaneViewModelTest {
     }
 
     @Test
+    void queryConsistingOfInvalidDOIIsValid() {
+        viewModel.queryProperty().setValue("101.1007/JHEP02(2023)082");
+        // There is currently no interpretation of nearly-valid identifiers, therefore, this is concidered as "regular" search term
+        assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
+    }
+
+    @Test
     void queryConsistingOfArXivIdIsValid() {
         viewModel.queryProperty().setValue("arXiv=2110.02957");
         assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
