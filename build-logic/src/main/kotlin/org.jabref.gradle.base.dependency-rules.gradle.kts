@@ -293,7 +293,6 @@ extraJavaModuleInfo {
     module("com.github.javaparser:javaparser-symbol-solver-core", "com.github.javaparser.symbolsolver.core")
     module("net.sf.jopt-simple:jopt-simple", "jopt.simple")
 
-
     module("org.eclipse.lsp4j:org.eclipse.lsp4j", "org.eclipse.lsp4j") {
         exportAllPackages()
         requireAllDefinedDependencies()
