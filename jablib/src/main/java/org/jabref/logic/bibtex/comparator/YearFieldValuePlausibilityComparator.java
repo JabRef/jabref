@@ -46,8 +46,8 @@ public class YearFieldValuePlausibilityComparator extends FieldValuePlausibility
 
         // left and right values are correctly formatted.
 
-        Integer leftYear = extractYear(leftValue).get();
-        Integer rightYear = extractYear(rightValue).get();
+        int leftYear = extractYear(leftValue).get();
+        int rightYear = extractYear(rightValue).get();
         boolean leftYearInRange = (leftYear >= 1800) && (leftYear <= Year.now().getValue() + 2);
         boolean rightYearInRange = (rightYear >= 1800) && (rightYear <= Year.now().getValue() + 2);
         if (leftYearInRange && !rightYearInRange) {
