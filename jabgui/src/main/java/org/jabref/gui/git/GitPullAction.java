@@ -24,7 +24,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class GitPullAction extends SimpleCommand {
