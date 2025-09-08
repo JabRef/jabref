@@ -294,7 +294,7 @@ public class JabKit {
         public GitPreferences getGitPreferences() {
             return null;
         }
-    }
+    };
 
     public static void main(String[] args) {
         initLogging(args);
