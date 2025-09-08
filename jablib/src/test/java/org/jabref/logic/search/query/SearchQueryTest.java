@@ -26,6 +26,7 @@ public class SearchQueryTest {
             "Breitenb{\\\"{u}}cher",
             "K{\\'{a}}lm{\\'{a}}n K{\\'{e}}pes",
             "field = value",
+            "field : value",
             "filed CONTAINS value",
             "field MATCHES value",
             "field != value",
@@ -46,6 +47,7 @@ public class SearchQueryTest {
             "t\\~erm",
             "t\\(1\\)erm",
             "t\\\"erm",
+            "t\\ erm",
     })
     public void validSearchQuery(String searchExpression) {
         assertTrue(new SearchQuery(searchExpression).isValid());
