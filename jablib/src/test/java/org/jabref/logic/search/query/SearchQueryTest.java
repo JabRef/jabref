@@ -12,6 +12,7 @@ public class SearchQueryTest {
     @ParameterizedTest
     @CsvSource({
             "term",
+            "101.1007/JHEP02(2023)082", // invalid DOI but valid search term
             "term1 term2",
             "term1 term2 term3",
             "term1 AND term2",
