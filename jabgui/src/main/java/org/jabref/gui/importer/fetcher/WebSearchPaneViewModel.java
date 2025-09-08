@@ -87,8 +87,7 @@ public class WebSearchPaneViewModel {
                         return null;
                     } catch (ParseCancellationException e) {
                         // RecognitionException can point out the exact error
-                        if (e.getCause() instanceof RecognitionException) {
-                            RecognitionException recEx = (RecognitionException) e.getCause();
+                        if (e.getCause() instanceof RecognitionException recEx) {
                             Token offendingToken = recEx.getOffendingToken();
 
                             // The character position is 0-based, so we add 1 for user-friendliness.
