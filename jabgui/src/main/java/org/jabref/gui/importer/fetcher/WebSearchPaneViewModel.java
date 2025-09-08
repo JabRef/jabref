@@ -97,7 +97,7 @@ public class WebSearchPaneViewModel {
                             return ValidationMessage.error(Localization.lang("Invalid query element '%0' at position %1", line, charPositionInLine));
                         }
 
-                        // Fallback for other cancellation reasons
+                        // Fallback for other failing reasons
                         return ValidationMessage.error(Localization.lang("Invalid query"));
                     }
                 });
