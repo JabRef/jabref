@@ -73,7 +73,7 @@ public class GitStatusChecker {
 
     public static GitStatusSnapshot checkStatus(Path anyPathInsideRepo) {
         return GitHandler.fromAnyPath(anyPathInsideRepo)
-                         .map(handler -> checkStatus(handler))
+                         .map(GitStatusChecker::checkStatus)
                          .orElse(new GitStatusSnapshot(
                                  !GitStatusSnapshot.TRACKING,
                                  SyncStatus.UNTRACKED,
