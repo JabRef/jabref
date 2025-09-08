@@ -71,6 +71,13 @@ class WebSearchPaneViewModelTest {
     }
 
     @Test
+    void queryConsistingOfInvalidDOIIsValid() {
+        viewModel.queryProperty().setValue("101.1007/JHEP02(2023)082");
+        // There is currently no interpretation of nearly-valid identifiers, therefore, this is concidered as "regular" search term
+        assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
+    }
+
+    @Test
     void queryConsistingOfISBNIsValid() {
         viewModel.queryProperty().setValue("9780134685991");
         assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
@@ -79,13 +86,6 @@ class WebSearchPaneViewModelTest {
     @Test
     void canExtractISBNFromQueryText() {
         viewModel.queryProperty().setValue(";:isbn (9780134685991), text2");
-        assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
-    }
-
-    @Test
-    void queryConsistingOfInvalidDOIIsValid() {
-        viewModel.queryProperty().setValue("101.1007/JHEP02(2023)082");
-        // There is currently no interpretation of nearly-valid identifiers, therefore, this is concidered as "regular" search term
         assertTrue(viewModel.queryValidationStatus().validProperty().getValue());
     }
 
