@@ -19,7 +19,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.internal.storage.file.WindowCache;
 import org.eclipse.jgit.lib.ConfigConstants;
@@ -127,7 +126,7 @@ class GitSyncServiceTest {
 
         gitConflictResolverStrategy = mock(GitConflictResolverStrategy.class);
         mergeExecutor = new GitSemanticMergeExecutorImpl(importFormatPreferences);
-        gitHandlerRegistry = Injector.instantiateModelOrService(GitHandlerRegistry.class);
+        gitHandlerRegistry = new GitHandlerRegistry();
 
         // create fake remote repo
         remoteDir = tempDir.resolve("remote.git");

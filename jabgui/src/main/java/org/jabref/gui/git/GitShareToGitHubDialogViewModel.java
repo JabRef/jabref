@@ -28,7 +28,6 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
-import com.airhacks.afterburner.injection.Injector;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -44,6 +43,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     private final GitPreferences gitPreferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     // The preferences of this dialog
     private final StringProperty usernameProperty = new SimpleStringProperty("");
@@ -64,11 +64,13 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
             GitPreferences gitPreferences,
             StateManager stateManager,
             DialogService dialogService,
-            TaskExecutor taskExecutor) {
+            TaskExecutor taskExecutor,
+            GitHandlerRegistry gitHandlerRegistry) {
         this.stateManager = stateManager;
         this.gitPreferences = gitPreferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
 
         repositoryUrlValidator = new FunctionBasedValidator<>(
                 repositoryUrlProperty,
@@ -133,11 +135,8 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
 
         Path bibPath = bibFilePathOpt.get();
 
-        GitInitService.initRepoAndSetRemote(bibPath, url);
-
-        GitHandlerRegistry registry = Injector.instantiateModelOrService(GitHandlerRegistry.class);
-        GitHandler handler = registry.get(bibPath.getParent());
-
+        GitInitService.initRepoAndSetRemote(bibPath, url, gitHandlerRegistry);
+        GitHandler handler = gitHandlerRegistry.get(bibPath.getParent());
         handler.setCredentials(user, pat);
 
         GitStatusSnapshot status = GitStatusChecker.checkStatusAndFetch(handler);

@@ -85,6 +85,7 @@ public class JabRefGUI extends Application {
     private static ClipBoardManager clipBoardManager;
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
+    private static GitHandlerRegistry gitHandlerRegistry;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
@@ -120,7 +121,8 @@ public class JabRefGUI extends Application {
                 countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
 
         openWindow();
 
@@ -158,7 +160,7 @@ public class JabRefGUI extends Application {
         DirectoryMonitor directoryMonitor = new DirectoryMonitor();
         Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
 
-        GitHandlerRegistry gitHandlerRegistry = new GitHandlerRegistry();
+        gitHandlerRegistry = new GitHandlerRegistry();
         Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
