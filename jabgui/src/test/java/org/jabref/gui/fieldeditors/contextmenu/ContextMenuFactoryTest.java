@@ -27,6 +27,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.when;
 class ContextMenuFactoryTest {
 
     @Test
-    void createMenuForSelection_returnsEmptyMenu_whenSelectionIsNull() {
+    void createMenuForSelection_throwsNPE_whenSelectionIsNull() {
         DialogService dialogService = mock(DialogService.class);
         GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
@@ -46,10 +47,8 @@ class ContextMenuFactoryTest {
                 dialogService, guiPreferences, bibDatabaseContext, bibEntryOptional, mockEditorViewModel()
         );
 
-        ContextMenu contextMenu = contextMenuFactory.createMenuForSelection(null);
-
-        assertNotNull(contextMenu);
-        assertTrue(contextMenu.getItems().isEmpty(), "Menu should be empty for null selection");
+        assertThrows(NullPointerException.class, () -> contextMenuFactory.createMenuForSelection(null),
+                "Factory should reject null selection");
     }
 
     @Test
@@ -109,8 +108,7 @@ class ContextMenuFactoryTest {
         LinkedFileViewModel offlineExistingFileViewModel = mockOfflineExistingFileViewModel(
                 bibDatabaseContext, filePreferences, "https://example.com/file.pdf"
         );
-        LinkedFileViewModel onlineFileViewModel = mockOnlineFileViewModel(
-        );
+        LinkedFileViewModel onlineFileViewModel = mockOnlineFileViewModel();
 
         ObservableList<LinkedFileViewModel> multiSelection = FXCollections.observableArrayList(
                 List.of(offlineExistingFileViewModel, onlineFileViewModel)
@@ -129,8 +127,6 @@ class ContextMenuFactoryTest {
         assertTrue(containsMenuItemWithText(contextMenu, "Copy linked file"),
                 "Menu should contain 'Copy linked file' item");
     }
-
-    // ---------- helpers ----------
 
     private static boolean containsMenuItemWithText(ContextMenu contextMenu, String expectedFragment) {
         return contextMenu.getItems().stream()

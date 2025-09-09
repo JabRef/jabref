@@ -73,9 +73,6 @@ class SingleSelectionMenuBuilderTest {
 
         assertInstanceOf(SeparatorMenuItem.class, items.get(1), "Second item should be a separator");
         assertInstanceOf(SeparatorMenuItem.class, items.get(4), "Fifth item should be a separator");
-
-        SEPARATOR_INDICES.forEach(i ->
-                assertInstanceOf(SeparatorMenuItem.class, items.get(i)));
     }
 
     @Test
