@@ -132,8 +132,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        CountingUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
-                       TaskExecutor taskExecutor,
-                       GitHandlerRegistry gitHandlerRegistry) {
+                       TaskExecutor taskExecutor) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -146,7 +145,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
-        this.gitHandlerRegistry = gitHandlerRegistry;
 
         setId("frame");
 
