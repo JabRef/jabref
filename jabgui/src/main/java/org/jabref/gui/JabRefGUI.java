@@ -127,8 +127,7 @@ public class JabRefGUI extends Application {
                 countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
                 clipBoardManager,
-                taskExecutor,
-                gitHandlerRegistry);
+                taskExecutor);
 
         openWindow();
 
