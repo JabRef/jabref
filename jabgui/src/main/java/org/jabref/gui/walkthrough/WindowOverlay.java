@@ -267,7 +267,7 @@ class WindowOverlay {
     private PopOver createPopover(TooltipStep step, Runnable beforeNavigate) {
         Node content = renderer.render(step, walkthrough, beforeNavigate);
         PopOver popover = new PopOver();
-        popover.getScene().getStylesheets().setAll(window.getScene().getStylesheets());
+        popover.getStyleClass().add("walkthrough-tooltip");
         popover.setContentNode(content);
         popover.setDetachable(false);
         popover.setCloseButtonEnabled(false);

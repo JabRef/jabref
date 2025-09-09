@@ -61,7 +61,7 @@ import org.jabref.logic.importer.fetcher.DBLPFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
-import org.jabref.logic.importer.fetcher.SpringerFetcher;
+import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
@@ -261,6 +261,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String CLEANUP_JOBS = "CleanUpJobs";
     public static final String CLEANUP_FIELD_FORMATTERS_ENABLED = "CleanUpFormattersEnabled";
     public static final String CLEANUP_FIELD_FORMATTERS = "CleanUpFormatters";
+    public static final String AUTO_RENAME_FILES_ON_CHANGE = "autoRenameFilesOnChange";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
@@ -373,6 +374,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
     private static final String HTTP_SERVER_PORT = "httpServerPort";
     private static final String ENABLE_HTTP_SERVER = "enableHttpServer";
+    private static final String ENABLE_LANGUAGE_SERVER = "enableLanguageServer";
+    private static final String LANGUAGE_SERVER_PORT = "languageServerPort";
 
     private static final String AI_ENABLED = "aiEnabled";
     private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
@@ -517,7 +520,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(SEARCH_WINDOW_DIVIDER_POS, 0.5);
         defaults.put(SEARCH_CATALOGS, convertListToString(List.of(
                 ACMPortalFetcher.FETCHER_NAME,
-                SpringerFetcher.FETCHER_NAME,
+                SpringerNatureWebFetcher.FETCHER_NAME,
                 DBLPFetcher.FETCHER_NAME,
                 IEEE.FETCHER_NAME)));
         defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED.name());
@@ -672,6 +675,8 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(REMOTE_SERVER_PORT, 6050);
         defaults.put(ENABLE_HTTP_SERVER, Boolean.FALSE);
         defaults.put(HTTP_SERVER_PORT, 23119);
+        defaults.put(ENABLE_LANGUAGE_SERVER, Boolean.FALSE);
+        defaults.put(LANGUAGE_SERVER_PORT, 2087);
 
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
@@ -693,6 +698,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(CLEANUP_FIELD_FORMATTERS_ENABLED, Boolean.FALSE);
         defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, OS.NEWLINE));
 
+        defaults.put(AUTO_RENAME_FILES_ON_CHANGE, false);
         // use citation key appended with filename as default pattern
         defaults.put(IMPORT_FILENAMEPATTERN, FilePreferences.DEFAULT_FILENAME_PATTERNS[1]);
         // Default empty String to be backwards compatible
@@ -1382,12 +1388,16 @@ public class JabRefCliPreferences implements CliPreferences {
                 getInt(REMOTE_SERVER_PORT),
                 getBoolean(USE_REMOTE_SERVER),
                 getInt(HTTP_SERVER_PORT),
-                getBoolean(ENABLE_HTTP_SERVER));
+                getBoolean(ENABLE_HTTP_SERVER),
+                getBoolean(ENABLE_LANGUAGE_SERVER),
+                getInt(LANGUAGE_SERVER_PORT));
 
         EasyBind.listen(remotePreferences.portProperty(), (_, _, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
         EasyBind.listen(remotePreferences.useRemoteServerProperty(), (_, _, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
         EasyBind.listen(remotePreferences.httpPortProperty(), (_, _, newValue) -> putInt(HTTP_SERVER_PORT, newValue));
         EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_HTTP_SERVER, newValue));
+        EasyBind.listen(remotePreferences.languageServerPortProperty(), (_, _, newValue) -> putInt(LANGUAGE_SERVER_PORT, newValue));
+        EasyBind.listen(remotePreferences.enableLanguageServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_LANGUAGE_SERVER, newValue));
 
         return remotePreferences;
     }
@@ -1694,6 +1704,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getUserHostInfo().getUserHostString(),
                 getPath(MAIN_FILE_DIRECTORY, getDefaultPath()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
+                getBoolean(AUTO_RENAME_FILES_ON_CHANGE),
                 get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
                 getBoolean(DOWNLOAD_LINKED_FILES),
@@ -1713,6 +1724,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (_, _, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (_, _, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
         EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (_, _, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
+        EasyBind.listen(filePreferences.autoRenameFilesOnChangeProperty(), (_, _, newValue) -> putBoolean(AUTO_RENAME_FILES_ON_CHANGE, newValue));
         EasyBind.listen(filePreferences.fileNamePatternProperty(), (_, _, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
         EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (_, _, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (_, _, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
@@ -2096,7 +2108,7 @@ public class JabRefCliPreferences implements CliPreferences {
         searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) _ ->
                 putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT)));
         EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (_, _, newValue) -> putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));
-        EasyBind.listen(searchPreferences.keepSearchStingProperty(), (_, _, newValue) -> putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));
+        EasyBind.listen(searchPreferences.keepSearchStringProperty(), (_, _, newValue) -> putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));
         EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (_, _, _) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
         EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));
         EasyBind.listen(searchPreferences.getSearchWindowWidthProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_WIDTH, searchPreferences.getSearchWindowWidth()));
@@ -2310,7 +2322,7 @@ public class JabRefCliPreferences implements CliPreferences {
         keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);
         keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);
         keys.put(ScienceDirect.FETCHER_NAME, buildInfo.scienceDirectApiKey);
-        keys.put(SpringerFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
+        keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);
         // SpringerLink uses the same key and fetcher name as SpringerFetcher
 
         return keys;

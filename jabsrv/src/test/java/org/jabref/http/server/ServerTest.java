@@ -3,14 +3,18 @@ package org.jabref.http.server;
 import java.util.EnumSet;
 import java.util.List;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.http.JabRefSrvStateManager;
 import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
+import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.LastFilesOpenedPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
 
 import com.google.gson.Gson;
@@ -32,7 +36,7 @@ import static org.mockito.Mockito.when;
  * </ul>
  * <p>More information on testing with Jersey is available at <a href="https://eclipse-ee4j.github.io/jersey.github.io/documentation/latest/test-framework.html">the Jersey's testing documentation</a></p>.
  */
-abstract class ServerTest extends JerseyTest {
+public abstract class ServerTest extends JerseyTest {
 
     private static CliPreferences preferences;
 
@@ -80,6 +84,15 @@ abstract class ServerTest extends JerseyTest {
         });
     }
 
+    protected void addFormatterServiceToResourceConfig(ResourceConfig resourceConfig) {
+        resourceConfig.register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(new FormatterService()).to(FormatterService.class);
+            }
+        });
+    }
+
     protected void addPreferencesToResourceConfig(ResourceConfig resourceConfig) {
         resourceConfig.register(new AbstractBinder() {
             @Override
@@ -111,6 +124,10 @@ abstract class ServerTest extends JerseyTest {
         FieldPreferences fieldContentFormatterPreferences = new FieldPreferences(false, List.of(), List.of());
         // used twice, once for reading and once for writing
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldContentFormatterPreferences);
+
+        LastFilesOpenedPreferences lastFilesOpenedPreferences = mock(LastFilesOpenedPreferences.class);
+        when(preferences.getLastFilesOpenedPreferences()).thenReturn(lastFilesOpenedPreferences);
+        when(lastFilesOpenedPreferences.getLastFilesOpened()).thenReturn(FXCollections.emptyObservableList());
     }
 
     protected void addGlobalExceptionMapperToResourceConfig(ResourceConfig resourceConfig) {

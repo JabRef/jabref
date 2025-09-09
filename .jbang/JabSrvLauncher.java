@@ -19,6 +19,10 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/BibLatexFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/NatbibFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/MMDFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/PandocFormatter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/TypstFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/CAYWFormatter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/FormatterService.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/format/SimpleJsonFormatter.java
@@ -65,7 +69,7 @@
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.postgresql:postgresql:42.7.7
 //DEPS org.bouncycastle:bcprov-jdk18on:1.81
-//DEPS com.konghq:unirest-modules-gson:4.5.0
+//DEPS com.konghq:unirest-modules-gson:4.5.1
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
 //DEPS org.glassfish.jersey.core:jersey-server:3.1.11
 //DEPS org.glassfish.jersey.inject:jersey-hk2:3.1.11
@@ -77,7 +81,7 @@
 //DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
 //DEPS org.hibernate.validator:hibernate-validator:9.0.1.Final
-//DEPS com.konghq:unirest-modules-gson:4.5.0
+//DEPS com.konghq:unirest-modules-gson:4.5.1
 //DEPS com.google.guava:guava:33.4.8-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS net.harawata:appdirs:1.4.0

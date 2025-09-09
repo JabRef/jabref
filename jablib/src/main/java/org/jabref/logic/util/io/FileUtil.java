@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -48,6 +49,9 @@ public class FileUtil {
     private static final String ELLIPSIS = "...";
     private static final int ELLIPSIS_LENGTH = ELLIPSIS.length();
     private static final RemoveLatexCommandsFormatter REMOVE_LATEX_COMMANDS_FORMATTER = new RemoveLatexCommandsFormatter();
+    private static final String CYGDRIVE_PREFIX = "/cygdrive/";
+    private static final String MNT_PREFIX = "/mnt/";
+    private static final Pattern ROOT_DRIVE_PATTERN = Pattern.compile("^/[a-zA-Z]/.*");
 
     /**
      * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
@@ -135,35 +139,30 @@ public class FileUtil {
      *
      * @param path      the path to add the extension to
      * @param extension the extension to add
-     * @return the with the modified file name
+     * @return the modified file name
      */
     public static Path addExtension(Path path, String extension) {
         return path.resolveSibling(path.getFileName() + extension);
     }
 
-    /**
-     * Looks for the unique directory, if any, different to the provided paths
-     *
-     * @param paths       List of paths as Strings
-     * @param comparePath The to be tested path
-     */
+    /// Looks for the shortest unique path of the parent directory in the list of paths
+    /// @param paths       List of paths as Strings
+    /// @param comparePath The to be tested path
+    ///
+    /// @return Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathDirectory(List<String> paths, Path comparePath) {
-        String fileName = comparePath.getFileName().toString();
-
-        List<String> uniquePathParts = uniquePathSubstrings(paths);
-        return uniquePathParts.stream()
-                              .filter(part -> comparePath.toString().contains(part)
-                                      && !part.equals(fileName) && part.contains(File.separator))
-                              .findFirst()
-                              .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
+        // Difference to getUniquePathFragment: We want the parent directory, so we cut off the last path fragment
+        return getUniquePathFragment(paths, comparePath)
+                .filter(part -> part.contains(File.separator))
+                .map(part -> part.substring(0, part.lastIndexOf(File.separator)));
     }
 
-    /**
-     * Looks for the shortest unique path of the in a list of paths
-     *
-     * @param paths       List of paths as Strings
-     * @param comparePath The to be shortened path
-     */
+    /// Looks for the shortest unique path in the list of paths
+    ///
+    /// @param paths       List of paths as Strings
+    /// @param comparePath The to be shortened path
+    ///
+    /// @return Shortest unique path fragment (if exists) - Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
                                           .filter(part -> comparePath.toString().contains(part))
@@ -609,5 +608,48 @@ public class FileUtil {
 
     public static boolean isCharLegal(char c) {
         return Arrays.binarySearch(ILLEGAL_CHARS, c) < 0;
+    }
+
+    /// Converts a Cygwin-style file path to a Windows-style path if the operating system is Windows.
+    ///
+    /// Supported formats:
+    /// - /cygdrive/c/Users/... → C:\Users\...
+    /// - /mnt/c/Users/...      → C:\Users\...
+    /// - /c/Users/...          → C:\Users\...
+    ///
+    /// @param filePath the input file path
+    /// @return the converted path if running on Windows and path is in Cygwin format; otherwise, returns the original path
+    public static Path convertCygwinPathToWindows(String filePath) {
+        if (filePath == null) {
+            return null;
+        }
+
+        if (!OS.WINDOWS) {
+            return Path.of(filePath);
+        }
+
+        if (filePath.startsWith(MNT_PREFIX) && filePath.length() > 5) {
+            return buildWindowsPathWithDriveLetterIndex(filePath, 5);
+        }
+
+        if (filePath.startsWith(CYGDRIVE_PREFIX) && filePath.length() > 10) {
+            return buildWindowsPathWithDriveLetterIndex(filePath, 10);
+        }
+
+        if (ROOT_DRIVE_PATTERN.matcher(filePath).matches()) {
+            return buildWindowsPathWithDriveLetterIndex(filePath, 1);
+        }
+
+        return Path.of(filePath);
+    }
+
+    /// Builds a Windows-style path from a Cygwin-style path using a known prefix index.
+    /// @param path the input file path
+    /// @param letterIndex the index driver letter, zero-based indexing
+    /// @return a windows-style path
+    private static Path buildWindowsPathWithDriveLetterIndex(String path, int letterIndex) {
+        String driveLetter = path.substring(letterIndex, letterIndex + 1).toUpperCase();
+        String windowsPath = path.substring(letterIndex + 1).replace("/", "\\\\");
+        return Path.of(driveLetter + ":" + windowsPath);
     }
 }

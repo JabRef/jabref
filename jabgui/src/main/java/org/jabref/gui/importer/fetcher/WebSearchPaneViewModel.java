@@ -22,6 +22,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
@@ -30,12 +31,9 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
-import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
-import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
-import org.apache.lucene.queryparser.flexible.standard.parser.ParseException;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
-
-import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 public class WebSearchPaneViewModel {
 
@@ -47,7 +45,6 @@ public class WebSearchPaneViewModel {
     private final StateManager stateManager;
 
     private final Validator searchQueryValidator;
-    private final SyntaxParser parser = new StandardSyntaxParser();
 
     public WebSearchPaneViewModel(GuiPreferences preferences, DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
@@ -85,18 +82,23 @@ public class WebSearchPaneViewModel {
                     }
 
                     try {
-                        parser.parse(queryText, NO_EXPLICIT_FIELD);
+                        // The result is ignored because we just check for validity
+                        SearchQuery.getStartContext(queryText);
                         return null;
-                    } catch (ParseException e) {
-                        String element = e.currentToken.image;
-                        int position = e.currentToken.beginColumn;
-                        if (element == null) {
-                            return ValidationMessage.error(Localization.lang("Invalid query. Check position %0.", position));
-                        } else {
-                            return ValidationMessage.error(Localization.lang("Invalid query element '%0' at position %1", element, position));
+                    } catch (ParseCancellationException e) {
+                        // RecognitionException can point out the exact error
+                        if (e.getCause() instanceof RecognitionException recEx) {
+                            Token offendingToken = recEx.getOffendingToken();
+
+                            // The character position is 0-based, so we add 1 for user-friendliness.
+                            int line = offendingToken.getLine();
+                            int charPositionInLine = offendingToken.getCharPositionInLine() + 1;
+
+                            return ValidationMessage.error(Localization.lang("Invalid query element '%0' at position %1", line, charPositionInLine));
                         }
-                    } catch (QueryNodeParseException e) {
-                        return ValidationMessage.error("");
+
+                        // Fallback for other failing reasons
+                        return ValidationMessage.error(Localization.lang("Invalid query"));
                     }
                 });
     }
@@ -162,7 +164,7 @@ public class WebSearchPaneViewModel {
                                                           .withInitialMessage(Localization.lang("Processing \"%0\"...", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
-        ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
+        ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task, activeFetcher, query);
         dialog.setTitle(fetcherName);
         dialogService.showCustomDialogAndWait(dialog);
     }

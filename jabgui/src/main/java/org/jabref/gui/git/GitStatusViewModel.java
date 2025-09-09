@@ -16,12 +16,10 @@ import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
 import org.jabref.logic.git.status.SyncStatus;
+import org.jabref.logic.git.util.GitHandlerRegistry;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
-
-import com.tobiasdiez.easybind.EasyBind;
-import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// ViewModel that holds current Git sync status for the open .bib database.
 /// It maintains the state of the GitHandler bound to the current file path, including:
@@ -33,79 +31,82 @@ import org.slf4j.LoggerFactory;
 ///   <li>The current sync status (e.g., {@code UP_TO_DATE}, {@code DIVERGED}, etc.)</li>
 /// </ul>
 public class GitStatusViewModel extends AbstractViewModel {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GitStatusViewModel.class);
     private final StateManager stateManager;
-    private final ObjectProperty<BibDatabaseContext> databaseContext = new SimpleObjectProperty<>();
+    private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry handlerRegistry;
     private final ObjectProperty<SyncStatus> syncStatus = new SimpleObjectProperty<>(SyncStatus.UNTRACKED);
     private final BooleanProperty isTracking = new SimpleBooleanProperty(false);
     private final BooleanProperty conflictDetected = new SimpleBooleanProperty(false);
-    // "" denotes that no commit was pulled
     private final StringProperty lastPulledCommit = new SimpleStringProperty("");
-    private @Nullable GitHandler activeHandler = null;
+    private final BooleanProperty hasRemoteConfigured = new SimpleBooleanProperty(false);
 
-    public GitStatusViewModel(StateManager stateManager, Path bibFilePath) {
+    public GitStatusViewModel(StateManager stateManager, TaskExecutor taskExecutor, GitHandlerRegistry handlerRegistry) {
         this.stateManager = stateManager;
-        EasyBind.subscribe(stateManager.activeDatabaseProperty(), newDb -> {
-            if (newDb != null && newDb.isPresent() && newDb.get().getDatabasePath().isPresent()) {
-                BibDatabaseContext databaseContext1 = newDb.get();
-                databaseContext.set(databaseContext1);
-                updateStatusFromContext(databaseContext1);
+        this.taskExecutor = taskExecutor;
+        this.handlerRegistry = handlerRegistry;
+
+        stateManager.activeDatabaseProperty().addListener((_, _, newDb) -> {
+            if ((newDb != null) && newDb.isPresent() && newDb.get().getDatabasePath().isPresent()) {
+                Path path = newDb.get().getDatabasePath().get();
+                refresh(path);
+                updateRemoteStatus(path);
             } else {
-                LOGGER.debug("No active database with path; resetting Git status.");
                 reset();
+                hasRemoteConfigured.set(false);
             }
         });
 
-        stateManager.getActiveDatabase().ifPresent(presentContext -> {
-            databaseContext.set(presentContext);
-            updateStatusFromContext(presentContext);
-        });
+        stateManager.getActiveDatabase()
+                    .flatMap(BibDatabaseContext::getDatabasePath)
+                    .ifPresent(path -> {
+                        refresh(path);
+                        updateRemoteStatus(path);
+                    });
     }
 
     protected void updateStatusFromContext(BibDatabaseContext context) {
-        Optional<Path> databasePathOpt = context.getDatabasePath();
-        if (databasePathOpt.isEmpty()) {
-            LOGGER.debug("No .bib file path available in database context; resetting Git status.");
+        Path path = context.getDatabasePath().orElse(null);
+        if (path == null) {
             reset();
             return;
         }
 
-        Path path = databasePathOpt.get();
-
-        Optional<GitHandler> gitHandlerOpt = GitHandler.fromAnyPath(path);
-        if (gitHandlerOpt.isEmpty()) {
-            LOGGER.debug("No Git repository found for path {}; resetting Git status.", path);
-            reset();
-            return;
-        }
-        this.activeHandler = gitHandlerOpt.get();
-
-        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(activeHandler);
-        setTracking(snapshot.tracking());
-        setSyncStatus(snapshot.syncStatus());
-        setConflictDetected(snapshot.conflict());
-        snapshot.lastPulledCommit().ifPresent(this::setLastPulledCommit);
+        refresh(path);
     }
 
-    /**
-     * Clears all internal state to defaults.
-     * Should be called when switching projects or Git context is lost
-     */
+    public void refresh(Path path) {
+        handlerRegistry.fromAnyPath(path).ifPresentOrElse(handler -> {
+            GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(handler);
+            setTracking(snapshot.tracking());
+            setSyncStatus(snapshot.syncStatus());
+            setConflictDetected(snapshot.conflict());
+            snapshot.lastPulledCommit().ifPresent(this::setLastPulledCommit);
+        }, this::reset);
+    }
+
     public void reset() {
-        activeHandler = null;
         setSyncStatus(SyncStatus.UNTRACKED);
         setTracking(false);
         setConflictDetected(false);
         setLastPulledCommit("");
     }
 
-    public Optional<BibDatabaseContext> getDatabaseContext() {
-        return Optional.ofNullable(databaseContext.get());
+    public BooleanProperty hasRemoteConfiguredProperty() {
+        return hasRemoteConfigured;
     }
 
-    public Optional<Path> getCurrentBibFile() {
-        return getDatabaseContext()
-                .flatMap(BibDatabaseContext::getDatabasePath);
+    public void updateRemoteStatus(Path databasePath) {
+        BackgroundTask
+                .wrap(() -> {
+                    GitHandler handler = handlerRegistry.get(databasePath.getParent());
+                    return handler != null && handler.hasRemote("origin");
+                })
+                .onSuccess(hasRemote -> hasRemoteConfigured.set(hasRemote))
+                .executeWith(taskExecutor);
+    }
+
+    public Optional<Path> currentBibPath() {
+        return stateManager.getActiveDatabase().flatMap(BibDatabaseContext::getDatabasePath);
     }
 
     public ObjectProperty<SyncStatus> syncStatusProperty() {
@@ -156,7 +157,9 @@ public class GitStatusViewModel extends AbstractViewModel {
         this.lastPulledCommit.set(commitHash);
     }
 
-    public Optional<GitHandler> getActiveHandler() {
-        return Optional.ofNullable(activeHandler);
+    public static GitStatusViewModel fromPathAndContext(StateManager stateManager, TaskExecutor taskExecutor, GitHandlerRegistry handlerRegistry, Path path) {
+        GitStatusViewModel viewModel = new GitStatusViewModel(stateManager, taskExecutor, handlerRegistry);
+        viewModel.refresh(path);
+        return viewModel;
     }
 }
