@@ -16,10 +16,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  *
  * The file is parsed using by {@link StudyYamlParser}
  */
-@JsonPropertyOrder({"authors", "title", "research-questions", "queries", "databases"})
+@JsonPropertyOrder({"version", "authors", "title", "research-questions", "queries", "catalogues"})
 // The user might add arbitrary content to the YAML
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Study {
+    private String version = "2.0";
     private List<String> authors;
 
     private String title;
@@ -29,20 +30,28 @@ public class Study {
 
     private List<StudyQuery> queries;
 
-    private List<StudyDatabase> databases;
+    private List<StudyDatabase> catalogues;
 
-    public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyDatabase> databases) {
+    public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyDatabase> catalogues) {
         this.authors = authors;
         this.title = title;
         this.researchQuestions = researchQuestions;
         this.queries = queryEntries;
-        this.databases = databases;
+        this.catalogues = catalogues;
     }
 
     /**
      * Used for Jackson deserialization
      */
     private Study() {
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public List<String> getAuthors() {
@@ -61,12 +70,12 @@ public class Study {
         this.queries = queries;
     }
 
-    public List<StudyDatabase> getDatabases() {
-        return databases;
+    public List<StudyDatabase> getCatalogues() {
+        return catalogues;
     }
 
-    public void setDatabases(List<StudyDatabase> databases) {
-        this.databases = databases;
+    public void setCatalogues(List<StudyDatabase> catalogues) {
+        this.catalogues = catalogues;
     }
 
     public String getTitle() {
@@ -92,7 +101,7 @@ public class Study {
                 ", studyName='" + title + '\'' +
                 ", researchQuestions=" + researchQuestions +
                 ", queries=" + queries +
-                ", libraries=" + databases +
+                ", libraries=" + catalogues +
                 '}';
     }
 
@@ -111,12 +120,12 @@ public class Study {
                 Objects.equals(title, otherStudy.title) &&
                 Objects.equals(researchQuestions, otherStudy.researchQuestions) &&
                 Objects.equals(queries, otherStudy.queries) &&
-                Objects.equals(databases, otherStudy.databases);
+                Objects.equals(catalogues, otherStudy.catalogues);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authors, title, researchQuestions, queries, databases);
+        return Objects.hash(authors, title, researchQuestions, queries, catalogues);
     }
 }
 

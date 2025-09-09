@@ -197,7 +197,7 @@ public class StudyRepository {
      * @throws IllegalArgumentException If a transformation from Library entry to LibraryDefinition fails
      */
     public List<StudyDatabase> getActiveLibraryEntries() throws IllegalArgumentException {
-        return study.getDatabases()
+        return study.getCatalogues()
                     .parallelStream()
                     .filter(StudyDatabase::isEnabled)
                     .collect(Collectors.toList());

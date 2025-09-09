@@ -103,7 +103,7 @@ public class ManageStudyDefinitionViewModel {
         title.setValue(study.getTitle());
         researchQuestions.addAll(study.getResearchQuestions());
         queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).toList());
-        List<StudyDatabase> studyDatabases = study.getDatabases();
+        List<StudyDatabase> studyDatabases = study.getCatalogues();
         databases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences, importerPreferences)
                                     .stream()
                                     .map(SearchBasedFetcher::getName)
