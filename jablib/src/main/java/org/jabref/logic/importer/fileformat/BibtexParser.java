@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -90,7 +91,7 @@ import static org.jabref.logic.util.MetadataSerializationConfiguration.GROUP_TYP
  */
 public class BibtexParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexParser.class);
-    private static final Integer LOOKAHEAD = 1024;
+    private static final int LOOKAHEAD = 1024;
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final int INDEX_RELATIVE_PATH_IN_PLIST = 4;
@@ -100,7 +101,13 @@ public class BibtexParser implements Parser {
     private BibDatabase database;
     private Set<BibEntryType> entryTypes;
     private boolean eof;
+
     private int line = 1;
+    private int column = 1;
+    // Stores the last read column of the highest column number encountered on any line so far.
+    // In basic JDK data structures, there is no size-limited stack. We did not want to include Apache Commons Collections only for "CircularFifoBuffer"
+    private Stack<Integer> highestColumns = new Stack<>();
+
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;
     private final Map<String, String> parsedBibdeskGroups;
@@ -634,6 +641,10 @@ public class BibtexParser implements Parser {
         }
         if (character == '\n') {
             line++;
+            highestColumns.push(column);
+            column = 1;
+        } else {
+            column++;
         }
         return character;
     }
@@ -641,6 +652,9 @@ public class BibtexParser implements Parser {
     private void unread(int character) throws IOException {
         if (character == '\n') {
             line--;
+            column = highestColumns.pop();
+        } else {
+            column--;
         }
         pushbackReader.unread(character);
         if (pureTextFromFile.getLast() == character) {
@@ -679,6 +693,9 @@ public class BibtexParser implements Parser {
     private BibEntry parseEntry(String entryType) throws IOException {
         BibEntry result = new BibEntry(EntryTypeFactory.parse(entryType));
 
+        result.setStartLine(line);
+        result.setStartColumn(column);
+
         skipWhitespace();
         consume('{', '(');
         int character = peek();
@@ -713,10 +730,13 @@ public class BibtexParser implements Parser {
         // Consume new line which signals end of entry
         skipOneNewline();
 
+        result.setEndLine(line);
+        result.setEndColumn(column);
         return result;
     }
 
     private void parseField(BibEntry entry) throws IOException {
+        int startLine = line;
         Field field = FieldFactory.parseField(parseTextToken().toLowerCase(Locale.ROOT));
 
         skipWhitespace();
@@ -770,6 +790,8 @@ public class BibtexParser implements Parser {
                 }
             }
         }
+
+        entry.getFieldRanges().put(field, new BibEntry.FieldRange(0, 0, line - startLine, column));
     }
 
     private String parseFieldContent(Field field) throws IOException {

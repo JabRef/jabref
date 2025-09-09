@@ -1,6 +1,10 @@
 package org.jabref.cli;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
@@ -70,72 +74,61 @@ class CheckIntegrity implements Callable<Integer> {
         );
 
         List<IntegrityMessage> messages = databaseContext.getEntries().stream()
-                .flatMap(entry -> integrityCheck.checkEntry(entry).stream())
-                .toList();
-
-        switch (outputFormat) {
-            case "errorformat" -> messages.forEach(message -> {
-                if (message.field() != null) {
-                    System.out.println(String.format("%s:%d: %s: %s",
-                            inputFile,
-                            message.getLineNumber().orElse(0),
-                            message.field().getName(),
-                            message.message()));
-                } else {
-                    System.out.println(String.format("%s:%d: %s",
-                            inputFile,
-                            message.getLineNumber().orElse(0),
-                            message.message()));
+                                                         .flatMap(entry -> integrityCheck.checkEntry(entry).stream())
+                                                         .toList();
+        try {
+            return switch (outputFormat.toLowerCase(Locale.ROOT)) {
+                case "errorformat" ->
+                        outputErrorFormat(messages);
+                case "txt" ->
+                        outputTxt(messages);
+                case "csv" ->
+                        outputCsv(messages);
+                default -> {
+                    System.out.println(Localization.lang("Unknown output format '%0'.", outputFormat));
+                    yield 3;
                 }
-            });
-            case "txt" -> {
-                if (messages.isEmpty()) {
-                    System.out.println(Localization.lang("No integrity problems found."));
-                } else {
-                    messages.forEach(message -> {
-                        if (message.field() != null) {
-                            System.out.println(String.format("- %s: %s", message.field().getName(), message.message()));
-                        } else {
-                            System.out.println(String.format("- %s", message.message()));
-                        }
-                    });
-                    System.out.println();
-                    System.out.println(Localization.lang("Total integrity problems found: %0.", String.valueOf(messages.size())));
-                }
-            }
-            case "csv" -> {
-                System.out.println("file,line,field,message");
-                messages.forEach(message -> {
-                    String line = message.getLineNumber().map(Object::toString).orElse("");
-                    String field = message.field() != null ? message.field().getName() : "";
-                    System.out.println(String.format("%s,%s,%s,%s",
-                            inputFile,
-                            line,
-                            field,
-                            message.message().replace("\"", "\"\"")));
-                });
-            }
-            default -> {
-                System.out.println(Localization.lang("Unknown output format '%0'.", outputFormat));
-                return 3;
-            }
+            };
+        } catch (
+                IOException e) {
+            System.err.println("Error writing to output: " + e.getMessage());
         }
+        return 1;
     }
 
-    private void outputErrorFormat(List<IntegrityMessage> messages) {
-        messages.forEach(message -> {
-            if (message.field() != null) {
-                System.out.println(String.format("%s:%d: %s: %s",
-                        inputFile,
-                        message.getLineNumber().orElse(0),
-                        message.field().getName(),
-                        message.message()));
-            } else {
-                System.out.println(String.format("%s:%d: %s",
-                        inputFile,
-                        message.getLineNumber().orElse(0),
-                        message.message()));
-            }
-        });
+    private int outputCsv(List<IntegrityMessage> messages) throws IOException {
+        Writer writer = new OutputStreamWriter(System.out);
+        writer.write("Citation Key,Field,Message\n");
+        for (IntegrityMessage message : messages) {
+            String citationKey = message.entry().getCitationKey().orElse("");
+            String field = message.field() != null ? message.field().getDisplayName() : "";
+            String msg = message.message().replace("\"", "\"\"");
+            writer.write("%s,%s,%s\n".formatted(citationKey, field, msg));
+        }
+        writer.flush();
+        return 0;
+    }
+
+    private int outputTxt(List<IntegrityMessage> messages) throws IOException {
+        Writer writer = new OutputStreamWriter(System.out);
+        for (IntegrityMessage message : messages) {
+            writer.append(message.toString()).write("\n");
+        }
+        writer.flush();
+        return 0;
+    }
+
+    private int outputErrorFormat(List<IntegrityMessage> messages) throws IOException {
+        Writer writer = new OutputStreamWriter(System.out);
+        for (IntegrityMessage message : messages) {
+            BibEntry.FieldRange fieldRange = message.entry().getFieldRangeFromField(message.field());
+            writer.write("%s:%d:%d: %s\n".formatted(
+                    inputFile,
+                    fieldRange.startLine(),
+                    fieldRange.startColumn(),
+                    message.message()));
+        }
+        writer.flush();
+        return 0;
     }
 }
