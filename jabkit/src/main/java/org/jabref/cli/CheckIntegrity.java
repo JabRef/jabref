@@ -72,7 +72,7 @@ class CheckIntegrity implements Callable<Integer> {
         List<IntegrityMessage> messages = databaseContext.getEntries().stream()
                                                          .flatMap(entry -> {
                                                              if (!sharedOptions.porcelain) {
-                                                                 System.out.println(Localization.lang("Checking entry with citation key '%0'.", entry.getCitationKey().orElse("")));
+                                                                 System.out.println(Localization.lang("Checking integrity of '%0'", entry.getCitationKey().orElse("")));
                                                              }
                                                              return integrityCheck.checkEntry(entry).stream();
                                                          })
