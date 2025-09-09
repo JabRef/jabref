@@ -1,8 +1,6 @@
 package org.jabref.cli;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -60,7 +58,6 @@ class CheckIntegrity implements Callable<Integer> {
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Checking integrity of '%0'.", inputFile));
-            System.out.flush();
         }
 
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
@@ -74,8 +71,14 @@ class CheckIntegrity implements Callable<Integer> {
         );
 
         List<IntegrityMessage> messages = databaseContext.getEntries().stream()
-                                                         .flatMap(entry -> integrityCheck.checkEntry(entry).stream())
+                                                         .flatMap(entry -> {
+                                                             if (!sharedOptions.porcelain) {
+                                                                    System.out.println(Localization.lang("Checking entry with citation key '%0'.", entry.getCitationKey().orElse("")));
+                                                             }
+                                                             return integrityCheck.checkEntry(entry).stream();
+                                                         })
                                                          .toList();
+
         try {
             return switch (outputFormat.toLowerCase(Locale.ROOT)) {
                 case "errorformat" ->
@@ -89,46 +92,37 @@ class CheckIntegrity implements Callable<Integer> {
                     yield 3;
                 }
             };
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             System.err.println("Error writing to output: " + e.getMessage());
         }
         return 1;
     }
 
     private int outputCsv(List<IntegrityMessage> messages) throws IOException {
-        Writer writer = new OutputStreamWriter(System.out);
-        writer.write("Citation Key,Field,Message\n");
+        System.out.println("Citation Key,Field,Message");
         for (IntegrityMessage message : messages) {
             String citationKey = message.entry().getCitationKey().orElse("");
             String field = message.field() != null ? message.field().getDisplayName() : "";
             String msg = message.message().replace("\"", "\"\"");
-            writer.write("%s,%s,%s\n".formatted(citationKey, field, msg));
+            System.out.printf("%s,%s,%s%n", citationKey, field, msg);
         }
-        writer.flush();
         return 0;
     }
 
     private int outputTxt(List<IntegrityMessage> messages) throws IOException {
-        Writer writer = new OutputStreamWriter(System.out);
-        for (IntegrityMessage message : messages) {
-            writer.append(message.toString()).write("\n");
-        }
-        writer.flush();
+        messages.forEach(System.out::println);
         return 0;
     }
 
     private int outputErrorFormat(List<IntegrityMessage> messages) throws IOException {
-        Writer writer = new OutputStreamWriter(System.out);
         for (IntegrityMessage message : messages) {
             BibEntry.FieldRange fieldRange = message.entry().getFieldRangeFromField(message.field());
-            writer.write("%s:%d:%d: %s\n".formatted(
+            System.out.printf("%s:%d:%d: %s\n".formatted(
                     inputFile,
                     fieldRange.startLine(),
                     fieldRange.startColumn(),
                     message.message()));
         }
-        writer.flush();
         return 0;
     }
 }
