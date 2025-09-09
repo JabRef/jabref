@@ -37,6 +37,7 @@ import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -87,6 +88,7 @@ public class JabRefGUI extends Application {
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
     private static BibEntryTypesManager bibEntryTypesManager;
+    private static GitHandlerRegistry gitHandlerRegistry;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
@@ -162,6 +164,9 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository(bibEntryTypesManager);
+        gitHandlerRegistry = new GitHandlerRegistry();
+        Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
+
         JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
