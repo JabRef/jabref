@@ -103,7 +103,10 @@ class CheckIntegrity implements Callable<Integer> {
         for (IntegrityMessage message : messages) {
             String citationKey = message.entry().getCitationKey().orElse("");
             String field = message.field() != null ? message.field().getDisplayName() : "";
-            String msg = message.message().replace("\"", "\"\"");
+            String msg = message.message().replace("\"", "\\\"");
+            if (msg.contains(",")) {
+                msg = "\"" + msg + "\"";
+            }
             System.out.printf("%s,%s,%s%n", citationKey, field, msg);
         }
         return 0;
