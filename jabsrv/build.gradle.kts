@@ -37,7 +37,7 @@ dependencies {
     implementation("org.hibernate.validator:hibernate-validator")
 
     // LSP4J for LSP Server
-    implementation("com.github.eclipse:lsp4j")
+    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j")
 
     implementation("com.konghq:unirest-modules-gson")
 
