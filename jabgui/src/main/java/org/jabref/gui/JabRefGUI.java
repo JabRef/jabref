@@ -120,6 +120,7 @@ public class JabRefGUI extends Application {
                 fileUpdateMonitor,
                 preferences,
                 cliPreferences,
+                gitHandlerRegistry,
                 aiService,
                 stateManager,
                 countingUndoManager,

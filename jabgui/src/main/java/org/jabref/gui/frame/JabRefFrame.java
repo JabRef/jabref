@@ -55,6 +55,7 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.welcome.WelcomeTab;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BuildInfo;
@@ -100,6 +101,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final StateManager stateManager;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
+    private final GitHandlerRegistry gitHandlerRegistry;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipBoardManager;
@@ -123,6 +125,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        FileUpdateMonitor fileUpdateMonitor,
                        GuiPreferences preferences,
                        CliPreferences cliPreferences,
+                       GitHandlerRegistry gitHandlerRegistry,
                        AiService aiService,
                        StateManager stateManager,
                        CountingUndoManager undoManager,
@@ -134,6 +137,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.preferences = preferences;
         this.cliPreferences = cliPreferences;
+        this.gitHandlerRegistry = gitHandlerRegistry;
         this.aiService = aiService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
