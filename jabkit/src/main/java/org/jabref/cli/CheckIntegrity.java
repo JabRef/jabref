@@ -1,6 +1,5 @@
 package org.jabref.cli;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -73,32 +72,27 @@ class CheckIntegrity implements Callable<Integer> {
         List<IntegrityMessage> messages = databaseContext.getEntries().stream()
                                                          .flatMap(entry -> {
                                                              if (!sharedOptions.porcelain) {
-                                                                    System.out.println(Localization.lang("Checking entry with citation key '%0'.", entry.getCitationKey().orElse("")));
+                                                                 System.out.println(Localization.lang("Checking entry with citation key '%0'.", entry.getCitationKey().orElse("")));
                                                              }
                                                              return integrityCheck.checkEntry(entry).stream();
                                                          })
                                                          .toList();
 
-        try {
-            return switch (outputFormat.toLowerCase(Locale.ROOT)) {
-                case "errorformat" ->
-                        outputErrorFormat(messages);
-                case "txt" ->
-                        outputTxt(messages);
-                case "csv" ->
-                        outputCsv(messages);
-                default -> {
-                    System.out.println(Localization.lang("Unknown output format '%0'.", outputFormat));
-                    yield 3;
-                }
-            };
-        } catch (IOException e) {
-            System.err.println("Error writing to output: " + e.getMessage());
-        }
-        return 1;
+        return switch (outputFormat.toLowerCase(Locale.ROOT)) {
+            case "errorformat" ->
+                    outputErrorFormat(messages);
+            case "txt" ->
+                    outputTxt(messages);
+            case "csv" ->
+                    outputCsv(messages);
+            default -> {
+                System.out.println(Localization.lang("Unknown output format '%0'.", outputFormat));
+                yield 3;
+            }
+        };
     }
 
-    private int outputCsv(List<IntegrityMessage> messages) throws IOException {
+    private int outputCsv(List<IntegrityMessage> messages) {
         System.out.println("Citation Key,Field,Message");
         for (IntegrityMessage message : messages) {
             String citationKey = message.entry().getCitationKey().orElse("");
@@ -112,12 +106,12 @@ class CheckIntegrity implements Callable<Integer> {
         return 0;
     }
 
-    private int outputTxt(List<IntegrityMessage> messages) throws IOException {
+    private int outputTxt(List<IntegrityMessage> messages) {
         messages.forEach(System.out::println);
         return 0;
     }
 
-    private int outputErrorFormat(List<IntegrityMessage> messages) throws IOException {
+    private int outputErrorFormat(List<IntegrityMessage> messages) {
         for (IntegrityMessage message : messages) {
             BibEntry.FieldRange fieldRange = message.entry().getFieldRangeFromField(message.field());
             System.out.printf("%s:%d:%d: %s\n".formatted(
