@@ -110,14 +110,14 @@ public class BibtexParser implements Parser {
 
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;
-    private final Map<String, String> parsedBibdeskGroups;
+    private final Map<String, String> parsedBibDeskGroups;
 
     private GroupTreeNode bibDeskGroupTreeNode;
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
         this.metaDataParser = new MetaDataParser(fileMonitor);
-        this.parsedBibdeskGroups = new HashMap<>();
+        this.parsedBibDeskGroups = new HashMap<>();
     }
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences) {
@@ -400,8 +400,8 @@ public class BibtexParser implements Parser {
      * Adds BibDesk group entries to the JabRef database
      */
     private void addBibDeskGroupEntriesToJabRefGroups() {
-        for (String groupName : parsedBibdeskGroups.keySet()) {
-            String[] citationKeys = parsedBibdeskGroups.get(groupName).split(",");
+        for (String groupName : parsedBibDeskGroups.keySet()) {
+            String[] citationKeys = parsedBibDeskGroups.get(groupName).split(",");
             for (String citation : citationKeys) {
                 Optional<BibEntry> bibEntry = database.getEntryByCitationKey(citation);
                 Optional<String> groupValue = bibEntry.flatMap(entry -> entry.getField(StandardField.GROUPS));
@@ -450,7 +450,7 @@ public class BibtexParser implements Parser {
                     }
                 }
                 // Adds the group name and citation keys to the field so all the entries can be added in the groups once parsed
-                parsedBibdeskGroups.putIfAbsent(groupName, citationKeys);
+                parsedBibDeskGroups.putIfAbsent(groupName, citationKeys);
             }
         } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new ParseException(e);
@@ -783,7 +783,7 @@ public class BibtexParser implements Parser {
                             LOGGER.error("Could not find attribute 'relativePath' for entry {} in decoded BibDesk field bdsk-file...) ", entry);
                         }
                     } catch (Exception e) {
-                        LOGGER.error("Could not parse Bibdesk files content (field: bdsk-file...) for entry {}", entry, e);
+                        LOGGER.error("Could not parse BibDesk files content (field: bdsk-file...) for entry {}", entry, e);
                     }
                 } else {
                     entry.setField(field, content);

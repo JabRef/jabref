@@ -90,8 +90,6 @@ public class CleanupWorker {
                     new MoveFilesCleanup(() -> databaseContext, filePreferences);
             case FIX_FILE_LINKS ->
                     new FileLinksCleanup();
-            case CLEAN_UP_ISSN ->
-                    new ISSNCleanup();
             default ->
                     throw new UnsupportedOperationException(action.name());
         };

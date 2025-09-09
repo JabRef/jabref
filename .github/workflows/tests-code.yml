@@ -52,6 +52,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Run checkstyle reporter
         uses: dbelyaev/action-checkstyle@master
         with:
@@ -91,6 +92,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -125,6 +127,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -242,6 +245,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -277,6 +281,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -325,6 +330,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -374,6 +380,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -422,6 +429,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -462,6 +470,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -483,6 +492,8 @@ jobs:
         with:
           files: |
             jablib/src/main/java/**/*.java
+          files_ignore: |
+            jablib/src/main/java/**/*-*.java
 
       - name: Build ${{ matrix.launcher }} launcher including changed classes
         shell: bash
@@ -536,6 +547,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -581,6 +593,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew traceRequirements

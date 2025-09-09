@@ -21,11 +21,6 @@ public class SimpleJsonFormatter implements CAYWFormatter {
     }
 
     @Override
-    public String getFormatName() {
-        return "simple-json";
-    }
-
-    @Override
     public MediaType getMediaType() {
         return MediaType.APPLICATION_JSON_TYPE;
     }

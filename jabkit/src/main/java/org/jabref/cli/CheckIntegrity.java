@@ -1,15 +1,5 @@
 package org.jabref.cli;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.integrity.IntegrityCheck;
-import org.jabref.logic.integrity.IntegrityMessage;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

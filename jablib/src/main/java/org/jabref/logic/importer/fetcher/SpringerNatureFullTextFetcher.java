@@ -31,6 +31,9 @@ public class SpringerNatureFullTextFetcher implements FulltextFetcher, Customiza
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerNatureFullTextFetcher.class);
 
+    // TODO: Update to the new [fulltext API](https://dev.springernature.com/docs/api-endpoints/fulltext-api/?source=jabref)
+    //       as well as [Open Access API](https://dev.springernature.com/docs/api-endpoints/open-access/?source=jabref)
+    //       Both APIs also [require separate API keys](https://dev.springernature.com/subscription/).
     private static final String API_URL = "https://api.springer.com/meta/v1/json";
     private static final String CONTENT_HOST = "link.springer.com";
 
