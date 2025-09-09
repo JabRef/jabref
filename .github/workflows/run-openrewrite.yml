@@ -35,6 +35,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
