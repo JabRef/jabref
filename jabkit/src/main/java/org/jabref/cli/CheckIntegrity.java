@@ -92,8 +92,7 @@ class CheckIntegrity implements Callable<Integer> {
                     yield 3;
                 }
             };
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             System.err.println("Error writing to output: " + e.getMessage());
         }
         return 1;
