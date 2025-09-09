@@ -38,6 +38,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(ApplicationExtension.class)
 class SingleSelectionMenuBuilderTest {
 
+    private static final List<Integer> SEPARATOR_INDICES =
+            List.of(0, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+
     @Test
     void supportsReturnsTrueOnlyForSingleSelection() {
         SingleSelectionMenuBuilder builder = newBuilder(mock(LinkedFilesEditorViewModel.class));
@@ -71,9 +74,8 @@ class SingleSelectionMenuBuilderTest {
         assertInstanceOf(SeparatorMenuItem.class, items.get(1), "Second item should be a separator");
         assertInstanceOf(SeparatorMenuItem.class, items.get(4), "Fifth item should be a separator");
 
-        for (int index : new int[] {0, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13}) {
-            assertFalse(items.get(index) instanceof SeparatorMenuItem, "Unexpected separator at index " + index);
-        }
+        SEPARATOR_INDICES.forEach(i ->
+                assertInstanceOf(SeparatorMenuItem.class, items.get(i)));
     }
 
     @Test

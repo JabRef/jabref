@@ -19,6 +19,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
@@ -126,7 +127,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
             fileViewModel.downloadProgressProperty().addListener(ignore -> recompute.run());
         }
 
-        files.addListener((javafx.collections.ListChangeListener<LinkedFileViewModel>) change -> {
+        files.addListener((ListChangeListener.Change<? extends LinkedFileViewModel> change) -> {
             while (change.next()) {
                 if (change.wasAdded()) {
                     for (LinkedFileViewModel fileViewModel : change.getAddedSubList()) {
@@ -190,7 +191,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     }
 
     /**
-     * Find files that are probably associated  to the given entry but not yet linked.
+     * Find files that are probably associated with the given entry but not yet linked.
      */
     private List<LinkedFileViewModel> findAssociatedNotLinkedFiles(BibEntry entry) {
         List<LinkedFileViewModel> result = new ArrayList<>();

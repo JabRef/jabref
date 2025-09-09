@@ -12,9 +12,12 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 interface SelectionChecks {
+
+    Logger LOG = LoggerFactory.getLogger(SelectionChecks.class);
 
     BibDatabaseContext databaseContext();
 
@@ -50,8 +53,8 @@ interface SelectionChecks {
             Path fileToSelect = entry.getValue().getFirst();
             try {
                 NativeDesktop.get().openFolderAndSelectFile(fileToSelect);
-            } catch (IOException ioException) {
-                LoggerFactory.getLogger(getClass()).warn("Could not open folder ", ioException);
+            } catch (IOException e) {
+                LOG.warn("Could not open folder and select file: {}", fileToSelect, e);
             }
         }
     }

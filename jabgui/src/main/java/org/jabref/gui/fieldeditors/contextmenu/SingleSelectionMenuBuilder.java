@@ -47,6 +47,11 @@ record SingleSelectionMenuBuilder(
 
     @Override
     public List<MenuItem> buildMenu(ObservableList<LinkedFileViewModel> selection) {
+        Objects.requireNonNull(selection, "selection must not be null");
+        if (selection.isEmpty()) {
+            return List.of();
+        }
+
         LinkedFileViewModel selectedLinkedFile = selection.getFirst();
         ActionFactory factory = new ActionFactory();
 

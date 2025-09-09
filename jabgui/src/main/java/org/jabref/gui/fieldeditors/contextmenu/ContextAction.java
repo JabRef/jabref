@@ -5,6 +5,8 @@ import java.util.Objects;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
@@ -14,11 +16,14 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 
 public class ContextAction extends SimpleCommand {
 
+    private static final ObservableMap<Field, String> EMPTY_FIELDS =
+            FXCollections.emptyObservableMap();
     private final StandardActions command;
     private final LinkedFileViewModel linkedFile;
     private final LinkedFilesEditorViewModel viewModel;
@@ -35,7 +40,7 @@ public class ContextAction extends SimpleCommand {
 
         Observable entryFieldsObservable = bibEntry.getValue()
                                                    .map(BibEntry::getFieldsObservable)
-                                                   .orElse(null);
+                                                   .orElse(EMPTY_FIELDS);
 
         this.executable.bind(
                 switch (command) {
