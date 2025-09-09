@@ -97,7 +97,6 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
 
                 stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).set(stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).get());
                 stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(selectedEntry.getEntry()));
-
                 if (!keepOnTop.isSelected()) {
                     stage.hide();
                 }
