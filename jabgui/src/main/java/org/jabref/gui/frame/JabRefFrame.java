@@ -89,7 +89,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
 
     private final GuiPreferences preferences;
-    private final CliPreferences cliPreferences;
     private final AiService aiService;
     private final GlobalSearchBar globalSearchBar;
 
@@ -124,7 +123,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        DialogService dialogService,
                        FileUpdateMonitor fileUpdateMonitor,
                        GuiPreferences preferences,
-                       CliPreferences cliPreferences,
                        GitHandlerRegistry gitHandlerRegistry,
                        AiService aiService,
                        StateManager stateManager,
@@ -136,7 +134,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.preferences = preferences;
-        this.cliPreferences = cliPreferences;
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.aiService = aiService;
         this.stateManager = stateManager;
@@ -244,7 +241,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 sidePane,
                 pushToApplicationCommand,
                 preferences,
-                cliPreferences,
                 stateManager,
                 fileUpdateMonitor,
                 taskExecutor,

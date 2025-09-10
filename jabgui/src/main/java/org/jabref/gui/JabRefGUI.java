@@ -43,7 +43,6 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
@@ -72,7 +71,6 @@ public class JabRefGUI extends Application {
 
     private static List<UiCommand> uiCommands;
     private static GuiPreferences preferences;
-    private static CliPreferences cliPreferences;
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
     private static AiService aiService;
@@ -120,7 +118,6 @@ public class JabRefGUI extends Application {
                 dialogService,
                 fileUpdateMonitor,
                 preferences,
-                cliPreferences,
                 gitHandlerRegistry,
                 aiService,
                 stateManager,

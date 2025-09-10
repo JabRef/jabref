@@ -57,7 +57,6 @@ public class Launcher {
         Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
         final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
-        final BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
 
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(
                 args,
@@ -89,7 +88,7 @@ public class Launcher {
             systemExit();
         }
 
-        PreferencesMigrations.runMigrations(preferences, bibEntryTypesManager);
+        PreferencesMigrations.runMigrations(preferences, preferences.getCustomEntryTypesRepository());
 
         PostgreServer postgreServer = new PostgreServer();
         Injector.setModelOrService(PostgreServer.class, postgreServer);
