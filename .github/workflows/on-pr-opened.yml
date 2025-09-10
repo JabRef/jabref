@@ -2,7 +2,7 @@ name: Welcome a first-time contributor
 
 on:
   pull_request_target:
-    types: opened
+    types: [opened]
 
 jobs:
   welcome-first-time-contributor:
