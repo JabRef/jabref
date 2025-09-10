@@ -168,7 +168,7 @@
 
     Give it a read, and you’ll discover the ancient wisdom of assigning issues to yourself. Trust me, it’s worth it. 🚀
 
-- jobName: 'PR title must not start with "Fix for issue <number>"'
+- jobName: 'PR title must not contain "issue <number>"'
   workflowName: 'PR Format'
   always: true
   message: >
