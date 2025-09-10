@@ -163,7 +163,7 @@ public class JabRefGUI extends Application {
         gitHandlerRegistry = new GitHandlerRegistry();
         Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
 
-        BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository(null);
+        BibEntryTypesManager entryTypesManager = preferences.getCustomEntryRepository();
 
         JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
