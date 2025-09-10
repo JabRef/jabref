@@ -71,7 +71,7 @@ public interface CliPreferences {
 
     BibEntryTypesManager getCustomEntryTypesRepository(BibEntryTypesManager bibEntryTypesManager);
 
-    BibEntryTypesManager getCustomEntryRepository();
+    BibEntryTypesManager getCustomEntryTypesRepository();
 
     void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager);
 
