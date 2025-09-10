@@ -46,10 +46,6 @@ public class YearChecker implements ValueChecker {
             return false;
         }
 
-        if (!ENDS_WITH_FOUR_DIGIT.test(value.replaceAll(PUNCTUATION_MARKS, ""))) {
-            return false;
-        }
-
-        return true;
+        return ENDS_WITH_FOUR_DIGIT.test(value.replaceAll(PUNCTUATION_MARKS, ""));
     }
 }
