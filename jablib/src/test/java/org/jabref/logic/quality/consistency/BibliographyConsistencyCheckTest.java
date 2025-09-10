@@ -71,6 +71,11 @@ class BibliographyConsistencyCheckTest {
             }
 
             @Override
+            public BibEntryTypesManager getCustomEntryTypesRepository() {
+                return bibEntryTypesManager;
+            }
+
+            @Override
             public BibEntryTypesManager getCustomEntryTypesRepository(BibEntryTypesManager bibEntryTypesManager) {
                 return bibEntryTypesManager;
             }
