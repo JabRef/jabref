@@ -1,6 +1,7 @@
 package org.jabref.logic.quality.consistency;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -76,11 +77,16 @@ public class BibliographyConsistencyCheck {
     @VisibleForTesting
     List<BibEntry> filterAndSortEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> requiredFields) {
         return entries.stream()
-                .sorted(new FieldComparatorStack<>(List.of(
-                        new BibEntryByCitationKeyComparator(),
-                        new BibEntryByFieldsComparator()
-                )))
-                .toList();
+                      .filter(entry ->
+                              // This removes entries that have all differing fields set (could be confusing to the user)
+                              !Collections.disjoint(entry.getFields(), differingFields)
+                                      // This ensures that all entries with missing required fields are included
+                                      || !entry.getFields().containsAll(requiredFields))
+                      .sorted(new FieldComparatorStack<>(List.of(
+                              new BibEntryByCitationKeyComparator(),
+                              new BibEntryByFieldsComparator()
+                      )))
+                      .toList();
     }
 
     public record Result(Map<EntryType, EntryTypeResult> entryTypeToResultMap) {
@@ -133,7 +139,6 @@ public class BibliographyConsistencyCheck {
             Optional<BibEntryType> typeDefOpt = entryTypeDefinitions.stream()
                                                                  .filter(def -> def.getType().equals(entryType))
                                                                  .findFirst();
-            boolean isUnknownTypeInMode = typeDefOpt.isEmpty();
 
             Set<Field> requiredFields = typeDefOpt.map(typeDef ->
                         typeDef.getRequiredFields().stream()
@@ -141,19 +146,14 @@ public class BibliographyConsistencyCheck {
                                .collect(Collectors.toSet())
                 ).orElse(Set.of());
 
-            Set<BibEntry> entriesSet = entryTypeToEntriesMap.get(entryType);
-            assert entriesSet != null;
-            assert entriesSet.size() != 1;
-            if (entriesSet == null || entriesSet.size() <= 1 || differingFields.isEmpty()) {
+            Set<BibEntry> entries = entryTypeToEntriesMap.get(entryType);
+            assert entries != null;
+            assert entries.size() != 1; // Either there is no entry with different fields or more than one
+            if (entries == null || entries.size() <= 1 || differingFields.isEmpty()) {
                 continue;
             }
 
-            List<BibEntry> sortedEntries = filterAndSortEntriesWithFieldDifferences(entriesSet, differingFields, requiredFields);
-            if (isUnknownTypeInMode) {
-                sortedEntries = sortedEntries.stream()
-                        .filter(e -> e.getFields().stream().anyMatch(differingFields::contains))
-                        .toList();
-            }
+            List<BibEntry> sortedEntries = filterAndSortEntriesWithFieldDifferences(entries, differingFields, requiredFields);
             if (!sortedEntries.isEmpty()) {
                 resultMap.put(entryType, new EntryTypeResult(differingFields, sortedEntries));
             }
