@@ -47,6 +47,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.groups.ExplicitGroup;
@@ -702,7 +703,10 @@ public class BibtexParser implements Parser {
         if ((character != '\n') && (character != '\r')) {
             skipWhitespace();
         }
+        int keyStartLine = line;
+        int keyStartColumn = column;
         String key = parseKey();
+        result.getFieldRanges().put(InternalField.KEY_FIELD, new BibEntry.FieldRange(keyStartLine, keyStartColumn, line, column));
         result.setCitationKey(key);
         skipWhitespace();
 
@@ -737,6 +741,7 @@ public class BibtexParser implements Parser {
 
     private void parseField(BibEntry entry) throws IOException {
         int startLine = line;
+        int startColumn = column;
         Field field = FieldFactory.parseField(parseTextToken().toLowerCase(Locale.ROOT));
 
         skipWhitespace();
@@ -791,7 +796,7 @@ public class BibtexParser implements Parser {
             }
         }
 
-        entry.getFieldRanges().put(field, new BibEntry.FieldRange(0, 0, line - startLine, column));
+        entry.getFieldRanges().put(field, new BibEntry.FieldRange(startLine, startColumn, line, column));
     }
 
     private String parseFieldContent(Field field) throws IOException {
