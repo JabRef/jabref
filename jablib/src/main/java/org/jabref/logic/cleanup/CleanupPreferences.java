@@ -2,6 +2,7 @@ package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.property.ObjectProperty;
@@ -72,38 +73,78 @@ public class CleanupPreferences {
         fieldFormatterCleanups.setValue(fieldFormatters);
     }
 
+    public CleanupPreferences updateWith(CleanupPreferences tabPreferences) {
+        EnumSet<CleanupStep> mergedJobs = getActiveJobs();
+
+        Optional<CleanupStepCategory> updatedCategory =
+                tabPreferences.getActiveJobs().stream()
+                              .map(CleanupStep::getCategory)
+                              .findFirst();
+
+        updatedCategory.ifPresent(category -> {
+                mergedJobs.removeIf(step -> step.getCategory() == category);
+                mergedJobs.addAll(tabPreferences.getActiveJobs());
+            }
+        );
+
+        return new CleanupPreferences(
+                mergedJobs,
+                tabPreferences.getFieldFormatterCleanups() != null
+                        ? tabPreferences.getFieldFormatterCleanups()
+                        : getFieldFormatterCleanups()
+        );
+    }
+
     public enum CleanupStep {
         /**
          * Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
          */
-        CLEAN_UP_DOI,
-        CLEANUP_EPRINT,
-        CLEAN_UP_URL,
-        MAKE_PATHS_RELATIVE,
-        RENAME_PDF,
-        RENAME_PDF_ONLY_RELATIVE_PATHS,
-        /**
-         * Collects file links from the pdf or ps field, and adds them to the list contained in the file field.
-         */
-        CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-        CLEAN_UP_DELETED_LINKED_FILES,
+        CLEAN_UP_DOI(CleanupStepCategory.MULTI_FIELD),
+        CLEANUP_EPRINT(CleanupStepCategory.MULTI_FIELD),
+        CLEAN_UP_URL(CleanupStepCategory.MULTI_FIELD),
         /**
          * Converts to biblatex format
          */
-        CONVERT_TO_BIBLATEX,
+        CONVERT_TO_BIBLATEX(CleanupStepCategory.MULTI_FIELD),
         /**
          * Converts to bibtex format
          */
-        CONVERT_TO_BIBTEX,
-        CONVERT_TIMESTAMP_TO_CREATIONDATE,
-        CONVERT_TIMESTAMP_TO_MODIFICATIONDATE,
-        DO_NOT_CONVERT_TIMESTAMP,
-        MOVE_PDF,
-        FIX_FILE_LINKS,
-        CLEAN_UP_ISSN,
+        CONVERT_TO_BIBTEX(CleanupStepCategory.MULTI_FIELD),
+        CONVERT_TIMESTAMP_TO_CREATIONDATE(CleanupStepCategory.MULTI_FIELD),
+        CONVERT_TIMESTAMP_TO_MODIFICATIONDATE(CleanupStepCategory.MULTI_FIELD),
+        DO_NOT_CONVERT_TIMESTAMP(CleanupStepCategory.MULTI_FIELD),
+
+        MOVE_PDF(CleanupStepCategory.FILE_RELATED),
+        MAKE_PATHS_RELATIVE(CleanupStepCategory.FILE_RELATED),
+        RENAME_PDF(CleanupStepCategory.FILE_RELATED),
+        RENAME_PDF_ONLY_RELATIVE_PATHS(CleanupStepCategory.FILE_RELATED),
+        /**
+         * Collects file links from the pdf or ps field, and adds them to the list contained in the file field.
+         */
+        CLEAN_UP_UPGRADE_EXTERNAL_LINKS(CleanupStepCategory.FILE_RELATED),
+        CLEAN_UP_DELETED_LINKED_FILES(CleanupStepCategory.FILE_RELATED),
+
+        FIX_FILE_LINKS(CleanupStepCategory.NONE),
+        CLEAN_UP_ISSN(CleanupStepCategory.NONE),
         /*
          * Converts Math Subject Classification Codes presented in Keywords into their Descriptions
          */
-        CONVERT_MSC_CODES
+        CONVERT_MSC_CODES(CleanupStepCategory.NONE);
+
+        private final CleanupStepCategory category;
+
+        CleanupStep(CleanupStepCategory category) {
+            this.category = category;
+        }
+
+        public CleanupStepCategory getCategory() {
+            return category;
+        }
+    }
+
+    public enum CleanupStepCategory {
+        MULTI_FIELD,
+        FILE_RELATED,
+        NONE
     }
 }
