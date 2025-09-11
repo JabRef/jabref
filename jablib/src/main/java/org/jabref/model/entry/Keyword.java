@@ -21,10 +21,8 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
         this.keyword = Objects.requireNonNull(keyword).trim();
     }
 
-    /**
-     * Connects all the given keywords into one chain and returns its root,
-     * e.g. "A", "B", "C" is transformed into "A > B > C".
-     */
+    /// Connects all the given keywords into one chain and returns its root,
+    /// e.g. "A", "B", "C" is transformed into "A > B > C".
     public static Keyword of(String... keywords) {
         if (keywords.length == 0) {
             return new Keyword("");
@@ -35,6 +33,11 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
             root.addAtEnd(keywords[i]);
         }
         return root;
+    }
+
+    /// Converts a raw String to a single Keyword
+    public static Keyword ofHierarchical(String rawString) {
+        return Keyword.of(rawString.split(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString()));
     }
 
     @Override

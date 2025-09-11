@@ -73,7 +73,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
 
             @Override
             public Keyword fromString(String keywordString) {
-                return Keyword.of(keywordString.split(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString()));
+                return Keyword.ofHierarchical(keywordString);
             }
         };
     }

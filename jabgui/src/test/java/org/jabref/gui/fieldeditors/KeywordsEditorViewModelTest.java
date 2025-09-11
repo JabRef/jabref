@@ -10,7 +10,7 @@ class KeywordsEditorViewModelTest {
     @Test
     void stringConverterWithHierarchicalKeywords() {
         String hierarchichalString = "parent > node > child";
-        Keyword keyword = Keyword.of("parent", "node", "child");
+        Keyword keyword = Keyword.ofHierarchical(hierarchichalString);
 
         assertEquals(hierarchichalString, KeywordsEditorViewModel.getStringConverter().toString(keyword));
     }
