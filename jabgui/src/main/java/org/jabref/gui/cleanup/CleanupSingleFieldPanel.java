@@ -1,7 +1,6 @@
 package org.jabref.gui.cleanup;
 
 import java.util.Objects;
-import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -35,11 +34,11 @@ public class CleanupSingleFieldPanel extends VBox implements CleanupPanel {
     }
 
     @Override
-    public Optional<CleanupPreferences> getCleanupPreferences() {
+    public CleanupPreferences getCleanupPreferences() {
         FieldFormatterCleanups fieldFormatterCleanups = new FieldFormatterCleanups(
                 !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
                 formatterCleanupsPanel.cleanupsProperty()
         );
-        return Optional.of(new CleanupPreferences(fieldFormatterCleanups));
+        return new CleanupPreferences(fieldFormatterCleanups);
     }
 }

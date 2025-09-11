@@ -74,7 +74,7 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
         cleanupDeletedFiles.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES));
     }
 
-    public Optional<CleanupPreferences> getCleanupPreferences() {
+    public CleanupPreferences getCleanupPreferences() {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
 
         if (cleanupMakePathsRelative.isSelected()) {
@@ -94,6 +94,6 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES);
         }
 
-        return Optional.of(new CleanupPreferences(activeJobs));
+        return new CleanupPreferences(activeJobs);
     }
 }

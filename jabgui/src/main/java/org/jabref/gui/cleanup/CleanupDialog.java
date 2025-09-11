@@ -38,7 +38,7 @@ public class CleanupDialog extends BaseDialog<CleanupPreferences> {
             if (button.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                 Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
                 CleanupPanel panel = (CleanupPanel) selectedTab.getContent();
-                return panel.getCleanupPreferences().orElse(null);
+                return panel.getCleanupPreferences();
             } else {
                 return null;
             }

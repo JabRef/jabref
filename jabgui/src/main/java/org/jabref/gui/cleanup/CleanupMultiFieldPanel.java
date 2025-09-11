@@ -2,7 +2,6 @@ package org.jabref.gui.cleanup;
 
 import java.util.EnumSet;
 import java.util.Objects;
-import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -72,7 +71,7 @@ public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
     }
 
     @Override
-    public Optional<CleanupPreferences> getCleanupPreferences() {
+    public CleanupPreferences getCleanupPreferences() {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
 
         if (cleanupDOI.isSelected()) {
@@ -97,6 +96,6 @@ public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
         }
 
-        return Optional.of(new CleanupPreferences(activeJobs));
+        return new CleanupPreferences(activeJobs);
     }
 }
