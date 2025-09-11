@@ -1,8 +1,10 @@
 package org.jabref.cli;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
@@ -13,7 +15,8 @@ import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 
 import picocli.CommandLine;
 
@@ -83,7 +86,7 @@ class CheckIntegrity implements Callable<Integer> {
 
         return switch (outputFormat.toLowerCase(Locale.ROOT)) {
             case "errorformat" ->
-                    outputErrorFormat(messages);
+                    outputErrorFormat(messages, parserResult.get());
             case "txt" ->
                     outputTxt(messages);
             case "csv" ->
@@ -114,9 +117,11 @@ class CheckIntegrity implements Callable<Integer> {
         return 0;
     }
 
-    private int outputErrorFormat(List<IntegrityMessage> messages) {
+    private int outputErrorFormat(List<IntegrityMessage> messages, ParserResult parserResult) {
         for (IntegrityMessage message : messages) {
-            BibEntry.FieldRange fieldRange = message.entry().getFieldRangeFromField(message.field());
+            Map<Field, ParserResult.Range> fieldRangeMap = parserResult.getFieldRanges().getOrDefault(message.entry(), new HashMap<>());
+            ParserResult.Range fieldRange = fieldRangeMap.getOrDefault(message.field(), fieldRangeMap.getOrDefault(InternalField.KEY_FIELD, parserResult.getArticleRanges().getOrDefault(message.entry(), ParserResult.Range.getNullRange())));
+
             System.out.printf("%s:%d:%d: %s\n".formatted(
                     inputFile,
                     fieldRange.startLine(),

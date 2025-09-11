@@ -3,8 +3,10 @@ package org.jabref.logic.importer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -14,6 +16,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.MetaData;
 
 public class ParserResult {
@@ -24,6 +27,9 @@ public class ParserResult {
     private Path file;
     private boolean invalid;
     private boolean changedOnMigration = false;
+
+    private final Map<BibEntry, Range> articleRanges = new HashMap<>();
+    private final Map<BibEntry, Map<Field, Range>> fieldRanges = new HashMap<>();
 
     public ParserResult() {
         this(List.of());
@@ -146,5 +152,19 @@ public class ParserResult {
 
     public void setChangedOnMigration(boolean wasChangedOnMigration) {
         this.changedOnMigration = wasChangedOnMigration;
+    }
+
+    public Map<BibEntry, Map<Field, Range>> getFieldRanges() {
+        return fieldRanges;
+    }
+
+    public Map<BibEntry, Range> getArticleRanges() {
+        return articleRanges;
+    }
+
+    public record Range(int startLine, int startColumn, int endLine, int endColumn) {
+        public static Range getNullRange() {
+            return new Range(0, 0, 0, 0);
+        }
     }
 }

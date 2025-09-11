@@ -130,14 +130,6 @@ public class BibEntry {
      */
     private boolean changed;
 
-    private int startLine = -1;
-    private int endLine = -1;
-
-    private int startColumn = -1;
-    private int endColumn = -1;
-
-    private final Map<Field, FieldRange> fieldRanges = new HashMap<>();
-
     /**
      * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
      */
@@ -1293,51 +1285,5 @@ public class BibEntry {
             return true;
         }
         return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());
-    }
-
-    public int getStartLine() {
-        return startLine;
-    }
-
-    public void setStartLine(int startLine) {
-        this.startLine = startLine;
-    }
-
-    public int getEndLine() {
-        return endLine;
-    }
-
-    public void setEndLine(int endLine) {
-        this.endLine = endLine;
-    }
-
-    public int getStartColumn() {
-        return startColumn;
-    }
-
-    public void setStartColumn(int startColumn) {
-        this.startColumn = startColumn;
-    }
-
-    public int getEndColumn() {
-        return endColumn;
-    }
-
-    public void setEndColumn(int endColumn) {
-        this.endColumn = endColumn;
-    }
-
-    public Map<Field, FieldRange> getFieldRanges() {
-        return fieldRanges;
-    }
-
-    public FieldRange getFieldRangeFromField(Field field) {
-        return fieldRanges.getOrDefault(field, fieldRanges.getOrDefault(field.getAlias().orElse(InternalField.KEY_FIELD), FieldRange.getNullRange()));
-    }
-
-    public record FieldRange(int startLine, int startColumn, int endLine, int endColumn) {
-        public static FieldRange getNullRange() {
-            return new FieldRange(0, 0, 0, 0);
-        }
     }
 }

@@ -694,8 +694,8 @@ public class BibtexParser implements Parser {
     private BibEntry parseEntry(String entryType) throws IOException {
         BibEntry result = new BibEntry(EntryTypeFactory.parse(entryType));
 
-        result.setStartLine(line);
-        result.setStartColumn(column);
+        int articleStartLine = line;
+        int articleStartColumn = column;
 
         skipWhitespace();
         consume('{', '(');
@@ -706,7 +706,10 @@ public class BibtexParser implements Parser {
         int keyStartLine = line;
         int keyStartColumn = column;
         String key = parseKey();
-        result.getFieldRanges().put(InternalField.KEY_FIELD, new BibEntry.FieldRange(keyStartLine, keyStartColumn, line, column));
+
+        ParserResult.Range keyRange = new ParserResult.Range(keyStartLine, keyStartColumn, line, column);
+        parserResult.getFieldRanges().computeIfAbsent(result, _ -> new HashMap<>()).put(InternalField.KEY_FIELD, keyRange);
+
         result.setCitationKey(key);
         skipWhitespace();
 
@@ -734,8 +737,7 @@ public class BibtexParser implements Parser {
         // Consume new line which signals end of entry
         skipOneNewline();
 
-        result.setEndLine(line);
-        result.setEndColumn(column);
+        parserResult.getArticleRanges().put(result, new ParserResult.Range(articleStartLine, articleStartColumn, line, column));
         return result;
     }
 
@@ -795,8 +797,8 @@ public class BibtexParser implements Parser {
                 }
             }
         }
-
-        entry.getFieldRanges().put(field, new BibEntry.FieldRange(startLine, startColumn, line, column));
+        ParserResult.Range keyRange = new ParserResult.Range(startLine, startColumn, line, column);
+        parserResult.getFieldRanges().computeIfAbsent(entry, _ -> new HashMap<>()).put(field, keyRange);
     }
 
     private String parseFieldContent(Field field) throws IOException {
