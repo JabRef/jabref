@@ -3,6 +3,7 @@ package org.jabref.gui.edit.automaticfiededitor.clearcontent;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
@@ -26,19 +27,10 @@ public class ClearContentViewModel {
     }
 
     public Set<Field> getSetFieldsOnly() {
-        List<BibEntry> selected = stateManager.getSelectedEntries();
-        Set<Field> setFields = new LinkedHashSet<>();
-
-        for (BibEntry entry : selected) {
-            for (Field f : entry.getFields()) {
-                entry.getField(f).ifPresent(val -> {
-                    if (!val.isBlank()) {
-                        setFields.add(f);
-                    }
-                });
-            }
-        }
-        return setFields;
+        return stateManager.getSelectedEntries().stream()
+                           .flatMap(entry -> entry.getFields().stream()
+                           .filter(f -> entry.getField(f).isPresent() && !entry.getField(f).get().isBlank()))
+                           .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public void clearField(Field field) {
@@ -51,9 +43,8 @@ public class ClearContentViewModel {
 
         List<BibEntry> selected = stateManager.getSelectedEntries();
         for (BibEntry entry : selected) {
-            // clearField returns Optional<FieldChange>
             entry.clearField(field).ifPresent((FieldChange change) -> {
-                edits.addEdit(new UndoableFieldChange(change)); // Wrap into UndoableEdit
+                edits.addEdit(new UndoableFieldChange(change));
             });
         }
 
