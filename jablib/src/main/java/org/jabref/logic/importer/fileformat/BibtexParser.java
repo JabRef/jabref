@@ -7,6 +7,7 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Deque;
@@ -19,7 +20,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Stack;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -107,7 +107,7 @@ public class BibtexParser implements Parser {
     private int column = 1;
     // Stores the last read column of the highest column number encountered on any line so far.
     // In basic JDK data structures, there is no size-limited stack. We did not want to include Apache Commons Collections only for "CircularFifoBuffer"
-    private Deque<Integer> highestColumns = ;
+    private final Deque<Integer> highestColumns = new ArrayDeque<>();
 
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;

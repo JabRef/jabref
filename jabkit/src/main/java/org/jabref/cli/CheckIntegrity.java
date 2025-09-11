@@ -59,6 +59,7 @@ class CheckIntegrity implements Callable<Integer> {
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Checking integrity of '%0'.", inputFile));
+            System.out.flush();
         }
 
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
