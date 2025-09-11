@@ -1,23 +1,28 @@
 package org.jabref.cli;
 
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.jabref.cli.converter.CygWinPathConverter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.integrity.IntegrityCheck;
+import org.jabref.logic.integrity.IntegrityCheckResultCsvWriter;
+import org.jabref.logic.integrity.IntegrityCheckResultErrorFormatWriter;
+import org.jabref.logic.integrity.IntegrityCheckResultTxtWriter;
+import org.jabref.logic.integrity.IntegrityCheckResultWriter;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
@@ -27,6 +32,8 @@ import static picocli.CommandLine.Parameters;
 
 @Command(name = "check-integrity", description = "Check integrity of the database.")
 class CheckIntegrity implements Callable<Integer> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckIntegrity.class);
 
     @CommandLine.ParentCommand
     private ArgumentProcessor argumentProcessor;
@@ -75,58 +82,29 @@ class CheckIntegrity implements Callable<Integer> {
                 allowIntegerEdition
         );
 
-        List<IntegrityMessage> messages = databaseContext.getEntries().stream()
-                                                         .flatMap(entry -> {
-                                                             if (!sharedOptions.porcelain) {
-                                                                 System.out.println(Localization.lang("Checking integrity of '%0'.", entry.getCitationKey().orElse("")));
-                                                             }
-                                                             return integrityCheck.checkEntry(entry).stream();
-                                                         })
-                                                         .toList();
+        List<IntegrityMessage> messages = integrityCheck.checkDatabase(databaseContext.getDatabase());
 
-        return switch (outputFormat.toLowerCase(Locale.ROOT)) {
+        Writer writer = new OutputStreamWriter(System.out);
+        IntegrityCheckResultWriter checkResultWriter;
+        switch (outputFormat.toLowerCase(Locale.ROOT)) {
             case "errorformat" ->
-                    outputErrorFormat(messages, parserResult.get());
+                    checkResultWriter = new IntegrityCheckResultErrorFormatWriter(writer, messages, parserResult.get(), inputFile);
             case "txt" ->
-                    outputTxt(messages);
+                    checkResultWriter = new IntegrityCheckResultTxtWriter(writer, messages);
             case "csv" ->
-                    outputCsv(messages);
+                    checkResultWriter = new IntegrityCheckResultCsvWriter(writer, messages);
             default -> {
                 System.out.println(Localization.lang("Unknown output format '%0'.", outputFormat));
-                yield 3;
+                return 3;
             }
-        };
-    }
-
-    private int outputCsv(List<IntegrityMessage> messages) {
-        System.out.println("Citation Key,Field,Message");
-        for (IntegrityMessage message : messages) {
-            String citationKey = message.entry().getCitationKey().orElse("");
-            String field = message.field() != null ? message.field().getDisplayName() : "";
-            String msg = message.message().replace("\"", "\\\"");
-            if (msg.contains(",")) {
-                msg = "\"" + msg + "\"";
-            }
-            System.out.printf("%s,%s,%s%n", citationKey, field, msg);
         }
-        return 0;
-    }
 
-    private int outputTxt(List<IntegrityMessage> messages) {
-        messages.forEach(System.out::println);
-        return 0;
-    }
-
-    private int outputErrorFormat(List<IntegrityMessage> messages, ParserResult parserResult) {
-        for (IntegrityMessage message : messages) {
-            Map<Field, ParserResult.Range> fieldRangeMap = parserResult.getFieldRanges().getOrDefault(message.entry(), new HashMap<>());
-            ParserResult.Range fieldRange = fieldRangeMap.getOrDefault(message.field(), fieldRangeMap.getOrDefault(InternalField.KEY_FIELD, parserResult.getArticleRanges().getOrDefault(message.entry(), ParserResult.Range.getNullRange())));
-
-            System.out.printf("%s:%d:%d: %s\n".formatted(
-                    inputFile,
-                    fieldRange.startLine(),
-                    fieldRange.startColumn(),
-                    message.message()));
+        try {
+            checkResultWriter.writeFindings();
+            writer.flush();
+        } catch (IOException e) {
+            LOGGER.error("Error writing results", e);
+            return 2;
         }
         return 0;
     }
