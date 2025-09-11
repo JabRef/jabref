@@ -1,4 +1,3 @@
-import org.gradle.api.internal.artifacts.dsl.dependencies.DependenciesExtensionModule.module
 
 plugins {
     id("org.gradlex.extra-java-module-info")
