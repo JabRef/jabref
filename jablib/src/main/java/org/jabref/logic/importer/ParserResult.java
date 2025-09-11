@@ -168,5 +168,4 @@ public class ParserResult {
             return new Range(0, 0, 0, 0);
         }
     }
-
 }
