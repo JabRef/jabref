@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -28,8 +29,8 @@ public class ParserResult {
     private boolean invalid;
     private boolean changedOnMigration = false;
 
-    private final Map<BibEntry, Range> articleRanges = new HashMap<>();
-    private final Map<BibEntry, Map<Field, Range>> fieldRanges = new HashMap<>();
+    private final Map<BibEntry, Range> articleRanges = new IdentityHashMap<>();
+    private final Map<BibEntry, Map<Field, Range>> fieldRanges = new IdentityHashMap<>();
 
     public ParserResult() {
         this(List.of());
@@ -167,4 +168,5 @@ public class ParserResult {
             return new Range(0, 0, 0, 0);
         }
     }
+
 }
