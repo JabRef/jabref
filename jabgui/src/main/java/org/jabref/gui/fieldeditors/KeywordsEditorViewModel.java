@@ -68,12 +68,12 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
                     LOGGER.debug("Keyword is null");
                     return "";
                 }
-                return keyword.get();
+                return keyword.toString();
             }
 
             @Override
             public Keyword fromString(String keywordString) {
-                return new Keyword(keywordString);
+                return Keyword.of(keywordString.split(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString()));
             }
         };
     }
