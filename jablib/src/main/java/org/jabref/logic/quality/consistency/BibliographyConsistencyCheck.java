@@ -76,6 +76,11 @@ public class BibliographyConsistencyCheck {
     @VisibleForTesting
     List<BibEntry> filterAndSortEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> requiredFields) {
         return entries.stream()
+                      .filter(entry -> {
+                          boolean hasOneDifferingFieldSet = differingFields.stream().anyMatch(entry::hasField);
+                          boolean hasOneMissingField = requiredFields.stream().anyMatch(field -> !entry.hasField(field));
+                          return (hasOneMissingField || hasOneDifferingFieldSet);
+                      })
                       .sorted(new FieldComparatorStack<>(List.of(
                               new BibEntryByCitationKeyComparator(),
                               new BibEntryByFieldsComparator()
