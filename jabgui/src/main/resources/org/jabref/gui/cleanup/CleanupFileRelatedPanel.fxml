@@ -17,12 +17,12 @@
             <Insets left="20.0" />
         </VBox.margin>
         <CheckBox fx:id="cleanUpUpgradeExternalLinks" />
-        <CheckBox fx:id="cleanUpMovePDF" />
+        <CheckBox fx:id="cleanUpMovePdf" />
         <CheckBox fx:id="cleanUpMakePathsRelative" text="%Make paths of linked files relative (if possible)" />
-        <CheckBox fx:id="cleanUpRenamePDF" text="%Rename files to configured filename format pattern" />
+        <CheckBox fx:id="cleanUpRenamePdf" text="%Rename files to configured filename format pattern" />
         <VBox prefHeight="40.0" prefWidth="451.0" spacing="10.0">
-            <Label fx:id="cleanupRenamePDFLabel" />
-            <CheckBox fx:id="cleanUpRenamePDFonlyRelativePaths" text="%Only rename files that have a relative path" />
+            <Label fx:id="cleanupRenamePdfLabel" />
+            <CheckBox fx:id="cleanUpRenamePdfonlyRelativePaths" text="%Only rename files that have a relative path" />
             <VBox.margin>
                 <Insets left="20.0" />
             </VBox.margin>

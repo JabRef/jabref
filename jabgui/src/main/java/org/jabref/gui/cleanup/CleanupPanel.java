@@ -1,7 +1,9 @@
 package org.jabref.gui.cleanup;
 
+import java.util.Optional;
+
 import org.jabref.logic.cleanup.CleanupPreferences;
 
 public interface CleanupPanel {
-    CleanupPreferences getCleanupPreferences();
+    Optional<CleanupPreferences> getCleanupPreferences();
 }

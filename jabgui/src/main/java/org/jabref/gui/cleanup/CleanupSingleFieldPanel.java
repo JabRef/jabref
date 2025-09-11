@@ -1,5 +1,8 @@
 package org.jabref.gui.cleanup;
 
+import java.util.Objects;
+import java.util.Optional;
+
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
@@ -15,6 +18,8 @@ public class CleanupSingleFieldPanel extends VBox implements CleanupPanel {
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
     public CleanupSingleFieldPanel(CleanupPreferences cleanupPreferences) {
+        Objects.requireNonNull(cleanupPreferences, "cleanupPreferences must not be null");
+
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -30,11 +35,11 @@ public class CleanupSingleFieldPanel extends VBox implements CleanupPanel {
     }
 
     @Override
-    public CleanupPreferences getCleanupPreferences() {
+    public Optional<CleanupPreferences> getCleanupPreferences() {
         FieldFormatterCleanups fieldFormatterCleanups = new FieldFormatterCleanups(
                 !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
                 formatterCleanupsPanel.cleanupsProperty()
         );
-        return new CleanupPreferences(fieldFormatterCleanups);
+        return Optional.of(new CleanupPreferences(fieldFormatterCleanups));
     }
 }

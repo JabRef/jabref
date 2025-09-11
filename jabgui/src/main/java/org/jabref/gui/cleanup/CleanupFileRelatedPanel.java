@@ -2,6 +2,7 @@ package org.jabref.gui.cleanup;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
@@ -19,17 +20,18 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
 
-    @FXML private Label cleanupRenamePDFLabel;
+    @FXML private Label cleanupRenamePdfLabel;
 
-    @FXML private CheckBox cleanUpMovePDF;
+    @FXML private CheckBox cleanUpMovePdf;
     @FXML private CheckBox cleanUpMakePathsRelative;
-    @FXML private CheckBox cleanUpRenamePDF;
-    @FXML private CheckBox cleanUpRenamePDFonlyRelativePaths;
+    @FXML private CheckBox cleanUpRenamePdf;
+    @FXML private CheckBox cleanUpRenamePdfonlyRelativePaths;
     @FXML private CheckBox cleanUpDeletedFiles;
     @FXML private CheckBox cleanUpUpgradeExternalLinks;
 
     public CleanupFileRelatedPanel(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
-        // Load FXML
+        Objects.requireNonNull(cleanupPreferences, "cleanupPreferences must not be null");
+
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -40,45 +42,45 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
     private void init(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
         Optional<Path> firstExistingDir = databaseContext.getFirstExistingFileDir(filePreferences);
         if (firstExistingDir.isPresent()) {
-            cleanUpMovePDF.setText(Localization.lang("Move linked files to default file directory %0", firstExistingDir.get().toString()));
+            cleanUpMovePdf.setText(Localization.lang("Move linked files to default file directory %0", firstExistingDir.get().toString()));
         } else {
-            cleanUpMovePDF.setText(Localization.lang("Move linked files to default file directory %0", "..."));
+            cleanUpMovePdf.setText(Localization.lang("Move linked files to default file directory %0", "..."));
 
             // Since the directory does not exist, we cannot move it to there. So, this option is not checked - regardless of the presets stored in the preferences.
-            cleanUpMovePDF.setDisable(true);
-            cleanUpMovePDF.setSelected(false);
+            cleanUpMovePdf.setDisable(true);
+            cleanUpMovePdf.setSelected(false);
         }
 
-        cleanUpRenamePDFonlyRelativePaths.disableProperty().bind(cleanUpRenamePDF.selectedProperty().not());
+        cleanUpRenamePdfonlyRelativePaths.disableProperty().bind(cleanUpRenamePdf.selectedProperty().not());
 
         cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
 
         String currentPattern = Localization.lang("Filename format pattern (from preferences)")
                                             .concat(filePreferences.getFileNamePattern());
-        cleanupRenamePDFLabel.setText(currentPattern);
+        cleanupRenamePdfLabel.setText(currentPattern);
 
         updateDisplay(cleanupPreferences);
     }
 
     private void updateDisplay(CleanupPreferences preset) {
-        if (!cleanUpMovePDF.isDisabled()) {
-            cleanUpMovePDF.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MOVE_PDF));
+        if (!cleanUpMovePdf.isDisabled()) {
+            cleanUpMovePdf.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MOVE_PDF));
         }
         cleanUpMakePathsRelative.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE));
-        cleanUpRenamePDF.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF));
-        cleanUpRenamePDFonlyRelativePaths.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
+        cleanUpRenamePdf.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF));
+        cleanUpRenamePdfonlyRelativePaths.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
         cleanUpUpgradeExternalLinks.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
         cleanUpDeletedFiles.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES));
     }
 
-    public CleanupPreferences getCleanupPreferences() {
+    public Optional<CleanupPreferences> getCleanupPreferences() {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
 
         if (cleanUpMakePathsRelative.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE);
         }
-        if (cleanUpRenamePDF.isSelected()) {
-            if (cleanUpRenamePDFonlyRelativePaths.isSelected()) {
+        if (cleanUpRenamePdf.isSelected()) {
+            if (cleanUpRenamePdfonlyRelativePaths.isSelected()) {
                 activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
             } else {
                 activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF);
@@ -91,6 +93,6 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES);
         }
 
-        return new CleanupPreferences(activeJobs);
+        return Optional.of(new CleanupPreferences(activeJobs));
     }
 }

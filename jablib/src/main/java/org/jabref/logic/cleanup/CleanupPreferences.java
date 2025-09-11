@@ -92,11 +92,13 @@ public class CleanupPreferences {
             }
         );
 
+        FieldFormatterCleanups mergedFormatters =
+                Optional.ofNullable(tabPreferences.getFieldFormatterCleanups())
+                        .filter(ff -> !ff.getConfiguredActions().isEmpty())
+                        .orElse(getFieldFormatterCleanups());
+
         return new CleanupPreferences(
-                mergedJobs,
-                tabPreferences.getFieldFormatterCleanups() != null
-                        ? tabPreferences.getFieldFormatterCleanups()
-                        : getFieldFormatterCleanups()
+                mergedJobs, mergedFormatters
         );
     }
 
