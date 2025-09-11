@@ -33,14 +33,9 @@ public class ClearContentViewModel {
     }
 
     public void clearField(Field field) {
-        if (field == null) {
-            return;
-        }
-
         NamedCompound edits = new NamedCompound("Clear field content");
-        int affected = 0;
-
         List<BibEntry> selected = stateManager.getSelectedEntries();
+
         for (BibEntry entry : selected) {
             entry.clearField(field).ifPresent(change ->
                 edits.addEdit(new UndoableFieldChange(change))
