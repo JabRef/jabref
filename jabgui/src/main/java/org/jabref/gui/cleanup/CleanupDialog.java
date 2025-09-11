@@ -1,7 +1,5 @@
 package org.jabref.gui.cleanup;
 
-import java.util.Optional;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Tab;
@@ -15,7 +13,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class CleanupDialog extends BaseDialog<Optional<CleanupPreferences>> {
+public class CleanupDialog extends BaseDialog<CleanupPreferences> {
 
     @FXML private TabPane tabPane;
 
@@ -40,9 +38,9 @@ public class CleanupDialog extends BaseDialog<Optional<CleanupPreferences>> {
             if (button.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                 Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
                 CleanupPanel panel = (CleanupPanel) selectedTab.getContent();
-                return panel.getCleanupPreferences();
+                return panel.getCleanupPreferences().orElse(null);
             } else {
-                return Optional.empty();
+                return null;
             }
         });
     }
