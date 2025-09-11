@@ -13,13 +13,13 @@ import org.jabref.logic.cleanup.CleanupPreferences;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
-    @FXML private CheckBox cleanUpDOI;
-    @FXML private CheckBox cleanUpEprint;
-    @FXML private CheckBox cleanUpURL;
-    @FXML private CheckBox cleanUpBiblatex;
-    @FXML private CheckBox cleanUpBibtex;
-    @FXML private CheckBox cleanUpTimestampToCreationDate;
-    @FXML private CheckBox cleanUpTimestampToModificationDate;
+    @FXML private CheckBox cleanupDOI;
+    @FXML private CheckBox cleanupEprint;
+    @FXML private CheckBox cleanupURL;
+    @FXML private CheckBox cleanupBiblatex;
+    @FXML private CheckBox cleanupBibtex;
+    @FXML private CheckBox cleanupTimestampToCreationDate;
+    @FXML private CheckBox cleanupTimestampToModificationDate;
 
     public CleanupMultiFieldPanel(CleanupPreferences cleanupPreferences) {
         Objects.requireNonNull(cleanupPreferences, "cleanupPreferences must not be null");
@@ -32,68 +32,68 @@ public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
     }
 
     private void init(CleanupPreferences cleanupPreferences) {
-        cleanUpBibtex.selectedProperty().addListener(
+        cleanupBibtex.selectedProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue) {
-                        cleanUpBiblatex.selectedProperty().setValue(false);
+                        cleanupBiblatex.selectedProperty().setValue(false);
                     }
                 });
-        cleanUpBiblatex.selectedProperty().addListener(
+        cleanupBiblatex.selectedProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue) {
-                        cleanUpBibtex.selectedProperty().setValue(false);
+                        cleanupBibtex.selectedProperty().setValue(false);
                     }
                 });
 
-        cleanUpTimestampToCreationDate.selectedProperty().addListener(
+        cleanupTimestampToCreationDate.selectedProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue) {
-                        cleanUpTimestampToModificationDate.selectedProperty().setValue(false);
+                        cleanupTimestampToModificationDate.selectedProperty().setValue(false);
                     }
                 });
-        cleanUpTimestampToModificationDate.selectedProperty().addListener(
+        cleanupTimestampToModificationDate.selectedProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue) {
-                        cleanUpTimestampToCreationDate.selectedProperty().setValue(false);
+                        cleanupTimestampToCreationDate.selectedProperty().setValue(false);
                     }
                 });
         updateDisplay(cleanupPreferences);
     }
 
     private void updateDisplay(CleanupPreferences preset) {
-        cleanUpDOI.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));
-        cleanUpEprint.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));
-        cleanUpURL.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_URL));
-        cleanUpBiblatex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX));
-        cleanUpBibtex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
-        cleanUpTimestampToCreationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
-        cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
-        cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
+        cleanupDOI.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));
+        cleanupEprint.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));
+        cleanupURL.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_URL));
+        cleanupBiblatex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX));
+        cleanupBibtex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
+        cleanupTimestampToCreationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
+        cleanupTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
+        cleanupTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
     }
 
     @Override
     public Optional<CleanupPreferences> getCleanupPreferences() {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
 
-        if (cleanUpDOI.isSelected()) {
+        if (cleanupDOI.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DOI);
         }
-        if (cleanUpEprint.isSelected()) {
+        if (cleanupEprint.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEANUP_EPRINT);
         }
-        if (cleanUpURL.isSelected()) {
+        if (cleanupURL.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_URL);
         }
-        if (cleanUpBiblatex.isSelected()) {
+        if (cleanupBiblatex.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX);
         }
-        if (cleanUpBibtex.isSelected()) {
+        if (cleanupBibtex.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX);
         }
-        if (cleanUpTimestampToCreationDate.isSelected()) {
+        if (cleanupTimestampToCreationDate.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE);
         }
-        if (cleanUpTimestampToModificationDate.isSelected()) {
+        if (cleanupTimestampToModificationDate.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
         }
 

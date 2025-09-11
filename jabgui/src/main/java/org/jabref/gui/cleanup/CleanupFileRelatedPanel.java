@@ -22,12 +22,12 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
 
     @FXML private Label cleanupRenamePdfLabel;
 
-    @FXML private CheckBox cleanUpMovePdf;
-    @FXML private CheckBox cleanUpMakePathsRelative;
-    @FXML private CheckBox cleanUpRenamePdf;
-    @FXML private CheckBox cleanUpRenamePdfonlyRelativePaths;
-    @FXML private CheckBox cleanUpDeletedFiles;
-    @FXML private CheckBox cleanUpUpgradeExternalLinks;
+    @FXML private CheckBox cleanupMovePdf;
+    @FXML private CheckBox cleanupMakePathsRelative;
+    @FXML private CheckBox cleanupRenamePdf;
+    @FXML private CheckBox cleanupRenamePdfonlyRelativePaths;
+    @FXML private CheckBox cleanupDeletedFiles;
+    @FXML private CheckBox cleanupUpgradeExternalLinks;
 
     public CleanupFileRelatedPanel(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
         Objects.requireNonNull(databaseContext, "databaseContext must not be null");
@@ -44,17 +44,17 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
     private void init(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
         Optional<Path> firstExistingDir = databaseContext.getFirstExistingFileDir(filePreferences);
         if (firstExistingDir.isPresent()) {
-            cleanUpMovePdf.setText(Localization.lang("Move linked files to default file directory %0", firstExistingDir.get().toString()));
+            cleanupMovePdf.setText(Localization.lang("Move linked files to default file directory %0", firstExistingDir.get().toString()));
         } else {
-            cleanUpMovePdf.setText(Localization.lang("Move linked files to default file directory %0", "..."));
+            cleanupMovePdf.setText(Localization.lang("Move linked files to default file directory %0", "..."));
 
-            cleanUpMovePdf.setDisable(true);
-            cleanUpMovePdf.setSelected(false);
+            cleanupMovePdf.setDisable(true);
+            cleanupMovePdf.setSelected(false);
         }
 
-        cleanUpRenamePdfonlyRelativePaths.disableProperty().bind(cleanUpRenamePdf.selectedProperty().not());
+        cleanupRenamePdfonlyRelativePaths.disableProperty().bind(cleanupRenamePdf.selectedProperty().not());
 
-        cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
+        cleanupUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
 
         String currentPattern = Localization.lang("Filename format pattern (from preferences)")
                                             .concat(filePreferences.getFileNamePattern());
@@ -64,33 +64,33 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
     }
 
     private void updateDisplay(CleanupPreferences preset) {
-        if (!cleanUpMovePdf.isDisabled()) {
-            cleanUpMovePdf.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MOVE_PDF));
+        if (!cleanupMovePdf.isDisabled()) {
+            cleanupMovePdf.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MOVE_PDF));
         }
-        cleanUpMakePathsRelative.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE));
-        cleanUpRenamePdf.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF));
-        cleanUpRenamePdfonlyRelativePaths.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
-        cleanUpUpgradeExternalLinks.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
-        cleanUpDeletedFiles.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES));
+        cleanupMakePathsRelative.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE));
+        cleanupRenamePdf.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF));
+        cleanupRenamePdfonlyRelativePaths.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
+        cleanupUpgradeExternalLinks.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
+        cleanupDeletedFiles.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES));
     }
 
     public Optional<CleanupPreferences> getCleanupPreferences() {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
 
-        if (cleanUpMakePathsRelative.isSelected()) {
+        if (cleanupMakePathsRelative.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE);
         }
-        if (cleanUpRenamePdf.isSelected()) {
-            if (cleanUpRenamePdfonlyRelativePaths.isSelected()) {
+        if (cleanupRenamePdf.isSelected()) {
+            if (cleanupRenamePdfonlyRelativePaths.isSelected()) {
                 activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
             } else {
                 activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF);
             }
         }
-        if (cleanUpUpgradeExternalLinks.isSelected()) {
+        if (cleanupUpgradeExternalLinks.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
         }
-        if (cleanUpDeletedFiles.isSelected()) {
+        if (cleanupDeletedFiles.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES);
         }
 
