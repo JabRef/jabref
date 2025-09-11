@@ -9,7 +9,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -43,9 +42,9 @@ public class ClearContentViewModel {
 
         List<BibEntry> selected = stateManager.getSelectedEntries();
         for (BibEntry entry : selected) {
-            entry.clearField(field).ifPresent((FieldChange change) -> {
-                edits.addEdit(new UndoableFieldChange(change));
-            });
+            entry.clearField(field).ifPresent(change ->
+                edits.addEdit(new UndoableFieldChange(change))
+            );
         }
 
         if (edits.hasEdits()) {

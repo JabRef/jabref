@@ -37,15 +37,15 @@ public class ClearContentTabView extends AbstractAutomaticFieldEditorTabView imp
 
         fieldComboBox.setConverter(FIELD_STRING_CONVERTER);
 
-        fieldComboBox.getItems().setAll(viewModel.getAllFields().stream().toList());
+        fieldComboBox.getItems().setAll(viewModel.getAllFields());
 
         if (!fieldComboBox.getItems().isEmpty()) {
             fieldComboBox.getSelectionModel().selectFirst();
         }
         showOnlySetFieldsCheckBox.setOnAction(e -> {
             var items = showOnlySetFieldsCheckBox.isSelected()
-                    ? viewModel.getSetFieldsOnly().stream().toList()
-                    : viewModel.getAllFields().stream().toList();
+                    ? viewModel.getSetFieldsOnly()
+                    : viewModel.getAllFields();
             fieldComboBox.getItems().setAll(items);
             if (!items.isEmpty()) {
                 fieldComboBox.getSelectionModel().selectFirst();
