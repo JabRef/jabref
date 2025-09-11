@@ -15,34 +15,42 @@ class CleanupPreferencesTest {
 
     @BeforeEach
     void setUp() {
-        cleanupPreferences = new CleanupPreferences(
-                EnumSet.of(CleanupPreferences.CleanupStep.CLEAN_UP_DOI)
-        );
+        cleanupPreferences = new CleanupPreferences(EnumSet.of(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));
     }
 
     @Test
-    void updateWithReplacesStepsInSameCategory() {
-        CleanupPreferences update = new CleanupPreferences(
-                EnumSet.of(CleanupPreferences.CleanupStep.CLEANUP_EPRINT)
-        );
-
+    void updateWithReplacesStepsInSameCategory_RemovesOldStep() {
+        CleanupPreferences update = new CleanupPreferences(EnumSet.of(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));
         CleanupPreferences result = cleanupPreferences.updateWith(update);
         Set<CleanupPreferences.CleanupStep> activeJobs = result.getActiveJobs();
 
         assertFalse(activeJobs.contains(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));
+    }
+
+    @Test
+    void updateWithReplacesStepsInSameCategory_AddsNewStep() {
+        CleanupPreferences update = new CleanupPreferences(EnumSet.of(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));
+        CleanupPreferences result = cleanupPreferences.updateWith(update);
+        Set<CleanupPreferences.CleanupStep> activeJobs = result.getActiveJobs();
+
         assertTrue(activeJobs.contains(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));
     }
 
     @Test
-    void updateWithDifferentCategoryKeepsOtherJobs() {
-        CleanupPreferences update = new CleanupPreferences(
-                EnumSet.of(CleanupPreferences.CleanupStep.MOVE_PDF)
-        );
-
+    void updateWithDifferentCategory_KeepsOldStep() {
+        CleanupPreferences update = new CleanupPreferences(EnumSet.of(CleanupPreferences.CleanupStep.MOVE_PDF));
         CleanupPreferences result = cleanupPreferences.updateWith(update);
         Set<CleanupPreferences.CleanupStep> activeJobs = result.getActiveJobs();
 
         assertTrue(activeJobs.contains(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));
+    }
+
+    @Test
+    void updateWithDifferentCategory_AddsNewStep() {
+        CleanupPreferences update = new CleanupPreferences(EnumSet.of(CleanupPreferences.CleanupStep.MOVE_PDF));
+        CleanupPreferences result = cleanupPreferences.updateWith(update);
+        Set<CleanupPreferences.CleanupStep> activeJobs = result.getActiveJobs();
+
         assertTrue(activeJobs.contains(CleanupPreferences.CleanupStep.MOVE_PDF));
     }
 }
