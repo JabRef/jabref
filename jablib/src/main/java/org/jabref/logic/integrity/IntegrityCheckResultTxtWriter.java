@@ -12,9 +12,13 @@ public class IntegrityCheckResultTxtWriter extends IntegrityCheckResultWriter {
 
     @Override
     public void writeFindings() throws IOException {
-        messages.forEach(System.out::println);
+        for (IntegrityMessage message : messages) {
+            writer.write(message.toString());
+            writer.write(System.lineSeparator());
+        }
     }
 
     @Override
-    public void close() throws IOException { }
+    public void close() throws IOException {
+    }
 }

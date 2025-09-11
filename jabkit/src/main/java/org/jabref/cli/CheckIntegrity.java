@@ -28,7 +28,6 @@ import picocli.CommandLine;
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
-import static picocli.CommandLine.Parameters;
 
 @Command(name = "check-integrity", description = "Check integrity of the database.")
 class CheckIntegrity implements Callable<Integer> {
@@ -41,12 +40,14 @@ class CheckIntegrity implements Callable<Integer> {
     @Mixin
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
-    @Parameters(converter = CygWinPathConverter.class, description = "BibTeX file to check", arity = "1")
+    // [impl->req~jabkit.cli.input-flag~1]
+    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
     private Path inputFile;
 
     @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = "errorformat")
     private String outputFormat;
 
+    // in BibTeX it could be preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex()
     @Option(names = {"--allow-integer-edition"}, description = "Allows Integer edition: true or false", defaultValue = "true")
     private boolean allowIntegerEdition = true;
 

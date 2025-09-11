@@ -163,8 +163,6 @@ public class ParserResult {
     }
 
     public record Range(int startLine, int startColumn, int endLine, int endColumn) {
-        public static Range getNullRange() {
-            return new Range(0, 0, 0, 0);
-        }
+        public static final Range NULL_RANGE = new Range(0, 0, 0, 0);
     }
 }

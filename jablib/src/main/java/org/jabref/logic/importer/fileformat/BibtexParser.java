@@ -106,6 +106,7 @@ public class BibtexParser implements Parser {
     private int line = 1;
     private int column = 1;
     // Stores the last read column of the highest column number encountered on any line so far.
+    // The intended data structure is Stack, but it is not used because Java code style checkers complain.
     // In basic JDK data structures, there is no size-limited stack. We did not want to include Apache Commons Collections only for "CircularFifoBuffer"
     private final Deque<Integer> highestColumns = new ArrayDeque<>();
 

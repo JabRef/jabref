@@ -14,7 +14,7 @@ import org.jabref.model.entry.field.InternalField;
 public class IntegrityCheckResultErrorFormatWriter extends IntegrityCheckResultWriter {
 
     private final ParserResult parserResult;
-    private Path inputFile;
+    private final Path inputFile;
 
     public IntegrityCheckResultErrorFormatWriter(Writer writer, List<IntegrityMessage> messages, ParserResult parserResult, Path inputFile) {
         super(writer, messages);
@@ -26,9 +26,9 @@ public class IntegrityCheckResultErrorFormatWriter extends IntegrityCheckResultW
     public void writeFindings() throws IOException {
         for (IntegrityMessage message : messages) {
             Map<Field, ParserResult.Range> fieldRangeMap = parserResult.getFieldRanges().getOrDefault(message.entry(), new HashMap<>());
-            ParserResult.Range fieldRange = fieldRangeMap.getOrDefault(message.field(), fieldRangeMap.getOrDefault(InternalField.KEY_FIELD, parserResult.getArticleRanges().getOrDefault(message.entry(), ParserResult.Range.getNullRange())));
+            ParserResult.Range fieldRange = fieldRangeMap.getOrDefault(message.field(), fieldRangeMap.getOrDefault(InternalField.KEY_FIELD, parserResult.getArticleRanges().getOrDefault(message.entry(), ParserResult.Range.NULL_RANGE)));
 
-            System.out.printf("%s:%d:%d: %s\n".formatted(
+            writer.write("%s:%d:%d: %s\n".formatted(
                     inputFile,
                     fieldRange.startLine(),
                     fieldRange.startColumn(),
