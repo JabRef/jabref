@@ -1,4 +1,3 @@
-import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
     `kotlin-dsl`
