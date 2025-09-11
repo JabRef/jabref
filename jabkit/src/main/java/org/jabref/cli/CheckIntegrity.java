@@ -1,10 +1,12 @@
 package org.jabref.cli;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
+import org.jabref.cli.converter.CygWinPathConverter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.integrity.IntegrityMessage;
@@ -29,8 +31,8 @@ class CheckIntegrity implements Callable<Integer> {
     @Mixin
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
-    @Parameters(description = "BibTeX file to check", arity = "1")
-    private String inputFile;
+    @Parameters(converter = CygWinPathConverter.class, description = "BibTeX file to check", arity = "1")
+    private Path inputFile;
 
     @Option(names = {"--output-format"}, description = "Output format: errorformat, txt or csv", defaultValue = "errorformat")
     private String outputFormat;
