@@ -38,6 +38,11 @@ public class CleanupDialog extends BaseDialog<CleanupPreferences> {
             if (button.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                 Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
                 CleanupPanel panel = (CleanupPanel) selectedTab.getContent();
+                /*
+                 * Returning null here is intentional: indicates either user cancelled
+                 * the dialog or panel had no preferences selected. Dialog.showAndWait()
+                 * will return Optional.empty() if null.
+                 */
                 return panel.getCleanupPreferences().orElse(null);
             } else {
                 return null;

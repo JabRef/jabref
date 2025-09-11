@@ -73,11 +73,6 @@ public class CleanupPreferences {
         fieldFormatterCleanups.setValue(fieldFormatters);
     }
 
-    /*
-     * Categories are used to group CleanupSteps by tab type. This allows the updateWith()
-     * method to replace only the steps of the same category when merging preferences from
-     * a single tab, without affecting other categories.
-     */
     public CleanupPreferences updateWith(CleanupPreferences tabPreferences) {
         EnumSet<CleanupStep> mergedJobs = getActiveJobs();
 

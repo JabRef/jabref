@@ -46,7 +46,6 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
         } else {
             cleanUpMovePdf.setText(Localization.lang("Move linked files to default file directory %0", "..."));
 
-            // Since the directory does not exist, we cannot move it to there. So, this option is not checked - regardless of the presets stored in the preferences.
             cleanUpMovePdf.setDisable(true);
             cleanUpMovePdf.setSelected(false);
         }
