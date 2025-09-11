@@ -1,5 +1,7 @@
 package org.jabref.gui.cleanup;
 
+import java.util.Optional;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Tab;
@@ -13,7 +15,7 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class CleanupDialog extends BaseDialog<CleanupPreferences> {
+public class CleanupDialog extends BaseDialog<Optional<CleanupPreferences>> {
 
     @FXML private TabPane tabPane;
 
@@ -38,14 +40,9 @@ public class CleanupDialog extends BaseDialog<CleanupPreferences> {
             if (button.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
                 Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
                 CleanupPanel panel = (CleanupPanel) selectedTab.getContent();
-                /*
-                 * Returning null here is intentional: indicates either user cancelled
-                 * the dialog or panel had no preferences selected. Dialog.showAndWait()
-                 * will return Optional.empty() if null.
-                 */
-                return panel.getCleanupPreferences().orElse(null);
+                return panel.getCleanupPreferences();
             } else {
-                return null;
+                return Optional.empty();
             }
         });
     }

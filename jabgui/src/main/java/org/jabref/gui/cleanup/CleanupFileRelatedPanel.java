@@ -30,7 +30,9 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
     @FXML private CheckBox cleanUpUpgradeExternalLinks;
 
     public CleanupFileRelatedPanel(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
+        Objects.requireNonNull(databaseContext, "databaseContext must not be null");
         Objects.requireNonNull(cleanupPreferences, "cleanupPreferences must not be null");
+        Objects.requireNonNull(filePreferences, "filePreferences must not be null");
 
         ViewLoader.view(this)
                   .root(this)

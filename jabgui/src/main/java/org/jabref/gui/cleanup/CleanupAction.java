@@ -78,9 +78,9 @@ public class CleanupAction extends SimpleCommand {
                 preferences.getFilePreferences()
         );
 
-        Optional<CleanupPreferences> chosenPreset = dialogService.showCustomDialogAndWait(cleanupDialog);
+        Optional<Optional<CleanupPreferences>> chosenPreset = dialogService.showCustomDialogAndWait(cleanupDialog);
 
-        chosenPreset.ifPresent(preset -> {
+        chosenPreset.flatMap(p -> p).ifPresent(preset -> {
             if (preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF) && preferences.getAutoLinkPreferences().shouldAskAutoNamingPdfs()) {
                 boolean confirmed = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
                         Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
