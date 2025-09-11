@@ -1,7 +1,6 @@
 package org.jabref.logic.quality.consistency;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -77,11 +76,6 @@ public class BibliographyConsistencyCheck {
     @VisibleForTesting
     List<BibEntry> filterAndSortEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> requiredFields) {
         return entries.stream()
-                      .filter(entry ->
-                              // This removes entries that have all differing fields set (could be confusing to the user)
-                              !Collections.disjoint(entry.getFields(), differingFields)
-                                      // This ensures that all entries with missing required fields are included
-                                      || !entry.getFields().containsAll(requiredFields))
                       .sorted(new FieldComparatorStack<>(List.of(
                               new BibEntryByCitationKeyComparator(),
                               new BibEntryByFieldsComparator()
