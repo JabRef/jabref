@@ -217,12 +217,6 @@ open module org.jabref.jablib {
     requires jvm.openai;
     requires langchain4j;
     requires langchain4j.core;
-    requires langchain4j.http.client.jdk;
-    uses dev.langchain4j.http.client.jdk.JdkHttpClientBuilderFactory;
-    requires langchain4j.google.ai.gemini;
-    requires langchain4j.hugging.face;
-    requires langchain4j.mistral.ai;
-    requires langchain4j.open.ai;
     uses ai.djl.engine.EngineProvider;
     uses ai.djl.repository.RepositoryFactory;
     uses ai.djl.repository.zoo.ZooProvider;

@@ -1,3 +1,4 @@
+import org.gradle.api.internal.artifacts.dsl.dependencies.DependenciesExtensionModule.module
 
 plugins {
     id("org.gradlex.extra-java-module-info")
@@ -194,12 +195,19 @@ extraJavaModuleInfo {
     }
     module("dev.langchain4j:langchain4j", "langchain4j")
     module("dev.langchain4j:langchain4j-core", "langchain4j.core") {
-          exportAllPackages()
-          requireAllDefinedDependencies()
-          patchRealModule()
-        // This does not work when starting
-        // java.lang.module.ResolutionException: Module langchain4j.core does not read a module that exports dev.langchain4j.http.client.jdk
-         uses("dev.langchain4j.http.client.jdk.JdkHttpClientBuilderFactory")
+        // workaround for https://github.com/langchain4j/langchain4j/issues/3668
+        mergeJar("dev.langchain4j:langchain4j-http-client")
+        mergeJar("dev.langchain4j:langchain4j-http-client-jdk")
+        mergeJar("dev.langchain4j:langchain4j-hugging-face")
+        mergeJar("dev.langchain4j:langchain4j-mistral-ai")
+        mergeJar("dev.langchain4j:langchain4j-open-ai")
+        mergeJar("dev.langchain4j:langchain4j-google-ai-gemini")
+        requires("jtokkit")
+        requires("java.net.http")
+        uses("dev.langchain4j.http.client.HttpClientBuilderFactory")
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        patchRealModule()
     }
     module("dev.langchain4j:langchain4j-google-ai-gemini", "langchain4j.google.ai.gemini")
     module("dev.langchain4j:langchain4j-http-client", "langchain4j.http.client")

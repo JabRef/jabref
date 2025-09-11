@@ -18,8 +18,6 @@ dependencies {
     api("dev.langchain4j:langchain4j-hugging-face")
     api("dev.langchain4j:langchain4j-mistral-ai")
     api("dev.langchain4j:langchain4j-open-ai")
-    api("dev.langchain4j:langchain4j-http-client")
-    api("dev.langchain4j:langchain4j-http-client-jdk")
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.6.0"))
 }
 
