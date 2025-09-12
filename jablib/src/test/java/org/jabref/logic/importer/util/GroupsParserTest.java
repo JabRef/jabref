@@ -42,8 +42,8 @@ class GroupsParserTest {
         metaData = new MetaData();
     }
 
+    // For https://github.com/JabRef/jabref/issues/1681
     @Test
-        // For https://github.com/JabRef/jabref/issues/1681
     void fromStringParsesExplicitGroupWithEscapedCharacterInName() throws ParseException {
         ExplicitGroup expected = new ExplicitGroup("B{\\\"{o}}hmer", GroupHierarchyType.INDEPENDENT, ',');
         AbstractGroup parsed = GroupsParser.fromString("ExplicitGroup:B{\\\\\"{o}}hmer;0;", ',', fileMonitor, metaData, "userAndHost");
