@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  *
  * The file is parsed using by {@link StudyYamlParser}
  */
-@JsonPropertyOrder({"version", "authors", "title", "research-questions", "queries", "catalogues"})
+@JsonPropertyOrder({"version", "authors", "title", "research-questions", "queries", "catalogues", "metadata"})
 // The user might add arbitrary content to the YAML
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Study {
@@ -30,14 +30,25 @@ public class Study {
 
     private List<StudyQuery> queries;
 
-    private List<StudyDatabase> catalogues;
+    private List<StudyCatalog> catalogues;
 
-    public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyDatabase> catalogues) {
+    private StudyMetadata metadata;
+
+    public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogues) {
         this.authors = authors;
         this.title = title;
         this.researchQuestions = researchQuestions;
         this.queries = queryEntries;
         this.catalogues = catalogues;
+    }
+
+    public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogues, StudyMetadata metadata) {
+        this.authors = authors;
+        this.title = title;
+        this.researchQuestions = researchQuestions;
+        this.queries = queryEntries;
+        this.catalogues = catalogues;
+        this.metadata = metadata;
     }
 
     /**
@@ -70,11 +81,11 @@ public class Study {
         this.queries = queries;
     }
 
-    public List<StudyDatabase> getCatalogues() {
+    public List<StudyCatalog> getCatalogues() {
         return catalogues;
     }
 
-    public void setCatalogues(List<StudyDatabase> catalogues) {
+    public void setCatalogues(List<StudyCatalog> catalogues) {
         this.catalogues = catalogues;
     }
 
@@ -126,6 +137,14 @@ public class Study {
     @Override
     public int hashCode() {
         return Objects.hash(authors, title, researchQuestions, queries, catalogues);
+    }
+
+    public StudyMetadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(StudyMetadata metadata) {
+        this.metadata = metadata;
     }
 }
 

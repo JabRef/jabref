@@ -8,7 +8,7 @@ import org.jabref.gui.WorkspacePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.study.Study;
-import org.jabref.model.study.StudyDatabase;
+import org.jabref.model.study.StudyCatalog;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,8 +92,8 @@ class ManageStudyDefinitionViewModelTest {
     }
 
     private ManageStudyDefinitionViewModel getManageStudyDefinitionViewModel(Path tempDir) {
-        List<StudyDatabase> databases = List.of(
-                new StudyDatabase("ACM Portal", true));
+        List<StudyCatalog> databases = List.of(
+                new StudyCatalog("ACM Portal", true));
         Study study = new Study(
                 List.of("Name"),
                 "title",

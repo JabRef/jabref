@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.study.Study;
-import org.jabref.model.study.StudyDatabase;
+import org.jabref.model.study.StudyCatalog;
 import org.jabref.model.study.StudyQuery;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -33,8 +33,8 @@ class StudyYamlParserTest {
         String studyName = "TestStudyName";
         List<String> researchQuestions = List.of("Question1", "Question2");
         List<StudyQuery> queryEntries = List.of(new StudyQuery("Quantum"), new StudyQuery("Cloud Computing"), new StudyQuery("\"Software Engineering\""));
-        List<StudyDatabase> libraryEntries = List.of(new StudyDatabase("Springer", true), new StudyDatabase("ArXiv", true),
-                new StudyDatabase("Medline/PubMed", true), new StudyDatabase("IEEEXplore", false));
+        List<StudyCatalog> libraryEntries = List.of(new StudyCatalog("Springer", true), new StudyCatalog("ArXiv", true),
+                new StudyCatalog("Medline/PubMed", true), new StudyCatalog("IEEEXplore", false));
 
         expectedStudy = new Study(authors, studyName, researchQuestions, queryEntries, libraryEntries);
     }

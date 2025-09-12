@@ -34,7 +34,7 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
-import org.jabref.model.study.StudyDatabase;
+import org.jabref.model.study.StudyCatalog;
 import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -196,10 +196,10 @@ public class StudyRepository {
      * @return List of BibEntries of type Library
      * @throws IllegalArgumentException If a transformation from Library entry to LibraryDefinition fails
      */
-    public List<StudyDatabase> getActiveLibraryEntries() throws IllegalArgumentException {
+    public List<StudyCatalog> getActiveLibraryEntries() throws IllegalArgumentException {
         return study.getCatalogues()
                     .parallelStream()
-                    .filter(StudyDatabase::isEnabled)
+                    .filter(StudyCatalog::isEnabled)
                     .collect(Collectors.toList());
     }
 
