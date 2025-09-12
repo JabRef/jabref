@@ -57,10 +57,11 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private final FieldPreferences fieldPreferences;
     private final FileUpdateMonitor fileMonitor;
     private Optional<BibEntry> lastEntryChanged;
+    private final String userAndHost;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
                             FieldPreferences fieldPreferences,
-                            GlobalCitationKeyPatterns globalCiteKeyPattern, FileUpdateMonitor fileMonitor) {
+                            GlobalCitationKeyPatterns globalCiteKeyPattern, FileUpdateMonitor fileMonitor, String userAndHost) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
@@ -70,6 +71,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.keywordSeparator = keywordSeparator;
         this.globalCiteKeyPattern = Objects.requireNonNull(globalCiteKeyPattern);
         this.lastEntryChanged = Optional.empty();
+        this.userAndHost = userAndHost;
     }
 
     /**
@@ -267,7 +269,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         try {
             metaData.setEventPropagation(false);
             MetaDataParser parser = new MetaDataParser(fileMonitor);
-            parser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator);
+            parser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator, userAndHost);
             metaData.setEventPropagation(true);
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);

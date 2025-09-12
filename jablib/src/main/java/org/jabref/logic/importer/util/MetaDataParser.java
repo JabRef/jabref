@@ -93,8 +93,8 @@ public class MetaDataParser {
     /**
      * Parses the given data map and returns a new resulting {@link MetaData} instance.
      */
-    public MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
-        return parse(new MetaData(), data, keywordSeparator);
+    public MetaData parse(Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
+        return parse(new MetaData(), data, keywordSeparator, userAndHost);
     }
 
     /**
@@ -102,7 +102,7 @@ public class MetaDataParser {
      *
      * @return the given metaData instance (which is modified, too)
      */
-    public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
+    public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
         CitationKeyPattern defaultCiteKeyPattern = CitationKeyPattern.NULL_CITATION_KEY_PATTERN;
         Map<EntryType, CitationKeyPattern> nonDefaultCiteKeyPatterns = new HashMap<>();
 
@@ -146,7 +146,7 @@ public class MetaDataParser {
             } else if (MetaData.SAVE_ORDER_CONFIG.equals(entry.getKey())) {
                 metaData.setSaveOrder(SaveOrder.parse(values));
             } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {
-                metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData));
+                metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData, userAndHost));
             } else if (MetaData.GROUPS_SEARCH_SYNTAX_VERSION.equals(entry.getKey())) {
                 Version version = Version.parse(getSingleItem(values));
                 metaData.setGroupSearchSyntaxVersion(version);

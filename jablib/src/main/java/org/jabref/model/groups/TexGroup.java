@@ -1,7 +1,6 @@
 package org.jabref.model.groups;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -41,19 +40,15 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
         this.fileMonitor = fileMonitor;
     }
 
-    TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
-        this(name, context, filePath, auxParser, fileMonitor, metaData, System.getProperty("user.name") + '-' + InetAddress.getLocalHost().getHostName());
-    }
-
-    public static TexGroup create(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
-        TexGroup group = new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
+    public static TexGroup create(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, String userAndHost) throws IOException {
+        TexGroup group = new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData, userAndHost);
         fileMonitor.addListenerForFile(group.getFilePathResolved(), group);
         return group;
     }
 
     // without FileUpdateMonitor
-    public static TexGroup create(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, MetaData metaData) throws IOException {
-        return new TexGroup(name, context, filePath, auxParser, new DummyFileUpdateMonitor(), metaData);
+    public static TexGroup create(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, MetaData metaData, String userAndHost) throws IOException {
+        return new TexGroup(name, context, filePath, auxParser, new DummyFileUpdateMonitor(), metaData, userAndHost);
     }
 
     public Path getFilePathResolved() {
@@ -77,13 +72,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     @Override
     public AbstractGroup deepCopy() {
-        try {
-            return new TexGroup(name.getValue(), context, filePath, auxParser, fileMonitor, metaData);
-        } catch (IOException ex) {
-            // This should never happen because we were able to monitor the file just fine until now
-            LOGGER.error("Problem creating copy of group", ex);
-            return null;
-        }
+        return new TexGroup(name.getValue(), context, filePath, auxParser, fileMonitor, metaData, user);
     }
 
     @Override

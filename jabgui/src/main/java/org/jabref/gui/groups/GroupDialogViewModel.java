@@ -373,7 +373,9 @@ public class GroupDialogViewModel {
                         Path.of(texGroupFilePathProperty.getValue().trim()),
                         new DefaultAuxParser(new BibDatabase()),
                         fileUpdateMonitor,
-                        currentDatabase.getMetaData());
+                        currentDatabase.getMetaData(),
+                        preferences.getFilePreferences().getUserAndHost()
+                );
             }
 
             if (resultingGroup != null) {

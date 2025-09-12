@@ -259,7 +259,7 @@ public class FileUtil {
      * @param file The file to relativize, can be already relative or absolute
      * @param directories File directories to resolve against
      * @param baseDirForRelative Base directory for resolve a relative file path against first (e.g. "." )
-     * @return Relative path to the file, or the original file if it is already relative or thw
+     * @return Relative path to the file, or the original file if it is already relative or the file is
      */
     public static Path relativize(Path file, List<Path> directories, @Nullable Path baseDirForRelative) {
         if (!file.isAbsolute()) {
