@@ -16,7 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-      # Full history is preferred so create-pull-request can diff and commit
         uses: actions/checkout@v5
 
       - name: Set up JDK
