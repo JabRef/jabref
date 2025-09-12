@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added the integrity check to the jabkit cli application. [#13848](https://github.com/JabRef/jabref/issues/13848)
 - We added support for Cygwin-file paths on a Windows Operating System. [#13274](https://github.com/JabRef/jabref/issues/13274)
 - We fixed an issue where "Print preview" would throw a `NullPointerException` if no printers were available. [#13708](https://github.com/JabRef/jabref/issues/13708)
 - We added the option to enable the language server in the preferences. [#13697](https://github.com/JabRef/jabref/pull/13697)
@@ -132,6 +133,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where theme or font size are not respected for all dialogs [#13558](https://github.com/JabRef/jabref/issues/13558)
 - We removed unnecessary spacing and margin in the AutomaticFieldEditor. [#13792](https://github.com/JabRef/jabref/pull/13792)
 - We fixed an issue where global search auto-completion only worked after switching tabs. [#11428](https://github.com/JabRef/jabref/issues/11428)
+- We fixed an issue where hierarchical keywords would only show the parent keyword in the entry editor. [#11390](https://github.com/JabRef/jabref/issues/11390)
 
 ### Removed
 
