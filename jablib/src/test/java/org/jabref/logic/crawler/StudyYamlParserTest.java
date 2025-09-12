@@ -41,14 +41,14 @@ class StudyYamlParserTest {
 
     @Test
     void parseStudyFileSuccessfully() throws IOException {
-        Study study = new StudyYamlParser().parseStudyYamlFile(testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
+        Study study = new StudyYamlService().parseStudyYamlFile(testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
         assertEquals(expectedStudy, study);
     }
 
     @Test
     void writeStudyFileSuccessfully() throws IOException {
-        new StudyYamlParser().writeStudyYamlFile(expectedStudy, testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
-        Study study = new StudyYamlParser().parseStudyYamlFile(testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
+        new StudyYamlService().writeStudyYamlFile(expectedStudy, testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
+        Study study = new StudyYamlService().parseStudyYamlFile(testDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME));
         assertEquals(expectedStudy, study);
     }
 
@@ -58,8 +58,8 @@ class StudyYamlParserTest {
         // If the field is "just" removed from the datamodel, one gets following exception:
         //   com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException: Unrecognized field "last-search-date" (class org.jabref.model.study.Study), not marked as ignorable (5 known properties: "authors", "research-questions", "queries", "title", "databases"])
         // This tests ensures that this exception does not occur
-        URL studyDefinition = StudyYamlParser.class.getResource("study-jabref-5.7.yml");
-        Study study = new StudyYamlParser().parseStudyYamlFile(Path.of(studyDefinition.toURI()));
+        URL studyDefinition = StudyYamlService.class.getResource("study-jabref-5.7.yml");
+        Study study = new StudyYamlService().parseStudyYamlFile(Path.of(studyDefinition.toURI()));
         assertEquals(expectedStudy, study);
     }
 }
