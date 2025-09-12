@@ -112,8 +112,4 @@ public interface StateManager extends SrvStateManager {
     BooleanProperty canGoBackProperty();
 
     BooleanProperty canGoForwardProperty();
-
-    void updateNavigationState(boolean canGoBack, boolean canGoForward);
-
-    void clearNavigationHistory();
 }

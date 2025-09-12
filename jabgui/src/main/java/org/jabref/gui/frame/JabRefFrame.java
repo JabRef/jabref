@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -419,8 +420,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 // Listen for auto-completer changes after real context is loaded
                 libraryTab.setAutoCompleterChangedListener(() -> globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter()));
 
-                libraryTab.updateNavigationState();
-
                 // [impl->req~maintable.focus~1]
                 Platform.runLater(() -> libraryTab.getMainTable().requestFocus());
 
@@ -444,7 +443,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.setActiveDatabase(null);
                 stateManager.activeTabProperty().set(Optional.empty());
                 stateManager.setSelectedEntries(List.of());
-                stateManager.clearNavigationHistory();
                 mainStage.titleProperty().unbind();
                 mainStage.setTitle(FRAME_TITLE);
             }
@@ -463,6 +461,22 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // Hide tab bar
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
         EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
+
+        stateManager.canGoBackProperty().bind(
+                stateManager.activeTabProperty().flatMap(
+                        optionalTab -> optionalTab
+                                .map(LibraryTab::canGoBackProperty)
+                                .orElse(new SimpleBooleanProperty(false))
+                )
+        );
+
+        stateManager.canGoForwardProperty().bind(
+                stateManager.activeTabProperty().flatMap(
+                        optionalTab -> optionalTab
+                                .map(LibraryTab::canGoForwardProperty)
+                                .orElse(new SimpleBooleanProperty(false))
+                )
+        );
     }
 
     private void updateTabBarVisible() {

@@ -122,6 +122,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final List<BibEntry> previousEntries = new ArrayList<>();
     private final List<BibEntry> nextEntries = new ArrayList<>();
     private BibEntry currentlyShowing;
+    private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
     private boolean backOrForwardInProgress = false;
 
 
@@ -1037,9 +1039,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
      * Only update if this is the active tab
      */
     public void updateNavigationState() {
-        if (stateManager.activeTabProperty().get().filter(tab -> tab == this).isPresent()) {
-            stateManager.updateNavigationState(canGoBack(), canGoForward());
-        }
+        canGoBackProperty.set(canGoBack());
+        canGoForwardProperty.set(canGoForward());
     }
 
     /**
@@ -1110,6 +1111,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 clipBoardManager,
                 taskExecutor,
                 false);
+    }
+
+    public BooleanProperty canGoBackProperty() {
+        return canGoBackProperty;
+    }
+
+    public BooleanProperty canGoForwardProperty() {
+        return canGoForwardProperty;
     }
 
     private class GroupTreeListener {

@@ -319,18 +319,4 @@ public class JabRefGuiStateManager implements StateManager {
     public BooleanProperty canGoForwardProperty() {
         return canGoForward;
     }
-
-    @Override
-    public void updateNavigationState(boolean canGoBack, boolean canGoForward) {
-        this.canGoBack.set(canGoBack);
-        this.canGoForward.set(canGoForward);
-    }
-
-    /**
-     * Called when switching tabs to reset navigation state
-     */
-    @Override
-    public void clearNavigationHistory() {
-        updateNavigationState(false, false);
-    }
 }
