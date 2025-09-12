@@ -1,5 +1,7 @@
 package org.jabref.languageserver.util;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,10 +12,12 @@ import java.util.stream.Stream;
 import org.jabref.languageserver.ExtensionSettings;
 import org.jabref.languageserver.LspClientHandler;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -63,9 +67,9 @@ public class LspDiagnosticHandler {
     }
 
     private List<Diagnostic> computeDiagnostics(String content, String uri) {
-        BibDatabaseContext bibDatabaseContext;
+        ParserResult parserResult;
         try {
-            bibDatabaseContext = BibDatabaseContext.of(content, jabRefCliPreferences.getImportFormatPreferences());
+            parserResult = parserResultOfString(content, jabRefCliPreferences.getImportFormatPreferences());
         } catch (JabRefException e) {
             Diagnostic parseDiagnostic = LspDiagnosticBuilder.create(Localization.lang(
                     "Failed to parse entries.\nThe following error was encountered:\n%0",
@@ -74,12 +78,12 @@ public class LspDiagnosticHandler {
         }
 
         if (clientHandler.getSettings().isIntegrityCheck()) {
-            integrityDiagnosticsCache.put(uri, lspIntegrityCheck.check(bibDatabaseContext, content));
+            integrityDiagnosticsCache.put(uri, lspIntegrityCheck.check(parserResult));
             LOGGER.debug("Cached integrity diagnostics for {}", uri);
         }
 
         if (clientHandler.getSettings().isConsistencyCheck()) {
-            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(bibDatabaseContext, content));
+            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(parserResult));
             LOGGER.debug("Cached consistency diagnostics for {}", uri);
         }
 
@@ -101,5 +105,14 @@ public class LspDiagnosticHandler {
             List<Diagnostic> diagnostics = getFinalDiagnosticsList(uri);
             publishDiagnostics(client, uri, diagnostics);
         });
+    }
+
+    private ParserResult parserResultOfString(String content, ImportFormatPreferences importFormatPreferences) throws JabRefException {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        try {
+            return parser.parse(Reader.of(content));
+        } catch (IOException e) {
+            throw new JabRefException("Failed to parse BibTeX", e);
+        }
     }
 }
