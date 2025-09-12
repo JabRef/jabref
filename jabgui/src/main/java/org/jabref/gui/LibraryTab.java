@@ -503,8 +503,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             if (entries.size() == 1) {
                 newEntryShowing(entries.getFirst());
             } else if (entries.isEmpty()) {
-                // when no entries are selected, don't update navigation history
-                // but still update the navigation state
+                // an empty selection isn't a navigational step, so we don't alter the history list
+                // this avoids adding a "null" entry to the back/forward stack
+                // we just refresh the UI button states to ensure they are consistent with the latest history.
                 updateNavigationState();
             }
         });
