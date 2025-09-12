@@ -172,7 +172,7 @@ public class ParserResult {
         public static final Range NULL_RANGE = new Range(0, 0, 0, 0);
     }
 
-    /// returns the range of the field if it exists, respecting field alieasses with `NULL_RANGE` as fallback.
+    /// returns the range of the field if it exists, respecting field aliases with `NULL_RANGE` as fallback.
     public Range getFieldRangeOrFallback(BibEntry entry, Field field) {
         Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
 
@@ -185,20 +185,23 @@ public class ParserResult {
             return range;
         }
 
-        Field alias = field.getAlias().orElse(InternalField.KEY_FIELD);
-        range = rangeMap.get(alias);
-        if (range != null) {
-            return range;
+        Field alias = field.getAlias().get();
+        if (alias != null) {
+            range = rangeMap.get(alias);
+            if (range != null) {
+                return range;
+            }
         }
 
-        return articleRanges.getOrDefault(entry, Range.NULL_RANGE);
+        return getKeyRangeOrFallback(entry);
     }
 
     public Range getKeyRangeOrFallback(BibEntry entry) {
         Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
         Range range = rangeMap.get(InternalField.KEY_FIELD);
         if (range != null) {
-            return range;
+            // this ensures that the line is highlighted from the beginning of the entry so it highlights "@Article{key," (but only if on the same line) and not just the citation key
+            return new Range(range.startLine(), 0, range.endLine(), range.endColumn());
         }
 
         return articleRanges.getOrDefault(entry, Range.NULL_RANGE);
