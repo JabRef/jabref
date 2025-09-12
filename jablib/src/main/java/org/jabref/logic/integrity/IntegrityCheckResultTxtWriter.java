@@ -17,8 +17,4 @@ public class IntegrityCheckResultTxtWriter extends IntegrityCheckResultWriter {
             writer.write(System.lineSeparator());
         }
     }
-
-    @Override
-    public void close() throws IOException {
-    }
 }

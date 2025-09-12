@@ -34,8 +34,4 @@ public class IntegrityCheckResultErrorFormatWriter extends IntegrityCheckResultW
                     message.message()));
         }
     }
-
-    @Override
-    public void close() throws IOException {
-    }
 }
