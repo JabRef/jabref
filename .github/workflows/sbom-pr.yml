@@ -58,7 +58,7 @@ jobs:
             Generated via Gradle task `cyclonedxBom` using the org.cyclonedx.bom plugin configured in the build.
           branch: chore/update-sbom
           delete-branch: true
-          labels: "dev: dependencies""
+          labels: "dev: dependencies"
           add-paths: |
             bom.json
             bom.xml
