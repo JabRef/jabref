@@ -73,7 +73,7 @@ public class CopySingleFileAction extends SimpleCommand {
 
             boolean success = FileUtil.copyFile(src, dst, false);
             if (success) {
-                ok++;
+                copiedFiles++;
             } else {
                 failed.add(src.getFileName().toString());
             }
