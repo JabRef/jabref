@@ -18,7 +18,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.logic.crawler.StudyRepository;
-import org.jabref.logic.crawler.StudyYamlParser;
+import org.jabref.logic.crawler.StudyYamlService;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -185,7 +185,7 @@ public class ManageStudyDefinitionViewModel {
         }
         Path studyDefinitionFile = studyDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         try {
-            new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);
+            new StudyYamlService().writeStudyYamlFile(study, studyDefinitionFile);
         } catch (IOException e) {
             LOGGER.error("Could not write study file {}", studyDefinitionFile, e);
             dialogService.notify(Localization.lang("Please enter a valid file path.") +

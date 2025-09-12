@@ -116,9 +116,9 @@ public class StudyRepository {
 
             gitHandler.checkoutBranch(SEARCH_BRANCH);
             // If study definition does not exist on this branch or was changed on work branch, copy it from work
-            boolean studyDefinitionDoesNotExistOrChanged = !(Files.exists(studyDefinitionFile) && new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile).equals(study));
+            boolean studyDefinitionDoesNotExistOrChanged = !(Files.exists(studyDefinitionFile) && new StudyYamlService().parseStudyYamlFile(studyDefinitionFile).equals(study));
             if (studyDefinitionDoesNotExistOrChanged) {
-                new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);
+                new StudyYamlService().writeStudyYamlFile(study, studyDefinitionFile);
             }
             setUpRepositoryStructureForQueriesAndFetchers();
             gitHandler.createCommitOnCurrentBranch(updateRepositoryStructureMessage, false);
@@ -175,7 +175,7 @@ public class StudyRepository {
      * @throws IOException Problem opening the input stream.
      */
     private Study parseStudyFile() throws IOException {
-        return new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile);
+        return new StudyYamlService().parseStudyYamlFile(studyDefinitionFile);
     }
 
     /**
