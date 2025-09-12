@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +72,7 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
         return newStudy;
     }
 
-    private @NotNull Study getNewStudy(V1StudyFormat oldStudy, List<StudyQuery> newQueries, List<StudyCatalog> catalogues) {
+    private @NonNull Study getNewStudy(V1StudyFormat oldStudy, List<StudyQuery> newQueries, List<StudyCatalog> catalogues) {
         Study newStudy = new Study(
                 oldStudy.getAuthors(),
                 oldStudy.getTitle(),
@@ -92,9 +92,9 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
     }
 
     private StudyQuery convertQuery(Object queryObj) {
-        if (queryObj instanceof String) {
+        if (queryObj instanceof String string) {
             // Simple string query
-            return new StudyQuery((String) queryObj);
+            return new StudyQuery(string);
         } else if (queryObj instanceof Map) {
             // Complex query object from v1
             @SuppressWarnings("unchecked")
