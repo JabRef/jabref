@@ -185,9 +185,8 @@ public class ParserResult {
             return range;
         }
 
-        Field alias = field.getAlias().get();
-        if (alias != null) {
-            range = rangeMap.get(alias);
+        if (field.getAlias().isPresent()) {
+            range = rangeMap.get(field.getAlias().get());
             if (range != null) {
                 return range;
             }
