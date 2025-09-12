@@ -54,7 +54,6 @@ class CheckIntegrity implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        System.err.println(allowIntegerEdition);
         Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
                 inputFile,
                 "bibtex",
