@@ -1708,7 +1708,7 @@ class BibtexParserTest {
      */
     @Test
     void integrationTestTexGroup() throws IOException {
-        String userHostInfo = new UserHostInfo("user", "host").getUserHostString();
+        String userHostInfo = new UserHostInfo(System.getProperty("user.name"), OS.getHostName()).getUserHostString();
         ParserResult result = parser.parse(Reader.of(
                 "@comment{jabref-meta: grouping:" + OS.NEWLINE
                         + "0 AllEntriesGroup:;" + OS.NEWLINE
@@ -1726,8 +1726,7 @@ class BibtexParserTest {
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
 
-        assertEquals(((TexGroup) root.getChildren().getFirst().getGroup()).getFilePath(),
-                Path.of("src/test/resources/org/jabref/model/groups/paper.aux"));
+        assertEquals(Path.of("paper.aux"), ((TexGroup) root.getChildren().getFirst().getGroup()).getFilePath());
     }
 
     @Test
