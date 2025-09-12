@@ -47,12 +47,10 @@ jobs:
           echo "" >> bom.json
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore(sbom): update CycloneDX SBOM files"
-          committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-          author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
           title: "[Bot] Update SBOM files"
           body: |
             This automated PR updates the aggregated CycloneDX SBOM files (bom.json and bom.xml) in the repository root.
