@@ -1,13 +1,10 @@
 package org.jabref.languageserver.util;
 
-import java.util.Map;
 import java.util.Objects;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
 
 import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
@@ -88,12 +85,10 @@ public final class LspDiagnosticBuilder {
         }
 
         if (field == null) {
-            return parserResult.getFieldRanges().getOrDefault(entry, Map.of()).getOrDefault(InternalField.KEY_FIELD, parserResult.getArticleRanges().getOrDefault(entry, ParserResult.Range.NULL_RANGE));
+            return parserResult.getKeyRangeOrFallback(entry);
         }
 
-        Map<Field, ParserResult.Range> rangeMap = parserResult.getFieldRanges().getOrDefault(entry, Map.of());
-
-        return rangeMap.getOrDefault(field, rangeMap.get(field.getAlias().orElse(EntryConverter.FIELD_ALIASES.getOrDefault(field, InternalField.KEY_FIELD))));
+        return parserResult.getFieldRangeOrFallback(entry, field);
     }
 
     private Range convertToLspRange(ParserResult.Range range) {

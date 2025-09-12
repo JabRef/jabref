@@ -3,6 +3,7 @@ package org.jabref.logic.importer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -16,7 +17,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 
 public class ParserResult {
@@ -164,5 +167,40 @@ public class ParserResult {
 
     public record Range(int startLine, int startColumn, int endLine, int endColumn) {
         public static final Range NULL_RANGE = new Range(0, 0, 0, 0);
+    }
+
+    /// returns the range of the field if it exists, otherwise it searches for aliases, then the citation key, the whole article range and at last returns NULL_RANGE
+    public Range getFieldRangeOrFallback(BibEntry entry, Field field) {
+        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
+
+        Range range = rangeMap.get(field);
+        if (range != null) {
+            return range;
+        }
+
+        Field alias = field.getAlias().orElse(EntryConverter.FIELD_ALIASES.get(field));
+        if (alias != null) {
+            range = rangeMap.get(alias);
+            if (range != null) {
+                return range;
+            }
+        }
+
+        range = rangeMap.get(InternalField.KEY_FIELD);
+        if (range != null) {
+            return range;
+        }
+
+        return articleRanges.getOrDefault(entry, Range.NULL_RANGE);
+    }
+
+    public Range getKeyRangeOrFallback(BibEntry entry) {
+        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
+        Range range = rangeMap.get(InternalField.KEY_FIELD);
+        if (range != null) {
+            return range;
+        }
+
+        return articleRanges.getOrDefault(entry, Range.NULL_RANGE);
     }
 }
