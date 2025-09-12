@@ -77,7 +77,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
         });
         taskExecutor.execute(task);
 
-        dialogService.showProgressDialogAndWait(
+        dialogService.showProgressDialog(
                 Localization.lang("Check consistency"),
                 Localization.lang("Checking consistency..."),
                 task);
