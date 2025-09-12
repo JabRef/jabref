@@ -63,7 +63,7 @@ public class CopySingleFileAction extends SimpleCommand {
         int ok = 0;
         List<String> failed = new ArrayList<>();
 
-        for (LinkedFile lf : linkedFiles) {
+        for (LinkedFile file : linkedFiles) {
             Optional<Path> srcOpt = lf.findIn(databaseContext, filePreferences);
             if (srcOpt.isEmpty()) {
                 continue;
