@@ -116,6 +116,13 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
         metaData.groupsBinding().invalidate();
     }
 
+    /**
+     * Relativizes the given path to the file directories.
+     * The getLatexFileDirectory must be absolute to correctly relativize because we do not have a bibdatabasecontext
+     *
+     * @param path The path to relativize
+     * @return A relative path or the original one if it could not be made relative
+     */
     private Path relativize(Path path) {
         List<Path> fileDirectories = getFileDirectoriesAsPaths();
         return FileUtil.relativize(path, fileDirectories);
