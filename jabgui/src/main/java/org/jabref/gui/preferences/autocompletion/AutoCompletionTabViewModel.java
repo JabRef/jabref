@@ -17,6 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
 
@@ -129,7 +130,7 @@ public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
         return new StringConverter<>() {
             @Override
             public String toString(Field field) {
-                return field.getDisplayName();
+                return FieldTextMapper.getDisplayName(field);
             }
 
             @Override
@@ -141,7 +142,7 @@ public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
 
     public List<Field> getSuggestions(String request) {
         return FieldFactory.getAllFieldsWithOutInternal().stream()
-                           .filter(field -> field.getDisplayName().toLowerCase().contains(request.toLowerCase()))
+                           .filter(field -> FieldTextMapper.getDisplayName(field).toLowerCase().contains(request.toLowerCase()))
                            .collect(Collectors.toList());
     }
 }

@@ -30,6 +30,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 
@@ -79,12 +80,11 @@ public class FetchAndMergeEntry {
                 fetcher.ifPresent(idBasedFetcher -> BackgroundTask.wrap(() -> idBasedFetcher.performSearchById(fieldContent.get()))
                                                                   .onSuccess(fetchedEntry -> {
                                                                       ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
-                                                                      String type = field.getDisplayName();
                                                                       if (fetchedEntry.isPresent()) {
                                                                           cleanup.doPostCleanup(fetchedEntry.get());
                                                                           showMergeDialog(entry, fetchedEntry.get(), idBasedFetcher);
                                                                       } else {
-                                                                          dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
+                                                                          dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", FieldTextMapper.getDisplayName(field), fieldContent.get()));
                                                                       }
                                                                   })
                                                                   .onFailure(exception -> {
@@ -99,7 +99,7 @@ public class FetchAndMergeEntry {
                                                                   })
                                                                   .executeWith(taskExecutor));
             } else {
-                dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
+                dialogService.notify(Localization.lang("No %0 found", FieldTextMapper.getDisplayName(field)));
             }
         }
     }

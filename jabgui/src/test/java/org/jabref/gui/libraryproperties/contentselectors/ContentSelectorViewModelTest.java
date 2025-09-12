@@ -14,6 +14,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
@@ -87,7 +88,7 @@ class ContentSelectorViewModelTest {
         addField(testField);
 
         ListProperty<Field> fields = viewModel.getFieldNamesBackingList();
-        boolean fieldsContainTestValue = fields.stream().anyMatch(field -> "Test".equals(field.getDisplayName()));
+        boolean fieldsContainTestValue = fields.stream().anyMatch(field -> "Test".equals(FieldTextMapper.getDisplayName(field)));
 
         assertTrue(fieldsContainTestValue);
     }
@@ -161,7 +162,7 @@ class ContentSelectorViewModelTest {
     private void removeField(Field field) {
         when(dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Remove field name"),
-                Localization.lang("Are you sure you want to remove field name: \"%0\"?", field.getDisplayName())))
+                Localization.lang("Are you sure you want to remove field name: \"%0\"?", FieldTextMapper.getDisplayName(field))))
                 .thenReturn(true);
 
         viewModel.showRemoveFieldNameConfirmationDialog(field);
