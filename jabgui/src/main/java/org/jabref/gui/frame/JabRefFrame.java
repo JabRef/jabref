@@ -371,6 +371,14 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     case NEW_INPROCEEDINGS:
                         new NewEntryAction(StandardEntryType.InProceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
+                    case BACK:
+                        Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::back);
+                        event.consume();
+                        break;
+                    case FORWARD:
+                        Optional.ofNullable(getCurrentLibraryTab()).ifPresent(LibraryTab::forward);
+                        event.consume();
+                        break;
                     default:
                 }
             }
@@ -411,6 +419,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 // Listen for auto-completer changes after real context is loaded
                 libraryTab.setAutoCompleterChangedListener(() -> globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter()));
 
+                libraryTab.updateNavigationState();
+
                 // [impl->req~maintable.focus~1]
                 Platform.runLater(() -> libraryTab.getMainTable().requestFocus());
 
@@ -434,6 +444,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.setActiveDatabase(null);
                 stateManager.activeTabProperty().set(Optional.empty());
                 stateManager.setSelectedEntries(List.of());
+                stateManager.clearNavigationHistory();
                 mainStage.titleProperty().unbind();
                 mainStage.setTitle(FRAME_TITLE);
             }
