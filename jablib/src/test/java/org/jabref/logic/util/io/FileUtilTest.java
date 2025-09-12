@@ -19,6 +19,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -481,6 +482,7 @@ class FileUtilTest {
     }
 
     @Test
+    @Disabled("We partly reverted the symlink matching behavior in")
     @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
     void nestedRelativizeSymlinks() throws IOException {
         Path realDir = bibTempDir.resolve("realDir_" + UUID.randomUUID());

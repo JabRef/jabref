@@ -32,7 +32,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -251,35 +250,23 @@ public class FileUtil {
      * @param directories directories to check
      */
     public static Path relativize(Path file, List<Path> directories) {
-        return relativize(file, directories, null);
-    }
-
-    /**
-     *
-     * @param file The file to relativize, can be already relative or absolute
-     * @param directories File directories to resolve against
-     * @param baseDirForRelative Base directory for resolve a relative file path against first (e.g. "." )
-     * @return Relative path to the file, or the original file if it is already relative or the file is
-     */
-    public static Path relativize(Path file, List<Path> directories, @Nullable Path baseDirForRelative) {
         if (!file.isAbsolute()) {
             return file;
         }
+        Optional<Path> realFileOpt = toRealPath(file);
 
         for (Path directory : directories) {
             if (file.startsWith(directory)) {
                 return directory.relativize(file);
             }
-            if (baseDirForRelative != null) {
-                Optional<Path> realFileOpt = toRealPath(file);
-                if (realFileOpt.isPresent()) {
-                    Optional<Path> realDirOpt = toRealPath(directory);
-                    if (realDirOpt.isPresent()) {
-                        Path realFile = realFileOpt.get();
-                        Path realDir = realDirOpt.get();
-                        if (realFile.startsWith(realDir)) {
-                            return realDir.relativize(realFile);
-                        }
+
+            if (realFileOpt.isPresent()) {
+                Optional<Path> realDirOpt = toRealPath(directory);
+                if (realDirOpt.isPresent()) {
+                    Path realFile = realFileOpt.get();
+                    Path realDir = realDirOpt.get();
+                    if (realFile.startsWith(realDir)) {
+                        return realDir.relativize(realFile);
                     }
                 }
             }
