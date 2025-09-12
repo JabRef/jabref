@@ -133,8 +133,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We removed unnecessary spacing and margin in the AutomaticFieldEditor. [#13792](https://github.com/JabRef/jabref/pull/13792)
 - We fixed an issue where global search auto-completion only worked after switching tabs. [#11428](https://github.com/JabRef/jabref/issues/11428)
 - We fixed an issue where hierarchical keywords would only show the parent keyword in the entry editor. [#11390](https://github.com/JabRef/jabref/issues/11390)
-- We fixed an issue where some file choosers regarding LaTeX-aux files did not open in the directory of the last selected file. [#8344](https://github.com/JabRef/jabref/issues/8344)
-- We fixed an issue where the LaTeX-File directory was not stored correctly in combination with the usage of Groups from aux files. [#13820](https://github.com/JabRef/jabref/issues/13820)
+- We fixed an issue where some file choosers regarding LaTeX-aux files did not open in the directory of the last selected file. [#13681](https://github.com/JabRef/jabref/pull/13861)
+- We fixed an issue where the LaTeX-File directory was not stored correctly in combination with the usage of Groups from aux files. [#8344](https://github.com/JabRef/jabref/issues/8344)
 
 ### Removed
 
