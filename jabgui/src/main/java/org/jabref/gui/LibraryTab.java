@@ -1022,7 +1022,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
-        nextEntries.clear(); // clear forward history when new entry selected
+        nextEntries.clear(); // clear forward history when new entry selected in existing chronological sequence
 
         if (!Objects.equals(entry, currentlyShowing)) {
             // add the entry we are leaving to the history
