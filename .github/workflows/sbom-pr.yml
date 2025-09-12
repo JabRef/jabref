@@ -13,16 +13,13 @@ permissions:
 
 jobs:
   generate-and-pr:
-    if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
       # Full history is preferred so create-pull-request can diff and commit
         uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
 
-      - name: Set up JDK 24 (Corretto)
+      - name: Set up JDK
         uses: actions/setup-java@v5
         with:
           distribution: 'corretto'
@@ -34,7 +31,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Generate aggregated CycloneDX SBOM
-        run: ./gradlew --no-daemon cyclonedxBom
+        run: ./gradlew cyclonedxBom
 
       - name: Copy SBOMs to repository root
         run: |
@@ -45,8 +42,10 @@ jobs:
             ls -la "$src_dir" || true
             exit 1
           fi
-          cp "$src_dir/bom.json" ./bom.json
-          cp "$src_dir/bom.xml" ./bom.xml
+          cp "$src_dir/bom.json" bom.json
+          cp "$src_dir/bom.xml"  bom.xml
+          echo "" >> bom.xml
+          echo "" >> bom.json
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
@@ -62,7 +61,7 @@ jobs:
             Generated via Gradle task `cyclonedxBom` using the org.cyclonedx.bom plugin configured in the build.
           branch: chore/update-sbom
           delete-branch: true
-          labels: sbom, dependencies
+          labels: "dev: dependencies""
           add-paths: |
             bom.json
             bom.xml
