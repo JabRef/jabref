@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 
@@ -24,9 +25,9 @@ public class IntegrityCheckResultErrorFormatWriter extends IntegrityCheckResultW
     @Override
     public void writeFindings() throws IOException {
         for (IntegrityMessage message : messages) {
-            Map<Field, ParserResult.Range> fieldRangeMap = parserResult.getFieldRanges().getOrDefault(message.entry(), Map.of());
-            ParserResult.Range fieldRange = fieldRangeMap.getOrDefault(message.field(), fieldRangeMap.getOrDefault(InternalField.KEY_FIELD, parserResult.getArticleRanges().getOrDefault(message.entry(), ParserResult.Range.NULL_RANGE)));
-
+            Field field = message.field();
+            Map<Field, ParserResult.Range> rangeMap = parserResult.getFieldRanges().getOrDefault(message.entry(), Map.of());
+            ParserResult.Range fieldRange = rangeMap.getOrDefault(field, rangeMap.getOrDefault(field.getAlias().orElse(EntryConverter.FIELD_ALIASES.getOrDefault(field, InternalField.KEY_FIELD)), parserResult.getArticleRanges().getOrDefault(message.entry(), ParserResult.Range.NULL_RANGE)));
             writer.append("%s:%d:%d: %s\n".formatted(
                     inputFile,
                     fieldRange.startLine(),

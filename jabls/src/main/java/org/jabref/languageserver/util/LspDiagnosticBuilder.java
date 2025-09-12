@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 
@@ -91,7 +92,8 @@ public final class LspDiagnosticBuilder {
         }
 
         Map<Field, ParserResult.Range> rangeMap = parserResult.getFieldRanges().getOrDefault(entry, Map.of());
-        return rangeMap.getOrDefault(field, rangeMap.getOrDefault(field.getAlias().orElse(InternalField.KEY_FIELD), ParserResult.Range.NULL_RANGE));
+
+        return rangeMap.getOrDefault(field, rangeMap.get(field.getAlias().orElse(EntryConverter.FIELD_ALIASES.getOrDefault(field, InternalField.KEY_FIELD))));
     }
 
     private Range convertToLspRange(ParserResult.Range range) {

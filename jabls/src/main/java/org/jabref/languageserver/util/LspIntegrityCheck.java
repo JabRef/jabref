@@ -31,7 +31,7 @@ public class LspIntegrityCheck {
         );
 
         return parserResult.getDatabaseContext().getEntries().stream().flatMap(entry -> integrityCheck.checkEntry(entry).stream().map(message -> {
-            if (entry.getField(message.field()).isPresent()) {
+            if (entry.getFieldOrAlias(message.field()).isPresent()) {
                 return LspDiagnosticBuilder.create(parserResult, message.message()).setField(message.field()).setEntry(entry).build();
             } else {
                 return LspDiagnosticBuilder.create(parserResult, message.message()).setEntry(entry).build();
