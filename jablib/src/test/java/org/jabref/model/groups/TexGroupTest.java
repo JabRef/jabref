@@ -52,7 +52,7 @@ class TexGroupTest {
     void getFilePathReturnsRelativePath() throws URISyntaxException {
         Path auxFile = Path.of(TexGroupTest.class.getResource("paper.aux").toURI());
         String user = "Darwin";
-        metaData.setLatexFileDirectory(user, auxFile.getParent());
+        metaData.setLatexFileDirectory(user, auxFile.getParent().toString());
         TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData, user);
 
         assertEquals("paper.aux", group.getFilePath().toString());

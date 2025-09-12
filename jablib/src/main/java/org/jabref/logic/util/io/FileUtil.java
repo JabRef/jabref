@@ -32,6 +32,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,9 +147,9 @@ public class FileUtil {
     }
 
     /// Looks for the shortest unique path of the parent directory in the list of paths
+    ///
     /// @param paths       List of paths as Strings
     /// @param comparePath The to be tested path
-    ///
     /// @return Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathDirectory(List<String> paths, Path comparePath) {
         // Difference to getUniquePathFragment: We want the parent directory, so we cut off the last path fragment
@@ -161,7 +162,6 @@ public class FileUtil {
     ///
     /// @param paths       List of paths as Strings
     /// @param comparePath The to be shortened path
-    ///
     /// @return Shortest unique path fragment (if exists) - Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
@@ -251,23 +251,35 @@ public class FileUtil {
      * @param directories directories to check
      */
     public static Path relativize(Path file, List<Path> directories) {
+        return relativize(file, directories, null);
+    }
+
+    /**
+     *
+     * @param file The file to relativize, can be already relative or absolute
+     * @param directories File directories to resolve against
+     * @param baseDirForRelative Base directory for resolve a relative file path against first (e.g. "." )
+     * @return Relative path to the file, or the original file if it is already relative or thw
+     */
+    public static Path relativize(Path file, List<Path> directories, @Nullable Path baseDirForRelative) {
         if (!file.isAbsolute()) {
             return file;
         }
-        Optional<Path> realFileOpt = toRealPath(file);
 
         for (Path directory : directories) {
             if (file.startsWith(directory)) {
                 return directory.relativize(file);
             }
-
-            if (realFileOpt.isPresent()) {
-                Optional<Path> realDirOpt = toRealPath(directory);
-                if (realDirOpt.isPresent()) {
-                    Path realFile = realFileOpt.get();
-                    Path realDir = realDirOpt.get();
-                    if (realFile.startsWith(realDir)) {
-                        return realDir.relativize(realFile);
+            if (baseDirForRelative != null) {
+                Optional<Path> realFileOpt = toRealPath(file);
+                if (realFileOpt.isPresent()) {
+                    Optional<Path> realDirOpt = toRealPath(directory);
+                    if (realDirOpt.isPresent()) {
+                        Path realFile = realFileOpt.get();
+                        Path realDir = realDirOpt.get();
+                        if (realFile.startsWith(realDir)) {
+                            return realDir.relativize(realFile);
+                        }
                     }
                 }
             }
@@ -644,7 +656,8 @@ public class FileUtil {
     }
 
     /// Builds a Windows-style path from a Cygwin-style path using a known prefix index.
-    /// @param path the input file path
+    ///
+    /// @param path        the input file path
     /// @param letterIndex the index driver letter, zero-based indexing
     /// @return a windows-style path
     private static Path buildWindowsPathWithDriveLetterIndex(String path, int letterIndex) {

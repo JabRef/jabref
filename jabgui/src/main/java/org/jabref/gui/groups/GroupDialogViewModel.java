@@ -231,8 +231,8 @@ public class GroupDialogViewModel {
                             return false;
                         }
                         return FileUtil.getFileExtension(input)
-                                .map("aux"::equalsIgnoreCase)
-                                .orElse(false);
+                                       .map("aux"::equalsIgnoreCase)
+                                       .orElse(false);
                     }
                 },
                 ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
@@ -485,9 +485,10 @@ public class GroupDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(currentDatabase.getMetaData()
-                                                     .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                                     .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory()))).build();
+                .withInitialDirectory(texGroupFilePathProperty.getValue().isBlank() ?
+                        currentDatabase.getMetaData()
+                                       .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                       .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory())).toString() : texGroupFilePathProperty.get()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()

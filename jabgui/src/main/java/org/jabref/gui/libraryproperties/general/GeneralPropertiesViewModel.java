@@ -113,7 +113,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         if (latexFileDirectory.isEmpty()) {
             newMetaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
         } else if (laTexFileDirectoryStatus().isValid()) {
-            newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), Path.of(latexFileDirectory));
+            newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
         }
 
         databaseContext.setMetaData(newMetaData);
