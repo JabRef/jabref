@@ -27,7 +27,7 @@ public class IntegrityCheckResultErrorFormatWriter extends IntegrityCheckResultW
             Map<Field, ParserResult.Range> fieldRangeMap = parserResult.getFieldRanges().getOrDefault(message.entry(), Map.of());
             ParserResult.Range fieldRange = fieldRangeMap.getOrDefault(message.field(), fieldRangeMap.getOrDefault(InternalField.KEY_FIELD, parserResult.getArticleRanges().getOrDefault(message.entry(), ParserResult.Range.NULL_RANGE)));
 
-            writer.write("%s:%d:%d: %s\n".formatted(
+            writer.append("%s:%d:%d: %s\n".formatted(
                     inputFile,
                     fieldRange.startLine(),
                     fieldRange.startColumn(),

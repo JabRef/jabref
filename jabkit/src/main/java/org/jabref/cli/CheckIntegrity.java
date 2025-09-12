@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import org.jabref.cli.converter.CygWinPathConverter;
 import org.jabref.logic.importer.ParserResult;
@@ -48,11 +49,12 @@ class CheckIntegrity implements Callable<Integer> {
     private String outputFormat;
 
     // in BibTeX it could be preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex()
-    @Option(names = {"--allow-integer-edition"}, description = "Allows Integer edition: true or false", defaultValue = "true")
-    private boolean allowIntegerEdition = true;
+    @Option(names = {"--allow-integer-edition"}, description = "Allows Integer edition", negatable = true, defaultValue = "true", fallbackValue = "true")
+    private boolean allowIntegerEdition;
 
     @Override
     public Integer call() {
+        System.err.println(allowIntegerEdition);
         Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
                 inputFile,
                 "bibtex",
@@ -83,7 +85,11 @@ class CheckIntegrity implements Callable<Integer> {
                 allowIntegerEdition
         );
 
-        List<IntegrityMessage> messages = integrityCheck.checkDatabase(databaseContext.getDatabase());
+        List<IntegrityMessage> messages = databaseContext.getEntries().stream()
+                .flatMap(entry -> integrityCheck.checkEntry(entry).stream())
+                .collect(Collectors.toList());
+
+        messages.addAll(integrityCheck.checkDatabase(databaseContext.getDatabase()));
 
         Writer writer = new OutputStreamWriter(System.out);
         IntegrityCheckResultWriter checkResultWriter;
