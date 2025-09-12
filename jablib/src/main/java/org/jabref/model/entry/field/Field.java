@@ -3,6 +3,7 @@ package org.jabref.model.entry.field;
 import java.util.EnumSet;
 import java.util.Optional;
 
+import org.jabref.model.entry.EntryConverter;
 import org.jabref.model.strings.StringUtil;
 
 public interface Field {
@@ -36,7 +37,7 @@ public interface Field {
     }
 
     default Optional<Field> getAlias() {
-        return Optional.empty();
+        return Optional.ofNullable(EntryConverter.FIELD_ALIASES.get(this));
     }
 
     default boolean isNumeric() {
