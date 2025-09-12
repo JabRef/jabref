@@ -146,9 +146,9 @@ public class FileUtil {
     }
 
     /// Looks for the shortest unique path of the parent directory in the list of paths
+    ///
     /// @param paths       List of paths as Strings
     /// @param comparePath The to be tested path
-    ///
     /// @return Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathDirectory(List<String> paths, Path comparePath) {
         // Difference to getUniquePathFragment: We want the parent directory, so we cut off the last path fragment
@@ -161,7 +161,6 @@ public class FileUtil {
     ///
     /// @param paths       List of paths as Strings
     /// @param comparePath The to be shortened path
-    ///
     /// @return Shortest unique path fragment (if exists) - Optional.empty() if the paths are disjoint
     public static Optional<String> getUniquePathFragment(List<String> paths, Path comparePath) {
         return uniquePathSubstrings(paths).stream()
@@ -644,7 +643,8 @@ public class FileUtil {
     }
 
     /// Builds a Windows-style path from a Cygwin-style path using a known prefix index.
-    /// @param path the input file path
+    ///
+    /// @param path        the input file path
     /// @param letterIndex the index driver letter, zero-based indexing
     /// @return a windows-style path
     private static Path buildWindowsPathWithDriveLetterIndex(String path, int letterIndex) {

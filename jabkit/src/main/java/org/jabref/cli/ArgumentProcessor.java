@@ -41,7 +41,7 @@ import static picocli.CommandLine.Option;
         // sorted alphabetically
         subcommands = {
                 CheckConsistency.class,
-//                CheckIntegrity.class,
+                CheckIntegrity.class,
                 Convert.class,
                 Fetch.class,
                 GenerateBibFromAux.class,

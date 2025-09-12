@@ -2411,7 +2411,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getFieldPreferences(),
                 getXmpPreferences(),
                 getDOIPreferences(),
-                getGrobidPreferences());
+                getGrobidPreferences(),
+                getFilePreferences());
     }
 
     // endregion
