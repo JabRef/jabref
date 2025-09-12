@@ -269,7 +269,8 @@ public class BibtexParser implements Parser {
         }
 
         addBibDeskGroupEntriesToJabRefGroups();
-
+        int startLine = line;
+        int startColumn = column;
         try {
             MetaData metaData = metaDataParser.parse(
                     meta,
@@ -295,7 +296,7 @@ public class BibtexParser implements Parser {
             }
             parserResult.setMetaData(metaData);
         } catch (ParseException exception) {
-            parserResult.addException(exception);
+            parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), exception);
         }
 
         parseRemainingContent();
@@ -309,7 +310,7 @@ public class BibtexParser implements Parser {
         // This is an incomplete and inaccurate try to verify if something went wrong with previous parsing activity even though there were no warnings so far
         // regex looks for something like 'identifier = blabla ,'
         if (!parserResult.hasWarnings() && Pattern.compile("\\w+\\s*=.*,").matcher(database.getEpilog()).find()) {
-            parserResult.addWarning("following BibTex fragment has not been parsed:\n" + database.getEpilog());
+            parserResult.addWarning(new ParserResult.Range(line, column, line, column), "following BibTex fragment has not been parsed:\n" + database.getEpilog());
         }
     }
 
@@ -318,6 +319,8 @@ public class BibtexParser implements Parser {
     }
 
     private void parseAndAddEntry(String type) {
+        int startLine = line;
+        int startColumn = column;
         try {
             // collect all comments and the entry type definition in front of the actual entry
             // this is at least `@Type`
@@ -346,13 +349,16 @@ public class BibtexParser implements Parser {
             // This makes the parser more robust:
             // If an exception is thrown when parsing an entry, drop the entry and try to resume parsing.
             LOGGER.warn("Could not parse entry", ex);
-            parserResult.addWarning(Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
-                    + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry."));
+            String errorMessage = Localization.lang("Error occurred when parsing entry") + ": '" + ex.getMessage()
+                    + "'. " + "\n\n" + Localization.lang("JabRef skipped the entry.");
+            parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), errorMessage);
         }
     }
 
     private void parseJabRefComment(Map<String, String> meta) {
         StringBuilder buffer;
+        int startLine = line;
+        int startColumn = column;
         try {
             buffer = parseBracketedFieldContent();
         } catch (IOException e) {
@@ -384,7 +390,7 @@ public class BibtexParser implements Parser {
             if (typ.isPresent()) {
                 entryTypes.add(typ.get());
             } else {
-                parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in BIB file") + ": " + comment);
+                parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), Localization.lang("Ill-formed entrytype comment in BIB file") + ": " + comment);
             }
 
             // custom entry types are always re-written by JabRef and not stored in the file
@@ -393,7 +399,7 @@ public class BibtexParser implements Parser {
             try {
                 parseBibDeskComment(comment, meta);
             } catch (ParseException ex) {
-                parserResult.addException(ex);
+                parserResult.addException(new ParserResult.Range(startLine, startColumn, line, column), ex);
             }
         }
     }
@@ -460,11 +466,13 @@ public class BibtexParser implements Parser {
     }
 
     private void parseBibtexString() throws IOException {
+        int startLine = line;
+        int startColumn = column;
         BibtexString bibtexString = parseString();
         try {
             database.addString(bibtexString);
         } catch (KeyCollisionException ex) {
-            parserResult.addWarning(Localization.lang("Duplicate string name: '%0'", bibtexString.getName()));
+            parserResult.addWarning(new ParserResult.Range(startLine, startColumn, line, column), Localization.lang("Duplicate string name: '%0'", bibtexString.getName()));
         }
     }
 
@@ -919,19 +927,19 @@ public class BibtexParser implements Parser {
 
                         // Finished, now reverse newKey and remove whitespaces:
                         key = newKey.reverse();
-                        parserResult.addWarning(
+                        parserResult.addWarning(new ParserResult.Range(line, column),
                                 Localization.lang("Line %0: Found corrupted citation key %1.", String.valueOf(line), key.toString()));
                     }
                 }
                 break;
 
             case ',':
-                parserResult.addWarning(
+                parserResult.addWarning(new ParserResult.Range(line, column),
                         Localization.lang("Line %0: Found corrupted citation key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
                 break;
 
             case '\n':
-                parserResult.addWarning(
+                parserResult.addWarning(new ParserResult.Range(line, column),
                         Localization.lang("Line %0: Found corrupted citation key %1 (comma missing).", String.valueOf(line), key.toString()));
                 break;
 

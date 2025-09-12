@@ -21,7 +21,7 @@ public class IntegrityCheckResultErrorFormatWriter extends IntegrityCheckResultW
     @Override
     public void writeFindings() throws IOException {
         for (IntegrityMessage message : messages) {
-            ParserResult.Range fieldRange = parserResult.getFieldRangeOrFallback(message.entry(), message.field());
+            ParserResult.Range fieldRange = parserResult.getFieldRange(message.entry(), message.field());
             writer.append("%s:%d:%d: %s\n".formatted(
                     inputFile,
                     fieldRange.startLine(),

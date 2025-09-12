@@ -21,9 +21,12 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
 public class ParserResult {
     private final Set<BibEntryType> entryTypes;
-    private final List<String> warnings = new ArrayList<>();
+    private final Multimap<Range, String> warnings = ArrayListMultimap.create();
     private BibDatabase database;
     private MetaData metaData;
     private Path file;
@@ -53,7 +56,7 @@ public class ParserResult {
 
     public static ParserResult fromErrorMessage(String message) {
         ParserResult parserResult = new ParserResult();
-        parserResult.addWarning(message);
+        parserResult.addWarning(Range.NULL_RANGE, message);
         parserResult.setInvalid(true);
         return parserResult;
     }
@@ -100,14 +103,20 @@ public class ParserResult {
      * @param s String Warning text. Must be pretranslated. Only added if there isn't already a dupe.
      */
     public void addWarning(String s) {
-        if (!warnings.contains(s)) {
-            warnings.add(s);
+        if (!warnings.containsValue(s)) {
+            warnings.put(Range.NULL_RANGE, s);
         }
     }
 
-    public void addException(Exception exception) {
+    public void addWarning(Range range, String s) {
+        if (!warnings.containsKey(range) && !warnings.containsValue(s)) {
+            warnings.put(range, s);
+        }
+    }
+
+    public void addException(Range range, Exception exception) {
         String errorMessage = getErrorMessage(exception);
-        addWarning(errorMessage);
+        addWarning(range, errorMessage);
     }
 
     public boolean hasWarnings() {
@@ -115,7 +124,11 @@ public class ParserResult {
     }
 
     public List<String> warnings() {
-        return new ArrayList<>(warnings);
+        return new ArrayList<>(warnings.values());
+    }
+
+    public Multimap<Range, String> getWarningsMap() {
+        return warnings;
     }
 
     public boolean isInvalid() {
@@ -164,16 +177,17 @@ public class ParserResult {
         return articleRanges;
     }
 
-    public record Range(
-            int startLine,
-            int startColumn,
-            int endLine,
-            int endColumn) {
+    public record Range(int startLine, int startColumn, int endLine, int endColumn) {
         public static final Range NULL_RANGE = new Range(0, 0, 0, 0);
+
+        public Range(int startLine, int startColumn) {
+            this(startLine, startColumn, startLine, startColumn);
+        }
     }
 
-    /// returns the range of the field if it exists, respecting field aliases with `NULL_RANGE` as fallback.
-    public Range getFieldRangeOrFallback(BibEntry entry, Field field) {
+    /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
+    public Range getFieldRange(BibEntry entry, Field
+        field) {
         Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
 
         if (rangeMap.isEmpty()) {
@@ -192,10 +206,11 @@ public class ParserResult {
             }
         }
 
-        return getKeyRangeOrFallback(entry);
+        return getCompleteEntryIndicator(entry);
     }
 
-    public Range getKeyRangeOrFallback(BibEntry entry) {
+    /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
+    public Range getCompleteEntryIndicator(BibEntry entry) {
         Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
         Range range = rangeMap.get(InternalField.KEY_FIELD);
         if (range != null) {

@@ -2,6 +2,7 @@ package org.jabref.languageserver.util;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,15 +68,21 @@ public class LspDiagnosticHandler {
     }
 
     private List<Diagnostic> computeDiagnostics(String content, String uri) {
+        List<Diagnostic> diagnostics = new ArrayList<>();
         ParserResult parserResult;
         try {
-            parserResult = parserResultOfString(content, jabRefCliPreferences.getImportFormatPreferences());
-        } catch (JabRefException e) {
+            parserResult = parserResultFromString(content, jabRefCliPreferences.getImportFormatPreferences());
+        } catch (JabRefException | IOException e) {
             Diagnostic parseDiagnostic = LspDiagnosticBuilder.create(Localization.lang(
                     "Failed to parse entries.\nThe following error was encountered:\n%0",
                     e.getMessage())).setSeverity(DiagnosticSeverity.Error).build();
             return List.of(parseDiagnostic);
         }
+
+        parserResult.getWarningsMap().forEach((range, message) -> {
+            Diagnostic warningDiagnostic = LspDiagnosticBuilder.create(message).setRange(range).setSeverity(DiagnosticSeverity.Error).build();
+            diagnostics.add(warningDiagnostic);
+        });
 
         if (clientHandler.getSettings().isIntegrityCheck()) {
             integrityDiagnosticsCache.put(uri, lspIntegrityCheck.check(parserResult));
@@ -87,7 +94,7 @@ public class LspDiagnosticHandler {
             LOGGER.debug("Cached consistency diagnostics for {}", uri);
         }
 
-        return getFinalDiagnosticsList(uri);
+        return Stream.of(getFinalDiagnosticsList(uri), diagnostics).flatMap(List::stream).toList();
     }
 
     private List<Diagnostic> getFinalDiagnosticsList(String uri) {
@@ -107,12 +114,8 @@ public class LspDiagnosticHandler {
         });
     }
 
-    private ParserResult parserResultOfString(String content, ImportFormatPreferences importFormatPreferences) throws JabRefException {
+    private ParserResult parserResultFromString(String content, ImportFormatPreferences importFormatPreferences) throws JabRefException, IOException {
         BibtexParser parser = new BibtexParser(importFormatPreferences);
-        try {
-            return parser.parse(Reader.of(content));
-        } catch (IOException e) {
-            throw new JabRefException("Failed to parse BibTeX", e);
-        }
+        return parser.parse(Reader.of(content));
     }
 }

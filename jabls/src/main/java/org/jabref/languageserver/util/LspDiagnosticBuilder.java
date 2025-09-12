@@ -10,18 +10,26 @@ import org.eclipse.lsp4j.Diagnostic;
 import org.eclipse.lsp4j.DiagnosticSeverity;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.Range;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public final class LspDiagnosticBuilder {
 
     private static final String DEFAULT_SOURCE = "JabRef";
 
+    @Nullable
     private String message;
     private DiagnosticSeverity severity = DiagnosticSeverity.Warning;
     private String source = DEFAULT_SOURCE;
 
+    @Nullable
     private BibEntry entry;
+    @Nullable
     private ParserResult parserResult;
+    @Nullable
     private Field field;
+    @Nullable
     private Range explicitRange;
 
     private LspDiagnosticBuilder() { }
@@ -64,6 +72,11 @@ public final class LspDiagnosticBuilder {
         return this;
     }
 
+    public LspDiagnosticBuilder setRange(ParserResult.Range range) {
+        this.explicitRange = convertToLspRange(range);
+        return this;
+    }
+
     public LspDiagnosticBuilder setParserResult(ParserResult parserResult) {
         this.parserResult = parserResult;
         return this;
@@ -85,10 +98,10 @@ public final class LspDiagnosticBuilder {
         }
 
         if (field == null) {
-            return parserResult.getKeyRangeOrFallback(entry);
+            return parserResult.getCompleteEntryIndicator(entry);
         }
 
-        return parserResult.getFieldRangeOrFallback(entry, field);
+        return parserResult.getFieldRange(entry, field);
     }
 
     private Range convertToLspRange(ParserResult.Range range) {
