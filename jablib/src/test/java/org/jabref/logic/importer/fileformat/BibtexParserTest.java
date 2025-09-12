@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.net.InetAddress;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +57,7 @@ import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.UserHostInfo;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -1708,6 +1708,7 @@ class BibtexParserTest {
      */
     @Test
     void integrationTestTexGroup() throws IOException {
+        String userHostInfo = new UserHostInfo("user", "host").getUserHostString();
         ParserResult result = parser.parse(Reader.of(
                 "@comment{jabref-meta: grouping:" + OS.NEWLINE
                         + "0 AllEntriesGroup:;" + OS.NEWLINE
@@ -1716,12 +1717,10 @@ class BibtexParserTest {
                         + "@Comment{jabref-meta: databaseType:biblatex;}" + OS.NEWLINE
                         + "@Comment{jabref-meta: fileDirectory:src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
                         + "@Comment{jabref-meta: fileDirectory-"
-                        + System.getProperty("user.name") + "-"
-                        + InetAddress.getLocalHost().getHostName()
+                        + userHostInfo
                         + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
                         + "@Comment{jabref-meta: fileDirectoryLatex-"
-                        + System.getProperty("user.name") + "-"
-                        + InetAddress.getLocalHost().getHostName()
+                        + userHostInfo
                         + ":src/test/resources/org/jabref/model/groups;}" + OS.NEWLINE
         ));
 

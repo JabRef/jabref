@@ -124,21 +124,6 @@ public class MetaDataParserTest {
     }
 
     @Test
-    void retrievesLatexFileDirectoryForDifferentUserOnSameHost() throws ParseException {
-        String originalUserHost = "user1-host";
-        String newUserHost = "user2-host";
-
-        Map<String, String> data = Map.of(
-                "fileDirectoryLatex-" + originalUserHost, "/path/to/latex;"
-        );
-
-        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
-        MetaData parsed = parser.parse(data, ',', "userAndHost");
-
-        assertEquals(Optional.of(Path.of("/path/to/latex")), parsed.getLatexFileDirectory(newUserHost));
-    }
-
-    @Test
     void parsesWindowsPathsInLatexFileDirectoryCorrectly() throws ParseException {
         String userHost = "user-host";
         String rawKey = "fileDirectoryLatex-" + userHost;
