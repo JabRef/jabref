@@ -3,7 +3,7 @@
 This document lists the fonts, icons, and libraries used by JabRef.
 
 One can generate a file with all library dependencies by using Gradle task `cyclonedxBom`.
-It generates the file `build/cyclonedx/bom.xml` and `build/cyclonedx/bom.json`.
+It generates the file `build/cyclonedx/bom.xml` and `build/cyclonedx/bom.json`. The file is in the [SBOM Standard](https://cyclonedx.org/).
 
 ## bst files
 
@@ -13,8 +13,11 @@ Path:    src/main/resources/bst/IEEEtran.bst
 URL:     https://www.ctan.org/tex-archive/macros/latex/contrib/IEEEtran/bibtex
 License: LPPL-1.3
 ```
+
 ## Fonts and Icons
+
 The loading animation during loading of recommendations from Mr. DLib is created by <http://loading.io/> and is free of use under license CC0 1.0.
+
 ```yaml
 Id:      material-design-icons.font
 Project: Material Design Icons
