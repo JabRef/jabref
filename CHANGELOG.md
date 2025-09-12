@@ -127,6 +127,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where "Copy to" was enabled even if no other library was opened. [#13280](https://github.com/JabRef/jabref/pull/13280)
 - We fixed an issue where the groups were still displayed after closing all libraries. [#13382](https://github.com/JabRef/jabref/issues/13382)
 - Enhanced field selection logic in the Merge Entries dialog when fetching from DOI to prefer valid years and entry types. [#12549](https://github.com/JabRef/jabref/issues/12549)
+- We fixed an issue where the "Check Consistency" dialog is unresponsive. [#13700](https://github.com/JabRef/jabref/issues/13700)
 - We fixed an issue where opening the Three Way Merge dialog would throw an exception when year field contains an invalid year value. [#13673](https://github.com/JabRef/jabref/issues/13673)
 - We improved consistency in the Add Buttons. [#13791](https://github.com/JabRef/jabref/pull/13791)
 - We fixed an issue where theme or font size are not respected for all dialogs [#13558](https://github.com/JabRef/jabref/issues/13558)
