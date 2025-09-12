@@ -2,15 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -24,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
@@ -38,6 +31,7 @@ import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
+import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -100,26 +94,44 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     private SourceTab sourceTab;
 
-    @FXML private TabPane tabbed;
+    @FXML
+    private TabPane tabbed;
 
-    @FXML private Button typeChangeButton;
-    @FXML private Button fetcherButton;
-    @FXML private Label typeLabel;
+    @FXML
+    private Button typeChangeButton;
+    @FXML
+    private Button fetcherButton;
+    @FXML
+    private Label typeLabel;
 
-    @Inject private BuildInfo buildInfo;
-    @Inject private DialogService dialogService;
-    @Inject private TaskExecutor taskExecutor;
-    @Inject private GuiPreferences preferences;
-    @Inject private StateManager stateManager;
-    @Inject private ThemeManager themeManager;
-    @Inject private FileUpdateMonitor fileMonitor;
-    @Inject private DirectoryMonitor directoryMonitor;
-    @Inject private CountingUndoManager undoManager;
-    @Inject private BibEntryTypesManager bibEntryTypesManager;
-    @Inject private KeyBindingRepository keyBindingRepository;
-    @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
-    @Inject private AiService aiService;
-    @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
+    @Inject
+    private BuildInfo buildInfo;
+    @Inject
+    private DialogService dialogService;
+    @Inject
+    private TaskExecutor taskExecutor;
+    @Inject
+    private GuiPreferences preferences;
+    @Inject
+    private StateManager stateManager;
+    @Inject
+    private ThemeManager themeManager;
+    @Inject
+    private FileUpdateMonitor fileMonitor;
+    @Inject
+    private DirectoryMonitor directoryMonitor;
+    @Inject
+    private CountingUndoManager undoManager;
+    @Inject
+    private BibEntryTypesManager bibEntryTypesManager;
+    @Inject
+    private KeyBindingRepository keyBindingRepository;
+    @Inject
+    private JournalAbbreviationRepository journalAbbreviationRepository;
+    @Inject
+    private AiService aiService;
+    @Inject
+    private SearchCitationsRelationsService searchCitationsRelationsService;
 
     private final List<EntryEditorTab> allPossibleTabs = new ArrayList<>();
 
@@ -129,8 +141,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         this.redoAction = redoAction;
 
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
 
         this.fileLinker = new ExternalFilesEntryLinker(
                 preferences.getExternalApplicationsPreferences(),
@@ -162,6 +174,10 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         });
 
         setupDragAndDrop();
+        EditorTextField.setupTabNavigation(
+                this::isLastFieldInCurrentTab,
+                () -> tabbed.getSelectionModel().selectNext()
+        );
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;
@@ -496,8 +512,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     public void setFocusToField(Field field) {
         UiTaskExecutor.runInJavaFXThread(() -> {
-        Field actualField = field;
-        boolean fieldFound = false;
+            Field actualField = field;
+            boolean fieldFound = false;
             for (Tab tab : tabbed.getTabs()) {
                 tabbed.getSelectionModel().select(tab);
                 if ((tab instanceof FieldsEditorTab fieldsEditorTab)
@@ -527,5 +543,41 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     @Override
     public void previousPreviewStyle() {
         this.previewPanel.previousPreviewStyle();
+    }
+
+    // And replace the existing static method with this instance method:
+    /**
+     * Checks if the given TextField is the last field in the currently selected tab.
+     *
+     * @param textField the TextField to check
+     * @return true if this is the last field in the current tab, false otherwise
+     */
+    private boolean isLastFieldInCurrentTab(TextField textField) {
+        if (textField == null || tabbed.getSelectionModel().getSelectedItem() == null) {
+            return false;
+        }
+
+        Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+        if (!(selectedTab instanceof FieldsEditorTab)) {
+            return false;
+        }
+
+        FieldsEditorTab currentTab = (FieldsEditorTab) selectedTab;
+        Collection<Field> shownFields = currentTab.getShownFields();
+
+        if (shownFields.isEmpty()) {
+            return false;
+        }
+
+        Field lastField = null;
+        for (Field field : shownFields) {
+            lastField = field;
+        }
+
+        if (lastField == null || textField.getId() == null) {
+            return false;
+        }
+
+        return lastField.getDisplayName().equalsIgnoreCase(textField.getId());
     }
 }
