@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.jabref.model.study.Study;
 
@@ -17,29 +15,24 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for migrating study.yml files between versions.
- * Provides common functionality for version detection, backup creation,
- * and handles the migration process using specific version MIGRATORS.
+ * Provides common functionality for version detection
+ * and handles the migration process
  */
 
 public abstract class StudyYamlMigrator {
     protected static final String CURRENT_VERSION = "2.0";
     private static final Logger LOGGER = LoggerFactory.getLogger(StudyYamlMigrator.class);
 
-    private static final Map<String, StudyYamlMigrator> MIGRATORS = new HashMap<>();
-
-    static {
-        // Register all the avaliable MIGRATORS
-        MIGRATORS.put("1.0", new StudyYamlV1Migrator());
-        // Unknown should be treated as 1.0 as the old version doesn't have
-        // a version field
-        MIGRATORS.put("unknown", new StudyYamlV1Migrator());
-    }
-
-    /**
-     * Factory method to get the appropriate migrator for a version
-     */
     public static StudyYamlMigrator getMigratorForVersion(String version) {
-        return MIGRATORS.getOrDefault(version, new StudyYamlV1Migrator());
+        return switch (version) {
+            case "1.0",
+                 "unknown" ->
+                    new StudyYamlV1Migrator();
+            default -> {
+                LOGGER.warn("Unknown version {}, using V1 migrator", version);
+                yield new StudyYamlV1Migrator();
+            }
+        };
     }
 
     /**
@@ -61,11 +54,7 @@ public abstract class StudyYamlMigrator {
         StudyYamlMigrator migrator = getMigratorForVersion(version);
         Study migratedStudy = migrator.migrate(studyYamlFile);
 
-        // Backup original file
-        createBackup(studyYamlFile);
-
         LOGGER.info("Successfully migrated study.yml to version {}", CURRENT_VERSION);
-
         return migratedStudy;
     }
 
@@ -107,14 +96,5 @@ public abstract class StudyYamlMigrator {
 
             return "unknown";
         }
-    }
-
-    /**
-     * Creates a backup of the original file
-     */
-    private static void createBackup(Path originalFile) throws IOException {
-        Path backupPath = originalFile.getParent().resolve(originalFile.getFileName() + ".backup");
-        Files.copy(originalFile, backupPath);
-        LOGGER.info("Created backup at: {}", backupPath);
     }
 }
