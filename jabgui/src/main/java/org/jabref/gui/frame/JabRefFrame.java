@@ -32,7 +32,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.WelcomeTab;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -53,8 +52,10 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.welcome.WelcomeTab;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
@@ -102,6 +103,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     private final JabRefFrameViewModel viewModel;
     private final GuiPushToApplicationCommand pushToApplicationCommand;
@@ -125,7 +127,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        CountingUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
-                       TaskExecutor taskExecutor) {
+                       TaskExecutor taskExecutor,
+                       GitHandlerRegistry gitHandlerRegistry) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -136,6 +139,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
 
         setId("frame");
 
@@ -246,7 +250,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 clipBoardManager,
                 this::getOpenDatabaseAction,
                 aiService,
-                entryEditor);
+                entryEditor,
+                gitHandlerRegistry);
 
         VBox head = new VBox(mainMenu, mainToolBar);
         head.setSpacing(0d);
@@ -403,6 +408,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.searchResultSize(SearchType.NORMAL_SEARCH).bind(libraryTab.resultSizeProperty());
                 globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
 
+                // Listen for auto-completer changes after real context is loaded
+                libraryTab.setAutoCompleterChangedListener(() -> globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter()));
+
                 // [impl->req~maintable.focus~1]
                 Platform.runLater(() -> libraryTab.getMainTable().requestFocus());
 
@@ -447,7 +455,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void updateTabBarVisible() {
-        if (preferences.getWorkspacePreferences().shouldHideTabBar() && stateManager.getOpenDatabases().size() <= 1) {
+        // When WelcomeTab is open, the tabbar should be visible
+        if (preferences.getWorkspacePreferences().shouldHideTabBar() && tabbedPane.getTabs().size() <= 1) {
             if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
                 tabbedPane.getStyleClass().add("hide-tab-bar");
             }
@@ -495,6 +504,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // WelcomeTab not found
 
         WelcomeTab welcomeTab = new WelcomeTab(
+                Injector.instantiateModelOrService(Stage.class),
                 this,
                 preferences,
                 aiService,
@@ -506,7 +516,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 clipBoardManager,
                 taskExecutor,
                 fileHistory,
-                Injector.instantiateModelOrService(BuildInfo.class)
+                Injector.instantiateModelOrService(BuildInfo.class),
+                preferences.getWorkspacePreferences()
         );
         tabbedPane.getTabs().add(welcomeTab);
         tabbedPane.getSelectionModel().select(welcomeTab);
@@ -706,7 +717,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         public CloseOthersDatabaseAction(LibraryTab libraryTab) {
             this.libraryTab = libraryTab;
-            this.executable.bind(ActionHelper.needsMultipleDatabases(tabbedPane));
+            this.executable.bind(ActionHelper.needsMultipleDatabases(stateManager));
         }
 
         @Override

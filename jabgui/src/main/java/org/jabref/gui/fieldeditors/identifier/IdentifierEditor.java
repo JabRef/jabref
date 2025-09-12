@@ -17,7 +17,6 @@ import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
-import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -37,6 +36,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @FXML private BaseIdentifierEditorViewModel<?> viewModel;
     @FXML private EditorTextField textField;
+    @FXML private Button shortenDOIButton;
     @FXML private Button fetchInformationByIdentifierButton;
     @FXML private Button lookupIdentifierButton;
 
@@ -71,8 +71,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         }
 
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                 .root(this)
+                 .load();
 
         textField.textProperty().bindBidirectional(viewModel.textProperty());
 
@@ -80,12 +80,10 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                 new Tooltip(Localization.lang("Get bibliographic data from %0", field.getDisplayName())));
         lookupIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
+        shortenDOIButton.setTooltip(
+                new Tooltip(Localization.lang("Shorten %0", field.getDisplayName())));
 
-        if (field.equals(DOI)) {
-            textField.initContextMenu(EditorMenus.getDOIMenu(textField, dialogService), preferences.getKeyBindingRepository());
-        } else {
-            textField.initContextMenu(new DefaultMenu(textField), preferences.getKeyBindingRepository());
-        }
+        textField.initContextMenu(new DefaultMenu(textField), preferences.getKeyBindingRepository());
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
@@ -118,5 +116,10 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML
     private void openExternalLink() {
         viewModel.openExternalLink();
+    }
+
+    @FXML
+    private void shortenID() {
+        viewModel.shortenID();
     }
 }

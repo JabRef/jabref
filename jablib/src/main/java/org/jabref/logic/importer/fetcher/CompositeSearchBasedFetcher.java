@@ -11,8 +11,8 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.search.query.BaseQueryNode;
 
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcher.class);
 
-    private Set<SearchBasedFetcher> fetchers;
+    private final Set<SearchBasedFetcher> fetchers;
     private final int maximumNumberOfReturnedResults;
 
     public CompositeSearchBasedFetcher(Set<SearchBasedFetcher> searchBasedFetchers, ImporterPreferences importerPreferences, int maximumNumberOfReturnedResults)
@@ -52,18 +52,18 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
+    public List<BibEntry> performSearch(BaseQueryNode queryList) throws FetcherException {
         // All entries have to be converted into one format, this is necessary for the format conversion
         return fetchers.parallelStream()
                        .flatMap(searchBasedFetcher -> {
                            try {
-                               return searchBasedFetcher.performSearch(luceneQuery).stream();
+                               return searchBasedFetcher.performSearch(queryList).stream();
                            } catch (FetcherException e) {
-                               LOGGER.warn("%s API request failed".formatted(searchBasedFetcher.getName()), e);
+                               LOGGER.warn("{} API request failed", searchBasedFetcher.getName(), e);
                                return Stream.empty();
                            }
                        })
                        .limit(maximumNumberOfReturnedResults)
-                       .collect(Collectors.toList());
+                       .toList();
     }
 }

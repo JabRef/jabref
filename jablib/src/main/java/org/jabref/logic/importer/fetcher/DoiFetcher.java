@@ -94,8 +94,8 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                     waitingTime = CROSSREF_DCN_RATE_LIMITER.acquire();
                 } // mEDRA does not explicit an API rating
 
-                LOGGER.trace("Thread %s, searching for DOI '%s', waited %.2fs because of API rate limiter".formatted(
-                        Thread.currentThread().threadId(), identifier, waitingTime));
+                LOGGER.trace("Thread {}, searching for DOI '{}', waited {} because of API rate limiter",
+                        Thread.currentThread().threadId(), identifier, waitingTime);
             }
         } catch (FetcherException | MalformedURLException e) {
             LOGGER.warn("Could not limit DOI API access rate", e);
@@ -194,7 +194,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
             // In theory, the actual update might rarely happen...
             if (Math.abs(newRate - oldRate) >= 1.0) {
-                LOGGER.info("Updated Crossref API rate limit from %.2f to %.2f".formatted(oldRate, newRate));
+                LOGGER.info("Updated Crossref API rate limit from {} to {}", oldRate, newRate);
                 CROSSREF_DCN_RATE_LIMITER.setRate(newRate);
             }
         } catch (NullPointerException | IllegalArgumentException e) {
