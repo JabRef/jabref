@@ -39,6 +39,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a field for the latest ICORE conference ranking lookup on the General Tab. [#13476](https://github.com/JabRef/jabref/issues/13476)
 - We added BibLaTeX datamodel validation support in order to improve error message quality in entries' fields validation. [#13318](https://github.com/JabRef/jabref/issues/13318)
 - We added more supported formats of CAYW endpoint of HTTP server. [#13578](https://github.com/JabRef/jabref/issues/13578)
+- We added chronological navigation for entries in each library. [#6352](https://github.com/JabRef/jabref/issues/6352)
 
 ### Changed
 

@@ -8,9 +8,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
@@ -21,10 +21,10 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 
 public class LspConsistencyCheck {
 
-    public List<Diagnostic> check(BibDatabaseContext bibDatabaseContext, String content) {
+    public List<Diagnostic> check(ParserResult parserResult) {
         List<Diagnostic> diagnostics = new ArrayList<>();
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibDatabaseContext, (_, _) -> {
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(parserResult.getDatabaseContext(), (_, _) -> {
         });
 
         List<Field> allReportedFields = result.entryTypeToResultMap().values().stream()
@@ -34,7 +34,7 @@ public class LspConsistencyCheck {
                                               .toList();
 
         result.entryTypeToResultMap().forEach((entryType, entryTypeResult) -> {
-            Optional<BibEntryType> bibEntryType = new BibEntryTypesManager().enrich(entryType, bibDatabaseContext.getMode());
+            Optional<BibEntryType> bibEntryType = new BibEntryTypesManager().enrich(entryType, parserResult.getDatabaseContext().getMode());
             Set<Field> requiredFields = bibEntryType
                     .map(BibEntryType::getRequiredFields)
                     .stream()
@@ -44,9 +44,8 @@ public class LspConsistencyCheck {
 
             entryTypeResult.sortedEntries().forEach(entry -> requiredFields.forEach(requiredField -> {
                 if (entry.getFieldOrAlias(requiredField).isEmpty()) {
-                    LspDiagnosticBuilder diagnosticBuilder = LspDiagnosticBuilder.create(Localization.lang("Required field \"%0\" is empty.", requiredField.getName()));
+                    LspDiagnosticBuilder diagnosticBuilder = LspDiagnosticBuilder.create(parserResult, Localization.lang("Required field \"%0\" is empty.", requiredField.getName()));
                     diagnosticBuilder.setSeverity(DiagnosticSeverity.Error);
-                    diagnosticBuilder.setContent(content);
                     diagnosticBuilder.setEntry(entry);
                     diagnostics.add(diagnosticBuilder.build());
                 }
@@ -62,8 +61,7 @@ public class LspConsistencyCheck {
 
             optionalFields.forEach(optionalField -> entryTypeResult.sortedEntries().forEach(entry -> {
                 if (entry.getFieldOrAlias(optionalField).isEmpty()) {
-                    LspDiagnosticBuilder diagnosticBuilder = LspDiagnosticBuilder.create(Localization.lang("Optional field \"%0\" is empty.", optionalField.getName()));
-                    diagnosticBuilder.setContent(content);
+                    LspDiagnosticBuilder diagnosticBuilder = LspDiagnosticBuilder.create(parserResult, Localization.lang("Optional field \"%0\" is empty.", optionalField.getName()));
                     diagnosticBuilder.setEntry(entry);
                     diagnostics.add(diagnosticBuilder.build());
                 }

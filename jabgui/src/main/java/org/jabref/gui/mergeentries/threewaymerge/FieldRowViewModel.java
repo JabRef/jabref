@@ -38,7 +38,7 @@ public class FieldRowViewModel {
         /**
          * When the user types something into the merged field value and neither the left nor
          * right values match it, NONE is selected
-         * */
+         */
         NONE
     }
 

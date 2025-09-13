@@ -3,6 +3,7 @@ package org.jabref.logic.importer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -17,11 +18,15 @@ import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
+
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 
 public class ParserResult {
     private final Set<BibEntryType> entryTypes;
-    private final List<String> warnings = new ArrayList<>();
+    private final Multimap<Range, String> warnings;
     private BibDatabase database;
     private MetaData metaData;
     private Path file;
@@ -47,11 +52,12 @@ public class ParserResult {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.entryTypes = Objects.requireNonNull(entryTypes);
+        this.warnings = MultimapBuilder.hashKeys().hashSetValues().build();
     }
 
     public static ParserResult fromErrorMessage(String message) {
         ParserResult parserResult = new ParserResult();
-        parserResult.addWarning(message);
+        parserResult.addWarning(Range.NULL_RANGE, message);
         parserResult.setInvalid(true);
         return parserResult;
     }
@@ -95,17 +101,19 @@ public class ParserResult {
     /**
      * Add a parser warning.
      *
-     * @param s String Warning text. Must be pretranslated. Only added if there isn't already a dupe.
+     * @param s String Warning text. Must be pre-translated. Only added if there isn't already a dupe.
      */
     public void addWarning(String s) {
-        if (!warnings.contains(s)) {
-            warnings.add(s);
-        }
+        addWarning(Range.NULL_RANGE, s);
     }
 
-    public void addException(Exception exception) {
+    public void addWarning(Range range, String s) {
+        warnings.put(range, s);
+    }
+
+    public void addException(Range range, Exception exception) {
         String errorMessage = getErrorMessage(exception);
-        addWarning(errorMessage);
+        addWarning(range, errorMessage);
     }
 
     public boolean hasWarnings() {
@@ -113,7 +121,11 @@ public class ParserResult {
     }
 
     public List<String> warnings() {
-        return new ArrayList<>(warnings);
+        return new ArrayList<>(warnings.values());
+    }
+
+    public Multimap<Range, String> getWarningsMap() {
+        return warnings;
     }
 
     public boolean isInvalid() {
@@ -162,7 +174,45 @@ public class ParserResult {
         return articleRanges;
     }
 
-    public record Range(int startLine, int startColumn, int endLine, int endColumn) {
+    public record Range(
+            int startLine,
+            int startColumn,
+            int endLine,
+            int endColumn) {
         public static final Range NULL_RANGE = new Range(0, 0, 0, 0);
+
+        public Range(int startLine, int startColumn) {
+            this(startLine, startColumn, startLine, startColumn);
+        }
+    }
+
+    /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
+    public Range getFieldRange(BibEntry entry, Field field) {
+        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
+
+        if (rangeMap.isEmpty()) {
+            return Range.NULL_RANGE;
+        }
+
+        Range range = rangeMap.get(field);
+        if (range != null) {
+            return range;
+        }
+
+        return field.getAlias()
+                    .map(rangeMap::get)
+                    .orElseGet(() -> getCompleteEntryIndicator(entry));
+    }
+
+    /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
+    public Range getCompleteEntryIndicator(BibEntry entry) {
+        Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
+        Range range = rangeMap.get(InternalField.KEY_FIELD);
+        if (range != null) {
+            // this ensures that the line is highlighted from the beginning of the entry so it highlights "@Article{key," (but only if on the same line) and not just the citation key
+            return new Range(range.startLine(), 0, range.endLine(), range.endColumn());
+        }
+
+        return articleRanges.getOrDefault(entry, Range.NULL_RANGE);
     }
 }

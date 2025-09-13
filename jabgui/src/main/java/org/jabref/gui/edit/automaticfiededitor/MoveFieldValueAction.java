@@ -53,9 +53,7 @@ public class MoveFieldValueAction extends SimpleCommand {
         edits.end();
     }
 
-    /**
-     * @return the number of affected entries
-     * */
+    /// @return the number of affected entries
     public int executeAndGetAffectedEntriesCount() {
         execute();
         return affectedEntriesCount;
