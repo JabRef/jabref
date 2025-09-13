@@ -94,3 +94,6 @@ Accept: application/x-bibtex-library-csl+json
 ### GET not available library
 
 GET http://localhost:23119/libraries/notfound
+
+###
+GET http://localhost:23119/libraries/demo/entries/Corti_2009
