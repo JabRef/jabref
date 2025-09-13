@@ -56,7 +56,7 @@ public class ConferenceUtils {
      *
      * @param input the string to search, must not be {@code null}
      * @return an {@code Optional} containing the extracted and trimmed string from the first set of parentheses,
-     *         or {@code Optional.empty()} if no string is found
+     * or {@code Optional.empty()} if no string is found
      */
     public static Optional<String> extractStringFromParentheses(@NonNull String input) {
         if (input.indexOf('(') < 0) {
@@ -95,7 +95,7 @@ public class ConferenceUtils {
      * @param input  the raw string to extract acronym candidates from, must not be {@code null}
      * @param cutoff the maximum allowed length of each candidate substring; candidates longer than this are discarded
      * @return a set of acronym candidates ordered by descending length and then lexicographically,
-     *         or an empty set if no valid candidates are found
+     * or an empty set if no valid candidates are found
      */
     public static Set<String> generateAcronymCandidates(@NonNull String input, int cutoff) {
         if (input.isEmpty() || cutoff <= 0) {
@@ -209,7 +209,7 @@ public class ConferenceUtils {
         normalizeTokenAndFlush(currentToken, normalized);
 
         return normalized.toString()
-                .replaceFirst("^(ofthe|of|the)+", "");   // remove any false starts
+                         .replaceFirst("^(ofthe|of|the)+", "");   // remove any false starts
     }
 
     private static void normalizeTokenAndFlush(StringBuilder currentToken, StringBuilder output) {

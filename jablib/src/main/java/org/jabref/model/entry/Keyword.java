@@ -39,8 +39,8 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
     /// Converts a raw String to a single Keyword
     public static Keyword ofHierarchical(String rawString) {
         return Keyword.of(Stream.of(rawString.split(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString()))
-                        .map(String::trim)
-                        .toList());
+                                .map(String::trim)
+                                .toList());
     }
 
     @Override

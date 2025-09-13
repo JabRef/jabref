@@ -75,7 +75,7 @@ public class InternalPreferences {
     public StringProperty getUserAndHostProperty() {
         return userAndHost;
     }
-    
+
     /**
      * Returns the user and host information as a UserHostInfo object.
      *
@@ -84,7 +84,7 @@ public class InternalPreferences {
     public UserHostInfo getUserHostInfo() {
         return UserHostInfo.parse(getUserAndHost());
     }
-    
+
     /**
      * Sets the user and host information from a UserHostInfo object.
      *

@@ -156,9 +156,9 @@ public class ArgumentProcessor implements Runnable {
     }
 
     protected static void saveDatabaseContext(CliPreferences cliPreferences,
-                                       BibEntryTypesManager entryTypesManager,
-                                       BibDatabaseContext bibDatabaseContext,
-                                       Path outputFile) {
+                                              BibEntryTypesManager entryTypesManager,
+                                              BibDatabaseContext bibDatabaseContext,
+                                              Path outputFile) {
         try {
             if (!FileUtil.isBibFile(outputFile)) {
                 System.err.println(Localization.lang("Invalid output file type provided."));

@@ -38,12 +38,12 @@ public class FileAnnotationTab extends EntryEditorTab {
 
         return entry.getField(StandardField.FILE).isPresent()
                 && stateManager.activeTabProperty().get()
-                .map(tab -> tab.getAnnotationCache()
-                        .getFromCache(entry)
-                        .values()
-                        .stream()
-                        .anyMatch(list -> !list.isEmpty()))
-                .orElse(false);
+                               .map(tab -> tab.getAnnotationCache()
+                                              .getFromCache(entry)
+                                              .values()
+                                              .stream()
+                                              .anyMatch(list -> !list.isEmpty()))
+                               .orElse(false);
     }
 
     @Override

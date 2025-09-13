@@ -9,4 +9,5 @@ package org.jabref.gui.ai.components.util.notifications;
  * about possible problems with entries (because that will affect LLM output), but on the other hand the user would
  * like to chat with all available entries in the group, even if some of them are not valid.
  */
-public record Notification(String title, String message) { }
+public record Notification(String title, String message) {
+}

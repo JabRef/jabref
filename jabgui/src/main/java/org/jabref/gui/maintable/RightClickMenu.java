@@ -162,12 +162,12 @@ public class RightClickMenu {
     }
 
     public static Menu createCopySubMenu(ActionFactory factory,
-                                          DialogService dialogService,
-                                          StateManager stateManager,
-                                          GuiPreferences preferences,
-                                          ClipBoardManager clipBoardManager,
-                                          JournalAbbreviationRepository abbreviationRepository,
-                                          TaskExecutor taskExecutor) {
+                                         DialogService dialogService,
+                                         StateManager stateManager,
+                                         GuiPreferences preferences,
+                                         ClipBoardManager clipBoardManager,
+                                         JournalAbbreviationRepository abbreviationRepository,
+                                         TaskExecutor taskExecutor) {
         Menu copySpecialMenu = factory.createMenu(StandardActions.COPY_MORE);
 
         copySpecialMenu.getItems().addAll(
@@ -203,11 +203,11 @@ public class RightClickMenu {
     }
 
     static Menu createCopyFieldContentSubMenu(ActionFactory factory,
-                                                      DialogService dialogService,
-                                                      StateManager stateManager,
-                                                      ClipBoardManager clipBoardManager,
-                                                      GuiPreferences preferences,
-                                                      JournalAbbreviationRepository abbreviationRepository) {
+                                              DialogService dialogService,
+                                              StateManager stateManager,
+                                              ClipBoardManager clipBoardManager,
+                                              GuiPreferences preferences,
+                                              JournalAbbreviationRepository abbreviationRepository) {
         Menu copyFieldContentMenu = factory.createMenu(StandardActions.COPY_FIELD_CONTENT);
 
         copyFieldContentMenu.getItems().addAll(

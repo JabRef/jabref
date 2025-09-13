@@ -64,15 +64,16 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                     this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
 
             // TODO: Add support for PMID
-            case null, default -> {
+            case null,
+                 default -> {
                 assert field != null;
                 throw new IllegalStateException("Unable to instantiate a view model for identifier field editor '%s'".formatted(field.getDisplayName()));
             }
         }
 
         ViewLoader.view(this)
-                 .root(this)
-                 .load();
+                  .root(this)
+                  .load();
 
         textField.textProperty().bindBidirectional(viewModel.textProperty());
 

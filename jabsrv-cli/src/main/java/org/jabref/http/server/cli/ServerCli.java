@@ -50,9 +50,9 @@ public class ServerCli implements Callable<Void> {
         // Additionally, files can be provided as args
         if (files != null) {
             List<Path> filesToAdd = files.stream()
-                                          .filter(Files::exists)
-                                          .filter(path -> !filesToServe.contains(path))
-                                          .toList();
+                                         .filter(Files::exists)
+                                         .filter(path -> !filesToServe.contains(path))
+                                         .toList();
             LOGGER.info("Adding following files to the list of opened libraries: {}", filesToAdd);
             filesToServe.addAll(0, filesToAdd);
         }

@@ -44,8 +44,8 @@ public class AutosaveManager {
         this.executor.scheduleAtFixedRate(
                 () -> {
                     if (needsSave) {
-                       eventBus.post(new AutosaveEvent());
-                       needsSave = false;
+                        eventBus.post(new AutosaveEvent());
+                        needsSave = false;
                     }
                 },
                 DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS,
