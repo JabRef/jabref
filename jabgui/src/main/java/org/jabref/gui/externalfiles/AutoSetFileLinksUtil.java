@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
@@ -61,7 +63,7 @@ public class AutoSetFileLinksUtil {
         this(databaseContext.getFileDirectories(filePreferences), externalApplicationsPreferences, autoLinkPreferences);
     }
 
-    private AutoSetFileLinksUtil(List<Path> directories, ExternalApplicationsPreferences externalApplicationsPreferences, AutoLinkPreferences autoLinkPreferences) {
+    public AutoSetFileLinksUtil(List<Path> directories, ExternalApplicationsPreferences externalApplicationsPreferences, AutoLinkPreferences autoLinkPreferences) {
         this.directories = directories;
         this.autoLinkPreferences = autoLinkPreferences;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
@@ -96,7 +98,7 @@ public class AutoSetFileLinksUtil {
     ///
     /// NOTE: This method does not check if the file is already linked to another entry.
     public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
-        List<LinkedFile> linkedFiles = new ArrayList<>();
+        Set<LinkedFile> linkedFiles = new HashSet<>();
 
         List<String> extensions = externalApplicationsPreferences.getExternalFileTypes().stream().map(ExternalFileType::getExtension).toList();
 
@@ -133,11 +135,11 @@ public class AutoSetFileLinksUtil {
             }
         }
 
-        return linkedFiles;
+        return linkedFiles.stream().toList();
     }
 
     private List<Path> findByBrokenLinkName(BibEntry entry) throws IOException {
-        List<Path> matches = new ArrayList<>();
+        Set<Path> matches = new HashSet<>();
 
         for (LinkedFile brokenLink : entry.getFiles()) {
             if (brokenLink.findIn(directories).isPresent()) {
@@ -156,6 +158,6 @@ public class AutoSetFileLinksUtil {
             }
         }
 
-        return matches;
+        return matches.stream().toList();
     }
 }

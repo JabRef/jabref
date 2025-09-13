@@ -7,6 +7,7 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -37,11 +38,12 @@ import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -73,7 +75,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ObservableList<ExternalFileSorter> fileSortList;
 
     private final DialogService dialogService;
-    private final CliPreferences preferences;
+    private final GuiPreferences preferences;  // Changed from CliPreferences to GuiPreferences
     private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
     private BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesBackgroundTask;
 
@@ -85,7 +87,7 @@ public class UnlinkedFilesDialogViewModel {
     public UnlinkedFilesDialogViewModel(DialogService dialogService,
                                         UndoManager undoManager,
                                         FileUpdateMonitor fileUpdateMonitor,
-                                        GuiPreferences preferences,
+                                        GuiPreferences preferences,  // Changed parameter type
                                         StateManager stateManager,
                                         TaskExecutor taskExecutor) {
         this.preferences = preferences;
@@ -118,6 +120,49 @@ public class UnlinkedFilesDialogViewModel {
         treeRootProperty.setValue(Optional.empty());
     }
 
+    public void findAndFixBrokenLinks(Path searchDirectory, Filter<Path> fileFilter) {
+        // Get entries with broken links
+        List<BibEntry> entriesWithBrokenLinks = bibDatabase.getDatabase().getEntries().stream()
+                                                           .filter(entry -> entry.getFiles().stream()
+                                                                                 .anyMatch(file -> {
+                                                                                     Optional<Path> filePath = file.findIn(bibDatabase, preferences.getFilePreferences());
+                                                                                     return filePath.isEmpty() || !Files.exists(filePath.get());
+                                                                                 }))
+                                                           .toList();
+
+        List<ImportFilesResultItemViewModel> results = new ArrayList<>();
+
+        // Create AutoSetFileLinksUtil
+        AutoSetFileLinksUtil autoLinkUtil = new AutoSetFileLinksUtil(
+                List.of(searchDirectory),
+                preferences.getExternalApplicationsPreferences(),
+                preferences.getAutoLinkPreferences());
+
+        // For each entry with broken links
+        for (BibEntry entry : entriesWithBrokenLinks) {
+            try {
+                // Use the existing sophisticated logic to find associated files
+                List<LinkedFile> associatedFiles = autoLinkUtil.findAssociatedNotLinkedFiles(entry);
+
+                // If exactly one matching file is found, link it
+                if (associatedFiles.size() == 1) {
+                    LinkedFile newLinkedFile = associatedFiles.getFirst();
+                    entry.addFile(newLinkedFile);
+
+                    // Get the actual path for the result
+                    Optional<Path> filePath = newLinkedFile.findIn(bibDatabase, preferences.getFilePreferences());
+                    filePath.ifPresent(path -> results.add(new ImportFilesResultItemViewModel(path, true, "Fixed broken link")));
+                }
+            } catch (IOException e) {
+                LOGGER.error("Error finding associated files for entry", e);
+            }
+        }
+
+        // Update the result list directly
+        resultList.clear();
+        resultList.addAll(results);
+    }
+
     public void startSearch() {
         Path directory = this.getSearchDirectory();
         Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
@@ -125,7 +170,7 @@ public class UnlinkedFilesDialogViewModel {
         ExternalFileSorter selectedSortFilter = selectedSort.getValue();
         progressValueProperty.unbind();
         progressTextProperty.unbind();
-
+        findAndFixBrokenLinks(directory, selectedFileFilter);
         findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences())
                 .onRunning(() -> {
                     progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
