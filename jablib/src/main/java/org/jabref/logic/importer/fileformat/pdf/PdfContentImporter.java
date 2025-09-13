@@ -137,8 +137,7 @@ public class PdfContentImporter extends PdfImporter {
             boolean isFirst = true;
             int i = 0;
             res = "";
-            do
-            {
+            do {
                 if (workedOnFirstOrMiddle) {
                     // last item was a first or a middle name
                     // we have to check whether we are on a middle name
