@@ -96,7 +96,7 @@ public class BibtexParser implements Parser {
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final int INDEX_RELATIVE_PATH_IN_PLIST = 4;
-    private static final Pattern EPILOG_PATTERN = Pattern.compile("\\w+\\s*=.*,");
+    private final Pattern epilogPattern;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
@@ -121,6 +121,7 @@ public class BibtexParser implements Parser {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
         this.metaDataParser = new MetaDataParser(fileMonitor);
         this.parsedBibDeskGroups = new HashMap<>();
+        this.epilogPattern = Pattern.compile("\\w+\\s*=.*,");
     }
 
     public BibtexParser(ImportFormatPreferences importFormatPreferences) {
@@ -312,7 +313,7 @@ public class BibtexParser implements Parser {
     private void checkEpilog() {
         // This is an incomplete and inaccurate try to verify if something went wrong with previous parsing activity even though there were no warnings so far
         // regex looks for something like 'identifier = blabla ,'
-        if (!parserResult.hasWarnings() && EPILOG_PATTERN.matcher(database.getEpilog()).find()) {
+        if (!parserResult.hasWarnings() && epilogPattern.matcher(database.getEpilog()).find()) {
             parserResult.addWarning(new ParserResult.Range(line, column, line, column), "following BibTeX fragment has not been parsed:\n" + database.getEpilog());
         }
     }
