@@ -414,12 +414,6 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0.5em 1em 0.5em 1em;
 }
 
-.dialog-pane .button-bar .button {
-    -fx-min-width: 6em;
-    -fx-pref-width: 6em;
-    -fx-max-width: 6em;
-}
-
 .menu-button > .label {
     -fx-padding: 0 8 0 8;
 }
