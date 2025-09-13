@@ -15,22 +15,22 @@ WS: [ \t\n\r]+ -> skip; // whitespace is ignored/skipped
 LPAREN: '(';
 RPAREN: ')';
 
-EQUAL: '='; // case insensitive contains, semantically the same as CONTAINS
+EQUAL: '=';   // case insensitive contains, semantically the same as CONTAINS
 CEQUAL: '=!'; // case sensitive contains
 
-EEQUAL: '=='; // exact match case insensitive, semantically the same as MATCHES
+EEQUAL: '==';   // exact match case insensitive, semantically the same as MATCHES
 CEEQUAL: '==!'; // exact match case sensitive
 
-REQUAL: '=~'; // regex check case insensitive
+REQUAL: '=~';    // regex check case insensitive
 CREEQUAL: '=~!'; // regex check case sensitive
 
-NEQUAL: '!='; //  negated case insensitive contains
+NEQUAL: '!=';   //  negated case insensitive contains
 NCEQUAL: '!=!'; // negated case sensitive contains
 
-NEEQUAL: '!=='; // negated case insensitive exact match
+NEEQUAL: '!==';   // negated case insensitive exact match
 NCEEQUAL: '!==!'; // negated case sensitive exact match
 
-NREQUAL: '!=~'; // negated regex check case insensitive
+NREQUAL: '!=~';    // negated regex check case insensitive
 NCREEQUAL: '!=~!'; // negated regex check case sensitive
 
 AND: 'AND';
@@ -41,7 +41,7 @@ NOT: 'NOT';
 
 FIELD: [A-Z]([A-Z] | '-' | '_')*;           // field name should allow for - or _
 STRING_LITERAL: '"' ('\\"' | ~["])* '"';    // " should be escaped with a backslash
-TERM: ('\\' [=!~()] | ~[ \t\n\r=!~()])+;    // =!~() should be escaped with a backslash
+TERM: ('\\' [ :=!~()] | ~[ :=!~()\t\r\n])+; // space and :, =, !, ~, (, ) should be escaped with a backslash; \t\r\n cannot be escaped
 
 start
     : EOF
