@@ -99,13 +99,16 @@ public class ThemeManager {
     /// Using `installCss` directly would cause a delay in theme application, resulting
     /// in a brief flash of the default JavaFX theme (Modena CSS) before the intended theme appears.
     public void installCssImmediately(Scene scene) {
-        List<String> stylesheets = Stream
+        List<String> stylesheets = scene.getStylesheets();
+        scene.getStylesheets().clear();
+        List<String> baseOrThemeStylesheet = Stream
                 .of(baseStyleSheet.getSceneStylesheet(),
-                        theme.getAdditionalStylesheet().map(StyleSheet::getSceneStylesheet).orElse(null))
-                .filter(Objects::nonNull)
+                        theme.getAdditionalStylesheet().map(StyleSheet::getSceneStylesheet).orElse(null)
+                ).filter(Objects::nonNull)
                 .map(URL::toExternalForm)
                 .toList();
-        scene.getStylesheets().setAll(stylesheets);
+
+        stylesheets.addAll(baseOrThemeStylesheet);
     }
 
     /// Registers a runnable on JavaFX thread to install the base and additional css files as stylesheets in the given scene.
