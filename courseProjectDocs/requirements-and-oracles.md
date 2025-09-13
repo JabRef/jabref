@@ -11,7 +11,7 @@
 
 ## Non-Functional Requirements
 1. The system shall be free of charge, open-source, and cross-platform to ensure accessibility and ease of use for users across different operating systems and environments.
-2. The system shall sha
+2. The system shall shall be able to be run as a CLI application or built from the source to give users installion options. 
 3. The system shall ...
 ...
 
