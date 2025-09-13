@@ -604,9 +604,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
     }
 
-    /**
-     * Recursively searches for a TextInputControl (TextField or TextArea) with the given ID.
-     */
+     /// Recursively searches for a TextInputControl (TextField or TextArea) with the given ID.
     private Optional<TextInputControl> findTextInputById(Parent parent, String id) {
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (child instanceof TextInputControl textInput && id.equalsIgnoreCase(textInput.getId())) {
