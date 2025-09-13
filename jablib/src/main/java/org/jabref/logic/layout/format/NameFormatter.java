@@ -9,69 +9,63 @@ import org.jabref.logic.bst.util.BstNameFormatter;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.model.entry.AuthorList;
 
-/**
- * This layout formatter uses the Bibtex name.format$ method and provides ultimate flexibility:
- * <p>
- * The formatter needs a parameter to be passed in that follows the following format:
- *
- * <code>&lt;case1>@&lt;range11>@"&lt;format>"@&lt;range12>@"&lt;format>"@&lt;range13>...@@
- * <p>
- * &lt;case2>@&lt;range21>@...</code> and so on.
- * <p>
- * Individual cases are separated by @@ and items in a case by @.
- * <p>
- * Cases are just integers or the character * and will tell the formatter to apply the following formats if there are
- * less or equal authors given to it. The cases must be in strict increasing order with the * in the last position.
- * <p>
- * For instance:
- * <p>
- * case1 = 2
- * case2 = 3
- * case3 = *
- * <p>
- * Ranges are either &lt;integer>..&lt;integer>, &lt;integer> or the character * using a 1 based index for indexing
- * authors from the given authorlist. Integer indexes can be negative to denote them to start from
- * the end of the list where -1 is the last author.
- * <p>
- * For instance with an authorlist of "Joe Doe and Mary Jane and Bruce Bar and Arthur Kay":
- * <p>
- * 1..3 will affect Joe, Mary and Bruce
- * <p>
- * 4..4 will affect Arthur
- * <p>
- * * will affect all of them
- * <p>
- * 2..-1 will affect Mary, Bruce and Arthur
- * <p>
- * The &lt;format> uses the Bibtex formatter format:
- * <p>
- * The four letter v, f, l, j indicate the name parts von, first, last, jr which
- * are used within curly braces. A single letter v, f, l, j indicates that the name should be abbreviated.
- * To put a quote in the format string quote it using \" (mh. this doesn't work yet)
- * <p>
- * I give some examples but would rather point you to the bibtex documentation.
- * <p>
- * "{ll}, {f}." Will turn "Joe Doe" into "Doe, J."
- * <p>
- * Complete example:
- * <p>
- * To turn:
- * <p>
- * "Joe Doe and Mary Jane and Bruce Bar and Arthur Kay"
- * <p>
- * into
- * <p>
- * "Doe, J., Jane, M., Bar, B. and Kay, A."
- * <p>
- * you would use
- * <p>
- * 1@*@{ll}, {f}.@@2@1@{ll}, {f}.@2@ and {ll}, {f}.@@*@1..-3@{ll}, {f}., @-2@{ll}, {f}.@-1@ and {ll}, {f}.
- * <p>
- * Yeah this is trouble-some to write, but should work.
- * <p>
- * For more examples see the test-cases.
- *
- */
+/// This layout formatter uses the BibTeX `name.format$` method and provides ultimate flexibility.
+///
+/// The formatter needs a parameter with the following format:
+///
+/// ```
+/// <case1>@<range11>@"<format>"@<range12>@"<format>"@<range13>...@@
+/// <case2>@<range21>@...
+/// ```
+///
+/// Individual cases are separated by `@@` and items in a case by `@`.
+///
+/// Cases are just integers or the character `*` and tell the formatter to apply the following formats
+/// if there are less or equal authors given.
+/// The cases must be in strictly increasing order with `*` in the last position.
+///
+/// Example:
+/// - `case1 = 2`
+/// - `case2 = 3`
+/// - `case3 = *`
+///
+/// Ranges are either `<integer>..<integer>`, `<integer>` or `*` (using a 1-based index).
+/// Negative integers start from the end (`-1` = last author).
+///
+/// Example with `Joe Doe and Mary Jane and Bruce Bar and Arthur Kay`:
+/// - `1..3` → Joe, Mary, Bruce
+/// - `4..4` → Arthur
+/// - `*` → all authors
+/// - `2..-1` → Mary, Bruce, Arthur
+///
+/// The `<format>` uses the BibTeX formatter syntax:
+/// - The letters `v`, `f`, `l`, `j` indicate name parts (von, first, last, jr).
+/// - Use them inside `{}` for full form.
+/// - A single letter (`v`, `f`, `l`, `j`) abbreviates the part.
+/// - Quotes must be escaped as `\"` (not fully supported yet).
+///
+/// Example:
+/// - `"{ll}, {f}."` → `"Joe Doe"` becomes `"Doe, J."`
+///
+/// Complete example:
+///
+/// Input:
+/// ```
+/// Joe Doe and Mary Jane and Bruce Bar and Arthur Kay
+/// ```
+///
+/// Output:
+/// ```
+/// Doe, J., Jane, M., Bar, B. and Kay, A.
+/// ```
+///
+/// Formatter parameter:
+/// ```
+/// 1@*@{ll}, {f}.@@2@1@{ll}, {f}.@2@ and {ll}, {f}.@@*@1..-3@{ll}, {f}., @-2@{ll}, {f}.@-1@ and {ll}, {f}.
+/// ```
+///
+/// This is troublesome to write, but it works.
+/// For more examples see the test cases.
 public class NameFormatter implements LayoutFormatter {
 
     public static final String DEFAULT_FORMAT = "1@*@{ff }{vv }{ll}{, jj}@@*@1@{ff }{vv }{ll}{, jj}@*@, {ff }{vv }{ll}{, jj}";
