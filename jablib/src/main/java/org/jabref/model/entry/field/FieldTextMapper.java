@@ -38,7 +38,7 @@ public class FieldTextMapper {
     public static String getDisplayName(OrFields fields) {
         StringJoiner joiner = new StringJoiner("/");
         for (Field field : fields.getFields()) {
-            joiner.add(StringUtil.capitalizeFirst(FieldTextMapper.getDisplayName(field)));
+            joiner.add(FieldTextMapper.getDisplayName(field));
         }
         return joiner.toString();
     }
