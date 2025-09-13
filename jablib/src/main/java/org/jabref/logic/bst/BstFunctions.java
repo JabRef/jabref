@@ -911,8 +911,9 @@ public class BstFunctions {
             throw new BstVMException("Expecting two functions for while$ (line %d)".formatted(ctx.start.getLine()));
         }
 
-        do
-        {
+        // @formatter:off
+        do {
+            // @formatter:on
             visitor.visit((ParseTree) f1);
 
             Object i = stack.pop();

@@ -32,8 +32,9 @@ public class INSPIREBibtexFilterReader extends FilterReader {
 
     private String readpreLine() throws IOException {
         String l;
-        do
-        {
+        // @formatter:off
+        do {
+            // @formatter:on
             l = inReader.readLine();
             if (l == null) {
                 return null;
