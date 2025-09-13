@@ -9,7 +9,10 @@ import java.nio.charset.StandardCharsets;
 
 import org.jsoup.HttpStatusException;
 
-public record SimpleHttpResponse(int statusCode, String responseMessage, String responseBody) {
+public record SimpleHttpResponse(
+        int statusCode,
+        String responseMessage,
+        String responseBody) {
     private static final int MAX_RESPONSE_LENGTH = 1024; // 1 KB
 
     public SimpleHttpResponse(int statusCode, String responseMessage, String responseBody) {
@@ -69,8 +72,8 @@ public record SimpleHttpResponse(int statusCode, String responseMessage, String 
      * Truncates the response body to 1 KB if it exceeds that size.
      * Appends "... (truncated)" to indicate truncation.
      *
-     * @param responseBody  the original response body
-     * @return  the truncated response body
+     * @param responseBody the original response body
+     * @return the truncated response body
      */
     private static String truncateResponseBody(String responseBody) {
         byte[] bytes = responseBody.getBytes(StandardCharsets.UTF_8);

@@ -111,6 +111,9 @@ public class RangeSortVisual {
      * <p>
      * Used for sorting reference marks by their visual positions.
      */
-    private record ComparableMark<T>(Point position, int indexInPosition, T content) {
+    private record ComparableMark<T>(
+            Point position,
+            int indexInPosition,
+            T content) {
     }
 }

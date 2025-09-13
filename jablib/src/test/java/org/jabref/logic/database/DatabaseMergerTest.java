@@ -107,10 +107,10 @@ class DatabaseMergerTest {
         new DatabaseMerger(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).mergeStrings(target, source2);
         // Use string representation to compare since the id will not match
         List<String> resultStringsSorted = target.getStringValues()
-                .stream()
-                .map(BibtexString::toString)
-                .sorted()
-                .collect(Collectors.toList());
+                                                 .stream()
+                                                 .map(BibtexString::toString)
+                                                 .sorted()
+                                                 .collect(Collectors.toList());
 
         assertEquals(List.of(targetString.toString(), importedBibTeXString1.toString(),
                 importedBibTeXString2.toString()), resultStringsSorted);
@@ -134,9 +134,9 @@ class DatabaseMergerTest {
 
         new DatabaseMerger(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).mergeStrings(target, source);
         List<BibtexString> resultStringsSorted = target.getStringValues()
-                .stream()
-                .sorted(new BibtexStringComparator(false)::compare)
-                .collect(Collectors.toList());
+                                                       .stream()
+                                                       .sorted(new BibtexStringComparator(false)::compare)
+                                                       .collect(Collectors.toList());
 
         assertEquals(List.of(targetString1, targetString2), resultStringsSorted);
     }

@@ -100,15 +100,15 @@ public class CleanupSingleAction extends SimpleCommand {
     }
 
     private void cleanup(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
-            // undo granularity is on entry level
-            NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
+        // undo granularity is on entry level
+        NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
 
-            doCleanup(databaseContext, cleanupPreferences, entry, ce);
+        doCleanup(databaseContext, cleanupPreferences, entry, ce);
 
-            ce.end();
-            if (ce.hasEdits()) {
-                undoManager.addEdit(ce);
-            }
+        ce.end();
+        if (ce.hasEdits()) {
+            undoManager.addEdit(ce);
+        }
     }
 
     private void showFailures(List<JabRefException> failures) {

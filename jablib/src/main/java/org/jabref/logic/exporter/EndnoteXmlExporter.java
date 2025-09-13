@@ -94,7 +94,9 @@ public class EndnoteXmlExporter extends Exporter {
 
     private final DocumentBuilderFactory documentBuilderFactory;
 
-    private record EndNoteType(String name, int number) {
+    private record EndNoteType(
+            String name,
+            int number) {
     }
 
     private final BibEntryPreferences bibEntryPreferences;

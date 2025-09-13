@@ -7,13 +7,26 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root type="VBox" styleClass="edit-field-content-pane" xmlns="http://javafx.com/javafx/17"
-         xmlns:fx="http://javafx.com/fxml/1"
-         fx:controller="org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView">
-    <Label styleClass="sectionHeader" text="%Rename field"/>
+<fx:root
+        type="VBox"
+        styleClass="edit-field-content-pane"
+        xmlns="http://javafx.com/javafx/17"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.jabref.gui.edit.automaticfiededitor.renamefield.RenameFieldTabView">
+    <Label styleClass="sectionHeader"
+           text="%Rename field"/>
     <HBox styleClass="actions">
-        <ComboBox fx:id="fieldComboBox" editable="true" HBox.hgrow="ALWAYS"/>
-        <TextField fx:id="newFieldNameTextField" promptText="%New field name" HBox.hgrow="ALWAYS"/>
+        <ComboBox
+                fx:id="fieldComboBox"
+                editable="true"
+                HBox.hgrow="ALWAYS"/>
+        <TextField
+                fx:id="newFieldNameTextField"
+                promptText="%New field name"
+                HBox.hgrow="ALWAYS"/>
     </HBox>
-    <Button fx:id="renameButton" mnemonicParsing="false" onAction="#renameField" text="%Rename"/>
+    <Button fx:id="renameButton"
+            mnemonicParsing="false"
+            onAction="#renameField"
+            text="%Rename"/>
 </fx:root>

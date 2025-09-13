@@ -162,7 +162,11 @@ public class ParserResult {
         return articleRanges;
     }
 
-    public record Range(int startLine, int startColumn, int endLine, int endColumn) {
+    public record Range(
+            int startLine,
+            int startColumn,
+            int endLine,
+            int endColumn) {
         public static final Range NULL_RANGE = new Range(0, 0, 0, 0);
     }
 }

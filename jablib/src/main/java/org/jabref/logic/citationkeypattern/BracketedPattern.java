@@ -235,7 +235,8 @@ public class BracketedPattern {
         while (parsedPattern.hasMoreTokens()) {
             String token = parsedPattern.nextToken();
             switch (token) {
-                case "\"" -> appendQuote(expandedPattern, parsedPattern);
+                case "\"" ->
+                        appendQuote(expandedPattern, parsedPattern);
                 case "[" -> {
                     String fieldMarker = contentBetweenBrackets(parsedPattern, pattern);
                     expandedPattern.append(bracketContentHandler.apply(fieldMarker));
@@ -247,7 +248,8 @@ public class BracketedPattern {
                         LOGGER.warn("Found a \"\\\" that is not part of an escape sequence");
                     }
                 }
-                default -> expandedPattern.append(token);
+                default ->
+                        expandedPattern.append(token);
             }
         }
 
@@ -273,7 +275,8 @@ public class BracketedPattern {
             String token = tokenizer.nextToken();
             // If the beginning of a quote is found, append the content
             switch (token) {
-                case "\"" -> appendQuote(bracketContent, tokenizer);
+                case "\"" ->
+                        appendQuote(bracketContent, tokenizer);
                 case "]" -> {
                     if (subBrackets == 0) {
                         foundClosingBracket = true;
@@ -286,7 +289,8 @@ public class BracketedPattern {
                     subBrackets++;
                     bracketContent.append(token);
                 }
-                default -> bracketContent.append(token);
+                default ->
+                        bracketContent.append(token);
             }
         }
 
@@ -1281,8 +1285,8 @@ public class BracketedPattern {
      *         <li>null if content is null</li>
      *         </ul>
      */
-     @VisibleForTesting
-     static String generateInstitutionKey(String content) {
+    @VisibleForTesting
+    static String generateInstitutionKey(String content) {
         if (content == null) {
             return null;
         }

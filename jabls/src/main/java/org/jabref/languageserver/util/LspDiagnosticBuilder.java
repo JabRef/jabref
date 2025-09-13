@@ -25,7 +25,8 @@ public final class LspDiagnosticBuilder {
     private Field field;
     private Range explicitRange;
 
-    private LspDiagnosticBuilder() { }
+    private LspDiagnosticBuilder() {
+    }
 
     public static LspDiagnosticBuilder create(String message) {
         return new LspDiagnosticBuilder().setMessage(message);

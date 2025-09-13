@@ -7,7 +7,7 @@ import org.jabref.logic.l10n.Localization;
 
 /**
  * Remove {} braces around words in case they appear balanced
- *
+ * <p>
  * Related formatter: {@link ProtectTermsFormatter}
  */
 public class UnprotectTermsFormatter extends Formatter {
@@ -22,7 +22,8 @@ public class UnprotectTermsFormatter extends Formatter {
         StringBuilder result = new StringBuilder();
         int level = 0;
         int index = 0;
-        do {
+        do
+        {
             char charAtIndex = text.charAt(index);
             if (charAtIndex == '{') {
                 level++;

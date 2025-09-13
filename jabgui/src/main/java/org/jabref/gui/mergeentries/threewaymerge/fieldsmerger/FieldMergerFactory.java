@@ -13,12 +13,18 @@ public class FieldMergerFactory {
 
     public FieldMerger create(Field field) {
         return switch (field) {
-            case StandardField.GROUPS -> new GroupMerger(bibEntryPreferences);
-            case StandardField.KEYWORDS -> new KeywordMerger(bibEntryPreferences);
-            case StandardField.COMMENT -> new CommentMerger();
-            case StandardField.FILE -> new FileMerger();
-            case null -> throw new IllegalArgumentException("Field must not be null");
-            default -> throw new IllegalArgumentException("No implementation found for merging the given field: " + field.getDisplayName());
+            case StandardField.GROUPS ->
+                    new GroupMerger(bibEntryPreferences);
+            case StandardField.KEYWORDS ->
+                    new KeywordMerger(bibEntryPreferences);
+            case StandardField.COMMENT ->
+                    new CommentMerger();
+            case StandardField.FILE ->
+                    new FileMerger();
+            case null ->
+                    throw new IllegalArgumentException("Field must not be null");
+            default ->
+                    throw new IllegalArgumentException("No implementation found for merging the given field: " + field.getDisplayName());
         };
     }
 

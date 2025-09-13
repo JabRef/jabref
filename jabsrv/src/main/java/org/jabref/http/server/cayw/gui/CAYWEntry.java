@@ -6,9 +6,12 @@ import org.jabref.model.entry.BibEntry;
 
 public record CAYWEntry(
         BibEntry bibEntry,
-        String label, // Used in the list
-        String shortLabel, // Used on the buttons ("chips")
-        String description // Used when hovering and used as bases on the second line
+        String label,
+        // Used in the list
+        String shortLabel,
+        // Used on the buttons ("chips")
+        String description
+        // Used when hovering and used as bases on the second line
 ) {
 
     @Override

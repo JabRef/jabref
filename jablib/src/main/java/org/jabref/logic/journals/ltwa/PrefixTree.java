@@ -79,7 +79,9 @@ public class PrefixTree<D> {
         }
     }
 
-    private record SearchState(Node<?> node, int index) {
+    private record SearchState(
+            Node<?> node,
+            int index) {
     }
 
     private static class Node<D> {

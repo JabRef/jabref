@@ -12,44 +12,84 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<DialogPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.171"
-            fx:controller="org.jabref.gui.exporter.CreateModifyExporterDialogView">
+<DialogPane
+        xmlns:fx="http://javafx.com/fxml/1"
+        xmlns="http://javafx.com/javafx/8.0.171"
+        fx:controller="org.jabref.gui.exporter.CreateModifyExporterDialogView">
     <content>
         <HBox>
-            <GridPane hgap="4.0" vgap="4.0" HBox.hgrow="ALWAYS">
+            <GridPane
+                    hgap="4.0"
+                    vgap="4.0"
+                    HBox.hgrow="ALWAYS">
                 <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
-                    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                    <ColumnConstraints
+                            hgrow="SOMETIMES"
+                            minWidth="10.0"/>
+                    <ColumnConstraints
+                            hgrow="ALWAYS"
+                            minWidth="10.0"/>
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints vgrow="SOMETIMES" />
-                    <RowConstraints vgrow="SOMETIMES" />
-                    <RowConstraints vgrow="SOMETIMES" />
+                    <RowConstraints
+                            vgrow="SOMETIMES"/>
+                    <RowConstraints
+                            vgrow="SOMETIMES"/>
+                    <RowConstraints
+                            vgrow="SOMETIMES"/>
                 </rowConstraints>
-                <Label text="%Export format name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                <TextField fx:id="name" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label text="%Export format name:"
+                       GridPane.rowIndex="0"
+                       GridPane.columnIndex="0"/>
+                <TextField
+                        fx:id="name"
+                        GridPane.rowIndex="0"
+                        GridPane.columnIndex="1"/>
 
-                <Label text="%Main layout file:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                <HBox spacing="4.0" GridPane.rowIndex="1" GridPane.columnIndex="1" alignment="CENTER">
-                    <TextField fx:id="fileName" HBox.hgrow="ALWAYS" />
-                    <Button onAction="#browse" styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0">
+                <Label text="%Main layout file:"
+                       GridPane.rowIndex="1"
+                       GridPane.columnIndex="0"/>
+                <HBox spacing="4.0"
+                      GridPane.rowIndex="1"
+                      GridPane.columnIndex="1"
+                      alignment="CENTER">
+                    <TextField
+                            fx:id="fileName"
+                            HBox.hgrow="ALWAYS"/>
+                    <Button onAction="#browse"
+                            styleClass="icon-button,narrow"
+                            prefHeight="20.0"
+                            prefWidth="20.0">
                         <graphic>
-                            <JabRefIconView glyph="OPEN"/>
+                            <JabRefIconView
+                                    glyph="OPEN"/>
                         </graphic>
                         <tooltip>
-                            <Tooltip text="%Browse"/>
+                            <Tooltip
+                                    text="%Browse"/>
                         </tooltip>
                     </Button>
                 </HBox>
 
-                <Label text="%File extension:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                <TextField fx:id="extension" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Label text="%File extension:"
+                       GridPane.rowIndex="2"
+                       GridPane.columnIndex="0"/>
+                <TextField
+                        fx:id="extension"
+                        GridPane.rowIndex="2"
+                        GridPane.columnIndex="1"/>
                 <padding>
-                    <Insets bottom="30.0" left="30.0" right="30.0" top="30.0"/>
+                    <Insets bottom="30.0"
+                            left="30.0"
+                            right="30.0"
+                            top="30.0"/>
                 </padding>
             </GridPane>
         </HBox>
     </content>
-    <ButtonType fx:id="saveExporter" text="%Save exporter"/>
-    <ButtonType fx:constant="CANCEL"/>
+    <ButtonType
+            fx:id="saveExporter"
+            text="%Save exporter"/>
+    <ButtonType
+            fx:constant="CANCEL"/>
 </DialogPane>

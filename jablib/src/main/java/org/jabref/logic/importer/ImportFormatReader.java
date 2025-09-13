@@ -136,7 +136,9 @@ public class ImportFormatReader {
         return new TreeSet<>(this.formats);
     }
 
-    public record UnknownFormatImport(String format, ParserResult parserResult) {
+    public record UnknownFormatImport(
+            String format,
+            ParserResult parserResult) {
     }
 
     /// Tries to import a file by iterating through the available import filters,

@@ -21,7 +21,9 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class Pseudonymization {
 
-    public record Result(BibDatabaseContext bibDatabaseContext, Map<String, String> valueMapping) {
+    public record Result(
+            BibDatabaseContext bibDatabaseContext,
+            Map<String, String> valueMapping) {
     }
 
     public Result pseudonymizeLibrary(BibDatabaseContext bibDatabaseContext) {
@@ -33,7 +35,7 @@ public class Pseudonymization {
 
         Map<String, String> valueMapping = new HashMap<>();
         fieldToValueToIdMap.forEach((field, stringToIntMap) ->
-            stringToIntMap.forEach((value, id) -> valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value)));
+                stringToIntMap.forEach((value, id) -> valueMapping.put(field.getName().toLowerCase(Locale.ROOT) + "-" + id, value)));
 
         BibDatabase bibDatabase = new BibDatabase(newEntries);
         BibDatabaseContext result = new BibDatabaseContext(bibDatabase);

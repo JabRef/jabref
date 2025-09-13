@@ -5,8 +5,9 @@ import java.util.Optional;
 
 import org.jspecify.annotations.NonNull;
 
-public record WalkthroughEffect(@NonNull List<WindowEffect> windowEffects,
-                                Optional<HighlightEffect> fallbackEffect) {
+public record WalkthroughEffect(
+        @NonNull List<WindowEffect> windowEffects,
+        Optional<HighlightEffect> fallbackEffect) {
     public WalkthroughEffect(WindowEffect windowEffect) {
         this(windowEffect, HighlightEffect.FULL_SCREEN_DARKEN);
     }

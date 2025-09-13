@@ -93,7 +93,9 @@ public class MrDLibImporter extends Importer {
     /**
      * Small pair-class to ensure the right order of the recommendations.
      */
-    private record RankedBibEntry(BibEntry entry, Integer rank) {
+    private record RankedBibEntry(
+            BibEntry entry,
+            Integer rank) {
     }
 
     /**

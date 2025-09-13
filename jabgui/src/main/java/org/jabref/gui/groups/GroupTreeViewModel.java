@@ -189,10 +189,10 @@ public class GroupTreeViewModel extends AbstractViewModel {
         String grpName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
         AbstractGroup importEntriesGroup = new SmartGroup(grpName, GroupHierarchyType.INDEPENDENT, ',');
         boolean isGrpExist = parent.getGroupNode()
-                                 .getChildren()
-                                 .stream()
-                                 .map(GroupTreeNode::getGroup)
-                                 .anyMatch(grp -> grp instanceof SmartGroup);
+                                   .getChildren()
+                                   .stream()
+                                   .map(GroupTreeNode::getGroup)
+                                   .anyMatch(grp -> grp instanceof SmartGroup);
         if (!isGrpExist) {
             currentDatabase.ifPresent(db -> {
                 GroupTreeNode newSubgroup = parent.addSubgroup(importEntriesGroup);

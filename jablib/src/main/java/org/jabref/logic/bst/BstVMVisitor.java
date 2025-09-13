@@ -27,7 +27,8 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
 
     private BstEntry selectedBstEntry = null;
 
-    public record Identifier(String name) {
+    public record Identifier(
+            String name) {
     }
 
     public BstVMVisitor(BstVMContext bstVMContext, StringBuilder bbl) {
