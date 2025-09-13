@@ -124,7 +124,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private BibEntry currentlyShowing;
     private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
-    private boolean backOrForwardNavigation = false;
+    private boolean backOrForwardNavigationActionTriggered = false;
 
 
     private BibDatabaseContext bibDatabaseContext;
@@ -1000,7 +1000,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 destinationHistory.add(currentlyShowing);
             }
 
-            backOrForwardNavigation = true;
+            backOrForwardNavigationActionTriggered = true;
             clearAndSelect(toShow);
             updateNavigationState();
         }
@@ -1016,9 +1016,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private void newEntryShowing(BibEntry entry) {
         // skip history updates if this is from a back/forward operation
-        if (backOrForwardNavigation) {
+        if (backOrForwardNavigationActionTriggered) {
             currentlyShowing = entry;
-            backOrForwardNavigation = false;
+            backOrForwardNavigationActionTriggered = false;
             updateNavigationState();
             return;
         }
