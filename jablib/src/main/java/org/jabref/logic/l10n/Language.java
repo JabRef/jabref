@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * Contains all supported languages.
@@ -65,6 +66,13 @@ public enum Language {
         }
 
         return Optional.of(locale);
+    }
+
+    public static Language getLanguageFor(String languageString) {
+        return Stream.of(Language.values())
+                     .filter(language -> language.getId().equalsIgnoreCase(languageString))
+                     .findFirst()
+                     .orElse(Language.ENGLISH);
     }
 
     public String getDisplayName() {

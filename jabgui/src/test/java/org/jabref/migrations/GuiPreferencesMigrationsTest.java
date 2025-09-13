@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
@@ -187,7 +188,7 @@ class GuiPreferencesMigrationsTest {
 
         when(preferences.getStringList("columnNames")).thenReturn(updatedNames);
 
-        when(preferences.get(JabRefGuiPreferences.MAIN_FONT_SIZE)).thenReturn("11.2");
+        when(preferences.get(WorkspacePreferences.MAIN_FONT_SIZE)).thenReturn("11.2");
 
         PreferencesMigrations.restoreVariablesForBackwardCompatibility(preferences);
 
@@ -196,7 +197,7 @@ class GuiPreferencesMigrationsTest {
         verify(preferences).put("columnSortTypes", "");
         verify(preferences).put("columnSortOrder", "");
 
-        verify(preferences).putInt(JabRefGuiPreferences.MAIN_FONT_SIZE, 11);
+        verify(preferences).putInt(WorkspacePreferences.MAIN_FONT_SIZE, 11);
     }
 
     @Test
