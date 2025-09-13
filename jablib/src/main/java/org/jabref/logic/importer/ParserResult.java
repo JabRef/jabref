@@ -103,13 +103,11 @@ public class ParserResult {
      * @param s String Warning text. Must be pretranslated. Only added if there isn't already a dupe.
      */
     public void addWarning(String s) {
-        if (!warnings.containsValue(s)) {
-            warnings.put(Range.NULL_RANGE, s);
-        }
+        warnings.put(Range.NULL_RANGE, s);
     }
 
     public void addWarning(Range range, String s) {
-        if (!warnings.containsKey(range) && !warnings.containsValue(s)) {
+        if (!warnings.containsEntry(range, s)) {
             warnings.put(range, s);
         }
     }
@@ -177,7 +175,11 @@ public class ParserResult {
         return articleRanges;
     }
 
-    public record Range(int startLine, int startColumn, int endLine, int endColumn) {
+    public record Range(
+            int startLine,
+            int startColumn,
+            int endLine,
+            int endColumn) {
         public static final Range NULL_RANGE = new Range(0, 0, 0, 0);
 
         public Range(int startLine, int startColumn) {
@@ -187,7 +189,7 @@ public class ParserResult {
 
     /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
     public Range getFieldRange(BibEntry entry, Field
-        field) {
+            field) {
         Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
 
         if (rangeMap.isEmpty()) {
@@ -199,14 +201,9 @@ public class ParserResult {
             return range;
         }
 
-        if (field.getAlias().isPresent()) {
-            range = rangeMap.get(field.getAlias().get());
-            if (range != null) {
-                return range;
-            }
-        }
-
-        return getCompleteEntryIndicator(entry);
+        return field.getAlias()
+                    .map(rangeMap::get)
+                    .orElseGet(() -> getCompleteEntryIndicator(entry));
     }
 
     /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.

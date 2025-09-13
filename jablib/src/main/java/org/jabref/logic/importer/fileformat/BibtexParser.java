@@ -96,6 +96,7 @@ public class BibtexParser implements Parser {
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final int INDEX_RELATIVE_PATH_IN_PLIST = 4;
+    private static final Pattern EPILOG_PATTERN = Pattern.compile("\\w+\\s*=.*,");
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
@@ -269,6 +270,7 @@ public class BibtexParser implements Parser {
         }
 
         addBibDeskGroupEntriesToJabRefGroups();
+
         int startLine = line;
         int startColumn = column;
         try {
@@ -310,8 +312,8 @@ public class BibtexParser implements Parser {
     private void checkEpilog() {
         // This is an incomplete and inaccurate try to verify if something went wrong with previous parsing activity even though there were no warnings so far
         // regex looks for something like 'identifier = blabla ,'
-        if (!parserResult.hasWarnings() && Pattern.compile("\\w+\\s*=.*,").matcher(database.getEpilog()).find()) {
-            parserResult.addWarning(new ParserResult.Range(line, column, line, column), "following BibTex fragment has not been parsed:\n" + database.getEpilog());
+        if (!parserResult.hasWarnings() && EPILOG_PATTERN.matcher(database.getEpilog()).find()) {
+            parserResult.addWarning(new ParserResult.Range(line, column, line, column), "following BibTeX fragment has not been parsed:\n" + database.getEpilog());
         }
     }
 
