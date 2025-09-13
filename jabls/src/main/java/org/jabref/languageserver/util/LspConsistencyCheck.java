@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryType;
@@ -21,9 +22,10 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 
 public class LspConsistencyCheck {
 
-    public List<Diagnostic> check(BibDatabaseContext bibDatabaseContext, String content) {
+    public List<Diagnostic> check(BibDatabaseContext bibDatabaseContext, String content, CliPreferences cliPreferences) {
         List<Diagnostic> diagnostics = new ArrayList<>();
-        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
+        BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
+        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck(cliPreferences, bibEntryTypesManager);
         BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibDatabaseContext, (_, _) -> {
         });
 

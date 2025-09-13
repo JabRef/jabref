@@ -57,6 +57,7 @@ import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -99,11 +100,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final StateManager stateManager;
     private final CountingUndoManager undoManager;
     private final DialogService dialogService;
+    private final GitHandlerRegistry gitHandlerRegistry;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
-    private final GitHandlerRegistry gitHandlerRegistry;
 
     private final JabRefFrameViewModel viewModel;
     private final GuiPushToApplicationCommand pushToApplicationCommand;
@@ -122,24 +123,24 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                        DialogService dialogService,
                        FileUpdateMonitor fileUpdateMonitor,
                        GuiPreferences preferences,
+                       GitHandlerRegistry gitHandlerRegistry,
                        AiService aiService,
                        StateManager stateManager,
                        CountingUndoManager undoManager,
                        BibEntryTypesManager entryTypesManager,
                        ClipBoardManager clipBoardManager,
-                       TaskExecutor taskExecutor,
-                       GitHandlerRegistry gitHandlerRegistry) {
+                       TaskExecutor taskExecutor) {
         this.mainStage = mainStage;
         this.dialogService = dialogService;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.preferences = preferences;
+        this.gitHandlerRegistry = gitHandlerRegistry;
         this.aiService = aiService;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
-        this.gitHandlerRegistry = gitHandlerRegistry;
 
         setId("frame");
 

@@ -1,7 +1,6 @@
 package org.jabref.logic.quality.consistency;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -17,16 +16,14 @@ import org.jabref.logic.bibtex.comparator.BibEntryByCitationKeyComparator;
 import org.jabref.logic.bibtex.comparator.BibEntryByFieldsComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
-import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
-import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -55,6 +52,12 @@ public class BibliographyConsistencyCheck {
             StandardField.MODIFICATIONDATE
     );
 
+    private final BibEntryTypesManager bibEntryTypesManager;
+
+    public BibliographyConsistencyCheck(org.jabref.logic.preferences.CliPreferences cliPreferences, BibEntryTypesManager bibEntryTypesManager) {
+        this.bibEntryTypesManager = cliPreferences.getCustomEntryTypesRepository(bibEntryTypesManager);
+    }
+
     private static Set<Field> filterExcludedFields(Collection<Field> fields) {
         return fields.stream()
                      .filter(field -> !EXPLICITLY_EXCLUDED_FIELDS.contains(field))
@@ -73,11 +76,17 @@ public class BibliographyConsistencyCheck {
     @VisibleForTesting
     List<BibEntry> filterAndSortEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> requiredFields) {
         return entries.stream()
-                      .filter(entry ->
-                              // This removes entries that have all differing fields set (could be confusing to the user)
-                              !Collections.disjoint(entry.getFields(), differingFields)
-                                      // This ensures that all entries with missing required fields are included
-                                      || !entry.getFields().containsAll(requiredFields))
+                      .filter(entry -> {
+                          // Include entries that are missing any required fields
+                          boolean missingRequiredField = requiredFields.stream().anyMatch(field -> !entry.hasField(field));
+
+                          // Include entries that have any of the differing fields
+                          boolean hasDifferingField = differingFields.stream().anyMatch(entry::hasField);
+
+                          // Include all entries when there are differing fields (to show inconsistencies)
+                          // OR when missing required fields
+                          return !differingFields.isEmpty() || missingRequiredField;
+                      })
                       .sorted(new FieldComparatorStack<>(List.of(
                               new BibEntryByCitationKeyComparator(),
                               new BibEntryByFieldsComparator()
@@ -112,12 +121,10 @@ public class BibliographyConsistencyCheck {
 
         collectEntriesIntoMaps(bibContext, entryTypeToFieldsInAnyEntryMap, entryTypeToFieldsInAllEntriesMap, entryTypeToEntriesMap);
 
-        List<BibEntryType> entryTypeDefinitions;
-        if (bibContext.getMode() == BibDatabaseMode.BIBLATEX) {
-            entryTypeDefinitions = BiblatexEntryTypeDefinitions.ALL;
-        } else {
-            entryTypeDefinitions = BibtexEntryTypeDefinitions.ALL;
-        }
+        List<BibEntryType> entryTypeDefinitions = bibEntryTypesManager
+                .getAllTypes(bibContext.getMode())
+                .stream()
+                .toList();
 
         // Use LinkedHashMap to preserve the order of Bib(tex|latex)EntryTypeDefinitions.ALL
         Map<EntryType, EntryTypeResult> resultMap = new LinkedHashMap<>();
@@ -161,7 +168,6 @@ public class BibliographyConsistencyCheck {
     }
 
     private static void collectEntriesIntoMaps(BibDatabaseContext bibContext, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
-        BibDatabaseMode mode = bibContext.getMode();
         List<BibEntry> entries = bibContext.getEntries();
 
         for (BibEntry entry : entries) {

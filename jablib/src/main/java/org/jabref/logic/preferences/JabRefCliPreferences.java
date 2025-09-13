@@ -1220,10 +1220,15 @@ public class JabRefCliPreferences implements CliPreferences {
     //*************************************************************************************************************
     // CustomEntryTypes
     //*************************************************************************************************************
-
-    @Override
     public BibEntryTypesManager getCustomEntryTypesRepository() {
         BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
+        EnumSet.allOf(BibDatabaseMode.class).forEach(mode ->
+                bibEntryTypesManager.addCustomOrModifiedTypes(getBibEntryTypes(mode), mode));
+        return bibEntryTypesManager;
+    }
+
+    @Override
+    public BibEntryTypesManager getCustomEntryTypesRepository(BibEntryTypesManager bibEntryTypesManager) {
         EnumSet.allOf(BibDatabaseMode.class).forEach(mode ->
                 bibEntryTypesManager.addCustomOrModifiedTypes(getBibEntryTypes(mode), mode));
         return bibEntryTypesManager;
