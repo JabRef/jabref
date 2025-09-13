@@ -25,10 +25,6 @@ public class EditorTextField extends TextField implements Initializable, Context
     private static Predicate<TextField> isLastFieldChecker;
     private final ContextMenu contextMenu = new ContextMenu();
 
-    // Callbacks for tab navigation - replaces static dependency
-    private static Predicate<TextField> isLastFieldChecker;
-    private static Runnable nextTabSelector;
-
     private Runnable additionalPasteActionHandler = () -> {
         // No additional paste behavior
     };
