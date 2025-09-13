@@ -85,7 +85,7 @@ upstream     https://github.com/JabRef/jabref.git (fetch)
 upstream     https://github.com/JabRef/jabref.git (push)
 ```
 
-## Have `git blame` working.
+## Have `git blame` working
 
 You need to tell git to ignore some commits when doing `git blame`:
 
