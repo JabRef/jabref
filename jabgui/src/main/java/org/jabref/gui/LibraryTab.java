@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -119,9 +118,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final BibEntryTypesManager entryTypesManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
-    private final List<BibEntry> previousEntries = new ArrayList<>();
-    private final List<BibEntry> nextEntries = new ArrayList<>();
-    private BibEntry currentlyShowing;
+    private final NavigationHistory navigationHistory = new NavigationHistory();
     private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
     private boolean backOrForwardNavigationActionTriggered = false;
@@ -983,56 +980,36 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void back() {
-        navigateToEntry(previousEntries, nextEntries);
+        navigationHistory.back().ifPresent(this::navigateToEntry);
     }
 
     public void forward() {
-        navigateToEntry(nextEntries, previousEntries);
+        navigationHistory.forward().ifPresent(this::navigateToEntry);
     }
 
-    private void navigateToEntry(List<BibEntry> sourceHistory, List<BibEntry> destinationHistory) {
-        if (!sourceHistory.isEmpty()) {
-            BibEntry toShow = sourceHistory.getLast();
-            sourceHistory.removeLast();
-
-            // add current entry to destination history
-            if (currentlyShowing != null) {
-                destinationHistory.add(currentlyShowing);
-            }
-
-            backOrForwardNavigationActionTriggered = true;
-            clearAndSelect(toShow);
-            updateNavigationState();
-        }
+    private void navigateToEntry(BibEntry entry) {
+        backOrForwardNavigationActionTriggered = true;
+        clearAndSelect(entry);
+        updateNavigationState();
     }
 
     public boolean canGoBack() {
-        return !previousEntries.isEmpty();
+        return navigationHistory.canGoBack();
     }
 
     public boolean canGoForward() {
-        return !nextEntries.isEmpty();
+        return navigationHistory.canGoForward();
     }
 
     private void newEntryShowing(BibEntry entry) {
         // skip history updates if this is from a back/forward operation
         if (backOrForwardNavigationActionTriggered) {
-            currentlyShowing = entry;
             backOrForwardNavigationActionTriggered = false;
-            updateNavigationState();
             return;
         }
 
-        nextEntries.clear(); // clear forward history when new entry selected in existing chronological sequence
-
-        if (!Objects.equals(entry, currentlyShowing)) {
-            // add the entry we are leaving to the history
-            if (currentlyShowing != null) {
-                previousEntries.add(currentlyShowing);
-            }
-            currentlyShowing = entry;
-            updateNavigationState();
-        }
+        navigationHistory.add(entry);
+        updateNavigationState();
     }
 
     /**
