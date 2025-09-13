@@ -1,25 +1,25 @@
 ---
-title: Hardcode StandardField Names and use exact or customized names otherwise
+title: Hardcode `StandardField` names and use exact or customized names otherwise
 nav_order: 49
 parent: Decision Records
 status: accepted
 date: 2025-09-13
 ---
 <!-- markdownlint-disable-next-line MD025 -->
-# Hardcode StandardField Names and use exact or customized names otherwise
+# Hardcode `StandardField` names and use exact or customized names otherwise (disallow customization of `StandardField`s)
 
 ## Context and Problem Statement
 
-JabRef allows users to define custom fields and customizing StandardFields with arbitrary names and arbitrary casing. Users reported inconsistent casing of field names across the tabs in the details panes of the entry editor (Required/Optional/Other fields), within saved BibTeX files and preferences. 
-Fields were partially forced to show in UI with a capital first letter by a ui method inside the Field model.
-This inconsistency confuses users and makes it impossible to achieve a predictable, uniform presentation between UI and persisted data, especially when dealing with customized fields.
+JabRef allows users to define custom fields and customizing `StandardField`s with arbitrary names and arbitrary casing. Users reported inconsistent casing of field names across the tabs in the details panes of the entry editor (Required/Optional/Other fields), within saved BibTeX files and preferences.
+Fields were partially forced to show in UI with a capital first letter by a UI method inside the `Field` model.
+This inconsistency [confuses users](https://github.com/JabRef/jabref/issues/10590) and makes it impossible to achieve a predictable, uniform presentation between UI and persisted data, especially when dealing with customized fields.
 
 How should JabRef consistently determine the casing for field names in UI and persistence for both built‑in and custom fields?
 
 ## Decision Drivers
 
 * Consistent user experience across all UI locations
-* Predictable persistence and round‑trip stability (UI ↔ preferences ↔ .bib)
+* Predictable persistence and round‑trip stability (UI ↔ preferences ↔ `.bib`)
 * Backward compatibility with existing libraries and preferences
 * Internationalization (i18n) and localization concerns for built‑in fields
 * Minimal complexity added to parsing/serialization logic
@@ -29,49 +29,60 @@ How should JabRef consistently determine the casing for field names in UI and pe
 
 ## Considered Options
 
-* Hardcode display names for built‑in fields; preserve exact user/customized names for non‑standard fields; serialize canonical lowercase keys to .bib
-* Make all field names (including built‑ins) fully user‑configurable for display casing across UI and persistence
-* Normalize all field names to lowercase everywhere (UI, prefs, .bib)
-* Normalize all field names to Title Case in UI and in prefs; lowercase in .bib
+* Hardcode `StandardField` names and use exact or customized names otherwise (disallow customization of `StandardField`s)
+* Make all field names (including `StandardField`s) fully user‑configurable for display casing across UI and persistence
+* Normalize all field names to lowercase everywhere (UI, preferences, `.bib`)
+* Normalize all field names to title case in UI and in preferences; lowercase in `.bib`
 
 ## Decision Outcome
 
-Chosen option: "Hardcode display names for built‑in fields; preserve exact user/customized names for non‑standard fields; serialize canonical lowercase keys to .bib.", because comes out best (see below).
+Chosen option: "Hardcode `StandardField` names and use exact or customized names otherwise", because
 
-Rationale:
-* Aligns with community conventions (lowercase keys in .bib), ensuring compatibility.
+* Aligns with community conventions (lowercase keys in `.bib`), ensuring compatibility.
 * Provides a consistent and localized UI for built‑ins by using canonical, hardcoded display labels.
 * Respects users’ expectations for custom fields by preserving the casing they define everywhere in the UI and in preferences.
 * Minimizes behavioral surprises and avoids mixed casing rules per UI location.
 
 ## Pros and Cons of the Options
 
-### Hardcode built‑in display names; preserve custom names; lowercase in .bib
+<!-- markdownlint-disable-next-line MD024 -->
+### Hardcode `StandardField` names and use exact or customized names otherwise (disallow customization of `StandardField`s)
 
-* Good, because Round‑trip: UI labels ↔ preferences ↔ UI remain stable.
-* Good, because Built‑in labels can be localized predictably (Title Case or localized form).
-* Good, because Consistent casing across Details pane (all tabs) and custom tabs.
-* Good, because Matches BibTeX convention for stored keys.
-* Good, because Supports localization of built‑ins.
-* Good, because .bib files keep canonical lowercase keys, matching common BibTeX/BibLaTeX practice.
-* Good, because Decouples model (internal key) from ui (display label).
-* Bad, because Users cannot change casing of built‑in field display names (by design).
-* Bad, because Requires a clear separation of internal key vs. display label, which slightly increases conceptual complexity.
+<!-- markdownlint-disable-next-line MD004 -->>
+- For the build-in types (`StandardFiel`), the display names are hard-coded. Users cannot customize this. Optional/required can still be customized.
+<!-- markdownlint-disable-next-line MD004 -->>
+- Preserve exact user/customized names for non‑standard fields
+<!-- markdownlint-disable-next-line MD004 -->>
+- Serialize as customized (and lower-case as standard) to `.bib` file
+
+* Good, because round‑trip: UI labels ↔ preferences ↔ UI remain stable.
+* Good, because built‑in labels can be localized predictably (title case or localized form).
+* Good, because consistent casing across entry editor tabs.
+* Good, because matches BibTeX convention for stored keys.
+* Good, because supports localization of displaying of `StandardField` names.
+* Good, because `.bib` files keep canonical lowercase keys in the default case. This matches common BibTeX/BibLaTeX practice.
+* Good, because decouples model (internal key) from UI (display label).
+* Bad, because users cannot change casing of built‑in field display names by using the entry customization.
+* Bad, because perceived as inconsistent at [#10590](https://github.com/JabRef/jabref/issues/10590).
+* Bad, because requires a clear separation of internal key vs. display label, which slightly increases conceptual complexity.
 * Bad, because migration needs to ensure older preferences do not inadvertently force lowercasing of custom fields in UI.
 
 ### Make all fields fully user‑configurable
 
-* Good, because provides maximum flexibility for users.
-* Bad, because Increases settings complexity and risk of inconsistent UI/prefs.
-* Bad, because Harder to localize built‑ins; can lead to team‑specific divergences.
+This is option "Hardcode `StandardField` names and use exact or customized names otherwise (disallow customization of `StandardField`s)" with allowing customization of `StandardField`s.
 
-### Lowercase everywhere
+* Good, because provides maximum flexibility for users: Users can change casing of built‑in field display names by using the entry customization.
+* Good, because perceived as consistent at [#10590](https://github.com/JabRef/jabref/issues/10590).
+* Bad, because increases settings complexity and risk of inconsistent UI and preferences.
+* Bad, because harder to localize built‑ins; can lead to team‑specific divergences.
+
+### Normalize all field names to lowercase everywhere (UI, preferences, `.bib`)
 
 * Good, because simplest to implement; fully consistent.
 * Bad, because Poor UX; clashes with common expectations for UI labels.
 * Bad, because Undermines localization and readability.
 
-### Title Case everywhere in UI and prefs; lowercase in .bib
+### Normalize all field names to title case in UI and in preferences; lowercase in `.bib`
 
 * Good, because UI looks consistent and readable.
 * Bad, because ignores user intent for custom fields’ casing (less flexibility).
