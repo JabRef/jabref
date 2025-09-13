@@ -70,14 +70,14 @@ class MVStoreBibEntryRelationRepositoryTest {
 
     private static Stream<BibEntry> createBibEntries() {
         return IntStream
-            .range(0, 150)
-            .mapToObj(MVStoreBibEntryRelationRepositoryTest::createBibEntry);
+                .range(0, 150)
+                .mapToObj(MVStoreBibEntryRelationRepositoryTest::createBibEntry);
     }
 
     private static BibEntry createBibEntry(int i) {
         return new BibEntry()
-            .withCitationKey(String.valueOf(i))
-            .withField(StandardField.DOI, "10.1234/5678" + i);
+                .withCitationKey(String.valueOf(i))
+                .withField(StandardField.DOI, "10.1234/5678" + i);
     }
 
     /**
@@ -90,19 +90,19 @@ class MVStoreBibEntryRelationRepositoryTest {
      */
     private List<BibEntry> createRelations(BibEntry entry) {
         return entry
-            .getCitationKey()
-            .map(key -> RandomGenerator.StreamableGenerator
-                .of("L128X256MixRandom").ints(150)
-                .mapToObj(i -> new BibEntry(StandardEntryType.Book)
-                    .withField(StandardField.TITLE, "A title: " + i)
-                    .withField(StandardField.YEAR, String.valueOf(2024))
-                    .withField(StandardField.AUTHOR, "{A list of authors: " + i + "}")
-                    .withField(StandardField.DOI, entry.getDOI().map(DOI::asString).orElse("") + ":" + i)
-                    .withField(StandardField.ABSTRACT, "The Universe is expanding: " + i)
+                .getCitationKey()
+                .map(key -> RandomGenerator.StreamableGenerator
+                        .of("L128X256MixRandom").ints(150)
+                        .mapToObj(i -> new BibEntry(StandardEntryType.Book)
+                                .withField(StandardField.TITLE, "A title: " + i)
+                                .withField(StandardField.YEAR, String.valueOf(2024))
+                                .withField(StandardField.AUTHOR, "{A list of authors: " + i + "}")
+                                .withField(StandardField.DOI, entry.getDOI().map(DOI::asString).orElse("") + ":" + i)
+                                .withField(StandardField.ABSTRACT, "The Universe is expanding: " + i)
+                        )
                 )
-            )
-            .orElseThrow()
-            .toList();
+                .orElseThrow()
+                .toList();
     }
 
     @ParameterizedTest
@@ -123,9 +123,9 @@ class MVStoreBibEntryRelationRepositoryTest {
 
         // THEN
         List<BibEntry> uniqueRelations = Stream
-            .concat(firstRelations.stream(), secondRelations.stream())
-            .distinct()
-            .toList();
+                .concat(firstRelations.stream(), secondRelations.stream())
+                .distinct()
+                .toList();
         assertFalse(uniqueRelations.isEmpty());
         assertNotSame(uniqueRelations, relationFromCache);
         assertEquals(uniqueRelations, relationFromCache);
@@ -178,8 +178,8 @@ class MVStoreBibEntryRelationRepositoryTest {
         // THEN
         assertFalse(dao.shouldUpdate(entry, clock));
         Clock clockOneWeekAfter = Clock.fixed(
-            LocalDateTime.now(ZoneId.of("UTC")).plusWeeks(1).plusSeconds(1).toInstant(ZoneOffset.UTC),
-            ZoneId.of("UTC")
+                LocalDateTime.now(ZoneId.of("UTC")).plusWeeks(1).plusSeconds(1).toInstant(ZoneOffset.UTC),
+                ZoneId.of("UTC")
         );
         assertTrue(dao.shouldUpdate(entry, clockOneWeekAfter));
     }

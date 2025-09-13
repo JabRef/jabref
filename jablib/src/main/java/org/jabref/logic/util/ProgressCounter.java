@@ -24,7 +24,10 @@ import ai.djl.util.Progress;
  */
 public class ProgressCounter implements Progress {
 
-    private record ProgressMessage(int maxTime, String message) { }
+    private record ProgressMessage(
+            int maxTime,
+            String message) {
+    }
 
     // The list should be sorted by ProgressMessage.maxTime, smaller first.
     private static final List<ProgressMessage> PROGRESS_MESSAGES = List.of(
@@ -98,8 +101,14 @@ public class ProgressCounter implements Progress {
 
     private void update() {
         Duration workTime = Duration.between(workStartTime, Instant.now());
-        Duration oneWorkTime = workTime.dividedBy(workDone.get() == 0 ? 1 : workDone.get());
-        Duration eta = oneWorkTime.multipliedBy(workMax.get() - workDone.get() <= 0 ? 1 : workMax.get() - workDone.get());
+        Duration oneWorkTime = workTime.dividedBy(
+                workDone.get() == 0 ?
+                1 :
+                workDone.get());
+        Duration eta = oneWorkTime.multipliedBy(
+                workMax.get() - workDone.get() <= 0 ?
+                1 :
+                workMax.get() - workDone.get());
 
         updateMessage(eta);
     }

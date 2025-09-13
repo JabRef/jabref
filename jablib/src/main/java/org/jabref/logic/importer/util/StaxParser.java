@@ -74,13 +74,17 @@ public class StaxParser {
         String prefix = reader.getPrefix();
 
         startTag.append("<")
-                .append(prefix != null && !prefix.isBlank() ? prefix + ":" : "")
+                .append(prefix != null && !prefix.isBlank() ?
+                        prefix + ":" :
+                        "")
                 .append(reader.getName().getLocalPart());
 
         String namespaceURI = reader.getNamespaceURI();
         if (addNamespaceURI && namespaceURI != null) {
             startTag.append(" xmlns")
-                    .append(prefix != null && !prefix.isBlank() ? ":" + prefix : "")
+                    .append(prefix != null && !prefix.isBlank() ?
+                            ":" + prefix :
+                            "")
                     .append("=\"")
                     .append(namespaceURI)
                     .append("\"");
@@ -103,7 +107,9 @@ public class StaxParser {
         String prefix = reader.getPrefix();
 
         endTag.append("</")
-              .append(prefix != null && !prefix.isBlank() ? prefix + ":" : "")
+              .append(prefix != null && !prefix.isBlank() ?
+                      prefix + ":" :
+                      "")
               .append(reader.getName().getLocalPart())
               .append(">");
 

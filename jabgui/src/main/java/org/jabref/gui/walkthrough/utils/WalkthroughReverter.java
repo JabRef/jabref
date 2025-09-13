@@ -140,7 +140,8 @@ public class WalkthroughReverter {
                         return;
                     }
                 }
-                case SideEffect _ -> undo(i);
+                case SideEffect _ ->
+                        undo(i);
             }
         }
 
@@ -151,7 +152,8 @@ public class WalkthroughReverter {
     private void undo(int stepIndex) {
         WalkthroughStep step = walkthrough.getStepAtIndex(stepIndex);
         if (step instanceof SideEffect(
-                String title, WalkthroughSideEffect sideEffect
+                String title,
+                WalkthroughSideEffect sideEffect
         )) {
             if (!sideEffectExecutor.executeBackward(sideEffect, walkthrough)) {
                 LOGGER.warn("Failed to revert side effect {}: {}", title, sideEffect.description());

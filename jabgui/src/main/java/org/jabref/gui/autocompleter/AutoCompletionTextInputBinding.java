@@ -101,7 +101,9 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
         return new StringConverter<>() {
             @Override
             public String toString(T t) {
-                return t == null ? null : t.toString();
+                return t == null ?
+                       null :
+                       t.toString();
             }
 
             @SuppressWarnings("unchecked")

@@ -120,7 +120,9 @@ public class JabRefGuiStateManager implements StateManager {
 
     @Override
     public OptionalObjectProperty<SearchQuery> activeSearchQuery(SearchType type) {
-        return type == SearchType.NORMAL_SEARCH ? activeSearchQuery : activeGlobalSearchQuery;
+        return type == SearchType.NORMAL_SEARCH ?
+               activeSearchQuery :
+               activeGlobalSearchQuery;
     }
 
     @Override
@@ -130,7 +132,9 @@ public class JabRefGuiStateManager implements StateManager {
 
     @Override
     public IntegerProperty searchResultSize(SearchType type) {
-        return type == SearchType.NORMAL_SEARCH ? searchResultSize : globalSearchResultSize;
+        return type == SearchType.NORMAL_SEARCH ?
+               searchResultSize :
+               globalSearchResultSize;
     }
 
     @Override

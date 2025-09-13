@@ -15,8 +15,8 @@ public final class EntryAdd extends DatabaseChange {
         super(databaseContext, databaseChangeResolverFactory);
         this.addedEntry = addedEntry;
         setChangeName(addedEntry.getCitationKey()
-                           .map(key -> Localization.lang("Added entry '%0'", key))
-                           .orElse(Localization.lang("Added entry")));
+                                .map(key -> Localization.lang("Added entry '%0'", key))
+                                .orElse(Localization.lang("Added entry")));
     }
 
     @Override

@@ -40,7 +40,7 @@ public class Theme {
             }
         } else {
             this.additionalStylesheet = StyleSheet.create(name);
-             if (this.additionalStylesheet.isPresent()) {
+            if (this.additionalStylesheet.isPresent()) {
                 this.type = Type.CUSTOM;
                 this.name = name;
             } else {

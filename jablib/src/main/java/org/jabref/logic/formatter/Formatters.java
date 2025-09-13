@@ -123,7 +123,9 @@ public class Formatters {
 
     public static Optional<Formatter> getFormatterForKey(String name) {
         Objects.requireNonNull(name);
-        return keyToFormatterMap.containsKey(name) ? Optional.of(keyToFormatterMap.get(name)) : Optional.empty();
+        return keyToFormatterMap.containsKey(name) ?
+               Optional.of(keyToFormatterMap.get(name)) :
+               Optional.empty();
     }
 
     public static Optional<Formatter> getFormatterForModifier(String modifier) {

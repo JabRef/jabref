@@ -37,7 +37,10 @@ class OOCalcDatabase {
                                                      .toList();
 
     public OOCalcDatabase(BibDatabase bibtex, List<BibEntry> entries) {
-        this.entries.addAll(entries != null ? entries : bibtex.getEntries());
+        this.entries.addAll(
+                entries != null ?
+                entries :
+                bibtex.getEntries());
 
         List<FieldComparator> comparators = new ArrayList<>();
         comparators.add(new FieldComparator(StandardField.AUTHOR));

@@ -129,16 +129,26 @@ public class GroupSerializer {
 
     private String serializeGroup(AbstractGroup group) {
         return switch (group) {
-            case AllEntriesGroup _ -> serializeAllEntriesGroup();
-            case SmartGroup smartGroup -> serializeSmartGroup(smartGroup);
-            case ExplicitGroup explicitGroup -> serializeExplicitGroup(explicitGroup);
-            case KeywordGroup keywordGroup -> serializeKeywordGroup(keywordGroup);
-            case SearchGroup searchGroup -> serializeSearchGroup(searchGroup);
-            case AutomaticKeywordGroup keywordGroup -> serializeAutomaticKeywordGroup(keywordGroup);
-            case AutomaticPersonsGroup personsGroup -> serializeAutomaticPersonsGroup(personsGroup);
-            case TexGroup texGroup -> serializeTexGroup(texGroup);
-            case null -> throw new IllegalArgumentException("Group cannot be null");
-            default -> throw new UnsupportedOperationException("Don't know how to serialize group" + group.getClass().getName());
+            case AllEntriesGroup _ ->
+                    serializeAllEntriesGroup();
+            case SmartGroup smartGroup ->
+                    serializeSmartGroup(smartGroup);
+            case ExplicitGroup explicitGroup ->
+                    serializeExplicitGroup(explicitGroup);
+            case KeywordGroup keywordGroup ->
+                    serializeKeywordGroup(keywordGroup);
+            case SearchGroup searchGroup ->
+                    serializeSearchGroup(searchGroup);
+            case AutomaticKeywordGroup keywordGroup ->
+                    serializeAutomaticKeywordGroup(keywordGroup);
+            case AutomaticPersonsGroup personsGroup ->
+                    serializeAutomaticPersonsGroup(personsGroup);
+            case TexGroup texGroup ->
+                    serializeTexGroup(texGroup);
+            case null ->
+                    throw new IllegalArgumentException("Group cannot be null");
+            default ->
+                    throw new UnsupportedOperationException("Don't know how to serialize group" + group.getClass().getName());
         };
     }
 

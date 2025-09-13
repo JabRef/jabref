@@ -381,7 +381,10 @@ public class GroupDialogViewModel {
             if (resultingGroup != null) {
                 preferences.getGroupsPreferences().setDefaultHierarchicalContext(groupHierarchySelectedProperty.getValue());
 
-                resultingGroup.setColor(Boolean.TRUE.equals(colorUseProperty.getValue()) ? colorProperty.getValue() : null);
+                resultingGroup.setColor(
+                        Boolean.TRUE.equals(colorUseProperty.getValue()) ?
+                        colorProperty.getValue() :
+                        null);
                 resultingGroup.setDescription(descriptionProperty.getValue());
                 resultingGroup.setIconName(iconProperty.getValue());
                 return resultingGroup;
@@ -487,10 +490,12 @@ public class GroupDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(texGroupFilePathProperty.getValue().isBlank() ?
+                .withInitialDirectory(
+                        texGroupFilePathProperty.getValue().isBlank() ?
                         currentDatabase.getMetaData()
                                        .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                       .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory())).toString() : texGroupFilePathProperty.get()).build();
+                                       .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory())).toString() :
+                        texGroupFilePathProperty.get()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()

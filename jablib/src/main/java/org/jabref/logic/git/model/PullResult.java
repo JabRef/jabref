@@ -12,7 +12,10 @@ public final class PullResult implements GitOperationResult {
     private PullResult(boolean isSuccessful, boolean noop, List<BibEntry> mergedEntries) {
         this.isSuccessful = isSuccessful;
         this.noop = noop;
-        this.mergedEntries = mergedEntries == null ? List.of() : mergedEntries;
+        this.mergedEntries =
+                mergedEntries == null ?
+                List.of() :
+                mergedEntries;
     }
 
     public static PullResult merged(List<BibEntry> mergedEntries) {

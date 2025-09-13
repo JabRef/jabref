@@ -110,10 +110,10 @@ public class GitSyncService {
     }
 
     public PullResult performSemanticMerge(Git git,
-                                            Optional<RevCommit> baseCommitOpt,
-                                            RevCommit remoteCommit,
-                                            BibDatabaseContext localDatabaseContext,
-                                            Path bibFilePath) throws IOException, JabRefException, GitAPIException {
+                                           Optional<RevCommit> baseCommitOpt,
+                                           RevCommit remoteCommit,
+                                           BibDatabaseContext localDatabaseContext,
+                                           Path bibFilePath) throws IOException, JabRefException, GitAPIException {
 
         Path bibPath = bibFilePath.toRealPath();
         Path workTree = git.getRepository().getWorkTree().toPath().toRealPath();
@@ -128,13 +128,18 @@ public class GitSyncService {
         BibDatabaseContext base;
         if (baseCommitOpt.isPresent()) {
             Optional<String> baseContent = GitFileReader.readFileFromCommit(git, baseCommitOpt.get(), relativePath);
-            base = baseContent.isEmpty() ? BibDatabaseContext.empty() : BibDatabaseContext.of(baseContent.get(), importFormatPreferences);
+            base = baseContent.isEmpty() ?
+                   BibDatabaseContext.empty() :
+                   BibDatabaseContext.of(baseContent.get(), importFormatPreferences);
         } else {
             base = new BibDatabaseContext();
         }
 
         Optional<String> remoteContent = GitFileReader.readFileFromCommit(git, remoteCommit, relativePath);
-        BibDatabaseContext remote = remoteContent.isEmpty() ? BibDatabaseContext.empty() : BibDatabaseContext.of(remoteContent.get(), importFormatPreferences);
+        BibDatabaseContext remote =
+                remoteContent.isEmpty() ?
+                BibDatabaseContext.empty() :
+                BibDatabaseContext.of(remoteContent.get(), importFormatPreferences);
         BibDatabaseContext local = localDatabaseContext;
 
         // 2. Conflict detection
@@ -200,7 +205,8 @@ public class GitSyncService {
                 throw new JabRefException("Push aborted: Unknown Git status.");
             }
 
-            case BEHIND, DIVERGED -> {
+            case BEHIND,
+                 DIVERGED -> {
                 fetchAndMerge(localDatabaseContext, bibFilePath);
                 status = GitStatusChecker.checkStatus(gitHandler);
                 if (status.conflict()) {

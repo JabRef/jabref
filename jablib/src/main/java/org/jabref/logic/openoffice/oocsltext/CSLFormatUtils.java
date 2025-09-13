@@ -142,7 +142,8 @@ public final class CSLFormatUtils {
                 String alphaKey = BracketedPattern.authorsAlphaLNI(authorList);
 
                 // Extract last two digits of the year
-                String shortYear = year.get().length() >= 2 ?
+                String shortYear =
+                        year.get().length() >= 2 ?
                         year.get().substring(year.get().length() - 2) :
                         year.get();
 
@@ -179,7 +180,7 @@ public final class CSLFormatUtils {
      * <p>
      * <b>Precondition:</b> Use ONLY with numeric citation styles.</p>
      *
-     * @param citation the numeric citation with an unresolved number.
+     * @param citation      the numeric citation with an unresolved number.
      * @param currentNumber the correct number to update the citation with.
      * @return the bibliographic citation with resolved number.
      */
@@ -191,10 +192,22 @@ public final class CSLFormatUtils {
 
         while (matcher.find()) {
             if (!numberReplaced) {
-                String prefix = matcher.group(1) != null ? matcher.group(1) : "";
-                String suffix = matcher.group(3) != null ? matcher.group(3) : "";
-                String dot = matcher.group(4) != null ? "." : "";
-                String space = matcher.group().endsWith(" ") ? " " : "";
+                String prefix =
+                        matcher.group(1) != null ?
+                        matcher.group(1) :
+                        "";
+                String suffix =
+                        matcher.group(3) != null ?
+                        matcher.group(3) :
+                        "";
+                String dot =
+                        matcher.group(4) != null ?
+                        "." :
+                        "";
+                String space =
+                        matcher.group().endsWith(" ") ?
+                        " " :
+                        "";
 
                 String replacement = prefix + currentNumber + suffix + dot + space;
 

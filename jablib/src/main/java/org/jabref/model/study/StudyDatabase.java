@@ -48,13 +48,21 @@ public class StudyDatabase {
         if (isEnabled() != that.isEnabled()) {
             return false;
         }
-        return getName() != null ? getName().equals(that.getName()) : that.getName() == null;
+        return getName() != null ?
+               getName().equals(that.getName()) :
+               that.getName() == null;
     }
 
     @Override
     public int hashCode() {
-        int result = getName() != null ? getName().hashCode() : 0;
-        result = 31 * result + (isEnabled() ? 1 : 0);
+        int result =
+                getName() != null ?
+                getName().hashCode() :
+                0;
+        result = 31 * result + (
+                isEnabled() ?
+                1 :
+                0);
         return result;
     }
 

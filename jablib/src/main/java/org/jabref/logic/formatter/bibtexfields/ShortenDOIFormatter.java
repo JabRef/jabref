@@ -31,7 +31,9 @@ public class ShortenDOIFormatter extends Formatter {
     @Override
     public String format(String value) {
         Objects.requireNonNull(value);
-        return SHORT_DOI_FORMAT.test(value) ? value : DOI.parse(value)
+        return SHORT_DOI_FORMAT.test(value) ?
+               value :
+               DOI.parse(value)
                   .map(doi -> {
                       try {
                           return new ShortDOIService().getShortDOI(doi).asString();

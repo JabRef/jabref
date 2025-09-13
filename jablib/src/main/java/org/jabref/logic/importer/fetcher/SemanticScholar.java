@@ -95,10 +95,10 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             }
             String source = SOURCE_ID_SEARCH + arXivString;
             Connection jsoupRequest = Jsoup.connect(getURLBySource(source))
-                                    .userAgent(URLDownload.USER_AGENT)
-                                    .referrer("https://www.google.com")
-                                    .header("Accept", "text/html; charset=utf-8")
-                                    .ignoreHttpErrors(true);
+                                           .userAgent(URLDownload.USER_AGENT)
+                                           .referrer("https://www.google.com")
+                                           .header("Accept", "text/html; charset=utf-8")
+                                           .ignoreHttpErrors(true);
             importerPreferences.getApiKey(getName()).ifPresent(
                     key -> jsoupRequest.header("x-api-key", key));
             html = jsoupRequest.get();
@@ -199,7 +199,10 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             entry.setField(StandardField.AUTHOR,
                     IntStream.range(0, item.optJSONArray("authors").length())
                              .mapToObj(item.optJSONArray("authors")::getJSONObject)
-                             .map(author -> author.has("name") ? author.getString("name") : "")
+                             .map(author ->
+                                     author.has("name") ?
+                                     author.getString("name") :
+                                     "")
                              .collect(Collectors.joining(" and ")));
 
             JSONObject externalIds = item.optJSONObject("externalIds");

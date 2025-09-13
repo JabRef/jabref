@@ -127,7 +127,10 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
     public SqlQueryNode visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
         SqlQueryNode left = visit(ctx.left);
         SqlQueryNode right = visit(ctx.right);
-        String operator = ctx.bin_op.getType() == SearchParser.AND ? "INTERSECT" : "UNION";
+        String operator =
+                ctx.bin_op.getType() == SearchParser.AND ?
+                "INTERSECT" :
+                "UNION";
 
         String cte = """
                 cte%d AS (
@@ -220,7 +223,10 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
     private SqlQueryNode getFieldQueryNode(String field, String term, EnumSet<SearchFlags> searchFlags) {
         String sqlOperator = getSqlOperator(searchFlags);
-        String prefixSuffix = searchFlags.contains(INEXACT_MATCH) ? "%" : "";
+        String prefixSuffix =
+                searchFlags.contains(INEXACT_MATCH) ?
+                "%" :
+                "";
 
         if (!searchFlags.contains(REGULAR_EXPRESSION)) {
             term = escapeTermForSql(term);
@@ -228,10 +234,14 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
         // Pseudo-fields
         field = switch (field) {
-            case "key" -> InternalField.KEY_FIELD.getName();
-            case "anykeyword" -> StandardField.KEYWORDS.getName();
-            case "anyfield" -> "any";
-            default -> field;
+            case "key" ->
+                    InternalField.KEY_FIELD.getName();
+            case "anykeyword" ->
+                    StandardField.KEYWORDS.getName();
+            case "anyfield" ->
+                    "any";
+            default ->
+                    field;
         };
 
         if (ENTRY_ID.toString().equals(field)) {
@@ -239,22 +249,30 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
         } else if ("any".equals(field)) {
             if (searchFlags.contains(EXACT_MATCH)) {
                 return searchFlags.contains(NEGATION)
-                        ? buildExactNegationAnyFieldQuery(sqlOperator, term)
-                        : buildExactAnyFieldQuery(sqlOperator, term);
+                       ?
+                       buildExactNegationAnyFieldQuery(sqlOperator, term)
+                       :
+                       buildExactAnyFieldQuery(sqlOperator, term);
             } else {
                 return searchFlags.contains(NEGATION)
-                        ? buildContainsNegationAnyFieldQuery(sqlOperator, prefixSuffix, term)
-                        : buildContainsAnyFieldQuery(sqlOperator, prefixSuffix, term);
+                       ?
+                       buildContainsNegationAnyFieldQuery(sqlOperator, prefixSuffix, term)
+                       :
+                       buildContainsAnyFieldQuery(sqlOperator, prefixSuffix, term);
             }
         } else {
             if (searchFlags.contains(EXACT_MATCH)) {
                 return searchFlags.contains(NEGATION)
-                        ? buildExactNegationFieldQuery(field, sqlOperator, term)
-                        : buildExactFieldQuery(field, sqlOperator, term);
+                       ?
+                       buildExactNegationFieldQuery(field, sqlOperator, term)
+                       :
+                       buildExactFieldQuery(field, sqlOperator, term);
             } else {
                 return searchFlags.contains(NEGATION)
-                        ? buildContainsNegationFieldQuery(field, sqlOperator, prefixSuffix, term)
-                        : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
+                       ?
+                       buildContainsNegationFieldQuery(field, sqlOperator, prefixSuffix, term)
+                       :
+                       buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);
             }
         }
     }
@@ -537,7 +555,10 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
     private static void setFlags(EnumSet<SearchFlags> flags, SearchFlags matchType, boolean caseSensitive, boolean negation) {
         flags.add(matchType);
 
-        flags.add(caseSensitive ? CASE_SENSITIVE : CASE_INSENSITIVE);
+        flags.add(
+                caseSensitive ?
+                CASE_SENSITIVE :
+                CASE_INSENSITIVE);
         if (negation) {
             flags.add(NEGATION);
         }
@@ -545,8 +566,14 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
     private static String getSqlOperator(EnumSet<SearchFlags> searchFlags) {
         return searchFlags.contains(REGULAR_EXPRESSION)
-                ? (searchFlags.contains(CASE_SENSITIVE) ? "~" : "~*")
-                : (searchFlags.contains(CASE_SENSITIVE) ? "LIKE" : "ILIKE");
+               ?
+               (searchFlags.contains(CASE_SENSITIVE) ?
+                "~" :
+                "~*")
+               :
+               (searchFlags.contains(CASE_SENSITIVE) ?
+                "LIKE" :
+                "ILIKE");
     }
 
     /**

@@ -27,10 +27,16 @@ public class NamedRangeReferenceMark implements NamedRange {
             REFERENCE_MARK_USE_INVISIBLE_BRACKETS = true; // !debug;
 
     public static final String
-            REFERENCE_MARK_LEFT_BRACKET = REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : "<";
+            REFERENCE_MARK_LEFT_BRACKET =
+            REFERENCE_MARK_USE_INVISIBLE_BRACKETS ?
+            ZERO_WIDTH_SPACE :
+            "<";
 
     public static final String
-            REFERENCE_MARK_RIGHT_BRACKET = REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : ">";
+            REFERENCE_MARK_RIGHT_BRACKET =
+            REFERENCE_MARK_USE_INVISIBLE_BRACKETS ?
+            ZERO_WIDTH_SPACE :
+            ">";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NamedRangeReferenceMark.class);
 
@@ -97,9 +103,12 @@ public class NamedRangeReferenceMark implements NamedRange {
 
         final String left = NamedRangeReferenceMark.REFERENCE_MARK_LEFT_BRACKET;
         final String right = NamedRangeReferenceMark.REFERENCE_MARK_RIGHT_BRACKET;
-        String bracketedContent = withoutBrackets
-                ? ""
-                : left + right;
+        String bracketedContent =
+                withoutBrackets
+                ?
+                ""
+                :
+                left + right;
 
         cursor.getText().insertString(cursor, bracketedContent, true);
         DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, refMarkName, cursor, true /* absorb */);
@@ -135,7 +144,7 @@ public class NamedRangeReferenceMark implements NamedRange {
             NoDocumentException,
             WrappedTargetException {
         return UnoReferenceMark.getAnchor(doc, refMarkName)
-                                .map(e -> new NamedRangeReferenceMark(refMarkName));
+                               .map(e -> new NamedRangeReferenceMark(refMarkName));
     }
 
     /**

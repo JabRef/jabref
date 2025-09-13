@@ -104,9 +104,12 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         entryEditorPreferences.setShowSourceTabByDefault(defaultSourceProperty.getValue());
         entryEditorPreferences.setEnableValidation(enableValidationProperty.getValue());
         entryEditorPreferences.setAllowIntegerEditionBibtex(allowIntegerEditionProperty.getValue());
-        entryEditorPreferences.setEnableJournalPopup(journalPopupProperty.getValue()
-                ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
-                : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
+        entryEditorPreferences.setEnableJournalPopup(
+                journalPopupProperty.getValue()
+                ?
+                EntryEditorPreferences.JournalPopupEnabled.ENABLED
+                :
+                EntryEditorPreferences.JournalPopupEnabled.DISABLED);
         // entryEditorPreferences.setDividerPosition();
         entryEditorPreferences.setAutoLinkFilesEnabled(autoLinkEnabledProperty.getValue());
         entryEditorPreferences.setShouldShowSciteTab(enableSciteTabProperty.getValue());

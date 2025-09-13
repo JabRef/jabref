@@ -69,7 +69,8 @@ public class CopyMoreAction extends SimpleCommand {
                     copyKeyAndTitle();
             case COPY_CITATION_KEY_AND_LINK ->
                     copyKeyAndLink();
-            case COPY_DOI, COPY_DOI_URL ->
+            case COPY_DOI,
+                 COPY_DOI_URL ->
                     copyDoi();
             case COPY_FIELD_AUTHOR ->
                     copyField(StandardField.AUTHOR, Localization.lang("Author"));
@@ -232,9 +233,15 @@ public class CopyMoreAction extends SimpleCommand {
                 LOGGER.debug("entry {} had no citation key, but it should have had one", entry);
             }
             String url = entry.getField(StandardField.URL).orElse("");
-            keyAndLink.append(url.isEmpty() ? key : "<a href=\"%s\">%s</a>".formatted(url, key));
+            keyAndLink.append(
+                    url.isEmpty() ?
+                    key :
+                    "<a href=\"%s\">%s</a>".formatted(url, key));
             keyAndLink.append(OS.NEWLINE);
-            fallbackString.append(url.isEmpty() ? key : "%s - %s".formatted(key, url));
+            fallbackString.append(
+                    url.isEmpty() ?
+                    key :
+                    "%s - %s".formatted(key, url));
             fallbackString.append(OS.NEWLINE);
         }
 

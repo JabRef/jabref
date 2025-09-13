@@ -9,11 +9,15 @@ import java.util.Optional;
 public abstract class YearRangeByFilteringQueryTransformer extends AbstractQueryTransformer {
 
     public Optional<Integer> getStartYear() {
-        return startYear == Integer.MAX_VALUE ? Optional.empty() : Optional.of(startYear);
+        return startYear == Integer.MAX_VALUE ?
+               Optional.empty() :
+               Optional.of(startYear);
     }
 
     public Optional<Integer> getEndYear() {
-        return endYear == Integer.MIN_VALUE ? Optional.empty() : Optional.of(endYear);
+        return endYear == Integer.MIN_VALUE ?
+               Optional.empty() :
+               Optional.of(endYear);
     }
 
     /**

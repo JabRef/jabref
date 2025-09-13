@@ -160,7 +160,10 @@ public class LayoutHelper {
                         // bracketed option must be followed by an (optionally empty) parameter
                         // if empty, the parameter is set to " " (whitespace to avoid that the tokenizer that
                         // splits the string later on ignores the empty parameter)
-                        String parameter = buffer == null ? " " : buffer.toString();
+                        String parameter =
+                                buffer == null ?
+                                " " :
+                                buffer.toString();
                         if (option == null) {
                             tmp = parameter;
                         } else {
@@ -264,7 +267,9 @@ public class LayoutHelper {
             if (!validChar(c) && !validAnnotation(c)) {
                 unread(c);
 
-                name = buffer == null ? "" : buffer.toString();
+                name = buffer == null ?
+                       "" :
+                       buffer.toString();
 
                 if (name.isEmpty()) {
                     StringBuilder lastFive = new StringBuilder(10);

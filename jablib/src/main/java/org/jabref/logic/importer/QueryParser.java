@@ -17,7 +17,7 @@ import org.apache.lucene.search.QueryVisitor;
 
 /**
  * This class converts a query string written in lucene syntax into a complex  query.
- *
+ * <p>
  * For simplicity this is currently limited to fielded data and the boolean AND operator.
  */
 public class QueryParser {

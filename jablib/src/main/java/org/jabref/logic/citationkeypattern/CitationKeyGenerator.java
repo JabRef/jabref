@@ -132,10 +132,14 @@ public class CitationKeyGenerator extends BracketedPattern {
             boolean firstLetterA = citationKeyPatternPreferences.getKeySuffix()
                     == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
 
-            int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
+            int number =
+                    !alwaysAddLetter && !firstLetterA ?
+                    1 :
+                    0;
             String moddedKey;
 
-            do {
+            do
+            {
                 moddedKey = key + getAppendix(number);
                 number++;
 

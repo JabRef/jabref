@@ -79,7 +79,10 @@ public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor<String> {
         String field = ctx.FIELD().getText();
         int operator = ctx.operator().getStart().getType();
 
-        searchFlags.add(isCaseSensitive ? CASE_SENSITIVE : CASE_INSENSITIVE);
+        searchFlags.add(
+                isCaseSensitive ?
+                CASE_SENSITIVE :
+                CASE_INSENSITIVE);
         if (operator == SearchParser.NEQUAL) {
             searchFlags.add(NEGATION);
         }

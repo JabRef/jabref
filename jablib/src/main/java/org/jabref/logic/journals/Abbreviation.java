@@ -79,7 +79,9 @@ public class Abbreviation implements Comparable<Abbreviation>, Serializable {
         String currentTrimmed = current.trim();
 
         if (getDotlessAbbreviation().equals(currentTrimmed)) {
-            return getShortestUniqueAbbreviation().equals(getAbbreviation()) ? getName() : getShortestUniqueAbbreviation();
+            return getShortestUniqueAbbreviation().equals(getAbbreviation()) ?
+                   getName() :
+                   getShortestUniqueAbbreviation();
         } else if (getShortestUniqueAbbreviation().equals(currentTrimmed) && !getShortestUniqueAbbreviation().equals(getAbbreviation())) {
             return getName();
         } else if (getName().equals(currentTrimmed)) {

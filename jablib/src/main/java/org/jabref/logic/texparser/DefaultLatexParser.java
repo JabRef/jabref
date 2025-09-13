@@ -122,8 +122,10 @@ public class DefaultLatexParser implements LatexParser {
                 bibString = bibString.trim();
                 Path bibFile = file.getParent().resolve(
                         bibString.endsWith(BIB_EXT)
-                                ? bibString
-                                : "%s%s".formatted(bibString, BIB_EXT)).normalize();
+                        ?
+                        bibString
+                        :
+                        "%s%s".formatted(bibString, BIB_EXT)).normalize();
 
                 if (Files.exists(bibFile)) {
                     latexParserResult.addBibFile(bibFile);
@@ -140,9 +142,12 @@ public class DefaultLatexParser implements LatexParser {
 
         while (includeMatch.find()) {
             String filenamePassedToInclude = includeMatch.group(INCLUDE_GROUP);
-            String texFileName = filenamePassedToInclude.endsWith(TEX_EXT)
-                    ? filenamePassedToInclude
-                    : "%s%s".formatted(filenamePassedToInclude, TEX_EXT);
+            String texFileName =
+                    filenamePassedToInclude.endsWith(TEX_EXT)
+                    ?
+                    filenamePassedToInclude
+                    :
+                    "%s%s".formatted(filenamePassedToInclude, TEX_EXT);
             Path nestedFile = texFile.getParent().resolve(texFileName).normalize();
             if (Files.exists(nestedFile)) {
                 latexParserResult.addNestedFile(nestedFile);

@@ -23,7 +23,9 @@ public class MVStoreChatHistoryStorage extends MVStoreBase implements ChatHistor
     private static final String ENTRY_CHAT_HISTORY_PREFIX = "entry";
     private static final String GROUP_CHAT_HISTORY_PREFIX = "group";
 
-    private record ChatHistoryRecord(String className, String content) implements Serializable {
+    private record ChatHistoryRecord(
+            String className,
+            String content) implements Serializable {
         private static final Logger LOGGER = LoggerFactory.getLogger(ChatHistoryRecord.class);
 
         public static ChatHistoryRecord fromLangchainMessage(ChatMessage chatMessage) {

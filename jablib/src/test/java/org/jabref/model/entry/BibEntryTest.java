@@ -827,9 +827,18 @@ class BibEntryTest {
             "Last One, Title with {B}races, 2024, One: \"Title with Braces\" (2024)"
     })
     void getAuthorTitleYearFormatted(String author, String title, String year, String expected) {
-        entry.setField(StandardField.AUTHOR, author != null ? author : "");
-        entry.setField(StandardField.TITLE, title != null ? title : "");
-        entry.setField(StandardField.YEAR, year != null ? year : "");
+        entry.setField(StandardField.AUTHOR,
+                author != null ?
+                author :
+                "");
+        entry.setField(StandardField.TITLE,
+                title != null ?
+                title :
+                "");
+        entry.setField(StandardField.YEAR,
+                year != null ?
+                year :
+                "");
         assertEquals(expected, entry.getAuthorTitleYear(0));
     }
 

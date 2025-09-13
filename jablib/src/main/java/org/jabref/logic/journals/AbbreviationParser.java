@@ -34,9 +34,18 @@ public class AbbreviationParser {
 
         try (CSVParser csvParser = new CSVParser(Files.newBufferedReader(file, StandardCharsets.UTF_8), AbbreviationFormat.getCSVFormatWithDelimiter(delimiter))) {
             for (CSVRecord csvRecord : csvParser) {
-                String name = csvRecord.size() > 0 ? csvRecord.get(0) : "";
-                String abbreviation = csvRecord.size() > 1 ? csvRecord.get(1) : "";
-                String shortestUniqueAbbreviation = csvRecord.size() > 2 ? csvRecord.get(2) : "";
+                String name =
+                        csvRecord.size() > 0 ?
+                        csvRecord.get(0) :
+                        "";
+                String abbreviation =
+                        csvRecord.size() > 1 ?
+                        csvRecord.get(1) :
+                        "";
+                String shortestUniqueAbbreviation =
+                        csvRecord.size() > 2 ?
+                        csvRecord.get(2) :
+                        "";
 
                 // Check name and abbreviation
                 if (name.isEmpty() || abbreviation.isEmpty()) {

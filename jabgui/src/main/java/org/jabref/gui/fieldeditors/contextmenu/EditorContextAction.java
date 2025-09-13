@@ -40,12 +40,18 @@ public class EditorContextAction extends SimpleCommand {
 
         this.executable.bind(
                 switch (command) {
-                    case COPY -> editableBinding.and(maskTextBinding.not()).and(hasSelectionBinding);
-                    case CUT -> maskTextBinding.not().and(hasSelectionBinding);
-                    case PASTE -> editableBinding.and(hasStringInClipboardBinding);
-                    case DELETE -> editableBinding.and(hasSelectionBinding);
-                    case UNDO -> undoableBinding;
-                    case REDO -> redoableBinding;
+                    case COPY ->
+                            editableBinding.and(maskTextBinding.not()).and(hasSelectionBinding);
+                    case CUT ->
+                            maskTextBinding.not().and(hasSelectionBinding);
+                    case PASTE ->
+                            editableBinding.and(hasStringInClipboardBinding);
+                    case DELETE ->
+                            editableBinding.and(hasSelectionBinding);
+                    case UNDO ->
+                            undoableBinding;
+                    case REDO ->
+                            redoableBinding;
                     case SELECT_ALL -> {
                         if (SHOW_HANDLES) {
                             yield hasTextBinding.and(allSelectedBinding.not());
@@ -53,20 +59,28 @@ public class EditorContextAction extends SimpleCommand {
                             yield BindingsHelper.constantOf(true);
                         }
                     }
-                    default -> BindingsHelper.constantOf(true);
+                    default ->
+                            BindingsHelper.constantOf(true);
                 });
     }
 
     @Override
     public void execute() {
         switch (command) {
-            case COPY -> textInputControl.copy();
-            case CUT -> textInputControl.cut();
-            case PASTE -> textInputControl.paste();
-            case DELETE -> textInputControl.deleteText(textInputControl.getSelection());
-            case SELECT_ALL -> textInputControl.selectAll();
-            case UNDO -> textInputControl.undo();
-            case REDO -> textInputControl.redo();
+            case COPY ->
+                    textInputControl.copy();
+            case CUT ->
+                    textInputControl.cut();
+            case PASTE ->
+                    textInputControl.paste();
+            case DELETE ->
+                    textInputControl.deleteText(textInputControl.getSelection());
+            case SELECT_ALL ->
+                    textInputControl.selectAll();
+            case UNDO ->
+                    textInputControl.undo();
+            case REDO ->
+                    textInputControl.redo();
         }
         textInputControl.requestFocus();
     }

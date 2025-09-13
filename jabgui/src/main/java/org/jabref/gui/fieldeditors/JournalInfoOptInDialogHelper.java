@@ -22,9 +22,12 @@ public class JournalInfoOptInDialogHelper {
                             Localization.lang("Entry editor")), Localization.lang("Enable"), Localization.lang("Keep disabled")
             );
 
-            preferences.setEnableJournalPopup(enableJournalPopup
-                    ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
-                    : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
+            preferences.setEnableJournalPopup(
+                    enableJournalPopup
+                    ?
+                    EntryEditorPreferences.JournalPopupEnabled.ENABLED
+                    :
+                    EntryEditorPreferences.JournalPopupEnabled.DISABLED);
 
             return enableJournalPopup;
         }
@@ -33,9 +36,12 @@ public class JournalInfoOptInDialogHelper {
                 Localization.lang("Remote services"),
                 Localization.lang("Allow sending ISSN to a JabRef online service (SCimago) for fetching journal information"));
 
-        preferences.setEnableJournalPopup(journalInfoEnabled
-                ? EntryEditorPreferences.JournalPopupEnabled.ENABLED
-                : EntryEditorPreferences.JournalPopupEnabled.DISABLED);
+        preferences.setEnableJournalPopup(
+                journalInfoEnabled
+                ?
+                EntryEditorPreferences.JournalPopupEnabled.ENABLED
+                :
+                EntryEditorPreferences.JournalPopupEnabled.DISABLED);
         return journalInfoEnabled;
     }
 }

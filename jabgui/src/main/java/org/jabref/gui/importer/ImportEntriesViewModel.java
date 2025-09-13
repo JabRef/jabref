@@ -165,7 +165,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public boolean hasDuplicate(BibEntry entry) {
         return findInternalDuplicate(entry).isPresent() ||
                 new DuplicateCheck(entryTypesManager)
-                .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();
+                        .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();
     }
 
     public String getSourceString(BibEntry entry) {
@@ -281,8 +281,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     public void fetchMoreEntries() {
         if (fetcher.isPresent() &&
-            fetcher.get() instanceof PagedSearchBasedFetcher pagedFetcher &&
-            query.isPresent() && !loading.get()) {
+                fetcher.get() instanceof PagedSearchBasedFetcher pagedFetcher &&
+                query.isPresent() && !loading.get()) {
             loading.set(true);
             BackgroundTask<ArrayList<BibEntry>> fetchTask = BackgroundTask
                     .wrap(() -> {

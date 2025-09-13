@@ -46,7 +46,10 @@ public class FieldComparator implements Comparator<BibEntry> {
         this.fields = fields;
         fieldType = determineFieldType();
         isNumeric = this.fields.getPrimary().isNumeric();
-        multiplier = descending ? -1 : 1;
+        multiplier =
+                descending ?
+                -1 :
+                1;
     }
 
     private static Collator getCollator() {

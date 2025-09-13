@@ -26,10 +26,10 @@ public class EntryComparator implements Comparator<BibEntry> {
 
     /**
      *
-     * @param binary true: the presence of fields is checked; false: the content of the fields is compared
+     * @param binary     true: the presence of fields is checked; false: the content of the fields is compared
      * @param descending true: if the most different entry should get the highest score
-     * @param field the field to sort on
-     * @param next the next comparator to use (if the current comparator results in equality)
+     * @param field      the field to sort on
+     * @param next       the next comparator to use (if the current comparator results in equality)
      */
     public EntryComparator(boolean binary, boolean descending, Field field, Comparator<BibEntry> next) {
         this.binary = binary;
@@ -60,9 +60,17 @@ public class EntryComparator implements Comparator<BibEntry> {
         if (binary) {
             // We just separate on set and unset fields:
             if (f1 == null) {
-                return f2 == null ? (next == null ? idCompare(e1, e2) : next.compare(e1, e2)) : 1;
+                return f2 == null ?
+                       (next == null ?
+                        idCompare(e1, e2) :
+                        next.compare(e1, e2)) :
+                       1;
             } else {
-                return f2 == null ? -1 : (next == null ? idCompare(e1, e2) : next.compare(e1, e2));
+                return f2 == null ?
+                       -1 :
+                       (next == null ?
+                        idCompare(e1, e2) :
+                        next.compare(e1, e2));
             }
         }
 
@@ -97,7 +105,9 @@ public class EntryComparator implements Comparator<BibEntry> {
 
         if (f2 == null) {
             if (f1 == null) {
-                return next == null ? idCompare(e1, e2) : next.compare(e1, e2);
+                return next == null ?
+                       idCompare(e1, e2) :
+                       next.compare(e1, e2);
             } else {
                 return 1;
             }
@@ -124,7 +134,9 @@ public class EntryComparator implements Comparator<BibEntry> {
             result = comp;
         }
         if (result != 0) {
-            return descending ? -result : result; // Primary sort.
+            return descending ?
+                   -result :
+                   result; // Primary sort.
         }
         if (next == null) {
             return idCompare(e1, e2); // If still equal, we use the unique IDs.

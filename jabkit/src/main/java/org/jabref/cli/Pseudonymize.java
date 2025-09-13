@@ -97,7 +97,9 @@ public class Pseudonymize implements Runnable {
     }
 
     private Path resolveOutputPath(String customPath, Path inputPath, String defaultFileName) {
-        return customPath != null ? Path.of(customPath) : inputPath.getParent().resolve(defaultFileName);
+        return customPath != null ?
+               Path.of(customPath) :
+               inputPath.getParent().resolve(defaultFileName);
     }
 
     private boolean fileOverwriteCheck(Path filePath) {

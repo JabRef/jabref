@@ -49,7 +49,9 @@ public class StringUtil {
     private static final String STRING_TABLE_DELIMITER = " : ";
 
     public static String booleanToBinaryString(boolean expression) {
-        return expression ? "1" : "0";
+        return expression ?
+               "1" :
+               "0";
     }
 
     /**
@@ -140,7 +142,7 @@ public class StringUtil {
      * String[] s = "ab/cd/ed".split("/"); join(s, "\\", 0, s.length) ->
      * "ab\\cd\\ed"
      *
-     * @param to        Excluding strings[to]
+     * @param to Excluding strings[to]
      */
     public static String join(String[] strings, String separator, int from, int to) {
         if ((strings.length == 0) || (from >= to)) {
@@ -483,7 +485,9 @@ public class StringUtil {
         for (; ; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
-                return sign ? ival : -ival;
+                return sign ?
+                       ival :
+                       -ival;
             }
             if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
                 throw new NumberFormatException(str);
@@ -513,7 +517,10 @@ public class StringUtil {
         for (; ; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
-                return Optional.of(sign ? ival : -ival);
+                return Optional.of(
+                        sign ?
+                        ival :
+                        -ival);
             }
             if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
                 return Optional.empty();
@@ -756,7 +763,9 @@ public class StringUtil {
     }
 
     public static String ignoreCurlyBracket(String title) {
-        return isNotBlank(title) ? title.replace("{", "").replace("}", "") : title;
+        return isNotBlank(title) ?
+               title.replace("{", "").replace("}", "") :
+               title;
     }
 
     /**
@@ -778,7 +787,8 @@ public class StringUtil {
      *
      * @param s The string to check
      * @return {@code True} if the given string does contain at least one whitespace character, {@code False} otherwise
-     * */
+     *
+     */
     public static boolean containsWhitespace(String s) {
         return s.chars().anyMatch(Character::isWhitespace);
     }

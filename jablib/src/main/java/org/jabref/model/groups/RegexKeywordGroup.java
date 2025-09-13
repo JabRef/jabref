@@ -20,8 +20,10 @@ public class RegexKeywordGroup extends KeywordGroup {
     }
 
     private static Pattern compilePattern(String searchExpression, boolean caseSensitive) {
-        return caseSensitive ? Pattern.compile("\\b" + searchExpression + "\\b") : Pattern.compile(
-                "\\b" + searchExpression + "\\b", Pattern.CASE_INSENSITIVE);
+        return caseSensitive ?
+               Pattern.compile("\\b" + searchExpression + "\\b") :
+               Pattern.compile(
+                       "\\b" + searchExpression + "\\b", Pattern.CASE_INSENSITIVE);
     }
 
     @Override

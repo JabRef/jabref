@@ -31,7 +31,7 @@ public final class MergeEntriesHelper {
     ///
     /// @param entryFromFetcher The entry containing new information (source, from the fetcher)
     /// @param entryFromLibrary The entry to be updated (target, from the library)
-    /// @param namedCompound Compound edit to collect undo information
+    /// @param namedCompound    Compound edit to collect undo information
     public static boolean mergeEntries(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound namedCompound) {
         LOGGER.debug("Entry from fetcher: {}", entryFromFetcher);
         LOGGER.debug("Entry from library: {}", entryFromLibrary);

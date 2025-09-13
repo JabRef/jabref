@@ -27,13 +27,17 @@ class SearchCitationsRelationsServiceTest {
         return CitationFetcherHelpersForTest.Mocks.from(
                 entry -> {
                     if (entry == targetEntry) {
-                        return citationsToReturn != null ? citationsToReturn : List.of();
+                        return citationsToReturn != null ?
+                               citationsToReturn :
+                               List.of();
                     }
                     return List.of();
                 },
                 entry -> {
                     if (entry == targetEntry) {
-                        return referencesToReturn != null ? referencesToReturn : List.of();
+                        return referencesToReturn != null ?
+                               referencesToReturn :
+                               List.of();
                     }
                     return List.of();
                 },
@@ -88,7 +92,8 @@ class SearchCitationsRelationsServiceTest {
                     _ -> citationsToReturn,
                     citationsDatabase::put,
                     List::of,
-                    (_, _) -> { },
+                    (_, _) -> {
+                    },
                     _ -> true,
                     _ -> false
             );
@@ -169,7 +174,8 @@ class SearchCitationsRelationsServiceTest {
             CitationFetcher fetcher = createMockFetcher(referencer, null, referencesToReturn, null);
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                     List::of,
-                    (_, _) -> { },
+                    (_, _) -> {
+                    },
                     _ -> referencesToReturn,
                     referencesDatabase::put,
                     _ -> false,

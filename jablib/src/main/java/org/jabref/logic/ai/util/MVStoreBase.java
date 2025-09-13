@@ -31,7 +31,10 @@ public abstract class MVStoreBase implements AutoCloseable {
         try {
             this.mvStore = new MVStore.Builder()
                     .autoCommitDisabled()
-                    .fileName(mvStorePath == null ? null : mvStorePath.toString())
+                    .fileName(
+                            mvStorePath == null ?
+                            null :
+                            mvStorePath.toString())
                     .open();
         } catch (MVStoreException e) {
             this.mvStore = new MVStore.Builder()

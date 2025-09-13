@@ -7,7 +7,7 @@ import org.jabref.model.strings.StringUtil;
 
 /**
  * Needs to be instantiated for each new query
- *
+ * <p>
  * Stop words are ignored. See ADR-0022.
  */
 public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
@@ -57,8 +57,10 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
     @Override
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
         return switch (fieldAsString) {
-            case "article_number" -> handleArticleNumber(term);
-            default -> super.handleOtherField(fieldAsString, term);
+            case "article_number" ->
+                    handleArticleNumber(term);
+            default ->
+                    super.handleOtherField(fieldAsString, term);
         };
     }
 
@@ -76,10 +78,14 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
     }
 
     public Optional<String> getJournal() {
-        return journal == null ? Optional.empty() : Optional.of(journal);
+        return journal == null ?
+               Optional.empty() :
+               Optional.of(journal);
     }
 
     public Optional<String> getArticleNumber() {
-        return articleNumber == null ? Optional.empty() : Optional.of(articleNumber);
+        return articleNumber == null ?
+               Optional.empty() :
+               Optional.of(articleNumber);
     }
 }

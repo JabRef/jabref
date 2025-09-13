@@ -148,16 +148,28 @@ public class OOPreFormatter implements LayoutFormatter {
         String result = "";
         switch (latexCommand) {
             // Should really separate between emphasized and italic but since in later stages both are converted to italic...
-            case "textit", "it", "emph", "em" -> result = "i";  // Italic
-            case "textbf", "bf" -> result = "b";                // Bold font
-            case "textsc" -> result = "smallcaps";              // Small caps
-                                                                // Not a proper HTML tag, but used here for convenience
-            case "underline" -> result = "u";                   // Underline
-            case "sout" -> result = "s";                        // Strikeout
-                                                                // sout is the "standard" command, although it is actually based on the package ulem
-            case "texttt" -> result = "tt";                     // Monospace font
-            case "textsuperscript" -> result = "sup";           // Superscript
-            case "textsubscript" -> result = "sub";             // Subscript
+            case "textit",
+                 "it",
+                 "emph",
+                 "em" ->
+                    result = "i";  // Italic
+            case "textbf",
+                 "bf" ->
+                    result = "b";                // Bold font
+            case "textsc" ->
+                    result = "smallcaps";              // Small caps
+            // Not a proper HTML tag, but used here for convenience
+            case "underline" ->
+                    result = "u";                   // Underline
+            case "sout" ->
+                    result = "s";                        // Strikeout
+            // sout is the "standard" command, although it is actually based on the package ulem
+            case "texttt" ->
+                    result = "tt";                     // Monospace font
+            case "textsuperscript" ->
+                    result = "sup";           // Superscript
+            case "textsubscript" ->
+                    result = "sub";             // Subscript
         }
         return result;
     }

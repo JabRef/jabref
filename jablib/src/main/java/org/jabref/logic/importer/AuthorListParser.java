@@ -99,7 +99,9 @@ public class AuthorListParser {
         return stringBuilder;
     }
 
-    private record SimpleNormalFormResult(String authors, boolean andOthersPresent) {
+    private record SimpleNormalFormResult(
+            String authors,
+            boolean andOthersPresent) {
     }
 
     private static SimpleNormalFormResult getSimpleNormalForm(String listOfNames) {
@@ -125,7 +127,7 @@ public class AuthorListParser {
 
     /**
      * Tries to get a simple BibTeX author list of the given string.
-     *
+     * <p>
      * This is an intermediate step in {@link #parse}. Since parse does not work in all cases,
      * this method can be used to get more valid BibTeX.
      *
@@ -397,11 +399,26 @@ public class AuthorListParser {
         }
 
         // Third step: do actual splitting, construct Author object
-        String firstPart = firstPartStart < 0 ? null : concatTokens(tokens, firstPartStart, firstPartEnd, OFFSET_TOKEN, false);
-        String firstAbbr = firstPartStart < 0 ? null : concatTokens(tokens, firstPartStart, firstPartEnd, OFFSET_TOKEN_ABBR, true);
-        String vonPart = vonPartStart < 0 ? null : concatTokens(tokens, vonPartStart, vonPartEnd, OFFSET_TOKEN, false);
-        String lastPart = lastPartStart < 0 ? null : concatTokens(tokens, lastPartStart, lastPartEnd, OFFSET_TOKEN, false);
-        String jrPart = jrPartStart < 0 ? null : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
+        String firstPart =
+                firstPartStart < 0 ?
+                null :
+                concatTokens(tokens, firstPartStart, firstPartEnd, OFFSET_TOKEN, false);
+        String firstAbbr =
+                firstPartStart < 0 ?
+                null :
+                concatTokens(tokens, firstPartStart, firstPartEnd, OFFSET_TOKEN_ABBR, true);
+        String vonPart =
+                vonPartStart < 0 ?
+                null :
+                concatTokens(tokens, vonPartStart, vonPartEnd, OFFSET_TOKEN, false);
+        String lastPart =
+                lastPartStart < 0 ?
+                null :
+                concatTokens(tokens, lastPartStart, lastPartEnd, OFFSET_TOKEN, false);
+        String jrPart =
+                jrPartStart < 0 ?
+                null :
+                concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
 
         if ((commaFirst < 0) && (firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) && (lastPart.length() < 5)
                 && (Character.UnicodeScript.of(lastPart.charAt(0)) != Character.UnicodeScript.HAN)) {

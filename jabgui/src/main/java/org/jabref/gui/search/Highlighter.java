@@ -131,10 +131,14 @@ public class Highlighter {
     }
 
     private static List<SearchQueryNode> getSearchQueryNodes(SearchQuery searchQuery) {
-        return searchQuery.isValid() ? SearchQueryConversion.extractSearchTerms(searchQuery) : List.of();
+        return searchQuery.isValid() ?
+               SearchQueryConversion.extractSearchTerms(searchQuery) :
+               List.of();
     }
 
     public static Optional<String> buildSearchPattern(List<String> terms) {
-        return terms.isEmpty() ? Optional.empty() : Optional.of(String.join("|", terms));
+        return terms.isEmpty() ?
+               Optional.empty() :
+               Optional.of(String.join("|", terms));
     }
 }

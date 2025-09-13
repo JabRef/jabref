@@ -43,7 +43,7 @@ class FormatterTest {
         assertEquals(List.of(),
                 getFormatters().collect(Collectors.groupingBy(
                                        Formatter::getKey,
-                        Collectors.counting()))
+                                       Collectors.counting()))
                                .entrySet().stream()
                                .filter(e -> e.getValue() > 1)
                                .map(Map.Entry::getKey)

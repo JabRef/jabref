@@ -75,7 +75,10 @@ public class KeyBindingViewModel {
     }
 
     private void setDisplayName() {
-        this.displayName.set(keyBinding == null ? this.category.getName() : keyBinding.getLocalization());
+        this.displayName.set(
+                keyBinding == null ?
+                this.category.getName() :
+                keyBinding.getLocalization());
     }
 
     public StringProperty nameProperty() {
@@ -147,10 +150,14 @@ public class KeyBindingViewModel {
     }
 
     public Optional<JabRefIcon> getResetIcon() {
-        return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcons.REFRESH);
+        return isCategory() ?
+               Optional.empty() :
+               Optional.of(IconTheme.JabRefIcons.REFRESH);
     }
 
     public Optional<JabRefIcon> getClearIcon() {
-        return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcons.CLEANUP_ENTRIES);
+        return isCategory() ?
+               Optional.empty() :
+               Optional.of(IconTheme.JabRefIcons.CLEANUP_ENTRIES);
     }
 }

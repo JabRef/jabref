@@ -33,7 +33,9 @@ public class PseudonymizationResultCsvWriter {
 
     private static String getKeyPrefix(String key) {
         int dashIndex = key.lastIndexOf('-');
-        return dashIndex != -1 ? key.substring(0, dashIndex) : key;
+        return dashIndex != -1 ?
+               key.substring(0, dashIndex) :
+               key;
     }
 
     private static int extractNumber(String key) {

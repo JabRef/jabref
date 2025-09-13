@@ -36,7 +36,7 @@ class RemoteSetupTest {
     @Test
     void goodCase() {
         final int port = 34567;
-        final String[] message = new String[]{"MYMESSAGE"};
+        final String[] message = new String[] {"MYMESSAGE"};
 
         try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             assertFalse(server.isOpen());
@@ -52,7 +52,7 @@ class RemoteSetupTest {
     @Test
     void goodCaseWithAllLifecycleMethods() {
         final int port = 34567;
-        final String[] message = new String[]{"MYMESSAGE"};
+        final String[] message = new String[] {"MYMESSAGE"};
 
         try (RemoteListenerServerManager server = new RemoteListenerServerManager()) {
             assertFalse(server.isOpen());
@@ -98,7 +98,7 @@ class RemoteSetupTest {
         final int port = 34567;
         final String message = "MYMESSAGE";
 
-        assertFalse(new RemoteClient(port).sendCommandLineArguments(new String[]{message}));
+        assertFalse(new RemoteClient(port).sendCommandLineArguments(new String[] {message}));
     }
 
     @Test

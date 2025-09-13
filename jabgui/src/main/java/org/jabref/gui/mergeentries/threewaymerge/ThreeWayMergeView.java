@@ -117,9 +117,9 @@ public class ThreeWayMergeView extends VBox {
 
     private void initializeHeaderView() {
         headerView.getColumnConstraints().addAll(fieldNameColumnConstraints,
-                                                 leftEntryColumnConstraints,
-                                                 rightEntryColumnConstraints,
-                                                 mergedEntryColumnConstraints);
+                leftEntryColumnConstraints,
+                rightEntryColumnConstraints,
+                mergedEntryColumnConstraints);
     }
 
     private void initializeScrollPane() {
@@ -215,9 +215,12 @@ public class ThreeWayMergeView extends VBox {
         if (primary != null) {
             return new BibEntry(primary);
         }
-        BibEntry placeholder = peer != null && peer.getType() != null
-                ? new BibEntry(peer.getType())
-                : new BibEntry();
+        BibEntry placeholder =
+                peer != null && peer.getType() != null
+                ?
+                new BibEntry(peer.getType())
+                :
+                new BibEntry();
         if (peer != null) {
             peer.getCitationKey().ifPresent(placeholder::withCitationKey);
         }

@@ -75,16 +75,28 @@ public class Version {
                 parsedVersion.major = Integer.parseInt(matcher.group("major"));
 
                 String minorString = matcher.group("minor");
-                parsedVersion.minor = minorString == null ? 0 : Integer.parseInt(minorString);
+                parsedVersion.minor =
+                        minorString == null ?
+                        0 :
+                        Integer.parseInt(minorString);
 
                 String patchString = matcher.group("patch");
-                parsedVersion.patch = patchString == null ? 0 : Integer.parseInt(patchString);
+                parsedVersion.patch =
+                        patchString == null ?
+                        0 :
+                        Integer.parseInt(patchString);
 
                 String versionStageString = matcher.group("stage");
-                parsedVersion.developmentStage = versionStageString == null ? DevelopmentStage.STABLE : DevelopmentStage.parse(versionStageString);
+                parsedVersion.developmentStage =
+                        versionStageString == null ?
+                        DevelopmentStage.STABLE :
+                        DevelopmentStage.parse(versionStageString);
 
                 String stageNumString = matcher.group("num");
-                parsedVersion.developmentNum = stageNumString == null ? 0 : Integer.parseInt(stageNumString);
+                parsedVersion.developmentNum =
+                        stageNumString == null ?
+                        0 :
+                        Integer.parseInt(stageNumString);
 
                 parsedVersion.isDevelopmentVersion = matcher.group("dev") != null;
             } catch (NumberFormatException e) {

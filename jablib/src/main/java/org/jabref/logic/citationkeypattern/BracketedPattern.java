@@ -235,7 +235,8 @@ public class BracketedPattern {
         while (parsedPattern.hasMoreTokens()) {
             String token = parsedPattern.nextToken();
             switch (token) {
-                case "\"" -> appendQuote(expandedPattern, parsedPattern);
+                case "\"" ->
+                        appendQuote(expandedPattern, parsedPattern);
                 case "[" -> {
                     String fieldMarker = contentBetweenBrackets(parsedPattern, pattern);
                     expandedPattern.append(bracketContentHandler.apply(fieldMarker));
@@ -247,7 +248,8 @@ public class BracketedPattern {
                         LOGGER.warn("Found a \"\\\" that is not part of an escape sequence");
                     }
                 }
-                default -> expandedPattern.append(token);
+                default ->
+                        expandedPattern.append(token);
             }
         }
 
@@ -273,7 +275,8 @@ public class BracketedPattern {
             String token = tokenizer.nextToken();
             // If the beginning of a quote is found, append the content
             switch (token) {
-                case "\"" -> appendQuote(bracketContent, tokenizer);
+                case "\"" ->
+                        appendQuote(bracketContent, tokenizer);
                 case "]" -> {
                     if (subBrackets == 0) {
                         foundClosingBracket = true;
@@ -286,7 +289,8 @@ public class BracketedPattern {
                     subBrackets++;
                     bracketContent.append(token);
                 }
-                default -> bracketContent.append(token);
+                default ->
+                        bracketContent.append(token);
             }
         }
 
@@ -530,7 +534,8 @@ public class BracketedPattern {
                          .map(author -> {
                              // If the author is an institution, use an institution key instead of the full name
                              String lastName = author.getFamilyName()
-                                                     .map(lastPart -> isInstitution(author) ?
+                                                     .map(lastPart ->
+                                                             isInstitution(author) ?
                                                              generateInstitutionKey(lastPart) :
                                                              LatexToUnicodeAdapter.format(lastPart))
                                                      .orElse(null);
@@ -768,7 +773,10 @@ public class BracketedPattern {
     private static String firstAuthor(AuthorList authorList) {
         return authorList.getAuthors().stream()
                          .findFirst()
-                         .flatMap(author -> author.getFamilyName().isPresent() ? author.getFamilyName() : author.getNamePrefix())
+                         .flatMap(author ->
+                                 author.getFamilyName().isPresent() ?
+                                 author.getFamilyName() :
+                                 author.getNamePrefix())
                          .orElse("");
     }
 
@@ -795,8 +803,9 @@ public class BracketedPattern {
      * never return null.
      */
     private static String firstAuthorVonAndLast(AuthorList authorList) {
-        return authorList.isEmpty() ? "" :
-                authorList.getAuthor(0).getNamePrefixAndFamilyName().replace(" ", "");
+        return authorList.isEmpty() ?
+               "" :
+               authorList.getAuthor(0).getNamePrefixAndFamilyName().replace(" ", "");
     }
 
     /**
@@ -954,7 +963,10 @@ public class BracketedPattern {
      * `maxAuthors` replaced with `suffix`
      */
     public static String joinAuthorsOnLastName(AuthorList authorList, int maxAuthors, String delimiter, final String suffix) {
-        final String finalSuffix = authorList.getNumberOfAuthors() > maxAuthors ? suffix : "";
+        final String finalSuffix =
+                authorList.getNumberOfAuthors() > maxAuthors ?
+                suffix :
+                "";
         return authorList.getAuthors().stream()
                          .map(author -> {
                              if (author.equals(Author.OTHERS)) {
@@ -1043,7 +1055,9 @@ public class BracketedPattern {
         }
         String lastName = lastAuthor.getFamilyName()
                                     .map(CitationKeyGenerator::removeDefaultUnwantedCharacters).orElse("");
-        return lastName.length() > n ? lastName.substring(0, n) : lastName;
+        return lastName.length() > n ?
+               lastName.substring(0, n) :
+               lastName;
     }
 
     /**
@@ -1281,8 +1295,8 @@ public class BracketedPattern {
      *         <li>null if content is null</li>
      *         </ul>
      */
-     @VisibleForTesting
-     static String generateInstitutionKey(String content) {
+    @VisibleForTesting
+    static String generateInstitutionKey(String content) {
         if (content == null) {
             return null;
         }
@@ -1370,9 +1384,17 @@ public class BracketedPattern {
         }
 
         // Putting parts together.
-        return (university == null ? Objects.toString(rest, "") : university)
-                + (school == null ? "" : school)
-                + ((department == null) || (department.equals(school)) ? "" : department);
+        return (university == null ?
+                Objects.toString(rest, "") :
+                university)
+                + (
+                school == null ?
+                "" :
+                school)
+                + (
+                (department == null) || (department.equals(school)) ?
+                "" :
+                department);
     }
 
     /**

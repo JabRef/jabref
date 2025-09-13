@@ -30,10 +30,10 @@ public class ReferenceMark {
 
     /**
      * @param name Allowed formats:
-     * Single entry: <code>JABREF_{citationKey} CID_{citationNumber} {uniqueId}</code>
-     * Group of entries: <code>JABREF_{citationKey1} CID_{citationNumber1}, JABREF_{citationKey2} CID_{citationNumber2}, ..., JABREF_{citationKeyN} CID_{citationNumberN} {uniqueId}</code>
-     * Disallowed: <code>JABREF_{citationKey} CID_{citationNumber}</code> (no unique ID at the end)
-     * Disallowed: <code>JABREF_{citationKey1} CID_{citationNumber1} JABREF_{citationKey2} CID_{citationNumber2} {uniqueId}</code> (no comma between entries)
+     *             Single entry: <code>JABREF_{citationKey} CID_{citationNumber} {uniqueId}</code>
+     *             Group of entries: <code>JABREF_{citationKey1} CID_{citationNumber1}, JABREF_{citationKey2} CID_{citationNumber2}, ..., JABREF_{citationKeyN} CID_{citationNumberN} {uniqueId}</code>
+     *             Disallowed: <code>JABREF_{citationKey} CID_{citationNumber}</code> (no unique ID at the end)
+     *             Disallowed: <code>JABREF_{citationKey1} CID_{citationNumber1} JABREF_{citationKey2} CID_{citationNumber2} {uniqueId}</code> (no comma between entries)
      */
     public ReferenceMark(String name) {
         this.name = name;
@@ -58,7 +58,10 @@ public class ReferenceMark {
         }
 
         String entriesString = matcher.group(1).trim();
-        this.uniqueId = matcher.group(2) != null ? matcher.group(2).trim() : CUID.randomCUID2(8).toString();
+        this.uniqueId =
+                matcher.group(2) != null ?
+                matcher.group(2).trim() :
+                CUID.randomCUID2(8).toString();
 
         this.citationKeys = new ArrayList<>();
         this.citationNumbers = new ArrayList<>();
@@ -99,6 +102,8 @@ public class ReferenceMark {
 
     public static Optional<ReferenceMark> of(String name) {
         ReferenceMark mark = new ReferenceMark(name);
-        return mark.citationKeys.isEmpty() ? Optional.empty() : Optional.of(mark);
+        return mark.citationKeys.isEmpty() ?
+               Optional.empty() :
+               Optional.of(mark);
     }
 }

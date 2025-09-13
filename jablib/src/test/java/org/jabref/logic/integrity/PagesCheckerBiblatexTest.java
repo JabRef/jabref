@@ -38,7 +38,7 @@ public class PagesCheckerBiblatexTest {
                 "43+",
                 // bibTexAcceptsMorePageNumbersWithRangeOfNumbers
                 "7+,41--43,73"
-                );
+        );
     }
 
     @ParameterizedTest
@@ -55,7 +55,7 @@ public class PagesCheckerBiblatexTest {
                 "1 2",
                 // bibTexDoesNotAcceptBrackets
                 "{1}-{2}"
-                );
+        );
     }
 
     @ParameterizedTest

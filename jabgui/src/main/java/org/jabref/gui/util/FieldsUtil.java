@@ -37,11 +37,16 @@ public class FieldsUtil {
             case SpecialField specialField ->
                     new SpecialFieldViewModel(specialField, preferences, undoManager).getLocalization()
                             + " (" + Localization.lang("Special") + ")";
-            case IEEEField _ -> field.getDisplayName() + " (" + Localization.lang("IEEE") + ")";
-            case InternalField _ -> field.getDisplayName() + " (" + Localization.lang("Internal") + ")";
-            case UnknownField _ -> field.getDisplayName() + " (" + Localization.lang("Custom") + ")";
-            case null -> throw new IllegalArgumentException("Field must not be null");
-            default -> field.getDisplayName();
+            case IEEEField _ ->
+                    field.getDisplayName() + " (" + Localization.lang("IEEE") + ")";
+            case InternalField _ ->
+                    field.getDisplayName() + " (" + Localization.lang("Internal") + ")";
+            case UnknownField _ ->
+                    field.getDisplayName() + " (" + Localization.lang("Custom") + ")";
+            case null ->
+                    throw new IllegalArgumentException("Field must not be null");
+            default ->
+                    field.getDisplayName();
         };
     }
 }

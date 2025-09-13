@@ -12,32 +12,32 @@ class ProxyTest {
      */
     @Test
     void proxyPreferencesStorePassword() {
-       // mock data
-       boolean useProxy = true;
-       String hostname = "testName";
-       String port = "8080";
-       boolean useAuthentication = true;
-       String username = "testUserName";
-       String password = "testPassword";
-       boolean persist = false;
+        // mock data
+        boolean useProxy = true;
+        String hostname = "testName";
+        String port = "8080";
+        boolean useAuthentication = true;
+        String username = "testUserName";
+        String password = "testPassword";
+        boolean persist = false;
 
-       // Creates proxy preference
-       ProxyPreferences proxyPref = new ProxyPreferences(
-               useProxy,
-               hostname,
-               port,
-               useAuthentication,
-               username,
-               password,
-               persist);
+        // Creates proxy preference
+        ProxyPreferences proxyPref = new ProxyPreferences(
+                useProxy,
+                hostname,
+                port,
+                useAuthentication,
+                username,
+                password,
+                persist);
 
-       // Check if mock data is stored in object memory and can be extracted
-       assertTrue(proxyPref.shouldUseProxy());
-       assertEquals(proxyPref.getHostname(), hostname);
-       assertEquals(proxyPref.getPort(), port);
-       assertTrue(proxyPref.shouldUseAuthentication());
-       assertEquals(proxyPref.getUsername(), username);
-       assertEquals(proxyPref.getPassword(), password);
-       assertEquals(proxyPref.shouldPersistPassword(), persist);
-   }
+        // Check if mock data is stored in object memory and can be extracted
+        assertTrue(proxyPref.shouldUseProxy());
+        assertEquals(proxyPref.getHostname(), hostname);
+        assertEquals(proxyPref.getPort(), port);
+        assertTrue(proxyPref.shouldUseAuthentication());
+        assertEquals(proxyPref.getUsername(), username);
+        assertEquals(proxyPref.getPassword(), password);
+        assertEquals(proxyPref.shouldPersistPassword(), persist);
+    }
 }

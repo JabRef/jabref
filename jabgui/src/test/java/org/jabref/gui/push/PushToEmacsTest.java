@@ -30,7 +30,10 @@ class PushToEmacsTest {
 
         PushToApplicationPreferences pushToApplicationPreferences = mock(PushToApplicationPreferences.class);
 
-        String emacsClient = OS.WINDOWS ? "\"C:\\tools\\emacs\\bin\\emacsclientw.exe\"" : "emacsclient";
+        String emacsClient =
+                OS.WINDOWS ?
+                "\"C:\\tools\\emacs\\bin\\emacsclientw.exe\"" :
+                "emacsclient";
         Map<String, String> emacsConfig = Map.of("Emacs", emacsClient);
         ObservableMap<String, String> emacsConfigObservableMap = FXCollections.observableMap(emacsConfig);
         when(pushToApplicationPreferences.getCommandPaths()).thenReturn(new SimpleMapProperty<>(emacsConfigObservableMap));

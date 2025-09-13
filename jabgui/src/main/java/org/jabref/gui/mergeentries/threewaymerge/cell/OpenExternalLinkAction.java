@@ -40,7 +40,7 @@ public class OpenExternalLinkAction extends SimpleCommand {
                 );
             } else {
                 NativeDesktop.openBrowser(urlOrDoi, externalApplicationPreferences
-        );
+                );
             }
         } catch (IOException e) {
             LOGGER.warn("Cannot open the given external link '{}'", urlOrDoi, e);

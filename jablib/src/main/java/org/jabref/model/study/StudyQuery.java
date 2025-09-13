@@ -32,12 +32,16 @@ public class StudyQuery {
 
         StudyQuery that = (StudyQuery) o;
 
-        return getQuery() != null ? getQuery().equals(that.getQuery()) : that.getQuery() == null;
+        return getQuery() != null ?
+               getQuery().equals(that.getQuery()) :
+               that.getQuery() == null;
     }
 
     @Override
     public int hashCode() {
-        return getQuery() != null ? getQuery().hashCode() : 0;
+        return getQuery() != null ?
+               getQuery().hashCode() :
+               0;
     }
 
     @Override

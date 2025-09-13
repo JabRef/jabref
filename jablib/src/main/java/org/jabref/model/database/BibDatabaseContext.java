@@ -166,7 +166,6 @@ public class BibDatabaseContext {
      * </ol>
      *
      * @param preferences The fileDirectory preferences
-     *
      * @return List of existing absolute paths
      */
     public List<Path> getFileDirectories(FilePreferences preferences) {

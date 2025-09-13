@@ -93,7 +93,9 @@ public class MrDLibImporter extends Importer {
     /**
      * Small pair-class to ensure the right order of the recommendations.
      */
-    private record RankedBibEntry(BibEntry entry, Integer rank) {
+    private record RankedBibEntry(
+            BibEntry entry,
+            Integer rank) {
     }
 
     /**
@@ -142,12 +144,30 @@ public class MrDLibImporter extends Importer {
         BibEntry current = new BibEntry();
 
         // parse each of the relevant fields into variables
-        String authors = isRecommendationFieldPresent(recommendation, "authors") ? recommendation.getString("authors") : "";
-        String title = isRecommendationFieldPresent(recommendation, "title") ? recommendation.getString("title") : "";
-        String year = isRecommendationFieldPresent(recommendation, "published_year") ? Integer.toString(recommendation.getInt("published_year")) : "";
-        String journal = isRecommendationFieldPresent(recommendation, "published_in") ? recommendation.getString("published_in") : "";
-        String url = isRecommendationFieldPresent(recommendation, "url") ? recommendation.getString("url") : "";
-        Integer rank = isRecommendationFieldPresent(recommendation, "recommendation_id") ? recommendation.getInt("recommendation_id") : 100;
+        String authors =
+                isRecommendationFieldPresent(recommendation, "authors") ?
+                recommendation.getString("authors") :
+                "";
+        String title =
+                isRecommendationFieldPresent(recommendation, "title") ?
+                recommendation.getString("title") :
+                "";
+        String year =
+                isRecommendationFieldPresent(recommendation, "published_year") ?
+                Integer.toString(recommendation.getInt("published_year")) :
+                "";
+        String journal =
+                isRecommendationFieldPresent(recommendation, "published_in") ?
+                recommendation.getString("published_in") :
+                "";
+        String url =
+                isRecommendationFieldPresent(recommendation, "url") ?
+                recommendation.getString("url") :
+                "";
+        Integer rank =
+                isRecommendationFieldPresent(recommendation, "recommendation_id") ?
+                recommendation.getInt("recommendation_id") :
+                100;
 
         // Populate bib entry with relevant data
         current.setField(StandardField.AUTHOR, authors);

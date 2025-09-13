@@ -64,8 +64,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
     public ThreeWayMergeToolbar() {
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @FXML
@@ -123,13 +123,22 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     private void loadSavedConfiguration() {
         MergeDialogPreferences mergeDialogPreferences = preferences.getMergeDialogPreferences();
 
-        PlainTextOrDiff plainTextOrDiffPreference = mergeDialogPreferences.getMergeShouldShowDiff() ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT;
+        PlainTextOrDiff plainTextOrDiffPreference =
+                mergeDialogPreferences.getMergeShouldShowDiff() ?
+                PlainTextOrDiff.Diff :
+                PlainTextOrDiff.PLAIN_TEXT;
         plainTextOrDiffComboBox.getSelectionModel().select(plainTextOrDiffPreference);
 
-        DiffView diffViewPreference = mergeDialogPreferences.getMergeShouldShowUnifiedDiff() ? DiffView.UNIFIED : DiffView.SPLIT;
+        DiffView diffViewPreference =
+                mergeDialogPreferences.getMergeShouldShowUnifiedDiff() ?
+                DiffView.UNIFIED :
+                DiffView.SPLIT;
         diffViewComboBox.getSelectionModel().select(diffViewPreference);
 
-        diffHighlightingMethodToggleGroup.selectToggle(mergeDialogPreferences.getMergeHighlightWords() ? highlightWordsRadioButton : highlightCharactersRadioButtons);
+        diffHighlightingMethodToggleGroup.selectToggle(
+                mergeDialogPreferences.getMergeHighlightWords() ?
+                highlightWordsRadioButton :
+                highlightCharactersRadioButtons);
     }
 
     public void saveToolbarConfiguration() {
@@ -157,7 +166,10 @@ public class ThreeWayMergeToolbar extends AnchorPane {
     }
 
     public void setShowDiff(boolean showDiff) {
-        plainTextOrDiffComboBox.valueProperty().set(showDiff ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT);
+        plainTextOrDiffComboBox.valueProperty().set(
+                showDiff ?
+                PlainTextOrDiff.Diff :
+                PlainTextOrDiff.PLAIN_TEXT);
     }
 
     public BooleanProperty hideEqualFieldsProperty() {

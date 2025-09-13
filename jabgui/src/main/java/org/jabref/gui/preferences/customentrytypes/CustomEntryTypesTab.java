@@ -245,7 +245,10 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                 fields.getItems().add(field);
             } else {
                 // decide based on drop position whether to add the element before or after
-                int offset = event.getY() > (row.getHeight() / 2) ? 1 : 0;
+                int offset =
+                        event.getY() > (row.getHeight() / 2) ?
+                        1 :
+                        0;
                 fields.getItems().add(row.getIndex() + offset, field);
             }
         }

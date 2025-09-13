@@ -70,9 +70,12 @@ public class ExportCommand extends SimpleCommand {
         this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
 
-        this.executable.bind(exportMethod == ExportMethod.EXPORT_SELECTED
-                ? ActionHelper.needsEntriesSelected(stateManager)
-                : ActionHelper.needsDatabase(stateManager));
+        this.executable.bind(
+                exportMethod == ExportMethod.EXPORT_SELECTED
+                ?
+                ActionHelper.needsEntriesSelected(stateManager)
+                :
+                ActionHelper.needsDatabase(stateManager));
     }
 
     @Override
@@ -112,8 +115,8 @@ public class ExportCommand extends SimpleCommand {
         }
 
         List<Path> fileDirForDatabase = stateManager.getActiveDatabase()
-                                                       .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
-                                                       .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));
+                                                    .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
+                                                    .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));
 
         // Make sure we remember which filter was used, to set
         // the default for next time:

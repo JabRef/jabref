@@ -320,7 +320,9 @@ public class CSLReferenceMarkManager {
 
     private int compareTextRanges(XTextRange r1, XTextRange r2) {
         try {
-            return r1 != null && r2 != null ? textRangeCompare.compareRegionStarts(r1, r2) : 0;
+            return r1 != null && r2 != null ?
+                   textRangeCompare.compareRegionStarts(r1, r2) :
+                   0;
         } catch (IllegalArgumentException e) {
             LOGGER.warn("Error comparing text ranges: {}", e.getMessage(), e);
             return 0;

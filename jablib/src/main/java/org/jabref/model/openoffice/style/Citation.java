@@ -77,10 +77,10 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
 
     public static Optional<CitationLookupResult> lookup(List<BibDatabase> databases, String key) {
         return databases.stream()
-                         .map(database -> Citation.lookup(database, key))
-                         .filter(Optional::isPresent)
-                         .map(Optional::get)
-                         .findFirst();
+                        .map(database -> Citation.lookup(database, key))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .findFirst();
     }
 
     public void lookupInDatabases(List<BibDatabase> databases) {
