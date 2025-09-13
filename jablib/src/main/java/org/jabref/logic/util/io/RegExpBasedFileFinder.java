@@ -92,17 +92,17 @@ class RegExpBasedFileFinder implements FileFinder {
     /**
      * Searches the given directory and filename pattern for a file for the
      * BibTeX entry.
-     *
+     * <p>
      * Used to fix:
-     *
+     * <p>
      * http://sourceforge.net/tracker/index.php?func=detail&aid=1503410&group_id=92314&atid=600309
-     *
+     * <p>
      * Requirements:
      * - Be able to find the associated PDF in a set of given directories.
      * - Be able to return a relative path or absolute path.
      * - Be fast.
      * - Allow for flexible naming schemes in the PDFs.
-     *
+     * <p>
      * Syntax scheme for file:
      * <ul>
      * <li>* Any subDir</li>

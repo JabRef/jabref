@@ -22,7 +22,7 @@ public class MarkdownEditor extends SimpleEditor {
     }
 
     @Override
-    protected TextInputControl createTextInputControl() {
+    protected TextInputControl createTextInputControl(Field field) {
         return new EditorTextArea() {
             @Override
             public void paste() {

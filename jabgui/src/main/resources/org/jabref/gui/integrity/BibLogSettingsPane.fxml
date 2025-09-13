@@ -12,7 +12,11 @@
       fx:controller="org.jabref.gui.integrity.BibLogSettingsPane"
       fx:id="bibLogSettingsPane">
     <Label text="BibTeX log (.blg) file:"/>
-    <TextField fx:id="pathField" prefWidth="300"/>
-    <Button onAction="#onBrowse" text="Browse..."/>
-    <Button onAction="#onReset" text="Reset"/>
+    <TextField
+            fx:id="pathField"
+            prefWidth="300"/>
+    <Button onAction="#onBrowse"
+            text="Browse..."/>
+    <Button onAction="#onReset"
+            text="Reset"/>
 </HBox>

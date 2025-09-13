@@ -59,7 +59,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final CliPreferences preferences;
 
-
     private final ProxyPreferences proxyPreferences;
     private final ProxyPreferences backupProxyPreferences;
     private final InternalPreferences internalPreferences;

@@ -20,7 +20,8 @@ public class HTMLChars implements ParamLayoutFormatter {
      * <b>&</b>{@literal amp;} <b>Not Matched</b><br>
      * <b>&</b>{@literal #34;} <b>Not Matched</b><br>
      * <b>&</b>Hey <b>Matched</b>
-     * */
+     *
+     */
     private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile("&(?!(?:[a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});)");
 
     private boolean keepCurlyBraces = false;

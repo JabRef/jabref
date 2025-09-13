@@ -107,7 +107,8 @@ public class DuplicateResolverDialog extends BaseDialog<DuplicateResolverResult>
                 threeWayMerge = new ThreeWayMergeView(one, two, Localization.lang("Existing entry"),
                         Localization.lang("From import"), preferences);
             }
-            default -> throw new IllegalStateException("Switch expression should be exhaustive");
+            default ->
+                    throw new IllegalStateException("Switch expression should be exhaustive");
         }
 
         this.getDialogPane().getButtonTypes().addAll(first, second, both, merge, cancel);

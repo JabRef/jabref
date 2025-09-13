@@ -135,7 +135,7 @@ public class NamedRangeReferenceMark implements NamedRange {
             NoDocumentException,
             WrappedTargetException {
         return UnoReferenceMark.getAnchor(doc, refMarkName)
-                                .map(e -> new NamedRangeReferenceMark(refMarkName));
+                               .map(e -> new NamedRangeReferenceMark(refMarkName));
     }
 
     /**

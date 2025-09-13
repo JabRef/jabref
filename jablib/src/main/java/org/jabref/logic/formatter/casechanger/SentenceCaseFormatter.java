@@ -24,15 +24,15 @@ public class SentenceCaseFormatter extends Formatter {
     @Override
     public String format(String input) {
         return StringUtil.getStringAsSentences(input)
-                .stream()
-                .map(new LowerCaseFormatter()::format)
-                .map(Title::new)
-                .map(title -> {
-                    title.getFirstWord().ifPresent(Word::toUpperFirst);
-                    return title;
-                })
-                .map(Object::toString)
-                .collect(Collectors.joining(" "));
+                         .stream()
+                         .map(new LowerCaseFormatter()::format)
+                         .map(Title::new)
+                         .map(title -> {
+                             title.getFirstWord().ifPresent(Word::toUpperFirst);
+                             return title;
+                         })
+                         .map(Object::toString)
+                         .collect(Collectors.joining(" "));
     }
 
     @Override

@@ -52,7 +52,7 @@ class UTF8CheckerTest {
     @Test
     void NonUTF8EncodingCheckerTest() {
         String NonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(StandardCharsets.UTF_8), GBK);
-            assertFalse(UTF8Checker.UTF8EncodingChecker(NonUTF8.getBytes(GBK)));
+        assertFalse(UTF8Checker.UTF8EncodingChecker(NonUTF8.getBytes(GBK)));
     }
 
     /**
@@ -62,6 +62,6 @@ class UTF8CheckerTest {
     @Test
     void UTF8EncodingCheckerTest() {
         String UTF8Demo = new String("你好，这条语句使用GBK字符集".getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
-            assertTrue(UTF8Checker.UTF8EncodingChecker(UTF8Demo.getBytes(StandardCharsets.UTF_8)));
+        assertTrue(UTF8Checker.UTF8EncodingChecker(UTF8Demo.getBytes(StandardCharsets.UTF_8)));
     }
 }

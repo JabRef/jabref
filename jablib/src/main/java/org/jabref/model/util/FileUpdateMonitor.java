@@ -27,7 +27,7 @@ public interface FileUpdateMonitor {
     boolean isActive();
 
     /**
-     *  stops watching for changes
+     * stops watching for changes
      */
     void shutdown();
 }

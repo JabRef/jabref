@@ -157,10 +157,14 @@ public class AuthorList implements Iterable<Author> {
         String lastDelimiter = oxfordComma ? ", and " : " and ";
         int lastIndex = authors.size() - 1;
         return switch (authors.size()) {
-            case 0 -> "";
-            case 1 -> authors.getFirst();
-            case 2 -> authors.getFirst() + " and " + authors.get(1);
-            default -> String.join(", ", authors.subList(0, lastIndex)) + lastDelimiter + authors.get(lastIndex);
+            case 0 ->
+                    "";
+            case 1 ->
+                    authors.getFirst();
+            case 2 ->
+                    authors.getFirst() + " and " + authors.get(1);
+            default ->
+                    String.join(", ", authors.subList(0, lastIndex)) + lastDelimiter + authors.get(lastIndex);
         };
     }
 
@@ -316,10 +320,14 @@ public class AuthorList implements Iterable<Author> {
     public String getAsNatbib() {
         List<Author> authors = getAuthors();
         return switch (authors.size()) {
-            case 0 -> "";
-            case 1 -> authors.getFirst().getNamePrefixAndFamilyName();
-            case 2 -> authors.getFirst().getNamePrefixAndFamilyName() + " and " + authors.get(1).getNamePrefixAndFamilyName();
-            default -> authors.getFirst().getNamePrefixAndFamilyName() + " et al.";
+            case 0 ->
+                    "";
+            case 1 ->
+                    authors.getFirst().getNamePrefixAndFamilyName();
+            case 2 ->
+                    authors.getFirst().getNamePrefixAndFamilyName() + " and " + authors.get(1).getNamePrefixAndFamilyName();
+            default ->
+                    authors.getFirst().getNamePrefixAndFamilyName() + " et al.";
         };
     }
 
@@ -395,15 +403,18 @@ public class AuthorList implements Iterable<Author> {
      */
     public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {
         return switch (authors.size()) {
-            case 0 -> "";
-            case 1 -> authors.getFirst().getFamilyGiven(abbreviate);
-            default -> authors.stream()
-                              .skip(1)
-                              .map(author -> author.getGivenFamily(abbreviate))
-                              .collect(Collectors.joining(
-                                      " and ",
-                                      authors.getFirst().getFamilyGiven(abbreviate) + " and ",
-                                      ""));
+            case 0 ->
+                    "";
+            case 1 ->
+                    authors.getFirst().getFamilyGiven(abbreviate);
+            default ->
+                    authors.stream()
+                           .skip(1)
+                           .map(author -> author.getGivenFamily(abbreviate))
+                           .collect(Collectors.joining(
+                                   " and ",
+                                   authors.getFirst().getFamilyGiven(abbreviate) + " and ",
+                                   ""));
         };
     }
 

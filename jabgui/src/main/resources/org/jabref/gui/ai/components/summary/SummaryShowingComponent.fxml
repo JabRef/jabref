@@ -8,19 +8,43 @@
 <?import javafx.scene.text.TextFlow?>
 <?import javafx.scene.text.Text?>
 
-<fx:root alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="-Infinity" spacing="8.0" type="VBox" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.ai.components.summary.SummaryShowingComponent">
+<fx:root
+        alignment="TOP_CENTER"
+        maxHeight="1.7976931348623157E308"
+        maxWidth="1.7976931348623157E308"
+        minHeight="400.0"
+        minWidth="-Infinity"
+        spacing="8.0"
+        type="VBox"
+        xmlns="http://javafx.com/javafx/17.0.2-ea"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.jabref.gui.ai.components.summary.SummaryShowingComponent">
     <children>
-        <BorderPane minHeight="30.0">
+        <BorderPane
+                minHeight="30.0">
             <left>
-                <CheckBox fx:id="markdownCheckbox" mnemonicParsing="false" onAction="#onMarkdownToggle" text="Markdown" />
+                <CheckBox
+                        fx:id="markdownCheckbox"
+                        mnemonicParsing="false"
+                        onAction="#onMarkdownToggle"
+                        text="Markdown"/>
             </left>
             <center>
-                <Button mnemonicParsing="false" onAction="#onRegenerateButtonClick" text="%Regenerate" translateX="-40" />
+                <Button mnemonicParsing="false"
+                        onAction="#onRegenerateButtonClick"
+                        text="%Regenerate"
+                        translateX="-40"/>
             </center>
         </BorderPane>
-        <Text fx:id="summaryInfoText" strokeType="OUTSIDE" strokeWidth="0.0" text="%Generated at %0 by %1" />
+        <Text fx:id="summaryInfoText"
+              strokeType="OUTSIDE"
+              strokeWidth="0.0"
+              text="%Generated at %0 by %1"/>
     </children>
     <padding>
-        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+        <Insets bottom="8.0"
+                left="8.0"
+                right="8.0"
+                top="8.0"/>
     </padding>
 </fx:root>

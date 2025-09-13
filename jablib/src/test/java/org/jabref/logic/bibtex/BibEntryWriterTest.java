@@ -608,12 +608,12 @@ class BibEntryWriterTest {
     void addFieldWithLongerLength() throws Exception {
         String bibtexEntry = """
 
-            @Article{test,
-              author =  {BlaBla},
-              journal = {International Journal of Something},
-              number =  {1},
-              note =    {some note},
-            }""".replace("\n", OS.NEWLINE);
+                @Article{test,
+                  author =  {BlaBla},
+                  journal = {International Journal of Something},
+                  number =  {1},
+                  note =    {some note},
+                }""".replace("\n", OS.NEWLINE);
         BibEntry entry = firstEntryFrom(bibtexEntry);
 
         // modify entry
@@ -623,14 +623,14 @@ class BibEntryWriterTest {
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
         String expected = """
-            @Article{test,
-              author       = {BlaBla},
-              journal      = {International Journal of Something},
-              note         = {some note},
-              number       = {1},
-              howpublished = {asdf},
-            }
-            """.replace("\n", OS.NEWLINE);
+                @Article{test,
+                  author       = {BlaBla},
+                  journal      = {International Journal of Something},
+                  note         = {some note},
+                  number       = {1},
+                  howpublished = {asdf},
+                }
+                """.replace("\n", OS.NEWLINE);
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -643,10 +643,10 @@ class BibEntryWriterTest {
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
         String expected = """
-           @Article{,
-             note   = {some note},
-           }
-           """.replace("\n", OS.NEWLINE);
+                @Article{,
+                  note   = {some note},
+                }
+                """.replace("\n", OS.NEWLINE);
         assertEquals(expected, stringWriter.toString());
     }
 

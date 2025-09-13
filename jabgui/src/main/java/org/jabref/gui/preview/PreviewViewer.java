@@ -55,26 +55,26 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     // https://stackoverflow.com/questions/5669448/get-selected-texts-html-in-div/5670825#5670825
     private static final String JS_GET_SELECTION_HTML_SCRIPT = """
-        function getSelectionHtml() {
-            var html = "";
-            if (typeof window.getSelection != "undefined") {
-                var sel = window.getSelection();
-                if (sel.rangeCount) {
-                    var container = document.createElement("div");
-                    for (var i = 0, len = sel.rangeCount; i < len; ++i) {
-                        container.appendChild(sel.getRangeAt(i).cloneContents());
+            function getSelectionHtml() {
+                var html = "";
+                if (typeof window.getSelection != "undefined") {
+                    var sel = window.getSelection();
+                    if (sel.rangeCount) {
+                        var container = document.createElement("div");
+                        for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+                            container.appendChild(sel.getRangeAt(i).cloneContents());
+                        }
+                        html = container.innerHTML;
                     }
-                    html = container.innerHTML;
+                } else if (typeof document.selection != "undefined") {
+                    if (document.selection.type == "Text") {
+                        html = document.selection.createRange().htmlText;
+                    }
                 }
-            } else if (typeof document.selection != "undefined") {
-                if (document.selection.type == "Text") {
-                    html = document.selection.createRange().htmlText;
-                }
+                return html;
             }
-            return html;
-        }
-        getSelectionHtml();
-        """;
+            getSelectionHtml();
+            """;
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;

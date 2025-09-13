@@ -62,10 +62,10 @@ public class ConferenceRepository {
 
         try (inputStream; reader) {
             Iterable<CSVRecord> records = CSVFormat.DEFAULT.builder()
-                    .setHeader()
-                    .setSkipHeaderRecord(true)
-                    .get()
-                    .parse(reader);
+                                                           .setHeader()
+                                                           .setSkipHeaderRecord(true)
+                                                           .get()
+                                                           .parse(reader);
 
             for (CSVRecord record : records) {
                 String id = record.get("Id").strip();
@@ -104,10 +104,10 @@ public class ConferenceRepository {
      * of conference titles.
      * </p>
      *
-     * @implNote see {@link ConferenceRepository#fuzzySearchConferenceTitles} for more details on matching
      * @param bookTitle the string to search, must not be {@code null}
      * @return an {@code Optional} conference entry, if found
-     *         or {@code Optional.empty()} if no conference entry is found
+     * or {@code Optional.empty()} if no conference entry is found
+     * @implNote see {@link ConferenceRepository#fuzzySearchConferenceTitles} for more details on matching
      */
     public Optional<ConferenceEntry> getConferenceFromBookTitle(@NonNull String bookTitle) {
         String query = bookTitle.strip().toLowerCase();
@@ -163,14 +163,14 @@ public class ConferenceRepository {
      *     <li>Whenever Levenshtein similarity exceeds the threshold defined by the <code>LEVENSHTEIN_THRESHOLD</code> constant.</li>
      *     <li>The combined weighted score of both LCS and Levenshtein similarities exceeds the <code>COMBINED_LCS_LEV_THRESHOLD</code>.</li>
      * </ol>
-     *
+     * <p>
      * The combined score is calculated as follows:
      * <code>(0.6 * Levenshtein similarity) + (0.4 * LCS similarity)</code>
      * </p>
      *
      * @param query The query string to be searched
      * @return an {@code Optional} conference entry, if found
-     *         or {@code Optional.empty()} if no conference entry is found
+     * or {@code Optional.empty()} if no conference entry is found
      */
     private Optional<ConferenceEntry> fuzzySearchConferenceTitles(String query) {
         String bestMatch = "";

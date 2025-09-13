@@ -326,7 +326,7 @@ public class JabRefGUI extends Application {
 
         // Open last edited databases
         if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
-            && preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
+                && preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
             mainFrame.openLastEditedDatabases();
         }
 

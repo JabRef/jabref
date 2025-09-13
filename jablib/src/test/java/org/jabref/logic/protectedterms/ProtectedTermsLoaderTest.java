@@ -34,7 +34,7 @@ class ProtectedTermsLoaderTest {
         }
         assertTrue(loader.getProtectedTermsLists().isEmpty());
         Path path = Path.of(ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
-                                                            .toURI());
+                                                      .toURI());
         loader.addProtectedTermsListFromFile(path, true);
         assertEquals(List.of("Einstein"), loader.getProtectedTerms());
     }
@@ -42,7 +42,7 @@ class ProtectedTermsLoaderTest {
     @Test
     void addProtectedTermsListFromFile() throws URISyntaxException {
         Path path = Path.of(ProtectedTermsLoader.class.getResource("/org/jabref/logic/protectedterms/namedterms.terms")
-                                                            .toURI());
+                                                      .toURI());
         assertEquals(ProtectedTermsLoader.getInternalLists().size(), loader.getProtectedTermsLists().size());
         loader.addProtectedTermsListFromFile(path, false);
         assertEquals(ProtectedTermsLoader.getInternalLists().size() + 1, loader.getProtectedTermsLists().size());

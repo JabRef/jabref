@@ -55,8 +55,8 @@ public class MathMLParser {
 
             latexResult = writer.getBuffer().toString();
         } catch (XMLStreamException
-                | TransformerException
-                | IOException e) {
+                 | TransformerException
+                 | IOException e) {
             LOGGER.error("Could not transform", e);
             return "<Unsupported MathML expression>";
         }

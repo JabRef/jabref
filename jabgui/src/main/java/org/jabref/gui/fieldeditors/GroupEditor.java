@@ -44,9 +44,9 @@ public class GroupEditor extends SimpleEditor {
                 List<String> draggedGroups = (List<String>) event.getDragboard().getContent(DragAndDropDataFormats.GROUP);
                 if (bibEntry.isPresent() && draggedGroups.getFirst() != null) {
                     String newGroup = bibEntry.map(entry -> entry.getField(StandardField.GROUPS)
-                                                                     .map(oldGroups -> oldGroups + (preferences.getBibEntryPreferences().getKeywordSeparator()) + (draggedGroups.getFirst()))
-                                                                     .orElse(draggedGroups.getFirst()))
-                                                  .orElse(null);
+                                                                 .map(oldGroups -> oldGroups + (preferences.getBibEntryPreferences().getKeywordSeparator()) + (draggedGroups.getFirst()))
+                                                                 .orElse(draggedGroups.getFirst()))
+                                              .orElse(null);
                     bibEntry.map(entry -> entry.setField(StandardField.GROUPS, newGroup));
                     success = true;
                 }

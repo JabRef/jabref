@@ -28,7 +28,7 @@ public class UnoProperties {
 
     public static Optional<XPropertySetInfo> getPropertySetInfo(XPropertySet propertySet) {
         return Optional.ofNullable(propertySet)
-                        .flatMap(e -> Optional.ofNullable(e.getPropertySetInfo()));
+                       .flatMap(e -> Optional.ofNullable(e.getPropertySetInfo()));
     }
 
     public static Optional<XPropertySetInfo> getPropertySetInfo(XPropertyContainer propertyContainer) {
@@ -38,8 +38,8 @@ public class UnoProperties {
     public static List<String> getPropertyNames(Property[] properties) {
         Objects.requireNonNull(properties);
         return Arrays.stream(properties)
-                      .map(p -> p.Name)
-                      .collect(Collectors.toList());
+                     .map(p -> p.Name)
+                     .collect(Collectors.toList());
     }
 
     public static List<String> getPropertyNames(XPropertySetInfo propertySetInfo) {

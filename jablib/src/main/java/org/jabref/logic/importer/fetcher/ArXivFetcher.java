@@ -243,10 +243,10 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
     /**
      * Eventually merge the ArXiv Bibtex entry with a Future Bibtex entry (ArXiv/user-assigned DOIs)
      *
-     * @param arXivEntry The entry to merge into
+     * @param arXivEntry     The entry to merge into
      * @param bibEntryFuture A future result of the fetching process
      * @param priorityFields Which fields from "bibEntryFuture" to prioritize, replacing them on "arXivEntry"
-     * @param id Identifier used in initiating the "bibEntryFuture" future (for logging). This is usually a DOI, but can be anything.
+     * @param id             Identifier used in initiating the "bibEntryFuture" future (for logging). This is usually a DOI, but can be anything.
      */
     private void mergeArXivEntryWithFutureDoiEntry(BibEntry arXivEntry, CompletableFuture<Optional<BibEntry>> bibEntryFuture, Set<Field> priorityFields, String id) {
         Optional<BibEntry> bibEntry;
@@ -286,7 +286,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
      * Infuse arXivBibEntryFuture with additional fields in an asynchronous way, accelerating the process by providing a valid ArXiv ID
      *
      * @param arXivBibEntryFuture A future entry that (if it exists) will be updated with new/modified fields
-     * @param arXivId An ArXiv ID for the main reference (from ArXiv), so that the retrieval of ArXiv-issued DOI metadata can be faster
+     * @param arXivId             An ArXiv ID for the main reference (from ArXiv), so that the retrieval of ArXiv-issued DOI metadata can be faster
      * @throws FetcherException when failed to fetch the main ArtXiv Bibtex entry ('arXivBibEntryFuture').
      */
     private void inplaceAsyncInfuseArXivWithDoi(CompletableFuture<Optional<BibEntry>> arXivBibEntryFuture, Optional<ArXivIdentifier> arXivId) throws FetcherException {
@@ -346,17 +346,17 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         ExecutorService executor = Executors.newFixedThreadPool(getPageSize() * 2);
 
         Collection<CompletableFuture<BibEntry>> futureSearchResult = result.getContent()
-                                                                       .stream()
-                                                                       .map(bibEntry ->
-                                                                               CompletableFuture.supplyAsync(() -> {
-                                                                                   this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
-                                                                                   return bibEntry;
-                                                                               }, executor))
-                                                                       .toList();
+                                                                           .stream()
+                                                                           .map(bibEntry ->
+                                                                                   CompletableFuture.supplyAsync(() -> {
+                                                                                       this.inplaceAsyncInfuseArXivWithDoi(bibEntry);
+                                                                                       return bibEntry;
+                                                                                   }, executor))
+                                                                           .toList();
 
         Collection<BibEntry> modifiedSearchResult = futureSearchResult.stream()
-                                      .map(CompletableFuture::join)
-                                      .collect(Collectors.toList());
+                                                                      .map(CompletableFuture::join)
+                                                                      .collect(Collectors.toList());
 
         return new Page<>(result.getQuery(), result.getPageNumber(), modifiedSearchResult);
     }

@@ -358,15 +358,24 @@ public class WelcomeTab extends Tab {
         Hyperlink link = new Hyperlink(text);
         link.getStyleClass().add("welcome-community-link");
         String url = switch (action) {
-            case HELP -> URLs.HELP_URL;
-            case OPEN_FORUM -> URLs.FORUM_URL;
-            case OPEN_MASTODON -> URLs.MASTODON_URL;
-            case OPEN_LINKEDIN -> URLs.LINKEDIN_URL;
-            case DONATE -> URLs.DONATE_URL;
-            case OPEN_DEV_VERSION_LINK -> URLs.DEV_VERSION_LINK_URL;
-            case OPEN_CHANGELOG -> URLs.CHANGELOG_URL;
-            case OPEN_PRIVACY_POLICY -> URLs.PRIVACY_POLICY_URL;
-            default -> null;
+            case HELP ->
+                    URLs.HELP_URL;
+            case OPEN_FORUM ->
+                    URLs.FORUM_URL;
+            case OPEN_MASTODON ->
+                    URLs.MASTODON_URL;
+            case OPEN_LINKEDIN ->
+                    URLs.LINKEDIN_URL;
+            case DONATE ->
+                    URLs.DONATE_URL;
+            case OPEN_DEV_VERSION_LINK ->
+                    URLs.DEV_VERSION_LINK_URL;
+            case OPEN_CHANGELOG ->
+                    URLs.CHANGELOG_URL;
+            case OPEN_PRIVACY_POLICY ->
+                    URLs.PRIVACY_POLICY_URL;
+            default ->
+                    null;
         };
         if (url != null) {
             link.setOnAction(_ -> new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute());

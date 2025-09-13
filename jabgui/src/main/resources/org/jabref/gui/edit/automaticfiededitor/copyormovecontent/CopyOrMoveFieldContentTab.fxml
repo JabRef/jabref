@@ -10,30 +10,61 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root type="VBox" styleClass="edit-field-content-pane" xmlns="http://javafx.com/javafx/17"
-         xmlns:fx="http://javafx.com/fxml/1"
-         fx:controller="org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabView">
-    <Label styleClass="sectionHeader" text="%Copy or move the content of one field to another"/>
-    <GridPane styleClass="grid-pane">
+<fx:root
+        type="VBox"
+        styleClass="edit-field-content-pane"
+        xmlns="http://javafx.com/javafx/17"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.jabref.gui.edit.automaticfiededitor.copyormovecontent.CopyOrMoveFieldContentTabView">
+    <Label styleClass="sectionHeader"
+           text="%Copy or move the content of one field to another"/>
+    <GridPane
+            styleClass="grid-pane">
         <columnConstraints>
-            <ColumnConstraints hgrow="NEVER"/>
-            <ColumnConstraints hgrow="ALWAYS"/>
+            <ColumnConstraints
+                    hgrow="NEVER"/>
+            <ColumnConstraints
+                    hgrow="ALWAYS"/>
         </columnConstraints>
         <rowConstraints>
             <RowConstraints/>
             <RowConstraints/>
         </rowConstraints>
-        <Label text="%From" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-        <ComboBox fx:id="fromFieldComboBox" editable="true" maxWidth="Infinity" GridPane.columnIndex="1"
-                  GridPane.rowIndex="0"/>
-        <Label text="%To" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-        <ComboBox fx:id="toFieldComboBox" editable="true" maxWidth="Infinity" GridPane.columnIndex="1"
-                  GridPane.rowIndex="1"/>
+        <Label text="%From"
+               GridPane.columnIndex="0"
+               GridPane.rowIndex="0"/>
+        <ComboBox
+                fx:id="fromFieldComboBox"
+                editable="true"
+                maxWidth="Infinity"
+                GridPane.columnIndex="1"
+                GridPane.rowIndex="0"/>
+        <Label text="%To"
+               GridPane.columnIndex="0"
+               GridPane.rowIndex="1"/>
+        <ComboBox
+                fx:id="toFieldComboBox"
+                editable="true"
+                maxWidth="Infinity"
+                GridPane.columnIndex="1"
+                GridPane.rowIndex="1"/>
     </GridPane>
-    <CheckBox fx:id="overwriteFieldContentCheckBox" mnemonicParsing="false" text="%Overwrite field content"/>
+    <CheckBox
+            fx:id="overwriteFieldContentCheckBox"
+            mnemonicParsing="false"
+            text="%Overwrite field content"/>
     <HBox styleClass="actions">
-        <Button fx:id="copyContentButton" mnemonicParsing="false" onAction="#copyContent" text="%Copy content"/>
-        <Button fx:id="moveContentButton" mnemonicParsing="false" onAction="#moveContent" text="%Move content"/>
-        <Button fx:id="swapContentButton" mnemonicParsing="false" onAction="#swapContent" text="%Swap content"/>
+        <Button fx:id="copyContentButton"
+                mnemonicParsing="false"
+                onAction="#copyContent"
+                text="%Copy content"/>
+        <Button fx:id="moveContentButton"
+                mnemonicParsing="false"
+                onAction="#moveContent"
+                text="%Move content"/>
+        <Button fx:id="swapContentButton"
+                mnemonicParsing="false"
+                onAction="#swapContent"
+                text="%Swap content"/>
     </HBox>
 </fx:root>

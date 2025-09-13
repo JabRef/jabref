@@ -198,8 +198,8 @@ public class ContentSelectorViewModel implements PropertiesTabViewModel {
 
         // Remove all content selectors that are not in the new list
         List<Field> result = new ArrayList<>(metaData.getContentSelectors().getFieldsWithSelectors().stream()
-                                                   .filter(field -> !newlyAddedKeywords.contains(field))
-                                                   .toList());
+                                                     .filter(field -> !newlyAddedKeywords.contains(field))
+                                                     .toList());
         // Remove all unset default fields
         result.addAll(fieldKeywordsMap.entrySet()
                                       .stream()

@@ -25,12 +25,18 @@
                         vgap="10.0"
                         prefWidth="568.0">
                     <padding>
-                        <Insets top="20" right="20" bottom="20" left="20"/>
+                        <Insets top="20"
+                                right="20"
+                                bottom="20"
+                                left="20"/>
                     </padding>
                     <columnConstraints>
-                        <ColumnConstraints minWidth="150"/>
-                        <ColumnConstraints hgrow="ALWAYS"/>
-                        <ColumnConstraints minWidth="30"/>
+                        <ColumnConstraints
+                                minWidth="150"/>
+                        <ColumnConstraints
+                                hgrow="ALWAYS"/>
+                        <ColumnConstraints
+                                minWidth="30"/>
                     </columnConstraints>
 
                     <Label text="%GitHub Repository URL:"
@@ -40,11 +46,14 @@
                             fx:id="repositoryUrl"
                             GridPane.rowIndex="0"
                             GridPane.columnIndex="1"/>
-                    <Label fx:id="repoHelpIcon" text="?" styleClass="help-icon"
+                    <Label fx:id="repoHelpIcon"
+                           text="?"
+                           styleClass="help-icon"
                            GridPane.rowIndex="0"
                            GridPane.columnIndex="2">
                         <tooltip>
-                            <Tooltip fx:id="repoHelpTooltip"/>
+                            <Tooltip
+                                    fx:id="repoHelpTooltip"/>
                         </tooltip>
                     </Label>
 
@@ -56,11 +65,21 @@
                             GridPane.rowIndex="1"
                             GridPane.columnIndex="1"/>
 
-                    <Label text="%Personal Access Token:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <PasswordField fx:id="personalAccessToken" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                    <Label fx:id="patHelpIcon" text="?" styleClass="help-icon" GridPane.rowIndex="2" GridPane.columnIndex="2">
+                    <Label text="%Personal Access Token:"
+                           GridPane.rowIndex="2"
+                           GridPane.columnIndex="0"/>
+                    <PasswordField
+                            fx:id="personalAccessToken"
+                            GridPane.rowIndex="2"
+                            GridPane.columnIndex="1"/>
+                    <Label fx:id="patHelpIcon"
+                           text="?"
+                           styleClass="help-icon"
+                           GridPane.rowIndex="2"
+                           GridPane.columnIndex="2">
                         <tooltip>
-                            <Tooltip fx:id="patHelpTooltip"/>
+                            <Tooltip
+                                    fx:id="patHelpTooltip"/>
                         </tooltip>
                     </Label>
 

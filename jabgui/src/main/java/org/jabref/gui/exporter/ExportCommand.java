@@ -112,8 +112,8 @@ public class ExportCommand extends SimpleCommand {
         }
 
         List<Path> fileDirForDatabase = stateManager.getActiveDatabase()
-                                                       .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
-                                                       .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));
+                                                    .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
+                                                    .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));
 
         // Make sure we remember which filter was used, to set
         // the default for next time:

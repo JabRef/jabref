@@ -11,89 +11,123 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root type="BorderPane"
-         xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.112"
-         fx:controller="org.jabref.gui.entryeditor.EntryEditor" minHeight="50"
-         id="entryEditor">
+<fx:root
+        type="BorderPane"
+        xmlns:fx="http://javafx.com/fxml/1"
+        xmlns="http://javafx.com/javafx/8.0.112"
+        fx:controller="org.jabref.gui.entryeditor.EntryEditor"
+        minHeight="50"
+        id="entryEditor">
     <left>
-        <ToolBar orientation="VERTICAL">
-            <Button styleClass="icon-button,narrow" onAction="#close">
+        <ToolBar
+                orientation="VERTICAL">
+            <Button styleClass="icon-button,narrow"
+                    onAction="#close">
                 <graphic>
-                    <JabRefIconView glyph="CLOSE"/>
+                    <JabRefIconView
+                            glyph="CLOSE"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Close window"/>
+                    <Tooltip
+                            text="%Close window"/>
                 </tooltip>
             </Button>
-            <Pane prefHeight="10" VBox.vgrow="ALWAYS"/>
+            <Pane prefHeight="10"
+                  VBox.vgrow="ALWAYS"/>
             <Group>
-                <Label fx:id="typeLabel" rotate="270">
+                <Label fx:id="typeLabel"
+                       rotate="270">
                     <tooltip>
-                        <Tooltip text="%Change entry type"/>
+                        <Tooltip
+                                text="%Change entry type"/>
                     </tooltip>
                 </Label>
             </Group>
-            <Pane prefHeight="10" VBox.vgrow="ALWAYS"/>
-            <Button fx:id="typeChangeButton" styleClass="icon-button,narrow">
+            <Pane prefHeight="10"
+                  VBox.vgrow="ALWAYS"/>
+            <Button fx:id="typeChangeButton"
+                    styleClass="icon-button,narrow">
                 <graphic>
-                    <JabRefIconView glyph="ENTRY_TYPE"/>
+                    <JabRefIconView
+                            glyph="ENTRY_TYPE"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Change entry type"/>
+                    <Tooltip
+                            text="%Change entry type"/>
                 </tooltip>
             </Button>
-            <Button styleClass="icon-button,narrow" onAction="#generateCiteKeyButton">
+            <Button styleClass="icon-button,narrow"
+                    onAction="#generateCiteKeyButton">
                 <graphic>
-                    <JabRefIconView glyph="MAKE_KEY"/>
+                    <JabRefIconView
+                            glyph="MAKE_KEY"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Generate citation key"/>
+                    <Tooltip
+                            text="%Generate citation key"/>
                 </tooltip>
             </Button>
-            <Button styleClass="icon-button,narrow" onAction="#generateCleanupButton">
+            <Button styleClass="icon-button,narrow"
+                    onAction="#generateCleanupButton">
                 <graphic>
-                    <JabRefIconView glyph="CLEANUP_ENTRIES"/>
+                    <JabRefIconView
+                            glyph="CLEANUP_ENTRIES"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Cleanup entry"/>
+                    <Tooltip
+                            text="%Cleanup entry"/>
                 </tooltip>
             </Button>
-            <Button fx:id="fetcherButton" styleClass="icon-button,narrow">
+            <Button fx:id="fetcherButton"
+                    styleClass="icon-button,narrow">
                 <graphic>
-                    <JabRefIconView glyph="REFRESH"/>
+                    <JabRefIconView
+                            glyph="REFRESH"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Update with bibliographic information from the web"/>
+                    <Tooltip
+                            text="%Update with bibliographic information from the web"/>
                 </tooltip>
             </Button>
-            <Button styleClass="icon-button,narrow" onAction="#deleteEntry">
+            <Button styleClass="icon-button,narrow"
+                    onAction="#deleteEntry">
                 <graphic>
-                    <JabRefIconView glyph="DELETE_ENTRY"/>
+                    <JabRefIconView
+                            glyph="DELETE_ENTRY"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Delete entry"/>
+                    <Tooltip
+                            text="%Delete entry"/>
                 </tooltip>
             </Button>
             <Separator/>
-            <Button styleClass="icon-buttonNoSpaceBottom,narrow" onAction="#navigateToPreviousEntry">
+            <Button styleClass="icon-buttonNoSpaceBottom,narrow"
+                    onAction="#navigateToPreviousEntry">
                 <graphic>
-                    <JabRefIconView glyph="PREVIOUS_UP"/>
+                    <JabRefIconView
+                            glyph="PREVIOUS_UP"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Previous entry"/>
+                    <Tooltip
+                            text="%Previous entry"/>
                 </tooltip>
             </Button>
-            <Button styleClass="icon-buttonNoSpaceTop,narrow" onAction="#navigateToNextEntry">
+            <Button styleClass="icon-buttonNoSpaceTop,narrow"
+                    onAction="#navigateToNextEntry">
                 <graphic>
-                    <JabRefIconView glyph="NEXT_DOWN"/>
+                    <JabRefIconView
+                            glyph="NEXT_DOWN"/>
                 </graphic>
                 <tooltip>
-                    <Tooltip text="%Next entry"/>
+                    <Tooltip
+                            text="%Next entry"/>
                 </tooltip>
             </Button>
         </ToolBar>
     </left>
     <center>
-        <TabPane fx:id="tabbed" tabClosingPolicy="UNAVAILABLE"/>
+        <TabPane
+                fx:id="tabbed"
+                tabClosingPolicy="UNAVAILABLE"/>
     </center>
 </fx:root>

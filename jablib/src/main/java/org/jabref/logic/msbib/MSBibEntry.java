@@ -69,10 +69,10 @@ class MSBibEntry {
 
     /**
      * reduced subset, supports only "CITY , STATE, COUNTRY" <br>
-     *  <b>\b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b</b> <br>
-     *  WORD SPACE , SPACE WORD SPACE (Can be zero or more) , SPACE WORD (Can be zero or more) <br>
-     *  Matches both single locations (only city) like Berlin and full locations like Stroudsburg, PA, USA <br>
-     *  tested using http://www.regexpal.com/
+     * <b>\b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b</b> <br>
+     * WORD SPACE , SPACE WORD SPACE (Can be zero or more) , SPACE WORD (Can be zero or more) <br>
+     * Matches both single locations (only city) like Berlin and full locations like Stroudsburg, PA, USA <br>
+     * tested using http://www.regexpal.com/
      */
     private final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
 
@@ -336,15 +336,15 @@ class MSBibEntry {
     private void addDateAcessedFields(Document document, Element rootNode) {
         Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
         parsedDateAcesseField.flatMap(Date::getYear)
-            .map(Object::toString)
-            .ifPresent(yearAccessed -> addField(document, rootNode, "Year" + "Accessed", yearAccessed));
+                             .map(Object::toString)
+                             .ifPresent(yearAccessed -> addField(document, rootNode, "Year" + "Accessed", yearAccessed));
 
         parsedDateAcesseField.flatMap(Date::getMonth)
                              .map(Month::getFullName)
                              .ifPresent(monthAcessed -> addField(document, rootNode, "Month" + "Accessed", monthAcessed));
         parsedDateAcesseField.flatMap(Date::getDay)
-            .map(Object::toString)
-            .ifPresent(dayAccessed -> addField(document, rootNode, "Day" + "Accessed", dayAccessed));
+                             .map(Object::toString)
+                             .ifPresent(dayAccessed -> addField(document, rootNode, "Day" + "Accessed", dayAccessed));
     }
 
     private void addAddress(Document document, Element parent, String addressToSplit) {

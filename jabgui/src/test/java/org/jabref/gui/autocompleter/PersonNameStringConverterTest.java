@@ -13,7 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PersonNameStringConverterTest {
 
-    /** The author. **/
+    /**
+     * The author.
+     **/
     private Author author;
 
     @BeforeEach
@@ -60,9 +62,9 @@ class PersonNameStringConverterTest {
             "TRUE, BOTH, BOTH, 'Reagle, Jr., J. M.'"
     })
     void toStringWithAutoCompletePreferences(boolean shouldAutoComplete,
-                                                 AutoCompleteFirstNameMode firstNameMode,
-                                                 AutoCompletePreferences.NameFormat nameFormat,
-                                                 String expectedResult) {
+                                             AutoCompleteFirstNameMode firstNameMode,
+                                             AutoCompletePreferences.NameFormat nameFormat,
+                                             String expectedResult) {
         AutoCompletePreferences preferences = new AutoCompletePreferences(
                 shouldAutoComplete,
                 firstNameMode,

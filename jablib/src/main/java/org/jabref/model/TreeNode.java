@@ -52,7 +52,7 @@ public abstract class TreeNode<T extends TreeNode<T>> {
     /// Constructs a tree node without parent and no children.
     ///
     /// @param derivingClass class deriving from TreeNode<T>. It should always be "T.class".
-    ///                      We need this parameter since it is hard to get this information by other means.
+    ///                                           We need this parameter since it is hard to get this information by other means.
     public TreeNode(Class<T> derivingClass) {
         parent = null;
         children = FXCollections.observableArrayList();
@@ -584,11 +584,11 @@ public abstract class TreeNode<T extends TreeNode<T>> {
 
     /**
      * Adds the given function to the list of subscribers which are notified when something changes in the subtree.
-     *
+     * <p>
      * The following events are supported (the text in parentheses specifies which node is passed as the source):
-     *  - addChild (new parent)
-     *  - removeChild (old parent)
-     *  - move (old parent and new parent)
+     * - addChild (new parent)
+     * - removeChild (old parent)
+     * - move (old parent and new parent)
      *
      * @param subscriber function to be invoked upon a change
      */

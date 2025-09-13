@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * With this class, the user of an instance can directly sort things. Without looking up anything in the preferences or in the UI.
- *
+ * <p>
  * To avoid confusion at the caller, we offer ORIGINAL and SPECIFIED only. Not TABLE.
  */
 public class SelfContainedSaveOrder extends SaveOrder {

@@ -224,9 +224,11 @@ public class IsiImporter extends Importer {
                     }
                     case "TI" ->
                             hm.put(StandardField.TITLE, EOL_PATTERN.matcher(value).replaceAll(" "));
-                    case "SO", "JA" ->
+                    case "SO",
+                         "JA" ->
                             hm.put(StandardField.JOURNAL, EOL_PATTERN.matcher(value).replaceAll(" "));
-                    case "ID", "KW" -> {
+                    case "ID",
+                         "KW" -> {
                         value = EOL_PATTERN.matcher(value).replaceAll(" ");
                         String existingKeywords = hm.get(StandardField.KEYWORDS);
                         if ((existingKeywords == null) || existingKeywords.contains(value)) {
@@ -238,7 +240,10 @@ public class IsiImporter extends Importer {
                     }
                     case "AB" ->
                             hm.put(StandardField.ABSTRACT, EOL_PATTERN.matcher(value).replaceAll(" "));
-                    case "BP", "BR", "SP", "AR" ->
+                    case "BP",
+                         "BR",
+                         "SP",
+                         "AR" ->
                             pages = new StringBuilder(value);
                     case "EP" -> {
                         int detpos = value.indexOf(' ');

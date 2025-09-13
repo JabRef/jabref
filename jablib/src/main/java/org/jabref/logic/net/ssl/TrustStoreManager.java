@@ -169,7 +169,7 @@ public class TrustStoreManager {
      * @implNote based on https://stackoverflow.com/a/62586564/3450689
      */
     private static void configureTrustStore(Path myStorePath) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException,
-        CertificateException, IOException {
+            CertificateException, IOException {
         X509TrustManager jreTrustManager = getJreTrustManager();
         X509TrustManager myTrustManager = getJabRefTrustManager(myStorePath);
 
@@ -182,7 +182,7 @@ public class TrustStoreManager {
     }
 
     private static X509TrustManager getJabRefTrustManager(Path myStorePath) throws KeyStoreException, IOException,
-        NoSuchAlgorithmException, CertificateException {
+            NoSuchAlgorithmException, CertificateException {
         // Adapt to load your keystore
         try (InputStream myKeys = Files.newInputStream(myStorePath)) {
             KeyStore myTrustStore = KeyStore.getInstance("jks");
@@ -193,7 +193,7 @@ public class TrustStoreManager {
     }
 
     private static X509TrustManager findDefaultTrustManager(KeyStore keyStore)
-        throws NoSuchAlgorithmException, KeyStoreException {
+            throws NoSuchAlgorithmException, KeyStoreException {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(keyStore); // If keyStore is null, tmf will be initialized with the default trust store
 
@@ -235,7 +235,7 @@ public class TrustStoreManager {
     }
 
     private static void setSystemTrustManager(X509TrustManager mergedTrustManager)
-        throws NoSuchAlgorithmException, KeyManagementException {
+            throws NoSuchAlgorithmException, KeyManagementException {
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(null, new TrustManager[] {mergedTrustManager}, null);
 

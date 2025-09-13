@@ -62,14 +62,14 @@ class ImportFormatReaderIntegrationTest {
 
     private static Stream<Object[]> importFormats() {
         Collection<Object[]> result = new ArrayList<>();
-        result.add(new Object[]{"fileformat/RisImporterTest1.ris", "ris", 1});
-        result.add(new Object[]{"fileformat/IsiImporterTest1.isi", "isi", 1});
-        result.add(new Object[]{"fileformat/RepecNepImporterTest2.txt", "repecnep", 1});
-        result.add(new Object[]{"fileformat/OvidImporterTest3.txt", "ovid", 1});
-        result.add(new Object[]{"fileformat/Endnote.entries.enw", "refer", 5});
-        result.add(new Object[]{"fileformat/MsBibImporterTest4.xml", "msbib", 1});
-        result.add(new Object[]{"fileformat/MsBibImporterTest4.bib", "bibtex", 1});
-        result.add(new Object[]{"fileformat/refer.bibIX.ref", "refer-bibIX", 4});
+        result.add(new Object[] {"fileformat/RisImporterTest1.ris", "ris", 1});
+        result.add(new Object[] {"fileformat/IsiImporterTest1.isi", "isi", 1});
+        result.add(new Object[] {"fileformat/RepecNepImporterTest2.txt", "repecnep", 1});
+        result.add(new Object[] {"fileformat/OvidImporterTest3.txt", "ovid", 1});
+        result.add(new Object[] {"fileformat/Endnote.entries.enw", "refer", 5});
+        result.add(new Object[] {"fileformat/MsBibImporterTest4.xml", "msbib", 1});
+        result.add(new Object[] {"fileformat/MsBibImporterTest4.bib", "bibtex", 1});
+        result.add(new Object[] {"fileformat/refer.bibIX.ref", "refer-bibIX", 4});
         return result.stream();
     }
 }

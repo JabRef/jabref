@@ -65,8 +65,8 @@ public class ChangeEntryTypeMenu {
             createSubMenu(Localization.lang("Custom"), entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entries, undoManager)
                     .ifPresent(subMenu ->
                             items.addAll(new SeparatorMenuItem(),
-                            subMenu
-                    ));
+                                    subMenu
+                            ));
         } else {
             // Default BibTeX
             createSubMenu(BibDatabaseMode.BIBTEX.getFormattedName(), BibtexEntryTypeDefinitions.ALL, entries, undoManager)

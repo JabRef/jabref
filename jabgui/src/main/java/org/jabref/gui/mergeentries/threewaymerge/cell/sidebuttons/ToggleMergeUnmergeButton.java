@@ -65,7 +65,8 @@ public class ToggleMergeUnmergeButton extends Button {
 
     /**
      * Setting {@code canMerge} to {@code false} will disable the merge/unmerge button
-     * */
+     *
+     */
     public void setCanMerge(boolean value) {
         canMergeProperty().set(value);
     }

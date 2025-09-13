@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public record CitationKeyPattern(String stringRepresentation, Category category) {
+public record CitationKeyPattern(
+        String stringRepresentation,
+        Category category) {
     public enum Category {
         AUTHOR_RELATED, EDITOR_RELATED, TITLE_RELATED, OTHER_FIELDS, BIBENTRY_FIELDS
     }

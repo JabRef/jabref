@@ -64,8 +64,8 @@ public class ThreeWayMergeToolbar extends AnchorPane {
 
     public ThreeWayMergeToolbar() {
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @FXML

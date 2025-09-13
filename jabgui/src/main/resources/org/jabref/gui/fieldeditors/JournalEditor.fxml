@@ -6,27 +6,35 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.fieldeditors.EditorTextField?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
-         fx:controller="org.jabref.gui.fieldeditors.JournalEditor">
-    <EditorTextField fx:id="textField"/>
+<fx:root
+        xmlns:fx="http://javafx.com/fxml/1"
+        type="HBox"
+        xmlns="http://javafx.com/javafx/8.0.112"
+        fx:controller="org.jabref.gui.fieldeditors.JournalEditor">
+    <EditorTextField
+            fx:id="textField"/>
     <VBox>
         <Button onAction="#toggleAbbreviation"
                 styleClass="icon-button">
             <graphic>
-                <JabRefIconView glyph="TOGGLE_ABBREVIATION"/>
+                <JabRefIconView
+                        glyph="TOGGLE_ABBREVIATION"/>
             </graphic>
             <tooltip>
-                <Tooltip text="%Switches between full and abbreviated journal name if the journal name is known."/>
+                <Tooltip
+                        text="%Switches between full and abbreviated journal name if the journal name is known."/>
             </tooltip>
         </Button>
         <Button fx:id="journalInfoButton"
                 onAction="#showJournalInfo"
                 styleClass="icon-button">
             <graphic>
-                <JabRefIconView glyph="VIEW_JOURNAL_INFO"/>
+                <JabRefIconView
+                        glyph="VIEW_JOURNAL_INFO"/>
             </graphic>
             <tooltip>
-                <Tooltip text="%View journal info"/>
+                <Tooltip
+                        text="%View journal info"/>
             </tooltip>
         </Button>
     </VBox>

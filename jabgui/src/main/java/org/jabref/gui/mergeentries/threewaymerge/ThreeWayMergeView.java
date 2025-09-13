@@ -117,9 +117,9 @@ public class ThreeWayMergeView extends VBox {
 
     private void initializeHeaderView() {
         headerView.getColumnConstraints().addAll(fieldNameColumnConstraints,
-                                                 leftEntryColumnConstraints,
-                                                 rightEntryColumnConstraints,
-                                                 mergedEntryColumnConstraints);
+                leftEntryColumnConstraints,
+                rightEntryColumnConstraints,
+                mergedEntryColumnConstraints);
     }
 
     private void initializeScrollPane() {

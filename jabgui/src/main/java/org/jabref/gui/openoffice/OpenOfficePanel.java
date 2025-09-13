@@ -662,7 +662,8 @@ public class OpenOfficePanel {
                 }
                 case CitationStyle _ ->
                         contextMenu.getItems().remove(alwaysAddCitedOnPagesText);
-                default -> { }
+                default -> {
+                }
             }
         });
 

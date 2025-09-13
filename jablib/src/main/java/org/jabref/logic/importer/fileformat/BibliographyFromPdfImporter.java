@@ -139,7 +139,9 @@ public class BibliographyFromPdfImporter extends Importer {
     }
 
     @VisibleForTesting
-    record IntermediateData(String number, String reference) {
+    record IntermediateData(
+            String number,
+            String reference) {
     }
 
     /**
@@ -209,7 +211,7 @@ public class BibliographyFromPdfImporter extends Importer {
     /**
      * Example: <code>J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016, 2017. doi:10.1088/ 1741-4326/aa6a6a</code>
      *
-     * @param number     The number of the reference - used for logging only
+     * @param number The number of the reference - used for logging only
      */
     @VisibleForTesting
     BibEntry parseReference(String number, String reference) {
@@ -422,6 +424,8 @@ public class BibliographyFromPdfImporter extends Importer {
         return new EntryUpdateResult(true, reference);
     }
 
-    private record EntryUpdateResult(boolean modified, String newReference) {
+    private record EntryUpdateResult(
+            boolean modified,
+            String newReference) {
     }
 }

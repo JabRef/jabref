@@ -7,7 +7,7 @@ public interface PreferenceTabViewModel {
     /**
      * This method is called when the dialog is opened, or if it is made
      * visible after being hidden. The tab should update all its values.
-     *
+     * <p>
      * This is the ONLY PLACE to set values for the fields in the tab. It
      * is ILLEGAL to set values only at construction time, because the dialog
      * will be reused and updated.
