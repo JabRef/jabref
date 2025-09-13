@@ -39,52 +39,40 @@ How should JabRef consistently determine the casing for field names in UI and pe
 Chosen option: "Hardcode display names for built‑in fields; preserve exact user/customized names for non‑standard fields; serialize canonical lowercase keys to .bib.", because comes out best (see below).
 
 Rationale:
-- Aligns with community conventions (lowercase keys in .bib), ensuring compatibility.
-- Provides a consistent and localized UI for built‑ins by using canonical, hardcoded display labels.
-- Respects users’ expectations for custom fields by preserving the casing they define everywhere in the UI and in preferences.
-- Minimizes behavioral surprises and avoids mixed casing rules per UI location.
+* Aligns with community conventions (lowercase keys in .bib), ensuring compatibility.
+* Provides a consistent and localized UI for built‑ins by using canonical, hardcoded display labels.
+* Respects users’ expectations for custom fields by preserving the casing they define everywhere in the UI and in preferences.
+* Minimizes behavioral surprises and avoids mixed casing rules per UI location.
 
 ## Pros and Cons of the Options
 
 ### Hardcode built‑in display names; preserve custom names; lowercase in .bib
 
-- Good, because:
-    - Round‑trip: UI labels ↔ preferences ↔ UI remain stable.
-    - Built‑in labels can be localized predictably (Title Case or localized form).
-    - Consistent casing across Details pane (all tabs) and custom tabs.
-    - Matches BibTeX convention for stored keys.
-    - Supports localization of built‑ins.
-    - .bib files keep canonical lowercase keys, matching common BibTeX/BibLaTeX practice.
-    - Decouples model (internal key) from ui (display label).
-- Bad, because:
-    - Users cannot change casing of built‑in field display names (by design).
-    - Requires a clear separation of “internal canonical key” vs. “display label,” which slightly increases conceptual complexity.
-    - Migration needs to ensure older preferences do not inadvertently force lowercasing of custom fields in UI.
+* Good, because Round‑trip: UI labels ↔ preferences ↔ UI remain stable.
+* Good, because Built‑in labels can be localized predictably (Title Case or localized form).
+* Good, because Consistent casing across Details pane (all tabs) and custom tabs.
+* Good, because Matches BibTeX convention for stored keys.
+* Good, because Supports localization of built‑ins.
+* Good, because .bib files keep canonical lowercase keys, matching common BibTeX/BibLaTeX practice.
+* Good, because Decouples model (internal key) from ui (display label).
+* Bad, because Users cannot change casing of built‑in field display names (by design).
+* Bad, because Requires a clear separation of internal key vs. display label, which slightly increases conceptual complexity.
+* Bad, because migration needs to ensure older preferences do not inadvertently force lowercasing of custom fields in UI.
 
 ### Make all fields fully user‑configurable
 
-- Good, because:
-    - Maximum flexibility for users.
-- Neutral, because:
-    - Could still serialize lowercase to .bib for compatibility.
-- Bad, because:
-    - Increases settings complexity and risk of inconsistent UI/prefs.
-    - Harder to localize built‑ins; can lead to team‑specific divergences.
+* Good, because provides maximum flexibility for users.
+* Bad, because Increases settings complexity and risk of inconsistent UI/prefs.
+* Bad, because Harder to localize built‑ins; can lead to team‑specific divergences.
 
 ### Lowercase everywhere
 
-- Good, because:
-    - Simplest to implement; fully consistent.
-- Bad, because:
-    - Poor UX; clashes with common expectations for UI labels.
-    - Undermines localization and readability.
+* Good, because simplest to implement; fully consistent.
+* Bad, because Poor UX; clashes with common expectations for UI labels.
+* Bad, because Undermines localization and readability.
 
 ### Title Case everywhere in UI and prefs; lowercase in .bib
 
-- Good, because:
-    - UI looks consistent and readable.
-- Neutral, because:
-    - Still needs dual representation (UI vs. .bib).
-- Bad, because:
-    - Ignores user intent for custom fields’ casing (less flexibility).
-    - Preferences may mask underlying canonical keys, complicating tooling.
+* Good, because UI looks consistent and readable.
+* Bad, because ignores user intent for custom fields’ casing (less flexibility).
+* Bad, because preferences may mask underlying canonical keys, complicating tooling.
