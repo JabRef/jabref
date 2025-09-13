@@ -103,7 +103,7 @@ public class ParserResult {
      * @param s String Warning text. Must be pretranslated. Only added if there isn't already a dupe.
      */
     public void addWarning(String s) {
-        warnings.put(Range.NULL_RANGE, s);
+        addWarning(Range.NULL_RANGE, s);
     }
 
     public void addWarning(Range range, String s) {
