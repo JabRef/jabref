@@ -135,7 +135,9 @@
               public String getTabName() { return Localization.lang("XMP metadata"); }
 
         -->
-        <module name="LeftCurly"/>
+        <module name="LeftCurly">
+            <property name="id" value="LeftCurly"/>
+        </module>
 
         <module name="RightCurly"/>
 
