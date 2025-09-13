@@ -1,12 +1,12 @@
 package org.jabref.logic.citationkeypattern;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
+import org.jabref.logic.bibtex.BibtexStandard;
 import org.jabref.logic.util.strings.Transliteration;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
@@ -34,10 +34,6 @@ public class CitationKeyGenerator extends BracketedPattern {
     ///
     /// See also #DISALLOWED_CHARACTERS
     public static final String DEFAULT_UNWANTED_CHARACTERS = "?!;^`ʹ";
-
-    /// Source of disallowed characters: <https://tex.stackexchange.com/a/408548/9075>
-    /// These characters are disallowed in BibTeX keys.
-    public static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
 
@@ -81,7 +77,7 @@ public class CitationKeyGenerator extends BracketedPattern {
     public static String removeUnwantedCharacters(String key, String unwantedCharacters) {
         String newKey = key.chars()
                            .filter(c -> unwantedCharacters.indexOf(c) == -1)
-                           .filter(c -> !DISALLOWED_CHARACTERS.contains((char) c))
+                           .filter(c -> !BibtexStandard.DISALLOWED_CHARACTERS.contains((char) c))
                            .collect(StringBuilder::new,
                                    StringBuilder::appendCodePoint, StringBuilder::append)
                            .toString();
@@ -160,7 +156,8 @@ public class CitationKeyGenerator extends BracketedPattern {
             return key;
         }
 
-        return Transliteration.transliterate(key, false);
+        String result = Transliteration.transliterate(key);
+        return result.replace(" ", "");
     }
 
     /**

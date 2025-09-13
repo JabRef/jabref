@@ -17,7 +17,7 @@ public class TransliterateFormatter extends Formatter {
 
     @Override
     public String format(String value) {
-        return Transliteration.transliterate(value, false);
+        return Transliteration.transliterate(value);
     }
 
     @Override
