@@ -65,13 +65,13 @@ Click there "OK", too.
 
 Click on "Apply" to store the preferences.
 
-## Put JabRef's checkstyle configuration in place
+## Put JabRef's Checkstyle configuration in place
 
-Now, put the checkstyle configuration file is in place:
+Now, put the Checkstyle configuration file is in place:
 
 Go to **File > Settings... > Tools > Checkstyle > Configuration File**
 
-Trigger the import dialog of a CheckStyle style by clicking the \[+] button:
+Trigger the import dialog of a Checkstyle style by clicking the \[+] button:
 
 {% figure caption:"Trigger the rule import dialog" %}
 ![Trigger the rule import dialog](13-07-checkstyle-start-import.png)
@@ -90,13 +90,13 @@ Then:
 
 Click on "Finish"
 
-Activate the CheckStyle configuration file by ticking it in the list
+Activate the Checkstyle configuration file by ticking it in the list
 
-{% figure caption:"JabRef's checkstyle config is activated" %}
-![JabRef's checkstyle config is activated](13-09-checkstyle-jabref-active.png)
+{% figure caption:"JabRef's Checkstyle config is activated" %}
+![JabRef's Checkstyle config is activated](13-09-checkstyle-jabref-active.png)
 {% endfigure %}
 
-Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected (10.21.0 or higher).
+Ensure that the [latest Checkstyle version](https://checkstyle.org/releasenotes.html) is selected (10.21.0 or higher).
 Also, set the "Scan Scope" to "Only Java sources (including tests)".
 
 {% figure caption:"Checkstyle is the highest version - and tests are also scanned" %}
