@@ -14,6 +14,7 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
@@ -54,7 +55,7 @@ public class AutoCompletionTab extends AbstractPreferenceTabView<AutoCompletionT
     }
 
     private void setupTagsFiled() {
-        autoCompleteFields.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getDisplayName));
+        autoCompleteFields.setCellFactory(new ViewModelListCellFactory<Field>().withText(FieldTextMapper::getDisplayName));
         autoCompleteFields.setSuggestionProvider(request -> viewModel.getSuggestions(request.getUserText()));
         autoCompleteFields.tagsProperty().bindBidirectional(viewModel.autoCompleteFieldsProperty());
         autoCompleteFields.setConverter(viewModel.getFieldStringConverter());
@@ -63,12 +64,12 @@ public class AutoCompletionTab extends AbstractPreferenceTabView<AutoCompletionT
         autoCompleteFields.setOnMouseClicked(event -> autoCompleteFields.getEditor().requestFocus());
         autoCompleteFields.getEditor().getStyleClass().clear();
         autoCompleteFields.getEditor().getStyleClass().add("tags-field-editor");
-        autoCompleteFields.getEditor().focusedProperty().addListener((observable, oldValue, newValue) -> autoCompleteFields.pseudoClassStateChanged(FOCUSED, newValue));
+        autoCompleteFields.getEditor().focusedProperty().addListener((_, _, newValue) -> autoCompleteFields.pseudoClassStateChanged(FOCUSED, newValue));
     }
 
     private Node createTag(Field field) {
         Label tagLabel = new Label();
-        tagLabel.setText(field.getDisplayName());
+        tagLabel.setText(FieldTextMapper.getDisplayName(field));
         tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
         tagLabel.getGraphic().setOnMouseClicked(event -> autoCompleteFields.removeTags(field));
         tagLabel.setContentDisplay(ContentDisplay.RIGHT);

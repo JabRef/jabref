@@ -49,6 +49,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -416,7 +417,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             fieldEditor.getChildren().add(fieldEditorCell);
 
             // setup header label
-            Label fieldHeaderLabel = new Label(field.getDisplayName());
+            Label fieldHeaderLabel = new Label(FieldTextMapper.getDisplayName(field));
             fieldHeaderLabel.prefHeightProperty().bind(fieldEditorCell.heightProperty());
             fieldHeaderLabel.setMaxWidth(Control.USE_PREF_SIZE);
             fieldHeaderLabel.setMinWidth(Control.USE_PREF_SIZE);

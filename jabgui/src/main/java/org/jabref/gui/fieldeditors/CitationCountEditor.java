@@ -19,6 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
@@ -58,7 +59,7 @@ public class CitationCountEditor extends HBox implements FieldEditorFX {
         textField.textProperty().bindBidirectional(viewModel.textProperty());
 
         fetchCitationCountButton.setTooltip(
-                new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
+                new Tooltip(Localization.lang("Look up %0", FieldTextMapper.getDisplayName(field))));
         textField.initContextMenu(new DefaultMenu(textField), preferences.getKeyBindingRepository());
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }

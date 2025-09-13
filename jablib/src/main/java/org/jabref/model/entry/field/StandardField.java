@@ -203,13 +203,4 @@ public enum StandardField implements Field {
     public boolean isStandardField() {
         return true;
     }
-
-    @Override
-    public String getDisplayName() {
-        if (displayName == null) {
-            return Field.super.getDisplayName();
-        } else {
-            return displayName;
-        }
-    }
 }

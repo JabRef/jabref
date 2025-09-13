@@ -16,6 +16,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -145,7 +146,7 @@ class OOCalcDatabase {
         firstRow.setAttribute("table.style-name", "ro1");
         addTableCell(document, firstRow, "Type");
         for (Field field : toExportFields) {
-            addTableCell(document, firstRow, field.getDisplayName());
+            addTableCell(document, firstRow, FieldTextMapper.getDisplayName(field));
         }
 
         table.appendChild(firstRow);
