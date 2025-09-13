@@ -135,7 +135,9 @@ public class CitationKeyGenerator extends BracketedPattern {
             int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
             String moddedKey;
 
+            // @formatter:off
             do {
+                // @formatter:on
                 moddedKey = key + getAppendix(number);
                 number++;
 
