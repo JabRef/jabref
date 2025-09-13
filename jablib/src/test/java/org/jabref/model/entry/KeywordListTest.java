@@ -1,5 +1,7 @@
 package org.jabref.model.entry;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -81,15 +83,15 @@ class KeywordListTest {
 
     @Test
     void parseHierarchicalChain() {
-        Keyword expected = Keyword.of("Parent", "Node", "Child");
+        Keyword expected = Keyword.of(List.of("Parent", "Node", "Child"));
 
         assertEquals(new KeywordList(expected), KeywordList.parse("Parent > Node > Child", ',', '>'));
     }
 
     @Test
     void parseTwoHierarchicalChains() {
-        Keyword expectedOne = Keyword.of("Parent1", "Node1", "Child1");
-        Keyword expectedTwo = Keyword.of("Parent2", "Node2", "Child2");
+        Keyword expectedOne = Keyword.of(List.of("Parent1", "Node1", "Child1"));
+        Keyword expectedTwo = Keyword.of(List.of("Parent2", "Node2", "Child2"));
 
         assertEquals(new KeywordList(expectedOne, expectedTwo),
                 KeywordList.parse("Parent1 > Node1 > Child1, Parent2 > Node2 > Child2", ',', '>'));

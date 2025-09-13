@@ -95,6 +95,9 @@ public enum StandardActions implements Action {
     MANAGE_KEYWORDS(Localization.lang("Manage keywords")),
     MASS_SET_FIELDS(Localization.lang("Manage field names & content")),
 
+    BACK(Localization.lang("Back"), IconTheme.JabRefIcons.LEFT, KeyBinding.BACK),
+    FORWARD(Localization.lang("Forward"), Localization.lang("Forward"), IconTheme.JabRefIcons.RIGHT, KeyBinding.FORWARD),
+
     AUTOMATIC_FIELD_EDITOR(Localization.lang("Automatic field editor")),
     TOGGLE_GROUPS(Localization.lang("Groups"), IconTheme.JabRefIcons.TOGGLE_GROUPS, KeyBinding.TOGGLE_GROUPS_INTERFACE),
     TOGGLE_OO(Localization.lang("OpenOffice/LibreOffice"), IconTheme.JabRefIcons.FILE_OPENOFFICE, KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION),

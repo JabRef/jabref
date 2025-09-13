@@ -63,10 +63,10 @@ class CiteSeerTest {
         assertEquals(List.of(expected), fetchedEntries);
     }
 
-    /*
-    * CiteSeer seems to only apply year ranges effectively when we search for entries
-    * with associated pdfs, year values do not accurately reflect realistic values
-    * */
+    /**
+     * CiteSeer seems to only apply year ranges effectively when we search for entries
+     * with associated pdfs, year values do not accurately reflect realistic values
+     */
     @Disabled
     @Test
     void searchWithSortingByYear() throws FetcherException {

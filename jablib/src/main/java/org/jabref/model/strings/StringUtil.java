@@ -778,7 +778,7 @@ public class StringUtil {
      *
      * @param s The string to check
      * @return {@code True} if the given string does contain at least one whitespace character, {@code False} otherwise
-     * */
+     */
     public static boolean containsWhitespace(String s) {
         return s.chars().anyMatch(Character::isWhitespace);
     }
