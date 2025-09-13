@@ -113,7 +113,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         if (latexFileDirectory.isEmpty()) {
             newMetaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
         } else if (laTexFileDirectoryStatus().isValid()) {
-            newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), Path.of(latexFileDirectory));
+            newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), latexFileDirectory);
         }
 
         databaseContext.setMetaData(newMetaData);
@@ -271,7 +271,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             if (!currPath.isAbsolute()) {
                 newPath = parentPath.resolve(fileDirectory.get()).toAbsolutePath().toString();
             } else if (currPath.isAbsolute()) {
-                newPath = parentPath.relativize(currPath).toString();
+                Path rel = parentPath.relativize(currPath);
+                newPath = rel.toString().isEmpty() ? "." : rel.toString();
             } else {
                 // case: convert to relative path and currPath is relative
                 return;

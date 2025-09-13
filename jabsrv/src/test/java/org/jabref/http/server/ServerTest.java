@@ -11,11 +11,13 @@ import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.services.FilesToServe;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.LastFilesOpenedPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.metadata.UserHostInfo;
 
 import com.google.gson.Gson;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -128,6 +130,11 @@ public abstract class ServerTest extends JerseyTest {
         LastFilesOpenedPreferences lastFilesOpenedPreferences = mock(LastFilesOpenedPreferences.class);
         when(preferences.getLastFilesOpenedPreferences()).thenReturn(lastFilesOpenedPreferences);
         when(lastFilesOpenedPreferences.getLastFilesOpened()).thenReturn(FXCollections.emptyObservableList());
+
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(filePreferences.getUserAndHost()).thenReturn(new UserHostInfo("user", "host").getUserHostString());
+        when(importFormatPreferences.filePreferences()).thenReturn(filePreferences);
     }
 
     protected void addGlobalExceptionMapperToResourceConfig(ResourceConfig resourceConfig) {

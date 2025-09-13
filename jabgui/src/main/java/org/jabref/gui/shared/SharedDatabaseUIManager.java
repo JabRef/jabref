@@ -221,7 +221,8 @@ public class SharedDatabaseUIManager {
                 preferences.getBibEntryPreferences().getKeywordSeparator(),
                 preferences.getFieldPreferences(),
                 preferences.getCitationKeyPatternPreferences().getKeyPatterns(),
-                fileUpdateMonitor);
+                fileUpdateMonitor,
+                preferences.getFilePreferences().getUserAndHost());
         bibDatabaseContext.convertToSharedDatabase(synchronizer);
         return bibDatabaseContext;
     }
