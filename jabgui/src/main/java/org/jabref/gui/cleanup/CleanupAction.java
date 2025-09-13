@@ -94,8 +94,10 @@ public class CleanupAction extends SimpleCommand {
                 }
             }
 
-            preferences.getCleanupPreferences().setActiveJobs(preset.getActiveJobs());
-            preferences.getCleanupPreferences().setFieldFormatterCleanups(preset.getFieldFormatterCleanups());
+            CleanupPreferences updatedPreferences = preferences.getCleanupPreferences().updateWith(preset);
+
+            preferences.getCleanupPreferences().setActiveJobs(updatedPreferences.getActiveJobs());
+            preferences.getCleanupPreferences().setFieldFormatterCleanups(updatedPreferences.getFieldFormatterCleanups());
 
             BackgroundTask.wrap(() -> cleanup(stateManager.getActiveDatabase().get(), preset))
                           .onSuccess(result -> showResults())
