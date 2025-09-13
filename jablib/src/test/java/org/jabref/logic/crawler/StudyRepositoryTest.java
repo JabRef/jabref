@@ -15,7 +15,6 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.SaveException;
@@ -39,7 +38,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
-import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -72,22 +70,12 @@ class StudyRepositoryTest {
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        citationKeyPatternPreferences = new CitationKeyPatternPreferences(
-                false,
-                false,
-                false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
-                "",
-                "",
-                DEFAULT_UNWANTED_CHARACTERS,
-                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
-                "",
-                ',');
+        citationKeyPatternPreferences = CitationKeyPatternPreferences.getInstanceForTesting();
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(preferences.getImporterPreferences().getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
-        when(preferences.getTimestampPreferences().getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
+        when(preferences.getTimestampPreferences().getTimestampField()).then(_ -> StandardField.TIMESTAMP);
         entryTypesManager = new BibEntryTypesManager();
         getTestStudyRepository();
     }

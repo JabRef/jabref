@@ -20,6 +20,7 @@
     <Label styleClass="titleHeader" text="%Citation key patterns"/>
 
     <Label styleClass="sectionHeader" text="%General"/>
+    <CheckBox fx:id="transliterateFields" text="%Transliterate fields"/>
     <CheckBox fx:id="overwriteAllow" text="%Overwrite existing keys"/>
     <CheckBox fx:id="overwriteWarning" text="%Warn before overwriting existing keys" disable="${!overwriteAllow.selected}">
         <padding>

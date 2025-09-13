@@ -14,6 +14,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 
+import com.ibm.icu.text.Transliterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,11 @@ public class CitationKeyGenerator extends BracketedPattern {
     private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
+
+    // This transliterator configuration will transliterate from any language to Latin script
+    // that uses only allowed characters for citation keys (letters and numbers, hyphen and underscore).
+    private static final String TRANSLITERATOR_CONFIG = buildTransliteratorConfig();
+    private static final Transliterator TRANSLITERATOR = Transliterator.getInstance(TRANSLITERATOR_CONFIG);
 
     private final AbstractCitationKeyPatterns citeKeyPattern;
     private final BibDatabase database;
@@ -94,6 +100,18 @@ public class CitationKeyGenerator extends BracketedPattern {
         return removeUnwantedCharacters(key, unwantedCharacters).replaceAll("\\s", "");
     }
 
+    private static String buildTransliteratorConfig() {
+        StringBuilder pattern = new StringBuilder();
+
+        for (Character c : DISALLOWED_CHARACTERS) {
+            // Generally, only characters like `-` or `[` need to be escaped with a backslash,
+            // but for future proofing we escape all characters.
+            pattern.append("\\").append(c);
+        }
+
+        return "Any-Latin; Latin-ASCII; [" + pattern + "] Remove";
+    }
+
     /**
      * Generate a citation key for the given {@link BibEntry}.
      *
@@ -107,7 +125,8 @@ public class CitationKeyGenerator extends BracketedPattern {
         String newKey = createCitationKeyFromPattern(entry);
         newKey = replaceWithRegex(newKey);
         newKey = appendLettersToKey(newKey, currentKey);
-        return cleanKey(newKey, unwantedCharacters);
+        newKey = cleanKey(newKey, unwantedCharacters);
+        return transliterateIfNeeded(newKey);
     }
 
     /**
@@ -151,6 +170,14 @@ public class CitationKeyGenerator extends BracketedPattern {
             key = moddedKey;
         }
         return key;
+    }
+
+    public String transliterateIfNeeded(String key) {
+        if (!citationKeyPatternPreferences.shouldTransliterateFields()) {
+            return key;
+        }
+
+        return TRANSLITERATOR.transliterate(key);
     }
 
     /**
