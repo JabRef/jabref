@@ -121,8 +121,7 @@ public class URLDownload {
         try {
             String urlToCheck = source.toString();
             String locationHeader;
-            do
-            {
+            do {
                 retries++;
                 HttpResponse<String> response = Unirest.head(urlToCheck).asString();
                 // Check if we have redirects, e.g. arxiv will give otherwise content type html for the original url
