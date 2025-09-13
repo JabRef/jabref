@@ -23,10 +23,11 @@ import org.jabref.model.metadata.MetaData;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 
 public class ParserResult {
     private final Set<BibEntryType> entryTypes;
-    private final Multimap<Range, String> warnings = ArrayListMultimap.create();
+    private final Multimap<Range, String> warnings;
     private BibDatabase database;
     private MetaData metaData;
     private Path file;
@@ -52,6 +53,7 @@ public class ParserResult {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.entryTypes = Objects.requireNonNull(entryTypes);
+        this.warnings = MultimapBuilder.hashKeys().hashSetValues().build();
     }
 
     public static ParserResult fromErrorMessage(String message) {
@@ -107,9 +109,7 @@ public class ParserResult {
     }
 
     public void addWarning(Range range, String s) {
-        if (!warnings.containsEntry(range, s)) {
-            warnings.put(range, s);
-        }
+        warnings.put(range, s);
     }
 
     public void addException(Range range, Exception exception) {
