@@ -143,7 +143,11 @@ application {
         "-XX:+UseCompactObjectHeaders",
         "-XX:+UseZGC",
         "-XX:+ZUncommit",
-        "-XX:+UseStringDeduplication"
+        "-XX:+UseStringDeduplication",
+        "-Dcom.sun.management.jmxremote",
+        "-Dcom.sun.management.jmxremote.port=54219",
+        "-Dcom.sun.management.jmxremote.ssl=false",
+        "-Dcom.sun.management.jmxremote.authenticate=false"
     )
 }
 
