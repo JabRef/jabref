@@ -118,6 +118,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final BibEntryTypesManager entryTypesManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);
+    private final NavigationHistory navigationHistory = new NavigationHistory();
+    private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);
+    private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
+    private boolean backOrForwardNavigationActionTriggered = false;
+
 
     private BibDatabaseContext bibDatabaseContext;
 
@@ -490,6 +495,16 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         mainTable.addSelectionListener(event -> {
             List<BibEntry> entries = event.getList().stream().map(BibEntryTableViewModel::getEntry).toList();
             stateManager.setSelectedEntries(entries);
+
+            // track navigation history for single selections
+            if (entries.size() == 1) {
+                newEntryShowing(entries.getFirst());
+            } else if (entries.isEmpty()) {
+                // an empty selection isn't a navigational step, so we don't alter the history list
+                // this avoids adding a "null" entry to the back/forward stack
+                // we just refresh the UI button states to ensure they are consistent with the latest history.
+                updateNavigationState();
+            }
         });
     }
 
@@ -964,6 +979,48 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.changedProperty.setValue(false);
     }
 
+    public void back() {
+        navigationHistory.back().ifPresent(this::navigateToEntry);
+    }
+
+    public void forward() {
+        navigationHistory.forward().ifPresent(this::navigateToEntry);
+    }
+
+    private void navigateToEntry(BibEntry entry) {
+        backOrForwardNavigationActionTriggered = true;
+        clearAndSelect(entry);
+        updateNavigationState();
+    }
+
+    public boolean canGoBack() {
+        return navigationHistory.canGoBack();
+    }
+
+    public boolean canGoForward() {
+        return navigationHistory.canGoForward();
+    }
+
+    private void newEntryShowing(BibEntry entry) {
+        // skip history updates if this is from a back/forward operation
+        if (backOrForwardNavigationActionTriggered) {
+            backOrForwardNavigationActionTriggered = false;
+            return;
+        }
+
+        navigationHistory.add(entry);
+        updateNavigationState();
+    }
+
+    /**
+     * Updates the StateManager with current navigation state
+     * Only update if this is the active tab
+     */
+    public void updateNavigationState() {
+        canGoBackProperty.set(canGoBack());
+        canGoForwardProperty.set(canGoForward());
+    }
+
     /**
      * Creates a new library tab. Contents are loaded by the {@code dataLoadingTask}. Most of the other parameters are required by {@code resetChangeMonitor()}.
      *
@@ -1032,6 +1089,14 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                 clipBoardManager,
                 taskExecutor,
                 false);
+    }
+
+    public BooleanProperty canGoBackProperty() {
+        return canGoBackProperty;
+    }
+
+    public BooleanProperty canGoForwardProperty() {
+        return canGoForwardProperty;
     }
 
     private class GroupTreeListener {
