@@ -30,17 +30,6 @@ public class FieldTextMapper {
                 default ->
                         StringUtil.capitalizeFirst(field.getName());
             };
-        } else if (field instanceof BiblatexApaField apaField) {
-            return switch (apaField) {
-                case CITATION_CITEORG ->
-                        "Citation Citeorg";
-                case CITATION_CITEDATE ->
-                        "Citation Citedate";
-                case CITATION_CITEINFO ->
-                        "Citation Citeinfo";
-                default ->
-                        StringUtil.capitalizeFirst(field.getName());
-            };
         }
 
         return field.getName();
