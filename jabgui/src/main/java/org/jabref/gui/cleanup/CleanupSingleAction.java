@@ -11,7 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
@@ -79,7 +79,7 @@ public class CleanupSingleAction extends SimpleCommand {
     /**
      * Runs the cleanup on the entry and records the change.
      */
-    private void doCleanup(BibDatabaseContext databaseContext, CleanupPreferences preset, BibEntry entry, NamedCompound ce) {
+    private void doCleanup(BibDatabaseContext databaseContext, CleanupPreferences preset, BibEntry entry, NamedCompoundEdit compoundEdit) {
         // Create and run cleaner
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
@@ -91,7 +91,7 @@ public class CleanupSingleAction extends SimpleCommand {
 
         // Register undo action
         for (FieldChange change : changes) {
-            ce.addEdit(new UndoableFieldChange(change));
+            compoundEdit.addEdit(new UndoableFieldChange(change));
         }
 
         if (!cleaner.getFailures().isEmpty()) {
@@ -100,15 +100,15 @@ public class CleanupSingleAction extends SimpleCommand {
     }
 
     private void cleanup(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
-            // undo granularity is on entry level
-            NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entry"));
+        // undo granularity is on entry level
+        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Cleanup entry"));
 
-            doCleanup(databaseContext, cleanupPreferences, entry, ce);
+        doCleanup(databaseContext, cleanupPreferences, entry, compoundEdit);
 
-            ce.end();
-            if (ce.hasEdits()) {
-                undoManager.addEdit(ce);
-            }
+        compoundEdit.end();
+        if (compoundEdit.hasEdits()) {
+            undoManager.addEdit(compoundEdit);
+        }
     }
 
     private void showFailures(List<JabRefException> failures) {

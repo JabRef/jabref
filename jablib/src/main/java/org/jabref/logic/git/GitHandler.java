@@ -309,8 +309,8 @@ public class GitHandler {
             String branch = repo.getBranch();
 
             PushCommand pushCommand = git.push()
-                                 .setRemote("origin")
-                                 .setRefSpecs(new RefSpec("refs/heads/" + branch + ":refs/heads/" + branch));
+                                         .setRemote("origin")
+                                         .setRefSpecs(new RefSpec("refs/heads/" + branch + ":refs/heads/" + branch));
 
             if (credsOpt.isPresent()) {
                 pushCommand.setCredentialsProvider(credsOpt.get());
@@ -319,9 +319,9 @@ public class GitHandler {
         }
     }
 
-     /// Pulls from the current branch’s upstream.
-     /// If no remote is configured, silently performs local merge.
-     /// This ensures SLR repositories without remotes still initialize correctly.
+    /// Pulls from the current branch’s upstream.
+    /// If no remote is configured, silently performs local merge.
+    /// This ensures SLR repositories without remotes still initialize correctly.
     public void pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Optional<CredentialsProvider> credsOpt = resolveCredentials();

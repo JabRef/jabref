@@ -183,7 +183,7 @@ public abstract class DBMSProcessor {
         insertIntoEntryQuery.append(", (?)".repeat(Math.max(0, bibEntries.size() - 1)));
 
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
-                new String[]{"SHARED_ID"})) {
+                new String[] {"SHARED_ID"})) {
             for (int i = 0; i < bibEntries.size(); i++) {
                 preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
             }
@@ -235,7 +235,7 @@ public abstract class DBMSProcessor {
             LOGGER.error("SQL Error: ", e);
         }
         return bibEntries.stream().filter(entry ->
-                !remoteIds.contains(entry.getSharedBibEntryData().getSharedID()))
+                                 !remoteIds.contains(entry.getSharedBibEntryData().getSharedID()))
                          .collect(Collectors.toList());
     }
 

@@ -115,15 +115,25 @@ public class RisImporter extends Importer {
                     String value = entry.substring(6).trim();
                     if ("TY".equals(tag)) {
                         type = switch (value) {
-                            case "BOOK" -> StandardEntryType.Book;
-                            case "JOUR", "MGZN" -> StandardEntryType.Article;
-                            case "THES" -> StandardEntryType.PhdThesis;
-                            case "UNPB" -> StandardEntryType.Unpublished;
-                            case "RPRT" -> StandardEntryType.TechReport;
-                            case "CONF" -> StandardEntryType.InProceedings;
-                            case "CHAP" -> StandardEntryType.InCollection;
-                            case "PAT" -> IEEETranEntryType.Patent;
-                            default -> StandardEntryType.Misc;
+                            case "BOOK" ->
+                                    StandardEntryType.Book;
+                            case "JOUR",
+                                 "MGZN" ->
+                                    StandardEntryType.Article;
+                            case "THES" ->
+                                    StandardEntryType.PhdThesis;
+                            case "UNPB" ->
+                                    StandardEntryType.Unpublished;
+                            case "RPRT" ->
+                                    StandardEntryType.TechReport;
+                            case "CONF" ->
+                                    StandardEntryType.InProceedings;
+                            case "CHAP" ->
+                                    StandardEntryType.InCollection;
+                            case "PAT" ->
+                                    IEEETranEntryType.Patent;
+                            default ->
+                                    StandardEntryType.Misc;
                         };
                     } else if ("T1".equals(tag) || "TI".equals(tag)) {
                         String oldVal = fields.get(StandardField.TITLE);
@@ -304,8 +314,8 @@ public class RisImporter extends Importer {
         return new ParserResult(bibEntries);
     }
 
-  private void addDoi(Map<Field, String> hm, String val) {
-      Optional<DOI> parsedDoi = DOI.parse(val);
-      parsedDoi.ifPresent(doi -> hm.put(StandardField.DOI, doi.asString()));
-  }
+    private void addDoi(Map<Field, String> hm, String val) {
+        Optional<DOI> parsedDoi = DOI.parse(val);
+        parsedDoi.ifPresent(doi -> hm.put(StandardField.DOI, doi.asString()));
+    }
 }

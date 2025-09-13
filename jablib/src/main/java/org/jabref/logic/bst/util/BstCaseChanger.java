@@ -140,7 +140,7 @@ public final class BstCaseChanger {
      * is other stuff, too, between braces, but it doesn't try to do anything
      * special with |colon|s.
      *
-     * @param start  the current position. It points to the opening brace
+     * @param start the current position. It points to the opening brace
      */
     private int convertSpecialChar(StringBuilder sb, char[] c, int start, FormatMode format) {
         int i = start;
@@ -213,7 +213,8 @@ public final class BstCaseChanger {
     private int convertNonControl(char[] c, int start, StringBuilder sb, FormatMode format) {
         int pos = start;
         switch (format) {
-            case TITLE_LOWERS, ALL_LOWERS -> {
+            case TITLE_LOWERS,
+                 ALL_LOWERS -> {
                 sb.append(Character.toLowerCase(c[pos]));
                 pos++;
             }

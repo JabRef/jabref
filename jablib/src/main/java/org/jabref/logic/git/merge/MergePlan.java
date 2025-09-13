@@ -10,8 +10,9 @@ import org.jabref.model.entry.field.Field;
  * A data structure representing the result of semantic diffing between base and remote entries.
  *
  * @param fieldPatches contain field-level modifications per citation key. citationKey -> field -> newValue (null = delete)
- * @param newEntries entries present in remote but not in base/local
+ * @param newEntries   entries present in remote but not in base/local
  */
 public record MergePlan(
         Map<String, Map<Field, String>> fieldPatches,
-        List<BibEntry> newEntries) { }
+        List<BibEntry> newEntries) {
+}

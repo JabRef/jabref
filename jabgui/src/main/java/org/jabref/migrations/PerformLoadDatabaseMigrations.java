@@ -10,7 +10,7 @@ public class PerformLoadDatabaseMigrations {
     // FIXME: Should be called somewhere
     // Typical call: performLoadDatabaseMigrations(result, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
     public static void performLoadDatabaseMigrations(ParserResult parserResult,
-                                                      Character keywordDelimited) {
+                                                     Character keywordDelimited) {
         List<PostOpenMigration> postOpenMigrations = Arrays.asList(
                 new ConvertLegacyExplicitGroups(),
                 new ConvertMarkingToGroups(),

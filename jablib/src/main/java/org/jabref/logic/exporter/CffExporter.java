@@ -66,17 +66,17 @@ public class CffExporter extends Exporter {
     );
 
     public static final Map<EntryType, String> TYPES_MAP = Map.ofEntries(
-        Map.entry(StandardEntryType.Article, "article"),
-        Map.entry(StandardEntryType.Book, "book"),
-        Map.entry(StandardEntryType.Booklet, "pamphlet"),
-        Map.entry(StandardEntryType.Proceedings, "conference"),
-        Map.entry(StandardEntryType.InProceedings, "conference-paper"),
-        Map.entry(StandardEntryType.Misc, "misc"),
-        Map.entry(StandardEntryType.Manual, "manual"),
-        Map.entry(StandardEntryType.Software, "software"),
-        Map.entry(StandardEntryType.Dataset, "dataset"),
-        Map.entry(StandardEntryType.Report, "report"),
-        Map.entry(StandardEntryType.Unpublished, "unpublished")
+            Map.entry(StandardEntryType.Article, "article"),
+            Map.entry(StandardEntryType.Book, "book"),
+            Map.entry(StandardEntryType.Booklet, "pamphlet"),
+            Map.entry(StandardEntryType.Proceedings, "conference"),
+            Map.entry(StandardEntryType.InProceedings, "conference-paper"),
+            Map.entry(StandardEntryType.Misc, "misc"),
+            Map.entry(StandardEntryType.Manual, "manual"),
+            Map.entry(StandardEntryType.Software, "software"),
+            Map.entry(StandardEntryType.Dataset, "dataset"),
+            Map.entry(StandardEntryType.Report, "report"),
+            Map.entry(StandardEntryType.Unpublished, "unpublished")
     );
 
     public CffExporter() {
