@@ -49,7 +49,10 @@ public class SideEffectExecutor {
     }
 
     private boolean execute(@NonNull WalkthroughSideEffect sideEffect, @NonNull Walkthrough walkthrough, boolean forward) {
-        LOGGER.debug("Executing {} effect: {}", forward ? "forward" : "backward", sideEffect.description());
+        LOGGER.debug("Executing {} effect: {}",
+                forward ?
+                "forward" :
+                "backward", sideEffect.description());
 
         try {
             if (forward) {
@@ -65,7 +68,10 @@ public class SideEffectExecutor {
                 return sideEffect.backward(walkthrough);
             }
         } catch (Exception e) {
-            LOGGER.error("Error executing {} effect: {}", forward ? "forward" : "backward", sideEffect.description(), e);
+            LOGGER.error("Error executing {} effect: {}",
+                    forward ?
+                    "forward" :
+                    "backward", sideEffect.description(), e);
             notifyUser(Localization.lang("Walkthrough side effect error"),
                     Localization.lang("An error occurred while executing '%0': %1", sideEffect.description(), e.getMessage()));
             return false;

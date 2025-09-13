@@ -124,14 +124,14 @@ class DatabaseSearcherWithBibFilesTest {
                 Arguments.of(List.of(), "test-library-title-casing.bib", "title = NotExisting", false),
                 Arguments.of(List.of(TITLE_SENTENCE_CASED, TITLE_MIXED_CASED, TITLE_UPPER_CASED), "test-library-title-casing.bib", "title = Title", false),
 
-                 Arguments.of(List.of(), "test-library-title-casing.bib", "title =! TiTLE", false),
-                 Arguments.of(List.of(TITLE_SENTENCE_CASED), "test-library-title-casing.bib", "title =! Title", false),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "title =! TiTLE", false),
+                Arguments.of(List.of(TITLE_SENTENCE_CASED), "test-library-title-casing.bib", "title =! Title", false),
 
-                 Arguments.of(List.of(), "test-library-title-casing.bib", "any =! TiTLE", false),
-                 Arguments.of(List.of(TITLE_MIXED_CASED), "test-library-title-casing.bib", "any =! TiTle", false),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "any =! TiTLE", false),
+                Arguments.of(List.of(TITLE_MIXED_CASED), "test-library-title-casing.bib", "any =! TiTle", false),
 
-                 Arguments.of(List.of(), "test-library-title-casing.bib", "title =! NotExisting", false),
-                 Arguments.of(List.of(TITLE_MIXED_CASED), "test-library-title-casing.bib", "title =! TiTle", false),
+                Arguments.of(List.of(), "test-library-title-casing.bib", "title =! NotExisting", false),
+                Arguments.of(List.of(TITLE_MIXED_CASED), "test-library-title-casing.bib", "title =! TiTle", false),
 
                 Arguments.of(List.of(), "test-library-title-casing.bib", "any =~ [Y]", false),
 
@@ -150,7 +150,10 @@ class DatabaseSearcherWithBibFilesTest {
     @MethodSource
     void searchLibrary(List<BibEntry> expected, String testFile, String query, boolean isFullText) throws URISyntaxException, IOException {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
-        EnumSet<SearchFlags> flags = isFullText ? EnumSet.of(SearchFlags.FULLTEXT) : EnumSet.noneOf(SearchFlags.class);
+        EnumSet<SearchFlags> flags =
+                isFullText ?
+                EnumSet.of(SearchFlags.FULLTEXT) :
+                EnumSet.noneOf(SearchFlags.class);
         List<BibEntry> matches = new DatabaseSearcher(databaseContext, TASK_EXECUTOR, preferences, postgreServer).getMatches(new SearchQuery(query, flags));
         assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
     }

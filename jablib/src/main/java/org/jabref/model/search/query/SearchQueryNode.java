@@ -4,5 +4,7 @@ import java.util.Optional;
 
 import org.jabref.model.entry.field.Field;
 
-public record SearchQueryNode(Optional<Field> field, String term) implements BaseQueryNode {
+public record SearchQueryNode(
+        Optional<Field> field,
+        String term) implements BaseQueryNode {
 }

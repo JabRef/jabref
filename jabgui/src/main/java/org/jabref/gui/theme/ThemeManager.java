@@ -114,8 +114,10 @@ public class ThemeManager {
     /// @param webEngine the web engine to install the css into
     public void installCss(WebEngine webEngine) {
         if (this.webEngines.add(webEngine)) {
-            webEngine.setUserStyleSheetLocation(this.theme.getAdditionalStylesheet().isPresent() ?
-                    this.theme.getAdditionalStylesheet().get().getWebEngineStylesheet() : "");
+            webEngine.setUserStyleSheetLocation(
+                    this.theme.getAdditionalStylesheet().isPresent() ?
+                    this.theme.getAdditionalStylesheet().get().getWebEngineStylesheet() :
+                    "");
         }
     }
 
@@ -170,7 +172,10 @@ public class ThemeManager {
         }
         try {
             themeWindowManager.setDarkModeForWindowFrame(stage, isDarkMode);
-            LOGGER.debug("Applied {} mode to window: {}", isDarkMode ? "dark" : "light", stage);
+            LOGGER.debug("Applied {} mode to window: {}",
+                    isDarkMode ?
+                    "dark" :
+                    "light", stage);
         } catch (NoClassDefFoundError | UnsatisfiedLinkError e) {
             // We need to handle these exceptions because the native library may not be available on all platforms (e.g., x86).
             // See https://github.com/dukke/FXThemes/issues/13 for details.

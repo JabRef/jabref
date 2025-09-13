@@ -157,6 +157,8 @@ public class ExportToClipboardAction extends SimpleCommand {
         dialogService.notify(Localization.lang("Entries exported to clipboard") + ": " + entries.size());
     }
 
-    private record ExportResult(String content, FileType fileType) {
+    private record ExportResult(
+            String content,
+            FileType fileType) {
     }
 }

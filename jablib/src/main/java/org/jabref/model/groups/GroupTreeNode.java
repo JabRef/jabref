@@ -107,7 +107,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             return getGroup();
         }
         MatcherSet searchRule = MatcherSets.build(
-                context == GroupHierarchyType.REFINING ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
+                context == GroupHierarchyType.REFINING ?
+                MatcherSets.MatcherType.AND :
+                MatcherSets.MatcherType.OR);
         searchRule.addRule(getGroup());
         if ((context == GroupHierarchyType.INCLUDING) && (originalContext != GroupHierarchyType.REFINING)) {
             for (GroupTreeNode child : getChildren()) {

@@ -40,7 +40,10 @@ public class UndoableAbbreviator {
         }
 
         String origText = entry.getField(fieldName).get();
-        String text = database != null ? database.resolveForStrings(origText) : origText;
+        String text =
+                database != null ?
+                database.resolveForStrings(origText) :
+                origText;
 
         Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
 
@@ -48,9 +51,12 @@ public class UndoableAbbreviator {
             return false; // Unknown, cannot abbreviate anything.
         }
 
-        Optional<String> newTextOptional = abbreviationType == AbbreviationType.LTWA
-                ? journalAbbreviationRepository.getLtwaAbbreviation(text)
-                : foundAbbreviation.map(this::getAbbreviatedName);
+        Optional<String> newTextOptional =
+                abbreviationType == AbbreviationType.LTWA
+                ?
+                journalAbbreviationRepository.getLtwaAbbreviation(text)
+                :
+                foundAbbreviation.map(this::getAbbreviatedName);
 
         // Return early if no abbreviation found or it matches original
         if (newTextOptional.isEmpty() || newTextOptional.get().equals(origText)) {

@@ -151,17 +151,28 @@ public class PushToApplicationDetector {
 
     private static String[] getPossibleExecutableNames(String name) {
         return switch (name) {
-            case "Emacs" -> new String[] {"emacs", "emacsclient"};
-            case "LyX/Kile" -> new String[] {"lyx", "kile"};
-            case "Texmaker" -> new String[] {"texmaker"};
-            case "TeXstudio" -> new String[] {"texstudio"};
-            case "TeXworks" -> new String[] {"texworks"};
-            case "Vim" -> new String[] {"vim", "nvim", "gvim"};
-            case "WinEdt" -> new String[] {"winedt"};
-            case "Sublime Text" -> new String[] {"subl", "sublime_text"};
-            case "TeXShop" -> new String[] {"texshop"};
-            case "VScode" -> new String[] {"code", "code-insiders"};
-            default -> new String[] {name.replace(" ", "").toLowerCase()};
+            case "Emacs" ->
+                    new String[] {"emacs", "emacsclient"};
+            case "LyX/Kile" ->
+                    new String[] {"lyx", "kile"};
+            case "Texmaker" ->
+                    new String[] {"texmaker"};
+            case "TeXstudio" ->
+                    new String[] {"texstudio"};
+            case "TeXworks" ->
+                    new String[] {"texworks"};
+            case "Vim" ->
+                    new String[] {"vim", "nvim", "gvim"};
+            case "WinEdt" ->
+                    new String[] {"winedt"};
+            case "Sublime Text" ->
+                    new String[] {"subl", "sublime_text"};
+            case "TeXShop" ->
+                    new String[] {"texshop"};
+            case "VScode" ->
+                    new String[] {"code", "code-insiders"};
+            default ->
+                    new String[] {name.replace(" ", "").toLowerCase()};
         };
     }
 
@@ -174,7 +185,9 @@ public class PushToApplicationDetector {
         result = trySystemCommand("where", exe);
         if (result != null) {
             String[] lines = result.split("\n");
-            return lines.length > 0 && !lines[0].trim().isEmpty() ? lines[0].trim() : null;
+            return lines.length > 0 && !lines[0].trim().isEmpty() ?
+                   lines[0].trim() :
+                   null;
         }
 
         return null;

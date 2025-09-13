@@ -228,10 +228,19 @@ public class LtwaRepository {
         private Optional<LtwaEntry> findBestEntry(List<LtwaEntry> entries) {
             return entries.stream()
                           .max(Comparator
-                                  .<LtwaEntry>comparingInt(e -> e.word().endsWith("-") ? 1 : 0)
+                                  .<LtwaEntry>comparingInt(e ->
+                                          e.word().endsWith("-") ?
+                                          1 :
+                                          0)
                                   .thenComparingInt(e -> e.word().length())
-                                  .thenComparingInt(e -> e.abbreviation() != null ? 1 : 0)
-                                  .thenComparingInt(e -> e.languages().contains("eng") ? 1 : 0));
+                                  .thenComparingInt(e ->
+                                          e.abbreviation() != null ?
+                                          1 :
+                                          0)
+                                  .thenComparingInt(e ->
+                                          e.languages().contains("eng") ?
+                                          1 :
+                                          0));
         }
 
         @Override
@@ -276,7 +285,9 @@ public class LtwaRepository {
         }
 
         public Optional<String> getResult() {
-            return error ? Optional.empty() : Optional.of(result.toString());
+            return error ?
+                   Optional.empty() :
+                   Optional.of(result.toString());
         }
     }
 
@@ -332,7 +343,13 @@ public class LtwaRepository {
      */
     private static boolean matches(String title, LtwaEntry entry) {
         String word = entry.word();
-        int margin = (word.startsWith("-") ? 1 : 0) + (word.endsWith("-") ? 1 : 0);
+        int margin = (
+                word.startsWith("-") ?
+                1 :
+                0) + (
+                word.endsWith("-") ?
+                1 :
+                0);
         if (title.length() < word.length() - margin) {
             return false;
         }

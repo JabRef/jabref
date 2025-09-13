@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * From Bibtex:
- *
+ * <p>
  * "The |built_in| function {\.{format.name\$}} pops the
  * top three literals (they are a string, an integer, and a string
  * literal, in that order). The last string literal represents a
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * described in the \BibTeX\ documentation. Finally, this function
  * pushes the formatted name. If any of the types is incorrect, it
  * complains and pushes the null string."
- *
+ * <p>
  * Sounds easy - is a nightmare... X-(
  *
  */
@@ -102,10 +102,14 @@ public class BstNameFormatter {
                 char type = control.charAt(0);
 
                 Optional<String> tokenS = switch (type) {
-                    case 'f' -> author.getGivenName();
-                    case 'v' -> author.getNamePrefix();
-                    case 'l' -> author.getFamilyName();
-                    case 'j' -> author.getNameSuffix();
+                    case 'f' ->
+                            author.getGivenName();
+                    case 'v' ->
+                            author.getNamePrefix();
+                    case 'l' ->
+                            author.getFamilyName();
+                    case 'j' ->
+                            author.getNameSuffix();
                     default ->
                             throw new BstVMException("Internal error");
                 };

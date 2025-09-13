@@ -60,8 +60,8 @@ public class EditMerge {
                 List<CitationGroup> groups = joinableGroupData.group;
 
                 List<Citation> newCitations = groups.stream()
-                                                     .flatMap(group -> group.citationsInStorageOrder.stream())
-                                                     .collect(Collectors.toList());
+                                                    .flatMap(group -> group.citationsInStorageOrder.stream())
+                                                    .collect(Collectors.toList());
 
                 CitationType citationType = groups.getFirst().citationType;
                 List<Optional<OOText>> pageInfos = frontend.backend.combinePageInfos(groups);
@@ -97,7 +97,9 @@ public class EditMerge {
      * @param group       A list of consecutive citation groups only separated by spaces.
      * @param groupCursor A cursor covering the XTextRange of each entry in group (and the spaces between them)
      */
-    private record JoinableGroupData(List<CitationGroup> group, XTextCursor groupCursor) {
+    private record JoinableGroupData(
+            List<CitationGroup> group,
+            XTextCursor groupCursor) {
     }
 
     private static class ScanState {
@@ -177,8 +179,10 @@ public class EditMerge {
                                 state.prevRange.getString(),
                                 currentRange.getString(),
                                 (textOrder == 0
-                                        ? "they start at the same position"
-                                        : "the start of the latter precedes the start of the first"));
+                                 ?
+                                 "they start at the same position"
+                                 :
+                                 "the start of the latter precedes the start of the first"));
                 LOGGER.warn(msg);
                 return false;
             }
@@ -255,7 +259,7 @@ public class EditMerge {
         // If new group, create currentGroupCursor
         if (isNewGroup) {
             state.currentGroupCursor = currentRange.getText()
-                                                    .createTextCursorByRange(currentRange.getStart());
+                                                   .createTextCursorByRange(currentRange.getStart());
         }
 
         // include currentRange in currentGroupCursor
@@ -289,7 +293,7 @@ public class EditMerge {
 
         for (CitationGroup group : groups) {
             XTextRange currentRange = frontend.getMarkRange(doc, group)
-                                               .orElseThrow(IllegalStateException::new);
+                                              .orElseThrow(IllegalStateException::new);
 
             /*
              * Decide if we add group to the group. False when the group is empty.

@@ -39,7 +39,7 @@ public class PushToVim extends AbstractPushToApplication {
         String keyString = this.getKeyString(entries, getDelimiter());
 
         try {
-            String[] com = new String[]{commandPath, "--servername",
+            String[] com = new String[] {commandPath, "--servername",
                     preferences.getVimServer(), "--remote-send",
                     "<C-\\><C-N>a" + getCitePrefix() + keyString + getCiteSuffix()};
 
@@ -99,12 +99,12 @@ public class PushToVim extends AbstractPushToApplication {
         try {
             String[] command = jumpToLineCommandlineArguments(fileName, line, column);
             if (OS.WINDOWS) {
-                 processBuilder.command("cmd",
-                         "/c",
-                         "start",
-                         "",
+                processBuilder.command("cmd",
+                        "/c",
+                        "start",
+                        "",
                         "\"%s\"".formatted(command[0]),
-                         "\"%s\"".formatted(command[1]),
+                        "\"%s\"".formatted(command[1]),
                         "\"%s\"".formatted(command[2]),
                         "\"+normal %s|\"".formatted(Integer.toString(column)));
             } else if (OS.LINUX) {

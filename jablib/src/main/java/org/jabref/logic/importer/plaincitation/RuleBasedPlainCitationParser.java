@@ -71,7 +71,10 @@ public class RuleBasedPlainCitationParser implements PlainCitationParser {
     }
 
     private Optional<BibEntry> generateEntity(String input) {
-        EntryType type = isArticle ? StandardEntryType.Article : StandardEntryType.Book;
+        EntryType type =
+                isArticle ?
+                StandardEntryType.Article :
+                StandardEntryType.Book;
         BibEntry extractedEntity = new BibEntry(type);
         extractedEntity.setField(StandardField.AUTHOR, String.join(" and ", authors));
         extractedEntity.setField(StandardField.URL, String.join(", ", urls));

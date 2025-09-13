@@ -88,11 +88,11 @@ public class BibDatabaseWriter {
     }
 
     public BibDatabaseWriter(Writer writer,
-                                String newline,
-                                SelfContainedSaveConfiguration saveConfiguration,
-                                FieldPreferences fieldPreferences,
-                                CitationKeyPatternPreferences citationKeyPatternPreferences,
-                                BibEntryTypesManager entryTypesManager) {
+                             String newline,
+                             SelfContainedSaveConfiguration saveConfiguration,
+                             FieldPreferences fieldPreferences,
+                             CitationKeyPatternPreferences citationKeyPatternPreferences,
+                             BibEntryTypesManager entryTypesManager) {
         this(new BibWriter(writer, newline),
                 saveConfiguration,
                 fieldPreferences,
@@ -177,9 +177,9 @@ public class BibDatabaseWriter {
      */
     public void saveDatabase(BibDatabaseContext bibDatabaseContext) throws IOException {
         List<BibEntry> entries = bibDatabaseContext.getDatabase().getEntries()
-                                                .stream()
-                                                .filter(entry -> !entry.isEmpty())
-                                                .toList();
+                                                   .stream()
+                                                   .filter(entry -> !entry.isEmpty())
+                                                   .toList();
         savePartOfDatabase(bibDatabaseContext, entries);
     }
 

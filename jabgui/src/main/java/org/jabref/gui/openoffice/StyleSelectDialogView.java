@@ -144,7 +144,10 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         cslDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
         new ValueTableCellFactory<CSLStyleSelectViewModel, Boolean>()
-                .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withGraphic(internalStyle ->
+                        internalStyle ?
+                        null :
+                        IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withOnMouseClickedEvent(item -> evt -> {
                     CSLStyleSelectViewModel selectedStyle = cslStylesTable.getSelectionModel().getSelectedItem();
                     if (selectedStyle != null) {
@@ -198,7 +201,10 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         jStyleDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
         new ValueTableCellFactory<JStyleSelectViewModel, Boolean>()
-                .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withGraphic(internalStyle ->
+                        internalStyle ?
+                        null :
+                        IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withOnMouseClickedEvent(item -> evt -> viewModel.deleteJStyle())
                 .withTooltip(item -> Localization.lang("Remove style"))
                 .install(jStyleDeleteColumn);

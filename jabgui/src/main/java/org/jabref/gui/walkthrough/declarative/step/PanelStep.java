@@ -15,20 +15,21 @@ import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record PanelStep(@NonNull String title,
-                        @NonNull List<WalkthroughRichTextBlock> content,
-                        @Nullable NodeResolver resolverValue,
-                        @Nullable String continueButtonTextValue,
-                        @Nullable String skipButtonTextValue,
-                        @Nullable String backButtonTextValue,
-                        @Nullable Trigger triggerValue,
-                        @NonNull PanelPosition position,
-                        @Nullable Double widthValue,
-                        @Nullable Double heightValue,
-                        @Nullable WalkthroughEffect highlightValue,
-                        @Nullable WindowResolver activeWindowResolverValue,
-                        boolean showQuitButtonValue,
-                        @NonNull QuitButtonPosition quitButtonPositionValue) implements VisibleComponent {
+public record PanelStep(
+        @NonNull String title,
+        @NonNull List<WalkthroughRichTextBlock> content,
+        @Nullable NodeResolver resolverValue,
+        @Nullable String continueButtonTextValue,
+        @Nullable String skipButtonTextValue,
+        @Nullable String backButtonTextValue,
+        @Nullable Trigger triggerValue,
+        @NonNull PanelPosition position,
+        @Nullable Double widthValue,
+        @Nullable Double heightValue,
+        @Nullable WalkthroughEffect highlightValue,
+        @Nullable WindowResolver activeWindowResolverValue,
+        boolean showQuitButtonValue,
+        @NonNull QuitButtonPosition quitButtonPositionValue) implements VisibleComponent {
 
     @Override
     public Optional<NodeResolver> nodeResolver() {
@@ -57,12 +58,16 @@ public record PanelStep(@NonNull String title,
 
     @Override
     public OptionalDouble maxWidth() {
-        return widthValue != null ? OptionalDouble.of(widthValue) : OptionalDouble.empty();
+        return widthValue != null ?
+               OptionalDouble.of(widthValue) :
+               OptionalDouble.empty();
     }
 
     @Override
     public OptionalDouble maxHeight() {
-        return heightValue != null ? OptionalDouble.of(heightValue) : OptionalDouble.empty();
+        return heightValue != null ?
+               OptionalDouble.of(heightValue) :
+               OptionalDouble.empty();
     }
 
     @Override

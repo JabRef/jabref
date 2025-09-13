@@ -182,7 +182,6 @@ public class XmpUtilWriter {
      * This method generates an xmp metadata string in dublin core format without the
      * metadata section {@code <?xpacket begin=...>}.
      *
-     *
      * @param entries A list of entries, which are added to the dublin core metadata.
      * @return If something goes wrong (e.g. an exception is thrown), the method returns an empty string,
      * otherwise it returns the xmp metadata without metadata description as a string in dublin core format.
@@ -233,7 +232,8 @@ public class XmpUtilWriter {
                     // do not write file field
                     case StandardField.FILE -> {
                     }
-                    case null, default ->
+                    case null,
+                         default ->
                             di.setCustomMetadataValue(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName(), null);
                 }
                 continue;
@@ -256,7 +256,7 @@ public class XmpUtilWriter {
                 }
                 case null,
                      default ->
-                        // We hit the case of an PDF-unsupported field --> write it directly
+                    // We hit the case of an PDF-unsupported field --> write it directly
                         resolvedEntry.getField(field).ifPresent(val -> di.setCustomMetadataValue(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName(), val));
             }
         }

@@ -27,13 +27,17 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
     @Override
     public String visitImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx) {
         List<String> children = ctx.expression().stream().map(this::visit).toList();
-        return children.size() == 1 ? children.getFirst() : String.join(" ", children);
+        return children.size() == 1 ?
+               children.getFirst() :
+               String.join(" ", children);
     }
 
     @Override
     public String visitParenExpression(SearchParser.ParenExpressionContext ctx) {
         String expr = visit(ctx.andExpression());
-        return expr.isEmpty() ? "" : "(" + expr + ")";
+        return expr.isEmpty() ?
+               "" :
+               "(" + expr + ")";
     }
 
     @Override
@@ -56,7 +60,10 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             return left;
         }
 
-        String operator = ctx.bin_op.getType() == SearchParser.AND ? " AND " : " OR ";
+        String operator =
+                ctx.bin_op.getType() == SearchParser.AND ?
+                " AND " :
+                " OR ";
         return left + operator + right;
     }
 
@@ -70,7 +77,9 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
                 return "/" + term + "/";
             }
-            return isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
+            return isQuoted ?
+                   "\"" + escapeQuotes(term) + "\"" :
+                   QueryParser.escape(term);
         }
 
         String field = ctx.FIELD().getText().toLowerCase(Locale.ROOT);
@@ -78,7 +87,9 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             return "";
         }
 
-        field = "any".equals(field) || "anyfield".equals(field) ? "" : field + ":";
+        field = "any".equals(field) || "anyfield".equals(field) ?
+                "" :
+                field + ":";
         int operator = ctx.operator().getStart().getType();
         return buildFieldExpression(field, term, operator, isQuoted);
     }
@@ -93,11 +104,17 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
 
         if (isRegexOp) {
             String expression = field + "/" + term + "/";
-            return isNegationOp ? "NOT " + expression : expression;
+            return isNegationOp ?
+                   "NOT " + expression :
+                   expression;
         } else {
-            term = isQuoted ? "\"" + escapeQuotes(term) + "\"" : QueryParser.escape(term);
+            term = isQuoted ?
+                   "\"" + escapeQuotes(term) + "\"" :
+                   QueryParser.escape(term);
             String expression = field + term;
-            return isNegationOp ? "NOT " + expression : expression;
+            return isNegationOp ?
+                   "NOT " + expression :
+                   expression;
         }
     }
 
@@ -112,8 +129,10 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
                  SearchParser.NEEQUAL,
                  SearchParser.NCEEQUAL,
                  SearchParser.NREQUAL,
-                 SearchParser.NCREEQUAL -> true;
-            default -> false;
+                 SearchParser.NCREEQUAL ->
+                    true;
+            default ->
+                    false;
         };
     }
 
@@ -122,8 +141,10 @@ public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
             case SearchParser.REQUAL,
                  SearchParser.CREEQUAL,
                  SearchParser.NREQUAL,
-                 SearchParser.NCREEQUAL -> true;
-            default -> false;
+                 SearchParser.NCREEQUAL ->
+                    true;
+            default ->
+                    false;
         };
     }
 }

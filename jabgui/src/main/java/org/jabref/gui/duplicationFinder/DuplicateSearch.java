@@ -146,7 +146,10 @@ public class DuplicateSearch extends SimpleCommand {
                     askAboutExact = true;
                 }
 
-                DuplicateResolverType resolverType = askAboutExact ? DuplicateResolverType.DUPLICATE_SEARCH_WITH_EXACT : DuplicateResolverType.DUPLICATE_SEARCH;
+                DuplicateResolverType resolverType =
+                        askAboutExact ?
+                        DuplicateResolverType.DUPLICATE_SEARCH_WITH_EXACT :
+                        DuplicateResolverType.DUPLICATE_SEARCH;
 
                 UiTaskExecutor.runAndWaitInJavaFXThread(() -> askResolveStrategy(result, first, second, resolverType));
             }

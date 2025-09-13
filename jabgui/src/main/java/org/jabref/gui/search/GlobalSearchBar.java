@@ -321,7 +321,10 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(filterModeButton);
         searchPreferences.searchDisplayModeProperty().addListener((_, _, newVal) -> filterModeButton.setSelected(newVal == SearchDisplayMode.FILTER));
         filterModeButton.setOnAction(_ -> {
-            searchPreferences.setSearchDisplayMode(filterModeButton.isSelected() ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT);
+            searchPreferences.setSearchDisplayMode(
+                    filterModeButton.isSelected() ?
+                    SearchDisplayMode.FILTER :
+                    SearchDisplayMode.FLOAT);
             searchField.requestFocus();
         });
 

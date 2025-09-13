@@ -446,23 +446,23 @@ public class JabRefDialogService implements DialogService {
         LOGGER.info(message);
 
         UiTaskExecutor.runInJavaFXThread(() ->
-            Notifications.create()
-                         .text(message)
-                         .position(Pos.BOTTOM_CENTER)
-                         .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
-                         .owner(mainWindow)
-                         .threshold(5,
-                            Notifications.create()
-                                         .title(Localization.lang("Last notification"))
-                                         .text(
-                                            "(" + Localization.lang("Check the event log to see all notifications") + ")"
-                                            + "\n\n" + message)
-                                         .onAction(e -> {
-                                            ErrorConsoleAction ec = new ErrorConsoleAction();
-                                            ec.execute();
-                                         }))
-                         .hideCloseButton()
-                         .show());
+                Notifications.create()
+                             .text(message)
+                             .position(Pos.BOTTOM_CENTER)
+                             .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
+                             .owner(mainWindow)
+                             .threshold(5,
+                                     Notifications.create()
+                                                  .title(Localization.lang("Last notification"))
+                                                  .text(
+                                                          "(" + Localization.lang("Check the event log to see all notifications") + ")"
+                                                                  + "\n\n" + message)
+                                                  .onAction(e -> {
+                                                      ErrorConsoleAction ec = new ErrorConsoleAction();
+                                                      ec.execute();
+                                                  }))
+                             .hideCloseButton()
+                             .show());
     }
 
     @Override
@@ -493,7 +493,9 @@ public class JabRefDialogService implements DialogService {
         FileChooser chooser = getConfiguredFileChooser(fileDialogConfiguration);
         List<File> files = chooser.showOpenMultipleDialog(mainWindow);
         Optional.ofNullable(chooser.getSelectedExtensionFilter()).ifPresent(fileDialogConfiguration::setSelectedExtensionFilter);
-        return files != null ? files.stream().map(File::toPath).toList() : List.of();
+        return files != null ?
+               files.stream().map(File::toPath).toList() :
+               List.of();
     }
 
     private DirectoryChooser getConfiguredDirectoryChooser(DirectoryDialogConfiguration directoryDialogConfiguration) {

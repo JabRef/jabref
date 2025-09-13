@@ -50,9 +50,12 @@ public class AutoCompletionTabViewModel implements PreferenceTabViewModel {
         }
 
         switch (autoCompletePreferences.getFirstNameMode()) {
-            case ONLY_ABBREVIATED -> firstNameModeAbbreviatedProperty.setValue(true);
-            case ONLY_FULL -> firstNameModeFullProperty.setValue(true);
-            default -> firstNameModeBothProperty.setValue(true);
+            case ONLY_ABBREVIATED ->
+                    firstNameModeAbbreviatedProperty.setValue(true);
+            case ONLY_FULL ->
+                    firstNameModeFullProperty.setValue(true);
+            default ->
+                    firstNameModeBothProperty.setValue(true);
         }
     }
 

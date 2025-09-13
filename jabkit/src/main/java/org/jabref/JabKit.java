@@ -121,8 +121,14 @@ public class JabKit {
                                                 .anyMatch(opt -> Arrays.asList(opt.names()).contains("--output-format"));
 
             String footerText = "";
-            footerText += hasInputOption ? inputFooter : "";
-            footerText += hasOutputOption ? outputFooter : "";
+            footerText +=
+                    hasInputOption ?
+                    inputFooter :
+                    "";
+            footerText +=
+                    hasOutputOption ?
+                    outputFooter :
+                    "";
             subCommand.getCommandSpec().usageMessage().footer(footerText);
         });
 
@@ -168,7 +174,10 @@ public class JabKit {
         Map<String, String> configuration = Map.of(
                 "level", logLevel.name().toLowerCase(),
                 "writerFile", "rolling file",
-                "writerFile.logLevel", logLevel == Level.DEBUG ? "debug" : "info",
+                "writerFile.logLevel",
+                logLevel == Level.DEBUG ?
+                "debug" :
+                "info",
                 // We need to manually join the path, because ".resolve" does not work on Windows, because ":" is not allowed in file names on Windows
                 "writerFile.file", directory + File.separator + "log_{date:yyyy-MM-dd_HH-mm-ss}.txt",
                 "writerFile.charset", "UTF-8",

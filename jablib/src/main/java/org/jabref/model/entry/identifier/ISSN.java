@@ -44,7 +44,10 @@ public class ISSN implements Identifier {
         for (int pos = 0; pos <= 7; pos++) {
             char c = issnString.charAt(pos);
             if (pos != 4) {
-                sum += (c - '0') * ((8 - pos) + (pos > 4 ? 1 : 0));
+                sum += (c - '0') * ((8 - pos) + (
+                        pos > 4 ?
+                        1 :
+                        0));
             }
         }
         char control = issnString.charAt(8);

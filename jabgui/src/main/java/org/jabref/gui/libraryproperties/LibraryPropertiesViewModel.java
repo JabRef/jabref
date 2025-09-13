@@ -40,7 +40,7 @@ public class LibraryPropertiesViewModel {
     public boolean validateAllSettings() {
         for (PropertiesTab propertiesTab : propertiesTabs) {
             if (!propertiesTab.validateSettings()) {
-              return false;
+                return false;
             }
         }
         return true;

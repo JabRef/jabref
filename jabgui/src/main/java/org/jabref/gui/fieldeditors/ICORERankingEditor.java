@@ -43,8 +43,8 @@ public class ICORERankingEditor extends HBox implements FieldEditorFX {
         Injector.registerExistingAndInject(this);
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
 
         this.viewModel = new ICORERankingEditorViewModel(
                 field,

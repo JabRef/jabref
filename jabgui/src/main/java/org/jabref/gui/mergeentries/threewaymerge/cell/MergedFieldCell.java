@@ -28,9 +28,9 @@ public class MergedFieldCell extends ThreeWayMergeCell {
 
     private void initializeTextArea() {
         BindingsHelper.bindBidirectional(textArea.textProperty(),
-                                         textProperty(),
-                                         textArea::replaceText,
-                                         textProperty()::setValue);
+                textProperty(),
+                textArea::replaceText,
+                textProperty()::setValue);
 
         setAlignment(Pos.CENTER);
         textArea.setWrapText(true);

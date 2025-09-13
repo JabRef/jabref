@@ -42,7 +42,7 @@ public class SearchCitationsRelationsService {
 
     @VisibleForTesting
     SearchCitationsRelationsService(CitationFetcher citationFetcher,
-                                           BibEntryCitationsAndReferencesRepository repository
+                                    BibEntryCitationsAndReferencesRepository repository
     ) {
         this.citationFetcher = citationFetcher;
         this.relationsRepository = repository;
@@ -51,7 +51,7 @@ public class SearchCitationsRelationsService {
     public List<BibEntry> searchCites(BibEntry referencing) throws FetcherException {
         boolean isFetchingAllowed =
                 !relationsRepository.containsReferences(referencing) ||
-                relationsRepository.isReferencesUpdatable(referencing);
+                        relationsRepository.isReferencesUpdatable(referencing);
         if (isFetchingAllowed) {
             List<BibEntry> referencedBy = citationFetcher.searchCiting(referencing);
             relationsRepository.insertReferences(referencing, referencedBy);
@@ -67,7 +67,7 @@ public class SearchCitationsRelationsService {
     public List<BibEntry> searchCitedBy(BibEntry cited) throws FetcherException {
         boolean isFetchingAllowed =
                 !relationsRepository.containsCitations(cited) ||
-                relationsRepository.isCitationsUpdatable(cited);
+                        relationsRepository.isCitationsUpdatable(cited);
         if (isFetchingAllowed) {
             List<BibEntry> citedBy = citationFetcher.searchCitedBy(cited);
             relationsRepository.insertCitations(cited, citedBy);

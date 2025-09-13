@@ -123,7 +123,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);
     private boolean backOrForwardNavigationActionTriggered = false;
 
-
     private BibDatabaseContext bibDatabaseContext;
 
     // All subscribers needing "coarse" change events should use this filter
@@ -210,8 +209,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         stateManager.activeDatabaseProperty().addListener((_, _, _) -> {
             if (preferences.getSearchPreferences().isFulltext()) {
-              mainTable.getTableModel().refreshSearchMatches();
-           }
+                mainTable.getTableModel().refreshSearchMatches();
+            }
         });
     }
 
@@ -1025,7 +1024,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
      * Creates a new library tab. Contents are loaded by the {@code dataLoadingTask}. Most of the other parameters are required by {@code resetChangeMonitor()}.
      *
      * @param dataLoadingTask The task to execute to load the data asynchronously.
-     * @param file the path to the file (loaded by the dataLoadingTask)
+     * @param file            the path to the file (loaded by the dataLoadingTask)
      */
     public static LibraryTab createLibraryTab(BackgroundTask<ParserResult> dataLoadingTask,
                                               Path file,

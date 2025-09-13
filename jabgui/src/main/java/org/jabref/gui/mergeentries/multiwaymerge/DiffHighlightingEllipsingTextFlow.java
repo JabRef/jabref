@@ -132,9 +132,12 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
                     text.getStyleClass().add("text-unchanged");
                     yield List.of(text);
                 }
-                case WORD -> DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, " ");
-                case CHARACTER -> DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, "");
-                default -> throw new UnsupportedOperationException("Not implemented " + diffMode.getValue());
+                case WORD ->
+                        DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, " ");
+                case CHARACTER ->
+                        DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, "");
+                default ->
+                        throw new UnsupportedOperationException("Not implemented " + diffMode.getValue());
             };
             allChildren.addAll(highlightedText);
         } else {
@@ -155,11 +158,16 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
     }
 
     public final void setEllipsisString(String value) {
-        ellipsisString.set(value == null ? "" : value);
+        ellipsisString.set(
+                value == null ?
+                "" :
+                value);
     }
 
     public String getEllipsisString() {
-        return ellipsisString == null ? DEFAULT_ELLIPSIS_STRING : ellipsisString.get();
+        return ellipsisString == null ?
+               DEFAULT_ELLIPSIS_STRING :
+               ellipsisString.get();
     }
 
     public final StringProperty ellipsisStringProperty() {

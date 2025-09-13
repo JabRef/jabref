@@ -20,7 +20,8 @@ public class HTMLChars implements ParamLayoutFormatter {
      * <b>&</b>{@literal amp;} <b>Not Matched</b><br>
      * <b>&</b>{@literal #34;} <b>Not Matched</b><br>
      * <b>&</b>Hey <b>Matched</b>
-     * */
+     *
+     */
     private static final Pattern HTML_ENTITY_PATTERN = Pattern.compile("&(?!(?:[a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});)");
 
     private boolean keepCurlyBraces = false;
@@ -82,7 +83,9 @@ public class HTMLChars implements ParamLayoutFormatter {
                         String commandBody;
                         if (c == '{') {
                             String part = StringUtil.getPart(field, i, false);
-                            i += this.keepCurlyBraces ? part.length() + 1 : part.length();
+                            i += this.keepCurlyBraces ?
+                                 part.length() + 1 :
+                                 part.length();
                             commandBody = part;
                         } else {
                             commandBody = field.substring(i, i + 1);
@@ -124,7 +127,9 @@ public class HTMLChars implements ParamLayoutFormatter {
                         sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
                     } else if (c == '{') {
                         String argument = StringUtil.getPart(field, i, true);
-                        i += this.keepCurlyBraces ? argument.length() + 1 : argument.length();
+                        i += this.keepCurlyBraces ?
+                             argument.length() + 1 :
+                             argument.length();
                         // handle common case of general latex command
                         String result = HTML_CHARS.get(command + argument);
                         // If found, then use translated version. If not, then keep
@@ -185,7 +190,10 @@ public class HTMLChars implements ParamLayoutFormatter {
                                   .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
                                   .replace("\n", "<br>") // Replace single line breaks with <br>
                                   .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                                  .replaceAll("\\$([^$]*)\\$", this.keepCurlyBraces ? "\\\\{$1\\\\}" : "$1}");
+                                  .replaceAll("\\$([^$]*)\\$",
+                                          this.keepCurlyBraces ?
+                                          "\\\\{$1\\\\}" :
+                                          "$1}");
     }
 
     private String getHTMLTag(String latexCommand) {

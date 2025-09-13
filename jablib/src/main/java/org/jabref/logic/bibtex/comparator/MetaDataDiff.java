@@ -30,7 +30,10 @@ public class MetaDataDiff {
         USER_FILE_DIRECTORY
     }
 
-    public record Difference(DifferenceType differenceType, Object originalObject, Object newObject) {
+    public record Difference(
+            DifferenceType differenceType,
+            Object originalObject,
+            Object newObject) {
     }
 
     private final Optional<GroupDiff> groupDiff;

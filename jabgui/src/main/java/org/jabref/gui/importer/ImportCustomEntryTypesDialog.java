@@ -44,8 +44,8 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
                 viewModel.importBibEntryTypes(
                         unknownEntryTypesCheckList.getCheckModel().getCheckedItems(),
                         differentCustomizationCheckList.getCheckModel().getCheckedItems().stream()
-                                .map(BibEntryTypePrefsAndFileViewModel::customTypeFromPreferences)
-                                .toList());
+                                                       .map(BibEntryTypePrefsAndFileViewModel::customTypeFromPreferences)
+                                                       .toList());
             }
             return null;
         });
@@ -63,7 +63,9 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
             @Override
             public void updateItem(BibEntryType bibEntryType, boolean empty) {
                 super.updateItem(bibEntryType, empty);
-                setText(bibEntryType == null ? "" : bibEntryType.getType().getDisplayName());
+                setText(bibEntryType == null ?
+                        "" :
+                        bibEntryType.getType().getDisplayName());
             }
         });
         differentCustomizationCheckList.setItems(viewModel.differentCustomizations());

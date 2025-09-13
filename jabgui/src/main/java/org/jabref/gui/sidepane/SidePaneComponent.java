@@ -40,7 +40,10 @@ public class SidePaneComponent extends BorderPane {
         getStyleClass().add("sidePaneComponent");
         setTop(createHeaderView());
         setCenter(contentFactory.create(sidePaneType));
-        VBox.setVgrow(this, sidePaneType == SidePaneType.GROUPS ? Priority.ALWAYS : Priority.NEVER);
+        VBox.setVgrow(this,
+                sidePaneType == SidePaneType.GROUPS ?
+                Priority.ALWAYS :
+                Priority.NEVER);
     }
 
     private Node createHeaderView() {

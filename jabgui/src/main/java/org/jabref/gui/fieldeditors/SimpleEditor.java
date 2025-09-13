@@ -55,7 +55,9 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     }
 
     protected TextInputControl createTextInputControl() {
-        return isMultiLine ? new EditorTextArea() : new EditorTextField();
+        return isMultiLine ?
+               new EditorTextArea() :
+               new EditorTextField();
     }
 
     @Override

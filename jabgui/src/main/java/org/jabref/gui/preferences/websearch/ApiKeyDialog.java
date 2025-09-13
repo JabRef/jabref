@@ -86,10 +86,19 @@ public class ApiKeyDialog extends FXDialog {
             rotation.stop();
             testButton.setDisable(false);
 
-            testButton.setGraphic(success ? IconTheme.JabRefIcons.SUCCESS.getGraphicNode() : IconTheme.JabRefIcons.ERROR.getGraphicNode());
+            testButton.setGraphic(
+                    success ?
+                    IconTheme.JabRefIcons.SUCCESS.getGraphicNode() :
+                    IconTheme.JabRefIcons.ERROR.getGraphicNode());
             testButton.getStyleClass().removeAll("success", "error");
-            testButton.getStyleClass().add(success ? "success" : "error");
-            testButton.setText(success ? Localization.lang("API Key Valid") : Localization.lang("API Key Invalid"));
+            testButton.getStyleClass().add(
+                    success ?
+                    "success" :
+                    "error");
+            testButton.setText(
+                    success ?
+                    Localization.lang("API Key Valid") :
+                    Localization.lang("API Key Invalid"));
             apiKeyValid.set(success);
 
             new DelayedExecution(STATUS_DURATION, () -> {

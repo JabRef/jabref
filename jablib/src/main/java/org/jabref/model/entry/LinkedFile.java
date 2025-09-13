@@ -213,7 +213,9 @@ public class LinkedFile implements Serializable {
                 "description='" + description.get() + '\'' +
                 ", link='" + link.get() + '\'' +
                 ", fileType='" + fileType.get() + '\'' +
-                (StringUtil.isNullOrEmpty(sourceURL.get()) ? "" : (", sourceUrl='" + sourceURL.get() + '\'')) +
+                (StringUtil.isNullOrEmpty(sourceURL.get()) ?
+                 "" :
+                 (", sourceUrl='" + sourceURL.get() + '\'')) +
                 '}';
     }
 

@@ -129,9 +129,12 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         rightScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
 
         viewModel.failedSuppliersProperty().addListener((_, _, _) -> {
-            failedSuppliers.setText(viewModel.failedSuppliersProperty().get().isEmpty() ? "" : Localization.lang(
-                    "Could not extract Metadata from: %0",
-                    String.join(", ", viewModel.failedSuppliersProperty())));
+            failedSuppliers.setText(
+                    viewModel.failedSuppliersProperty().get().isEmpty() ?
+                    "" :
+                    Localization.lang(
+                            "Could not extract Metadata from: %0",
+                            String.join(", ", viewModel.failedSuppliersProperty())));
             int activeColumns = viewModel.entriesProperty().get().size() - viewModel.failedSuppliersProperty().get().size();
             if (activeColumns < ACTIVE_COLUMNS_MINIMUM) {
                 // [impl->req~ux.auto-close.merge-entries~1]

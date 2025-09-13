@@ -49,7 +49,7 @@ public class HeadlessExecutorService implements Executor {
     private final Timer timer = new Timer("timer", true);
 
     private HeadlessExecutorService() {
-   }
+    }
 
     public void execute(Runnable command) {
         Objects.requireNonNull(command);

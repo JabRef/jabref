@@ -153,8 +153,10 @@ public class BiblioscapeImporter extends Importer {
                                        .toString();
                     } else if ("UR".equals(entry.getKey()) || "AT".equals(entry.getKey())) {
                         String s = entry.getValue().toString().trim();
-                        hm.put(s.startsWith("http://") || s.startsWith("ftp://") ? StandardField.URL
-                                : StandardField.PDF, entry.getValue().toString());
+                        hm.put(s.startsWith("http://") || s.startsWith("ftp://") ?
+                               StandardField.URL
+                                                                                 :
+                               StandardField.PDF, entry.getValue().toString());
                     } else if ("C1".equals(entry.getKey())) {
                         comments.add("Custom1: "
                                 + entry.getValue());
@@ -248,12 +250,21 @@ public class BiblioscapeImporter extends Importer {
 
                 // concatenate pages
                 if ((pages[0] != null) || (pages[1] != null)) {
-                    hm.put(StandardField.PAGES, (pages[0] == null ? "" : pages[0]) + (pages[1] == null ? "" : "--" + pages[1]));
+                    hm.put(StandardField.PAGES, (
+                            pages[0] == null ?
+                            "" :
+                            pages[0]) + (
+                            pages[1] == null ?
+                            "" :
+                            "--" + pages[1]));
                 }
 
                 // concatenate address and country
                 if (address != null) {
-                    hm.put(StandardField.ADDRESS, address + (country == null ? "" : ", " + country));
+                    hm.put(StandardField.ADDRESS, address + (
+                            country == null ?
+                            "" :
+                            ", " + country));
                 }
 
                 if (!comments.isEmpty()) { // set comment if present

@@ -450,7 +450,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         BindingsHelper.bindBidirectional((ObservableValue<Boolean>) stateManager.getEditorShowing(), panelMode,
                 mode -> stateManager.getEditorShowing().setValue(mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR),
-                showing -> panelMode.setValue(showing ? PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR : PanelMode.MAIN_TABLE));
+                showing -> panelMode.setValue(
+                        showing ?
+                        PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR :
+                        PanelMode.MAIN_TABLE));
         EasyBind.subscribe(panelMode, mode -> {
             updateEditorPane();
             if (mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {

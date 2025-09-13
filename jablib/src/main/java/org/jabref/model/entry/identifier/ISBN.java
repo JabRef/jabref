@@ -80,7 +80,10 @@ public class ISBN implements Identifier {
 
         int sum = 0;
         for (int pos = 0; pos <= 12; pos++) {
-            sum += (isbnString.charAt(pos) - '0') * ((pos % 2) == 0 ? 1 : 3);
+            sum += (isbnString.charAt(pos) - '0') * (
+                    (pos % 2) == 0 ?
+                    1 :
+                    3);
         }
         return (sum % 10) == 0;
     }

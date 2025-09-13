@@ -124,7 +124,10 @@ public interface NodeResolver {
     static NodeResolver buttonType(@NonNull ButtonType buttonType) {
         return scene -> predicate(DialogPane.class::isInstance)
                 .resolve(scene)
-                .map(node -> node instanceof DialogPane pane ? pane.lookupButton(buttonType) : null);
+                .map(node ->
+                        node instanceof DialogPane pane ?
+                        pane.lookupButton(buttonType) :
+                        null);
     }
 
     /// Creates a resolver that finds a node by selector first, then matches text

@@ -26,7 +26,9 @@ public class OnlyIntegerFormatter extends TextFormatter<Integer> {
 
         @Override
         public Change apply(TextFormatter.Change aT) {
-            return DIGIT_PATTERN.matcher(aT.getText()).matches() ? aT : null;
+            return DIGIT_PATTERN.matcher(aT.getText()).matches() ?
+                   aT :
+                   null;
         }
     }
 }

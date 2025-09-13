@@ -274,7 +274,9 @@ public class BibDatabase {
 
     public Set<BibEntry> getEntriesForCitationKey(@Nullable String citationKey) {
         // explicit null check because citationIndex is a ConcurrentHashMap and will throw NPE on null
-        return citationKey != null ? citationIndex.getOrDefault(citationKey, Set.of()) : Set.of();
+        return citationKey != null ?
+               citationIndex.getOrDefault(citationKey, Set.of()) :
+               Set.of();
     }
 
     private Set<String> getReferencedCitationKeys(BibEntry entry) {

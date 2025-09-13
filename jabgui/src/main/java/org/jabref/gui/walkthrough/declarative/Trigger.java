@@ -96,7 +96,7 @@ public interface Trigger {
             ///
             /// @param node       The node to attach the trigger to.
             /// @param onNavigate A function that wraps the original event handler. It takes a Supplier representing the
-            ///                   original action and returns the result of that action.
+            ///                                     original action and returns the result of that action.
             /// @return A cleanup runnable that detaches the trigger.
             Runnable create(Node node, Function<Supplier<?>, ?> onNavigate);
         }

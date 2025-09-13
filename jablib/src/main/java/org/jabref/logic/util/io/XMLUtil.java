@@ -52,7 +52,9 @@ public class XMLUtil {
     }
 
     public static List<Node> asList(NodeList n) {
-        return n.getLength() == 0 ? List.of() : new NodeListWrapper(n);
+        return n.getLength() == 0 ?
+               List.of() :
+               new NodeListWrapper(n);
     }
 
     /**

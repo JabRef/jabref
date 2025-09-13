@@ -38,10 +38,16 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
 
     @Override
     public Node createDecorationNode(ValidationMessage message) {
-        Node graphic = Severity.ERROR == message.getSeverity()
-                ? IconTheme.JabRefIcons.ERROR.getGraphicNode()
-                : IconTheme.JabRefIcons.WARNING.getGraphicNode();
-        graphic.getStyleClass().add(Severity.ERROR == message.getSeverity() ? "error-icon" : "warning-icon");
+        Node graphic =
+                Severity.ERROR == message.getSeverity()
+                ?
+                IconTheme.JabRefIcons.ERROR.getGraphicNode()
+                :
+                IconTheme.JabRefIcons.WARNING.getGraphicNode();
+        graphic.getStyleClass().add(
+                Severity.ERROR == message.getSeverity() ?
+                "error-icon" :
+                "warning-icon");
         Label label = new Label();
         label.setGraphic(graphic);
         label.setTooltip(createTooltip(message));
@@ -54,7 +60,10 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
     @Override
     protected Tooltip createTooltip(ValidationMessage message) {
         Tooltip tooltip = new Tooltip(message.getText());
-        tooltip.getStyleClass().add(Severity.ERROR == message.getSeverity() ? "tooltip-error" : "tooltip-warning");
+        tooltip.getStyleClass().add(
+                Severity.ERROR == message.getSeverity() ?
+                "tooltip-error" :
+                "tooltip-warning");
         return tooltip;
     }
 

@@ -1,4 +1,4 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 
 //JAVA 24
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
@@ -100,7 +100,10 @@ public class LtwaListMvGenerator {
                                                   Stream.<LtwaEntry>builder().build().collect(Collectors.toList())
                                           ).add(entry);
                                       } else {
-                                          String key = word.endsWith("-") ? word.substring(0, word.length() - 1) : word;
+                                          String key =
+                                                  word.endsWith("-") ?
+                                                  word.substring(0, word.length() - 1) :
+                                                  word;
                                           prefixMap.computeIfAbsent(key, _ ->
                                                   Stream.<LtwaEntry>builder().build().collect(Collectors.toList())
                                           ).add(entry);

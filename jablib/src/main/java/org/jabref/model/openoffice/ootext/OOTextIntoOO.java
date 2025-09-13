@@ -164,7 +164,10 @@ public class OOTextIntoOO {
             String startTagName = tagMatcher.group(2);
             String attributeListPart = tagMatcher.group(3);
             boolean isStartTag = StringUtil.isNullOrEmpty(endTagName);
-            String tagName = isStartTag ? startTagName : endTagName;
+            String tagName =
+                    isStartTag ?
+                    startTagName :
+                    endTagName;
             Objects.requireNonNull(tagName);
 
             // Attibutes parsed into (name,value) pairs.
@@ -176,7 +179,8 @@ public class OOTextIntoOO {
                     formatStack.pushLayer(setCharWeight(FontWeight.BOLD));
                     expectEnd.push("/" + tagName);
                     break;
-                case "i", "em":
+                case "i",
+                     "em":
                     formatStack.pushLayer(setCharPosture(FontSlant.ITALIC));
                     expectEnd.push("/" + tagName);
                     break;
@@ -232,8 +236,10 @@ public class OOTextIntoOO {
                         String key = pair.a;
                         String value = pair.b;
                         switch (key) {
-                            case "target" -> UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
-                            default -> LOGGER.warn("Unexpected attribute '{}' for <{}>", key, tagName);
+                            case "target" ->
+                                    UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
+                            default ->
+                                    LOGGER.warn("Unexpected attribute '{}' for <{}>", key, tagName);
                         }
                     }
                     break;
@@ -249,11 +255,11 @@ public class OOTextIntoOO {
                         String value = pair.b;
                         switch (key) {
                             case "oo:CharStyleName" ->
-                                    // <span oo:CharStyleName="Standard">
+                                // <span oo:CharStyleName="Standard">
                                     settings.addAll(setCharStyleName(value));
                             case "lang" ->
-                                    // <span lang="zxx">
-                                    // <span lang="en-US">
+                                // <span lang="zxx">
+                                // <span lang="en-US">
                                     settings.addAll(setCharLocale(value));
                             case "style" -> {
                                 // HTML-style small-caps
@@ -263,7 +269,8 @@ public class OOTextIntoOO {
                                 }
                                 LOGGER.warn("Unexpected value {} for attribute '{}' for <{}>", value, key, tagName);
                             }
-                            default -> LOGGER.warn("Unexpected attribute '{}' for <{}>", key, tagName);
+                            default ->
+                                    LOGGER.warn("Unexpected attribute '{}' for <{}>", key, tagName);
                         }
                     }
                     formatStack.pushLayer(settings);
@@ -327,8 +334,8 @@ public class OOTextIntoOO {
             propertySet.setPropertyValue(CHAR_STYLE_NAME, "Standard");
             xPropertyState.setPropertyToDefault("CharCaseMap");
         } catch (UnknownPropertyException |
-                PropertyVetoException |
-                WrappedTargetException ex) {
+                 PropertyVetoException |
+                 WrappedTargetException ex) {
             LOGGER.warn("exception caught", ex);
         }
 
@@ -671,9 +678,18 @@ public class OOTextIntoOO {
             throw new java.lang.IllegalArgumentException("setCharLocale \"\" or null");
         }
         String[] parts = value.split("-");
-        String language = parts.length > 0 ? parts[0] : "";
-        String country = parts.length > 1 ? parts[1] : "";
-        String variant = parts.length > 2 ? parts[2] : "";
+        String language =
+                parts.length > 0 ?
+                parts[0] :
+                "";
+        String country =
+                parts.length > 1 ?
+                parts[1] :
+                "";
+        String variant =
+                parts.length > 2 ?
+                parts[2] :
+                "";
         return setCharLocale(new Locale(language, country, variant));
     }
 
@@ -747,9 +763,9 @@ public class OOTextIntoOO {
             propertySet.setPropertyValue(PARA_STYLE_NAME, paragraphStyle);
             return PASS;
         } catch (UnknownPropertyException
-                | PropertyVetoException
-                | IllegalArgumentException
-                | WrappedTargetException ex) {
+                 | PropertyVetoException
+                 | IllegalArgumentException
+                 | WrappedTargetException ex) {
             return FAIL;
         }
     }

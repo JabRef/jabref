@@ -101,23 +101,46 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
 
         librarySpecificFileDirectory.textProperty().addListener((_, _, newValue) -> {
             boolean isAbsolute = Path.of(newValue).isAbsolute();
-            libSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
-            libSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
-            librarySpecificFileDirectoryTooltip.setText(newValue.trim().isEmpty() ?
-                    Localization.lang("Library-specific file directory") : Localization.lang("Library-specific file directory: %0", newValue));
+            libSpecificFileDirSwitchIcon.setGlyph(
+                    isAbsolute ?
+                    RELATIVE_PATH :
+                    ABSOLUTE_PATH);
+            libSpecificFileDirSwitchTooltip.setText(
+                    isAbsolute ?
+                    switchToRelativeText :
+                    switchToAbsoluteText);
+            librarySpecificFileDirectoryTooltip.setText(
+                    newValue.trim().isEmpty() ?
+                    Localization.lang("Library-specific file directory") :
+                    Localization.lang("Library-specific file directory: %0", newValue));
         });
         userSpecificFileDirectory.textProperty().addListener((_, _, newValue) -> {
             boolean isAbsolute = Path.of(newValue).isAbsolute();
-            userSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
-            userSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
+            userSpecificFileDirSwitchIcon.setGlyph(
+                    isAbsolute ?
+                    RELATIVE_PATH :
+                    ABSOLUTE_PATH);
+            userSpecificFileDirSwitchTooltip.setText(
+                    isAbsolute ?
+                    switchToRelativeText :
+                    switchToAbsoluteText);
         });
 
         latexFileDirectory.textProperty().addListener((_, _, newValue) -> {
             boolean isAbsolute = Path.of(newValue).isAbsolute();
-            laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
-            laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
-            latexFileDirectoryTooltip.setText(newValue.trim().isEmpty()
-                    ? Localization.lang("LaTeX file directory") : Localization.lang("LaTeX file directory: %0", newValue));
+            laTexSpecificFileDirSwitchIcon.setGlyph(
+                    isAbsolute ?
+                    RELATIVE_PATH :
+                    ABSOLUTE_PATH);
+            laTexSpecificFileDirSwitchTooltip.setText(
+                    isAbsolute ?
+                    switchToRelativeText :
+                    switchToAbsoluteText);
+            latexFileDirectoryTooltip.setText(
+                    newValue.trim().isEmpty()
+                    ?
+                    Localization.lang("LaTeX file directory") :
+                    Localization.lang("LaTeX file directory: %0", newValue));
         });
 
         Platform.runLater(() -> {

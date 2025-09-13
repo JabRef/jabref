@@ -156,7 +156,10 @@ public class ClipBoardManager {
 
     public void setContent(List<BibEntry> entries, BibEntryTypesManager entryTypesManager, List<BibtexString> stringConstants) throws IOException {
         StringBuilder builder = new StringBuilder();
-        stringConstants.forEach(strConst -> builder.append(strConst.getParsedSerialization() == null ? "" : strConst.getParsedSerialization()));
+        stringConstants.forEach(strConst -> builder.append(
+                strConst.getParsedSerialization() == null ?
+                "" :
+                strConst.getParsedSerialization()));
         String serializedEntries = serializeEntries(entries, entryTypesManager);
         builder.append(serializedEntries);
         setContent(builder.toString());

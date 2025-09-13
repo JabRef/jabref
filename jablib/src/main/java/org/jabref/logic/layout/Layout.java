@@ -50,7 +50,9 @@ public class Layout {
                         if (blockStart.equals(parsedEntry.s)) {
                             blockEntries.add(parsedEntry);
                             le = new LayoutEntry(blockEntries,
-                                    parsedEntry.i == LayoutHelper.IS_FIELD_END ? LayoutHelper.IS_FIELD_START : LayoutHelper.IS_GROUP_START,
+                                    parsedEntry.i == LayoutHelper.IS_FIELD_END ?
+                                    LayoutHelper.IS_FIELD_START :
+                                    LayoutHelper.IS_GROUP_START,
                                     fileDirForDatabase,
                                     layoutPreferences,
                                     abbreviationRepository);

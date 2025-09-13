@@ -35,7 +35,10 @@ public class GitStatusChecker {
 
             ObjectId localHead = repo.resolve("HEAD");
             String trackingBranch = new BranchConfig(repo.getConfig(), repo.getBranch()).getTrackingBranch();
-            ObjectId remoteHead = trackingBranch != null ? repo.resolve(trackingBranch) : null;
+            ObjectId remoteHead =
+                    trackingBranch != null ?
+                    repo.resolve(trackingBranch) :
+                    null;
 
             SyncStatus syncStatus;
 

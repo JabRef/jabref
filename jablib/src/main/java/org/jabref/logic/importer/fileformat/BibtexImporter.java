@@ -45,7 +45,7 @@ public class BibtexImporter extends Importer {
 
     /**
      * @return true as we have no effective way to decide whether a file is in bibtex format or not. See
-     *         https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
+     * https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
      */
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) {
@@ -120,7 +120,9 @@ public class BibtexImporter extends Importer {
         return new EncodingResult(encoding, encodingExplicitlySupplied);
     }
 
-    public record EncodingResult(Charset encoding, boolean encodingExplicitlySupplied) {
+    public record EncodingResult(
+            Charset encoding,
+            boolean encodingExplicitlySupplied) {
     }
 
     /**

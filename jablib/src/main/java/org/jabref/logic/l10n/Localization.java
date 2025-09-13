@@ -141,7 +141,10 @@ public class Localization {
     private static String lookup(LocalizationBundle bundle, String key, String... params) {
         Objects.requireNonNull(key);
 
-        String translation = bundle.containsKey(key) ? bundle.getString(key) : "";
+        String translation =
+                bundle.containsKey(key) ?
+                bundle.getString(key) :
+                "";
         if (translation.isEmpty()) {
             LoggerFactory.getLogger(Localization.class).warn("Warning: could not get translation for \"{}\" for locale {}", key, Locale.getDefault());
             translation = key;

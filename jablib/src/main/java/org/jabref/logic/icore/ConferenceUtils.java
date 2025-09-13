@@ -56,7 +56,7 @@ public class ConferenceUtils {
      *
      * @param input the string to search, must not be {@code null}
      * @return an {@code Optional} containing the extracted and trimmed string from the first set of parentheses,
-     *         or {@code Optional.empty()} if no string is found
+     * or {@code Optional.empty()} if no string is found
      */
     public static Optional<String> extractStringFromParentheses(@NonNull String input) {
         if (input.indexOf('(') < 0) {
@@ -95,7 +95,7 @@ public class ConferenceUtils {
      * @param input  the raw string to extract acronym candidates from, must not be {@code null}
      * @param cutoff the maximum allowed length of each candidate substring; candidates longer than this are discarded
      * @return a set of acronym candidates ordered by descending length and then lexicographically,
-     *         or an empty set if no valid candidates are found
+     * or an empty set if no valid candidates are found
      */
     public static Set<String> generateAcronymCandidates(@NonNull String input, int cutoff) {
         if (input.isEmpty() || cutoff <= 0) {
@@ -115,7 +115,9 @@ public class ConferenceUtils {
         // TreeSet to ensure ordering; with longer strings positioned ahead
         Set<String> candidates = new TreeSet<>((a, b) -> {
             int lengthCompare = Integer.compare(b.length(), a.length());
-            return lengthCompare != 0 ? lengthCompare : a.compareTo(b);
+            return lengthCompare != 0 ?
+                   lengthCompare :
+                   a.compareTo(b);
         });
         // Process bounds and generate candidates
         for (int i = 0; i < bounds.size() - 1; i++) {
@@ -152,7 +154,9 @@ public class ConferenceUtils {
             right--;
         }
 
-        return left <= right ? candidate.substring(left, right + 1) : "";
+        return left <= right ?
+               candidate.substring(left, right + 1) :
+               "";
     }
 
     private static boolean isAcronymDelimiter(char c) {
@@ -209,7 +213,7 @@ public class ConferenceUtils {
         normalizeTokenAndFlush(currentToken, normalized);
 
         return normalized.toString()
-                .replaceFirst("^(ofthe|of|the)+", "");   // remove any false starts
+                         .replaceFirst("^(ofthe|of|the)+", "");   // remove any false starts
     }
 
     private static void normalizeTokenAndFlush(StringBuilder currentToken, StringBuilder output) {

@@ -117,7 +117,10 @@ public class BstFunctions {
             throw new BstVMException("Can only compare two integers with >");
         }
 
-        stack.push(((Integer) o1).compareTo((Integer) o2) > 0 ? BstVM.TRUE : BstVM.FALSE);
+        stack.push(
+                ((Integer) o1).compareTo((Integer) o2) > 0 ?
+                BstVM.TRUE :
+                BstVM.FALSE);
     }
 
     /**
@@ -136,7 +139,10 @@ public class BstFunctions {
             throw new BstVMException("Can only compare two integers with < (line %d)".formatted(ctx.start.getLine()));
         }
 
-        stack.push(((Integer) o1).compareTo((Integer) o2) < 0 ? BstVM.TRUE : BstVM.FALSE);
+        stack.push(
+                ((Integer) o1).compareTo((Integer) o2) < 0 ?
+                BstVM.TRUE :
+                BstVM.FALSE);
     }
 
     /**
@@ -160,7 +166,10 @@ public class BstFunctions {
             return;
         }
 
-        stack.push(o1.equals(o2) ? BstVM.TRUE : BstVM.FALSE);
+        stack.push(
+                o1.equals(o2) ?
+                BstVM.TRUE :
+                BstVM.FALSE);
     }
 
     /**
@@ -245,7 +254,9 @@ public class BstFunctions {
             Object o1 = stack.pop();
             Object o2 = stack.pop();
 
-            if (!(o1 instanceof BstVMVisitor.Identifier(String name))) {
+            if (!(o1 instanceof BstVMVisitor.Identifier(
+                    String name
+            ))) {
                 throw new BstVMException("Invalid parameters (line %d)".formatted(ctx.start.getLine()));
             }
 
@@ -448,7 +459,10 @@ public class BstFunctions {
 
         boolean result = s.trim().isEmpty();
         LOGGER.trace("empty$({}) result: {}", s, result);
-        stack.push(result ? BstVM.TRUE : BstVM.FALSE);
+        stack.push(
+                result ?
+                BstVM.TRUE :
+                BstVM.FALSE);
     }
 
     /**
@@ -524,7 +538,9 @@ public class BstFunctions {
     private void callIdentifierOrTree(Object f, BstVMVisitor visitor, ParserRuleContext ctx) {
         if (f instanceof ParseTree tree) {
             visitor.visit(tree);
-        } else if (f instanceof BstVMVisitor.Identifier(String name)) {
+        } else if (f instanceof BstVMVisitor.Identifier(
+                String name
+        )) {
             visitor.resolveIdentifier(name, ctx);
         } else {
             stack.push(f);
@@ -895,7 +911,9 @@ public class BstFunctions {
             throw new BstVMException("Expecting two functions for while$ (line %d)".formatted(ctx.start.getLine()));
         }
 
+        // @formatter:off
         do {
+            // @formatter:on
             visitor.visit((ParseTree) f1);
 
             Object i = stack.pop();

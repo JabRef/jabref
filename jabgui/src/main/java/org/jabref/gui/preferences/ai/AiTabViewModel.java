@@ -132,7 +132,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         });
 
         this.customizeExpertSettings.addListener((_, _, newValue) ->
-            disableExpertSettings.set(!newValue || !enableAi.get())
+                disableExpertSettings.set(!newValue || !enableAi.get())
         );
 
         this.selectedAiProvider.addListener((_, oldValue, newValue) -> {
@@ -168,7 +168,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                         huggingFaceApiKey.set(currentApiKey.get());
                         huggingFaceApiBaseUrl.set(currentApiBaseUrl.get());
                     }
-                    case GPT4ALL-> {
+                    case GPT4ALL -> {
                         gpt4AllChatModel.set(oldChatModel);
                         gpt4AllApiKey.set(currentApiKey.get());
                         gpt4AllApiBaseUrl.set(currentApiBaseUrl.get());
@@ -211,11 +211,16 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
 
             switch (selectedAiProvider.get()) {
-                case OPEN_AI -> openAiChatModel.set(newValue);
-                case MISTRAL_AI -> mistralAiChatModel.set(newValue);
-                case GEMINI -> geminiChatModel.set(newValue);
-                case HUGGING_FACE -> huggingFaceChatModel.set(newValue);
-                case GPT4ALL -> gpt4AllChatModel.set(newValue);
+                case OPEN_AI ->
+                        openAiChatModel.set(newValue);
+                case MISTRAL_AI ->
+                        mistralAiChatModel.set(newValue);
+                case GEMINI ->
+                        geminiChatModel.set(newValue);
+                case HUGGING_FACE ->
+                        huggingFaceChatModel.set(newValue);
+                case GPT4ALL ->
+                        gpt4AllChatModel.set(newValue);
             }
 
             contextWindowSize.set(AiDefaultPreferences.getContextWindowSize(selectedAiProvider.get(), newValue));
@@ -223,21 +228,31 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         this.currentApiKey.addListener((_, _, newValue) -> {
             switch (selectedAiProvider.get()) {
-                case OPEN_AI -> openAiApiKey.set(newValue);
-                case MISTRAL_AI -> mistralAiApiKey.set(newValue);
-                case GEMINI -> geminiAiApiKey.set(newValue);
-                case HUGGING_FACE -> huggingFaceApiKey.set(newValue);
-                case GPT4ALL -> gpt4AllApiKey.set(newValue);
+                case OPEN_AI ->
+                        openAiApiKey.set(newValue);
+                case MISTRAL_AI ->
+                        mistralAiApiKey.set(newValue);
+                case GEMINI ->
+                        geminiAiApiKey.set(newValue);
+                case HUGGING_FACE ->
+                        huggingFaceApiKey.set(newValue);
+                case GPT4ALL ->
+                        gpt4AllApiKey.set(newValue);
             }
         });
 
         this.currentApiBaseUrl.addListener((_, _, newValue) -> {
             switch (selectedAiProvider.get()) {
-                case OPEN_AI -> openAiApiBaseUrl.set(newValue);
-                case MISTRAL_AI -> mistralAiApiBaseUrl.set(newValue);
-                case GEMINI -> geminiApiBaseUrl.set(newValue);
-                case HUGGING_FACE -> huggingFaceApiBaseUrl.set(newValue);
-                case GPT4ALL -> gpt4AllApiBaseUrl.set(newValue);
+                case OPEN_AI ->
+                        openAiApiBaseUrl.set(newValue);
+                case MISTRAL_AI ->
+                        mistralAiApiBaseUrl.set(newValue);
+                case GEMINI ->
+                        geminiApiBaseUrl.set(newValue);
+                case HUGGING_FACE ->
+                        huggingFaceApiBaseUrl.set(newValue);
+                case GPT4ALL ->
+                        gpt4AllApiBaseUrl.set(newValue);
             }
         });
 
@@ -352,17 +367,47 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         aiPreferences.setAiProvider(selectedAiProvider.get());
 
-        aiPreferences.setOpenAiChatModel(openAiChatModel.get() == null ? "" : openAiChatModel.get());
-        aiPreferences.setMistralAiChatModel(mistralAiChatModel.get() == null ? "" : mistralAiChatModel.get());
-        aiPreferences.setGeminiChatModel(geminiChatModel.get() == null ? "" : geminiChatModel.get());
-        aiPreferences.setHuggingFaceChatModel(huggingFaceChatModel.get() == null ? "" : huggingFaceChatModel.get());
-        aiPreferences.setGpt4AllChatModel(gpt4AllChatModel.get() == null ? "" : gpt4AllChatModel.get());
+        aiPreferences.setOpenAiChatModel(
+                openAiChatModel.get() == null ?
+                "" :
+                openAiChatModel.get());
+        aiPreferences.setMistralAiChatModel(
+                mistralAiChatModel.get() == null ?
+                "" :
+                mistralAiChatModel.get());
+        aiPreferences.setGeminiChatModel(
+                geminiChatModel.get() == null ?
+                "" :
+                geminiChatModel.get());
+        aiPreferences.setHuggingFaceChatModel(
+                huggingFaceChatModel.get() == null ?
+                "" :
+                huggingFaceChatModel.get());
+        aiPreferences.setGpt4AllChatModel(
+                gpt4AllChatModel.get() == null ?
+                "" :
+                gpt4AllChatModel.get());
 
-        aiPreferences.storeAiApiKeyInKeyring(AiProvider.OPEN_AI, openAiApiKey.get() == null ? "" : openAiApiKey.get());
-        aiPreferences.storeAiApiKeyInKeyring(AiProvider.MISTRAL_AI, mistralAiApiKey.get() == null ? "" : mistralAiApiKey.get());
-        aiPreferences.storeAiApiKeyInKeyring(AiProvider.GEMINI, geminiAiApiKey.get() == null ? "" : geminiAiApiKey.get());
-        aiPreferences.storeAiApiKeyInKeyring(AiProvider.HUGGING_FACE, huggingFaceApiKey.get() == null ? "" : huggingFaceApiKey.get());
-        aiPreferences.storeAiApiKeyInKeyring(AiProvider.GPT4ALL, gpt4AllApiKey.get() == null ? "" : gpt4AllApiKey.get());
+        aiPreferences.storeAiApiKeyInKeyring(AiProvider.OPEN_AI,
+                openAiApiKey.get() == null ?
+                "" :
+                openAiApiKey.get());
+        aiPreferences.storeAiApiKeyInKeyring(AiProvider.MISTRAL_AI,
+                mistralAiApiKey.get() == null ?
+                "" :
+                mistralAiApiKey.get());
+        aiPreferences.storeAiApiKeyInKeyring(AiProvider.GEMINI,
+                geminiAiApiKey.get() == null ?
+                "" :
+                geminiAiApiKey.get());
+        aiPreferences.storeAiApiKeyInKeyring(AiProvider.HUGGING_FACE,
+                huggingFaceApiKey.get() == null ?
+                "" :
+                huggingFaceApiKey.get());
+        aiPreferences.storeAiApiKeyInKeyring(AiProvider.GPT4ALL,
+                gpt4AllApiKey.get() == null ?
+                "" :
+                gpt4AllApiKey.get());
         // We notify in all cases without a real check if something was changed
         aiPreferences.apiKeyUpdated();
 
@@ -370,11 +415,26 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         aiPreferences.setEmbeddingModel(selectedEmbeddingModel.get());
 
-        aiPreferences.setOpenAiApiBaseUrl(openAiApiBaseUrl.get() == null ? "" : openAiApiBaseUrl.get());
-        aiPreferences.setMistralAiApiBaseUrl(mistralAiApiBaseUrl.get() == null ? "" : mistralAiApiBaseUrl.get());
-        aiPreferences.setGeminiApiBaseUrl(geminiApiBaseUrl.get() == null ? "" : geminiApiBaseUrl.get());
-        aiPreferences.setHuggingFaceApiBaseUrl(huggingFaceApiBaseUrl.get() == null ? "" : huggingFaceApiBaseUrl.get());
-        aiPreferences.setGpt4AllApiBaseUrl(gpt4AllApiBaseUrl.get() == null ? "" : gpt4AllApiBaseUrl.get());
+        aiPreferences.setOpenAiApiBaseUrl(
+                openAiApiBaseUrl.get() == null ?
+                "" :
+                openAiApiBaseUrl.get());
+        aiPreferences.setMistralAiApiBaseUrl(
+                mistralAiApiBaseUrl.get() == null ?
+                "" :
+                mistralAiApiBaseUrl.get());
+        aiPreferences.setGeminiApiBaseUrl(
+                geminiApiBaseUrl.get() == null ?
+                "" :
+                geminiApiBaseUrl.get());
+        aiPreferences.setHuggingFaceApiBaseUrl(
+                huggingFaceApiBaseUrl.get() == null ?
+                "" :
+                huggingFaceApiBaseUrl.get());
+        aiPreferences.setGpt4AllApiBaseUrl(
+                gpt4AllApiBaseUrl.get() == null ?
+                "" :
+                gpt4AllApiBaseUrl.get());
 
         Arrays.stream(AiTemplate.values()).forEach(template ->
                 aiPreferences.setTemplate(template, templateSources.get(template).get()));

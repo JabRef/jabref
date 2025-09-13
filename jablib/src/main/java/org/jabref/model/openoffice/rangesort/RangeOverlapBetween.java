@@ -81,9 +81,14 @@ public class RangeOverlapBetween {
                 // In case of two equal collapsed ranges there is an ambiguity : TOUCH or EQUAL_RANGE ?
                 //
                 // We return EQUAL_RANGE
-                RangeOverlapKind kind = equal ? RangeOverlapKind.EQUAL_RANGE
-                        : (touching ? RangeOverlapKind.TOUCH
-                        : RangeOverlapKind.OVERLAP);
+                RangeOverlapKind kind =
+                        equal ?
+                        RangeOverlapKind.EQUAL_RANGE
+                              :
+                        (touching ?
+                         RangeOverlapKind.TOUCH
+                                  :
+                         RangeOverlapKind.OVERLAP);
 
                 List<V> valuesForOverlappingRanges = new ArrayList<>();
                 valuesForOverlappingRanges.add(aHolder);

@@ -166,10 +166,16 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         // so they are expanded into `addListener` calls.
 
         contextWindowSizeTextField.valueProperty().addListener((observable, oldValue, newValue) ->
-                viewModel.contextWindowSizeProperty().set(newValue == null ? 0 : newValue));
+                viewModel.contextWindowSizeProperty().set(
+                        newValue == null ?
+                        0 :
+                        newValue));
 
         viewModel.contextWindowSizeProperty().addListener((observable, oldValue, newValue) ->
-                contextWindowSizeTextField.valueProperty().set(newValue == null ? 0 : newValue.intValue()));
+                contextWindowSizeTextField.valueProperty().set(
+                        newValue == null ?
+                        0 :
+                        newValue.intValue()));
 
         contextWindowSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
@@ -177,26 +183,44 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         temperatureTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         documentSplitterChunkSizeTextField.valueProperty().addListener((observable, oldValue, newValue) ->
-                viewModel.documentSplitterChunkSizeProperty().set(newValue == null ? 0 : newValue));
+                viewModel.documentSplitterChunkSizeProperty().set(
+                        newValue == null ?
+                        0 :
+                        newValue));
 
         viewModel.documentSplitterChunkSizeProperty().addListener((observable, oldValue, newValue) ->
-                documentSplitterChunkSizeTextField.valueProperty().set(newValue == null ? 0 : newValue.intValue()));
+                documentSplitterChunkSizeTextField.valueProperty().set(
+                        newValue == null ?
+                        0 :
+                        newValue.intValue()));
 
         documentSplitterChunkSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         documentSplitterOverlapSizeTextField.valueProperty().addListener((observable, oldValue, newValue) ->
-                viewModel.documentSplitterOverlapSizeProperty().set(newValue == null ? 0 : newValue));
+                viewModel.documentSplitterOverlapSizeProperty().set(
+                        newValue == null ?
+                        0 :
+                        newValue));
 
         viewModel.documentSplitterOverlapSizeProperty().addListener((observable, oldValue, newValue) ->
-                documentSplitterOverlapSizeTextField.valueProperty().set(newValue == null ? 0 : newValue.intValue()));
+                documentSplitterOverlapSizeTextField.valueProperty().set(
+                        newValue == null ?
+                        0 :
+                        newValue.intValue()));
 
         documentSplitterOverlapSizeTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 
         ragMaxResultsCountTextField.valueProperty().addListener((observable, oldValue, newValue) ->
-                viewModel.ragMaxResultsCountProperty().set(newValue == null ? 0 : newValue));
+                viewModel.ragMaxResultsCountProperty().set(
+                        newValue == null ?
+                        0 :
+                        newValue));
 
         viewModel.ragMaxResultsCountProperty().addListener((observable, oldValue, newValue) ->
-                ragMaxResultsCountTextField.valueProperty().set(newValue == null ? 0 : newValue.intValue()));
+                ragMaxResultsCountTextField.valueProperty().set(
+                        newValue == null ?
+                        0 :
+                        newValue.intValue()));
 
         ragMaxResultsCountTextField.disableProperty().bind(viewModel.disableExpertSettingsProperty());
 

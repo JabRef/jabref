@@ -59,7 +59,10 @@ public class WalkthroughOverlay {
         cleanUp();
 
         switch (step) {
-            case SideEffect(String title, WalkthroughSideEffect sideEffect) -> {
+            case SideEffect(
+                    String title,
+                    WalkthroughSideEffect sideEffect
+            ) -> {
                 LOGGER.debug("Executing side effect for step: {}", title);
 
                 if (sideEffectExecutor.executeForward(sideEffect, walkthrough)) {
@@ -142,8 +145,10 @@ public class WalkthroughOverlay {
                 w -> new WindowOverlay(w, WalkthroughPane.getInstance(w), walkthrough));
 
         switch (component) {
-            case TooltipStep tooltip -> overlay.showTooltip(tooltip, resolvedNode, this::prepareForNavigation);
-            case PanelStep panel -> overlay.showPanel(panel, resolvedNode, this::prepareForNavigation);
+            case TooltipStep tooltip ->
+                    overlay.showTooltip(tooltip, resolvedNode, this::prepareForNavigation);
+            case PanelStep panel ->
+                    overlay.showPanel(panel, resolvedNode, this::prepareForNavigation);
         }
 
         reverter.attach(resolvedWindow, resolvedNode);

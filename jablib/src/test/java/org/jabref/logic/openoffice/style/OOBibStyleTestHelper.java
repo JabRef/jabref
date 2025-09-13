@@ -38,9 +38,12 @@ class OOBibStyleTestHelper {
 
         public CitationMarkerNumericEntryImpl(String citationKey, int num, Optional<OOText> pageInfo) {
             this.citationKey = citationKey;
-            this.num = num == UNRESOLVED_ENTRY_NUMBER
-                    ? Optional.empty()
-                    : Optional.of(num);
+            this.num =
+                    num == UNRESOLVED_ENTRY_NUMBER
+                    ?
+                    Optional.empty()
+                    :
+                    Optional.of(num);
             this.pageInfo = PageInfo.normalizePageInfo(pageInfo);
         }
 
@@ -98,7 +101,9 @@ class OOBibStyleTestHelper {
             int n = num.getFirst();
             CitationMarkerNumericBibEntryImpl x =
                     new CitationMarkerNumericBibEntryImpl("key",
-                            n == 0 ? Optional.empty() : Optional.of(n));
+                            n == 0 ?
+                            Optional.empty() :
+                            Optional.of(n));
             return style.getNumCitationMarkerForBibliography(x).toString();
         } else {
             List<CitationMarkerNumericEntry> input =

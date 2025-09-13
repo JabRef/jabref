@@ -149,10 +149,10 @@ public class StyleSelectDialogViewModel {
     public void storeStylePreferences() {
         // save external jstyles
         List<String> externalJStyles = jStyles.stream()
-                                             .map(this::toJStyle)
-                                             .filter(style -> !style.isInternalStyle())
-                                             .map(JStyle::getPath)
-                                             .toList();
+                                              .map(this::toJStyle)
+                                              .filter(style -> !style.isInternalStyle())
+                                              .map(JStyle::getPath)
+                                              .toList();
 
         openOfficePreferences.setExternalJStyles(externalJStyles);
 
@@ -280,7 +280,10 @@ public class StyleSelectDialogViewModel {
     // region - jstyle-specific methods
 
     public JStyleSelectViewModel fromJStyle(JStyle style) {
-        return new JStyleSelectViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
+        return new JStyleSelectViewModel(style.getName(), String.join(", ", style.getJournals()),
+                style.isInternalStyle() ?
+                Localization.lang("Internal style") :
+                style.getPath(), style);
     }
 
     public JStyle toJStyle(JStyleSelectViewModel item) {

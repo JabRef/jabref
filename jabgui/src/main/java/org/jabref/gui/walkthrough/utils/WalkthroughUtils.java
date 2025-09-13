@@ -145,8 +145,8 @@ public class WalkthroughUtils {
     /// until a stop condition is met.
     ///
     /// @param stopCondition A supplier that should return true when the listener should
-    ///                      be detached (as well as run anything interesting for the
-    ///                      actual callee).
+    ///                                           be detached (as well as run anything interesting for the
+    ///                                           actual callee).
     /// @return A runnable that can be used to detach the listener prematurely.
     public static Runnable onWindowChangedUntil(@NonNull BooleanSupplier stopCondition) {
         ListChangeListener<Window> listener = new ListChangeListener<>() {
