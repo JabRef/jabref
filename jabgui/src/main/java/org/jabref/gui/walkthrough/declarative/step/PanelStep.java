@@ -15,20 +15,21 @@ import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record PanelStep(@NonNull String title,
-                        @NonNull List<WalkthroughRichTextBlock> content,
-                        @Nullable NodeResolver resolverValue,
-                        @Nullable String continueButtonTextValue,
-                        @Nullable String skipButtonTextValue,
-                        @Nullable String backButtonTextValue,
-                        @Nullable Trigger triggerValue,
-                        @NonNull PanelPosition position,
-                        @Nullable Double widthValue,
-                        @Nullable Double heightValue,
-                        @Nullable WalkthroughEffect highlightValue,
-                        @Nullable WindowResolver activeWindowResolverValue,
-                        boolean showQuitButtonValue,
-                        @NonNull QuitButtonPosition quitButtonPositionValue) implements VisibleComponent {
+public record PanelStep(
+        @NonNull String title,
+        @NonNull List<WalkthroughRichTextBlock> content,
+        @Nullable NodeResolver resolverValue,
+        @Nullable String continueButtonTextValue,
+        @Nullable String skipButtonTextValue,
+        @Nullable String backButtonTextValue,
+        @Nullable Trigger triggerValue,
+        @NonNull PanelPosition position,
+        @Nullable Double widthValue,
+        @Nullable Double heightValue,
+        @Nullable WalkthroughEffect highlightValue,
+        @Nullable WindowResolver activeWindowResolverValue,
+        boolean showQuitButtonValue,
+        @NonNull QuitButtonPosition quitButtonPositionValue) implements VisibleComponent {
 
     @Override
     public Optional<NodeResolver> nodeResolver() {

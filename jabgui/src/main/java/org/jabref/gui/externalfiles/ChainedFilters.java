@@ -9,7 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Chains the given filters - if ALL of them accept, the result is also accepted
-public record ChainedFilters(List<DirectoryStream.Filter<Path>> filters) implements DirectoryStream.Filter<Path> {
+public record ChainedFilters(
+        List<DirectoryStream.Filter<Path>> filters) implements DirectoryStream.Filter<Path> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChainedFilters.class);
 

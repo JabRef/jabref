@@ -15,4 +15,5 @@
     <suppress checks="[a-zA-Z0-9]*" files="CustomTitledPaneSkin.java" />
     <!-- Following contain examples or comments with "}}" that are necessary -->
     <suppress id="NoMultipleClosingBracesAtEndOfLine" files="(BibtexParserTest|StringUtil).java" />
+    <suppress id="LeftCurly" files="(BibtexParser|BstFunctions|CitationKeyGenerator|GenerateSummaryTask|INSPIREBibtexFilterReader|LinkedFileHandler).java" />
 </suppressions>

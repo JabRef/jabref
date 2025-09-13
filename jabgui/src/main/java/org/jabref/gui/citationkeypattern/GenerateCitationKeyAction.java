@@ -109,32 +109,32 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
             @Override
             public Void call() {
-                    if (isCanceled) {
-                        return null;
-                    }
-                UiTaskExecutor.runInJavaFXThread(() -> {
-                        updateProgress(0, entries.size());
-                        messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
-                    });
-                    stateManager.getActiveDatabase().ifPresent(databaseContext -> {
-                        // generate the new citation keys for each entry
-                        compound = new NamedCompound(Localization.lang("Autogenerate citation keys"));
-                        CitationKeyGenerator keyGenerator =
-                                new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
-                        int entriesDone = 0;
-                        for (BibEntry entry : entries) {
-                            keyGenerator.generateAndSetKey(entry)
-                                        .ifPresent(fieldChange -> compound.addEdit(new UndoableKeyChange(fieldChange)));
-                            entriesDone++;
-                            int finalEntriesDone = entriesDone;
-                            UiTaskExecutor.runInJavaFXThread(() -> {
-                                updateProgress(finalEntriesDone, entries.size());
-                                messageProperty().set(Localization.lang("%0/%1 entries", finalEntriesDone, entries.size()));
-                            });
-                        }
-                        compound.end();
-                    });
+                if (isCanceled) {
                     return null;
+                }
+                UiTaskExecutor.runInJavaFXThread(() -> {
+                    updateProgress(0, entries.size());
+                    messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
+                });
+                stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+                    // generate the new citation keys for each entry
+                    compound = new NamedCompound(Localization.lang("Autogenerate citation keys"));
+                    CitationKeyGenerator keyGenerator =
+                            new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
+                    int entriesDone = 0;
+                    for (BibEntry entry : entries) {
+                        keyGenerator.generateAndSetKey(entry)
+                                    .ifPresent(fieldChange -> compound.addEdit(new UndoableKeyChange(fieldChange)));
+                        entriesDone++;
+                        int finalEntriesDone = entriesDone;
+                        UiTaskExecutor.runInJavaFXThread(() -> {
+                            updateProgress(finalEntriesDone, entries.size());
+                            messageProperty().set(Localization.lang("%0/%1 entries", finalEntriesDone, entries.size()));
+                        });
+                    }
+                    compound.end();
+                });
+                return null;
             }
 
             @Override

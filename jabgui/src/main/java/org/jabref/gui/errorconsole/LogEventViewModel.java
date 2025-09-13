@@ -24,17 +24,23 @@ public class LogEventViewModel {
 
     public String getStyleClass() {
         return switch (logEvent.getLevel()) {
-            case ERROR -> "exception";
-            case WARN -> "output";
-            default -> "log";
+            case ERROR ->
+                    "exception";
+            case WARN ->
+                    "output";
+            default ->
+                    "log";
         };
     }
 
     public JabRefIcon getIcon() {
         return switch (logEvent.getLevel()) {
-            case ERROR -> IconTheme.JabRefIcons.INTEGRITY_FAIL;
-            case WARN -> IconTheme.JabRefIcons.INTEGRITY_WARN;
-            default -> IconTheme.JabRefIcons.INTEGRITY_INFO;
+            case ERROR ->
+                    IconTheme.JabRefIcons.INTEGRITY_FAIL;
+            case WARN ->
+                    IconTheme.JabRefIcons.INTEGRITY_WARN;
+            default ->
+                    IconTheme.JabRefIcons.INTEGRITY_INFO;
         };
     }
 

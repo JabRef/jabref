@@ -2,7 +2,9 @@ package org.jabref.model.entry.field;
 
 import java.util.Objects;
 
-public record BibField(Field field, FieldPriority priority) implements Comparable<BibField> {
+public record BibField(
+        Field field,
+        FieldPriority priority) implements Comparable<BibField> {
 
     @Override
     public boolean equals(Object o) {

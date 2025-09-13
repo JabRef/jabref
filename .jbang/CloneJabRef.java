@@ -1,7 +1,7 @@
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-///usr/bin/env jbang "$0" "$@" ; exit $?
+/// usr/bin/env jbang "$0" "$@" ; exit $?
 
 //JAVA 21+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED

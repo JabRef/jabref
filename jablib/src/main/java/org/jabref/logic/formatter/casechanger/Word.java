@@ -116,10 +116,10 @@ public final class Word {
 
     private boolean isConjunction(char[] chars, int i) {
         StringBuilder word = new StringBuilder();
-            while (i < chars.length && !DASHES.contains(chars[i])) {
-                word.append(chars[i]);
-                i++;
-            }
+        while (i < chars.length && !DASHES.contains(chars[i])) {
+            word.append(chars[i]);
+            i++;
+        }
         return !CONJUNCTIONS.contains(word.toString());
     }
 

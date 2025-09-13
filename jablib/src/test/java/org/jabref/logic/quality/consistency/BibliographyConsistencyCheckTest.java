@@ -34,7 +34,8 @@ class BibliographyConsistencyCheckTest {
         BibDatabase database = new BibDatabase(List.of(first, second));
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> { });
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> {
+        });
 
         BibliographyConsistencyCheck.EntryTypeResult entryTypeResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
         BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(StandardEntryType.Article, entryTypeResult));
@@ -54,7 +55,8 @@ class BibliographyConsistencyCheckTest {
         BibDatabase bibDatabase = new BibDatabase(List.of(first, second));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> {
+        });
 
         BibliographyConsistencyCheck.EntryTypeResult entryTypeResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.TITLE, customField), List.of(first, second));
         BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(StandardEntryType.Article, entryTypeResult));
@@ -86,7 +88,8 @@ class BibliographyConsistencyCheckTest {
         BibDatabase bibDatabase = new BibDatabase(List.of(first, second, third, fourth, fifth));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> {
+        });
 
         BibliographyConsistencyCheck.EntryTypeResult articleResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
         BibliographyConsistencyCheck.EntryTypeResult inProceedingsResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER, StandardField.LOCATION), List.of(fifth, fourth, third));
@@ -108,7 +111,8 @@ class BibliographyConsistencyCheckTest {
         BibDatabase bibDatabase = new BibDatabase(List.of(first, second));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> {
+        });
 
         BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of());
         assertEquals(expected, result);
@@ -129,7 +133,8 @@ class BibliographyConsistencyCheckTest {
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
-                .check(bibContext, (_, _) -> { });
+                .check(bibContext, (_, _) -> {
+                });
 
         assertEquals(Map.of(), result.entryTypeToResultMap(),
                 "Differences only in filtered fields must be ignored");
@@ -145,7 +150,8 @@ class BibliographyConsistencyCheckTest {
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
-                .check(bibContext, (_, _) -> { });
+                .check(bibContext, (_, _) -> {
+                });
 
         BibliographyConsistencyCheck.EntryTypeResult typeResult =
                 result.entryTypeToResultMap().get(StandardEntryType.Misc);
@@ -168,7 +174,8 @@ class BibliographyConsistencyCheckTest {
         bibContext.setMode(BibDatabaseMode.BIBLATEX);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
-                .check(bibContext, (_, _) -> { });
+                .check(bibContext, (_, _) -> {
+                });
 
         BibliographyConsistencyCheck.EntryTypeResult typeResult =
                 result.entryTypeToResultMap().get(StandardEntryType.Online);
@@ -191,7 +198,8 @@ class BibliographyConsistencyCheckTest {
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
-                .check(bibContext, (_, _) -> { });
+                .check(bibContext, (_, _) -> {
+                });
         BibliographyConsistencyCheck.EntryTypeResult typeResult =
                 result.entryTypeToResultMap().get(StandardEntryType.Online);
 
@@ -260,7 +268,8 @@ class BibliographyConsistencyCheckTest {
         BibDatabase bibDatabase = new BibDatabase(List.of(first, second, third, fourth, fifth, sixth));
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
-        BibliographyConsistencyCheck.Result actualResult = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
+        BibliographyConsistencyCheck.Result actualResult = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> {
+        });
 
         BibliographyConsistencyCheck.EntryTypeResult articleResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
         BibliographyConsistencyCheck.EntryTypeResult expectedInProceedings = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER, StandardField.LOCATION, StandardField.YEAR), List.of(fifth, fourth, sixth, third));

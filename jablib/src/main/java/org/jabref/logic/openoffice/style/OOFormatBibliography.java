@@ -102,9 +102,9 @@ public class OOFormatBibliography {
             layout.setPostFormatter(POSTFORMATTER);
 
             return formatFullReferenceOfBibEntry(layout,
-                                                 bibentry,
-                                                 citedKey.getLookupResult().get().database,
-                                                 citedKey.getUniqueLetter().orElse(null));
+                    bibentry,
+                    citedKey.getLookupResult().get().database,
+                    citedKey.getUniqueLetter().orElse(null));
         }
     }
 
@@ -115,7 +115,6 @@ public class OOFormatBibliography {
      * @param entry      The entry to insert.
      * @param database   The database the entry belongs to.
      * @param uniquefier Uniqiefier letter, if any, to append to the entry's year.
-     *
      * @return OOText The reference part of a bibliography entry formatted as OOText
      */
     private static OOText formatFullReferenceOfBibEntry(Layout layout,
@@ -148,11 +147,11 @@ public class OOFormatBibliography {
 
     /**
      * Format links to citations of the source (citedKey).
-     *
+     * <p>
      * Requires reference marks for the citation groups.
-     *
+     * <p>
      * - The links are created as references that show page numbers of the reference marks.
-     *   - We do not control the text shown, that is provided by OpenOffice.
+     * - We do not control the text shown, that is provided by OpenOffice.
      */
     private static OOText formatCitedOnPages(CitationGroups citationGroups, CitedKey citedKey) {
         if (!citationGroups.citationGroupsProvideReferenceMarkNameForLinking()) {
@@ -177,10 +176,10 @@ public class OOFormatBibliography {
 
         // sort the citationGroups according to their indexInGlobalOrder
         filteredList.sort((a, b) -> {
-                Integer aa = a.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
-                Integer bb = b.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
-                return aa.compareTo(bb);
-            });
+            Integer aa = a.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
+            Integer bb = b.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
+            return aa.compareTo(bb);
+        });
 
         int index = 0;
         for (CitationGroup group : filteredList) {

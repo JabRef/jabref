@@ -179,7 +179,7 @@ public final class CSLFormatUtils {
      * <p>
      * <b>Precondition:</b> Use ONLY with numeric citation styles.</p>
      *
-     * @param citation the numeric citation with an unresolved number.
+     * @param citation      the numeric citation with an unresolved number.
      * @param currentNumber the correct number to update the citation with.
      * @return the bibliographic citation with resolved number.
      */

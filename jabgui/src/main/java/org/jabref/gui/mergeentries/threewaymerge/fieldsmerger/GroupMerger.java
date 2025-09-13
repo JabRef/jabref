@@ -11,7 +11,8 @@ import org.jspecify.annotations.NonNull;
 
 /**
  * A merger for the {@link StandardField#GROUPS} field
- * */
+ *
+ */
 public class GroupMerger implements FieldMerger {
 
     private final @NonNull BibEntryPreferences bibEntryPreferences;

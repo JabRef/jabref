@@ -40,8 +40,8 @@ public class ScholarArchiveFetcher implements PagedSearchBasedParserFetcher {
     /**
      * Gets the query URL by luceneQuery and pageNumber.
      *
-     * @param queryNode the first node from the parsed query
-     * @param pageNumber  the number of the page indexed from 0
+     * @param queryNode  the first node from the parsed query
+     * @param pageNumber the number of the page indexed from 0
      * @return URL
      */
     @Override

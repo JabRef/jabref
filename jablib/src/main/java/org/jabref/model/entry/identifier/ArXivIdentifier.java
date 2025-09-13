@@ -78,11 +78,12 @@ public class ArXivIdentifier extends EprintIdentifier {
     /**
      * ArXiV articles are assigned DOIs automatically, which starts with a DOI prefix '10.48550/' followed by the ArXiV
      * ID (replacing the colon with a period).
-     *<p>
+     * <p>
      * For more information:
      * <a href="https://blog.arxiv.org/2022/02/17/new-arxiv-articles-are-now-automatically-assigned-dois/">
-     *     new-arxiv-articles-are-now-automatically-assigned-dois</a>
-     * */
+     * new-arxiv-articles-are-now-automatically-assigned-dois</a>
+     *
+     */
     public Optional<DOI> inferDOI() {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();

@@ -11,38 +11,50 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.jabref.gui.util.component.HelpButton?>
-<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.jabref.gui.welcome.quicksettings.PushApplicationDialog">
+<DialogPane
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.jabref.gui.welcome.quicksettings.PushApplicationDialog">
     <content>
         <VBox styleClass="quick-settings-dialog-container">
-            <HBox alignment="CENTER_LEFT" spacing="4.0">
+            <HBox alignment="CENTER_LEFT"
+                  spacing="4.0">
                 <Label text="%Configure external applications to push citations to. Detected applications are highlighted. Applications that are not detected can be set manually by specifying the path to the executable."
-                       wrapText="true" HBox.hgrow="ALWAYS"/>
-                <HelpButton fx:id="helpButton"/>
+                       wrapText="true"
+                       HBox.hgrow="ALWAYS"/>
+                <HelpButton
+                        fx:id="helpButton"/>
             </HBox>
 
             <Label text="%Select your text editor or LaTeX application for pushing citations"/>
 
-            <ListView fx:id="applicationsList" styleClass="applications-list"
-                      prefHeight="200.0"/>
+            <ListView
+                    fx:id="applicationsList"
+                    styleClass="applications-list"
+                    prefHeight="200.0"/>
 
             <HBox spacing="4.0">
-                <TextField fx:id="pathField"
-                           promptText="%Path to application executable"
-                           HBox.hgrow="ALWAYS"/>
+                <TextField
+                        fx:id="pathField"
+                        promptText="%Path to application executable"
+                        HBox.hgrow="ALWAYS"/>
                 <Button styleClass="icon-button"
                         onAction="#browseApplication">
                     <graphic>
-                        <JabRefIconView glyph="OPEN"/>
+                        <JabRefIconView
+                                glyph="OPEN"/>
                     </graphic>
                     <tooltip>
-                        <Tooltip text="%Browse"/>
+                        <Tooltip
+                                text="%Browse"/>
                     </tooltip>
                 </Button>
             </HBox>
         </VBox>
     </content>
 
-    <ButtonType fx:constant="CLOSE"/>
-    <ButtonType fx:constant="OK"/>
+    <ButtonType
+            fx:constant="CLOSE"/>
+    <ButtonType
+            fx:constant="OK"/>
 </DialogPane>

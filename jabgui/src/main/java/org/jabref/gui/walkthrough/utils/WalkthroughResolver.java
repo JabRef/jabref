@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 public class WalkthroughResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughResolver.class);
     private static final Duration RESOLVE_TIMEOUT = Duration.millis(2_500);
-private static final Duration NODE_IDLE_TIMEOUT = Duration.millis(250);
+    private static final Duration NODE_IDLE_TIMEOUT = Duration.millis(250);
 
     private final WindowResolver windowResolver;
     private final @Nullable NodeResolver nodeResolver;
@@ -199,7 +199,9 @@ private static final Duration NODE_IDLE_TIMEOUT = Duration.millis(250);
         }
     }
 
-    public record WalkthroughResult(Window windowValue, Node nodeValue) {
+    public record WalkthroughResult(
+            Window windowValue,
+            Node nodeValue) {
         public Optional<Window> window() {
             return Optional.ofNullable(windowValue);
         }

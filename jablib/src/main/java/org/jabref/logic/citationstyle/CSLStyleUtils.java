@@ -30,7 +30,12 @@ public final class CSLStyleUtils {
     /**
      * Style information record (title, numeric nature, has bibliography specification, bibliography uses hanging indent) for a citation style.
      */
-    public record StyleInfo(String title, String shortTitle, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent) {
+    public record StyleInfo(
+            String title,
+            String shortTitle,
+            boolean isNumericStyle,
+            boolean hasBibliography,
+            boolean usesHangingIndent) {
     }
 
     static {
@@ -114,7 +119,7 @@ public final class CSLStyleUtils {
      * Parses the style information from a style content using StAX.
      *
      * @param filename The filename of the style (for logging)
-     * @param content The XML content of the style
+     * @param content  The XML content of the style
      * @return Optional containing the StyleInfo if valid, empty otherwise
      */
     public static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
@@ -141,8 +146,10 @@ public final class CSLStyleUtils {
                             String hangingIndent = reader.getAttributeValue(null, "hanging-indent");
                             usesHangingIndent = "true".equals(hangingIndent);
                         }
-                        case "citation" -> hasCitation = true;
-                        case "info" -> inInfo = true;
+                        case "citation" ->
+                                hasCitation = true;
+                        case "info" ->
+                                inInfo = true;
                         case "title" -> {
                             if (inInfo) {
                                 title = reader.getElementText();

@@ -94,11 +94,16 @@ public enum Season {
     static Optional<Season> parseGermanSeason(String value) {
         value = value.toLowerCase();
         return switch (value) {
-            case "frühling" -> Optional.of(SPRING);
-            case "sommer" -> Optional.of(SUMMER);
-            case "herbst" -> Optional.of(AUTUMN);
-            case "winter" -> Optional.of(WINTER);
-            default -> Optional.empty();
+            case "frühling" ->
+                    Optional.of(SPRING);
+            case "sommer" ->
+                    Optional.of(SUMMER);
+            case "herbst" ->
+                    Optional.of(AUTUMN);
+            case "winter" ->
+                    Optional.of(WINTER);
+            default ->
+                    Optional.empty();
         };
     }
 

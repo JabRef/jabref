@@ -53,24 +53,24 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
 
     @Override
     public Void call() {
-            if (isCancelled()) {
-                notifyCancellation();
-                return null;
-            }
-
-            List<String> updatedEntries = processMergeEntries();
-
-            if (isCancelled()) {
-                notifyCancellation();
-                updateUndoManager(updatedEntries);
-                return null;
-            }
-
-            updateUndoManager(updatedEntries);
-            LOGGER.debug("Merge operation completed. Processed: {}, Successfully updated: {}",
-                    processedEntries, successfulUpdates);
-            notifySuccess(successfulUpdates);
+        if (isCancelled()) {
+            notifyCancellation();
             return null;
+        }
+
+        List<String> updatedEntries = processMergeEntries();
+
+        if (isCancelled()) {
+            notifyCancellation();
+            updateUndoManager(updatedEntries);
+            return null;
+        }
+
+        updateUndoManager(updatedEntries);
+        LOGGER.debug("Merge operation completed. Processed: {}, Successfully updated: {}",
+                processedEntries, successfulUpdates);
+        notifySuccess(successfulUpdates);
+        return null;
     }
 
     private void notifyCancellation() {

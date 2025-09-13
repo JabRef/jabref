@@ -38,8 +38,8 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
      * Adds a view for a specific metadata difference to the container.
      * Default view if not a group diff.
      *
-     * @param container The parent container to add the difference view to
-     * @param diff The metadata difference to display
+     * @param container      The parent container to add the difference view to
+     * @param diff           The metadata difference to display
      * @param metadataChange The metadata change object containing all changes
      */
     private void addDifferenceView(VBox container, MetaDataDiff.Difference diff, MetadataChange metadataChange) {
@@ -176,14 +176,14 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
     /**
      * Recursively appends a group tree node to the string builder.
      *
-     * @param node The current node to append
+     * @param node    The current node to append
      * @param builder The string builder to append to
-     * @param level The current depth level in the tree (for indentation)
+     * @param level   The current depth level in the tree (for indentation)
      */
     private void appendGroupTreeNode(GroupTreeNode node, StringBuilder builder, int level) {
         builder.append("|  ".repeat(level))
-          .append(node.getName())
-          .append("\n");
+               .append(node.getName())
+               .append("\n");
 
         for (GroupTreeNode child : node.getChildren()) {
             appendGroupTreeNode(child, builder, level + 1);

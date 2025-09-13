@@ -4,5 +4,6 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
-public record IndexAddedOrUpdatedEvent(List<BibEntry> entries) {
+public record IndexAddedOrUpdatedEvent(
+        List<BibEntry> entries) {
 }

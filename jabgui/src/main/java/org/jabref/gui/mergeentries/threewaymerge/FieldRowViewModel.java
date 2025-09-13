@@ -37,7 +37,8 @@ public class FieldRowViewModel {
         /**
          * When the user types something into the merged field value and neither the left nor
          * right values match it, NONE is selected
-         * */
+         *
+         */
         NONE
     }
 
@@ -105,8 +106,10 @@ public class FieldRowViewModel {
         EasyBind.subscribe(selectionProperty(), selection -> {
             LOGGER.debug("Selecting {}' value for field {}", selection, field.getDisplayName());
             switch (selection) {
-                case LEFT -> EasyBind.subscribe(leftFieldValueProperty(), this::setMergedFieldValue);
-                case RIGHT -> EasyBind.subscribe(rightFieldValueProperty(), this::setMergedFieldValue);
+                case LEFT ->
+                        EasyBind.subscribe(leftFieldValueProperty(), this::setMergedFieldValue);
+                case RIGHT ->
+                        EasyBind.subscribe(rightFieldValueProperty(), this::setMergedFieldValue);
             }
         });
 
@@ -129,13 +132,13 @@ public class FieldRowViewModel {
         String rightValue = getRightFieldValue();
 
         if (StandardField.YEAR == field) {
-                YearFieldValuePlausibilityComparator comparator = new YearFieldValuePlausibilityComparator();
-                ComparisonResult comparison = comparator.compare(leftValue, rightValue);
-                if (ComparisonResult.RIGHT_BETTER == comparison) {
-                    selectRightValue();
-                } else if (ComparisonResult.LEFT_BETTER == comparison) {
-                    selectLeftValue();
-                }
+            YearFieldValuePlausibilityComparator comparator = new YearFieldValuePlausibilityComparator();
+            ComparisonResult comparison = comparator.compare(leftValue, rightValue);
+            if (ComparisonResult.RIGHT_BETTER == comparison) {
+                selectRightValue();
+            } else if (ComparisonResult.LEFT_BETTER == comparison) {
+                selectLeftValue();
+            }
         } else if (InternalField.TYPE_HEADER == field) {
             if (leftValue.equalsIgnoreCase(StandardEntryType.Misc.getName())) {
                 selectRightValue();

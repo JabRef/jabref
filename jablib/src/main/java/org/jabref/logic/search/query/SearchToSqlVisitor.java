@@ -228,10 +228,14 @@ public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
         // Pseudo-fields
         field = switch (field) {
-            case "key" -> InternalField.KEY_FIELD.getName();
-            case "anykeyword" -> StandardField.KEYWORDS.getName();
-            case "anyfield" -> "any";
-            default -> field;
+            case "key" ->
+                    InternalField.KEY_FIELD.getName();
+            case "anykeyword" ->
+                    StandardField.KEYWORDS.getName();
+            case "anyfield" ->
+                    "any";
+            default ->
+                    field;
         };
 
         if (ENTRY_ID.toString().equals(field)) {
