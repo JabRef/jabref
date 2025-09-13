@@ -85,8 +85,8 @@ class CheckIntegrity implements Callable<Integer> {
         );
 
         List<IntegrityMessage> messages = databaseContext.getEntries().stream()
-                .flatMap(entry -> integrityCheck.checkEntry(entry).stream())
-                .collect(Collectors.toList());
+                                                         .flatMap(entry -> integrityCheck.checkEntry(entry).stream())
+                                                         .collect(Collectors.toList());
 
         messages.addAll(integrityCheck.checkDatabase(databaseContext.getDatabase()));
 

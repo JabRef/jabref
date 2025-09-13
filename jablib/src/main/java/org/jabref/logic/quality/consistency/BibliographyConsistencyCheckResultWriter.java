@@ -95,15 +95,15 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
         results.add(entryType);
         results.add(bibEntry.getCitationKey().orElse(""));
         allReportedFields.forEach(field -> results.add(
-            bibEntry.getField(field).map(value -> {
-            if (requiredFields.contains(field)) {
-                return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-            } else if (optionalFields.contains(field)) {
-                return OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-            } else {
-                return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
-            }
-        }).orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY)));
+                bibEntry.getField(field).map(value -> {
+                    if (requiredFields.contains(field)) {
+                        return REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                    } else if (optionalFields.contains(field)) {
+                        return OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                    } else {
+                        return UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY;
+                    }
+                }).orElse(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY)));
         return results;
     }
 

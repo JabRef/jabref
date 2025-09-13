@@ -106,8 +106,8 @@ public class FileFilterConverter {
             return _ -> true;
         } else {
             return path -> FileUtil.getFileExtension(path)
-                                       .map(extensionsCleaned::contains)
-                                       .orElse(false);
+                                   .map(extensionsCleaned::contains)
+                                   .orElse(false);
         }
     }
 }

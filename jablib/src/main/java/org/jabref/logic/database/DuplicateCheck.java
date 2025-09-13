@@ -102,8 +102,8 @@ public class DuplicateCheck {
     private static double[] compareRequiredFields(final BibEntryType type, final BibEntry one, final BibEntry two) {
         final Set<OrFields> requiredFields = type.getRequiredFields();
         return requiredFields.isEmpty()
-                ? new double[] {0., 0.}
-                : DuplicateCheck.compareFieldSet(requiredFields.stream().map(OrFields::getPrimary).collect(Collectors.toSet()), one, two);
+               ? new double[] {0., 0.}
+               : DuplicateCheck.compareFieldSet(requiredFields.stream().map(OrFields::getPrimary).collect(Collectors.toSet()), one, two);
     }
 
     private static boolean isFarFromThreshold(double value) {

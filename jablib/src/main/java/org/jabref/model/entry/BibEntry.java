@@ -357,12 +357,13 @@ public class BibEntry {
         }
 
         return (database == null) || result.isEmpty() ?
-                result :
-                Optional.of(database.resolveForStrings(result.get()));
+               result :
+               Optional.of(database.resolveForStrings(result.get()));
     }
 
     /// Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
     //  It is **not** the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
+
     ///
     /// This id changes on each run of JabRef (because it is currently generated as increasing number).
     ///
@@ -510,7 +511,7 @@ public class BibEntry {
 
     /**
      * Internal method used to get the content of a field (or its alias)
-     *
+     * <p>
      * Used by {@link #getFieldOrAlias(Field)} and {@link #getFieldOrAliasLatexFree(Field)}
      *
      * @param field         the field
@@ -550,10 +551,14 @@ public class BibEntry {
             Optional<Date> parsedDate = Date.parse(date.get());
             if (parsedDate.isPresent()) {
                 return switch (field) {
-                    case StandardField.YEAR -> parsedDate.get().getYear().map(Object::toString);
-                    case StandardField.MONTH -> parsedDate.get().getMonth().map(Month::getJabRefFormat);
-                    case StandardField.DAY -> parsedDate.get().getDay().map(Object::toString);
-                    default -> throw new IllegalStateException("Unexpected value");
+                    case StandardField.YEAR ->
+                            parsedDate.get().getYear().map(Object::toString);
+                    case StandardField.MONTH ->
+                            parsedDate.get().getMonth().map(Month::getJabRefFormat);
+                    case StandardField.DAY ->
+                            parsedDate.get().getDay().map(Object::toString);
+                    default ->
+                            throw new IllegalStateException("Unexpected value");
                 };
             } else {
                 // Date field not in valid format
@@ -733,7 +738,7 @@ public class BibEntry {
 
     /**
      * Creates a short textual description of the entry in the format: <code>Author1, Author2: Title (Year)</code>
-     *
+     * <p>
      * If <code>0</code> is passed as <code>maxCharacters</code>, the description is not truncated.
      *
      * @param maxCharacters The maximum number of characters (additional
@@ -952,7 +957,7 @@ public class BibEntry {
 
     /**
      * On purpose, this hashes the "content" of the BibEntry, not the {@link #sharedBibEntryData}.
-     *
+     * <p>
      * The content is
      *
      * <ul>

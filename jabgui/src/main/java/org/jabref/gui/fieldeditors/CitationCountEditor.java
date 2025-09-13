@@ -38,8 +38,8 @@ public class CitationCountEditor extends HBox implements FieldEditorFX {
     @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
 
     public CitationCountEditor(Field field,
-                             SuggestionProvider<?> suggestionProvider,
-                             FieldCheckers fieldCheckers) {
+                               SuggestionProvider<?> suggestionProvider,
+                               FieldCheckers fieldCheckers) {
         Injector.registerExistingAndInject(this);
         this.viewModel = new CitationCountEditorViewModel(
                 field,

@@ -132,9 +132,12 @@ public class DiffHighlightingEllipsingTextFlow extends TextFlow {
                     text.getStyleClass().add("text-unchanged");
                     yield List.of(text);
                 }
-                case WORD -> DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, " ");
-                case CHARACTER -> DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, "");
-                default -> throw new UnsupportedOperationException("Not implemented " + diffMode.getValue());
+                case WORD ->
+                        DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, " ");
+                case CHARACTER ->
+                        DiffHighlighting.generateDiffHighlighting(comparisonString.get(), fullText, "");
+                default ->
+                        throw new UnsupportedOperationException("Not implemented " + diffMode.getValue());
             };
             allChildren.addAll(highlightedText);
         } else {

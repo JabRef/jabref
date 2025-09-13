@@ -11,9 +11,9 @@ import org.jspecify.annotations.Nullable;
 /// Constraint: At least one of {@code local} or {@code remote} must be non-null.
 @NullMarked
 public record ThreeWayEntryConflict(
-    @Nullable BibEntry base,
-    @Nullable BibEntry local,
-    @Nullable BibEntry remote
+        @Nullable BibEntry base,
+        @Nullable BibEntry local,
+        @Nullable BibEntry remote
 ) {
     public ThreeWayEntryConflict {
         assert !(local == null && remote == null) : "Both local and remote are null: conflict must involve at least one side.";
