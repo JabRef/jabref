@@ -41,6 +41,13 @@
         <section>
           <rule>
             <match>
+              <ENUM>true</ENUM>
+            </match>
+          </rule>
+        </section>
+        <section>
+          <rule>
+            <match>
               <AND>
                 <FIELD>true</FIELD>
                 <FINAL>true</FINAL>
@@ -259,13 +266,6 @@
           <rule>
             <match>
               <METHOD>true</METHOD>
-            </match>
-          </rule>
-        </section>
-        <section>
-          <rule>
-            <match>
-              <ENUM>true</ENUM>
             </match>
           </rule>
         </section>
