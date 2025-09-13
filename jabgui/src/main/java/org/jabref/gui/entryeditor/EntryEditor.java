@@ -561,11 +561,12 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             return false;
         }
 
-        Field lastField = shownFields.stream()
-                                     .reduce((first, second) -> second)
-                                     .orElse(null);
+        Optional<Field> lastField = shownFields.stream()
+                                     .reduce((first, second) -> second);
 
-        return lastField != null && lastField.getDisplayName().equalsIgnoreCase(textField.getId());
+        return lastField.map(Field::getDisplayName)
+                        .map(displayName -> displayName.equalsIgnoreCase(textField.getId()))
+                        .orElse(false);
     }
 
     /**
@@ -604,7 +605,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
     }
 
-     /// Recursively searches for a TextInputControl (TextField or TextArea) with the given ID.
+     // Recursively searches for a TextInputControl (TextField or TextArea) with the given ID.
     private Optional<TextInputControl> findTextInputById(Parent parent, String id) {
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (child instanceof TextInputControl textInput && id.equalsIgnoreCase(textInput.getId())) {
