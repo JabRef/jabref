@@ -154,3 +154,4 @@ We tried out at <https://github.com/JabRef/jabref-koppor/pull/716>.
 ## Use eclipse formatter
 
 * Good, because it [can be used in IntelliJ](https://github.com/krasa/EclipseCodeFormatter)
+* Bad, because not actively maintained
