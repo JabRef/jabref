@@ -574,7 +574,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     private void moveToNextTabAndFocus() {
         tabbed.getSelectionModel().selectNext();
 
-        Platform.runLater(() -> {
+        UiTaskExecutor.runInJavaFXThread(() -> {
             Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
             if (selectedTab instanceof FieldsEditorTab currentTab) {
                 focusFirstFieldInTab(currentTab);
@@ -590,16 +590,16 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             if (!shownFields.isEmpty()) {
                 Field firstField = shownFields.iterator().next();
                 String firstFieldId = firstField.getDisplayName();
-                TextInputControl firstTextInput = findTextInputById(parent, firstFieldId);
-                if (firstTextInput != null) {
-                    firstTextInput.requestFocus();
+                Optional<TextInputControl> firstTextInput = findTextInputById(parent, firstFieldId);
+                if (firstTextInput.isPresent()) {
+                    firstTextInput.get().requestFocus();
                     return;
                 }
             }
 
-            TextInputControl anyTextInput = findAnyTextInput(parent);
-            if (anyTextInput != null) {
-                anyTextInput.requestFocus();
+            Optional<TextInputControl> anyTextInput = findAnyTextInput(parent);
+            if (anyTextInput.isPresent()) {
+                anyTextInput.get().requestFocus();
             }
         }
     }
@@ -607,31 +607,31 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     /**
      * Recursively searches for a TextInputControl (TextField or TextArea) with the given ID.
      */
-    private TextInputControl findTextInputById(Parent parent, String id) {
+    private Optional<TextInputControl> findTextInputById(Parent parent, String id) {
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (child instanceof TextInputControl textInput && id.equalsIgnoreCase(textInput.getId())) {
-                return textInput;
+                return Optional.of(textInput);
             } else if (child instanceof Parent childParent) {
-                TextInputControl found = findTextInputById(childParent, id);
-                if (found != null) {
+                Optional<TextInputControl> found = findTextInputById(childParent, id);
+                if (found.isPresent()) {
                     return found;
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    private TextInputControl findAnyTextInput(Parent parent) {
+    private Optional<TextInputControl> findAnyTextInput(Parent parent) {
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (child instanceof TextInputControl textInput) {
-                return textInput;
+                return Optional.of(textInput);
             } else if (child instanceof Parent childParent) {
-                TextInputControl found = findAnyTextInput(childParent);
-                if (found != null) {
+                Optional<TextInputControl> found = findAnyTextInput(childParent);
+                if (found.isPresent()) {
                     return found;
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 }
