@@ -72,7 +72,7 @@ public class MetaDataParserTest {
     void saveActions() throws ParseException {
         Map<String, String> data = Map.of("saveActions", "enabled;title[lower_case]");
         MetaDataParser metaDataParser = new MetaDataParser(new DummyFileUpdateMonitor());
-        MetaData parsed = metaDataParser.parse(new MetaData(), data, ',');
+        MetaData parsed = metaDataParser.parse(new MetaData(), data, ',', "userAndHost");
 
         MetaData expected = new MetaData();
         FieldFormatterCleanups fieldFormatterCleanups = new FieldFormatterCleanups(true, List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
@@ -87,7 +87,7 @@ public class MetaDataParserTest {
         String rawValue = "/home/user/test.blg;";
 
         MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
-        MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',');
+        MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',', "userAndHost");
 
         assertEquals(Optional.of(Path.of("/home/user/test.blg")), parsed.getBlgFilePath(user));
     }
@@ -101,7 +101,7 @@ public class MetaDataParserTest {
         String rawValue = "/home/user/latex;";
 
         MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
-        MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',');
+        MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',', "userAndHost");
 
         assertEquals(Optional.of(Path.of("/home/user/latex")), parsed.getLatexFileDirectory(userHost));
     }
@@ -117,7 +117,7 @@ public class MetaDataParserTest {
         );
 
         MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
-        MetaData parsed = parser.parse(data, ',');
+        MetaData parsed = parser.parse(data, ',', "userAndHost");
 
         assertEquals(Optional.of(Path.of("/path/for/host1")), parsed.getLatexFileDirectory(userHost1));
         assertEquals(Optional.of(Path.of("/path/for/host2")), parsed.getLatexFileDirectory(userHost2));
@@ -145,7 +145,7 @@ public class MetaDataParserTest {
         String rawValue = "C:\\\\Path\\\\To\\\\Latex;";
 
         MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
-        MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',');
+        MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',', "userAndHost");
 
         assertEquals(Optional.of(Path.of("C:\\Path\\To\\Latex")), parsed.getLatexFileDirectory(userHost));
     }
