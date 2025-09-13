@@ -59,8 +59,8 @@ public class FieldFactory {
      */
     public static Collection<Field> getNotTextFields() {
         Set<Field> result = Arrays.stream(StandardField.values())
-              .filter(field -> !Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.MULTIPLE_ENTRY_LINK)))
-                .collect(Collectors.toSet());
+                                  .filter(field -> !Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.MULTIPLE_ENTRY_LINK)))
+                                  .collect(Collectors.toSet());
 
         // These fields are not marked as verbatim, because they could include LaTeX code
         result.add(StandardField.MONTH);
@@ -100,7 +100,7 @@ public class FieldFactory {
     /**
      * Type T is an entry type and is used to direct the mapping to the Java field class.
      * This somehow acts as filter, BibLaTeX "APA" entry type has field "article", but we want to have StandardField (if not explicitly requested otherwise)
-     *
+     * <p>
      * Supports also parsing of "UnknownField{name='rights'}" as field name (written by JabRef 5.x)
      */
     public static <T extends EntryType> Field parseField(T type, String fieldName) {
@@ -117,19 +117,19 @@ public class FieldFactory {
         }
 
         return OptionalUtil.<Field>orElse(
-              OptionalUtil.<Field>orElse(
-               OptionalUtil.<Field>orElse(
-                OptionalUtil.<Field>orElse(
-                 OptionalUtil.<Field>orElse(
-                   OptionalUtil.<Field>orElse(
-              InternalField.fromName(fieldName),
-              StandardField.fromName(fieldName)),
-              SpecialField.fromName(fieldName)),
-              IEEEField.fromName(fieldName)),
-              BiblatexSoftwareField.fromName(type, fieldName)),
-              BiblatexApaField.fromName(type, fieldName)),
-              AMSField.fromName(type, fieldName))
-              .orElse(new UnknownField(fieldName));
+                                   OptionalUtil.<Field>orElse(
+                                           OptionalUtil.<Field>orElse(
+                                                   OptionalUtil.<Field>orElse(
+                                                           OptionalUtil.<Field>orElse(
+                                                                   OptionalUtil.<Field>orElse(
+                                                                           InternalField.fromName(fieldName),
+                                                                           StandardField.fromName(fieldName)),
+                                                                   SpecialField.fromName(fieldName)),
+                                                           IEEEField.fromName(fieldName)),
+                                                   BiblatexSoftwareField.fromName(type, fieldName)),
+                                           BiblatexApaField.fromName(type, fieldName)),
+                                   AMSField.fromName(type, fieldName))
+                           .orElse(new UnknownField(fieldName));
     }
 
     public static Field parseField(String fieldName) {
