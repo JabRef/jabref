@@ -103,7 +103,7 @@ Also, set the "Scan Scope" to "Only Java sources (including tests)".
 ![Checkstyle is the highest version - and tests are also scanned](13-10-checkstyle-final-settings.png)
 {% endfigure %}
 
-Save settings by clicking "Apply" and then "OK"
+Save settings by clicking "Apply".
 
 ## Have auto format working properly in JavaDoc
 
