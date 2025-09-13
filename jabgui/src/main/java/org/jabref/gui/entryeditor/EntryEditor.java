@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +25,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
@@ -38,6 +40,7 @@ import org.jabref.gui.entryeditor.citationrelationtab.CitationRelationsTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
 import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
+import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
 import org.jabref.gui.keyboard.KeyBinding;
@@ -162,6 +165,11 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         });
 
         setupDragAndDrop();
+
+        EditorTextField.setupTabNavigation(
+                this::isLastFieldInCurrentTab,
+                () -> tabbed.getSelectionModel().selectNext()
+        );
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;
@@ -527,5 +535,33 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     @Override
     public void previousPreviewStyle() {
         this.previewPanel.previousPreviewStyle();
+    }
+
+    /**
+     * Checks if the given TextField is the last field in the currently selected tab.
+     *
+     * @param textField the TextField to check
+     * @return true if this is the last field in the current tab, false otherwise
+     */
+    private boolean isLastFieldInCurrentTab(TextField textField) {
+        if (textField == null || tabbed.getSelectionModel().getSelectedItem() == null) {
+            return false;
+        }
+
+        Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+        if (!(selectedTab instanceof FieldsEditorTab currentTab)) {
+            return false;
+        }
+
+        Collection<Field> shownFields = currentTab.getShownFields();
+        if (shownFields.isEmpty() || textField.getId() == null) {
+            return false;
+        }
+
+        Field lastField = shownFields.stream()
+                                     .reduce((first, second) -> second)
+                                     .orElse(null);
+
+        return lastField != null && lastField.getDisplayName().equalsIgnoreCase(textField.getId());
     }
 }
