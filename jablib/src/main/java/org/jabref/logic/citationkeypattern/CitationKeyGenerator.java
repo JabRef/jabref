@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.PatternSyntaxException;
 
+import org.jabref.logic.util.strings.Transliteration;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -14,7 +15,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.strings.StringUtil;
 
-import com.ibm.icu.text.Transliterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,14 +37,9 @@ public class CitationKeyGenerator extends BracketedPattern {
 
     /// Source of disallowed characters: <https://tex.stackexchange.com/a/408548/9075>
     /// These characters are disallowed in BibTeX keys.
-    private static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
+    public static final List<Character> DISALLOWED_CHARACTERS = Arrays.asList('{', '}', '(', ')', ',', '=', '\\', '"', '#', '%', '~', '\'');
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);
-
-    // This transliterator configuration will transliterate from any language to Latin script
-    // that uses only allowed characters for citation keys (letters and numbers, hyphen and underscore).
-    private static final String TRANSLITERATOR_CONFIG = buildTransliteratorConfig();
-    private static final Transliterator TRANSLITERATOR = Transliterator.getInstance(TRANSLITERATOR_CONFIG);
 
     private final AbstractCitationKeyPatterns citeKeyPattern;
     private final BibDatabase database;
@@ -98,18 +93,6 @@ public class CitationKeyGenerator extends BracketedPattern {
 
     public static String cleanKey(String key, String unwantedCharacters) {
         return removeUnwantedCharacters(key, unwantedCharacters).replaceAll("\\s", "");
-    }
-
-    private static String buildTransliteratorConfig() {
-        StringBuilder pattern = new StringBuilder();
-
-        for (Character c : DISALLOWED_CHARACTERS) {
-            // Generally, only characters like `-` or `[` need to be escaped with a backslash,
-            // but for future proofing we escape all characters.
-            pattern.append("\\").append(c);
-        }
-
-        return "Any-Latin; Latin-ASCII; [" + pattern + "] Remove";
     }
 
     /**
@@ -177,7 +160,7 @@ public class CitationKeyGenerator extends BracketedPattern {
             return key;
         }
 
-        return TRANSLITERATOR.transliterate(key);
+        return Transliteration.transliterate(key, false);
     }
 
     /**

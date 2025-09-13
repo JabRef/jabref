@@ -88,13 +88,21 @@ class CitationKeyGeneratorTest {
     }
 
     static String generateKey(BibEntry entry, String pattern) {
-        return generateKey(entry, pattern, new BibDatabase());
+        return generateKey(entry, true, pattern, new BibDatabase());
+    }
+
+    static String generateKey(BibEntry entry, boolean transliterate, String pattern) {
+        return generateKey(entry, transliterate, pattern, new BibDatabase());
     }
 
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
+        return generateKey(entry, true, pattern, database);
+    }
+
+    static String generateKey(BibEntry entry, boolean transliterate, String pattern, BibDatabase database) {
         GlobalCitationKeyPatterns keyPattern = GlobalCitationKeyPatterns.fromPattern(pattern);
         CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
-                true,
+                transliterate,
                 false,
                 false,
                 false,
@@ -1088,6 +1096,13 @@ class CitationKeyGeneratorTest {
 
     @Test
     void generateKeyWithTransliteration() {
+        BibEntry entry = createABibEntryAuthor("Надежда Карпенко");
+        entry.setField(StandardField.YEAR, "2025");
+        assertEquals("Karpenko2025", generateKey(entry, "[auth][year]"));
+    }
+
+    @Test
+    void generateKeyWithoutTransliteration() {
         BibEntry entry = createABibEntryAuthor("Надежда Карпенко");
         entry.setField(StandardField.YEAR, "2025");
         assertEquals("Karpenko2025", generateKey(entry, "[auth][year]"));
