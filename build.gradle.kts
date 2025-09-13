@@ -3,6 +3,7 @@ plugins {
     id("org.jabref.gradle.feature.compile") // for openrewrite
     id("org.openrewrite.rewrite") version "7.15.0"
     id("org.itsallcode.openfasttrace") version "3.1.0"
+    id("org.cyclonedx.bom") version "3.0.0-alpha-1"
 }
 
 // OpenRewrite should rewrite all sources
@@ -51,4 +52,17 @@ tasks.register("run") {
     group = "application"
     description = "Runs the GUI"
     dependsOn(":jabgui:run")
+}
+
+allprojects {
+    tasks.cyclonedxDirectBom {
+    }
+}
+
+tasks.cyclonedxBom {
+    // Aggregated SBOM configuration
+    projectType = org.cyclonedx.model.Component.Type.APPLICATION
+    includeBuildSystem = true
+    componentVersion = project.version.toString()
+    componentGroup = "org.jabref"
 }

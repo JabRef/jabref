@@ -47,6 +47,7 @@ class Search implements Runnable {
     @Option(names = {"--query"}, description = "Search query", required = true)
     private String query;
 
+    // [impl->req~jabkit.cli.input-flag~1]
     @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
     private Path inputFile;
 
