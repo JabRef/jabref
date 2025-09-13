@@ -19,6 +19,8 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
 import javafx.geometry.Side;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -26,6 +28,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
@@ -168,7 +171,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
         EditorTextField.setupTabNavigation(
                 this::isLastFieldInCurrentTab,
-                () -> tabbed.getSelectionModel().selectNext()
+                this::moveToNextTabAndFocus
         );
 
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
@@ -563,5 +566,72 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
                                      .orElse(null);
 
         return lastField != null && lastField.getDisplayName().equalsIgnoreCase(textField.getId());
+    }
+
+    /**
+     * Moves to the next tab and focuses on its first field.
+     */
+    private void moveToNextTabAndFocus() {
+        tabbed.getSelectionModel().selectNext();
+
+        Platform.runLater(() -> {
+            Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
+            if (selectedTab instanceof FieldsEditorTab currentTab) {
+                focusFirstFieldInTab(currentTab);
+            }
+        });
+    }
+
+    private void focusFirstFieldInTab(FieldsEditorTab tab) {
+        Node tabContent = tab.getContent();
+        if (tabContent instanceof Parent parent) {
+            // First try to find field by ID (preferred method)
+            Collection<Field> shownFields = tab.getShownFields();
+            if (!shownFields.isEmpty()) {
+                Field firstField = shownFields.iterator().next();
+                String firstFieldId = firstField.getDisplayName();
+                TextInputControl firstTextInput = findTextInputById(parent, firstFieldId);
+                if (firstTextInput != null) {
+                    firstTextInput.requestFocus();
+                    return;
+                }
+            }
+
+            TextInputControl anyTextInput = findAnyTextInput(parent);
+            if (anyTextInput != null) {
+                anyTextInput.requestFocus();
+            }
+        }
+    }
+
+    /**
+     * Recursively searches for a TextInputControl (TextField or TextArea) with the given ID.
+     */
+    private TextInputControl findTextInputById(Parent parent, String id) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof TextInputControl textInput && id.equalsIgnoreCase(textInput.getId())) {
+                return textInput;
+            } else if (child instanceof Parent childParent) {
+                TextInputControl found = findTextInputById(childParent, id);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private TextInputControl findAnyTextInput(Parent parent) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof TextInputControl textInput) {
+                return textInput;
+            } else if (child instanceof Parent childParent) {
+                TextInputControl found = findAnyTextInput(childParent);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
     }
 }
