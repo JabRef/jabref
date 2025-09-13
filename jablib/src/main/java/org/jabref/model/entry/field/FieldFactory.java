@@ -39,15 +39,7 @@ public class FieldFactory {
 
     public static String serializeOrFields(OrFields fields) {
         return fields.getFields().stream()
-                     .map(field -> {
-                         if (field instanceof UnknownField unknownField) {
-                             // In case a user has put a user-defined field, the casing of that field is kept
-                             return unknownField.getName();
-                         } else {
-                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
-                             return field.getName();
-                         }
-                     })
+                     .map(FieldTextMapper::getDisplayName)
                      .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
