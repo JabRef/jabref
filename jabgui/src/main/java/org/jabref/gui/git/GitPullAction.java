@@ -24,7 +24,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class GitPullAction extends SimpleCommand {
@@ -33,15 +32,18 @@ public class GitPullAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences guiPreferences;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     public GitPullAction(DialogService dialogService,
                          StateManager stateManager,
                          GuiPreferences guiPreferences,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         GitHandlerRegistry gitHandlerRegistry) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.guiPreferences = guiPreferences;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
 
         this.executable.bind(ActionHelper.needsDatabase(stateManager).and(ActionHelper.needsGitRemoteConfigured(stateManager)));
     }
@@ -69,11 +71,10 @@ public class GitPullAction extends SimpleCommand {
 
         Path bibFilePath = bibFilePathOpt.get();
 
-        GitHandlerRegistry registry = Injector.instantiateModelOrService(GitHandlerRegistry.class);
-        GitStatusViewModel gitStatusViewModel = GitStatusViewModel.fromPathAndContext(stateManager, taskExecutor, registry, bibFilePath);
+        GitStatusViewModel gitStatusViewModel = GitStatusViewModel.fromPathAndContext(stateManager, taskExecutor, gitHandlerRegistry, bibFilePath);
 
         BackgroundTask
-                .wrap(() -> doPull(activeDatabase, bibFilePath, stateManager, registry))
+                .wrap(() -> doPull(activeDatabase, bibFilePath, gitHandlerRegistry))
                 .onSuccess(result -> {
                     if (result.noop()) {
                         dialogService.showInformationDialogAndWait(
@@ -92,11 +93,11 @@ public class GitPullAction extends SimpleCommand {
                         }
                     }
                 })
-                .onFailure(exception -> showPullError(exception))
+                .onFailure(this::showPullError)
                 .executeWith(taskExecutor);
     }
 
-    private PullResult doPull(BibDatabaseContext databaseContext, Path bibPath, StateManager stateManager, GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
+    private PullResult doPull(BibDatabaseContext databaseContext, Path bibPath, GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
         GitSyncService syncService = buildSyncService(bibPath, registry);
         GitHandler handler = registry.get(bibPath.getParent());
         String user = guiPreferences.getGitPreferences().getUsername();
@@ -105,7 +106,7 @@ public class GitPullAction extends SimpleCommand {
         return syncService.fetchAndMerge(databaseContext, bibPath);
     }
 
-    private GitSyncService buildSyncService(Path bibPath, GitHandlerRegistry handlerRegistry) throws JabRefException {
+    private GitSyncService buildSyncService(Path bibPath, GitHandlerRegistry handlerRegistry) {
         GitConflictResolverDialog dialog = new GitConflictResolverDialog(dialogService, guiPreferences);
         GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(dialog);
         GitSemanticMergeExecutor mergeExecutor = new GitSemanticMergeExecutorImpl(guiPreferences.getImportFormatPreferences());

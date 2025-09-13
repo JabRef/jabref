@@ -16,12 +16,14 @@ import org.eclipse.jgit.transport.URIish;
 import org.jspecify.annotations.NonNull;
 
 public final class GitInitService {
-    public static void initRepoAndSetRemote(@NonNull Path bibPath, @NonNull String remoteUrl) throws JabRefException {
+    public static void initRepoAndSetRemote(@NonNull Path bibPath, @NonNull String remoteUrl, GitHandlerRegistry gitHandlerRegistry) throws JabRefException {
         Path expectedRoot = bibPath.toAbsolutePath().getParent();
         if (expectedRoot == null) {
             throw new JabRefException("Invalid library path: no parent directory");
         }
 
+        // TODO: The assumption is that the .bib file is directly in the root of the repository (and preferably only one).
+        //       Maybe, this assumption can be relaxed in the future.
         Optional<Path> outerRoot = GitHandler.findRepositoryRoot(expectedRoot);
         if (outerRoot.isPresent() && !outerRoot.get().equals(expectedRoot)) {
             throw new JabRefException(
@@ -29,7 +31,6 @@ public final class GitInitService {
             );
         }
 
-        GitHandlerRegistry gitHandlerRegistry = new GitHandlerRegistry();
         GitHandler handler = gitHandlerRegistry.get(expectedRoot);
 
         handler.initIfNeeded();
