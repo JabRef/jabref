@@ -37,6 +37,8 @@ Click on "Restart" to finally restart.
 
 Wait for IntelliJ coming up again.
 
+## Put JabRef's code style configuration in place
+
 Go to **File > Settings... > Editor > Code Style**
 
 Click on the settings wheel (next to the scheme chooser),
