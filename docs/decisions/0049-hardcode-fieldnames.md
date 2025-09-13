@@ -49,7 +49,7 @@ Chosen option: "Hardcode `StandardField` names and use exact or customized names
 ### Hardcode `StandardField` names and use exact or customized names otherwise (disallow customization of `StandardField`s)
 
 <!-- markdownlint-disable-next-line MD004 -->>
-- For the build-in types (`StandardFiel`), the display names are hard-coded. Users cannot customize this. Optional/required can still be customized.
+- For the build-in types (`StandardField`), the display names are hard-coded. Users cannot customize this. Optional/required can still be customized.
 <!-- markdownlint-disable-next-line MD004 -->>
 - Preserve exact user/customized names for non‑standard fields
 <!-- markdownlint-disable-next-line MD004 -->>
