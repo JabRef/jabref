@@ -139,7 +139,9 @@ public class LinkedFileHandler {
             }
             Integer count = 1;
             boolean exists = false;
+            // @formatter:off
             do {
+                // @formatter:on
                 targetPath = targetDirectory.resolve(sourcePath.getFileName() + " (" + count + ")");
                 exists = Files.exists(targetPath);
                 if (exists && Files.mismatch(sourcePath, targetPath) == -1) {
