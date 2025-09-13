@@ -74,7 +74,7 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
             Optional<String> oldFieldValue = entry.getField(selectedField.get());
             if (oldFieldValue.isPresent()) {
                 entry.clearField(selectedField.get())
-                        .ifPresent(fieldChange -> clearFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));
+                     .ifPresent(fieldChange -> clearFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));
                 affectedEntriesCount++;
             }
         }
@@ -125,7 +125,7 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
                 String newFieldValue = oldFieldValue.orElse("").concat(toAppendFieldValue);
 
                 entry.setField(selectedField.get(), newFieldValue)
-                        .ifPresent(fieldChange -> appendToFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));
+                     .ifPresent(fieldChange -> appendToFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));
 
                 fieldValue.set("");
                 affectedEntriesCount++;

@@ -7,7 +7,7 @@ import org.jabref.logic.l10n.Localization;
 
 /**
  * Remove {} braces around words in case they appear balanced
- *
+ * <p>
  * Related formatter: {@link ProtectTermsFormatter}
  */
 public class UnprotectTermsFormatter extends Formatter {

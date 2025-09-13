@@ -369,8 +369,8 @@ public class URLDownload {
             }
 
             if ((status == HttpURLConnection.HTTP_MOVED_TEMP)
-                || (status == HttpURLConnection.HTTP_MOVED_PERM)
-                || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
+                    || (status == HttpURLConnection.HTTP_MOVED_PERM)
+                    || (status == HttpURLConnection.HTTP_SEE_OTHER)) {
                 // get redirect url from "location" header field
                 String newUrl = connection.getHeaderField("location");
                 // open the new connection again

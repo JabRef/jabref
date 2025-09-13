@@ -517,8 +517,8 @@ public class OpenOfficePanel {
             return CitationType.INVISIBLE_CIT;
         }
         return inParenthesis
-                ? CitationType.AUTHORYEAR_PAR
-                : CitationType.AUTHORYEAR_INTEXT;
+               ? CitationType.AUTHORYEAR_PAR
+               : CitationType.AUTHORYEAR_INTEXT;
     }
 
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
@@ -572,8 +572,8 @@ public class OpenOfficePanel {
 
         Optional<Update.SyncOptions> syncOptions =
                 openOfficePreferences.getSyncWhenCiting()
-                        ? Optional.of(new Update.SyncOptions(getBaseList()))
-                        : Optional.empty();
+                ? Optional.of(new Update.SyncOptions(getBaseList()))
+                : Optional.empty();
 
         // Sync options are non-null only when "Automatically sync bibliography when inserting citations" is enabled
         if (syncOptions.isPresent() && openOfficePreferences.getSyncWhenCiting()) {
@@ -662,7 +662,8 @@ public class OpenOfficePanel {
                 }
                 case CitationStyle _ ->
                         contextMenu.getItems().remove(alwaysAddCitedOnPagesText);
-                default -> { }
+                default -> {
+                }
             }
         });
 

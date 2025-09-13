@@ -90,7 +90,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         viewModel.selectedEntryTypeProperty().addListener((_, _, newValue) ->
                 filteredData.setPredicate(message ->
                         message.message().getFirst().equals(newValue)
-        ));
+                ));
 
         tableView.setItems(filteredData);
 
@@ -168,8 +168,8 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
         );
 
         targetSymbols.stream()
-            .map(ConsistencySymbol::getText)
-            .forEach(this::removeColumnWithUniformValue);
+                     .map(ConsistencySymbol::getText)
+                     .forEach(this::removeColumnWithUniformValue);
 
         Arrays.stream(SpecialField.values())
               .map(SpecialField::getDisplayName)

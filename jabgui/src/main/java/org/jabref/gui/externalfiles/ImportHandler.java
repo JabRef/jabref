@@ -263,7 +263,7 @@ public class ImportHandler {
                           if (existingDuplicateInLibrary.isPresent()) {
                               Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
                               if (duplicateHandledEntry.isEmpty()) {
-                                    tracker.markSkipped();
+                                  tracker.markSkipped();
                                   return;
                               }
                               finalEntry = duplicateHandledEntry.get();

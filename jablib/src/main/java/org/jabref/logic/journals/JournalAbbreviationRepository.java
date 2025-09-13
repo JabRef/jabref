@@ -36,7 +36,7 @@ public class JournalAbbreviationRepository {
     /**
      * Initializes the internal data based on the abbreviations found in the given MV file
      *
-     * @param journalList The path to the MV file containing the journal abbreviations.
+     * @param journalList    The path to the MV file containing the journal abbreviations.
      * @param ltwaRepository The LTWA repository to use for abbreviations.
      */
     public JournalAbbreviationRepository(Path journalList, LtwaRepository ltwaRepository) {
@@ -148,9 +148,9 @@ public class JournalAbbreviationRepository {
         }
 
         Optional<Abbreviation> abbreviation = Optional.ofNullable(fullToAbbreviationObject.get(journal))
-                .or(() -> Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))
-                .or(() -> Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))
-                .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));
+                                                      .or(() -> Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))
+                                                      .or(() -> Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))
+                                                      .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));
 
         if (abbreviation.isEmpty()) {
             abbreviation = findAbbreviationFuzzyMatched(journal);
@@ -173,9 +173,9 @@ public class JournalAbbreviationRepository {
         final double SIMILARITY_THRESHOLD = 1.0;
 
         List<Abbreviation> candidates = abbreviations.stream()
-                .filter(abbreviation -> similarity.isSimilar(input, abbreviation.getName()))
-                .sorted(Comparator.comparingDouble(abbreviation -> similarity.editDistanceIgnoreCase(input, abbreviation.getName())))
-                .toList();
+                                                     .filter(abbreviation -> similarity.isSimilar(input, abbreviation.getName()))
+                                                     .sorted(Comparator.comparingDouble(abbreviation -> similarity.editDistanceIgnoreCase(input, abbreviation.getName())))
+                                                     .toList();
 
         if (candidates.isEmpty()) {
             return Optional.empty();

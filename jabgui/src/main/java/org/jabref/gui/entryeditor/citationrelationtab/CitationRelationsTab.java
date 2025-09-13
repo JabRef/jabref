@@ -121,12 +121,12 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.searchCitationsRelationsService = searchCitationsRelationsService;
 
         this.citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(
-            preferences,
-            undoManager,
-            stateManager,
-            dialogService,
-            fileUpdateMonitor,
-            taskExecutor
+                preferences,
+                undoManager,
+                stateManager,
+                dialogService,
+                fileUpdateMonitor,
+                taskExecutor
         );
     }
 
@@ -515,18 +515,18 @@ public class CitationRelationsTab extends EntryEditorTab {
      * TODO: Make the method return a callable and let the calling method create the background task.
      */
     private BackgroundTask<List<BibEntry>> createBackgroundTask(
-        BibEntry entry, CitationFetcher.SearchType searchType
+            BibEntry entry, CitationFetcher.SearchType searchType
     ) {
         return switch (searchType) {
             case CitationFetcher.SearchType.CITES -> {
                 citingTask = BackgroundTask.wrap(
-                    () -> this.searchCitationsRelationsService.searchCites(entry)
+                        () -> this.searchCitationsRelationsService.searchCites(entry)
                 );
                 yield citingTask;
             }
             case CitationFetcher.SearchType.CITED_BY -> {
                 citedByTask = BackgroundTask.wrap(
-                    () -> this.searchCitationsRelationsService.searchCitedBy(entry)
+                        () -> this.searchCitationsRelationsService.searchCitedBy(entry)
                 );
                 yield citedByTask;
             }
@@ -603,7 +603,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * Function to open possible duplicate entries window to compare duplicate entries
      *
      * @param citationRelationItem duplicate in the citation relations tab
-     * @param listView CheckListView to display citations
+     * @param listView             CheckListView to display citations
      */
     private void openPossibleDuplicateEntriesWindow(CitationRelationItem citationRelationItem, CheckListView<CitationRelationItem> listView) {
         BibEntry libraryEntry = citationRelationItem.localEntry();

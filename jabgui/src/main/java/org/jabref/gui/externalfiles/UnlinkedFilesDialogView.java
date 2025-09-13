@@ -163,8 +163,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         fileTypeCombo.valueProperty().bindBidirectional(viewModel.selectedExtensionProperty());
 
         new ViewModelListCellFactory<DateRange>()
-            .withText(DateRange::getDateRange)
-            .install(fileDateCombo);
+                .withText(DateRange::getDateRange)
+                .install(fileDateCombo);
         fileDateCombo.setItems(viewModel.getDateFilters());
         fileDateCombo.valueProperty().bindBidirectional(viewModel.selectedDateProperty());
 
@@ -331,10 +331,14 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         @Override
         public void execute() {
             switch (command) {
-                case SELECT_ALL -> unlinkedFilesList.getCheckModel().checkAll();
-                case UNSELECT_ALL -> unlinkedFilesList.getCheckModel().clearChecks();
-                case EXPAND_ALL -> expandTree(unlinkedFilesList.getRoot(), true);
-                case COLLAPSE_ALL -> expandTree(unlinkedFilesList.getRoot(), false);
+                case SELECT_ALL ->
+                        unlinkedFilesList.getCheckModel().checkAll();
+                case UNSELECT_ALL ->
+                        unlinkedFilesList.getCheckModel().clearChecks();
+                case EXPAND_ALL ->
+                        expandTree(unlinkedFilesList.getRoot(), true);
+                case COLLAPSE_ALL ->
+                        expandTree(unlinkedFilesList.getRoot(), false);
             }
         }
     }

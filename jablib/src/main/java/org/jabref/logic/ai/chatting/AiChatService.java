@@ -22,10 +22,10 @@ public class AiChatService {
     private final AiTemplatesService aiTemplatesService;
 
     public AiChatService(AiPreferences aiPreferences,
-                       ChatModel chatLanguageModel,
-                       EmbeddingModel embeddingModel,
-                       EmbeddingStore<TextSegment> embeddingStore,
-                       AiTemplatesService aiTemplatesService
+                         ChatModel chatLanguageModel,
+                         EmbeddingModel embeddingModel,
+                         EmbeddingStore<TextSegment> embeddingStore,
+                         AiTemplatesService aiTemplatesService
     ) {
         this.aiPreferences = aiPreferences;
         this.chatLanguageModel = chatLanguageModel;

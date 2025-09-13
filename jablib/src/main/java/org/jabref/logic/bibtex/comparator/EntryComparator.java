@@ -26,10 +26,10 @@ public class EntryComparator implements Comparator<BibEntry> {
 
     /**
      *
-     * @param binary true: the presence of fields is checked; false: the content of the fields is compared
+     * @param binary     true: the presence of fields is checked; false: the content of the fields is compared
      * @param descending true: if the most different entry should get the highest score
-     * @param field the field to sort on
-     * @param next the next comparator to use (if the current comparator results in equality)
+     * @param field      the field to sort on
+     * @param next       the next comparator to use (if the current comparator results in equality)
      */
     public EntryComparator(boolean binary, boolean descending, Field field, Comparator<BibEntry> next) {
         this.binary = binary;

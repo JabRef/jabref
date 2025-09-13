@@ -49,8 +49,8 @@ public class UndoableAbbreviator {
         }
 
         Optional<String> newTextOptional = abbreviationType == AbbreviationType.LTWA
-                ? journalAbbreviationRepository.getLtwaAbbreviation(text)
-                : foundAbbreviation.map(this::getAbbreviatedName);
+                                           ? journalAbbreviationRepository.getLtwaAbbreviation(text)
+                                           : foundAbbreviation.map(this::getAbbreviatedName);
 
         // Return early if no abbreviation found or it matches original
         if (newTextOptional.isEmpty() || newTextOptional.get().equals(origText)) {

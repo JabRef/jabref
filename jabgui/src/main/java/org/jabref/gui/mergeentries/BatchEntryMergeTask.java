@@ -53,24 +53,24 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
 
     @Override
     public Void call() {
-            if (isCancelled()) {
-                notifyCancellation();
-                return null;
-            }
-
-            List<String> updatedEntries = processMergeEntries();
-
-            if (isCancelled()) {
-                notifyCancellation();
-                updateUndoManager(updatedEntries);
-                return null;
-            }
-
-            updateUndoManager(updatedEntries);
-            LOGGER.debug("Merge operation completed. Processed: {}, Successfully updated: {}",
-                    processedEntries, successfulUpdates);
-            notifySuccess(successfulUpdates);
+        if (isCancelled()) {
+            notifyCancellation();
             return null;
+        }
+
+        List<String> updatedEntries = processMergeEntries();
+
+        if (isCancelled()) {
+            notifyCancellation();
+            updateUndoManager(updatedEntries);
+            return null;
+        }
+
+        updateUndoManager(updatedEntries);
+        LOGGER.debug("Merge operation completed. Processed: {}, Successfully updated: {}",
+                processedEntries, successfulUpdates);
+        notifySuccess(successfulUpdates);
+        return null;
     }
 
     private void notifyCancellation() {
@@ -125,8 +125,8 @@ public class BatchEntryMergeTask extends BackgroundTask<Void> {
 
     private void notifySuccess(int updateCount) {
         String message = updateCount == 0
-                ? Localization.lang("No updates found.")
-                : Localization.lang("Batch update successful. %0 entry(s) updated.", updateCount);
+                         ? Localization.lang("No updates found.")
+                         : Localization.lang("Batch update successful. %0 entry(s) updated.", updateCount);
         notificationService.notify(message);
     }
 }

@@ -11,12 +11,12 @@ public class RootResource {
     @Produces(MediaType.TEXT_HTML)
     public String get() {
         return """
-<html>
-<body>
-<p>
-  JabRef http API runs. Please navigate to <a href="libraries">libraries</a>.
-</p>
-</body>
-""";
+                <html>
+                <body>
+                <p>
+                  JabRef http API runs. Please navigate to <a href="libraries">libraries</a>.
+                </p>
+                </body>
+                """;
     }
 }
