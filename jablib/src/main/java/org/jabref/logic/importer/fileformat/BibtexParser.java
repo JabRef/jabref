@@ -192,7 +192,9 @@ public class BibtexParser implements Parser {
         StringWriter stringWriter = new StringWriter(BibtexParser.LOOKAHEAD);
         int i = 0;
         int currentChar;
+        // @formatter:off
         do {
+            // @formatter:on
             currentChar = pushbackReader.read();
             stringWriter.append((char) currentChar);
             i++;
@@ -887,7 +889,9 @@ public class BibtexParser implements Parser {
         char currentChar;
 
         // Find a char which ends key (','&&'\n') or entryfield ('='):
+        // @formatter:off
         do {
+            // @formatter:on
             currentChar = (char) read();
             key.append(currentChar);
             lookaheadUsed++;
@@ -1173,7 +1177,9 @@ public class BibtexParser implements Parser {
 
     private boolean consumeUncritically(char expected) throws IOException {
         int character;
+        // @formatter:off
         do {
+            // @formatter:on
             character = read();
         } while ((character != expected) && (character != -1) && (character != 65535));
 
