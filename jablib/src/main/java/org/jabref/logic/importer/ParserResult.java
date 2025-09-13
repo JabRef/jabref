@@ -188,8 +188,7 @@ public class ParserResult {
     }
 
     /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
-    public Range getFieldRange(BibEntry entry, Field
-            field) {
+    public Range getFieldRange(BibEntry entry, Field field) {
         Map<Field, Range> rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());
 
         if (rangeMap.isEmpty()) {
