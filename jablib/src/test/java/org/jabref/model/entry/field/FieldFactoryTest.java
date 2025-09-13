@@ -4,6 +4,7 @@ import java.util.stream.Stream;
 
 import org.jabref.model.entry.types.BiblatexApaEntryType;
 
+import io.github.adr.linked.ADR;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class FieldFactoryTest {
-    /// ADR 49: Always use exact casing for UnknownFields, only StandardFields have hardcoded capital first letter as display name
+    @ADR(49)
     @Test
     void orFieldsTwoTerms() {
         assertEquals("aaa/bbb", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb")));
     }
 
-    /// ADR 49: Always use exact casing for UnknownFields, only StandardFields have hardcoded capital first letter as display name
+    @ADR(49)
     @Test
     void orFieldsThreeTerms() {
         assertEquals("aaa/bbb/ccc", FieldFactory.serializeOrFields(new UnknownField("aaa"), new UnknownField("bbb"), new UnknownField("ccc")));
