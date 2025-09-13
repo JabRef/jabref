@@ -96,61 +96,62 @@ import org.jabref.model.util.FileUpdateMonitor;
 import com.airhacks.afterburner.injection.Injector;
 
 public class MainMenu extends MenuBar {
-    private final JabRefFrame frame;
-    private final FileHistoryMenu fileHistoryMenu;
-    private final SidePane sidePane;
-    private final GuiPushToApplicationCommand pushToApplicationCommand;
-    private final GuiPreferences preferences;
-    private final StateManager stateManager;
-    private final FileUpdateMonitor fileUpdateMonitor;
-    private final TaskExecutor taskExecutor;
-    private final DialogService dialogService;
-    private final JournalAbbreviationRepository abbreviationRepository;
-    private final BibEntryTypesManager entryTypesManager;
-    private final CountingUndoManager undoManager;
-    private final ClipBoardManager clipBoardManager;
-    private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
-    private final AiService aiService;
-    private final PreviewControls previewControls;
-    private final GitHandlerRegistry gitHandlerRegistry;
 
-    public MainMenu(JabRefFrame frame,
-                    FileHistoryMenu fileHistoryMenu,
-                    SidePane sidePane,
-                    GuiPushToApplicationCommand pushToApplicationCommand,
-                    GuiPreferences preferences,
-                    StateManager stateManager,
-                    FileUpdateMonitor fileUpdateMonitor,
-                    TaskExecutor taskExecutor,
-                    DialogService dialogService,
-                    JournalAbbreviationRepository abbreviationRepository,
-                    BibEntryTypesManager entryTypesManager,
-                    CountingUndoManager undoManager,
-                    ClipBoardManager clipBoardManager,
-                    Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
-                    AiService aiService,
-                    PreviewControls previewControls,
-                    GitHandlerRegistry gitHandlerRegistry) {
-        this.frame = frame;
-        this.fileHistoryMenu = fileHistoryMenu;
-        this.sidePane = sidePane;
-        this.pushToApplicationCommand = pushToApplicationCommand;
-        this.preferences = preferences;
-        this.stateManager = stateManager;
-        this.fileUpdateMonitor = fileUpdateMonitor;
-        this.taskExecutor = taskExecutor;
-        this.dialogService = dialogService;
-        this.abbreviationRepository = abbreviationRepository;
-        this.entryTypesManager = entryTypesManager;
-        this.undoManager = undoManager;
-        this.clipBoardManager = clipBoardManager;
-        this.openDatabaseActionSupplier = openDatabaseActionSupplier;
-        this.aiService = aiService;
-        this.previewControls = previewControls;
-        this.gitHandlerRegistry = gitHandlerRegistry;
+        private final JabRefFrame frame;
+        private final FileHistoryMenu fileHistoryMenu;
+        private final SidePane sidePane;
+        private final GuiPushToApplicationCommand pushToApplicationCommand;
+        private final GuiPreferences preferences;
+        private final StateManager stateManager;
+        private final FileUpdateMonitor fileUpdateMonitor;
+        private final TaskExecutor taskExecutor;
+        private final DialogService dialogService;
+        private final JournalAbbreviationRepository abbreviationRepository;
+        private final BibEntryTypesManager entryTypesManager;
+        private final CountingUndoManager undoManager;
+        private final ClipBoardManager clipBoardManager;
+        private final Supplier<OpenDatabaseAction> openDatabaseActionSupplier;
+        private final AiService aiService;
+        private final PreviewControls previewControls;
+        private final GitHandlerRegistry gitHandlerRegistry;
 
-        createMenu();
-    }
+        public MainMenu(JabRefFrame frame,
+                        FileHistoryMenu fileHistoryMenu,
+                        SidePane sidePane,
+                        GuiPushToApplicationCommand pushToApplicationCommand,
+                        GuiPreferences preferences,
+                        StateManager stateManager,
+                        FileUpdateMonitor fileUpdateMonitor,
+                        TaskExecutor taskExecutor,
+                        DialogService dialogService,
+                        JournalAbbreviationRepository abbreviationRepository,
+                        BibEntryTypesManager entryTypesManager,
+                        CountingUndoManager undoManager,
+                        ClipBoardManager clipBoardManager,
+                        Supplier<OpenDatabaseAction> openDatabaseActionSupplier,
+                        AiService aiService,
+                        PreviewControls previewControls,
+                        GitHandlerRegistry gitHandlerRegistry) {
+                this.frame = frame;
+                this.fileHistoryMenu = fileHistoryMenu;
+                this.sidePane = sidePane;
+                this.pushToApplicationCommand = pushToApplicationCommand;
+                this.preferences = preferences;
+                this.stateManager = stateManager;
+                this.fileUpdateMonitor = fileUpdateMonitor;
+                this.taskExecutor = taskExecutor;
+                this.dialogService = dialogService;
+                this.abbreviationRepository = abbreviationRepository;
+                this.entryTypesManager = entryTypesManager;
+                this.undoManager = undoManager;
+                this.clipBoardManager = clipBoardManager;
+                this.openDatabaseActionSupplier = openDatabaseActionSupplier;
+                this.aiService = aiService;
+                this.previewControls = previewControls;
+                this.gitHandlerRegistry = gitHandlerRegistry;
+
+                createMenu();
+        }
 
     private void createMenu() {
         ActionFactory factory = new ActionFactory();
@@ -167,12 +168,22 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),
                 factory.createMenuItem(StandardActions.OPEN_LIBRARY, openDatabaseActionSupplier.get()),
                 fileHistoryMenu,
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService, stateManager)),
-                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
-
-                new SeparatorMenuItem(),
+                MenuItem saveLibrary = factory.createMenuItem(
+                 StandardActions.SAVE_LIBRARY,
+                new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)
+                );
+                saveLibrary.disableProperty().bind(stateManager.activeDatabaseProperty().isNull());
+                 file.getItems().add(saveLibrary);
+                MenuItem saveLibraryAs=factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))
+                saveLibraryAs.disableProperty().bind(stateManager.activeDatabaseProperty().isNull());
+                file.getItems().add(saveLibraryAs)
+                MenuItem saveAll=factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService, stateManager));
+                saveAll.disableProperty().bind(stateManager.activeDatabaseProperty().isNull());
+                file.getItems().add(saveAll)
+                MenuItem closeLibrary=factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager));
+                closeLibrary.disableProperty().bind(stateManager.activeDatabaseProperty().isNull());
+                file.getItems().add(closeLibrary)
+                new SeparatorMenuItem(),        
 
                 factory.createSubMenu(StandardActions.IMPORT,
                         factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.TO_EXISTING, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService)),
@@ -431,16 +442,15 @@ public class MainMenu extends MenuBar {
         setUseSystemMenuBar(true);
     }
 
-    private Menu createSendSubMenu(ActionFactory factory,
-                                   DialogService dialogService,
-                                   StateManager stateManager,
-                                   GuiPreferences preferences) {
-        Menu sendMenu = factory.createMenu(StandardActions.SEND);
-        sendMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor)),
-                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor))
-        );
+        private Menu createSendSubMenu(ActionFactory factory,
+                                       DialogService dialogService,
+                                       StateManager stateManager,
+                                       GuiPreferences preferences) {
+                Menu sendMenu = factory.createMenu(StandardActions.SEND);
+                sendMenu.getItems().addAll(
+                                           factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor)),
+                                           factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor)));
 
-        return sendMenu;
-    }
+                return sendMenu;
+        }
 }
