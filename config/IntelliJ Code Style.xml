@@ -42,7 +42,7 @@
     <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
     <option name="ALIGN_MULTILINE_TERNARY_OPERATION" value="true" />
     <option name="SPACE_BEFORE_ARRAY_INITIALIZER_LBRACE" value="true" />
-    <option name="TERNARY_OPERATION_WRAP" value="5" />
+    <option name="DOWHILE_BRACE_FORCE" value="3" />
     <arrangement>
       <rules>
         <section>
