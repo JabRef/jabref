@@ -5,18 +5,17 @@
 2. The system shall enable users to organize references into collections, assign keywords, merge duplicate entries, and automatically move associated documents according to a specific rule set.
 3. The system shall support native BibTex and BibLaTeX for importing and exoporting sources from files
 4. The system shall shaw allow users to completed and fix their bilibgraphic data through comparision of online catalogs such as Google Scholar, Springer, or MathSciNet
-5. The system shall allow users to share their document library with other users (including a .txt file) that can be shared to Dropbox or Google Drive.
+5. The system shall allow users to share their document library with other users as a .txt file that can be shared to Dropbox or Google Drive.
 6. The system shall provide customizable export options, including exporting over 15 supported files.
 8. The system shall synchronize user's content library with a SQL database.
-...
+
 
 ## Non-Functional Requirements
 1. The system shall be free of charge, open-source, and cross-platform to ensure accessibility and ease of use for users across different operating systems and environments.
 2. The system shall shall be able to be run as a CLI application or built from the source to give users installion options. 
 3. The SQL database for library syncing shall maintain 99.9% availability to ensure the user can always sync as needed.
 4. The SQL database for library syncing shall implement encryption and access controls to ensure data security.
-5. Given the user selects 'export' button on the GUI version of JabRef, the system must process and respond within seconds.
-...
+5. Upon pressing 'export' in JabRef GUI, the system shall process export filters accurately and efficiently, maintaining the integrity of user-customized export formats, given any.
 
 ## Test Oracles
 1. Given a valid DOI entered by the user, the system shall fetch and populate the corresponding complete bibliographic information.
@@ -28,7 +27,7 @@
 7. When the user clicks 'sync library', the system will securely connect to the remote storage and update the local library by merging changes from the server.
 8. When exporting a .bib citation, the system will display an export dialog allowing the user to select or preview the citation formatted according to the selected export filter.
 9. When exporting the entire library, the system will prompt the user with a save file dialog to choose the destination location, such as the desktop.
-...
+
 
 | Requirement ID | Requirement Description | Test Oracle (Expected Behavior) |
 |-----------------------|-----------------------------------|---------------------------------------------|
