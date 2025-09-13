@@ -31,6 +31,7 @@
         <package name="" withSubpackages="true" static="true" />
       </value>
     </option>
+    <option name="RECORD_COMPONENTS_WRAP" value="0" />
     <option name="MULTI_CATCH_TYPES_WRAP" value="0" />
   </JavaCodeStyleSettings>
   <codeStyleSettings language="JAVA">
