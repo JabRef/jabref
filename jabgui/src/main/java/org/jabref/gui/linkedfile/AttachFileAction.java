@@ -85,8 +85,8 @@ public class AttachFileAction extends SimpleCommand {
                          .ifPresent(editedLinkedFile -> {
                              Optional<FieldChange> fieldChange = entry.addFile(editedLinkedFile);
                              fieldChange.ifPresent(change -> {
-                                 UndoableFieldChange ce = new UndoableFieldChange(change);
-                                 libraryTab.getUndoManager().addEdit(ce);
+                                 UndoableFieldChange compoundEdit = new UndoableFieldChange(change);
+                                 libraryTab.getUndoManager().addEdit(compoundEdit);
                                  libraryTab.markBaseChanged();
                              });
                          });
