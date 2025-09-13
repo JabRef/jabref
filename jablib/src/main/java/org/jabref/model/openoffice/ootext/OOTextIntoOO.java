@@ -176,7 +176,8 @@ public class OOTextIntoOO {
                     formatStack.pushLayer(setCharWeight(FontWeight.BOLD));
                     expectEnd.push("/" + tagName);
                     break;
-                case "i", "em":
+                case "i",
+                     "em":
                     formatStack.pushLayer(setCharPosture(FontSlant.ITALIC));
                     expectEnd.push("/" + tagName);
                     break;
@@ -232,8 +233,10 @@ public class OOTextIntoOO {
                         String key = pair.a;
                         String value = pair.b;
                         switch (key) {
-                            case "target" -> UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
-                            default -> LOGGER.warn("Unexpected attribute '{}' for <{}>", key, tagName);
+                            case "target" ->
+                                    UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
+                            default ->
+                                    LOGGER.warn("Unexpected attribute '{}' for <{}>", key, tagName);
                         }
                     }
                     break;
@@ -249,11 +252,11 @@ public class OOTextIntoOO {
                         String value = pair.b;
                         switch (key) {
                             case "oo:CharStyleName" ->
-                                    // <span oo:CharStyleName="Standard">
+                                // <span oo:CharStyleName="Standard">
                                     settings.addAll(setCharStyleName(value));
                             case "lang" ->
-                                    // <span lang="zxx">
-                                    // <span lang="en-US">
+                                // <span lang="zxx">
+                                // <span lang="en-US">
                                     settings.addAll(setCharLocale(value));
                             case "style" -> {
                                 // HTML-style small-caps
@@ -263,7 +266,8 @@ public class OOTextIntoOO {
                                 }
                                 LOGGER.warn("Unexpected value {} for attribute '{}' for <{}>", value, key, tagName);
                             }
-                            default -> LOGGER.warn("Unexpected attribute '{}' for <{}>", key, tagName);
+                            default ->
+                                    LOGGER.warn("Unexpected attribute '{}' for <{}>", key, tagName);
                         }
                     }
                     formatStack.pushLayer(settings);
@@ -327,8 +331,8 @@ public class OOTextIntoOO {
             propertySet.setPropertyValue(CHAR_STYLE_NAME, "Standard");
             xPropertyState.setPropertyToDefault("CharCaseMap");
         } catch (UnknownPropertyException |
-                PropertyVetoException |
-                WrappedTargetException ex) {
+                 PropertyVetoException |
+                 WrappedTargetException ex) {
             LOGGER.warn("exception caught", ex);
         }
 
@@ -747,9 +751,9 @@ public class OOTextIntoOO {
             propertySet.setPropertyValue(PARA_STYLE_NAME, paragraphStyle);
             return PASS;
         } catch (UnknownPropertyException
-                | PropertyVetoException
-                | IllegalArgumentException
-                | WrappedTargetException ex) {
+                 | PropertyVetoException
+                 | IllegalArgumentException
+                 | WrappedTargetException ex) {
             return FAIL;
         }
     }

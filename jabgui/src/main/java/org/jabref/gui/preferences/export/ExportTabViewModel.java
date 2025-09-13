@@ -36,9 +36,12 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         SaveOrder exportSaveOrder = exportPreferences.getExportSaveOrder();
         switch (exportSaveOrder.getOrderType()) {
-            case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
-            case ORIGINAL -> exportInOriginalProperty.setValue(true);
-            case TABLE -> exportInTableOrderProperty.setValue(true);
+            case SPECIFIED ->
+                    exportInSpecifiedOrderProperty.setValue(true);
+            case ORIGINAL ->
+                    exportInOriginalProperty.setValue(true);
+            case TABLE ->
+                    exportInTableOrderProperty.setValue(true);
         }
         sortCriteriaProperty.addAll(exportSaveOrder.getSortCriteria().stream()
                                                    .map(SortCriterionViewModel::new)

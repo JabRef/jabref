@@ -81,7 +81,7 @@ public class BibtexString implements Cloneable {
 
     /**
      * Default constructor. Use this if in doubt.
-     *
+     * <p>
      * In case this constructor is used - and the library is eventually written, the serialization is generated from scratch (and not some null from parsedSerialization)
      */
     public BibtexString(String name, String content) {
@@ -170,7 +170,7 @@ public class BibtexString implements Cloneable {
     public Object clone() {
         BibtexString clone;
         if (parsedSerialization == null) {
-             clone = new BibtexString(name, content);
+            clone = new BibtexString(name, content);
         } else {
             clone = new BibtexString(name, content, parsedSerialization);
         }

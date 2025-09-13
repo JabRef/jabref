@@ -10,7 +10,8 @@ import org.jabref.model.strings.StringUtil;
 
 /**
  * A merger for the {@link StandardField#FILE} field
- * */
+ *
+ */
 public class FileMerger implements FieldMerger {
     @Override
     public String merge(String filesA, String filesB) {

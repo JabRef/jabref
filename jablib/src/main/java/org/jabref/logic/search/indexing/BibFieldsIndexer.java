@@ -412,11 +412,11 @@ public class BibFieldsIndexer {
         try {
             LOGGER.debug("Closing connection to Postgres server for library: {}", libraryName);
             connection.createStatement().executeUpdate("""
-                        DROP TABLE IF EXISTS %s
-                        """.formatted(schemaMainTableReference));
+                    DROP TABLE IF EXISTS %s
+                    """.formatted(schemaMainTableReference));
             connection.createStatement().executeUpdate("""
-                        DROP TABLE IF EXISTS %s
-                        """.formatted(schemaSplitValuesTableReference));
+                    DROP TABLE IF EXISTS %s
+                    """.formatted(schemaSplitValuesTableReference));
             connection.close();
         } catch (SQLException e) {
             LOGGER.error("Could not drop table for library: {}", libraryName, e);
@@ -429,8 +429,8 @@ public class BibFieldsIndexer {
 
     private void addEntryLinks(BibEntry bibEntry, Field field, PreparedStatement preparedStatementSplitValues, String entryId) {
         bibEntry.getEntryLinkList(field, databaseContext.getDatabase()).stream()
-            .distinct()
-            .forEach(link -> addBatch(preparedStatementSplitValues, entryId, field, link.getKey()));
+                .distinct()
+                .forEach(link -> addBatch(preparedStatementSplitValues, entryId, field, link.getKey()));
     }
 
     private static void addGroups(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {

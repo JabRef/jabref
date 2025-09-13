@@ -83,10 +83,14 @@ class BibEntrySerializer extends BasicDataType<BibEntry> {
     @Override
     public int compare(@NonNull BibEntry a, @NonNull BibEntry b) {
         return switch (BibEntryCompare.compareEntries(a, b)) {
-            case SUBSET -> -1;
-            case SUPERSET -> 1;
-            case EQUAL -> 0;
-            default -> Objects.compare(a.hashCode(), b.hashCode(), Integer::compare);
+            case SUBSET ->
+                    -1;
+            case SUPERSET ->
+                    1;
+            case EQUAL ->
+                    0;
+            default ->
+                    Objects.compare(a.hashCode(), b.hashCode(), Integer::compare);
         };
     }
 

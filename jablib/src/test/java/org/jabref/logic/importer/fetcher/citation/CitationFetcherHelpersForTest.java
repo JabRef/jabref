@@ -10,9 +10,9 @@ import org.jabref.model.entry.BibEntry;
 public class CitationFetcherHelpersForTest {
     public static class Mocks {
         public static CitationFetcher from(
-            Function<BibEntry, List<BibEntry>> retrieveCitedBy,
-            Function<BibEntry, List<BibEntry>> retrieveCiting,
-            Function<BibEntry, Optional<Integer>> retrieveCitationCount
+                Function<BibEntry, List<BibEntry>> retrieveCitedBy,
+                Function<BibEntry, List<BibEntry>> retrieveCiting,
+                Function<BibEntry, Optional<Integer>> retrieveCitationCount
         ) {
             return new CitationFetcher() {
                 @Override

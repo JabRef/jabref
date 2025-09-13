@@ -31,10 +31,10 @@ public class FileFieldParser {
 
     /**
      * Converts the string representation of LinkedFileData to a List of LinkedFile
-     *
+     * <p>
      * The syntax of one element is description:path:type
      * Multiple elements are concatenated with ;
-     *
+     * <p>
      * The main challenges of the implementation are:
      *
      * <ul>
@@ -139,9 +139,9 @@ public class FileFieldParser {
 
     /**
      * Converts the given textual representation of a LinkedFile object
-     *
+     * <p>
      * SIDE EFFECT: The given entry list is cleared upon completion
-     *
+     * <p>
      * Expected format is: description:link:fileType:sourceURL
      * fileType is an {@link org.jabref.gui.externalfiletype.ExternalFileType}, which contains a name and a mime type
      *

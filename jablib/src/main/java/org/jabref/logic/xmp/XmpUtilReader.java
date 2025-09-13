@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Readings on XMP are available at docs/code-howtos/xmp-parsing.md
- *
+ * <p>
  * See also {@link org.jabref.logic.xmp.XmpUtilWriter#writeDocumentInformation}
  */
 public class XmpUtilReader {
@@ -57,7 +57,6 @@ public class XmpUtilReader {
 
     /**
      * @param path The path to read from.
-     *
      * @return list of a single BibEntry retrieved by merging the data from the stream
      */
     public List<BibEntry> readXmp(Path path, XmpPreferences xmpPreferences) throws IOException {
@@ -68,13 +67,13 @@ public class XmpUtilReader {
 
     /**
      * Merges all XMP data together in one entry.
-     *
+     * <p>
      * Try to read the given BibTexEntry from the given PDF file.
      * <p>
      * Looks at the DocumentInformation and the XMP metadata.
      * Regarding the XMP metadata, only Dublin Core is supported.
      *
-     * @param path the path to the PDF file
+     * @param path     the path to the PDF file
      * @param document the PDF document to read from (should have been created from <code>path</code>
      */
     public List<BibEntry> readXmp(Path path, PDDocument document, XmpPreferences xmpPreferences) {
@@ -105,8 +104,11 @@ public class XmpUtilReader {
                     result.removeFirst();
                     result.addFirst(entry);
                 }
-                case DIFFERENT -> result.addFirst(entry);
-                case DISJUNCT_OR_EQUAL_FIELDS, DISJUNCT -> first.mergeWith(entry);
+                case DIFFERENT ->
+                        result.addFirst(entry);
+                case DISJUNCT_OR_EQUAL_FIELDS,
+                     DISJUNCT ->
+                        first.mergeWith(entry);
                 // in all other cases (EQUAL, SUPERSET), the documentInformation is ignored
             }
         });

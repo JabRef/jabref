@@ -25,7 +25,7 @@ public class OpenDatabase {
     }
 
     public static ParserResult loadDatabase(InputStream inputStream, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor)
-        throws IOException {
+            throws IOException {
         return new BibtexImporter(importFormatPreferences, fileUpdateMonitor).importDatabase(inputStream, new BibtexImporter.EncodingResult(Charset.defaultCharset(), true));
     }
 }

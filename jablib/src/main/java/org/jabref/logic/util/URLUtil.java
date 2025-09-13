@@ -84,12 +84,12 @@ public class URLUtil {
         if (url == null || url.trim().isEmpty()) {
             return false;
         }
-        
+
         // Check if the URL has a protocol (http://, https://, ftp://)
         if (!URL_PATTERN.matcher(url).matches()) {
             return false;
         }
-        
+
         try {
             create(url);
             return true;

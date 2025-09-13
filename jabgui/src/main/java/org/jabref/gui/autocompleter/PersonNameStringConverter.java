@@ -41,7 +41,8 @@ public class PersonNameStringConverter extends StringConverter<Author> {
     public String toString(Author author) {
         if (autoCompLF) {
             switch (autoCompleteFirstNameMode) {
-                case ONLY_ABBREVIATED, BOTH:
+                case ONLY_ABBREVIATED,
+                     BOTH:
                     return author.getFamilyGiven(true);
                 case ONLY_FULL:
                     return author.getFamilyGiven(false);
@@ -51,7 +52,8 @@ public class PersonNameStringConverter extends StringConverter<Author> {
         }
         if (autoCompFF) {
             switch (autoCompleteFirstNameMode) {
-                case ONLY_ABBREVIATED, BOTH:
+                case ONLY_ABBREVIATED,
+                     BOTH:
                     return author.getGivenFamily(true);
                 case ONLY_FULL:
                     return author.getGivenFamily(false);

@@ -9,24 +9,46 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root type="VBox" styleClass="edit-field-content-pane" xmlns="http://javafx.com/javafx/17"
-         xmlns:fx="http://javafx.com/fxml/1"
-         fx:controller="org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentTabView">
-    <Label styleClass="sectionHeader" text="%Edit field content for selected entries"/>
+<fx:root
+        type="VBox"
+        styleClass="edit-field-content-pane"
+        xmlns="http://javafx.com/javafx/17"
+        xmlns:fx="http://javafx.com/fxml/1"
+        fx:controller="org.jabref.gui.edit.automaticfiededitor.editfieldcontent.EditFieldContentTabView">
+    <Label styleClass="sectionHeader"
+           text="%Edit field content for selected entries"/>
     <HBox styleClass="actions">
-        <ComboBox fx:id="fieldComboBox" editable="true" HBox.hgrow="ALWAYS"/>
-        <TextField fx:id="fieldValueTextField" promptText="%Set or append content" HBox.hgrow="ALWAYS"/>
+        <ComboBox
+                fx:id="fieldComboBox"
+                editable="true"
+                HBox.hgrow="ALWAYS"/>
+        <TextField
+                fx:id="fieldValueTextField"
+                promptText="%Set or append content"
+                HBox.hgrow="ALWAYS"/>
     </HBox>
-    <CheckBox fx:id="overwriteFieldContentCheckBox" mnemonicParsing="false" text="%Overwrite field content"/>
+    <CheckBox
+            fx:id="overwriteFieldContentCheckBox"
+            mnemonicParsing="false"
+            text="%Overwrite field content"/>
     <HBox styleClass="actions">
-        <Button fx:id="setValueButton" mnemonicParsing="false" onAction="#setFieldValue" text="%Set"/>
-        <Button fx:id="appendValueButton" mnemonicParsing="false" onAction="#appendToFieldValue"
+        <Button fx:id="setValueButton"
+                mnemonicParsing="false"
+                onAction="#setFieldValue"
+                text="%Set"/>
+        <Button fx:id="appendValueButton"
+                mnemonicParsing="false"
+                onAction="#appendToFieldValue"
                 text="%Append"/>
-        <Separator orientation="VERTICAL"/>
-        <Button fx:id="clearFieldButton" mnemonicParsing="false" onAction="#clearField"
+        <Separator
+                orientation="VERTICAL"/>
+        <Button fx:id="clearFieldButton"
+                mnemonicParsing="false"
+                onAction="#clearField"
                 text="%Clear field content">
             <graphic>
-                <JabRefIconView glyph="DELETE_ENTRY"/>
+                <JabRefIconView
+                        glyph="DELETE_ENTRY"/>
             </graphic>
         </Button>
     </HBox>

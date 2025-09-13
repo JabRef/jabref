@@ -99,10 +99,14 @@
                 HBox.hgrow="ALWAYS"/>
     </HBox>
 
-    <GridPane hgap="10" vgap="10">
+    <GridPane
+            hgap="10"
+            vgap="10">
         <columnConstraints>
-            <ColumnConstraints halignment="LEFT"/>
-            <ColumnConstraints hgrow="ALWAYS"/>
+            <ColumnConstraints
+                    halignment="LEFT"/>
+            <ColumnConstraints
+                    hgrow="ALWAYS"/>
         </columnConstraints>
         <padding>
             <Insets left="20.0"/>
@@ -110,21 +114,25 @@
 
         <Label alignment="BASELINE_CENTER"
                text="%Chat model"
-               GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+               GridPane.rowIndex="0"
+               GridPane.columnIndex="0"/>
         <ComboBox
                 fx:id="chatModelComboBox"
                 editable="true"
                 maxWidth="1.7976931348623157E308"
                 HBox.hgrow="ALWAYS"
-                GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                GridPane.rowIndex="0"
+                GridPane.columnIndex="1"/>
 
         <Label alignment="BASELINE_CENTER"
                text="%API key"
-               GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+               GridPane.rowIndex="1"
+               GridPane.columnIndex="0"/>
         <CustomPasswordField
                 fx:id="apiKeyTextField"
                 HBox.hgrow="ALWAYS"
-                GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                GridPane.rowIndex="1"
+                GridPane.columnIndex="1"/>
     </GridPane>
 
     <HBox alignment="BASELINE_LEFT">
@@ -144,7 +152,8 @@
 
     <Spacer/>
 
-    <VBox spacing="10" fx:id="expertSettingsPane">
+    <VBox spacing="10"
+          fx:id="expertSettingsPane">
         <HBox alignment="CENTER_LEFT"
               spacing="10.0">
             <Label alignment="BASELINE_CENTER"
@@ -176,13 +185,21 @@
 
         <Spacer/>
 
-        <GridPane hgap="10" vgap="10">
+        <GridPane
+                hgap="10"
+                vgap="10">
             <columnConstraints>
-                <ColumnConstraints hgrow="ALWAYS" percentWidth="50"/>
-                <ColumnConstraints hgrow="ALWAYS" percentWidth="50"/>
+                <ColumnConstraints
+                        hgrow="ALWAYS"
+                        percentWidth="50"/>
+                <ColumnConstraints
+                        hgrow="ALWAYS"
+                        percentWidth="50"/>
             </columnConstraints>
 
-            <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="0">
+            <VBox spacing="10"
+                  GridPane.columnIndex="0"
+                  GridPane.rowIndex="0">
                 <Label HBox.hgrow="ALWAYS"
                        maxWidth="Infinity"
                        text="%Context window size"/>
@@ -191,7 +208,9 @@
                         HBox.hgrow="ALWAYS"/>
             </VBox>
 
-            <VBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="0">
+            <VBox spacing="10"
+                  GridPane.columnIndex="1"
+                  GridPane.rowIndex="0">
                 <Label HBox.hgrow="ALWAYS"
                        maxWidth="Infinity"
                        text="%Temperature"/>
@@ -200,7 +219,9 @@
                         HBox.hgrow="ALWAYS"/>
             </VBox>
 
-            <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="1">
+            <VBox spacing="10"
+                  GridPane.columnIndex="0"
+                  GridPane.rowIndex="1">
                 <Label HBox.hgrow="ALWAYS"
                        maxWidth="Infinity"
                        text="%RAG - maximum results count"/>
@@ -209,7 +230,9 @@
                         HBox.hgrow="ALWAYS"/>
             </VBox>
 
-            <VBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <VBox spacing="10"
+                  GridPane.columnIndex="1"
+                  GridPane.rowIndex="1">
                 <Label HBox.hgrow="ALWAYS"
                        maxWidth="Infinity"
                        text="%RAG - minimum score"/>
@@ -218,7 +241,9 @@
                         HBox.hgrow="ALWAYS"/>
             </VBox>
 
-            <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="2">
+            <VBox spacing="10"
+                  GridPane.columnIndex="0"
+                  GridPane.rowIndex="2">
                 <Label HBox.hgrow="ALWAYS"
                        maxWidth="Infinity"
                        text="%Document splitter - chunk size"/>
@@ -227,7 +252,9 @@
                         HBox.hgrow="ALWAYS"/>
             </VBox>
 
-            <VBox spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <VBox spacing="10"
+                  GridPane.columnIndex="1"
+                  GridPane.rowIndex="2">
                 <Label HBox.hgrow="ALWAYS"
                        maxWidth="Infinity"
                        text="%Document splitter - overlap size"/>
@@ -259,57 +286,76 @@
                 prefWidth="20.0"/>
     </HBox>
 
-    <TabPane fx:id="templatesTabPane">
+    <TabPane
+            fx:id="templatesTabPane">
         <Tab fx:id="systemMessageForChattingTab"
-             text="%System message for chatting" closable="false">
-            <TextArea fx:id="systemMessageTextArea"/>
+             text="%System message for chatting"
+             closable="false">
+            <TextArea
+                    fx:id="systemMessageTextArea"/>
         </Tab>
         <Tab fx:id="userMessageForChattingTab"
-             text="%User message for chatting" closable="false">
-            <TextArea fx:id="userMessageTextArea"/>
+             text="%User message for chatting"
+             closable="false">
+            <TextArea
+                    fx:id="userMessageTextArea"/>
         </Tab>
         <Tab fx:id="summarizationChunkSystemMessageTab"
-             text="%System message for summarization of a chunk" closable="false">
-            <TextArea fx:id="summarizationChunkSystemMessageTextArea"/>
+             text="%System message for summarization of a chunk"
+             closable="false">
+            <TextArea
+                    fx:id="summarizationChunkSystemMessageTextArea"/>
         </Tab>
         <Tab fx:id="summarizationChunkUserMessageTab"
-             text="%User message for summarization of a chunk" closable="false">
-            <TextArea fx:id="summarizationChunkUserMessageTextArea"/>
+             text="%User message for summarization of a chunk"
+             closable="false">
+            <TextArea
+                    fx:id="summarizationChunkUserMessageTextArea"/>
         </Tab>
         <Tab fx:id="summarizationCombineSystemMessageTab"
              text="%System message for summarization of several chunks"
              closable="false">
-            <TextArea fx:id="summarizationCombineSystemMessageTextArea"/>
+            <TextArea
+                    fx:id="summarizationCombineSystemMessageTextArea"/>
         </Tab>
         <Tab fx:id="summarizationCombineUserMessageTab"
              text="%User message for summarization of several chunks"
              closable="false">
-            <TextArea fx:id="summarizationCombineUserMessageTextArea"/>
+            <TextArea
+                    fx:id="summarizationCombineUserMessageTextArea"/>
         </Tab>
         <Tab fx:id="citationParsingSystemMessageTab"
              text="%System message for parsing raw citations"
              closable="false">
-            <TextArea fx:id="citationParsingSystemMessageTextArea"/>
+            <TextArea
+                    fx:id="citationParsingSystemMessageTextArea"/>
         </Tab>
         <Tab fx:id="citationParsingUserMessageTab"
              text="%User message for parsing raw citations"
              closable="false">
-            <TextArea fx:id="citationParsingUserMessageTextArea"/>
+            <TextArea
+                    fx:id="citationParsingUserMessageTextArea"/>
         </Tab>
     </TabPane>
 
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <Button text="Reset current template" onAction="#onResetCurrentTemplateButtonClick">
+    <HBox spacing="10"
+          alignment="CENTER_LEFT">
+        <Button text="Reset current template"
+                onAction="#onResetCurrentTemplateButtonClick">
             <graphic>
-                <JabRefIconView glyph="REFRESH"/>
+                <JabRefIconView
+                        glyph="REFRESH"/>
             </graphic>
         </Button>
 
-        <Region fx:id="spacer" HBox.hgrow="ALWAYS"/>
+        <Region fx:id="spacer"
+                HBox.hgrow="ALWAYS"/>
 
-        <Button onAction="#onResetTemplatesButtonClick" text="%Reset templates to default">
+        <Button onAction="#onResetTemplatesButtonClick"
+                text="%Reset templates to default">
             <graphic>
-                <JabRefIconView glyph="REFRESH"/>
+                <JabRefIconView
+                        glyph="REFRESH"/>
             </graphic>
         </Button>
     </HBox>
@@ -319,15 +365,17 @@
            maxWidth="Infinity"
            HBox.hgrow="ALWAYS"/>
 
-    <CheckBox fx:id="autoGenerateEmbeddings"
-              mnemonicParsing="false"
-              text="%Automatically generate embeddings for new entries"
-              HBox.hgrow="ALWAYS"
-              maxWidth="Infinity"/>
+    <CheckBox
+            fx:id="autoGenerateEmbeddings"
+            mnemonicParsing="false"
+            text="%Automatically generate embeddings for new entries"
+            HBox.hgrow="ALWAYS"
+            maxWidth="Infinity"/>
 
-    <CheckBox fx:id="autoGenerateSummaries"
-              mnemonicParsing="false"
-              text="%Automatically generate summaries for new entries"
-              HBox.hgrow="ALWAYS"
-              maxWidth="Infinity"/>
+    <CheckBox
+            fx:id="autoGenerateSummaries"
+            mnemonicParsing="false"
+            text="%Automatically generate summaries for new entries"
+            HBox.hgrow="ALWAYS"
+            maxWidth="Infinity"/>
 </fx:root>

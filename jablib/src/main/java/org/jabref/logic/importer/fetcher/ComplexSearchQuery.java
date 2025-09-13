@@ -41,16 +41,25 @@ public class ComplexSearchQuery {
         terms.forEach(term -> {
             String termText = term.text();
             switch (term.field().toLowerCase()) {
-                case "author" -> builder.author(termText);
-                case "title" -> builder.titlePhrase(termText);
-                case "abstract" -> builder.abstractPhrase(termText);
-                case "journal" -> builder.journal(termText);
-                case "year" -> builder.singleYear(Integer.valueOf(termText));
-                case "year-range" -> builder.parseYearRange(termText);
-                case "doi" -> builder.DOI(termText);
-                case "default" -> builder.defaultFieldPhrase(termText);
+                case "author" ->
+                        builder.author(termText);
+                case "title" ->
+                        builder.titlePhrase(termText);
+                case "abstract" ->
+                        builder.abstractPhrase(termText);
+                case "journal" ->
+                        builder.journal(termText);
+                case "year" ->
+                        builder.singleYear(Integer.valueOf(termText));
+                case "year-range" ->
+                        builder.parseYearRange(termText);
+                case "doi" ->
+                        builder.DOI(termText);
+                case "default" ->
+                        builder.defaultFieldPhrase(termText);
                 // add unknown field as default field
-                default -> builder.defaultFieldPhrase(termText);
+                default ->
+                        builder.defaultFieldPhrase(termText);
             }
         });
         return builder.build();
@@ -253,14 +262,22 @@ public class ComplexSearchQuery {
             terms.forEach(term -> {
                 String termText = term.text();
                 switch (term.field().toLowerCase()) {
-                    case "author" -> this.author(termText);
-                    case "title" -> this.titlePhrase(termText);
-                    case "abstract" -> this.abstractPhrase(termText);
-                    case "journal" -> this.journal(termText);
-                    case "doi" -> this.DOI(termText);
-                    case "year" -> this.singleYear(Integer.valueOf(termText));
-                    case "year-range" -> this.parseYearRange(termText);
-                    case "default" -> this.defaultFieldPhrase(termText);
+                    case "author" ->
+                            this.author(termText);
+                    case "title" ->
+                            this.titlePhrase(termText);
+                    case "abstract" ->
+                            this.abstractPhrase(termText);
+                    case "journal" ->
+                            this.journal(termText);
+                    case "doi" ->
+                            this.DOI(termText);
+                    case "year" ->
+                            this.singleYear(Integer.valueOf(termText));
+                    case "year-range" ->
+                            this.parseYearRange(termText);
+                    case "default" ->
+                            this.defaultFieldPhrase(termText);
                 }
             });
             return this;

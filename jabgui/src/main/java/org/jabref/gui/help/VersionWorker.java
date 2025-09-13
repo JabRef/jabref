@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * This worker checks if there is a new version of JabRef available. If there is it will display a dialog to the user
  * offering him multiple options to proceed (see changelog, go to the download page, ignore this version, and remind
  * later).
- *
+ * <p>
  * If the versions check is executed manually and this is the latest version it will also display a dialog to inform the
  * user.
  */
@@ -99,7 +99,7 @@ public class VersionWorker {
         } else {
             // notify the user about a newer version
             if (dialogService.showCustomDialogAndWait(
-                    new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, externalApplicationsPreferences))
+                                     new NewVersionDialog(installedVersion, newerVersion.get(), dialogService, externalApplicationsPreferences))
                              .orElse(true)) {
                 internalPreferences.setIgnoredVersion(newerVersion.get());
             }

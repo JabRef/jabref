@@ -20,7 +20,7 @@ public final class EntryChange extends DatabaseChange {
         this.oldEntry = oldEntry;
         this.newEntry = newEntry;
         setChangeName(oldEntry.getCitationKey().map(key -> Localization.lang("Modified entry '%0'", key))
-                           .orElse(Localization.lang("Modified entry")));
+                              .orElse(Localization.lang("Modified entry")));
     }
 
     public EntryChange(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext) {

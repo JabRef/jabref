@@ -7,46 +7,64 @@
 <?import javafx.scene.layout.StackPane?>
 <?import org.jabref.gui.fieldeditors.EditorTextField?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
-         fx:controller="org.jabref.gui.fieldeditors.identifier.IdentifierEditor">
-    <EditorTextField fx:id="textField" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
-    <Button fx:id="shortenDOIButton" disable="${controller.viewModel.isInvalidIdentifier}"
+<fx:root
+        xmlns:fx="http://javafx.com/fxml/1"
+        type="HBox"
+        xmlns="http://javafx.com/javafx/8.0.112"
+        fx:controller="org.jabref.gui.fieldeditors.identifier.IdentifierEditor">
+    <EditorTextField
+            fx:id="textField"
+            prefHeight="0.0"
+            HBox.hgrow="ALWAYS"/>
+    <Button fx:id="shortenDOIButton"
+            disable="${controller.viewModel.isInvalidIdentifier}"
             onAction="#shortenID"
             styleClass="icon-button"
             managed="${controller.viewModel.canShortenIdentifier}"
             visible="${controller.viewModel.canShortenIdentifier}">
         <graphic>
-            <JabRefIconView glyph="SHORTEN_DOI"/>
+            <JabRefIconView
+                    glyph="SHORTEN_DOI"/>
         </graphic>
     </Button>
-    <Button disable="${controller.viewModel.isInvalidIdentifier}" onAction="#openExternalLink"
+    <Button disable="${controller.viewModel.isInvalidIdentifier}"
+            onAction="#openExternalLink"
             styleClass="icon-button">
         <graphic>
-            <JabRefIconView glyph="OPEN_LINK"/>
+            <JabRefIconView
+                    glyph="OPEN_LINK"/>
         </graphic>
         <tooltip>
-            <Tooltip text="%Open"/>
+            <Tooltip
+                    text="%Open"/>
         </tooltip>
     </Button>
-    <Button fx:id="lookupIdentifierButton" onAction="#lookupIdentifier" styleClass="icon-button"
+    <Button fx:id="lookupIdentifierButton"
+            onAction="#lookupIdentifier"
+            styleClass="icon-button"
             visible="${controller.viewModel.canLookupIdentifier}"
             managed="${controller.viewModel.canLookupIdentifier}">
         <graphic>
             <StackPane>
-                <JabRefIconView glyph="LOOKUP_IDENTIFIER"
-                                visible="${controller.viewModel.identifierLookupInProgress == false}"/>
-                <ProgressIndicator maxHeight="12.0" maxWidth="12.0"
-                                   visible="${controller.viewModel.identifierLookupInProgress}"/>
+                <JabRefIconView
+                        glyph="LOOKUP_IDENTIFIER"
+                        visible="${controller.viewModel.identifierLookupInProgress == false}"/>
+                <ProgressIndicator
+                        maxHeight="12.0"
+                        maxWidth="12.0"
+                        visible="${controller.viewModel.identifierLookupInProgress}"/>
             </StackPane>
         </graphic>
     </Button>
-    <Button fx:id="fetchInformationByIdentifierButton" disable="${controller.viewModel.isInvalidIdentifier}"
+    <Button fx:id="fetchInformationByIdentifierButton"
+            disable="${controller.viewModel.isInvalidIdentifier}"
             onAction="#fetchInformationByIdentifier"
             styleClass="icon-button"
             managed="${controller.viewModel.canFetchBibliographyInformationById}"
             visible="${controller.viewModel.canFetchBibliographyInformationById}">
         <graphic>
-            <JabRefIconView glyph="FETCH_BY_IDENTIFIER"/>
+            <JabRefIconView
+                    glyph="FETCH_BY_IDENTIFIER"/>
         </graphic>
     </Button>
 </fx:root>

@@ -42,13 +42,13 @@ class DoiCleanupTest {
                 // cleanup with Doi and no URL to entries
                 Arguments.of(
                         new BibEntry()
-                        .withField(StandardField.DOI, "10.1145/2594455")
-                        .withField(StandardField.NOTE, "This is a random note to this Doi")
-                        .withField(unknownField, "This is a random ee field for this Doi"),
+                                .withField(StandardField.DOI, "10.1145/2594455")
+                                .withField(StandardField.NOTE, "This is a random note to this Doi")
+                                .withField(unknownField, "This is a random ee field for this Doi"),
                         new BibEntry()
-                        .withField(StandardField.DOI, "10.1145/2594455")
-                        .withField(StandardField.NOTE, "This is a random note to this Doi")
-                        .withField(unknownField, "This is a random ee field for this Doi")),
+                                .withField(StandardField.DOI, "10.1145/2594455")
+                                .withField(StandardField.NOTE, "This is a random note to this Doi")
+                                .withField(unknownField, "This is a random ee field for this Doi")),
 
                 // cleanup with spaced Doi
                 Arguments.of(doiResult, new BibEntry()
@@ -64,8 +64,8 @@ class DoiCleanupTest {
 
                 // cleanup of url encoded chars
                 Arguments.of(new BibEntry()
-                         .withField(StandardField.DOI, "10.18726/2018_3"),
-                          new BibEntry()
-                         .withField(unknownField, "https://doi.org/10.18726/2018%7B%5Ctextunderscore%7D3")));
-            }
+                                .withField(StandardField.DOI, "10.18726/2018_3"),
+                        new BibEntry()
+                                .withField(unknownField, "https://doi.org/10.18726/2018%7B%5Ctextunderscore%7D3")));
+    }
 }

@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 class GitFileWriterTest {
     private ImportFormatPreferences importFormatPreferences;
+
     @BeforeEach
     void setUp() {
         SystemReader.setInstance(new NoopGitSystemReader());
@@ -33,11 +34,11 @@ class GitFileWriterTest {
     @Test
     void writeThenReadBack() throws Exception {
         BibDatabaseContext inputDatabaseContext = BibDatabaseContext.of("""
-        @article{a,
-            author = {Alice},
-            title = {Test},
-        }
-        """, importFormatPreferences);
+                @article{a,
+                    author = {Alice},
+                    title = {Test},
+                }
+                """, importFormatPreferences);
 
         Path tempFile = Files.createTempFile("tempgitwriter", ".bib");
         GitFileWriter.write(tempFile, inputDatabaseContext, importFormatPreferences);

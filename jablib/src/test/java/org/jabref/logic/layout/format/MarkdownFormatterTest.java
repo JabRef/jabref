@@ -30,57 +30,57 @@ class MarkdownFormatterTest {
         return Stream.of(
                 Arguments.of("Hello World", "<p>Hello World</p>"),
                 Arguments.of("""
-                        Markup
-                        
-                        * list item one
-                        * list item two
-                        
-                         rest
-                        """,
+                                Markup
+
+                                * list item one
+                                * list item two
+
+                                 rest
+                                """,
                         "<p>Markup</p> <ul> <li>list item one</li> <li>list item two</li> </ul> <p>rest</p>"
                 ),
                 Arguments.of("""
-                        ```
-                        Hello World
-                        ```
-                        """,
+                                ```
+                                Hello World
+                                ```
+                                """,
                         "<pre><code>Hello World </code></pre>"
                 ),
                 Arguments.of("""
-                       First line
-                    
-                       Second line
-                    
-                       ```java
-                       String test;
-                       ```
-                    """,
-                    "<p>First line</p> <p>Second line</p> <pre><code class=\"language-java\">String test; </code></pre>"
+                                   First line
+
+                                   Second line
+
+                                   ```java
+                                   String test;
+                                   ```
+                                """,
+                        "<p>First line</p> <p>Second line</p> <pre><code class=\"language-java\">String test; </code></pre>"
                 ),
                 Arguments.of("""
-                       Some text.
-                       ```javascript
-                       let test = "Hello World";
-                       ```
-                    
-                       ```java
-                       String test = "Hello World";
-                       ```
-                       Some more text.
-                    """,
-                    "<p>Some text.</p> <pre><code class=\"language-javascript\">let test = &quot;Hello World&quot;; " +
-                            "</code></pre> <pre><code class=\"language-java\">String test = &quot;Hello World&quot;; " +
-                            "</code></pre> <p>Some more text.</p>"
+                                   Some text.
+                                   ```javascript
+                                   let test = "Hello World";
+                                   ```
+
+                                   ```java
+                                   String test = "Hello World";
+                                   ```
+                                   Some more text.
+                                """,
+                        "<p>Some text.</p> <pre><code class=\"language-javascript\">let test = &quot;Hello World&quot;; " +
+                                "</code></pre> <pre><code class=\"language-java\">String test = &quot;Hello World&quot;; " +
+                                "</code></pre> <p>Some more text.</p>"
                 ),
                 Arguments.of("""
-                        Some text.
-                        
-                        ```java
-                        int foo = 0;
-                        foo = 1;
-                        
-                        ```
-                        """,
+                                Some text.
+
+                                ```java
+                                int foo = 0;
+                                foo = 1;
+
+                                ```
+                                """,
                         "<p>Some text.</p> <pre><code class=\"language-java\">int foo = 0; foo = 1;  </code></pre>"
                 )
         );

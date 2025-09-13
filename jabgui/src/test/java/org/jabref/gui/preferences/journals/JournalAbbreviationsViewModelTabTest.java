@@ -92,16 +92,18 @@ class JournalAbbreviationsViewModelTabTest {
     }
 
     private static String csvListOfAbbreviations(List<TestAbbreviation> testAbbreviations) {
-       return testAbbreviations.stream()
-               .map(TestAbbreviation::toString)
-               .collect(Collectors.joining("\n"));
+        return testAbbreviations.stream()
+                                .map(TestAbbreviation::toString)
+                                .collect(Collectors.joining("\n"));
     }
 
     private static String csvListOfAbbreviations(TestAbbreviation... testAbbreviations) {
         return csvListOfAbbreviations(Arrays.stream(testAbbreviations).toList());
     }
 
-    private record CsvFileNameAndContent(String fileName, String content) {
+    private record CsvFileNameAndContent(
+            String fileName,
+            String content) {
         CsvFileNameAndContent(String fileName, TestAbbreviation... testAbbreviations) {
             this(fileName, csvListOfAbbreviations(testAbbreviations));
         }

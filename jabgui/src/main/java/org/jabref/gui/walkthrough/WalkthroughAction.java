@@ -70,11 +70,14 @@ public class WalkthroughAction extends SimpleCommand {
                 switch (name) {
                     case MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME ->
                             createMainFileDirectoryWalkthrough();
-                    case PDF_LINK_WALKTHROUGH_NAME -> createPdfLinkWalkthrough();
+                    case PDF_LINK_WALKTHROUGH_NAME ->
+                            createPdfLinkWalkthrough();
                     case CUSTOMIZE_ENTRY_TABLE_WALKTHROUGH_NAME ->
                             createCustomizeEntryTableWalkthrough();
-                    case GROUP_WALKTHROUGH_NAME -> createGroupWalkthrough();
-                    case SEARCH_WALKTHROUGH_NAME -> createSearchWalkthrough();
+                    case GROUP_WALKTHROUGH_NAME ->
+                            createGroupWalkthrough();
+                    case SEARCH_WALKTHROUGH_NAME ->
+                            createSearchWalkthrough();
                     default ->
                             throw new IllegalArgumentException("Unknown walkthrough: " + name);
                 }

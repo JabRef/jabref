@@ -13,20 +13,32 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.controlsfx.control.MasterDetailPane?>
-<ScrollPane xmlns:fx="http://javafx.com/fxml/1" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER"
-            xmlns="http://javafx.com/javafx/8.0.112"
-            fx:controller="org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTabView" styleClass="editorPane">
-    <MasterDetailPane dividerPosition="0.6">
+<ScrollPane
+        xmlns:fx="http://javafx.com/fxml/1"
+        fitToHeight="true"
+        fitToWidth="true"
+        hbarPolicy="NEVER"
+        xmlns="http://javafx.com/javafx/8.0.112"
+        fx:controller="org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTabView"
+        styleClass="editorPane">
+    <MasterDetailPane
+            dividerPosition="0.6">
         <masterNode>
             <BorderPane>
                 <top>
-                    <HBox alignment="BASELINE_LEFT" spacing="10">
-                        <Label alignment="BASELINE_LEFT" text="%File"/>
-                        <ComboBox fx:id="files" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                    <HBox alignment="BASELINE_LEFT"
+                          spacing="10">
+                        <Label alignment="BASELINE_LEFT"
+                               text="%File"/>
+                        <ComboBox
+                                fx:id="files"
+                                maxWidth="Infinity"
+                                HBox.hgrow="ALWAYS"/>
                     </HBox>
                 </top>
                 <center>
-                    <ListView fx:id="annotationList"/>
+                    <ListView
+                            fx:id="annotationList"/>
                 </center>
             </BorderPane>
         </masterNode>
@@ -35,19 +47,28 @@
                 <HBox>
                     <Label fx:id="author"/>
                     <Pane HBox.hgrow="ALWAYS"/>
-                    <Button onAction="#copy" styleClass="icon-button">
+                    <Button onAction="#copy"
+                            styleClass="icon-button">
                         <graphic>
-                            <JabRefIconView glyph="COPY"/>
+                            <JabRefIconView
+                                    glyph="COPY"/>
                         </graphic>
                         <tooltip>
-                            <Tooltip text="%Copy to clipboard"/>
+                            <Tooltip
+                                    text="%Copy to clipboard"/>
                         </tooltip>
                     </Button>
                 </HBox>
                 <Label text="%Marking"/>
-                <TextArea fx:id="marking" editable="false" wrapText="true"/>
+                <TextArea
+                        fx:id="marking"
+                        editable="false"
+                        wrapText="true"/>
                 <Label text="%Content"/>
-                <TextArea fx:id="content" editable="false" wrapText="true"/>
+                <TextArea
+                        fx:id="content"
+                        editable="false"
+                        wrapText="true"/>
             </VBox>
         </detailNode>
     </MasterDetailPane>

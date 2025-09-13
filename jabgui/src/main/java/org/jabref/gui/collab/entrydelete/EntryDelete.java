@@ -15,8 +15,8 @@ public final class EntryDelete extends DatabaseChange {
         super(databaseContext, databaseChangeResolverFactory);
         this.deletedEntry = deletedEntry;
         setChangeName(deletedEntry.getCitationKey()
-                           .map(key -> Localization.lang("Deleted entry '%0'", key))
-                           .orElse(Localization.lang("Deleted entry")));
+                                  .map(key -> Localization.lang("Deleted entry '%0'", key))
+                                  .orElse(Localization.lang("Deleted entry")));
     }
 
     @Override

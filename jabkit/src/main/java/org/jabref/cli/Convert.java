@@ -110,9 +110,9 @@ public class Convert implements Runnable {
                     fileDirForDatabase,
                     Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
         } catch (IOException
-                | SaveException
-                | ParserConfigurationException
-                | TransformerException ex) {
+                 | SaveException
+                 | ParserConfigurationException
+                 | TransformerException ex) {
             LOGGER.error("Could not export file '{}'.", outputFile, ex);
         }
     }

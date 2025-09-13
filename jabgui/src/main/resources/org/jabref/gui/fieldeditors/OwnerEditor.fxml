@@ -5,16 +5,24 @@
 <?import javafx.scene.layout.HBox?>
 <?import org.jabref.gui.fieldeditors.EditorTextField?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
-         fx:controller="org.jabref.gui.fieldeditors.OwnerEditor">
-    <EditorTextField fx:id="textField" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
+<fx:root
+        xmlns:fx="http://javafx.com/fxml/1"
+        type="HBox"
+        xmlns="http://javafx.com/javafx/8.0.112"
+        fx:controller="org.jabref.gui.fieldeditors.OwnerEditor">
+    <EditorTextField
+            fx:id="textField"
+            prefHeight="0.0"
+            HBox.hgrow="ALWAYS"/>
     <Button onAction="#setOwner"
             styleClass="icon-button">
         <graphic>
-            <JabRefIconView glyph="OWNER"/>
+            <JabRefIconView
+                    glyph="OWNER"/>
         </graphic>
         <tooltip>
-            <Tooltip text="%Set current user name as owner."/>
+            <Tooltip
+                    text="%Set current user name as owner."/>
         </tooltip>
     </Button>
 </fx:root>

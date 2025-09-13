@@ -3,7 +3,12 @@ package org.jabref.model.texparser;
 import java.nio.file.Path;
 import java.util.Objects;
 
-public record Citation(Path path, int line, int colStart, int colEnd, String lineText) {
+public record Citation(
+        Path path,
+        int line,
+        int colStart,
+        int colEnd,
+        String lineText) {
     /**
      * The total number of characters that are shown around a cite (cite width included).
      */
