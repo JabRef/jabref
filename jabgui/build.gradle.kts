@@ -138,6 +138,7 @@ application {
         // https://github.com/uncomplicate/neanderthal/issues/55
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
         "--add-modules", "jdk.incubator.vector",
+        "--add-modules", "jdk.management.agent",
 
         "-XX:+UnlockExperimentalVMOptions",
         "-XX:+UseCompactObjectHeaders",
@@ -162,6 +163,7 @@ javaModulePackaging {
     jpackageResources = layout.projectDirectory.dir("buildres")
     verbose = true
     addModules.add("jdk.incubator.vector")
+    addModules.add("jdk.management.agent")
     targetsWithOs("windows") {
         options.addAll(
             "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
