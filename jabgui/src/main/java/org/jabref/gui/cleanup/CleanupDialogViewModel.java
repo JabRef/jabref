@@ -58,8 +58,8 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         this.stateManager = Objects.requireNonNull(stateManager, "stateManager must not be null");
         this.undoManager = Objects.requireNonNull(undoManager, "undoManager must not be null");
 
-        this.tabSupplier = (tabSupplier.isEmpty()) ? Optional.empty() : tabSupplier;
-        this.taskExecutor = (taskExecutor.isEmpty()) ? Optional.empty() : taskExecutor;
+        this.tabSupplier = tabSupplier.isEmpty() ? Optional.empty() : tabSupplier;
+        this.taskExecutor = taskExecutor.isEmpty() ? Optional.empty() : taskExecutor;
 
         this.failures = new ArrayList<>();
         this.targetEntries = Optional.empty();
@@ -82,7 +82,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     }
 
     public void setTargetEntries(Optional<List<BibEntry>> entries) {
-        this.targetEntries = (entries.isEmpty()) ? Optional.empty() : entries.map(List::copyOf);
+        this.targetEntries = entries.isEmpty() ? Optional.empty() : entries.map(List::copyOf);
     }
 
     public void apply(CleanupTabSelection selectedTab) {

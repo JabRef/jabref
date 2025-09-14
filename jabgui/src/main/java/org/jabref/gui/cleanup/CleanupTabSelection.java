@@ -13,8 +13,8 @@ public record CleanupTabSelection(
         Optional<FieldFormatterCleanups> formatters) {
 
     public CleanupTabSelection {
-        allJobs = (allJobs == null) ? EnumSet.noneOf(CleanupPreferences.CleanupStep.class) : EnumSet.copyOf(allJobs);
-        selectedJobs = (selectedJobs == null) ? EnumSet.noneOf(CleanupPreferences.CleanupStep.class) : EnumSet.copyOf(selectedJobs);
+        allJobs = allJobs == null ? EnumSet.noneOf(CleanupPreferences.CleanupStep.class) : EnumSet.copyOf(allJobs);
+        selectedJobs = selectedJobs == null ? EnumSet.noneOf(CleanupPreferences.CleanupStep.class) : EnumSet.copyOf(selectedJobs);
         formatters = Objects.requireNonNullElse(formatters, Optional.empty());
     }
 
