@@ -114,6 +114,17 @@ jobs:
         run: |
           ./gradlew --no-configuration-cache :rewriteDryRun
 
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: koppor/intellij-format@update-to-latest-intellij
+        with:
+          mask: *.java
+          settings: "config/IntelliJ Code Style.xml"
+          message: ""
+          verify: true
+
   modernizer:
     name: Modernizer
     runs-on: ubuntu-latest
