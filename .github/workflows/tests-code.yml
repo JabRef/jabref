@@ -122,6 +122,8 @@ jobs:
         with:
           file-mask: "*.java"
           settings-file: "config/IntelliJ Code Style.xml"
+      # job should fail in case there are changes
+      - run: git diff-files --quiet
 
   modernizer:
     name: Modernizer
