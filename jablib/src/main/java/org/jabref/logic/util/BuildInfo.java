@@ -72,7 +72,7 @@ public final class BuildInfo {
         scienceDirectApiKey = BuildInfo.getValue(properties, "scienceDirectApiKey", "fb82f2e692b3c72dafe5f4f1fa0ac00b");
         semanticScholarApiKey = BuildInfo.getValue(properties, "semanticScholarApiKey", "");
         springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
-        medlineApiKey = BuildInfo.getValue(properties, "medlineApiKey", "1e11ad336b1105bd5945009600f892a6cc08");
+        medlineApiKey = BuildInfo.getValue(properties, "medlineApiKey", "");
     }
 
     private static String getValue(Properties properties, String key, String defaultValue) {
