@@ -11,6 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -32,8 +33,7 @@ public class EditorTextField extends TextField implements Initializable, Context
     public EditorTextField() {
         this("");
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            String keyText = event.getText();
-            if ("\t".equals(keyText) &&
+            if (event.getCode() == KeyCode.TAB &&
                     isLastFieldChecker != null &&
                     isLastFieldChecker.test(this)) {
                 if (nextTabSelector != null) {
