@@ -14,6 +14,7 @@ env:
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
+  MedlineAPiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
 

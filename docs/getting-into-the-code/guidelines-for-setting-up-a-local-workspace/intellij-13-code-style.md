@@ -67,46 +67,6 @@ Click there "OK", too.
 
 Click on "Apply" to store the preferences.
 
-## Put JabRef's Checkstyle configuration in place
-
-Now, put the Checkstyle configuration file is in place:
-
-Go to **File > Settings... > Tools > Checkstyle > Configuration File**
-
-Trigger the import dialog of a Checkstyle style by clicking the \[+] button:
-
-{% figure caption:"Trigger the rule import dialog" %}
-![Trigger the rule import dialog](13-07-checkstyle-start-import.png)
-{% endfigure %}
-
-Then:
-
-* Put "JabRef" as description.
-* Browse for `config/checkstyle/checkstyle.xml`
-* Tick "Store relative to project location"
-* Click "Next"
-
-{% figure caption:"Filled Rule Import Dialog" %}
-![Filled Rule Import Dialog](13-08-checkstyle-import-file.png)
-{% endfigure %}
-
-Click on "Finish"
-
-Activate the Checkstyle configuration file by ticking it in the list
-
-{% figure caption:"JabRef's Checkstyle config is activated" %}
-![JabRef's Checkstyle config is activated](13-09-checkstyle-jabref-active.png)
-{% endfigure %}
-
-Ensure that the [latest Checkstyle version](https://checkstyle.org/releasenotes.html) is selected (10.21.0 or higher).
-Also, set the "Scan Scope" to "Only Java sources (including tests)".
-
-{% figure caption:"Checkstyle is the highest version - and tests are also scanned" %}
-![Checkstyle is the highest version - and tests are also scanned](13-10-checkstyle-final-settings.png)
-{% endfigure %}
-
-Save settings by clicking "Apply".
-
 ## Have auto format working properly in JavaDoc
 
 To have auto format working properly in the context of JavaDoc and line wrapping, "Wrap at right margin" has to be disabled. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).

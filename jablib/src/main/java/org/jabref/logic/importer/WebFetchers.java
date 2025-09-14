@@ -112,7 +112,7 @@ public class WebFetchers {
         set.add(new INSPIREFetcher(importFormatPreferences));
         set.add(new GvkFetcher(importFormatPreferences));
         set.add(new BvbFetcher());
-        set.add(new MedlineFetcher());
+        set.add(new MedlineFetcher(importerPreferences));
         set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
@@ -150,7 +150,7 @@ public class WebFetchers {
         set.add(new DiVA(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
         set.add(new EuropePmcFetcher());
-        set.add(new MedlineFetcher());
+        set.add(new MedlineFetcher(importerPreferences));
         set.add(new TitleFetcher(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
@@ -237,6 +237,7 @@ public class WebFetchers {
         fetchers.add(new ScienceDirect(importerPreferences));
         fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));
         fetchers.add(new BiodiversityLibrary(importerPreferences));
+        fetchers.add(new MedlineFetcher(importerPreferences));
         return fetchers;
     }
 }
