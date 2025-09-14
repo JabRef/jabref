@@ -120,7 +120,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: koppor/intellij-format@update-to-latest-intellij
         with:
-          mask: *.java
+          mask: "*.java"
           settings: "config/IntelliJ Code Style.xml"
           message: ""
           verify: true
