@@ -146,8 +146,8 @@ public class BibliographyConsistencyCheck {
 
             Set<BibEntry> entries = entryTypeToEntriesMap.get(entryType);
             assert entries != null;
-            assert entries.size() != 1; // Either there is no entry with different fields or more than one
             if (entries == null || entries.size() <= 1 || differingFields.isEmpty()) {
+                // entries.size == 1 can happen if there is only one entry for one type. (E.g., only one `@Book` entry)
                 continue;
             }
 
