@@ -30,10 +30,8 @@ public class FieldTextMapper {
                 default ->
                         StringUtil.capitalizeFirst(field.getName());
             };
-        } else if (field instanceof InternalField internalField) {
-            if (internalField == InternalField.KEY_FIELD) {
-                return "Citationkey";
-            }
+        } else if (field == InternalField.KEY_FIELD) {
+            return "Citationkey";
         }
 
         return field.getName();

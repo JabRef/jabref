@@ -146,7 +146,7 @@ class OOCalcDatabase {
         firstRow.setAttribute("table.style-name", "ro1");
         addTableCell(document, firstRow, "Type");
         for (Field field : toExportFields) {
-            // Special case for OpenOffice/LibreOffice reporttype
+            // Special case for OpenOffice/LibreOffice internal field reporttype, should not be handled as a normal field
             if ("reporttype".equalsIgnoreCase(field.getName())) {
                 addTableCell(document, firstRow, "Reporttype");
             } else {

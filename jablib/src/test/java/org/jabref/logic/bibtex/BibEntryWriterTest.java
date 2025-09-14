@@ -190,10 +190,9 @@ class BibEntryWriterTest {
 
     @Test
     void writeReallyUnknownTypeTest() throws IOException {
-        BibEntry entry = new BibEntry();
-        entry.setType(new UnknownEntryType("ReallyUnknownType"));
-        entry.setField(StandardField.COMMENT, "testentry");
-        entry.setCitationKey("test");
+        BibEntry entry = new BibEntry(new UnknownEntryType("ReallyUnknownType"))
+                .withField(StandardField.COMMENT, "testentry")
+                .withCitationKey("test");
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
         String expected = """
@@ -329,7 +328,7 @@ class BibEntryWriterTest {
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
 
-        // Modify entry
+        // modify entry
         entry.setField(StandardField.AUTHOR, "BlaBla");
 
         // write out bibtex string
@@ -527,6 +526,7 @@ class BibEntryWriterTest {
 
         BibEntry entry = firstEntryFrom(bibtexEntry);
 
+        // modify entry
         entry.setField(FieldFactory.parseField("location"), "NY");
 
         // write out bibtex string
@@ -638,9 +638,9 @@ class BibEntryWriterTest {
 
     @Test
     void doNotWriteEmptyFields() throws IOException {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "  ");
-        entry.setField(StandardField.NOTE, "some note");
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "  ")
+                .withField(StandardField.NOTE, "some note");
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
@@ -654,8 +654,8 @@ class BibEntryWriterTest {
 
     @Test
     void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.NOTE, "some text with unbalanced { braces");
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.NOTE, "some text with unbalanced { braces");
 
         assertThrows(IOException.class, () -> bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX));
     }
@@ -694,7 +694,7 @@ class BibEntryWriterTest {
 
         BibEntry entry = firstEntryFrom(bibtexEntry);
 
-        // change the entry
+        // modify entry
         entry.setField(StandardField.AUTHOR, "John Doe");
 
         // write out bibtex string
@@ -714,18 +714,18 @@ class BibEntryWriterTest {
 
     @Test
     void alphabeticSerialization() throws IOException {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        // required fields
-        entry.setField(StandardField.AUTHOR, "Foo Bar");
-        entry.setField(StandardField.JOURNALTITLE, "International Journal of Something");
-        entry.setField(StandardField.TITLE, "Title");
-        entry.setField(StandardField.DATE, "2019-10-16");
-        // optional fields
-        entry.setField(StandardField.NUMBER, "1");
-        entry.setField(StandardField.NOTE, "some note");
-        // unknown fields
-        entry.setField(StandardField.YEAR, "2019");
-        entry.setField(StandardField.CHAPTER, "chapter");
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                // required fields
+                .withField(StandardField.AUTHOR, "Foo Bar")
+                .withField(StandardField.JOURNALTITLE, "International Journal of Something")
+                .withField(StandardField.TITLE, "Title")
+                .withField(StandardField.DATE, "2019-10-16")
+                // optional fields
+                .withField(StandardField.NUMBER, "1")
+                .withField(StandardField.NOTE, "some note")
+                // unknown fields
+                .withField(StandardField.YEAR, "2019")
+                .withField(StandardField.CHAPTER, "chapter");
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBLATEX);
 
@@ -746,33 +746,33 @@ class BibEntryWriterTest {
 
     @Test
     void serializeAll() throws IOException {
-        BibEntry entry1 = new BibEntry(StandardEntryType.Article);
-        // required fields
-        entry1.setField(StandardField.AUTHOR, "Journal Author");
-        entry1.setField(StandardField.JOURNALTITLE, "Journal of Words");
-        entry1.setField(StandardField.TITLE, "Entry Title");
-        entry1.setField(StandardField.DATE, "2020-11-16");
+        BibEntry entry1 = new BibEntry(StandardEntryType.Article)
+                // required fields
+                .withField(StandardField.AUTHOR, "Journal Author")
+                .withField(StandardField.JOURNALTITLE, "Journal of Words")
+                .withField(StandardField.TITLE, "Entry Title")
+                .withField(StandardField.DATE, "2020-11-16")
 
-        // optional fields
-        entry1.setField(StandardField.NUMBER, "1");
-        entry1.setField(StandardField.NOTE, "some note");
-        // unknown fields
-        entry1.setField(StandardField.YEAR, "2019");
-        entry1.setField(StandardField.CHAPTER, "chapter");
+                // optional fields
+                .withField(StandardField.NUMBER, "1")
+                .withField(StandardField.NOTE, "some note")
+                // unknown fields
+                .withField(StandardField.YEAR, "2019")
+                .withField(StandardField.CHAPTER, "chapter");
 
-        BibEntry entry2 = new BibEntry(StandardEntryType.Book);
-        // required fields
-        entry2.setField(StandardField.AUTHOR, "John Book");
-        entry2.setField(StandardField.BOOKTITLE, "The Big Book of Books");
-        entry2.setField(StandardField.TITLE, "Entry Title");
-        entry2.setField(StandardField.DATE, "2017-12-20");
+        BibEntry entry2 = new BibEntry(StandardEntryType.Book)
+                // required fields
+                .withField(StandardField.AUTHOR, "John Book")
+                .withField(StandardField.BOOKTITLE, "The Big Book of Books")
+                .withField(StandardField.TITLE, "Entry Title")
+                .withField(StandardField.DATE, "2017-12-20")
 
-        // optional fields
-        entry2.setField(StandardField.NUMBER, "1");
-        entry2.setField(StandardField.NOTE, "some note");
-        // unknown fields
-        entry2.setField(StandardField.YEAR, "2020");
-        entry2.setField(StandardField.CHAPTER, "chapter");
+                // optional fields
+                .withField(StandardField.NUMBER, "1")
+                .withField(StandardField.NOTE, "some note")
+                // unknown fields
+                .withField(StandardField.YEAR, "2020")
+                .withField(StandardField.CHAPTER, "chapter");
 
         String output = bibEntryWriter.serializeAll(List.of(entry1, entry2), BibDatabaseMode.BIBLATEX);
 
@@ -862,8 +862,11 @@ class BibEntryWriterTest {
                 """.replace("\n", OS.NEWLINE);
 
         BibEntry entry = firstEntryFrom(bibtexEntry);
+
+        // modify entry
         entry.setField(new UnknownField("CustomField"), "Some other value");
 
+        // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
         String expected = """
