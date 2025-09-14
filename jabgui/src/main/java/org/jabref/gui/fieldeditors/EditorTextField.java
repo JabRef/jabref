@@ -4,15 +4,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javafx.fxml.Initializable;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
@@ -22,26 +19,13 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 
 public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
-    private static Runnable nextTabSelector;
-    private static Predicate<TextField> isLastFieldChecker;
     private final ContextMenu contextMenu = new ContextMenu();
-
     private Runnable additionalPasteActionHandler = () -> {
         // No additional paste behavior
     };
 
     public EditorTextField() {
         this("");
-        this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.TAB &&
-                    isLastFieldChecker != null &&
-                    isLastFieldChecker.test(this)) {
-                if (nextTabSelector != null) {
-                    nextTabSelector.run();
-                }
-                event.consume();
-            }
-        });
     }
 
     public EditorTextField(final String text) {
@@ -52,11 +36,6 @@ public class EditorTextField extends TextField implements Initializable, Context
         HBox.setHgrow(this, Priority.ALWAYS);
 
         ClipBoardManager.addX11Support(this);
-    }
-
-    public static void setupTabNavigation(Predicate<TextField> isLastFieldChecker, Runnable nextTabSelector) {
-        EditorTextField.isLastFieldChecker = isLastFieldChecker;
-        EditorTextField.nextTabSelector = nextTabSelector;
     }
 
     @Override
