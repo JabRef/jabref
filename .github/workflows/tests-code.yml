@@ -118,12 +118,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: koppor/intellij-format@update-to-latest-intellij
+      - uses: koppor/intellij-idea-format@update-to-latest-intellij
         with:
-          mask: "*.java"
-          settings: '"config/IntelliJ Code Style.xml"'
-          message: ""
-          verify: true
+          file-mask: "*.java"
+          settings-file: "config/IntelliJ Code Style.xml"
 
   modernizer:
     name: Modernizer
