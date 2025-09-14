@@ -35,6 +35,7 @@
     </option>
     <option name="RECORD_COMPONENTS_WRAP" value="0" />
     <option name="MULTI_CATCH_TYPES_WRAP" value="0" />
+    <option name="JD_ALIGN_PARAM_COMMENTS" value="false" />
   </JavaCodeStyleSettings>
   <codeStyleSettings language="JAVA">
     <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
