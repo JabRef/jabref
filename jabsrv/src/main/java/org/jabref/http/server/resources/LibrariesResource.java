@@ -19,10 +19,10 @@ import jakarta.ws.rs.core.MediaType;
 public class LibrariesResource {
 
     @Inject
-    private SrvStateManager srvStateManager;
+    private SrvStateManager     srvStateManager;
 
     @Inject
-    private FilesToServe filesToServe;
+    private FilesToServe    filesToServe;
 
     @Inject
     private Gson gson;
