@@ -98,7 +98,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where pressing "Tab" in the last TextField of a Tab did not move the focus to the next Tab in the Entry Editor. [#11937](https://github.com/JabRef/jabref/issues/11937)
+- We fixed an issue where pressing <kbd>Tab</kbd> in the last text field of a tab did not move the focus to the next tab in the entry editor. [#11937](https://github.com/JabRef/jabref/issues/11937)
 - We fixed an issue where "Specify Bib(La)TeX" tab was not focused when Bib(La)TeX was in the clipboard [#13597](https://github.com/JabRef/jabref/issues/13597)
 - We fixed an issue whereby the 'About' dialog was not honouring the user's configured font preferences. [#13558](https://github.com/JabRef/jabref/issues/13558)
 - We fixed an issue where the Pagetotal column was sorting the values alphabetically instead of numerically. [#12533](https://github.com/JabRef/jabref/issues/12533)
