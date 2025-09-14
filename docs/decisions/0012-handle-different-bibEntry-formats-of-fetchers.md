@@ -12,7 +12,7 @@ Currently, all fetchers either return BibEntries in BibTeX or BibLaTeX format.
 This can lead to importing BibEntries of one format in a database of the other format.
 How can this inconsistency between fetchers and their used formats be addressed?
 
-## Considered Optionss
+## Considered Options
 
 * Pass fetchers the format, they have to create entries accordingly (in the correct format).
 * Pass fetchers the format, they have to call a conversion method if necessary (in the correct format).
