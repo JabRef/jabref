@@ -16,7 +16,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.logic.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
@@ -142,7 +142,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
      *
      * @return true iff entry was modified
      */
-    private boolean doCleanup(BibDatabaseContext databaseContext, CleanupPreferences preset, BibEntry entry, NamedCompound compound) {
+    private boolean doCleanup(BibDatabaseContext databaseContext, CleanupPreferences preset, BibEntry entry, NamedCompoundEdit compound) {
         // Create and run cleaner
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
@@ -184,7 +184,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         this.failures.clear();
 
         // undo granularity is on a set of all entries
-        NamedCompound compound = new NamedCompound(Localization.lang("Clean up entries"));
+        NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("Clean up entries"));
 
         for (BibEntry entry : entries) {
             if (doCleanup(databaseContext, cleanupPreferences, entry, compound)) {
