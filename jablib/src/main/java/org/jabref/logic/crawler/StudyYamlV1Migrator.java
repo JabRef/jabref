@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,14 +22,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Migrates study.yml files from version 1.0 format to the current format.
  * Handles:
- * - Renaming "databases" to "catalogues"
+ * - Renaming "databases" to "catalogs"
  * - Adding default "enabled" field for databases
  * - Converting simple query strings to StudyQuery objects
  * - Adding version field and metadata section
@@ -39,11 +43,8 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
         try (InputStream fileInputStream = Files.newInputStream(studyYamlFile)) {
-            // Parse as old format
             V1StudyFormat oldStudy = yamlMapper.readValue(fileInputStream, V1StudyFormat.class);
-
-            // Convert to new format
-            return convertToCurrentFormat(oldStudy);
+            return convertToCurrentFormat(oldStudy, studyYamlFile);
         }
     }
 
@@ -52,43 +53,116 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
         return "1.0";
     }
 
-    private Study convertToCurrentFormat(V1StudyFormat oldStudy) {
+    private Study convertToCurrentFormat(V1StudyFormat oldStudy, Path studyYamlFile) {
         // Convert queries - handle both simple strings and complex objects
         List<StudyQuery> newQueries = oldStudy.getQueries().stream()
-                                              .map(this::convertQuery)
-                                              .collect(Collectors.toList());
+                .map(this::convertQuery)
+                .collect(Collectors.toList());
 
-        // Convert databases to catalogues
-        List<StudyCatalog> catalogues = oldStudy.getDatabases().stream()
-                                                .map(this::convertDatabase)
-                                                .collect(Collectors.toList());
+        // Convert databases to catalogs
+        List<StudyCatalog> catalogs = oldStudy.getDatabases().stream()
+                .map(this::convertDatabase)
+                .collect(Collectors.toList());
 
         // Create new study with migrated data
-        Study newStudy = getNewStudy(oldStudy, newQueries, catalogues);
-
-        LOGGER.debug("Successfully converted v1.0 study with {} queries and {} catalogues",
-                newQueries.size(), catalogues.size());
-
-        return newStudy;
-    }
-
-    private @NonNull Study getNewStudy(V1StudyFormat oldStudy, List<StudyQuery> newQueries, List<StudyCatalog> catalogues) {
         Study newStudy = new Study(
                 oldStudy.getAuthors(),
                 oldStudy.getTitle(),
                 oldStudy.getResearchQuestions(),
                 newQueries,
-                catalogues
+                catalogs
         );
 
-        // Set version and add default metadata
+        // Set version
         newStudy.setVersion(getTargetVersion());
+        try {
+            StudyMetadata metadata = createMetadata(studyYamlFile, oldStudy);
+            newStudy.setMetadata(metadata);
+        } catch (IOException e) {
+            LOGGER.warn("Could not create metadata for study YAML file {}", studyYamlFile, e);
+        }
 
-        // Add basic metadata
-        StudyMetadata metadata = new StudyMetadata();
-        metadata.setStudyType("systematic-literature-review");
-        newStudy.setMetadata(metadata);
+        LOGGER.debug("Successfully converted v1.0 study with {} queries and {} catalogs",
+                    newQueries.size(), catalogs.size());
+
         return newStudy;
+    }
+
+    /**
+     * Creates metadata by extracting information from file and existing data
+     */
+    private StudyMetadata createMetadata(Path studyYamlFile, V1StudyFormat oldStudy) throws IOException {
+        StudyMetadata metadata = new StudyMetadata();
+
+        // Get file creation and modification times
+        BasicFileAttributes attrs = Files.readAttributes(studyYamlFile, BasicFileAttributes.class);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+        // Use file creation time as created date
+        Instant creationInstant = attrs.creationTime().toInstant();
+        LocalDateTime createdDate = LocalDateTime.ofInstant(creationInstant, ZoneId.systemDefault());
+        metadata.setCreatedDate(createdDate.format(formatter));
+
+        // Use file modification time as last modified date
+        Instant modificationInstant = attrs.lastModifiedTime().toInstant();
+        LocalDateTime modifiedDate = LocalDateTime.ofInstant(modificationInstant, ZoneId.systemDefault());
+        metadata.setLastModified(modifiedDate.format(formatter));
+
+        // Infer study type from queries and research questions
+        String studyType = inferStudyType(oldStudy);
+        metadata.setStudyType(studyType);
+
+        // Generate notes
+        String notes = generateMigrationNotes(oldStudy);
+        metadata.setNotes(notes);
+
+        return metadata;
+    }
+
+    /**
+     * Infer study type from the content of the study
+     */
+    private String inferStudyType(V1StudyFormat oldStudy) {
+        // Default to systematic literature review
+        String defaultType = "systematic-literature-review";
+
+        if (oldStudy.getResearchQuestions() == null || oldStudy.getResearchQuestions().isEmpty()) {
+            return defaultType;
+        }
+
+        // Analyze research questions for keywords that might indicate study type
+        String allQuestions = String.join(" ", oldStudy.getResearchQuestions()).toLowerCase();
+
+        if (allQuestions.contains("meta-analysis") || allQuestions.contains("quantitative synthesis")) {
+            return "meta-analysis";
+        } else if (allQuestions.contains("scoping") || allQuestions.contains("mapping")) {
+            return "scoping-review";
+        } else if (allQuestions.contains("rapid") || allQuestions.contains("quick")) {
+            return "rapid-review";
+        }
+
+        return defaultType;
+    }
+
+    /**
+     * Generate notes for the migration
+     */
+    private String generateMigrationNotes(V1StudyFormat oldStudy) {
+        StringBuilder notes = new StringBuilder();
+        notes.append("Migrated from v1.0 format. ");
+
+        if (oldStudy.getQueries() != null) {
+            notes.append("Contains ").append(oldStudy.getQueries().size()).append(" search queries. ");
+        }
+
+        if (oldStudy.getDatabases() != null) {
+            long enabledDatabases = oldStudy.getDatabases().stream()
+                    .filter(db -> db.isEnabled() == null || db.isEnabled())
+                    .count();
+            notes.append("Configured for ").append(enabledDatabases).append(" active databases.");
+        }
+
+        return notes.toString().trim();
     }
 
     private StudyQuery convertQuery(Object queryObj) {
@@ -96,7 +170,6 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
             // Simple string query
             return new StudyQuery(string);
         } else if (queryObj instanceof Map) {
-            // Complex query object from v1
             @SuppressWarnings("unchecked")
             Map<String, Object> queryMap = (Map<String, Object>) queryObj;
 
@@ -105,25 +178,20 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
             String lucene = (String) queryMap.get("lucene");
 
             @SuppressWarnings("unchecked")
-            Map<String, String> catalogueSpecific = (Map<String, String>) queryMap.get("catalogueSpecific");
+            Map<String, String> catalogSpecific = (Map<String, String>) queryMap.get("catalogSpecific");
 
-            return new StudyQuery(query, description, lucene, catalogueSpecific);
+            return new StudyQuery(query, description, lucene, catalogSpecific);
         }
 
-        // Fallback for unexpected types
         LOGGER.warn("Unexpected query type: {}, converting to string", queryObj.getClass());
         return new StudyQuery(queryObj.toString());
     }
 
     private StudyCatalog convertDatabase(V1Database oldDb) {
         // Set enabled=true as default if not specified
+
         boolean enabled = oldDb.isEnabled() != null ? oldDb.isEnabled() : true;
-        StudyCatalog newDb = new StudyCatalog(oldDb.getName(), enabled);
-
-        // If there was a comment field in v1, we could preserve it here
-        // For now, we just log if there are unexpected fields
-
-        return newDb;
+        return new StudyCatalog(oldDb.getName(), enabled);
     }
 
     /**
