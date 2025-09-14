@@ -192,7 +192,8 @@ class BibEntryWriterTest {
     void writeReallyUnknownTypeTest() throws IOException {
         BibEntry entry = new BibEntry(new UnknownEntryType("ReallyUnknownType"))
                 .withField(StandardField.COMMENT, "testentry")
-                .withCitationKey("test");
+                .withCitationKey("test")
+                .withChanged(true);
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
         String expected = """
@@ -640,7 +641,8 @@ class BibEntryWriterTest {
     void doNotWriteEmptyFields() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "  ")
-                .withField(StandardField.NOTE, "some note");
+                .withField(StandardField.NOTE, "some note")
+                .withChanged(true);
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
@@ -655,7 +657,8 @@ class BibEntryWriterTest {
     @Test
     void writeThrowsErrorIfFieldContainsUnbalancedBraces() {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.NOTE, "some text with unbalanced { braces");
+                .withField(StandardField.NOTE, "some text with unbalanced { braces")
+                .withChanged(true);
 
         assertThrows(IOException.class, () -> bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX));
     }
@@ -725,7 +728,8 @@ class BibEntryWriterTest {
                 .withField(StandardField.NOTE, "some note")
                 // unknown fields
                 .withField(StandardField.YEAR, "2019")
-                .withField(StandardField.CHAPTER, "chapter");
+                .withField(StandardField.CHAPTER, "chapter")
+                .withChanged(true);
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBLATEX);
 
@@ -758,7 +762,8 @@ class BibEntryWriterTest {
                 .withField(StandardField.NOTE, "some note")
                 // unknown fields
                 .withField(StandardField.YEAR, "2019")
-                .withField(StandardField.CHAPTER, "chapter");
+                .withField(StandardField.CHAPTER, "chapter")
+                .withChanged(true);
 
         BibEntry entry2 = new BibEntry(StandardEntryType.Book)
                 // required fields
@@ -772,7 +777,8 @@ class BibEntryWriterTest {
                 .withField(StandardField.NOTE, "some note")
                 // unknown fields
                 .withField(StandardField.YEAR, "2020")
-                .withField(StandardField.CHAPTER, "chapter");
+                .withField(StandardField.CHAPTER, "chapter")
+                .withChanged(true);
 
         String output = bibEntryWriter.serializeAll(List.of(entry1, entry2), BibDatabaseMode.BIBLATEX);
 
