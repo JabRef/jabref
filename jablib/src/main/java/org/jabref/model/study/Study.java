@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  *
  * The file is parsed using by {@link StudyYamlParser}
  */
-@JsonPropertyOrder({"version", "authors", "title", "research-questions", "queries", "catalogues", "metadata"})
+@JsonPropertyOrder({"version", "authors", "title", "research-questions", "queries", "catalogs", "metadata"})
 // The user might add arbitrary content to the YAML
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Study {
@@ -30,24 +30,25 @@ public class Study {
 
     private List<StudyQuery> queries;
 
-    private List<StudyCatalog> catalogues;
+    @JsonProperty("catalogs")
+    private List<StudyCatalog> catalogs;
 
     private StudyMetadata metadata;
 
-    public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogues) {
+    public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogs) {
         this.authors = authors;
         this.title = title;
         this.researchQuestions = researchQuestions;
         this.queries = queryEntries;
-        this.catalogues = catalogues;
+        this.catalogs = catalogs;
     }
 
-    public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogues, StudyMetadata metadata) {
+    public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogs, StudyMetadata metadata) {
         this.authors = authors;
         this.title = title;
         this.researchQuestions = researchQuestions;
         this.queries = queryEntries;
-        this.catalogues = catalogues;
+        this.catalogs = catalogs;
         this.metadata = metadata;
     }
 
@@ -81,12 +82,12 @@ public class Study {
         this.queries = queries;
     }
 
-    public List<StudyCatalog> getCatalogues() {
-        return catalogues;
+    public List<StudyCatalog> getCatalogs() {
+        return catalogs;
     }
 
-    public void setCatalogues(List<StudyCatalog> catalogues) {
-        this.catalogues = catalogues;
+    public void setCatalogs(List<StudyCatalog> catalogs) {
+        this.catalogs = catalogs;
     }
 
     public String getTitle() {
@@ -112,7 +113,7 @@ public class Study {
                 ", studyName='" + title + '\'' +
                 ", researchQuestions=" + researchQuestions +
                 ", queries=" + queries +
-                ", libraries=" + catalogues +
+                ", libraries=" + catalogs +
                 '}';
     }
 
@@ -131,12 +132,12 @@ public class Study {
                 Objects.equals(title, otherStudy.title) &&
                 Objects.equals(researchQuestions, otherStudy.researchQuestions) &&
                 Objects.equals(queries, otherStudy.queries) &&
-                Objects.equals(catalogues, otherStudy.catalogues);
+                Objects.equals(catalogs, otherStudy.catalogs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(authors, title, researchQuestions, queries, catalogues);
+        return Objects.hash(authors, title, researchQuestions, queries, catalogs);
     }
 
     public StudyMetadata getMetadata() {
@@ -147,4 +148,3 @@ public class Study {
         this.metadata = metadata;
     }
 }
-

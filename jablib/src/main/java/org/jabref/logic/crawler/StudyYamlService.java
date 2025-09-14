@@ -69,7 +69,7 @@ public class StudyYamlService {
             }
 
             // If no version field, check for old structure indicators
-            return rootNode.has("databases") && !rootNode.has("catalogues");
+            return rootNode.has("databases") && !rootNode.has("catalogs");  // Changed from "catalogues"
         }
     }
 

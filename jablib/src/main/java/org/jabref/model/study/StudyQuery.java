@@ -9,19 +9,18 @@ public class StudyQuery {
     private String description;
     private String lucene;
 
-    @JsonProperty("catalogue-specific")
-    private Map<String, String> catalogueSpecific;
+    @JsonProperty("catalog-specific")  // Changed from "catalogue-specific"
+    private Map<String, String> catalogSpecific;  // Changed from catalogueSpecific
 
     public StudyQuery(String query) {
         this.query = query;
     }
 
-    // Constructor for enhanced query with all fields
-    public StudyQuery(String query, String description, String lucene, Map<String, String> catalogueSpecific) {
+    public StudyQuery(String query, String description, String lucene, Map<String, String> catalogSpecific) {  // Changed parameter name
         this.query = query;
         this.description = description;
         this.lucene = lucene;
-        this.catalogueSpecific = catalogueSpecific;
+        this.catalogSpecific = catalogSpecific;  // Changed from catalogueSpecific
     }
 
     /**
@@ -54,12 +53,12 @@ public class StudyQuery {
         this.lucene = lucene;
     }
 
-    public Map<String, String> getCatalogueSpecific() {
-        return catalogueSpecific;
+    public Map<String, String> getCatalogSpecific() {  // Changed from getCatalogueSpecific()
+        return catalogSpecific;
     }
 
-    public void setCatalogueSpecific(Map<String, String> catalogueSpecific) {
-        this.catalogueSpecific = catalogueSpecific;
+    public void setCatalogSpecific(Map<String, String> catalogSpecific) {  // Changed from setCatalogueSpecific()
+        this.catalogSpecific = catalogSpecific;
     }
 
     @Override
