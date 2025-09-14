@@ -114,6 +114,18 @@ jobs:
         run: |
           ./gradlew --no-configuration-cache :rewriteDryRun
 
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: koppor/intellij-idea-format@update-to-latest-intellij
+        with:
+          file-mask: "*.java"
+          settings-file: "config/IntelliJ Code Style.xml"
+      # job should fail in case there are changes
+      - name: Check if any files changed
+        run: git diff --exit-code
+
   modernizer:
     name: Modernizer
     runs-on: ubuntu-latest
