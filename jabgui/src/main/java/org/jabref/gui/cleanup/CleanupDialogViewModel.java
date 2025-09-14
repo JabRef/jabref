@@ -16,7 +16,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.logic.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
