@@ -61,8 +61,8 @@ public class YearFieldValuePlausibilityComparator extends FieldValuePlausibility
         int diff = Math.abs(leftYear - rightYear);
         if (diff > 10) {
             return rightYear > leftYear
-                    ? ComparisonResult.RIGHT_BETTER
-                    : ComparisonResult.LEFT_BETTER;
+                   ? ComparisonResult.RIGHT_BETTER
+                   : ComparisonResult.LEFT_BETTER;
         }
 
         return ComparisonResult.UNDETERMINED; // years are close, undetermined

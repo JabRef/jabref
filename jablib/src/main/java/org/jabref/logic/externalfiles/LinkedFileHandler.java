@@ -136,7 +136,9 @@ public class LinkedFileHandler {
             }
             Integer count = 1;
             boolean exists = false;
+            // @formatter:off
             do {
+                // @formatter:on
                 targetPath = targetDirectory.resolve(sourcePath.getFileName() + " (" + count + ")");
                 exists = Files.exists(targetPath);
                 if (exists && Files.mismatch(sourcePath, targetPath) == -1) {
@@ -284,7 +286,7 @@ public class LinkedFileHandler {
     public Optional<Path> findExistingFile(LinkedFile linkedFile, BibEntry entry, String targetFileName) {
         // The .get() is legal without check because the method will always return a value.
         Path targetFilePath = linkedFile.findIn(databaseContext, filePreferences)
-                                     .get().getParent().resolve(targetFileName);
+                                        .get().getParent().resolve(targetFileName);
         Path oldFilePath = linkedFile.findIn(databaseContext, filePreferences).get();
         // Check if file already exists in directory with different case.
         // This is necessary because other entries may have such a file.

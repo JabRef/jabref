@@ -42,10 +42,12 @@ public class BibtexTextDocumentService implements TextDocumentService {
     }
 
     @Override
-    public void didClose(DidCloseTextDocumentParams params) { }
+    public void didClose(DidCloseTextDocumentParams params) {
+    }
 
     @Override
-    public void didSave(DidSaveTextDocumentParams params) { }
+    public void didSave(DidSaveTextDocumentParams params) {
+    }
 
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams position) {

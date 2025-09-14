@@ -106,12 +106,12 @@ class MedlinePlainImporterTest {
 
         BibEntry expectedEntry5 = new BibEntry(StandardEntryType.Proceedings)
                 .withField(StandardField.KEYWORDS, "Female")
-                        .withField(StandardField.PMID, "96578310");
+                .withField(StandardField.PMID, "96578310");
         assertEquals(expectedEntry5, entries.get(5));
 
         BibEntry expectedEntry6 = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.KEYWORDS, "Female")
-                        .withField(StandardField.PMID, "45984220");
+                .withField(StandardField.PMID, "45984220");
         assertEquals(expectedEntry6, entries.get(6));
     }
 

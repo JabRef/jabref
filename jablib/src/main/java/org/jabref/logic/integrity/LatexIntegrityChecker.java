@@ -33,7 +33,7 @@ import static uk.ac.ed.ph.snuggletex.definitions.Globals.TEXT_MODE_ONLY;
 /**
  * Similar check to {@link HTMLCharacterChecker}.
  * Here, we use <a href="https://github.com/davemckain/snuggletex">SnuggleTeX</a>, in the {@link HTMLCharacterChecker}, it is searched for HTML characters.
- *
+ * <p>
  * Unescaped ampersands cannot be checked by SnuggleTeX, therefore the {@link AmpersandChecker} is available additionaly.
  */
 public class LatexIntegrityChecker implements EntryChecker {

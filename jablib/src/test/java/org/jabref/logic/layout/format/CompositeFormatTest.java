@@ -16,7 +16,7 @@ class CompositeFormatTest {
 
     @Test
     void arrayComposite() {
-        LayoutFormatter f = new CompositeFormat(new LayoutFormatter[]{fieldText -> fieldText + fieldText,
+        LayoutFormatter f = new CompositeFormat(new LayoutFormatter[] {fieldText -> fieldText + fieldText,
                 fieldText -> "A" + fieldText, fieldText -> "B" + fieldText});
 
         assertEquals("BAff", f.format("f"));

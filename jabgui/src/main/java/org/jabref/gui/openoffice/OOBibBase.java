@@ -365,15 +365,18 @@ public class OOBibBase {
         if (internalName.isEmpty()) {
             String msg =
                     switch (familyName) {
-                        case UnoStyle.PARAGRAPH_STYLES -> Localization.lang("The %0 paragraph style '%1' is missing from the document",
-                                labelInJstyleFile,
-                                styleName);
-                        case UnoStyle.CHARACTER_STYLES -> Localization.lang("The %0 character style '%1' is missing from the document",
-                                labelInJstyleFile,
-                                styleName);
-                        default -> throw new IllegalArgumentException("Expected " + UnoStyle.CHARACTER_STYLES
-                                + " or " + UnoStyle.PARAGRAPH_STYLES
-                                + " for familyName");
+                        case UnoStyle.PARAGRAPH_STYLES ->
+                                Localization.lang("The %0 paragraph style '%1' is missing from the document",
+                                        labelInJstyleFile,
+                                        styleName);
+                        case UnoStyle.CHARACTER_STYLES ->
+                                Localization.lang("The %0 character style '%1' is missing from the document",
+                                        labelInJstyleFile,
+                                        styleName);
+                        default ->
+                                throw new IllegalArgumentException("Expected " + UnoStyle.CHARACTER_STYLES
+                                        + " or " + UnoStyle.PARAGRAPH_STYLES
+                                        + " for familyName");
                     }
                             + "\n"
                             + Localization.lang("Please create it in the document or change in the file:")
@@ -385,17 +388,20 @@ public class OOBibBase {
         if (!internalName.get().equals(styleName)) {
             String msg =
                     switch (familyName) {
-                        case UnoStyle.PARAGRAPH_STYLES -> Localization.lang("The %0 paragraph style '%1' is a display name for '%2'.",
-                                labelInJstyleFile,
-                                styleName,
-                                internalName.get());
-                        case UnoStyle.CHARACTER_STYLES -> Localization.lang("The %0 character style '%1' is a display name for '%2'.",
-                                labelInJstyleFile,
-                                styleName,
-                                internalName.get());
-                        default -> throw new IllegalArgumentException("Expected " + UnoStyle.CHARACTER_STYLES
-                                + " or " + UnoStyle.PARAGRAPH_STYLES
-                                + " for familyName");
+                        case UnoStyle.PARAGRAPH_STYLES ->
+                                Localization.lang("The %0 paragraph style '%1' is a display name for '%2'.",
+                                        labelInJstyleFile,
+                                        styleName,
+                                        internalName.get());
+                        case UnoStyle.CHARACTER_STYLES ->
+                                Localization.lang("The %0 character style '%1' is a display name for '%2'.",
+                                        labelInJstyleFile,
+                                        styleName,
+                                        internalName.get());
+                        default ->
+                                throw new IllegalArgumentException("Expected " + UnoStyle.CHARACTER_STYLES
+                                        + " or " + UnoStyle.PARAGRAPH_STYLES
+                                        + " for familyName");
                     }
                             + "\n"
                             + Localization.lang("Please use the latter in the style file below"
@@ -525,14 +531,14 @@ public class OOBibBase {
      * <p>
      * Note: Undo does not remove or reestablish custom properties.
      *
-     * @param entries      The entries to cite.
-     * @param bibDatabaseContext     The database the entries belong to (all of them). Used when creating the citation mark.
-     *                     <p>
-     *                     Consistency: for each entry in {@code entries}: looking it up in {@code syncOptions.get().databases} (if present) should yield {@code database}.
-     * @param style        The bibliography style we are using.
-     * @param citationType Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
-     * @param pageInfo     A single page-info for these entries. Attributed to the last entry.
-     * @param syncOptions  Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise provides options for refreshing the reference list.
+     * @param entries            The entries to cite.
+     * @param bibDatabaseContext The database the entries belong to (all of them). Used when creating the citation mark.
+     *                           <p>
+     *                           Consistency: for each entry in {@code entries}: looking it up in {@code syncOptions.get().databases} (if present) should yield {@code database}.
+     * @param style              The bibliography style we are using.
+     * @param citationType       Indicates whether it is an in-text citation, a citation in parenthesis or an invisible citation.
+     * @param pageInfo           A single page-info for these entries. Attributed to the last entry.
+     * @param syncOptions        Indicates whether in-text citations should be refreshed in the document. Optional.empty() indicates no refresh. Otherwise provides options for refreshing the reference list.
      */
     public void guiActionInsertEntry(List<BibEntry> entries,
                                      BibDatabaseContext bibDatabaseContext,

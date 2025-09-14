@@ -108,4 +108,8 @@ public interface StateManager extends SrvStateManager {
     void setActiveWalkthrough(Walkthrough walkthrough);
 
     Optional<Walkthrough> getActiveWalkthrough();
+
+    BooleanProperty canGoBackProperty();
+
+    BooleanProperty canGoForwardProperty();
 }
