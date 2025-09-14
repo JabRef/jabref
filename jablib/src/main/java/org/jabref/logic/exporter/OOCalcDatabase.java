@@ -147,7 +147,7 @@ class OOCalcDatabase {
         addTableCell(document, firstRow, "Type");
         for (Field field : toExportFields) {
             // Special case for OpenOffice/LibreOffice reporttype
-            if (field.getName().equalsIgnoreCase("reporttype")) {
+            if ("reporttype".equalsIgnoreCase(field.getName())) {
                 addTableCell(document, firstRow, "Reporttype");
             } else {
                 addTableCell(document, firstRow, FieldTextMapper.getDisplayName(field));
