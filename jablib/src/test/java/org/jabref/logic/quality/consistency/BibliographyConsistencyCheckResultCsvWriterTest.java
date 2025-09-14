@@ -83,7 +83,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         }
 
         assertEquals("""
-                entry type,citation key,Custom,Pages,Title
+                entry type,citation key,custom,Pages,Title
                 Article,first,?,o,x
                 Article,second,-,-,-
                 """, Files.readString(csvFile).replace("\r\n", "\n"));

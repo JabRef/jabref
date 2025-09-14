@@ -15,6 +15,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 public class ToggleMergeUnmergeButton extends Button {
     private final ObjectProperty<FieldState> fieldState = new SimpleObjectProperty<>(FieldState.UNMERGED);
@@ -77,7 +78,7 @@ public class ToggleMergeUnmergeButton extends Button {
 
             @Override
             public String getText() {
-                return Localization.lang("Merge %0", field.getDisplayName());
+                return Localization.lang("Merge %0", FieldTextMapper.getDisplayName(field));
             }
         };
 
@@ -89,7 +90,7 @@ public class ToggleMergeUnmergeButton extends Button {
 
             @Override
             public String getText() {
-                return Localization.lang("Unmerge %0", field.getDisplayName());
+                return Localization.lang("Unmerge %0", FieldTextMapper.getDisplayName(field));
             }
         };
 
