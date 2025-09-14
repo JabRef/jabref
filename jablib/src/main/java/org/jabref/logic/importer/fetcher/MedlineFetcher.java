@@ -52,7 +52,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
     private static final int NUMBER_TO_FETCH = 50;
     private static final String ID_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
     private static final String SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
-    private static final String TEST_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
+    private static final String TEST_URL_WITHOUT_API_KEY = "https://www.ncbi.nlm.nih.gov/entrez/eutils/einfo.fcgi?db=pubmed&api_key=";
     private final ImporterPreferences importerPreferences;
 
     private int numberOfResultsFound;
@@ -224,6 +224,6 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher,
 
     @Override
     public String getTestUrl() {
-        return TEST_URL;
+        return TEST_URL_WITHOUT_API_KEY;
     }
 }
