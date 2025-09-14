@@ -19,7 +19,7 @@ import java.util.SequencedSet;
  */
 public class OrFields implements Comparable<OrFields> {
 
-    private SequencedSet<Field> fields = new LinkedHashSet<>();
+    private final SequencedSet<Field> fields = new LinkedHashSet<>();
 
     public OrFields(Field field) {
         fields.add(field);

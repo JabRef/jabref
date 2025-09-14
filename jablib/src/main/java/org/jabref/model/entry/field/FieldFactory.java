@@ -39,7 +39,7 @@ public class FieldFactory {
 
     public static String serializeOrFields(OrFields fields) {
         return fields.getFields().stream()
-                     .map(FieldTextMapper::getDisplayName)
+                     .map(Field::getName)
                      .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
