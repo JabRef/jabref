@@ -77,7 +77,7 @@ public class LibraryResource {
 
     /**
      * At http://localhost:23119/libraries/{id}/map <br><br>
-     *
+     * <p>
      * Looks for the .jmp file in the directory of the given library ({id}.bib file).
      *
      * @param id The given library
@@ -123,11 +123,10 @@ public class LibraryResource {
 
     /**
      * At http://localhost:23119/libraries/{id}/map <br><br>
-     *
+     * <p>
      * Saves the mindmap next to its associated library.
      *
      * @param id The given library
-     *
      * @throws IOException
      */
     @PUT
@@ -204,10 +203,10 @@ public class LibraryResource {
 
     /**
      * At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
-     *
+     * <p>
      * Combines attributes of a given BibEntry into a basic entry preview for as plain text.
      *
-     * @param id The name of the library
+     * @param id      The name of the library
      * @param entryId The CitationKey of the BibEntry
      * @return a basic entry preview as plain text
      * @throws IOException
@@ -253,10 +252,10 @@ public class LibraryResource {
 
     /**
      * At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
-     *
+     * <p>
      * Combines attributes of a given BibEntry into a basic entry preview for as HTML text.
      *
-     * @param id The name of the library
+     * @param id      The name of the library
      * @param entryId The CitationKey of the BibEntry
      * @return a basic entry preview as HTML text
      * @throws IOException
@@ -300,7 +299,7 @@ public class LibraryResource {
 
     /**
      * At http://localhost:23119/libraries/{id}/entries/pdffiles <br><br>
-     *
+     * <p>
      * Loops through all entries in the specified library and adds attached files of type "PDF" to
      * a list and JSON serialises it.
      */

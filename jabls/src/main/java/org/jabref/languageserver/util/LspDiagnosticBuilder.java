@@ -32,7 +32,8 @@ public final class LspDiagnosticBuilder {
     @Nullable
     private Range explicitRange;
 
-    private LspDiagnosticBuilder() { }
+    private LspDiagnosticBuilder() {
+    }
 
     public static LspDiagnosticBuilder create(ParserResult parserResult, String message) {
         return new LspDiagnosticBuilder().setMessage(message).setParserResult(parserResult);

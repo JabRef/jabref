@@ -21,7 +21,8 @@ import java.util.Optional;
  *
  * @param <T> the type of the class
  */
-@SuppressWarnings("unchecked") // We use some explicit casts of the form "(T) this". The constructor ensures that this cast is valid.
+@SuppressWarnings("unchecked")
+// We use some explicit casts of the form "(T) this". The constructor ensures that this cast is valid.
 public abstract class ChainNode<T extends ChainNode<T>> {
 
     /**

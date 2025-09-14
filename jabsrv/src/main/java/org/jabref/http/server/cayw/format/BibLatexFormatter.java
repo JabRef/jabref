@@ -30,8 +30,8 @@ public class BibLatexFormatter implements CAYWFormatter {
         String command = queryParams.getCommand().orElse(defaultCommand);
 
         List<BibEntry> bibEntries = caywEntries.stream()
-                .map(CAYWEntry::bibEntry)
-                .toList();
+                                               .map(CAYWEntry::bibEntry)
+                                               .toList();
 
         return "\\%s{%s}".formatted(command,
                 bibEntries.stream()

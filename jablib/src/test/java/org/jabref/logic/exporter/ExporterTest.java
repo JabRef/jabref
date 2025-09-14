@@ -40,7 +40,7 @@ public class ExporterTest {
 
         Collection<Object[]> result = new ArrayList<>();
         for (Exporter format : exporterFactory.getExporters()) {
-            result.add(new Object[]{format, format.getName()});
+            result.add(new Object[] {format, format.getName()});
         }
         return result.stream();
     }

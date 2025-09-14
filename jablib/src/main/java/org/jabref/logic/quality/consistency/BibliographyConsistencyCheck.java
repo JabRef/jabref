@@ -135,14 +135,14 @@ public class BibliographyConsistencyCheck {
             assert fieldsInAllEntries != null;
 
             Optional<BibEntryType> typeDefOpt = entryTypeDefinitions.stream()
-                                                                 .filter(def -> def.getType().equals(entryType))
-                                                                 .findFirst();
+                                                                    .filter(def -> def.getType().equals(entryType))
+                                                                    .findFirst();
 
             Set<Field> requiredFields = typeDefOpt.map(typeDef ->
-                        typeDef.getRequiredFields().stream()
-                               .flatMap(orFields -> orFields.getFields().stream())
-                               .collect(Collectors.toSet())
-                ).orElse(Set.of());
+                    typeDef.getRequiredFields().stream()
+                           .flatMap(orFields -> orFields.getFields().stream())
+                           .collect(Collectors.toSet())
+            ).orElse(Set.of());
 
             Set<BibEntry> entries = entryTypeToEntriesMap.get(entryType);
             assert entries != null;
