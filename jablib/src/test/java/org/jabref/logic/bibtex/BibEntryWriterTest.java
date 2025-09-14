@@ -19,10 +19,12 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 
+import io.github.adr.linked.ADR;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -846,5 +848,32 @@ class BibEntryWriterTest {
                 .of(bibContentText, importFormatPreferences)
                 .getEntries()
                 .getFirst();
+    }
+
+    @ADR(49)
+    @Test
+    void lowercaseStandardAndPreserveCustomCasing() throws Exception {
+        String bibtexEntry = """
+                @Article{test,
+                  Author                   = {Foo Bar},
+                  Title                    = {My title},
+                  CustomField              = {Some value}
+                }
+                """.replace("\n", OS.NEWLINE);
+
+        BibEntry entry = firstEntryFrom(bibtexEntry);
+        entry.setField(new UnknownField("CustomField"), "Some other value");
+
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        String expected = """
+                @Article{test,
+                  author      = {Foo Bar},
+                  title       = {My title},
+                  CustomField = {Some other value},
+                }
+                """.replace("\n", OS.NEWLINE);
+
+        assertEquals(expected, stringWriter.toString());
     }
 }

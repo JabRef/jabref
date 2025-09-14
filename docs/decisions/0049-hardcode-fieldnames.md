@@ -12,7 +12,8 @@ date: 2025-09-13
 
 JabRef allows users to define custom fields and customizing `StandardField`s with arbitrary names and arbitrary casing. Users reported inconsistent casing of field names across the tabs in the details panes of the entry editor (Required/Optional/Other fields), within saved BibTeX files and preferences.
 Fields were partially forced to show in UI with a capital first letter by a UI method inside the `Field` model.
-This inconsistency [confuses users](https://github.com/JabRef/jabref/issues/10590) and makes it impossible to achieve a predictable, uniform presentation between UI and persisted data, especially when dealing with customized fields.
+A argument was made in issue [#116](https://github.com/JabRef/jabref/issues/116) about how to case the field names in the `.bib` file. It was then decided to always lowercase the field names, as BibTeX itself is case-insensitive in that matter, but convention in bibtex style is to lowercase it.
+There were complains, that this inconsistency [confuses users](https://github.com/JabRef/jabref/issues/10590) and makes it impossible to achieve a predictable, uniform presentation between UI and persisted data, especially when dealing with customized fields.
 
 How should JabRef consistently determine the casing for field names in UI and persistence for both built‑in and custom fields?
 
@@ -26,6 +27,7 @@ How should JabRef consistently determine the casing for field names in UI and pe
 * Avoid breaking community conventions for BibTeX/BibLaTeX (lowercase keys in files)
 * Avoid mixed casing rules per UI location
 * Minimize changes to bib files
+* Respect the choice of the user for casing of custom fields
 
 ## Considered Options
 
@@ -36,7 +38,7 @@ How should JabRef consistently determine the casing for field names in UI and pe
 
 ## Decision Outcome
 
-Chosen option: "Hardcode `StandardField` names and use exact or customized names otherwise", because
+Chosen option: "Hardcode `StandardField` names and use exact or customized names otherwise," because
 
 * Aligns with community conventions (lowercase keys in `.bib`), ensuring compatibility.
 * Provides a consistent and localized UI for built‑ins by using canonical, hardcoded display labels.
