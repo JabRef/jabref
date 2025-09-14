@@ -28,8 +28,8 @@ public class LspConsistencyCheck {
         });
 
         Set<Field> allReportedFields = result.entryTypeToResultMap().values().stream()
-                                              .flatMap(entryTypeResult -> entryTypeResult.fields().stream())
-                                              .collect(Collectors.toUnmodifiableSet());
+                                             .flatMap(entryTypeResult -> entryTypeResult.fields().stream())
+                                             .collect(Collectors.toUnmodifiableSet());
 
         result.entryTypeToResultMap().forEach((entryType, entryTypeResult) -> {
             Optional<BibEntryType> bibEntryType = new BibEntryTypesManager().enrich(entryType, parserResult.getDatabaseContext().getMode());
