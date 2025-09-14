@@ -146,7 +146,12 @@ class OOCalcDatabase {
         firstRow.setAttribute("table.style-name", "ro1");
         addTableCell(document, firstRow, "Type");
         for (Field field : toExportFields) {
-            addTableCell(document, firstRow, FieldTextMapper.getDisplayName(field));
+            // Special case for OpenOffice/LibreOffice reporttype
+            if (field.getName().equalsIgnoreCase("reporttype")) {
+                addTableCell(document, firstRow, "Reporttype");
+            } else {
+                addTableCell(document, firstRow, FieldTextMapper.getDisplayName(field));
+            }
         }
 
         table.appendChild(firstRow);
