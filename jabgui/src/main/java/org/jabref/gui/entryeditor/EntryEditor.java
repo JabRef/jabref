@@ -562,7 +562,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
 
         Optional<Field> lastField = shownFields.stream()
-                                     .reduce((first, second) -> second);
+                                               .reduce((first, second) -> second);
 
         return lastField.map(Field::getDisplayName)
                         .map(displayName -> displayName.equalsIgnoreCase(textField.getId()))
