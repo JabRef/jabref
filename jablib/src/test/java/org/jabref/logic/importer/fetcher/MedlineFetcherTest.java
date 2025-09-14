@@ -26,14 +26,13 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 class MedlineFetcherTest {
+    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().medlineApiKey);
 
     private MedlineFetcher fetcher;
     private BibEntry entryWijedasa;
     private BibEntry entryEndharti;
     private BibEntry bibEntryIchikawa;
     private BibEntry bibEntrySari;
-
-    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().medlineApiKey);
 
     @BeforeEach
     void setUp() throws InterruptedException {

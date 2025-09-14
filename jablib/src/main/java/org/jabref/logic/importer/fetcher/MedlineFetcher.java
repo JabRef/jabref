@@ -46,16 +46,17 @@ import org.slf4j.LoggerFactory;
  * See <a href="https://docs.jabref.org/collect/import-using-online-bibliographic-database#medline-pubmed">docs.jabref.org</a> for a detailed documentation of the available fields.
  */
 public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher, CustomizableKeyFetcher {
+    public static final String FETCHER_NAME = "Medline/PubMed";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MedlineFetcher.class);
 
     private static final int NUMBER_TO_FETCH = 50;
     private static final String ID_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
     private static final String SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
     private static final String TEST_URL_WITHOUT_API_KEY = "https://www.ncbi.nlm.nih.gov/entrez/eutils/einfo.fcgi?db=pubmed&api_key=";
+
     private final ImporterPreferences importerPreferences;
     private int numberOfResultsFound;
-
-    public static final String FETCHER_NAME = "Medline/PubMed";
 
     public MedlineFetcher(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
