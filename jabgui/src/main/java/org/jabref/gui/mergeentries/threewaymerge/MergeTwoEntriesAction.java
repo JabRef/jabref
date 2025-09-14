@@ -7,7 +7,7 @@ import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.l10n.Localization;
@@ -37,11 +37,11 @@ public class MergeTwoEntriesAction extends SimpleCommand {
         database.insertEntry(entriesMergeResult.mergedEntry());
         database.removeEntries(entriesToRemove);
 
-        NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
-        ce.addEdit(new UndoableInsertEntries(stateManager.getActiveDatabase().get().getDatabase(), entriesMergeResult.mergedEntry()));
-        ce.addEdit(new UndoableRemoveEntries(database, entriesToRemove));
-        ce.end();
+        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entries"));
+        compoundEdit.addEdit(new UndoableInsertEntries(stateManager.getActiveDatabase().get().getDatabase(), entriesMergeResult.mergedEntry()));
+        compoundEdit.addEdit(new UndoableRemoveEntries(database, entriesToRemove));
+        compoundEdit.end();
 
-        undoManager.addEdit(ce);
+        undoManager.addEdit(compoundEdit);
     }
 }

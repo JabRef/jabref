@@ -153,7 +153,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
      * Determines if a list of TableColumns contains the searched column.
      */
     private boolean isColumnInList(MainTableColumn<?> searchColumn, List<TableColumn<BibEntryTableViewModel, ?>> tableColumns) {
-        for (TableColumn<BibEntryTableViewModel, ?> column: tableColumns) {
+        for (TableColumn<BibEntryTableViewModel, ?> column : tableColumns) {
             MainTableColumnModel model = ((MainTableColumn<?>) column).getModel();
             if (model.equals(searchColumn.getModel())) {
                 return true;
@@ -193,7 +193,7 @@ public class MainTableHeaderContextMenu extends ContextMenu {
 
         // Create the Table Columns from the models using factory methods.
         List<TableColumn<BibEntryTableViewModel, ?>> commonTableColumns = new ArrayList<>();
-        for (MainTableColumnModel columnModel: commonColumns) {
+        for (MainTableColumnModel columnModel : commonColumns) {
             TableColumn<BibEntryTableViewModel, ?> tableColumn = factory.createColumn(columnModel);
             commonTableColumns.add(tableColumn);
         }

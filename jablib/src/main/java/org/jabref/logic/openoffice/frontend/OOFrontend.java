@@ -168,8 +168,8 @@ public class OOFrontend {
         List<RangeSortable<CitationGroup>> sorted = RangeSortVisual.visualSort(sortables, doc, fcursor);
 
         return sorted.stream()
-                      .map(RangeSortable::getContent)
-                      .collect(Collectors.toList());
+                     .map(RangeSortable::getContent)
+                     .collect(Collectors.toList());
     }
 
     /**
@@ -384,13 +384,16 @@ public class OOFrontend {
         StringBuilder msg = new StringBuilder();
         for (RangeOverlap<RangeForOverlapCheck<CitationGroupId>> overlap : overlaps) {
             String listOfRanges = overlap.valuesForOverlappingRanges.stream()
-                                                                     .map(v -> "'%s'".formatted(v.format()))
-                                                                     .collect(Collectors.joining(", "));
+                                                                    .map(v -> "'%s'".formatted(v.format()))
+                                                                    .collect(Collectors.joining(", "));
             msg.append(
                     switch (overlap.kind) {
-                        case EQUAL_RANGE -> Localization.lang("Found identical ranges");
-                        case OVERLAP -> Localization.lang("Found overlapping ranges");
-                        case TOUCH -> Localization.lang("Found touching ranges");
+                        case EQUAL_RANGE ->
+                                Localization.lang("Found identical ranges");
+                        case OVERLAP ->
+                                Localization.lang("Found overlapping ranges");
+                        case TOUCH ->
+                                Localization.lang("Found touching ranges");
                     });
             msg.append(": ");
             msg.append(listOfRanges);

@@ -254,18 +254,18 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 case COPY -> {
                     clipBoardManager.setContent(keyword.get());
                     dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                                                           JabRefDialogService.shortenDialogMessage(keyword.get())));
+                            JabRefDialogService.shortenDialogMessage(keyword.get())));
                 }
                 case CUT -> {
                     clipBoardManager.setContent(keyword.get());
                     dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                                                           JabRefDialogService.shortenDialogMessage(keyword.get())));
+                            JabRefDialogService.shortenDialogMessage(keyword.get())));
                     keywordTagsField.removeTags(keyword);
                 }
                 case DELETE ->
-                    keywordTagsField.removeTags(keyword);
+                        keywordTagsField.removeTags(keyword);
                 default ->
-                    LOGGER.info("Action {} not defined", command.getText());
+                        LOGGER.info("Action {} not defined", command.getText());
             }
         }
     }
