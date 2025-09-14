@@ -33,7 +33,7 @@ class MedlineFetcherTest {
     private BibEntry bibEntryIchikawa;
     private BibEntry bibEntrySari;
 
-    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().ieeeAPIKey);
+    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().medlineApiKey);
 
     @BeforeEach
     void setUp() throws InterruptedException {
@@ -42,7 +42,7 @@ class MedlineFetcherTest {
 
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(API_KEY);
+        when(importerPreferences.getApiKey(MedlineFetcher.FETCHER_NAME)).thenReturn(API_KEY);
 
         fetcher = new MedlineFetcher(importerPreferences);
 
