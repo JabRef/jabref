@@ -150,7 +150,7 @@ public class WebFetchers {
         set.add(new DiVA(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
         set.add(new EuropePmcFetcher());
-        set.add(new MedlineFetcher());
+        set.add(new MedlineFetcher(importerPreferences));
         set.add(new TitleFetcher(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));

@@ -24,6 +24,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -44,15 +45,21 @@ import org.slf4j.LoggerFactory;
  * The MedlineFetcher fetches the entries from the PubMed database.
  * See <a href="https://docs.jabref.org/collect/import-using-online-bibliographic-database#medline-pubmed">docs.jabref.org</a> for a detailed documentation of the available fields.
  */
-public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher {
+public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher, CustomizableKeyFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MedlineFetcher.class);
 
+    private static final String FETCHER_NAME = "Medline/PubMed";
     private static final int NUMBER_TO_FETCH = 50;
     private static final String ID_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
     private static final String SEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
+    private static final String TEST_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
+    private final ImporterPreferences importerPreferences;
 
     private int numberOfResultsFound;
 
+    public MedlineFetcher(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
+    }
     /**
      * When using 'esearch.fcgi?db=&lt;database>&term=&lt;query>' we will get a list of IDs matching the query.
      * Input: Any text query (&term)
@@ -130,6 +137,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         uriBuilder.addParameter("db", "pubmed");
         uriBuilder.addParameter("retmode", "xml");
         uriBuilder.addParameter("id", identifier);
+        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
         return uriBuilder.build().toURL();
     }
 
@@ -154,6 +162,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         uriBuilder.addParameter("sort", "relevance");
         uriBuilder.addParameter("retmax", String.valueOf(NUMBER_TO_FETCH));
         uriBuilder.addParameter("term", query); // already lucene query
+        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -> uriBuilder.addParameter("api_key", apiKey));
         return uriBuilder.build().toURL();
     }
 
@@ -211,5 +220,10 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
 
             return entryList;
         }
+    }
+
+    @Override
+    public String getTestUrl() {
+        return TEST_URL;
     }
 }
