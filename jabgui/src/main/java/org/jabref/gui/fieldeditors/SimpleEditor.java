@@ -35,7 +35,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         this.viewModel = new SimpleEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager);
         this.isMultiLine = isMultiLine;
 
-        textInput = createTextInputControl(field);
+        textInput = createTextInputControl();
         HBox.setHgrow(textInput, Priority.ALWAYS);
 
         establishBinding(textInput, viewModel.textProperty(), preferences.getKeyBindingRepository(), undoAction, redoAction);
@@ -54,10 +54,8 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
     }
 
-    protected TextInputControl createTextInputControl(Field field) {
-        TextInputControl inputControl = isMultiLine ? new EditorTextArea() : new EditorTextField();
-        inputControl.setId(field.getName());
-        return inputControl;
+    protected TextInputControl createTextInputControl() {
+        return isMultiLine ? new EditorTextArea() : new EditorTextField();
     }
 
     @Override
