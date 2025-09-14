@@ -33,6 +33,7 @@ env:
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
+  MedlineApiKey: ${{ secrets.MedlineApiKey_FOR_TESTS}}
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"

@@ -35,6 +35,7 @@ env:
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
+  MedlineAPiKey: ${{ secrets.MedlineApiKey }}
   OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
   GRADLE_OPTS: -Xmx4g -Dorg.gradle.vfs.watch=false
   JAVA_OPTS: -Xmx4g
