@@ -99,6 +99,7 @@ public class Server {
         resourceConfig.register(CommandResource.class);
         resourceConfig.register(CORSFilter.class);
         resourceConfig.register(GlobalExceptionMapper.class);
+        resourceConfig.register(LatestLibraryResource.class);
 
         LOGGER.debug("Starting HTTP server...");
         final HttpServer httpServer =
