@@ -12,12 +12,15 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.event.EntriesEventSource;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,46 +44,80 @@ public class LatestLibraryResource {
 
     @POST
     @Path("entries")
-    public Response addEntry(AddEntryDTO request) {
-        if (request == null || request.getText() == null || request.getText().trim().isEmpty()) {
+    public Response addEntry(String jsonInput) {
+        // Manual JSON parsing with gson.fromJson
+        AddEntryDTO request;
+        try {
+            if (jsonInput == null || jsonInput.trim().isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(gson.toJson(new ErrorResponse("Missing JSON input")))
+                        .type(MediaType.APPLICATION_JSON)
+                        .build();
+            }
+
+            request = gson.fromJson(jsonInput, AddEntryDTO.class);
+        } catch (JsonSyntaxException e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"Missing or empty 'text' field\"}")
+                    .entity(gson.toJson(new ErrorResponse("Invalid JSON format: " + e.getMessage())))
+                    .type(MediaType.APPLICATION_JSON)
                     .build();
         }
-        LOGGER.error("HERE 1");
+
+        if (request == null || request.getText() == null || request.getText().trim().isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(gson.toJson(new ErrorResponse("Missing or empty 'text' field")))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
+        }
 
         Optional<BibDatabaseContext> activeDb = srvStateManager.getActiveDatabase();
         if (activeDb.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"No active library. Please open a library first.\"}")
+                    .entity(gson.toJson(new ErrorResponse("No active library. Please open a library first.")))
+                    .type(MediaType.APPLICATION_JSON)
                     .build();
         }
-        LOGGER.error("HERE 2");
 
         String bibtexSource = request.getText();
 
-        LOGGER.error("HERE 3");
         BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences());
-        LOGGER.error("HERE 4");
+
         try {
-            LOGGER.error("GUFSF");
             Optional<BibEntry> entry = parser.parseSingleEntry(bibtexSource);
             if (entry.isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("{\"error\":\"No valid BibTeX entry found\"}")
+                        .entity(gson.toJson(new ErrorResponse("No valid BibTeX entry found")))
+                        .type(MediaType.APPLICATION_JSON)
                         .build();
             }
-            System.err.println("HERE 5");
 
-            activeDb.get().getDatabase().insertEntry(entry.get());
+            activeDb.get().getDatabase().insertEntry(entry.get(), EntriesEventSource.SHARED);
 
             BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
             BibEntryDTO dto = new BibEntryDTO(entry.get(), activeDb.get().getMode(), preferences.getFieldPreferences(), entryTypesManager);
-            return Response.ok(gson.toJson(dto)).build();
+
+            // Manual JSON serialization with gson.toJson
+            return Response.ok(gson.toJson(dto))
+                    .type(MediaType.APPLICATION_JSON)
+                    .build();
         } catch (ParseException e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("{\"error\":\"Error parsing BibTeX entry: " + e.getMessage().replace("\"", "\\\"") + "\"}")
+                    .entity(gson.toJson(new ErrorResponse("Error parsing BibTeX entry: " + e.getMessage())))
+                    .type(MediaType.APPLICATION_JSON)
                     .build();
+        }
+    }
+
+    // Helper class for error responses
+    private static class ErrorResponse {
+        private final String error;
+
+        public ErrorResponse(String error) {
+            this.error = error;
+        }
+
+        public String getError() {
+            return error;
         }
     }
 }

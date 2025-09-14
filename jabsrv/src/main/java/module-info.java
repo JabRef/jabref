@@ -5,12 +5,13 @@ module org.jabref.jabsrv {
     exports org.jabref.http.dto to com.google.gson, org.glassfish.hk2.locator;
     exports org.jabref.http.dto.cayw to com.google.gson;
 
-    opens org.jabref.http.server to org.glassfish.hk2.utilities, org.glassfish.hk2.locator;
+    opens org.jabref.http.server to org.glassfish.hk2.utilities, org.glassfish.hk2.locator, com.google.gson;
     exports org.jabref.http.server.cayw to jersey.server;
     exports org.jabref.http.server.command to jersey.server;
     opens org.jabref.http.server.cayw to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
     opens org.jabref.http.dto to com.google.gson;
     opens org.jabref.http.server.command to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities, com.fasterxml.jackson.databind;
+
     exports org.jabref.http.server.services;
     exports org.jabref.http;
 
