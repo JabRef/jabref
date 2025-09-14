@@ -12,18 +12,31 @@ import org.jabref.logic.cleanup.FieldFormatterCleanups;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class CleanupSingleFieldPanel extends VBox implements CleanupPanel {
+public class CleanupSingleFieldPanel extends VBox {
 
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
-    public CleanupSingleFieldPanel(CleanupPreferences cleanupPreferences) {
+    private final CleanupDialogViewModel viewModel;
+
+    public CleanupSingleFieldPanel(CleanupPreferences cleanupPreferences,
+                                   CleanupDialogViewModel viewModel) {
         Objects.requireNonNull(cleanupPreferences, "cleanupPreferences must not be null");
+        Objects.requireNonNull(viewModel, "viewModel must not be null");
+
+        this.viewModel = viewModel;
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
         init(cleanupPreferences);
+    }
+
+    @FXML
+    private void onApply() {
+        CleanupTabSelection selectedTab = CleanupTabSelection.ofFormatters(getSelectedFormatters());
+        viewModel.apply(selectedTab);
+        getScene().getWindow().hide();
     }
 
     private void init(CleanupPreferences cleanupPreferences) {
@@ -33,12 +46,10 @@ public class CleanupSingleFieldPanel extends VBox implements CleanupPanel {
         ));
     }
 
-    @Override
-    public CleanupPreferences getCleanupPreferences() {
-        FieldFormatterCleanups fieldFormatterCleanups = new FieldFormatterCleanups(
+    public FieldFormatterCleanups getSelectedFormatters() {
+        return new FieldFormatterCleanups(
                 !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
                 formatterCleanupsPanel.cleanupsProperty()
         );
-        return new CleanupPreferences(fieldFormatterCleanups);
     }
 }

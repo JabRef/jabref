@@ -18,7 +18,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
+public class CleanupFileRelatedPanel extends VBox {
 
     @FXML private Label cleanupRenamePdfLabel;
 
@@ -29,16 +29,41 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
     @FXML private CheckBox cleanupDeletedFiles;
     @FXML private CheckBox cleanupUpgradeExternalLinks;
 
-    public CleanupFileRelatedPanel(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
+    private final EnumSet<CleanupPreferences.CleanupStep> ALL_JOBS = EnumSet.of(
+            CleanupPreferences.CleanupStep.MOVE_PDF,
+            CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE,
+            CleanupPreferences.CleanupStep.RENAME_PDF,
+            CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+            CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+            CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES
+    );
+
+
+    private final CleanupDialogViewModel viewModel;
+
+    public CleanupFileRelatedPanel(BibDatabaseContext databaseContext,
+                                   CleanupPreferences cleanupPreferences,
+                                   FilePreferences filePreferences,
+                                   CleanupDialogViewModel viewModel) {
         Objects.requireNonNull(databaseContext, "databaseContext must not be null");
         Objects.requireNonNull(cleanupPreferences, "cleanupPreferences must not be null");
         Objects.requireNonNull(filePreferences, "filePreferences must not be null");
+        Objects.requireNonNull(viewModel, "viewModel must not be null");
+
+        this.viewModel = viewModel;
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
         init(databaseContext, cleanupPreferences, filePreferences);
+    }
+
+    @FXML
+    private void onApply() {
+        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(ALL_JOBS, getSelectedJobs());
+        viewModel.apply(selectedTab);
+        getScene().getWindow().hide();
     }
 
     private void init(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
@@ -74,7 +99,7 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
         cleanupDeletedFiles.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES));
     }
 
-    public CleanupPreferences getCleanupPreferences() {
+    public EnumSet<CleanupPreferences.CleanupStep> getSelectedJobs() {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
 
         if (cleanupMakePathsRelative.isSelected()) {
@@ -94,6 +119,6 @@ public class CleanupFileRelatedPanel extends VBox implements CleanupPanel {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES);
         }
 
-        return new CleanupPreferences(activeJobs);
+        return activeJobs;
     }
 }

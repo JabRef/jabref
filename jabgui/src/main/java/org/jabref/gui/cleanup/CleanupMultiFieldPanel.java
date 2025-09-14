@@ -11,7 +11,7 @@ import org.jabref.logic.cleanup.CleanupPreferences;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
+public class CleanupMultiFieldPanel extends VBox {
     @FXML private CheckBox cleanupDOI;
     @FXML private CheckBox cleanupEprint;
     @FXML private CheckBox cleanupURL;
@@ -20,14 +20,37 @@ public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
     @FXML private CheckBox cleanupTimestampToCreationDate;
     @FXML private CheckBox cleanupTimestampToModificationDate;
 
-    public CleanupMultiFieldPanel(CleanupPreferences cleanupPreferences) {
+    private final EnumSet<CleanupPreferences.CleanupStep> ALL_JOBS = EnumSet.of(
+            CleanupPreferences.CleanupStep.CLEAN_UP_DOI,
+            CleanupPreferences.CleanupStep.CLEANUP_EPRINT,
+            CleanupPreferences.CleanupStep.CLEAN_UP_URL,
+            CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
+            CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX,
+            CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE,
+            CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE
+    );
+
+    private final CleanupDialogViewModel viewModel;
+
+    public CleanupMultiFieldPanel(CleanupPreferences cleanupPreferences,
+                                  CleanupDialogViewModel viewModel) {
         Objects.requireNonNull(cleanupPreferences, "cleanupPreferences must not be null");
+        Objects.requireNonNull(viewModel, "viewModel must not be null");
+
+        this.viewModel = viewModel;
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
         init(cleanupPreferences);
+    }
+
+    @FXML
+    private void onApply() {
+        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(ALL_JOBS, getSelectedJobs());
+        viewModel.apply(selectedTab);
+        getScene().getWindow().hide();
     }
 
     private void init(CleanupPreferences cleanupPreferences) {
@@ -70,8 +93,7 @@ public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
         cleanupTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
     }
 
-    @Override
-    public CleanupPreferences getCleanupPreferences() {
+    public EnumSet<CleanupPreferences.CleanupStep> getSelectedJobs() {
         EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
 
         if (cleanupDOI.isSelected()) {
@@ -96,6 +118,6 @@ public class CleanupMultiFieldPanel extends VBox implements CleanupPanel {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
         }
 
-        return new CleanupPreferences(activeJobs);
+        return activeJobs;
     }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.layout.VBox?>
 <fx:root xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1"
@@ -23,4 +24,7 @@
         <CheckBox fx:id="cleanupTimestampToCreationDate" text="%Convert timestamp field to field 'creationdate'" />
         <CheckBox fx:id="cleanupTimestampToModificationDate" text="%Convert timestamp field to field 'modificationdate'" />
     </VBox>
+
+    <Button text="%Apply" onAction="#onApply" />
+
 </fx:root>
