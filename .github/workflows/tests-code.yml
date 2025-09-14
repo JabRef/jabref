@@ -124,7 +124,7 @@ jobs:
           settings-file: "config/IntelliJ Code Style.xml"
       # job should fail in case there are changes
       - name: Check if any files changed
-        run: git diff-files
+        run: git diff --exit-code
 
   modernizer:
     name: Modernizer
