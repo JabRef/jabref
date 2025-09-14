@@ -1,4 +1,4 @@
-package org.jabref.http.server;
+package org.jabref.http.server.resources;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,16 +20,13 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;

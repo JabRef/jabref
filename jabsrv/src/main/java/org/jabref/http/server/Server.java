@@ -14,6 +14,9 @@ import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.command.CommandResource;
+import org.jabref.http.server.resources.LibrariesResource;
+import org.jabref.http.server.resources.LibraryResource;
+import org.jabref.http.server.resources.RootResource;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.os.OS;
 
