@@ -30,8 +30,12 @@ import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BibliographyConsistencyCheck {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibliographyConsistencyCheck.class);
 
     private static final Set<Field> EXPLICITLY_EXCLUDED_FIELDS = Set.of(
             InternalField.KEY_FIELD, // Citation key
@@ -146,7 +150,9 @@ public class BibliographyConsistencyCheck {
 
             Set<BibEntry> entries = entryTypeToEntriesMap.get(entryType);
             assert entries != null;
-            assert entries.size() != 1; // Either there is no entry with different fields or more than one
+            if (entries.size() == 1) {
+                LOGGER.debug("Entries size is one for {}", entries);
+            }
             if (entries == null || entries.size() <= 1 || differingFields.isEmpty()) {
                 continue;
             }
