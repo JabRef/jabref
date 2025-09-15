@@ -6,7 +6,7 @@ parent: Code Howtos
 JabRef has a built-in http server.
 The source is located in the project `jabsrv`.
 
-The resource for a library is implemented at [`org.jabref.http.server.LibraryResource`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/LibraryResource.java).
+The resource for a library is implemented at [`org.jabref.http.server.resources.LibraryResource`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java).
 
 ## Start http server
 

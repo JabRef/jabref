@@ -1,4 +1,3 @@
-
 package org.jabref.logic.exporter;
 
 import java.io.IOException;

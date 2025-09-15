@@ -72,7 +72,7 @@ class CiteSeerTest {
     void searchWithSortingByYear() throws FetcherException {
         Optional<String> expected = Optional.of("1552");
         List<BibEntry> fetchedEntries = fetcher.performSearch("title:Theory AND year:1552 AND sortBy:Year");
-        for (BibEntry actual: fetchedEntries) {
+        for (BibEntry actual : fetchedEntries) {
             if (actual.hasField(StandardField.YEAR)) {
                 assertEquals(expected, actual.getField(StandardField.YEAR));
             }

@@ -4,7 +4,7 @@ import javax.swing.undo.CompoundEdit;
 
 import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.logic.l10n.Localization;
@@ -20,7 +20,7 @@ public final class EntryChange extends DatabaseChange {
         this.oldEntry = oldEntry;
         this.newEntry = newEntry;
         setChangeName(oldEntry.getCitationKey().map(key -> Localization.lang("Modified entry '%0'", key))
-                           .orElse(Localization.lang("Modified entry")));
+                              .orElse(Localization.lang("Modified entry")));
     }
 
     public EntryChange(BibEntry oldEntry, BibEntry newEntry, BibDatabaseContext databaseContext) {
@@ -36,7 +36,7 @@ public final class EntryChange extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(NamedCompound undoEdit) {
+    public void applyChange(NamedCompoundEdit undoEdit) {
         databaseContext.getDatabase().removeEntry(oldEntry);
         databaseContext.getDatabase().insertEntry(newEntry);
         CompoundEdit changeEntryEdit = new CompoundEdit();

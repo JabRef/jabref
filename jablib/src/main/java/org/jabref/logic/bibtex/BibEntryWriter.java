@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -29,10 +28,11 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.Range;
 
+import io.github.adr.linked.ADR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-///  Parsing is done at {@link org.jabref.logic.importer.fileformat.BibtexParser}
+/// Parsing is done at {@link org.jabref.logic.importer.fileformat.BibtexParser}
 public class BibEntryWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryWriter.class);
@@ -59,14 +59,12 @@ public class BibEntryWriter {
         write(entry, out, bibDatabaseMode, false);
     }
 
-    /**
-     * Writes the given BibEntry using the given writer
-     *
-     * @param entry           The entry to write
-     * @param out             The writer to use
-     * @param bibDatabaseMode The database mode (bibtex or biblatex)
-     * @param reformat        Should the entry be in any case, even if no change occurred?
-     */
+    /// Writes the given BibEntry using the given writer
+    ///
+    /// @param entry           The entry to write
+    /// @param out             The writer to use
+    /// @param bibDatabaseMode The database mode (bibtex or biblatex)
+    /// @param reformat        Should the entry be in any case, even if no change occurred?
     public void write(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode, boolean reformat) throws IOException {
         // if the entry has not been modified, write it as it was
         if (!reformat && !entry.hasChanged()) {
@@ -90,9 +88,7 @@ public class BibEntryWriter {
         }
     }
 
-    /**
-     * Writes fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
-     */
+    /// Writes fields in the order of requiredFields, optionalFields and other fields, but does not sort the fields.
     private void writeRequiredFieldsFirstRemainingFieldsSecond(BibEntry entry, BibWriter out,
                                                                BibDatabaseMode bibDatabaseMode) throws IOException {
         writeEntryType(entry, out, bibDatabaseMode);
@@ -161,14 +157,12 @@ public class BibEntryWriter {
         out.writeLine(",");
     }
 
-    /**
-     * Write a single field, if it has any content.
-     *
-     * @param entry the entry to write
-     * @param out   the target of the write
-     * @param field the field
-     * @throws IOException In case of an IO error
-     */
+    /// Write a single field, if it has any content.
+    ///
+    /// @param entry the entry to write
+    /// @param out   the target of the write
+    /// @param field the field
+    /// @throws IOException In case of an IO error
     private void writeField(BibEntry entry, BibWriter out, Field field, int indent) throws IOException {
         Optional<String> value = entry.getField(field);
         // only write field if it is not empty
@@ -199,21 +193,14 @@ public class BibEntryWriter {
                     .orElse(0);
     }
 
-    /**
-     * Get display version of an entry field.
-     * <p>
-     * BibTeX is case-insensitive therefore there is no difference between: howpublished, HOWPUBLISHED, HowPublished, etc.
-     * <p>
-     * There was a long discussion about how JabRef should write the fields. See https://github.com/JabRef/jabref/issues/116
-     * <p>
-     * The team decided to do the biblatex way and use lower case for the field names.
-     *
-     * @param field The name of the field.
-     * @return The display version of the field name.
-     */
+    /// Get serializable version of field name with trailing spaces and the equal sign.
+    ///
+    /// @param field The name of the field.
+    /// @return The display version of the field name.
+    @ADR(49)
     static String getFormattedFieldName(Field field, int indent) {
         String fieldName = field.getName();
-        return fieldName.toLowerCase(Locale.ROOT) + StringUtil.repeatSpaces(indent - fieldName.length()) + " = ";
+        return fieldName + StringUtil.repeatSpaces(indent - fieldName.length()) + " = ";
     }
 
     public Map<Field, Range> getFieldPositions() {

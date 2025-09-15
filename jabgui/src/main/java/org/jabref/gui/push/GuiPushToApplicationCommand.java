@@ -72,9 +72,9 @@ public class GuiPushToApplicationCommand extends SimpleCommand {
     private void setApplication(String applicationName) {
         final ActionFactory factory = new ActionFactory();
         GuiPushToApplication application = GuiPushToApplications.getGUIApplicationByName(
-                                                                  applicationName,
-                                                                  dialogService,
-                                                                  preferences.getPushToApplicationPreferences())
+                                                                        applicationName,
+                                                                        dialogService,
+                                                                        preferences.getPushToApplicationPreferences())
                                                                 .orElseGet(() -> new GuiPushToEmacs(dialogService, preferences.getPushToApplicationPreferences()));
 
         preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());

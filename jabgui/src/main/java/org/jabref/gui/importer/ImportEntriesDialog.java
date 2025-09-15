@@ -110,9 +110,9 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
      * This constructor is used for importing entries that support pagination and require search queries.
      *
      * @param database database where the imported entries will be added
-     * @param task task that handles parsing and loading entries from the search results
-     * @param fetcher the search-based fetcher implementation used to retrieve entries from the web source
-     * @param query the search string used to find relevant entries
+     * @param task     task that handles parsing and loading entries from the search results
+     * @param fetcher  the search-based fetcher implementation used to retrieve entries from the web source
+     * @param query    the search string used to find relevant entries
      */
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, SearchBasedFetcher fetcher, String query) {
         this.database = database;
@@ -256,62 +256,62 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         }, viewModel.currentPageProperty(), viewModel.totalPagesProperty());
 
         BooleanBinding isPagedFetcher = Bindings.createBooleanBinding(() ->
-            searchBasedFetcher.isPresent() && searchBasedFetcher.get() instanceof PagedSearchBasedFetcher
+                searchBasedFetcher.isPresent() && searchBasedFetcher.get() instanceof PagedSearchBasedFetcher
         );
 
         // Disable: during loading OR when on the last page for non-paged fetchers
         // OR when the initial load is not complete for paged fetchers
         nextPageButton.disableProperty().bind(
-            loading.or(isOnLastPage.and(isPagedFetcher.not()))
-               .or(isPagedFetcher.and(initialLoadComplete.not()))
+                loading.or(isOnLastPage.and(isPagedFetcher.not()))
+                       .or(isPagedFetcher.and(initialLoadComplete.not()))
         );
         prevPageButton.disableProperty().bind(loading.or(viewModel.currentPageProperty().isEqualTo(0)));
 
         prevPageButton.textProperty().bind(
-            Bindings.when(loading)
-                .then("< " + Localization.lang("Loading..."))
-                .otherwise("< " + Localization.lang("Previous"))
+                Bindings.when(loading)
+                        .then("< " + Localization.lang("Loading..."))
+                        .otherwise("< " + Localization.lang("Previous"))
         );
 
         nextPageButton.textProperty().bind(
-            Bindings.when(loading)
-                .then(Localization.lang("Loading...") + " >")
-                .otherwise(
-                    Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
-                        .then(Localization.lang("Loading initial entries..."))
+                Bindings.when(loading)
+                        .then(Localization.lang("Loading...") + " >")
                         .otherwise(
-                            Bindings.when(isOnLastPage)
-                                .then(
-                                    Bindings.when(isPagedFetcher)
-                                        .then(Localization.lang("Load More") + " >>")
-                                        .otherwise(Localization.lang("No more entries"))
-                                )
-                                .otherwise(Localization.lang("Next") + " >")
+                                Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
+                                        .then(Localization.lang("Loading initial entries..."))
+                                        .otherwise(
+                                                Bindings.when(isOnLastPage)
+                                                        .then(
+                                                                Bindings.when(isPagedFetcher)
+                                                                        .then(Localization.lang("Load More") + " >>")
+                                                                        .otherwise(Localization.lang("No more entries"))
+                                                        )
+                                                        .otherwise(Localization.lang("Next") + " >")
+                                        )
                         )
-            )
         );
 
         statusLabel.textProperty().bind(
-            Bindings.when(loading)
-                .then(Localization.lang("Fetching more entries..."))
-                .otherwise(
-                    Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
-                        .then(Localization.lang("Loading initial results..."))
+                Bindings.when(loading)
+                        .then(Localization.lang("Fetching more entries..."))
                         .otherwise(
-                            Bindings.when(isOnLastPage)
-                                .then(
-                                    Bindings.when(isPagedFetcher)
-                                        .then(Localization.lang("Click 'Load More' to fetch additional entries"))
-                                        .otherwise(Bindings.createStringBinding(() -> {
-                                            int totalEntries = viewModel.getAllEntries().size();
-                                            return totalEntries > 0 ?
-                                                Localization.lang("All %0 entries loaded", String.valueOf(totalEntries)) :
-                                                Localization.lang("No entries available");
-                                        }, viewModel.getAllEntries()))
-                                )
-                                .otherwise("")
+                                Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
+                                        .then(Localization.lang("Loading initial results..."))
+                                        .otherwise(
+                                                Bindings.when(isOnLastPage)
+                                                        .then(
+                                                                Bindings.when(isPagedFetcher)
+                                                                        .then(Localization.lang("Click 'Load More' to fetch additional entries"))
+                                                                        .otherwise(Bindings.createStringBinding(() -> {
+                                                                            int totalEntries = viewModel.getAllEntries().size();
+                                                                            return totalEntries > 0 ?
+                                                                                   Localization.lang("All %0 entries loaded", String.valueOf(totalEntries)) :
+                                                                                   Localization.lang("No entries available");
+                                                                        }, viewModel.getAllEntries()))
+                                                        )
+                                                        .otherwise("")
+                                        )
                         )
-                )
         );
 
         loading.addListener((_, _, newVal) -> {
@@ -325,7 +325,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                 statusLabel.getStyleClass().remove("info-message");
             }
         });
-}
+    }
 
     private void updatePageUI() {
         pageNumberLabel.textProperty().bind(Bindings.createStringBinding(() -> {

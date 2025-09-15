@@ -154,7 +154,7 @@ public class BiblioscapeImporter extends Importer {
                     } else if ("UR".equals(entry.getKey()) || "AT".equals(entry.getKey())) {
                         String s = entry.getValue().toString().trim();
                         hm.put(s.startsWith("http://") || s.startsWith("ftp://") ? StandardField.URL
-                                : StandardField.PDF, entry.getValue().toString());
+                                                                                 : StandardField.PDF, entry.getValue().toString());
                     } else if ("C1".equals(entry.getKey())) {
                         comments.add("Custom1: "
                                 + entry.getValue());

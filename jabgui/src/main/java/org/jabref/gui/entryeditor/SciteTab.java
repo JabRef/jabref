@@ -200,9 +200,9 @@ public class SciteTab extends EntryEditorTab {
                 } catch (IOException ioex) {
                     // Can't throw a checked exception from here, so display a message to the user instead.
                     dialogService.showErrorDialogAndWait(
-                    "An error occurred opening web browser",
-                "JabRef was unable to open a web browser for link:\n\n" + url + "\n\nError Message:\n\n" + ioex.getMessage(),
-                        ioex
+                            "An error occurred opening web browser",
+                            "JabRef was unable to open a web browser for link:\n\n" + url + "\n\nError Message:\n\n" + ioex.getMessage(),
+                            ioex
                     );
                 }
             }

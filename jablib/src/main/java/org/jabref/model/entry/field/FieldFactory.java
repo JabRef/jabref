@@ -39,15 +39,7 @@ public class FieldFactory {
 
     public static String serializeOrFields(OrFields fields) {
         return fields.getFields().stream()
-                     .map(field -> {
-                         if (field instanceof UnknownField unknownField) {
-                             // In case a user has put a user-defined field, the casing of that field is kept
-                             return unknownField.getDisplayName();
-                         } else {
-                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
-                             return field.getName();
-                         }
-                     })
+                     .map(Field::getName)
                      .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
@@ -67,8 +59,8 @@ public class FieldFactory {
      */
     public static Collection<Field> getNotTextFields() {
         Set<Field> result = Arrays.stream(StandardField.values())
-              .filter(field -> !Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.MULTIPLE_ENTRY_LINK)))
-                .collect(Collectors.toSet());
+                                  .filter(field -> !Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.MULTIPLE_ENTRY_LINK)))
+                                  .collect(Collectors.toSet());
 
         // These fields are not marked as verbatim, because they could include LaTeX code
         result.add(StandardField.MONTH);
@@ -101,22 +93,14 @@ public class FieldFactory {
 
     public static String serializeFieldsList(Collection<Field> fields) {
         return fields.stream()
-                     .map(field -> {
-                         if (field instanceof UnknownField unknownField) {
-                             // In case a user has put a user-defined field, the casing of that field is kept
-                             return unknownField.getDisplayName();
-                         } else {
-                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
-                             return field.getName();
-                         }
-                     })
+                     .map(Field::getName)
                      .collect(Collectors.joining(DELIMITER));
     }
 
     /**
      * Type T is an entry type and is used to direct the mapping to the Java field class.
      * This somehow acts as filter, BibLaTeX "APA" entry type has field "article", but we want to have StandardField (if not explicitly requested otherwise)
-     *
+     * <p>
      * Supports also parsing of "UnknownField{name='rights'}" as field name (written by JabRef 5.x)
      */
     public static <T extends EntryType> Field parseField(T type, String fieldName) {
@@ -133,19 +117,19 @@ public class FieldFactory {
         }
 
         return OptionalUtil.<Field>orElse(
-              OptionalUtil.<Field>orElse(
-               OptionalUtil.<Field>orElse(
-                OptionalUtil.<Field>orElse(
-                 OptionalUtil.<Field>orElse(
-                   OptionalUtil.<Field>orElse(
-              InternalField.fromName(fieldName),
-              StandardField.fromName(fieldName)),
-              SpecialField.fromName(fieldName)),
-              IEEEField.fromName(fieldName)),
-              BiblatexSoftwareField.fromName(type, fieldName)),
-              BiblatexApaField.fromName(type, fieldName)),
-              AMSField.fromName(type, fieldName))
-              .orElse(UnknownField.fromDisplayName(fieldName));
+                                   OptionalUtil.<Field>orElse(
+                                           OptionalUtil.<Field>orElse(
+                                                   OptionalUtil.<Field>orElse(
+                                                           OptionalUtil.<Field>orElse(
+                                                                   OptionalUtil.<Field>orElse(
+                                                                           InternalField.fromName(fieldName),
+                                                                           StandardField.fromName(fieldName)),
+                                                                   SpecialField.fromName(fieldName)),
+                                                           IEEEField.fromName(fieldName)),
+                                                   BiblatexSoftwareField.fromName(type, fieldName)),
+                                           BiblatexApaField.fromName(type, fieldName)),
+                                   AMSField.fromName(type, fieldName))
+                           .orElse(new UnknownField(fieldName));
     }
 
     public static Field parseField(String fieldName) {
@@ -176,10 +160,10 @@ public class FieldFactory {
     }
 
     /**
-     * Returns a sorted Set of Fields (by {@link Field#getDisplayName} with all fields without internal ones
+     * Returns an alphabetically sorted Set of Fields with all fields without internal ones
      */
     public static Set<Field> getAllFieldsWithOutInternal() {
-        Set<Field> fields = new TreeSet<>(Comparator.comparing(Field::getDisplayName));
+        Set<Field> fields = new TreeSet<>(Comparator.comparing(Field::getName));
         fields.addAll(getAllFields());
         fields.removeAll(EnumSet.allOf(InternalField.class));
 

@@ -352,6 +352,7 @@ val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
 val scienceDirectApiKey = providers.environmentVariable("SCIENCEDIRECTAPIKEY").orElse("")
 val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
 val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
+val medlineApiKey = providers.environmentVariable("MedlineApiKey").orElse("")
 
 tasks.named<ProcessResources>("processResources") {
     dependsOn(extractMaintainers)
@@ -370,6 +371,7 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("scienceDirectApiKey", scienceDirectApiKey)
     inputs.property("biodiversityHeritageApiKey", biodiversityHeritageApiKey)
     inputs.property("semanticScholarApiKey", semanticScholarApiKey)
+    inputs.property("medlineApiKey", medlineApiKey)
 
     filesMatching("build.properties") {
         expand(
@@ -383,7 +385,8 @@ tasks.named<ProcessResources>("processResources") {
                 "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
                 "scienceDirectApiKey" to inputs.properties["scienceDirectApiKey"],
                 "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
-                "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"]
+                "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"],
+                "medlineApiKey" to inputs.properties["medlineApiKey"]
             )
         )
     }

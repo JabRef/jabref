@@ -23,7 +23,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -190,7 +190,7 @@ public class DuplicateSearch extends SimpleCommand {
         }
 
         LibraryTab libraryTab = tabSupplier.get();
-        final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
+        final NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("duplicate removal"));
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
             compoundEdit.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));

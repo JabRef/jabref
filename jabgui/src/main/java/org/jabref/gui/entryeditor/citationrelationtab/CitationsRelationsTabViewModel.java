@@ -56,8 +56,10 @@ public class CitationsRelationsTabViewModel {
         boolean generateNewKeyOnImport = preferences.getImporterPreferences().generateNewKeyOnImportProperty().get();
 
         switch (searchType) {
-            case CITES -> importCites(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
-            case CITED_BY -> importCitedBy(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
+            case CITES ->
+                    importCites(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
+            case CITED_BY ->
+                    importCitedBy(entries, existingEntry, importHandler, generator, generateNewKeyOnImport);
         }
     }
 

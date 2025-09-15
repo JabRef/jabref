@@ -103,8 +103,7 @@ public class UiTaskExecutor implements TaskExecutor {
      * The JavaFX task executes the call method a background thread and the onFailed onSucceed on the FX UI thread
      *
      * @param task the BackgroundTask to run
-     * @param <V> The background task type
-     *
+     * @param <V>  The background task type
      * @return Future of a JavaFX Task which will execute the call method a background thread
      */
     @Override

@@ -143,8 +143,8 @@ public final class CSLFormatUtils {
 
                 // Extract last two digits of the year
                 String shortYear = year.get().length() >= 2 ?
-                        year.get().substring(year.get().length() - 2) :
-                        year.get();
+                                   year.get().substring(year.get().length() - 2) :
+                                   year.get();
 
                 citation.append(alphaKey).append(shortYear);
             } else {
@@ -179,7 +179,7 @@ public final class CSLFormatUtils {
      * <p>
      * <b>Precondition:</b> Use ONLY with numeric citation styles.</p>
      *
-     * @param citation the numeric citation with an unresolved number.
+     * @param citation      the numeric citation with an unresolved number.
      * @param currentNumber the correct number to update the citation with.
      * @return the bibliographic citation with resolved number.
      */

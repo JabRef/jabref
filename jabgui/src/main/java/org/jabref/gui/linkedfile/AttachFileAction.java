@@ -82,14 +82,14 @@ public class AttachFileAction extends SimpleCommand {
             LinkedFileEditDialog dialog = new LinkedFileEditDialog(linkedFile);
 
             dialogService.showCustomDialogAndWait(dialog)
-                  .ifPresent(editedLinkedFile -> {
-                      Optional<FieldChange> fieldChange = entry.addFile(editedLinkedFile);
-                      fieldChange.ifPresent(change -> {
-                          UndoableFieldChange ce = new UndoableFieldChange(change);
-                          libraryTab.getUndoManager().addEdit(ce);
-                          libraryTab.markBaseChanged();
-                      });
-                  });
+                         .ifPresent(editedLinkedFile -> {
+                             Optional<FieldChange> fieldChange = entry.addFile(editedLinkedFile);
+                             fieldChange.ifPresent(change -> {
+                                 UndoableFieldChange compoundEdit = new UndoableFieldChange(change);
+                                 libraryTab.getUndoManager().addEdit(compoundEdit);
+                                 libraryTab.markBaseChanged();
+                             });
+                         });
         });
     }
 }

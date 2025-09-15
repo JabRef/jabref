@@ -343,6 +343,48 @@ jobs:
           comment-tag: download-link
           mode: recreate
 
+  comment-on-issue:
+    name: Comment on issue
+    # separate job, because it should wait until all binaries are available
+    needs: [conditions, build]
+    if: ${{ (github.event_name == 'pull_request') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo PR data
+        run: |
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR URL: ${{ github.event.pull_request.html_url }}"
+          cat <<EOF
+          PR Body:
+          ${{ github.event.pull_request.body }}
+          EOF
+      - name: Determine issue number
+        id: get_issue_number
+        uses: koppor/ticket-check-action@add-output
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ticketLink: 'https://github.com/JabRef/jabref/issues/%ticketNumber%'
+          ticketPrefix: '#'
+          titleRegex: '^#(?<ticketNumber>\d+)'
+          branchRegex: '^(?<ticketNumber>\d+)'
+          # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #13109` in PULL_REQUEST_TEMPLATE
+          bodyRegex: '(?<action>fixes|closes|resolves)\s+(?:https?:\/\/github\.com\/JabRef\/jabref\/issues\/)?#?(?<ticketNumber>(?!13109\b)\d+)'
+          bodyRegexFlags: 'i'
+          outputOnly: true
+      - name: Comment on issue
+        if: ${{ steps.get_issue_number.outputs.ticketNumber != '-1' }}
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          pr-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          message: >
+             A pull request addressing the issue has been created.
+             The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
+
+
+             For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
+          comment-tag: download-link
+          mode: recreate
+
   notarize:
     # Outsourced in a separate job to be able to rerun if this fails for timeouts
     name: macOS notarization

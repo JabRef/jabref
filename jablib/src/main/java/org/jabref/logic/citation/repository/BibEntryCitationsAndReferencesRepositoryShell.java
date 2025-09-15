@@ -18,8 +18,8 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
     private final BibEntryRelationRepository referencesDao;
 
     public BibEntryCitationsAndReferencesRepositoryShell(
-        BibEntryRelationRepository citationsDao,
-        BibEntryRelationRepository referencesDao
+            BibEntryRelationRepository citationsDao,
+            BibEntryRelationRepository referencesDao
     ) {
         this.citationsDao = citationsDao;
         this.referencesDao = referencesDao;
@@ -28,7 +28,7 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
     @Override
     public void insertCitations(BibEntry entry, List<BibEntry> citations) {
         citationsDao.addRelations(
-            entry, Objects.requireNonNullElseGet(citations, List::of)
+                entry, Objects.requireNonNullElseGet(citations, List::of)
         );
     }
 
@@ -53,7 +53,7 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
     @Override
     public void insertReferences(BibEntry entry, List<BibEntry> references) {
         referencesDao.addRelations(
-            entry, Objects.requireNonNullElseGet(references, List::of)
+                entry, Objects.requireNonNullElseGet(references, List::of)
         );
     }
 

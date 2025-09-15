@@ -33,8 +33,8 @@ public record Citation(Path path, int line, int colStart, int colEnd, String lin
         int lineLength = lineText.length();
 
         int start = Math.max(0, center + CONTEXT_WIDTH / 2 < lineLength
-                ? center - CONTEXT_WIDTH / 2
-                : lineLength - CONTEXT_WIDTH);
+                                ? center - CONTEXT_WIDTH / 2
+                                : lineLength - CONTEXT_WIDTH);
         int end = Math.min(lineLength, start + CONTEXT_WIDTH);
 
         // Add three dots when the string does not contain all the line.

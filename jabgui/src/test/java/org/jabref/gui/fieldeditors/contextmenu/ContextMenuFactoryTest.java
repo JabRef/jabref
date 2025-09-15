@@ -46,7 +46,8 @@ public class ContextMenuFactoryTest {
     public static void initToolkit() {
         if (!toolkitInitialized) {
             try {
-                Platform.startup(() -> { });
+                Platform.startup(() -> {
+                });
             } catch (IllegalStateException e) {
                 // Toolkit already initialized by another thread/test
             }
@@ -133,12 +134,12 @@ public class ContextMenuFactoryTest {
         ContextMenu menu = factory.createForSelection(files);
 
         menu.getItems().stream()
-                .filter(item -> {
-                    String text = item.getText();
-                    return text != null && text.toLowerCase().contains("remove link");
-                })
-                .findFirst()
-                .ifPresent(item -> item.getOnAction().handle(null));
+            .filter(item -> {
+                String text = item.getText();
+                return text != null && text.toLowerCase().contains("remove link");
+            })
+            .findFirst()
+            .ifPresent(item -> item.getOnAction().handle(null));
 
         verify(viewModel).removeFileLink(file);
     }
@@ -152,12 +153,12 @@ public class ContextMenuFactoryTest {
         ContextMenu menu = factory.createForSelection(files);
 
         menu.getItems().stream()
-                .filter(item -> {
-                    String text = item.getText();
-                    return text != null && text.toLowerCase().contains("remove links");
-                })
-                .findFirst()
-                .ifPresent(item -> item.getOnAction().handle(null));
+            .filter(item -> {
+                String text = item.getText();
+                return text != null && text.toLowerCase().contains("remove links");
+            })
+            .findFirst()
+            .ifPresent(item -> item.getOnAction().handle(null));
 
         verify(viewModel).removeFileLink(file1);
         verify(viewModel).removeFileLink(file2);

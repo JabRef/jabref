@@ -42,7 +42,8 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         database.insertEntry(second);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> { });
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> {
+        });
 
         Path csvFile = tempDir.resolve("checkSimpleLibrary-result.csv");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
@@ -72,7 +73,8 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> { });
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> {
+        });
 
         Path csvFile = tempDir.resolve("checkDifferentOutputSymbols-result.csv");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
@@ -81,7 +83,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         }
 
         assertEquals("""
-                entry type,citation key,Custom,Pages,Title
+                entry type,citation key,custom,Pages,Title
                 Article,first,?,o,x
                 Article,second,-,-,-
                 """, Files.readString(csvFile).replace("\r\n", "\n"));
@@ -117,7 +119,8 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         database.insertEntry(fifth);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> { });
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> {
+        });
 
         Path csvFile = tempDir.resolve("checkSimpleLibrary-result.csv");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
@@ -148,7 +151,8 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
         bibContext.setMode(BibDatabaseMode.BIBTEX);
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> { });
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> {
+        });
 
         Path csvFile = tempDir.resolve("checkLibraryWithoutIssues-result.csv");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
@@ -166,7 +170,8 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         Path file = Path.of("C:\\TEMP\\JabRef\\biblio-anon.bib");
         Path csvFile = file.resolveSibling("biblio-cited.csv");
         BibDatabaseContext databaseContext = importer.importDatabase(file).getDatabaseContext();
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(databaseContext, (_, _) -> { });
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(databaseContext, (_, _) -> {
+        });
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
              BibliographyConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, true)) {
             paperConsistencyCheckResultCsvWriter.writeFindings();

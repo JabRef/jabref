@@ -99,9 +99,9 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
             String applicationName = preferences.getPushToApplicationPreferences()
                                                 .getActiveApplicationName();
             GuiPushToApplication application = GuiPushToApplications.getGUIApplicationByName(
-                                                                      applicationName,
-                                                                      dialogService,
-                                                                      preferences.getPushToApplicationPreferences())
+                                                                            applicationName,
+                                                                            dialogService,
+                                                                            preferences.getPushToApplicationPreferences())
                                                                     .orElseGet(() -> new GuiPushToTeXstudio(dialogService, preferences.getPushToApplicationPreferences()));
             preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
             application.jumpToLine(selectedItem.path(), selectedItem.line(), selectedItem.colStart());

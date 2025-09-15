@@ -78,10 +78,10 @@ public class PushToEmacs extends AbstractPushToApplication {
                 // so sh receives: (insert "\\cite{Blah2001}")
                 // so emacs receives: (insert "\cite{Blah2001}")
                 com[com.length - 1] = prefix.concat("\""
-                                                    + getCitePrefix().replace("\\", "\\\\")
-                                                    + keyString
-                                                    + getCiteSuffix().replace("\\", "\\\\")
-                                                    + "\"").concat(suffix);
+                        + getCitePrefix().replace("\\", "\\\\")
+                        + keyString
+                        + getCiteSuffix().replace("\\", "\\\\")
+                        + "\"").concat(suffix);
             }
 
             LOGGER.atDebug()

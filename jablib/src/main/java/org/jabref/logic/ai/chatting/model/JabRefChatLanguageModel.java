@@ -60,20 +60,23 @@ public class JabRefChatLanguageModel implements ChatModel, AutoCloseable {
         }
 
         switch (aiPreferences.getAiProvider()) {
-            case OPEN_AI -> langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
+            case OPEN_AI ->
+                    langchainChatModel = Optional.of(new JvmOpenAiChatLanguageModel(aiPreferences, httpClient));
 
-            case GPT4ALL-> langchainChatModel = Optional.of(new Gpt4AllModel(aiPreferences, httpClient));
+            case GPT4ALL ->
+                    langchainChatModel = Optional.of(new Gpt4AllModel(aiPreferences, httpClient));
 
-            case MISTRAL_AI -> langchainChatModel = Optional.of(MistralAiChatModel
-                    .builder()
-                    .apiKey(apiKey)
-                    .modelName(aiPreferences.getSelectedChatModel())
-                    .temperature(aiPreferences.getTemperature())
-                    .baseUrl(aiPreferences.getSelectedApiBaseUrl())
-                    .logRequests(true)
-                    .logResponses(true)
-                    .build()
-            );
+            case MISTRAL_AI ->
+                    langchainChatModel = Optional.of(MistralAiChatModel
+                            .builder()
+                            .apiKey(apiKey)
+                            .modelName(aiPreferences.getSelectedChatModel())
+                            .temperature(aiPreferences.getTemperature())
+                            .baseUrl(aiPreferences.getSelectedApiBaseUrl())
+                            .logRequests(true)
+                            .logResponses(true)
+                            .build()
+                    );
 
             case GEMINI -> // NOTE: {@link GoogleAiGeminiChatModel} doesn't support API base url.
                     langchainChatModel = Optional.of(GoogleAiGeminiChatModel

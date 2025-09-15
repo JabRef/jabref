@@ -88,8 +88,8 @@ public final class Word {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
                 chars[i] = i == 0 ?
-                        Character.toUpperCase(chars[i]) :
-                        Character.toLowerCase(chars[i]);
+                           Character.toUpperCase(chars[i]) :
+                           Character.toLowerCase(chars[i]);
             }
         }
     }
@@ -98,8 +98,8 @@ public final class Word {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
                 chars[i] = i == 0 || (DASHES.contains(chars[i - 1])) ?
-                        Character.toUpperCase(chars[i]) :
-                        Character.toLowerCase(chars[i]);
+                           Character.toUpperCase(chars[i]) :
+                           Character.toLowerCase(chars[i]);
             }
         }
     }
@@ -108,18 +108,18 @@ public final class Word {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
                 chars[i] = i == 0 || (DASHES.contains(chars[i - 1]) && isConjunction(chars, i)) ?
-                        Character.toUpperCase(chars[i]) :
-                        Character.toLowerCase(chars[i]);
+                           Character.toUpperCase(chars[i]) :
+                           Character.toLowerCase(chars[i]);
             }
         }
     }
 
     private boolean isConjunction(char[] chars, int i) {
         StringBuilder word = new StringBuilder();
-            while (i < chars.length && !DASHES.contains(chars[i])) {
-                word.append(chars[i]);
-                i++;
-            }
+        while (i < chars.length && !DASHES.contains(chars[i])) {
+            word.append(chars[i]);
+            i++;
+        }
         return !CONJUNCTIONS.contains(word.toString());
     }
 
@@ -127,8 +127,8 @@ public final class Word {
         for (int i = 0; i < chars.length; i++) {
             if (!protectedChars[i]) {
                 chars[i] = i == 0 || DASHES.contains(chars[i - 1]) ?
-                        Character.toUpperCase(chars[i]) :
-                        Character.toLowerCase(chars[i]);
+                           Character.toUpperCase(chars[i]) :
+                           Character.toLowerCase(chars[i]);
             }
         }
     }

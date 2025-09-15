@@ -60,7 +60,7 @@ public class GitIgnoreFileFilter implements DirectoryStream.Filter<Path> {
         return gitIgnorePatterns.stream().noneMatch(filter ->
                 // we need this one for "*.png"
                 filter.matches(path.getFileName()) ||
-                // we need this one for "**/*.png"
-                filter.matches(path));
+                        // we need this one for "**/*.png"
+                        filter.matches(path));
     }
 }

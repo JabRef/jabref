@@ -104,7 +104,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             libSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             libSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
             librarySpecificFileDirectoryTooltip.setText(newValue.trim().isEmpty() ?
-                    Localization.lang("Library-specific file directory") : Localization.lang("Library-specific file directory: %0", newValue));
+                                                        Localization.lang("Library-specific file directory") : Localization.lang("Library-specific file directory: %0", newValue));
         });
         userSpecificFileDirectory.textProperty().addListener((_, _, newValue) -> {
             boolean isAbsolute = Path.of(newValue).isAbsolute();
@@ -117,7 +117,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
             latexFileDirectoryTooltip.setText(newValue.trim().isEmpty()
-                    ? Localization.lang("LaTeX file directory") : Localization.lang("LaTeX file directory: %0", newValue));
+                                              ? Localization.lang("LaTeX file directory") : Localization.lang("LaTeX file directory: %0", newValue));
         });
 
         Platform.runLater(() -> {

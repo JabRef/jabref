@@ -5,12 +5,12 @@ import javax.swing.undo.UndoableEdit;
 
 import org.jabref.logic.l10n.Localization;
 
-public class NamedCompound extends CompoundEdit {
+public class NamedCompoundEdit extends CompoundEdit {
 
     private final String name;
     private boolean hasEdits;
 
-    public NamedCompound(String name) {
+    public NamedCompoundEdit(String name) {
         super();
         this.name = name;
     }

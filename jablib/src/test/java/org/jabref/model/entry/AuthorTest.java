@@ -27,10 +27,10 @@ class AuthorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"O.", "A. O.", "A.-O.",
-                            "O. Moore", "A. O. Moore", "O. von Moore", "A.-O. Moore",
-                            "Moore, O.", "Moore, O., Jr.", "Moore, A. O.", "Moore, A.-O.",
-                            "MEmre", "{\\'{E}}douard", "J{\\\"o}rg", "Moore, O. and O. Moore",
-                            "Moore, O. and O. Moore and Moore, O. O."})
+            "O. Moore", "A. O. Moore", "O. von Moore", "A.-O. Moore",
+            "Moore, O.", "Moore, O., Jr.", "Moore, A. O.", "Moore, A.-O.",
+            "MEmre", "{\\'{E}}douard", "J{\\\"o}rg", "Moore, O. and O. Moore",
+            "Moore, O. and O. Moore and Moore, O. O."})
     void addDotIfAbbreviationDoNotAddDot(String input) {
         assertEquals(input, Author.addDotIfAbbreviation(input));
     }

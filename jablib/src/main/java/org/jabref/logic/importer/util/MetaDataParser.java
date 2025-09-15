@@ -167,10 +167,10 @@ public class MetaDataParser {
 
     /**
      * Parse the content of the value as provided by "raw" content.
-     *
+     * <p>
      * We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
      * because this leads to difficulties with UNC names.
-     *
+     * <p>
      * No normalization is done - the library-specific file directory could be passed as Mac OS X path, but the user could sit on Windows.
      *
      * @param value the raw value (as stored in the .bib file)
@@ -191,7 +191,7 @@ public class MetaDataParser {
 
     private static Comparator<? super Map.Entry<String, String>> groupsLast() {
         return (s1, s2) -> MetaData.GROUPSTREE.equals(s1.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s1.getKey()) ? 1 :
-                MetaData.GROUPSTREE.equals(s2.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s2.getKey()) ? -1 : 0;
+                           MetaData.GROUPSTREE.equals(s2.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s2.getKey()) ? -1 : 0;
     }
 
     /**
@@ -270,7 +270,7 @@ public class MetaDataParser {
     /**
      * Handles a blgFilePath-* metadata entry. Expects exactly one valid path.
      *
-     * @param entry the metadata entry containing the user-specific .blg path.
+     * @param entry    the metadata entry containing the user-specific .blg path.
      * @param metaData the MetaData object to update.
      */
     private void handleBlgFilePathEntry(Map.Entry<String, String> entry, MetaData metaData) {

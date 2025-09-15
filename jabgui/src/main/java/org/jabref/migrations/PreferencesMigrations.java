@@ -272,13 +272,13 @@ public class PreferencesMigrations {
         // Migrate Import patterns
         // Check for prefs node for Version <= 4.0
         if (mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
-            String[] oldStylePatterns = new String[]{
+            String[] oldStylePatterns = new String[] {
                     "\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
-            String[] newStylePatterns = new String[]{"[citationkey]",
+            String[] newStylePatterns = new String[] {"[citationkey]",
                     "[citationkey] - [title]"};
 
-            String[] oldDisplayStylePattern = new String[]{"bibtexkey", "bibtexkey - title"};
+            String[] oldDisplayStylePattern = new String[] {"bibtexkey", "bibtexkey - title"};
 
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
@@ -534,8 +534,8 @@ public class PreferencesMigrations {
                 && (FieldFormatterCleanups.ENABLED.equals(formatterCleanups.getFirst())
                 || FieldFormatterCleanups.DISABLED.equals(formatterCleanups.getFirst()))) {
             prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, FieldFormatterCleanups.ENABLED.equals(formatterCleanups.getFirst())
-                    ? Boolean.TRUE
-                    : Boolean.FALSE);
+                                                                    ? Boolean.TRUE
+                                                                    : Boolean.FALSE);
 
             prefs.put(V6_0_CLEANUP_FIELD_FORMATTERS, String.join(OS.NEWLINE, formatterCleanups.subList(1, formatterCleanups.size() - 1)));
         }
@@ -571,24 +571,25 @@ public class PreferencesMigrations {
      * and only then does the update.
      * </p>
      *
-     * @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
      * @param preferences the user's current preferences
+     * @implNote The default fields for the "General" tab are defined by {@link FieldFactory#getDefaultGeneralFields()}.
      */
     static void addICORERankingFieldToGeneralTab(GuiPreferences preferences) {
         Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
+
         Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
+        if (currentGeneralPrefs != null) {
+            Set<Field> expectedGeneralPrefs = Set.of(
+                    StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT,
+                    StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER,
+                    StandardField.TIMESTAMP,
 
-        Set<Field> expectedGeneralPrefs = Set.of(
-                StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT,
-                StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER,
-                StandardField.TIMESTAMP,
-
-                SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.QUALITY, SpecialField.RANKING,
-                SpecialField.READ_STATUS, SpecialField.RELEVANCE
-        );
-
-        if (!currentGeneralPrefs.equals(expectedGeneralPrefs)) {
-            return;
+                    SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.QUALITY, SpecialField.RANKING,
+                    SpecialField.READ_STATUS, SpecialField.RELEVANCE
+            );
+            if (!currentGeneralPrefs.equals(expectedGeneralPrefs)) {
+                return;
+            }
         }
 
         entryEditorPrefs.put(

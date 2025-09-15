@@ -238,7 +238,8 @@ tasks.test {
         "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
 
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
-        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io"
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        "--enable-native-access=javafx.graphics,javafx.web,com.sun.jna"
 
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"

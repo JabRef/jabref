@@ -125,7 +125,7 @@ public class AuthorListParser {
 
     /**
      * Tries to get a simple BibTeX author list of the given string.
-     *
+     * <p>
      * This is an intermediate step in {@link #parse}. Since parse does not work in all cases,
      * this method can be used to get more valid BibTeX.
      *

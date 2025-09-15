@@ -101,7 +101,8 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
 
     @Override
     public String getKey() {
-        return "MSC_codes_to_descriptions"; }
+        return "MSC_codes_to_descriptions";
+    }
 
     @Override
     public String getExampleInput() {

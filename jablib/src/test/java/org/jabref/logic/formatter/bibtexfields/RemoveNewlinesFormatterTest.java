@@ -1,4 +1,3 @@
-
 package org.jabref.logic.formatter.bibtexfields;
 
 import org.junit.jupiter.api.BeforeEach;

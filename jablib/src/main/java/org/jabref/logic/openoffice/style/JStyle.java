@@ -603,9 +603,9 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
         }
         if (object instanceof JStyle otherStyle) {
             return Objects.equals(path, otherStyle.path)
-                   && Objects.equals(name, otherStyle.name)
-                   && Objects.equals(citProperties, otherStyle.citProperties)
-                   && Objects.equals(properties, otherStyle.properties);
+                    && Objects.equals(name, otherStyle.name)
+                    && Objects.equals(citProperties, otherStyle.citProperties)
+                    && Objects.equals(properties, otherStyle.properties);
         }
         return false;
     }
@@ -984,7 +984,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
         OOText title = style.getReferenceHeaderText();
         String parStyle = style.getReferenceHeaderParagraphFormat();
         return parStyle == null
-                ? OOFormat.paragraph(title)
-                : OOFormat.paragraph(title, parStyle);
+               ? OOFormat.paragraph(title)
+               : OOFormat.paragraph(title, parStyle);
     }
 }

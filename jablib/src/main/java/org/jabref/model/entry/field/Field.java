@@ -4,7 +4,6 @@ import java.util.EnumSet;
 import java.util.Optional;
 
 import org.jabref.model.entry.EntryConverter;
-import org.jabref.model.strings.StringUtil;
 
 public interface Field {
 
@@ -17,15 +16,8 @@ public interface Field {
     EnumSet<FieldProperty> getProperties();
 
     /**
-     * @return A version of the field name more suitable for display in the UI
-     */
-    default String getDisplayName() {
-        return StringUtil.capitalizeFirst(getName());
-    }
-
-    /**
      * Name used for writing to .bib (or as XMP data)
-     *
+     * <p>
      * However, BibEntryWriter converts to lower case. See {@link org.jabref.logic.bibtex.BibEntryWriter#getFormattedFieldName}
      */
     String getName();

@@ -24,15 +24,15 @@ public class UndoableUnabbreviator {
      *
      * @param entry The entry to be treated.
      * @param field The field
-     * @param ce    If the entry is changed, add an edit to this compound.
+     * @param compoundEdit    If the entry is changed, add an edit to this compound.
      * @return true if the entry was changed, false otherwise.
      */
-    public boolean unabbreviate(BibDatabase database, BibEntry entry, Field field, CompoundEdit ce) {
+    public boolean unabbreviate(BibDatabase database, BibEntry entry, Field field, CompoundEdit compoundEdit) {
         if (!entry.hasField(field)) {
             return false;
         }
 
-        if (restoreFromFJournal(entry, field, ce)) {
+        if (restoreFromFJournal(entry, field, compoundEdit)) {
             return true;
         }
 
@@ -53,11 +53,11 @@ public class UndoableUnabbreviator {
         Abbreviation abbreviation = journalAbbreviationRepository.get(text).get();
         String newText = abbreviation.getName();
         entry.setField(field, newText);
-        ce.addEdit(new UndoableFieldChange(entry, field, origText, newText));
+        compoundEdit.addEdit(new UndoableFieldChange(entry, field, origText, newText));
         return true;
     }
 
-    public boolean restoreFromFJournal(BibEntry entry, Field field, CompoundEdit ce) {
+    public boolean restoreFromFJournal(BibEntry entry, Field field, CompoundEdit compoundEdit) {
         if ((StandardField.JOURNAL != field && StandardField.JOURNALTITLE != field) || !entry.hasField(AMSField.FJOURNAL)) {
             return false;
         }
@@ -66,10 +66,10 @@ public class UndoableUnabbreviator {
         String newText = entry.getField(AMSField.FJOURNAL).get().trim();
 
         entry.setField(AMSField.FJOURNAL, "");
-        ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, newText, ""));
+        compoundEdit.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, newText, ""));
 
         entry.setField(field, newText);
-        ce.addEdit(new UndoableFieldChange(entry, field, origText, newText));
+        compoundEdit.addEdit(new UndoableFieldChange(entry, field, origText, newText));
 
         return true;
     }

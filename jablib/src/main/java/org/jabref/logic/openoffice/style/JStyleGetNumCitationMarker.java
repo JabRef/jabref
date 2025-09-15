@@ -33,17 +33,17 @@ class JStyleGetNumCitationMarker {
     }
 
     /**
-     *  Create a numeric marker for use in the bibliography as label for the entry.
+     * Create a numeric marker for use in the bibliography as label for the entry.
+     * <p>
+     * To support for example numbers in superscript without brackets for the text,
+     * but "[1]" form for the bibliography, the style can provide
+     * the optional "BracketBeforeInList" and "BracketAfterInList" strings
+     * to be used in the bibliography instead of "BracketBefore" and "BracketAfter"
      *
-     *  To support for example numbers in superscript without brackets for the text,
-     *  but "[1]" form for the bibliography, the style can provide
-     *  the optional "BracketBeforeInList" and "BracketAfterInList" strings
-     *  to be used in the bibliography instead of "BracketBefore" and "BracketAfter"
-     *
-     *  @return "[${number}]" where
-     *       "[" stands for BRACKET_BEFORE_IN_LIST (with fallback BRACKET_BEFORE)
-     *       "]" stands for BRACKET_AFTER_IN_LIST (with fallback BRACKET_AFTER)
-     *       "${number}" stands for the formatted number.
+     * @return "[${number}]" where
+     * "[" stands for BRACKET_BEFORE_IN_LIST (with fallback BRACKET_BEFORE)
+     * "]" stands for BRACKET_AFTER_IN_LIST (with fallback BRACKET_AFTER)
+     * "${number}" stands for the formatted number.
      */
     public static OOText getNumCitationMarkerForBibliography(JStyle style,
                                                              CitationMarkerNumericBibEntry entry) {
@@ -55,8 +55,8 @@ class JStyleGetNumCitationMarker {
         stringBuilder.append(bracketBefore);
         final Optional<Integer> current = entry.getNumber();
         stringBuilder.append(current.isPresent()
-                  ? String.valueOf(current.get())
-                  : (JStyle.UNDEFINED_CITATION_MARKER + entry.getCitationKey()));
+                             ? String.valueOf(current.get())
+                             : (JStyle.UNDEFINED_CITATION_MARKER + entry.getCitationKey()));
         stringBuilder.append(bracketAfter);
         stringBuilder.append(style.getCitationGroupMarkupAfter());
         return OOText.fromString(stringBuilder.toString());
@@ -160,24 +160,22 @@ class JStyleGetNumCitationMarker {
     /**
      * Format a number-based citation marker for the given number or numbers.
      *
-     * @param entries Provide the citation numbers.
-     *
-     *               An Optional.empty() number means: could not look this up
-     *               in the databases. Positive integers are the valid numbers.
-     *
-     *               Duplicate citation numbers are allowed:
-     *
-     *                 - If their pageInfos are identical, only a
-     *                   single instance is emitted.
-     *
-     *                 - If their pageInfos differ, the number is emitted with each
-     *                    distinct pageInfo.
-     *
-     *                    pageInfos are expected to be normalized
-     *
+     * @param entries          Provide the citation numbers.
+     *                         <p>
+     *                         An Optional.empty() number means: could not look this up
+     *                         in the databases. Positive integers are the valid numbers.
+     *                         <p>
+     *                         Duplicate citation numbers are allowed:
+     *                         <p>
+     *                         - If their pageInfos are identical, only a
+     *                         single instance is emitted.
+     *                         <p>
+     *                         - If their pageInfos differ, the number is emitted with each
+     *                         distinct pageInfo.
+     *                         <p>
+     *                         pageInfos are expected to be normalized
      * @param minGroupingCount Zero and negative means never group.
-     *                    Only used by tests to override the value in style.
-     *
+     *                         Only used by tests to override the value in style.
      * @return The text for the citation.
      *
      */
@@ -231,8 +229,8 @@ class JStyleGetNumCitationMarker {
                 } else if (compareCitationMarkerNumericEntry(current, prev) == 0) {
                     // Same as prev, just forget it.
                 } else if ((current.getNumber().get() == (prev.getNumber().get() + 1))
-                           && (prev.getPageInfo().isEmpty())
-                           && (current.getPageInfo().isEmpty())) {
+                        && (prev.getPageInfo().isEmpty())
+                        && (current.getPageInfo().isEmpty())) {
                     // Just two consecutive numbers without pageInfo: join
                     currentBlock.add(current);
                 } else {

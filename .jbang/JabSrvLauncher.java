@@ -34,14 +34,15 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/Command.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/CommandResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/SelectEntriesCommand.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/LibrariesResource.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/LibraryResource.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/PreferencesFactory.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/RootResource.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibrariesResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/LibraryResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/MapResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/resources/RootResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/PreferencesFactory.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
 
 // REPOS mavencentral,snapshots=https://central.sonatype.com/repository/maven-snapshots/
 // REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots

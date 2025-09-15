@@ -496,8 +496,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     public void setFocusToField(Field field) {
         UiTaskExecutor.runInJavaFXThread(() -> {
-        Field actualField = field;
-        boolean fieldFound = false;
+            Field actualField = field;
+            boolean fieldFound = false;
             for (Tab tab : tabbed.getTabs()) {
                 tabbed.getSelectionModel().select(tab);
                 if ((tab instanceof FieldsEditorTab fieldsEditorTab)

@@ -1,5 +1,3 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
-
 //JAVA 24
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
@@ -43,7 +41,6 @@ import org.h2.mvstore.MVStore;
 import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /// Has to be started in the root of the repository due to <https://github.com/jbangdev/jbang-gradle-plugin/issues/11>
 public class JournalListMvGenerator {

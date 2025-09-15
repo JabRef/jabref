@@ -46,10 +46,10 @@ class GitHandlerTest {
         SystemReader.setInstance(new NoopGitSystemReader());
 
         try (Git remoteGit = Git.init()
-                           .setBare(true)
-                           .setDirectory(remoteRepoPath.toFile())
-                           .setInitialBranch("main")
-                           .call()) {
+                                .setBare(true)
+                                .setDirectory(remoteRepoPath.toFile())
+                                .setInitialBranch("main")
+                                .call()) {
             // This ensures the remote repository is initialized and properly closed
         }
 

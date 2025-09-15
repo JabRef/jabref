@@ -4,7 +4,7 @@ import org.jabref.gui.collab.DatabaseChange;
 import org.jabref.gui.collab.DatabaseChangeResolverFactory;
 import org.jabref.gui.groups.GroupTreeNodeViewModel;
 import org.jabref.gui.groups.UndoableModifySubtree;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.bibtex.comparator.GroupDiff;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.l10n.Localization;
@@ -22,7 +22,7 @@ public final class GroupChange extends DatabaseChange {
     }
 
     @Override
-    public void applyChange(NamedCompound undoEdit) {
+    public void applyChange(NamedCompoundEdit undoEdit) {
         GroupTreeNode oldRoot = groupDiff.getOriginalGroupRoot();
         GroupTreeNode newRoot = groupDiff.getNewGroupRoot();
 

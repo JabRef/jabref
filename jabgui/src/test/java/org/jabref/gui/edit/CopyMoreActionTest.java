@@ -207,14 +207,22 @@ class CopyMoreActionTest {
 
     private String expectedClipboardString(StandardActions action) {
         return String.join("\n", switch (action) {
-            case COPY_FIELD_TITLE -> titles;
-            case COPY_CITATION_KEY -> keys;
-            case COPY_DOI -> dois;
-            case COPY_FIELD_AUTHOR -> authors;
-            case COPY_FIELD_JOURNAL -> journals;
-            case COPY_FIELD_DATE -> dates;
-            case COPY_FIELD_KEYWORDS -> keywords;
-            case COPY_FIELD_ABSTRACT -> abstracts;
+            case COPY_FIELD_TITLE ->
+                    titles;
+            case COPY_CITATION_KEY ->
+                    keys;
+            case COPY_DOI ->
+                    dois;
+            case COPY_FIELD_AUTHOR ->
+                    authors;
+            case COPY_FIELD_JOURNAL ->
+                    journals;
+            case COPY_FIELD_DATE ->
+                    dates;
+            case COPY_FIELD_KEYWORDS ->
+                    keywords;
+            case COPY_FIELD_ABSTRACT ->
+                    abstracts;
             default ->
                     throw new IllegalArgumentException("Unhandled action: " + action);
         });
