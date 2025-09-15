@@ -37,36 +37,6 @@ Click on "Restart" to finally restart.
 
 Wait for IntelliJ coming up again.
 
-## Put JabRef's code style configuration in place
-
-Go to **File > Settings... > Editor > Code Style**
-
-Click on the settings wheel (next to the scheme chooser),
-then click "Import Scheme >",
-then click "IntelliJ IDEA code style XML"
-
-{% figure caption:"Location of “Import Scheme > IntelliJ IDEA code style XML”" %}
-![Location of IntelliJ IDEA code style XML](13-04-import-checkstyle.png)
-{% endfigure %}
-
-You have to browse for the directory `config` in JabRef's code.
-There is an `IntelliJ Code Style.xml`.
-
-{% figure caption:"Browsing for `config/IntelliJ Code Style.xml`" %}
-![Browsing for config/IntelliJ Code Style.xml](13-05-select-checkstyle-xml-file.png)
-{% endfigure %}
-
-Click "OK".
-
-At following dialog is "Import Scheme".
-Click there "OK", too.
-
-{% figure caption:"Import to JabRef" %}
-![Import to JabRef](13-06-code-style-import-as-jabref.png)
-{% endfigure %}
-
-Click on "Apply" to store the preferences.
-
 ## Have auto format working properly in JavaDoc
 
 To have auto format working properly in the context of JavaDoc and line wrapping, "Wrap at right margin" has to be disabled. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
