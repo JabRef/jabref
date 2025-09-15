@@ -35,7 +35,7 @@ dependencies.constraints {
 
     api("com.dlsc.gemsfx:gemsfx:3.4.2")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
-    api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.2")
+    api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
     api("com.fasterxml:aalto-xml:1.3.3")
     api("org.eclipse.lsp4j:org.eclipse.lsp4j:0.24.0")
