@@ -115,15 +115,7 @@ public class ThemeManager {
     public void installCss(@NonNull Scene scene) {
         // Because of race condition in JavaFX, IndexOutOfBounds will be thrown, despite
         // all the invocation to this method come directly from the UI thread
-        UiTaskExecutor.runInJavaFXThread(() -> {
-            try {
-                installCssImmediately(scene);
-            } catch (IndexOutOfBoundsException e) {
-                // IndexOutOfBoundsException keeps being thrown although the theme is applied correctly.
-                // By catching the exception, we avoid spamming the exception to user.
-                LOGGER.error("IndexOutOfBoundsException while installing Css", e);
-            }
-        });
+        UiTaskExecutor.runInJavaFXThread(() -> installCssImmediately(scene));
     }
 
     /// Installs the css file as a stylesheet in the given web engine. Changes in the
