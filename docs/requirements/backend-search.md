@@ -2,7 +2,7 @@
 parent: Requirements
 ---
 # Backend Search
-Search functionialities the backend needs to support.
+Search functionalities the backend needs to support.
 
 ## General Search
 Standard search functions.
@@ -10,13 +10,13 @@ Standard search functions.
 ### Word Matching
 `req~backend-search.general-search.word-matching~1`
 
-Searching for a word retrieves all entries containing it. 
+Searching for a word retrieves all entries containing it.
 Searching for multiple words only returns entries containing all of them.
 
 ### Sequence Matching
 `req~backend-search.general-search.sequence-matching~1`
 
-Searching for a sequence of words only lists entries containing the words of the sequence in the given order. 
+Searching for a sequence of words only lists entries containing the words of the sequence in the given order.
 Searching for multiple sequences lists entries containing all sequences.
 
 ### Combinations
@@ -65,9 +65,10 @@ Note that the symbols used here are just an example.
 `req~backend-search.field-search.pseudo-fields~1`
 
 The following four pseudo fields are supported: anyfield, anykeyword, key and entrytype.  
+
 - Searching for a word or sequence in any field is possible and returns entries that have a field containing the searched word or sequence.  
-- Search among the keywords is supported, listing entries when the given phrase is amongst or part of its keywords.  
-- Searching for citation keys will show entries containing the phrase in their citation key or show the single entry whose key matches the phrase (in case of a exact match search).  
+- Search among the keywords is supported, listing entries when the given phrase is part of its keywords.  
+- Searching for citation keys will show entries containing the phrase in their citation key or show the single entry whose key matches the phrase (in case of an exact match search).  
 - Entries of a certain type can be listed. E.g. `entrytype = thesis` lists all entries whose type contains `thesis`, like `bachelorsthesis` or `mastersthesis`.
 
 ## Searching with Regular Expressions
@@ -76,10 +77,8 @@ Search function requirements regarding the support of regular expressions. In th
 ### Regular Expressions Search
 `req~backend-search.regex-search~1`
 
-When searching, regular expressions as defined in Java can be used. 
+When searching, regular expressions as defined in Java can be used.
 This means the backend is searchable with special characters (e.g. tab: `\t`, carriage-return: `\r`), with character classes (e.g. `[a-z]`), with boundary matchers (e.g. `\b`, `\B`), greedy, reluctant and possessive quantifiers (e.g. `?`, `*`, `+`) and logical operators (e.g. braces: `(` `)`, or: `|`).  
 Searching with special characters by escaping them is also supported.
-
-
 
 <!-- markdownlint-disable-file MD022 -->
