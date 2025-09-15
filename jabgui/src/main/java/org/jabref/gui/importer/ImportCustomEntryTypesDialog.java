@@ -44,8 +44,8 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
                 viewModel.importBibEntryTypes(
                         unknownEntryTypesCheckList.getCheckModel().getCheckedItems(),
                         differentCustomizationCheckList.getCheckModel().getCheckedItems().stream()
-                                .map(BibEntryTypePrefsAndFileViewModel::customTypeFromPreferences)
-                                .toList());
+                                                       .map(BibEntryTypePrefsAndFileViewModel::customTypeFromPreferences)
+                                                       .toList());
             }
             return null;
         });

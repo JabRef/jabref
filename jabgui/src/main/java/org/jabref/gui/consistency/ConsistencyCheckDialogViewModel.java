@@ -36,6 +36,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.types.EntryType;
 
 import org.jooq.lambda.Unchecked;
@@ -65,10 +66,10 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         this.result = result;
 
         this.allReportedFields = result.entryTypeToResultMap().values().stream()
-                                  .flatMap(entryTypeResult -> entryTypeResult.fields().stream())
-                                  .sorted(Comparator.comparing(Field::getName))
-                                  .distinct()
-                                  .toList();
+                                       .flatMap(entryTypeResult -> entryTypeResult.fields().stream())
+                                       .sorted(Comparator.comparing(Field::getName))
+                                       .distinct()
+                                       .toList();
 
         result.entryTypeToResultMap().entrySet().stream()
               .sorted(Comparator.comparing(entry -> entry.getKey().getName()))
@@ -93,7 +94,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         List<String> result = new ArrayList<>(allReportedFields.size() + 2); // there are two extra columns
         result.add("Entry Type");
         result.add("CitationKey");
-        allReportedFields.forEach(field-> result.add(field.getDisplayName().trim()));
+        allReportedFields.forEach(field -> result.add(FieldTextMapper.getDisplayName(field).trim()));
         return result;
     }
 
@@ -119,14 +120,14 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         SequencedCollection<BibEntry> bibEntries = entries.sortedEntries();
 
         bibEntries.forEach(Unchecked.consumer(bibEntry ->
-            writeBibEntry(bibEntry, entryType, requiredFields, optionalFields)
+                writeBibEntry(bibEntry, entryType, requiredFields, optionalFields)
         ));
     }
 
     private void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
         List<String> theRecord = getFindingsAsList(bibEntry, entryType, requiredFields, optionalFields);
         List<String> message = new ArrayList<>();
-        for (String s: theRecord) {
+        for (String s : theRecord) {
             String modifiedString = s.replaceAll("\\s+", " ");
             message.add(modifiedString);
         }
@@ -138,15 +139,15 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         result.add(entryType);
         result.add(bibEntry.getCitationKey().orElse(""));
         allReportedFields.forEach(field ->
-            result.add(bibEntry.getField(field).map(_ -> {
-                if (requiredFields.contains(field)) {
-                    return ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
-                } else if (optionalFields.contains(field)) {
-                    return ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
-                } else {
-                    return ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
-                }
-            }).orElse(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText()))
+                result.add(bibEntry.getField(field).map(_ -> {
+                    if (requiredFields.contains(field)) {
+                        return ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
+                    } else if (optionalFields.contains(field)) {
+                        return ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
+                    } else {
+                        return ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
+                    }
+                }).orElse(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText()))
         );
         return result;
     }

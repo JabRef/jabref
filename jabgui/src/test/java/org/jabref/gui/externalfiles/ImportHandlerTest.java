@@ -39,7 +39,6 @@ import static org.mockito.Mockito.when;
 
 class ImportHandlerTest {
 
-
     private ImportHandler importHandler;
     private BibDatabaseContext bibDatabaseContext;
     private BibEntry testEntry;

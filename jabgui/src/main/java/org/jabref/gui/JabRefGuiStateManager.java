@@ -90,6 +90,8 @@ public class JabRefGuiStateManager implements StateManager {
     private final List<AiChatWindow> aiChatWindows = new ArrayList<>();
     private final BooleanProperty editorShowing = new SimpleBooleanProperty(false);
     private final OptionalObjectProperty<Walkthrough> activeWalkthrough = OptionalObjectProperty.empty();
+    private final BooleanProperty canGoBack = new SimpleBooleanProperty(false);
+    private final BooleanProperty canGoForward = new SimpleBooleanProperty(false);
 
     @Override
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
@@ -306,5 +308,15 @@ public class JabRefGuiStateManager implements StateManager {
     @Override
     public Optional<Walkthrough> getActiveWalkthrough() {
         return activeWalkthrough.get();
+    }
+
+    @Override
+    public BooleanProperty canGoBackProperty() {
+        return canGoBack;
+    }
+
+    @Override
+    public BooleanProperty canGoForwardProperty() {
+        return canGoForward;
     }
 }

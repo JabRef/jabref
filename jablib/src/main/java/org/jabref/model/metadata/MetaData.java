@@ -63,7 +63,7 @@ public class MetaData {
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
-    private final Map<String, Path> latexFileDirectory = new HashMap<>(); // <User-Host, FilePath>
+    private final Map<String, String> latexFileDirectory = new HashMap<>(); // <User-Host, FilePath>
 
     private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
     private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
@@ -261,29 +261,10 @@ public class MetaData {
     }
 
     public Optional<Path> getLatexFileDirectory(String userHostString) {
-        // First try to get the LaTeX file directory for the exact user-host
-        Path path = latexFileDirectory.get(userHostString);
-        if (path != null) {
-            return Optional.of(path);
-        }
-        
-        // If not found, try to find a LaTeX file directory for the same host
-        // This handles the case where a file is moved between hosts with different users
-        UserHostInfo requestedUserHost = UserHostInfo.parse(userHostString);
-        if (!requestedUserHost.host().isEmpty()) {
-            for (Map.Entry<String, Path> entry : latexFileDirectory.entrySet()) {
-                UserHostInfo entryUserHost = UserHostInfo.parse(entry.getKey());
-                if (entryUserHost.hasSameHost(requestedUserHost)) {
-                    // Found a LaTeX file directory for the same host, return it
-                    return Optional.of(entry.getValue());
-                }
-            }
-        }
-        
-        return Optional.empty();
+        return Optional.ofNullable(latexFileDirectory.get(userHostString)).map(Path::of);
     }
 
-    public void setLatexFileDirectory(@NonNull String userHostString, @NonNull Path path) {
+    public void setLatexFileDirectory(@NonNull String userHostString, @NonNull String path) {
         latexFileDirectory.put(userHostString, path);
         postChange();
     }
@@ -380,7 +361,7 @@ public class MetaData {
         return Collections.unmodifiableMap(userFileDirectory);
     }
 
-    public Map<String, Path> getLatexFileDirectories() {
+    public Map<String, String> getLatexFileDirectories() {
         return Collections.unmodifiableMap(latexFileDirectory);
     }
 

@@ -137,7 +137,9 @@ public class PdfContentImporter extends PdfImporter {
             boolean isFirst = true;
             int i = 0;
             res = "";
+            // @formatter:off
             do {
+                // @formatter:on
                 if (workedOnFirstOrMiddle) {
                     // last item was a first or a middle name
                     // we have to check whether we are on a middle name
@@ -296,12 +298,12 @@ public class PdfContentImporter extends PdfImporter {
      * Parses the first page content of a PDF document and extracts bibliographic information such as title, author,
      * abstract, keywords, and other relevant metadata. This method processes the content line-by-line and uses
      * custom parsing logic to identify and assemble information blocks from academic papers.
-     *
+     * <p>
      * idea: split[] contains the different lines, blocks are separated by empty lines, treat each block
-     *       or do special treatment at authors (which are not broken).
-     *       Therefore, we do a line-based and not a block-based splitting i points to the current line
-     *       curString (mostly) contains the current block,
-     *       the different lines are joined into one and thereby separated by " "
+     * or do special treatment at authors (which are not broken).
+     * Therefore, we do a line-based and not a block-based splitting i points to the current line
+     * curString (mostly) contains the current block,
+     * the different lines are joined into one and thereby separated by " "
      *
      * <p> This method follows the structure typically found in academic paper PDFs:
      * - First, it attempts to detect the title by font size, if available, or by text position.
@@ -318,7 +320,7 @@ public class PdfContentImporter extends PdfImporter {
      * @param titleByFontSize   An optional title string determined by font size; if provided, this overrides the
      *                          default title parsing.
      * @return An {@link Optional} containing a {@link BibEntry} with the parsed bibliographic data if extraction
-     *         is successful. Otherwise, an empty {@link Optional}.
+     * is successful. Otherwise, an empty {@link Optional}.
      */
     @VisibleForTesting
     Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, Optional<String> titleByFontSize) {

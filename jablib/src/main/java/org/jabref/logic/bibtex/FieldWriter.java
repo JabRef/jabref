@@ -76,7 +76,6 @@ public class FieldWriter {
      * @param field   the name of the field - used to trigger different serializations, e.g., turning off resolution for some strings
      * @param content the content of the field
      * @return a formatted string suitable for output
-     *
      * @throws InvalidFieldValueException if content is not a correct bibtex string, e.g., because of improperly balanced braces or using # not paired
      */
     public String write(Field field, String content) throws InvalidFieldValueException {

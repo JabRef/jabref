@@ -117,7 +117,7 @@ class ArgumentProcessorTest {
         Path outputHtml = tempDir.resolve("output.html").toAbsolutePath();
         String outputHtmlFile = outputHtml.toAbsolutePath().toString();
 
-        when(importerPreferences.getCustomImporters()) .thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
 
         SaveOrder saveOrder = new SaveOrder(SaveOrder.OrderType.TABLE, List.of());
         ExportPreferences exportPreferences = new ExportPreferences(".html", tempDir, saveOrder, List.of());

@@ -214,7 +214,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
     /**
      * This is the real file opening. Should be called via {@link #openFile(Path)}
-     *
+     * <p>
      * Similar method: {@link org.jabref.gui.frame.JabRefFrame#addTab(org.jabref.model.database.BibDatabaseContext, boolean)}.
      *
      * @param file the file, may be NOT null, but may not be existing
@@ -281,18 +281,18 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         if (parserResult.getDatabase().isShared()) {
-                         openSharedDatabase(
-                                 parserResult,
-                                 tabContainer,
-                                 dialogService,
-                                 preferences,
-                                 aiService,
-                                 stateManager,
-                                 entryTypesManager,
-                                 fileUpdateMonitor,
-                                 undoManager,
-                                 clipboardManager,
-                                 taskExecutor);
+            openSharedDatabase(
+                    parserResult,
+                    tabContainer,
+                    dialogService,
+                    preferences,
+                    aiService,
+                    stateManager,
+                    entryTypesManager,
+                    fileUpdateMonitor,
+                    undoManager,
+                    clipboardManager,
+                    taskExecutor);
         }
         return parserResult;
     }
