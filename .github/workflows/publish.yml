@@ -57,7 +57,7 @@ jobs:
           fetch-depth: 0
       - name: Detect changed jablib classes or workflow
         id: changed
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             jablib/src/main/java/**/*.java

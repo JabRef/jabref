@@ -100,7 +100,7 @@ jobs:
       # No checkout -> the action uses GitHub's API (which is more reliable for submodule changes due to our submodule settings)
       - name: Get all submodule changes
         id: changes
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             jablib/src/main/abbrv.jabref.org
