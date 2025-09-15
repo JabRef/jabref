@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
 
 public class Date {
 
-    public static     final String DATE_REGEX;
-    private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern  (     "uuuu[-MM][-dd]");
+    public static final String DATE_REGEX;
+    private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
     private static final DateTimeFormatter SIMPLE_DATE_FORMATS;
     private static final Logger LOGGER = LoggerFactory.getLogger(Date.class);
 
