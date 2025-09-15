@@ -137,7 +137,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where some file choosers regarding LaTeX-aux files did not open in the directory of the last selected file. [#13861](https://github.com/JabRef/jabref/pull/13861)
 - We fixed an issue where the LaTeX file directory was not stored correctly in combination with the usage of groups from aux files. [#8344](https://github.com/JabRef/jabref/issues/8344)
 - We prevented a brief flash of the default JavaFX (Modena) theme on startup. [#13877](https://github.com/JabRef/jabref/pull/13877)
-- We fixed an issue where updating the theme at runtime could spam `IndexOutOfBoundsException` errors. [#13877](https://github.com/JabRef/jabref/pull/13877)
 - We fixed an issue where button-bar buttons truncated long text with ellipsis. [#13877](https://github.com/JabRef/jabref/pull/13877)
 
 ### Removed
