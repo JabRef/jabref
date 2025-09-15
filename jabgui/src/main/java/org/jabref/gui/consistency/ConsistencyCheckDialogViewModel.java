@@ -36,6 +36,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.types.EntryType;
 
 import org.jooq.lambda.Unchecked;
@@ -93,7 +94,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         List<String> result = new ArrayList<>(allReportedFields.size() + 2); // there are two extra columns
         result.add("Entry Type");
         result.add("CitationKey");
-        allReportedFields.forEach(field -> result.add(field.getDisplayName().trim()));
+        allReportedFields.forEach(field -> result.add(FieldTextMapper.getDisplayName(field).trim()));
         return result;
     }
 

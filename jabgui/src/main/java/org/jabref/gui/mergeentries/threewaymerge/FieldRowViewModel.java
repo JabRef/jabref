@@ -20,6 +20,7 @@ import org.jabref.logic.bibtex.comparator.ComparisonResult;
 import org.jabref.logic.bibtex.comparator.YearFieldValuePlausibilityComparator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -103,7 +104,7 @@ public class FieldRowViewModel {
         });
 
         EasyBind.subscribe(selectionProperty(), selection -> {
-            LOGGER.debug("Selecting {}' value for field {}", selection, field.getDisplayName());
+            LOGGER.debug("Selecting {}' value for field {}", selection, FieldTextMapper.getDisplayName(field));
             switch (selection) {
                 case LEFT ->
                         EasyBind.subscribe(leftFieldValueProperty(), this::setMergedFieldValue);
@@ -113,7 +114,7 @@ public class FieldRowViewModel {
         });
 
         EasyBind.subscribe(mergedFieldValueProperty(), mergedValue -> {
-            LOGGER.debug("Merged value is {} for field {}", mergedValue, field.getDisplayName());
+            LOGGER.debug("Merged value is {} for field {}", mergedValue, FieldTextMapper.getDisplayName(field));
             if (mergedValue.equals(getLeftFieldValue())) {
                 selectLeftValue();
             } else if (getMergedFieldValue().equals(getRightFieldValue())) {

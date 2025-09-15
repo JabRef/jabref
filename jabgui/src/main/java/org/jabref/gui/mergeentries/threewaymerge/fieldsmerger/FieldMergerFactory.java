@@ -2,6 +2,7 @@ package org.jabref.gui.mergeentries.threewaymerge.fieldsmerger;
 
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
 
 public class FieldMergerFactory {
@@ -24,7 +25,7 @@ public class FieldMergerFactory {
             case null ->
                     throw new IllegalArgumentException("Field must not be null");
             default ->
-                    throw new IllegalArgumentException("No implementation found for merging the given field: " + field.getDisplayName());
+                    throw new IllegalArgumentException("No implementation found for merging the given field: " + FieldTextMapper.getDisplayName(field));
         };
     }
 

@@ -16,6 +16,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -56,7 +57,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
         availableFieldsProperty.clear();
         availableFieldsProperty.addAll(FieldFactory.getCommonFields());
-        availableFieldsProperty.sort(Comparator.comparing(Field::getDisplayName));
+        availableFieldsProperty.sort(Comparator.comparing(FieldTextMapper::getDisplayName));
     }
 
     @Override

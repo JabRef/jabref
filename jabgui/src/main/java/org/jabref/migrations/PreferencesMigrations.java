@@ -576,19 +576,20 @@ public class PreferencesMigrations {
      */
     static void addICORERankingFieldToGeneralTab(GuiPreferences preferences) {
         Map<String, Set<Field>> entryEditorPrefs = preferences.getEntryEditorPreferences().getEntryEditorTabs();
+
         Set<Field> currentGeneralPrefs = entryEditorPrefs.get(Localization.lang("General"));
+        if (currentGeneralPrefs != null) {
+            Set<Field> expectedGeneralPrefs = Set.of(
+                    StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT,
+                    StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER,
+                    StandardField.TIMESTAMP,
 
-        Set<Field> expectedGeneralPrefs = Set.of(
-                StandardField.DOI, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT,
-                StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER,
-                StandardField.TIMESTAMP,
-
-                SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.QUALITY, SpecialField.RANKING,
-                SpecialField.READ_STATUS, SpecialField.RELEVANCE
-        );
-
-        if (!currentGeneralPrefs.equals(expectedGeneralPrefs)) {
-            return;
+                    SpecialField.PRINTED, SpecialField.PRIORITY, SpecialField.QUALITY, SpecialField.RANKING,
+                    SpecialField.READ_STATUS, SpecialField.RELEVANCE
+            );
+            if (!currentGeneralPrefs.equals(expectedGeneralPrefs)) {
+                return;
+            }
         }
 
         entryEditorPrefs.put(
