@@ -5,11 +5,9 @@
 2. The system shall enable users to organize references into collections, assign keywords, merge duplicate entries, and automatically move associated documents according to a specific rule set.
 3. The system shall support native BibTex and BibLaTeX for importing and exporting sources from files
 4. The system shall shaw allow users to complete and fix their bilibgraphic data through comparison of online catalogs such as Google Scholar, Springer, or MathSciNet
-
 5. The system shall allow users to share their document library with other users as a .txt file that can be shared to Dropbox or Google Drive.
 6. The system shall provide customizable export options, including exporting over 15 supported files.
 7. The system shall synchronize user's content library with a SQL database.
-
 
 ## Non-Functional Requirements
 1. The system shall be free of charge, open-source, and cross-platform to ensure accessibility and ease of use for users across different operating systems and environments.
