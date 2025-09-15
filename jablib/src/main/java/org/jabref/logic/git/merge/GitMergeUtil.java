@@ -9,6 +9,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+@Deprecated
 public class GitMergeUtil {
     /**
      * Replace conflicting entries in the remote context with user-resolved versions.

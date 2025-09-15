@@ -14,7 +14,7 @@ import org.jabref.model.entry.BibEntry;
 
 /// A wrapper around {@link MergeEntriesDialog} for Git feature
 ///
-/// Receives a semantic conflict (ThreeWayEntryConflict), pops up an interactive GUI (belonging to mergeentries), and returns a user-confirmed BibEntry merge result.
+/// Receives a semantic conflict (ThreeWayEntryConflict), pops up an interactive GUI (belonging to mergeentries), and returns a user-confirmed BibEntry computeMergePlan result.
 public class GitConflictResolverDialog {
     private final DialogService dialogService;
     private final GuiPreferences preferences;

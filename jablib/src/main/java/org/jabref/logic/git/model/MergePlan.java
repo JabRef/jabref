@@ -1,4 +1,4 @@
-package org.jabref.logic.git.merge;
+package org.jabref.logic.git.model;
 
 import java.util.List;
 import java.util.Map;
@@ -14,14 +14,19 @@ import org.jabref.model.entry.field.Field;
  * Thus, the data structure is different, because here, only the patches are contained, not any source or target.
  * "patch" in the sense of "commands" to be applied to the source to get the target
  *
- * TODO: Check why there are no deletions included here.
- *
- * @param fieldPatches contain field-level modifications per citation key. citationKey -> field -> newValue (null = delete)
+ * @param fieldPatches contains field-level modifications per citation key. citationKey -> field -> newValue (null = delete)
  * @param newEntries entries present in remote but not in base/local
  */
 public record MergePlan(
-        // Map from citation key to field patches (field -> new value)
         Map<String, Map<Field, String>> fieldPatches,
+        List<BibEntry> newEntries,
+        List<String> deletedEntryKeys
+) {
+    public static MergePlan empty() {
+        return new MergePlan(Map.of(), List.of(), List.of());
+    }
 
-        // Completely new entries
-        List<BibEntry> newEntries) { }
+    public boolean isEmpty() {
+        return fieldPatches.isEmpty() && newEntries.isEmpty() && deletedEntryKeys.isEmpty();
+    }
+}

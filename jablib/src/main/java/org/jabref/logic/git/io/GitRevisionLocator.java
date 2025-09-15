@@ -14,7 +14,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.revwalk.filter.RevFilter;
 
-///  Locates the three key commits required for a semantic merge:
+///  Locates the three key commits required for a semantic computeMergePlan:
 /// - base: the common ancestor of local (HEAD) and remote (origin/main)
 /// - local: the current working commit (HEAD)
 /// - remote: the latest commit on origin/main
@@ -35,7 +35,7 @@ public class GitRevisionLocator {
             RevCommit remote = walk.parseCommit(remoteId);
             RevCommit base = findMergeBase(repo, local, remote);
 
-            assert base != null : "Could not determine merge base between local and remote.";
+            assert base != null : "Could not determine computeMergePlan base between local and remote.";
 
             return new RevisionTriple(Optional.ofNullable(base), local, remote);
         }

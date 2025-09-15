@@ -236,7 +236,7 @@ public class GitHandler {
                    .setMessage(commitMessage)
                    .call();
             } else if (inMerging) {
-                // No content changes, but merge must be completed (create parent commit)
+                // No content changes, but computeMergePlan must be completed (create parent commit)
                 commitCreated = true;
                 git.commit()
                    .setAmend(amend)
@@ -320,7 +320,7 @@ public class GitHandler {
     }
 
      /// Pulls from the current branch’s upstream.
-     /// If no remote is configured, silently performs local merge.
+     /// If no remote is configured, silently performs local computeMergePlan.
      /// This ensures SLR repositories without remotes still initialize correctly.
     public void pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
@@ -412,22 +412,24 @@ public class GitHandler {
         }
     }
 
-    /// Pre-stage a merge (two parents) but do NOT commit yet.
-    /// Equivalent to: `git merge -s ours --no-commit <remote>`
+    // TODO: 清理GitHandler 里面和Bookkeeper的git 落账。现在调用的 GitHandler 里面的方法，似乎有隐式副作用导致索引/文件被触碰？
+    /// Pre-stage a computeMergePlan (two parents) but do NOT commit yet.
+    /// Equivalent to: `git computeMergePlan -s ours --no-commit <remote>`
     /// Puts the repo into MERGING state, sets MERGE_HEAD=remote; working tree becomes "ours".
+    @Deprecated
     public void beginOursMergeNoCommit(RevCommit remote) throws IOException, GitAPIException {
-        try (Git git = Git.open(this.repositoryPathAsFile)) {
-            git.merge()
-               .include(remote)
-               .setStrategy(org.eclipse.jgit.merge.MergeStrategy.OURS)
-               .setFastForward(org.eclipse.jgit.api.MergeCommand.FastForwardMode.NO_FF)
-               .setCommit(false)
-               .call();
-        }
+//        try (Git git = Git.open(this.repositoryPathAsFile)) {
+//            git.merge()
+//               .include(remote)
+//               .setStrategy(org.eclipse.jgit.merge.MergeStrategy.OURS)
+//               .setFastForward(org.eclipse.jgit.api.MergeCommand.FastForwardMode.NO_FF)
+//               .setCommit(false)
+//               .call();
+//        }
     }
 
     /// Fast-forward only to <remote> (when local is strictly behind).
-    /// Equivalent to: `git merge --ff-only <remote>`
+    /// Equivalent to: `git computeMergePlan --ff-only <remote>`
     public void fastForwardTo(RevCommit remote) throws IOException, GitAPIException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             git.merge()
@@ -438,8 +440,8 @@ public class GitHandler {
         }
     }
 
-    /// Abort a pre-commit semantic merge in a minimal/safe way:
-    /// 1) Clear merge state files (MERGE_HEAD / MERGE_MSG, etc.). Since there is no direct equivalent for git merge --abort in JGit.
+    /// Abort a pre-commit semantic computeMergePlan in a minimal/safe way:
+    /// 1) Clear computeMergePlan state files (MERGE_HEAD / MERGE_MSG, etc.). Since there is no direct equivalent for git computeMergePlan --abort in JGit.
     /// 2) Restore ONLY the given file back to HEAD (both index + working tree).
     ///
     /// NOTE: Callers should ensure the working tree was clean before starting,
@@ -448,14 +450,14 @@ public class GitHandler {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Repository repo = git.getRepository();
 
-            // Only act if a branch is actually in a merge state
+            // Only act if a branch is actually in a computeMergePlan state
             RepositoryState state = repo.getRepositoryState();
             boolean inMerging = (state == RepositoryState.MERGING) || (state == RepositoryState.MERGING_RESOLVED);
             if (!inMerging) {
                 return;
             }
 
-            // 1) Clear merge state files + possible REVERT/CHERRY_PICK state
+            // 1) Clear computeMergePlan state files + possible REVERT/CHERRY_PICK state
             repo.writeMergeCommitMsg(null);
             repo.writeMergeHeads(null);
             repo.writeRevertHead(null);
@@ -482,12 +484,14 @@ public class GitHandler {
         }
     }
 
-    /// Start a "semantic-merge merge-state" and return a guard:
+    /// Start a "semantic-computeMergePlan computeMergePlan-state" and return a guard:
+    @Deprecated
     public MergeGuard beginSemanticMergeGuard(RevCommit remote, Path bibFilePath) throws IOException, GitAPIException {
-        beginOursMergeNoCommit(remote);
+//        beginOursMergeNoCommit(remote);
         return new MergeGuard(this, bibFilePath);
     }
 
+    @Deprecated
     public static final class MergeGuard implements AutoCloseable {
         private final GitHandler handler;
         private final Path bibFilePath;
@@ -499,12 +503,12 @@ public class GitHandler {
             this.bibFilePath = bibFilePath;
         }
 
-        // Finalize: create the commit (in MERGING this becomes a merge commit with two parents).
+        // Finalize: create the commit (in MERGING this becomes a computeMergePlan commit with two parents).
         public void commit(String message) throws IOException, GitAPIException {
             if (!active.get()) {
                 return;
             }
-            handler.createCommitOnCurrentBranch(message, false);
+//            handler.createCommitOnCurrentBranch(message, false);
             committed = true;
         }
 
@@ -515,18 +519,18 @@ public class GitHandler {
             if (!active.compareAndSet(true, false)) {
                 return;
             }
-            if (committed) {
-                return;
-            }
-            try {
-                handler.abortSemanticMerge(bibFilePath, false);
-            } catch (IOException | GitAPIException e) {
-                LOGGER.debug("Abort semantic merge failed (best-effort cleanup). path={}", bibFilePath, e);
-            } catch (RuntimeException e) {
-                // Deliberately catching RuntimeException here because this is a best-effort cleanup in AutoCloseable.close().
-                // have to NOT throw from close() to avoid masking the primary failure/result of pull/merge.
-                LOGGER.warn("Unexpected runtime exception during cleanup; rethrowing. path={}", bibFilePath, e);
-            }
+//            if (committed) {
+//                return;
+//            }
+//            try {
+//                handler.abortSemanticMerge(bibFilePath, false);
+//            } catch (IOException | GitAPIException e) {
+//                LOGGER.debug("Abort semantic computeMergePlan failed (best-effort cleanup). path={}", bibFilePath, e);
+//            } catch (RuntimeException e) {
+//                // Deliberately catching RuntimeException here because this is a best-effort cleanup in AutoCloseable.close().
+//                // have to NOT throw from close() to avoid masking the primary failure/result of pull/computeMergePlan.
+//                LOGGER.warn("Unexpected runtime exception during cleanup; rethrowing. path={}", bibFilePath, e);
+//            }
         }
     }
 }

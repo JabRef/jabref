@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.git.conflicts.SemanticConflictDetector;
+import org.jabref.logic.git.model.MergePlan;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -15,7 +16,7 @@ public class SemanticMerger {
     private static final Logger LOGGER = LoggerFactory.getLogger(SemanticMerger.class);
 
     /**
-     * Implementation-only merge logic: applies changes from remote (relative to base) to local.
+     * Implementation-only computeMergePlan logic: applies changes from remote (relative to base) to local.
      * does not check for "modifications" or "conflicts"
      * all decisions should be handled in advance by the {@link SemanticConflictDetector}
      */

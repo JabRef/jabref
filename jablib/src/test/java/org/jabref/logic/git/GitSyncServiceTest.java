@@ -9,7 +9,7 @@ import java.util.List;
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
-import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
+import org.jabref.logic.git.merge.GitSemanticMergePlanner;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
 import org.jabref.logic.git.model.PullResult;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -58,7 +58,7 @@ class GitSyncServiceTest {
 
     private ImportFormatPreferences importFormatPreferences;
     private GitConflictResolverStrategy gitConflictResolverStrategy;
-    private GitSemanticMergeExecutor mergeExecutor;
+    private GitSemanticMergePlanner mergeExecutor;
     private BibDatabaseContext context;
     private GitHandlerRegistry gitHandlerRegistry;
 
