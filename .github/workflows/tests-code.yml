@@ -121,7 +121,7 @@ jobs:
       - uses: koppor/intellij-idea-format@update-to-latest-intellij
         with:
           file-mask: "*.java"
-          settings-file: "config/IntelliJ Code Style.xml"
+          settings-file: ".idea/codeStyles/Project.xml"
       # job should fail in case there are changes
       - name: Check if any files changed
         run: git diff --exit-code
