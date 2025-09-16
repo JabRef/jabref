@@ -34,7 +34,7 @@ class ManageStudyDefinitionViewModelTest {
     }
 
     @Test
-    void emptyStudyConstructorFillsDatabasesCorrectly() {
+    void emptyStudyConstructorFillsCatalogsCorrectly() {
         ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = new ManageStudyDefinitionViewModel(importFormatPreferences, importerPreferences, workspacePreferences, dialogService);
         assertEquals(List.of(
                 new StudyCatalogItem("ACM Portal", true),
@@ -63,7 +63,7 @@ class ManageStudyDefinitionViewModelTest {
     }
 
     @Test
-    void studyConstructorFillsDatabasesCorrectly(@TempDir Path tempDir) {
+    void studyConstructorFillsCatalogsCorrectly(@TempDir Path tempDir) {
         ManageStudyDefinitionViewModel manageStudyDefinitionViewModel = getManageStudyDefinitionViewModel(tempDir);
         assertEquals(List.of(
                 new StudyCatalogItem("ACM Portal", true),
@@ -92,14 +92,14 @@ class ManageStudyDefinitionViewModelTest {
     }
 
     private ManageStudyDefinitionViewModel getManageStudyDefinitionViewModel(Path tempDir) {
-        List<StudyCatalog> databases = List.of(
+        List<StudyCatalog> catalogs = List.of(
                 new StudyCatalog("ACM Portal", true));
         Study study = new Study(
                 List.of("Name"),
                 "title",
                 List.of("Q1"),
                 List.of(),
-                databases
+                catalogs
         );
         return new ManageStudyDefinitionViewModel(
                 study,

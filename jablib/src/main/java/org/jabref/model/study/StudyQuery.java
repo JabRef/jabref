@@ -1,5 +1,6 @@
 package org.jabref.model.study;
 
+import java.util.Collections;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,18 +10,18 @@ public class StudyQuery {
     private String description;
     private String lucene;
 
-    @JsonProperty("catalog-specific")  // Changed from "catalogue-specific"
-    private Map<String, String> catalogSpecific;  // Changed from catalogueSpecific
+    @JsonProperty("catalog-specific")
+    private Map<String, String> catalogSpecific;
 
     public StudyQuery(String query) {
         this.query = query;
     }
 
-    public StudyQuery(String query, String description, String lucene, Map<String, String> catalogSpecific) {  // Changed parameter name
+    public StudyQuery(String query, String description, String lucene, Map<String, String> catalogSpecific) {
         this.query = query;
         this.description = description;
         this.lucene = lucene;
-        this.catalogSpecific = catalogSpecific;  // Changed from catalogueSpecific
+        this.catalogSpecific = catalogSpecific;
     }
 
     /**
@@ -53,11 +54,11 @@ public class StudyQuery {
         this.lucene = lucene;
     }
 
-    public Map<String, String> getCatalogSpecific() {  // Changed from getCatalogueSpecific()
-        return catalogSpecific;
+    public Map<String, String> getCatalogSpecific() {
+        return catalogSpecific != null ? Collections.unmodifiableMap(catalogSpecific) : null;
     }
 
-    public void setCatalogSpecific(Map<String, String> catalogSpecific) {  // Changed from setCatalogueSpecific()
+    public void setCatalogSpecific(Map<String, String> catalogSpecific) {
         this.catalogSpecific = catalogSpecific;
     }
 
