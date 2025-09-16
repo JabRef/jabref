@@ -9,7 +9,7 @@
          spacing="10.0" type="VBox">
 
     <padding>
-        <Insets top="10.0"/>
+        <Insets top="10.0" left="20.0"/>
     </padding>
 
     <FieldFormatterCleanupsPanel fx:id="formatterCleanupsPanel" />

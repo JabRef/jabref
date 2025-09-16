@@ -1,7 +1,6 @@
 package org.jabref.gui.cleanup;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
@@ -31,22 +30,17 @@ public class CleanupDialog extends BaseDialog<Void> {
     private final CleanupDialogViewModel viewModel;
 
     // Constructor for multiple-entry cleanup
-    public CleanupDialog(Supplier<LibraryTab> tabSupplier,
-                         BibDatabaseContext databaseContext,
+    public CleanupDialog(BibDatabaseContext databaseContext,
                          CliPreferences preferences,
                          DialogService dialogService,
                          StateManager stateManager,
-                         TaskExecutor taskExecutor,
-                         UndoManager undoManager) {
+                         UndoManager undoManager,
+                         Supplier<LibraryTab> tabSupplier,
+                         TaskExecutor taskExecutor) {
 
         this.viewModel = new CleanupDialogViewModel(
-                Optional.of(tabSupplier),
-                databaseContext,
-                preferences,
-                dialogService,
-                stateManager,
-                Optional.of(taskExecutor),
-                undoManager
+                databaseContext, preferences, dialogService,
+                stateManager, undoManager, tabSupplier, taskExecutor
         );
 
         init(databaseContext, preferences);
@@ -61,16 +55,13 @@ public class CleanupDialog extends BaseDialog<Void> {
                          UndoManager undoManager) {
 
         this.viewModel = new CleanupDialogViewModel(
-                databaseContext,
-                preferences,
-                dialogService,
-                stateManager,
-                undoManager
+                databaseContext, preferences, dialogService,
+                stateManager, undoManager, null, null
         );
 
-        init(databaseContext, preferences);
+        viewModel.setTargetEntries(List.of(targetEntry));
 
-        viewModel.setTargetEntries(Optional.of(List.of(targetEntry)));
+        init(databaseContext, preferences);
     }
 
     private void init(BibDatabaseContext databaseContext, CliPreferences preferences) {

@@ -9,13 +9,10 @@
          spacing="10.0" type="VBox">
 
     <padding>
-        <Insets top="10.0"/>
+        <Insets top="10.0" left="20.0"/>
     </padding>
 
     <VBox>
-        <VBox.margin>
-            <Insets left="20.0" />
-        </VBox.margin>
         <CheckBox fx:id="cleanupDOI" text="%Move DOIs from 'note' field and 'URL' field to 'DOI' field and remove http prefix" />
         <CheckBox fx:id="cleanupEprint" text="%Move preprint information from 'URL' field and 'journal' field to the 'eprint' field" />
         <CheckBox fx:id="cleanupURL" text="%Move URL in 'note' field to 'URL' field" />

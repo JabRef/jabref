@@ -8,6 +8,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.layout.VBox;
 
 import org.jabref.logic.cleanup.CleanupPreferences;
+import org.jabref.logic.cleanup.CleanupTabSelection;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -19,16 +20,6 @@ public class CleanupMultiFieldPanel extends VBox {
     @FXML private CheckBox cleanupBibtex;
     @FXML private CheckBox cleanupTimestampToCreationDate;
     @FXML private CheckBox cleanupTimestampToModificationDate;
-
-    private final EnumSet<CleanupPreferences.CleanupStep> ALL_JOBS = EnumSet.of(
-            CleanupPreferences.CleanupStep.CLEAN_UP_DOI,
-            CleanupPreferences.CleanupStep.CLEANUP_EPRINT,
-            CleanupPreferences.CleanupStep.CLEAN_UP_URL,
-            CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
-            CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX,
-            CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE,
-            CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE
-    );
 
     private final CleanupDialogViewModel viewModel;
 
@@ -44,13 +35,6 @@ public class CleanupMultiFieldPanel extends VBox {
                   .load();
 
         init(cleanupPreferences);
-    }
-
-    @FXML
-    private void onApply() {
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(ALL_JOBS, getSelectedJobs());
-        viewModel.apply(selectedTab);
-        getScene().getWindow().hide();
     }
 
     private void init(CleanupPreferences cleanupPreferences) {
@@ -119,5 +103,12 @@ public class CleanupMultiFieldPanel extends VBox {
         }
 
         return activeJobs;
+    }
+
+    @FXML
+    private void onApply() {
+        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupDialogViewModel.MULTI_FIELD_JOBS, getSelectedJobs());
+        viewModel.apply(selectedTab);
+        getScene().getWindow().hide();
     }
 }

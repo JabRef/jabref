@@ -1,216 +1,219 @@
-package org.jabref.gui.cleanup;
+    package org.jabref.gui.cleanup;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+    import java.util.ArrayList;
+    import java.util.EnumSet;
+    import java.util.List;
+    import java.util.Objects;
+    import java.util.function.Supplier;
+    import java.util.stream.Collectors;
 
-import javax.swing.undo.UndoManager;
+    import javax.swing.undo.UndoManager;
 
-import javafx.application.Platform;
+    import javafx.application.Platform;
 
-import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTab;
-import org.jabref.gui.StateManager;
-import org.jabref.gui.undo.NamedCompoundEdit;
-import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.logic.JabRefException;
-import org.jabref.logic.cleanup.CleanupPreferences;
-import org.jabref.logic.cleanup.CleanupWorker;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.BackgroundTask;
-import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.FieldChange;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
+    import org.jabref.gui.AbstractViewModel;
+    import org.jabref.gui.DialogService;
+    import org.jabref.gui.LibraryTab;
+    import org.jabref.gui.StateManager;
+    import org.jabref.gui.undo.NamedCompoundEdit;
+    import org.jabref.gui.undo.UndoableFieldChange;
+    import org.jabref.logic.JabRefException;
+    import org.jabref.logic.cleanup.CleanupPreferences;
+    import org.jabref.logic.cleanup.CleanupTabSelection;
+    import org.jabref.logic.cleanup.CleanupWorker;
+    import org.jabref.logic.l10n.Localization;
+    import org.jabref.logic.preferences.CliPreferences;
+    import org.jabref.logic.util.BackgroundTask;
+    import org.jabref.logic.util.TaskExecutor;
+    import org.jabref.model.FieldChange;
+    import org.jabref.model.database.BibDatabaseContext;
+    import org.jabref.model.entry.BibEntry;
 
-public class CleanupDialogViewModel extends AbstractViewModel {
+    public class CleanupDialogViewModel extends AbstractViewModel {
 
-    private final Optional<Supplier<LibraryTab>> tabSupplier;
-    private final BibDatabaseContext databaseContext;
-    private final CliPreferences preferences;
-    private final DialogService dialogService;
-    private final StateManager stateManager;
-    private final Optional<TaskExecutor> taskExecutor;
-    private final UndoManager undoManager;
-
-    private final List<JabRefException> failures;
-    private Optional<List<BibEntry>> targetEntries;
-
-    private boolean isCanceled;
-    private int modifiedEntriesCount;
-
-    public CleanupDialogViewModel(Optional<Supplier<LibraryTab>> tabSupplier,
-                                  BibDatabaseContext databaseContext,
-                                  CliPreferences preferences,
-                                  DialogService dialogService,
-                                  StateManager stateManager,
-                                  Optional<TaskExecutor> taskExecutor,
-                                  UndoManager undoManager) {
-        this.databaseContext = Objects.requireNonNull(databaseContext, "databaseContext must not be null");
-        this.preferences = Objects.requireNonNull(preferences, "preferences must not be null");
-        this.dialogService = Objects.requireNonNull(dialogService, "dialogService must not be null");
-        this.stateManager = Objects.requireNonNull(stateManager, "stateManager must not be null");
-        this.undoManager = Objects.requireNonNull(undoManager, "undoManager must not be null");
-
-        this.tabSupplier = tabSupplier.isEmpty() ? Optional.empty() : tabSupplier;
-        this.taskExecutor = taskExecutor.isEmpty() ? Optional.empty() : taskExecutor;
-
-        this.failures = new ArrayList<>();
-        this.targetEntries = Optional.empty();
-    }
-
-    public CleanupDialogViewModel(BibDatabaseContext databaseContext,
-                                  CliPreferences preferences,
-                                  DialogService dialogService,
-                                  StateManager stateManager,
-                                  UndoManager undoManager) {
-        this(
-                Optional.empty(),
-                databaseContext,
-                preferences,
-                dialogService,
-                stateManager,
-                Optional.empty(),
-                undoManager
+        public static final EnumSet<CleanupPreferences.CleanupStep> FILE_RELATED_JOBS = EnumSet.of(
+                CleanupPreferences.CleanupStep.MOVE_PDF,
+                CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE,
+                CleanupPreferences.CleanupStep.RENAME_PDF,
+                CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+                CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+                CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES
         );
-    }
 
-    public void setTargetEntries(Optional<List<BibEntry>> entries) {
-        this.targetEntries = entries.isEmpty() ? Optional.empty() : entries.map(List::copyOf);
-    }
+        public static final EnumSet<CleanupPreferences.CleanupStep> MULTI_FIELD_JOBS = EnumSet.of(
+                CleanupPreferences.CleanupStep.CLEAN_UP_DOI,
+                CleanupPreferences.CleanupStep.CLEANUP_EPRINT,
+                CleanupPreferences.CleanupStep.CLEAN_UP_URL,
+                CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
+                CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX,
+                CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE,
+                CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE
+        );
 
-    public void apply(CleanupTabSelection selectedTab) {
-        if (stateManager.getActiveDatabase().isEmpty()) {
-            return;
+        private final BibDatabaseContext databaseContext;
+        private final CliPreferences preferences;
+        private final DialogService dialogService;
+        private final StateManager stateManager;
+        private final UndoManager undoManager;
+        private final Supplier<LibraryTab> tabSupplier;
+        private final TaskExecutor taskExecutor;
+
+        private List<BibEntry> targetEntries = List.of();
+        private int modifiedEntriesCount;
+
+        public CleanupDialogViewModel(
+                BibDatabaseContext databaseContext,
+                CliPreferences preferences,
+                DialogService dialogService,
+                StateManager stateManager,
+                UndoManager undoManager,
+                Supplier<LibraryTab> tabSupplier,
+                TaskExecutor taskExecutor
+        ) {
+            this.databaseContext = Objects.requireNonNull(databaseContext);
+            this.preferences = Objects.requireNonNull(preferences);
+            this.dialogService = Objects.requireNonNull(dialogService);
+            this.stateManager = Objects.requireNonNull(stateManager);
+            this.undoManager = Objects.requireNonNull(undoManager);
+
+            this.tabSupplier = tabSupplier; // can be null
+            this.taskExecutor = taskExecutor; // can be null
         }
 
-        List<BibEntry> entriesToProcess = targetEntries
-                .orElseGet(() -> List.copyOf(stateManager.getSelectedEntries()));
-
-        if (entriesToProcess.isEmpty()) { // None selected. Inform the user to select entries first.
-            dialogService.showInformationDialogAndWait(Localization.lang("Cleanup entry"), Localization.lang("First select entries to clean up.")
-            );
-            return;
+        public void setTargetEntries(List<BibEntry> entries) {
+            this.targetEntries = List.copyOf(Objects.requireNonNullElse(entries, List.of()));
         }
 
-        isCanceled = false;
-        modifiedEntriesCount = 0;
-
-        if (selectedTab.selectedJobs().contains(CleanupPreferences.CleanupStep.RENAME_PDF) && preferences.getAutoLinkPreferences().shouldAskAutoNamingPdfs()) {
-            boolean confirmed = dialogService.showConfirmationDialogWithOptOutAndWait(
-                    Localization.lang("Autogenerate PDF Names"),
-                    Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
-                    Localization.lang("Autogenerate PDF Names"),
-                    Localization.lang("Cancel"),
-                    Localization.lang("Do not ask again"),
-                    optOut -> preferences.getAutoLinkPreferences().setAskAutoNamingPdfs(!optOut)
-            );
-            if (!confirmed) {
-                isCanceled = true;
+        public void apply(CleanupTabSelection selectedTab) {
+            if (stateManager.getActiveDatabase().isEmpty()) {
                 return;
             }
-        }
 
-        CleanupPreferences updatedPreferences = preferences.getCleanupPreferences()
-                                                           .updateWith(Optional.ofNullable(selectedTab.allJobs()), Optional.of(selectedTab.selectedJobs()), selectedTab.formatters());
+            List<BibEntry> entriesToProcess = targetEntries.isEmpty()
+                    ? List.copyOf(stateManager.getSelectedEntries())
+                    : targetEntries;
 
-        preferences.getCleanupPreferences().setActiveJobs(updatedPreferences.getActiveJobs());
-        preferences.getCleanupPreferences().setFieldFormatterCleanups(updatedPreferences.getFieldFormatterCleanups());
+            if (entriesToProcess.isEmpty()) { // None selected. Inform the user to select entries first.
+                dialogService.showInformationDialogAndWait(Localization.lang("Cleanup entry"), Localization.lang("First select entries to clean up.")
+                );
+                return;
+            }
 
-        CleanupPreferences runPreset = new CleanupPreferences(EnumSet.copyOf(selectedTab.selectedJobs()));
-        selectedTab.formatters().ifPresent(runPreset::setFieldFormatterCleanups);
+            modifiedEntriesCount = 0;
 
-        taskExecutor.ifPresentOrElse(
-                executor -> BackgroundTask.wrap(() -> cleanup(databaseContext, runPreset, entriesToProcess))
-                                          .onSuccess(result -> showResults())
-                                          .onFailure(dialogService::showErrorDialogAndWait)
-                                          .executeWith(executor),
-                () -> {
-                    cleanup(databaseContext, runPreset, entriesToProcess);
+            if (selectedTab.selectedJobs().contains(CleanupPreferences.CleanupStep.RENAME_PDF) && preferences.getAutoLinkPreferences().shouldAskAutoNamingPdfs()) {
+                boolean confirmed = dialogService.showConfirmationDialogWithOptOutAndWait(
+                        Localization.lang("Autogenerate PDF Names"),
+                        Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
+                        Localization.lang("Autogenerate PDF Names"),
+                        Localization.lang("Cancel"),
+                        Localization.lang("Do not ask again"),
+                        optOut -> preferences.getAutoLinkPreferences().setAskAutoNamingPdfs(!optOut)
+                );
+                if (!confirmed) {
+                    return;
                 }
-        );
-    }
+            }
 
-    /**
-     * Runs the cleanup on the entry and records the change.
-     *
-     * @return true iff entry was modified
-     */
-    private boolean doCleanup(BibDatabaseContext databaseContext, CleanupPreferences preset, BibEntry entry, NamedCompoundEdit compound) {
-        // Create and run cleaner
-        CleanupWorker cleaner = new CleanupWorker(
-                databaseContext,
-                preferences.getFilePreferences(),
-                preferences.getTimestampPreferences()
-        );
+            CleanupPreferences updatedPreferences = selectedTab.updatePreferences(preferences.getCleanupPreferences());
 
-        List<FieldChange> changes = cleaner.cleanup(preset, entry);
+            if (selectedTab.isJobTab()) {
+                preferences.getCleanupPreferences().setActiveJobs(updatedPreferences.getActiveJobs());
+            }
 
-        // Register undo action
-        for (FieldChange change : changes) {
-            compound.addEdit(new UndoableFieldChange(change));
-        }
+            if (selectedTab.isFormatterTab()) {
+                preferences.getCleanupPreferences().setFieldFormatterCleanups(updatedPreferences.getFieldFormatterCleanups());
+            }
 
-        failures.addAll(cleaner.getFailures());
+            CleanupPreferences cleanupPreset = new CleanupPreferences(EnumSet.copyOf(selectedTab.selectedJobs()));
+            selectedTab.formatters().ifPresent(cleanupPreset::setFieldFormatterCleanups);
 
-        return !changes.isEmpty();
-    }
-
-    private void showResults() {
-        if (isCanceled) {
-            return;
-        }
-
-        if (modifiedEntriesCount > 0) {
-            tabSupplier.ifPresent(s -> s.get().markBaseChanged());
-        }
-
-        if (modifiedEntriesCount == 0) {
-            dialogService.notify(Localization.lang("No entry needed a clean up"));
-        } else if (modifiedEntriesCount == 1) {
-            dialogService.notify(Localization.lang("One entry needed a clean up"));
-        } else {
-            dialogService.notify(Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount)));
-        }
-    }
-
-    private void cleanup(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, List<BibEntry> entries) {
-        this.failures.clear();
-
-        // undo granularity is on a set of all entries
-        NamedCompoundEdit compound = new NamedCompoundEdit(Localization.lang("Clean up entries"));
-
-        for (BibEntry entry : entries) {
-            if (doCleanup(databaseContext, cleanupPreferences, entry, compound)) {
-                modifiedEntriesCount++;
+            if (taskExecutor != null) {
+                BackgroundTask.wrap(() -> cleanup(cleanupPreset, entriesToProcess))
+                              .onSuccess(result -> showResults())
+                              .onFailure(dialogService::showErrorDialogAndWait)
+                              .executeWith(taskExecutor);
+            } else {
+                cleanup(cleanupPreset, entriesToProcess);
             }
         }
 
-        compound.end();
+        /**
+         * Runs the cleanup on the entry and records the change.
+         *
+         * @return true iff entry was modified
+         */
+        private boolean doCleanup(CleanupPreferences preset,
+                                  BibEntry entry,
+                                  NamedCompoundEdit compoundEdit,
+                                  List<JabRefException> failures) {
+            // Create and run cleaner
+            CleanupWorker cleaner = new CleanupWorker(
+                    databaseContext,
+                    preferences.getFilePreferences(),
+                    preferences.getTimestampPreferences()
+            );
 
-        if (compound.hasEdits()) {
-            undoManager.addEdit(compound);
+            List<FieldChange> changes = cleaner.cleanup(preset, entry);
+
+            // Register undo action
+            for (FieldChange change : changes) {
+                compoundEdit.addEdit(new UndoableFieldChange(change));
+            }
+
+            failures.addAll(cleaner.getFailures());
+
+            return !changes.isEmpty();
         }
 
-        if (!failures.isEmpty()) {
-            showFailures(failures);
+        private void showResults() {
+            if (tabSupplier != null) {
+                tabSupplier.get().markBaseChanged();
+            }
+
+            String message = switch (modifiedEntriesCount) {
+                case 0 -> Localization.lang("No entry needed a clean up");
+                case 1 -> Localization.lang("One entry needed a clean up");
+                default -> Localization.lang("%0 entries needed a clean up", Integer.toString(modifiedEntriesCount));
+            };
+
+            dialogService.notify(message);
+        }
+
+        private void cleanup(CleanupPreferences cleanupPreferences, List<BibEntry> entries) {
+            List<JabRefException> failures = new ArrayList<>();
+
+            String editName = entries.size() == 1
+                    ? Localization.lang("Clean up entry")
+                    : Localization.lang("Clean up entries");
+            // undo granularity is on a set of all entries
+            NamedCompoundEdit compoundEdit = new NamedCompoundEdit(editName);
+
+            for (BibEntry entry : entries) {
+                if (doCleanup(cleanupPreferences, entry, compoundEdit, failures)) {
+                    modifiedEntriesCount++;
+                }
+            }
+
+            compoundEdit.end();
+
+            if (compoundEdit.hasEdits()) {
+                undoManager.addEdit(compoundEdit);
+            }
+
+            if (!failures.isEmpty()) {
+                showFailures(failures);
+            }
+        }
+
+        private void showFailures(List<JabRefException> failures) {
+            String message = failures.stream()
+                                     .map(exception -> "- " + exception.getLocalizedMessage())
+                                     .collect(Collectors.joining("\n"));
+
+            Platform.runLater(() ->
+                    dialogService.showErrorDialogAndWait(Localization.lang("File Move Errors"), message)
+            );
         }
     }
-
-    private void showFailures(List<JabRefException> failures) {
-        String message = failures.stream()
-                                 .map(exception -> "- " + exception.getLocalizedMessage())
-                                 .collect(Collectors.joining("\n"));
-
-        Platform.runLater(() ->
-                dialogService.showErrorDialogAndWait(Localization.lang("File Move Errors"), message)
-        );
-    }
-}
 

@@ -17,7 +17,11 @@ public class CleanupSingleAction extends SimpleCommand {
     private final BibEntry entry;
     private final UndoManager undoManager;
 
-    public CleanupSingleAction(BibEntry entry, CliPreferences preferences, DialogService dialogService, StateManager stateManager, UndoManager undoManager) {
+    public CleanupSingleAction(BibEntry entry,
+                               CliPreferences preferences,
+                               DialogService dialogService,
+                               StateManager stateManager,
+                               UndoManager undoManager) {
         this.entry = entry;
         this.preferences = preferences;
         this.dialogService = dialogService;

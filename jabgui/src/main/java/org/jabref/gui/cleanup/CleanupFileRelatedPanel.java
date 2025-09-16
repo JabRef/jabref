@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
+import org.jabref.logic.cleanup.CleanupTabSelection;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.StandardField;
@@ -28,16 +29,6 @@ public class CleanupFileRelatedPanel extends VBox {
     @FXML private CheckBox cleanupRenamePdfonlyRelativePaths;
     @FXML private CheckBox cleanupDeletedFiles;
     @FXML private CheckBox cleanupUpgradeExternalLinks;
-
-    private final EnumSet<CleanupPreferences.CleanupStep> ALL_JOBS = EnumSet.of(
-            CleanupPreferences.CleanupStep.MOVE_PDF,
-            CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE,
-            CleanupPreferences.CleanupStep.RENAME_PDF,
-            CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-            CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-            CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES
-    );
-
 
     private final CleanupDialogViewModel viewModel;
 
@@ -57,13 +48,6 @@ public class CleanupFileRelatedPanel extends VBox {
                   .load();
 
         init(databaseContext, cleanupPreferences, filePreferences);
-    }
-
-    @FXML
-    private void onApply() {
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(ALL_JOBS, getSelectedJobs());
-        viewModel.apply(selectedTab);
-        getScene().getWindow().hide();
     }
 
     private void init(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
@@ -120,5 +104,12 @@ public class CleanupFileRelatedPanel extends VBox {
         }
 
         return activeJobs;
+    }
+
+    @FXML
+    private void onApply() {
+        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupDialogViewModel.FILE_RELATED_JOBS, getSelectedJobs());
+        viewModel.apply(selectedTab);
+        getScene().getWindow().hide();
     }
 }

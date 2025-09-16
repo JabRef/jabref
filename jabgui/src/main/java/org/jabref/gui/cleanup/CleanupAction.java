@@ -44,13 +44,13 @@ public class CleanupAction extends SimpleCommand {
         }
 
         CleanupDialog cleanupDialog = new CleanupDialog(
-                tabSupplier,
                 stateManager.getActiveDatabase().get(),
                 preferences,
                 dialogService,
                 stateManager,
-                taskExecutor,
-                undoManager
+                undoManager,
+                tabSupplier,
+                taskExecutor
         );
 
         dialogService.showCustomDialogAndWait(cleanupDialog);

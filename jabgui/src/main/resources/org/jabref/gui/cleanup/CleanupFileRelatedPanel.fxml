@@ -10,13 +10,10 @@
          spacing="10.0" type="VBox">
 
     <padding>
-        <Insets top="10.0"/>
+        <Insets top="10.0" left="20.0"/>
     </padding>
 
     <VBox>
-        <VBox.margin>
-            <Insets left="20.0" />
-        </VBox.margin>
         <CheckBox fx:id="cleanupUpgradeExternalLinks" />
         <CheckBox fx:id="cleanupMovePdf" />
         <CheckBox fx:id="cleanupMakePathsRelative" text="%Make paths of linked files relative (if possible)" />

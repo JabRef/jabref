@@ -1,11 +1,8 @@
-package org.jabref.gui.cleanup;
+package org.jabref.logic.cleanup;
 
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Optional;
-
-import org.jabref.logic.cleanup.CleanupPreferences;
-import org.jabref.logic.cleanup.FieldFormatterCleanups;
 
 public record CleanupTabSelection(
         EnumSet<CleanupPreferences.CleanupStep> allJobs,
@@ -24,5 +21,30 @@ public record CleanupTabSelection(
 
     public static CleanupTabSelection ofFormatters(FieldFormatterCleanups cleanups) {
         return new CleanupTabSelection(EnumSet.noneOf(CleanupPreferences.CleanupStep.class), EnumSet.noneOf(CleanupPreferences.CleanupStep.class), Optional.of(cleanups));
+    }
+
+    public boolean isFormatterTab() {
+        return formatters.isPresent();
+    }
+
+    public boolean isJobTab() {
+        return !allJobs.isEmpty();
+    }
+
+    public CleanupPreferences updatePreferences(CleanupPreferences currentPreferences) {
+        EnumSet<CleanupPreferences.CleanupStep> updatedJobs = EnumSet.copyOf(currentPreferences.getActiveJobs());
+
+        if (!allJobs.isEmpty()) {
+            updatedJobs.removeAll(allJobs);
+        }
+        if (!selectedJobs.isEmpty()) {
+            updatedJobs.addAll(selectedJobs);
+        }
+
+        CleanupPreferences updated = new CleanupPreferences(updatedJobs);
+
+        updated.setFieldFormatterCleanups(formatters.orElse(currentPreferences.getFieldFormatterCleanups()));
+
+        return updated;
     }
 }

@@ -2,7 +2,6 @@ package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.property.ObjectProperty;
@@ -71,26 +70,6 @@ public class CleanupPreferences {
 
     public void setFieldFormatterCleanups(FieldFormatterCleanups fieldFormatters) {
         fieldFormatterCleanups.setValue(fieldFormatters);
-    }
-
-    public CleanupPreferences updateWith(Optional<Set<CleanupStep>> allJobs,
-                                         Optional<Set<CleanupStep>> selectedJobs,
-                                         Optional<FieldFormatterCleanups> formatters) {
-
-        EnumSet<CleanupStep> updatedJobs = getActiveJobs();
-
-        allJobs.filter(set -> !set.isEmpty()).ifPresent(updatedJobs::removeAll);
-        selectedJobs.filter(set -> !set.isEmpty()).ifPresent(updatedJobs::addAll);
-
-        CleanupPreferences result = new CleanupPreferences(updatedJobs);
-
-        if (formatters.isPresent()) {
-            result.setFieldFormatterCleanups(formatters.get());
-        } else {
-            result.setFieldFormatterCleanups(getFieldFormatterCleanups());
-        }
-
-        return result;
     }
 
     public enum CleanupStep {
