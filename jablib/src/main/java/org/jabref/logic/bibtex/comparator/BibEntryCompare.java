@@ -52,11 +52,11 @@ public class BibEntryCompare {
     }
 
     private static boolean isSubSet(BibEntry candidateSubSet, BibEntry candidateSuperSet, Collection<Field> fields) {
-        for (Field field: fields) {
+        for (Field field : fields) {
             String subValue = candidateSubSet.getField(field).get();
             boolean isEqualValue = candidateSuperSet.getField(field)
-                    .filter(superValue -> superValue.equals(subValue))
-                    .isPresent();
+                                                    .filter(superValue -> superValue.equals(subValue))
+                                                    .isPresent();
             if (!isEqualValue) {
                 return false;
             }

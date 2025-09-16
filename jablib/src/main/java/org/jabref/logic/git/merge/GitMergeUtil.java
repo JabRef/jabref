@@ -13,7 +13,7 @@ public class GitMergeUtil {
     /**
      * Replace conflicting entries in the remote context with user-resolved versions.
      *
-     * @param remote the original remote BibDatabaseContext
+     * @param remote          the original remote BibDatabaseContext
      * @param resolvedEntries list of entries that the user has manually resolved via GUI
      * @return a new BibDatabaseContext with resolved entries replacing original ones
      */

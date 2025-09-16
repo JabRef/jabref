@@ -49,7 +49,7 @@ import static org.jabref.model.entry.field.StandardField.URL;
  * <p>
  * See https://stackoverflow.com/questions/18004150/desktop-api-is-not-supported-on-the-current-platform for more implementation hints.
  * https://docs.oracle.com/javase/7/docs/api/java/awt/Desktop.html cannot be used as we don't want to rely on AWT.
- *
+ * <p>
  * For non-GUI things, see {@link org.jabref.logic.os.OS}.
  */
 @AllowedToUseAwt("Because of moveToTrash() is not available elsewhere.")
@@ -139,7 +139,8 @@ public abstract class NativeDesktop {
                     LoggerFactory.getLogger(NativeDesktop.class).error("An error occurred on the command: {}", link, e);
                 }
             }
-            case null, default ->
+            case null,
+                 default ->
                     LoggerFactory.getLogger(NativeDesktop.class).info("Message: currently only PDF, PS and HTML files can be opened by double clicking");
         }
     }
@@ -358,13 +359,13 @@ public abstract class NativeDesktop {
      * @return the path
      */
     public Path getDefaultFileChooserDirectory() {
-         Path userDirectory = Directories.getUserDirectory();
-         Path documents = userDirectory.resolve("Documents");
-         if (!Files.exists(documents)) {
-             return userDirectory;
-         }
-         return documents;
-     }
+        Path userDirectory = Directories.getUserDirectory();
+        Path documents = userDirectory.resolve("Documents");
+        if (!Files.exists(documents)) {
+            return userDirectory;
+        }
+        return documents;
+    }
 
     /**
      * Moves the given file to the trash.

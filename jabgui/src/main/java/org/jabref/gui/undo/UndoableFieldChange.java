@@ -4,6 +4,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
 
     @Override
     public String getPresentationName() {
-        return Localization.lang("change field %0 of entry %1 from %2 to %3", StringUtil.boldHTML(field.getDisplayName()),
+        return Localization.lang("change field %0 of entry %1 from %2 to %3", StringUtil.boldHTML(FieldTextMapper.getDisplayName(field)),
                 StringUtil.boldHTML(entry.getCitationKey().orElse(Localization.lang("undefined"))),
                 StringUtil.boldHTML(oldValue, Localization.lang("undefined")),
                 StringUtil.boldHTML(newValue, Localization.lang("undefined")));

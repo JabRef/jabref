@@ -110,8 +110,8 @@ public class GlobalSearchResultDialog extends BaseDialog<Void> {
         keepOnTopSubscription = EasyBind.subscribe(viewModel.keepOnTop(), value -> {
             stage.setAlwaysOnTop(value);
             keepOnTop.setGraphic(value
-                    ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
-                    : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
+                                 ? IconTheme.JabRefIcons.KEEP_ON_TOP.getGraphicNode()
+                                 : IconTheme.JabRefIcons.KEEP_ON_TOP_OFF.getGraphicNode());
         });
 
         stage.setOnShown(event -> {

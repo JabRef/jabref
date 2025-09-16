@@ -166,9 +166,9 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         dialogPane.setContent(settings.getSettingsPane());
 
         dialogService.showCustomDialogAndWait(
-                Localization.lang("Application settings"),
-                dialogPane,
-                ButtonType.OK, ButtonType.CANCEL)
+                             Localization.lang("Application settings"),
+                             dialogPane,
+                             ButtonType.OK, ButtonType.CANCEL)
                      .ifPresent(btn -> {
                                  if (btn == ButtonType.OK) {
                                      settings.storeSettings();

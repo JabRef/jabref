@@ -195,8 +195,8 @@ public class ImportCommand extends SimpleCommand {
                         () -> dialogService.showWarningDialogAndWait(
                                 Localization.lang("Import error"),
                                 Localization.lang("Please check your library file for wrong syntax.")
-                                + "\n\n"
-                                + ex.getLocalizedMessage()));
+                                        + "\n\n"
+                                        + ex.getLocalizedMessage()));
             }
         }
 

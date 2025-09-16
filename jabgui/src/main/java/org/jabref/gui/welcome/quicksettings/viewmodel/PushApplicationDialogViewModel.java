@@ -99,8 +99,8 @@ public class PushApplicationDialogViewModel extends AbstractViewModel {
             }
             String existingPath = pushToApplicationPreferences.getCommandPaths().get(selectedApp.getDisplayName());
             pathProperty.set(PushToApplicationDetector.isValidAbsolutePath(existingPath) ?
-                    existingPath :
-                    Objects.requireNonNullElse(detectedApplicationPaths.get(selectedApp), ""));
+                             existingPath :
+                             Objects.requireNonNullElse(detectedApplicationPaths.get(selectedApp), ""));
         });
     }
 

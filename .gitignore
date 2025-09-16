@@ -68,8 +68,19 @@ gradle.properties
 
 
 # IntelliJ IDEA
-.idea/*
-!.idea/runConfigurations/
+.idea/workspace.xml
+.idea/checkstyleidea-libs
+
+# references JDK_24 and the JDK name - high risk for conflicts
+.idea/misc.xml
+
+# We don't modify these (and the defaults are good enough)
+.idea/.name
+.idea/IntelliLang.xml
+.idea/compiler.xml
+.idea/kotlinc.xml
+.idea/modules.xml
+
 *.ipr
 *.iml
 

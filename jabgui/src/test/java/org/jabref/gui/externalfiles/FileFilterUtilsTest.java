@@ -120,40 +120,40 @@ class FileFilterUtilsTest {
         @Test
         void sortByDateAscendingPositiveTest() {
             List<String> sortedPaths = fileFilterUtils
-                .sortByDateAscending(files)
-                .stream()
-                .map(Path::toString)
-                .collect(Collectors.toList());
+                    .sortByDateAscending(files)
+                    .stream()
+                    .map(Path::toString)
+                    .collect(Collectors.toList());
             assertEquals(sortedPaths, expectedSortByDateAscending);
         }
 
         @Test
         void sortByDateAscendingNegativeTest() {
             List<String> sortedPaths = fileFilterUtils
-                .sortByDateAscending(files)
-                .stream()
-                .map(Path::toString)
-                .collect(Collectors.toList());
+                    .sortByDateAscending(files)
+                    .stream()
+                    .map(Path::toString)
+                    .collect(Collectors.toList());
             assertNotEquals(sortedPaths, wrongOrder);
         }
 
         @Test
         void sortByDateDescendingPositiveTest() {
             List<String> sortedPaths = fileFilterUtils
-                .sortByDateDescending(files)
-                .stream()
-                .map(Path::toString)
-                .collect(Collectors.toList());
+                    .sortByDateDescending(files)
+                    .stream()
+                    .map(Path::toString)
+                    .collect(Collectors.toList());
             assertEquals(sortedPaths, expectedSortByDateDescending);
         }
 
         @Test
         void sortByDateDescendingNegativeTest() {
             List<String> sortedPaths = fileFilterUtils
-                .sortByDateDescending(files)
-                .stream()
-                .map(Path::toString)
-                .collect(Collectors.toList());
+                    .sortByDateDescending(files)
+                    .stream()
+                    .map(Path::toString)
+                    .collect(Collectors.toList());
             assertNotEquals(sortedPaths, wrongOrder);
         }
     }

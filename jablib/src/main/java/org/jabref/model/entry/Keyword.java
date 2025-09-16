@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,21 +24,23 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
 
     /// Connects all the given keywords into one chain and returns its root,
     /// e.g. "A", "B", "C" is transformed into "A > B > C".
-    public static Keyword of(String... keywords) {
-        if (keywords.length == 0) {
+    public static Keyword of(List<String> keywords) {
+        if (keywords.isEmpty()) {
             return new Keyword("");
         }
 
-        Keyword root = new Keyword(keywords[0]);
-        for (int i = 1; i < keywords.length; i++) {
-            root.addAtEnd(keywords[i]);
+        Keyword root = new Keyword(keywords.getFirst());
+        for (int i = 1; i < keywords.size(); i++) {
+            root.addAtEnd(keywords.get(i));
         }
         return root;
     }
 
     /// Converts a raw String to a single Keyword
     public static Keyword ofHierarchical(String rawString) {
-        return Keyword.of(rawString.split(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString()));
+        return Keyword.of(Stream.of(rawString.split(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString()))
+                                .map(String::trim)
+                                .toList());
     }
 
     @Override
