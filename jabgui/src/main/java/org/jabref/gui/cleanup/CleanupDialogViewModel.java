@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -55,8 +56,8 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final UndoManager undoManager;
-    private final Supplier<LibraryTab> tabSupplier;
-    private final TaskExecutor taskExecutor;
+    private final Optional<Supplier<LibraryTab>> tabSupplier;
+    private final Optional<TaskExecutor> taskExecutor;
 
     private List<BibEntry> targetEntries = List.of();
     private int modifiedEntriesCount;
@@ -76,8 +77,8 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.undoManager = Objects.requireNonNull(undoManager);
 
-        this.tabSupplier = tabSupplier; // can be null
-        this.taskExecutor = taskExecutor; // can be null
+        this.tabSupplier = Optional.ofNullable(tabSupplier);
+        this.taskExecutor = Optional.ofNullable(taskExecutor);
     }
 
     public void setTargetEntries(List<BibEntry> entries) {
@@ -128,14 +129,13 @@ public class CleanupDialogViewModel extends AbstractViewModel {
         CleanupPreferences cleanupPreset = new CleanupPreferences(EnumSet.copyOf(selectedTab.selectedJobs()));
         selectedTab.formatters().ifPresent(cleanupPreset::setFieldFormatterCleanups);
 
-        if (taskExecutor != null) {
-            BackgroundTask.wrap(() -> cleanup(cleanupPreset, entriesToProcess))
-                          .onSuccess(result -> showResults())
-                          .onFailure(dialogService::showErrorDialogAndWait)
-                          .executeWith(taskExecutor);
-        } else {
-            cleanup(cleanupPreset, entriesToProcess);
-        }
+        taskExecutor.ifPresentOrElse(
+                executor -> BackgroundTask.wrap(() -> cleanup(cleanupPreset, entriesToProcess))
+                                      .onSuccess(result -> showResults())
+                                      .onFailure(dialogService::showErrorDialogAndWait)
+                                      .executeWith(executor),
+                () -> cleanup(cleanupPreset, entriesToProcess)
+        );
     }
 
     /**
@@ -167,9 +167,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     }
 
     private void showResults() {
-        if (tabSupplier != null) {
-            tabSupplier.get().markBaseChanged();
-        }
+        tabSupplier.ifPresent(supplier -> supplier.get().markBaseChanged());
 
         String message = switch (modifiedEntriesCount) {
             case 0 ->
