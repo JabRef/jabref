@@ -142,7 +142,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         assertEquals("""
                 Field Presence Consistency Check Result
 
-                | entry type | citation key | Custom | Pages | Title |
+                | entry type | citation key | custom | Pages | Title |
                 | ---------- | ------------ | ------ | ----- | ----- |
                 | Article    | first        | ?      | o     | x     |
                 | Article    | second       | -      | -     | -     |
@@ -182,7 +182,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         assertEquals("""
                 Field Presence Consistency Check Result
 
-                | entry type | citation key        | Custom | Pages | Title |
+                | entry type | citation key        | custom | Pages | Title |
                 | ---------- | ------------------- | ------ | ----- | ----- |
                 | Article    | first-very-long-key | ?      | o     | x     |
                 | Article    | second              | -      | -     | -     |
