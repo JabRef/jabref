@@ -63,7 +63,7 @@ public class CleanupFileRelatedPanel extends VBox {
 
         cleanupRenamePdfonlyRelativePaths.disableProperty().bind(cleanupRenamePdf.selectedProperty().not());
 
-        cleanupUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
+        cleanupUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getName()));
 
         String currentPattern = Localization.lang("Filename format pattern (from preferences)")
                                             .concat(filePreferences.getFileNamePattern());
