@@ -108,10 +108,6 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
         LocalDateTime modifiedDate = LocalDateTime.ofInstant(modificationInstant, ZoneId.systemDefault());
         metadata.setLastModified(modifiedDate.format(formatter));
 
-        // Infer study type from queries and research questions
-        String studyType = inferStudyType(oldStudy);
-        metadata.setStudyType(studyType);
-
         // Generate notes
         String notes = generateMigrationNotes(oldStudy);
         metadata.setNotes(notes);
@@ -119,30 +115,7 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
         return metadata;
     }
 
-    /**
-     * Infer study type from the content of the study
-     */
-    private String inferStudyType(V1StudyFormat oldStudy) {
-        // Default to systematic literature review
-        String defaultType = "systematic-literature-review";
-
-        if (oldStudy.getResearchQuestions() == null || oldStudy.getResearchQuestions().isEmpty()) {
-            return defaultType;
-        }
-
-        // Analyze research questions for keywords that might indicate study type
-        String allQuestions = String.join(" ", oldStudy.getResearchQuestions()).toLowerCase();
-
-        if (allQuestions.contains("meta-analysis") || allQuestions.contains("quantitative synthesis")) {
-            return "meta-analysis";
-        } else if (allQuestions.contains("scoping") || allQuestions.contains("mapping")) {
-            return "scoping-review";
-        } else if (allQuestions.contains("rapid") || allQuestions.contains("quick")) {
-            return "rapid-review";
-        }
-
-        return defaultType;
-    }
+    // Remove the inferStudyType method entirely
 
     /**
      * Generate notes for the migration

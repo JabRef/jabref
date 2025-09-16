@@ -13,8 +13,6 @@ public class StudyMetadata {
     @JsonProperty("last-modified")
     private String lastModified;
 
-    @JsonProperty("study-type")
-    private String studyType = "systematic-literature-review";
 
     private String notes; // optional
 
@@ -35,13 +33,11 @@ public class StudyMetadata {
     public StudyMetadata(String createdDate, String lastModified, String studyType) {
         this.createdDate = createdDate;
         this.lastModified = lastModified;
-        this.studyType = studyType;
     }
 
     public StudyMetadata(String createdDate, String lastModified, String studyType, String notes) {
         this.createdDate = createdDate;
         this.lastModified = lastModified;
-        this.studyType = studyType;
         this.notes = notes;
     }
 
@@ -59,14 +55,6 @@ public class StudyMetadata {
 
     public void setLastModified(String lastModified) {
         this.lastModified = lastModified;
-    }
-
-    public String getStudyType() {
-        return studyType;
-    }
-
-    public void setStudyType(String studyType) {
-        this.studyType = studyType;
     }
 
     public String getNotes() {
@@ -89,13 +77,12 @@ public class StudyMetadata {
         StudyMetadata that = (StudyMetadata) other;
         return Objects.equals(createdDate, that.createdDate) &&
                Objects.equals(lastModified, that.lastModified) &&
-               Objects.equals(studyType, that.studyType) &&
                Objects.equals(notes, that.notes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(createdDate, lastModified, studyType, notes);
+        return Objects.hash(createdDate, lastModified, notes);
     }
 
     @Override
@@ -103,7 +90,6 @@ public class StudyMetadata {
         return "StudyMetadata{" +
                 "createdDate='" + createdDate + '\'' +
                 ", lastModified='" + lastModified + '\'' +
-                ", studyType='" + studyType + '\'' +
                 ", notes='" + notes + '\'' +
                 '}';
     }
