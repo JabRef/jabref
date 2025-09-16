@@ -42,6 +42,7 @@ public enum Language {
     private static final Pattern IS_NOT_LATIN = Pattern.compile("[^\\p{IsLatin}]");
     private final String displayName;
     private final String id;
+
     /**
      * @param id Typically as 639-1 code
      */
@@ -77,11 +78,11 @@ public enum Language {
 
     public static List<Language> getSorted() {
         return Arrays.stream(values())
-                .sorted(Comparator.comparing(language -> removeNonLatinCharacters(language.getDisplayName())))
-                .toList();
+                     .sorted(Comparator.comparing(language -> removeNonLatinCharacters(language.getDisplayName())))
+                     .toList();
     }
 
     private static String removeNonLatinCharacters(String input) {
-       return IS_NOT_LATIN.matcher(input).replaceAll("");
+        return IS_NOT_LATIN.matcher(input).replaceAll("");
     }
 }

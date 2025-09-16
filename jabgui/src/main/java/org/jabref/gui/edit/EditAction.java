@@ -56,14 +56,22 @@ public class EditAction extends SimpleCommand {
                 // Focus is on text field -> copy/paste/cut selected text
                 // DELETE_ENTRY in text field should do forward delete
                 switch (action) {
-                    case SELECT_ALL -> textInput.selectAll();
-                    case COPY -> textInput.copy();
-                    case CUT -> textInput.cut();
-                    case PASTE -> textInput.paste();
-                    case DELETE -> textInput.clear();
-                    case DELETE_ENTRY -> textInput.deleteNextChar();
-                    case UNDO -> textInput.undo();
-                    case REDO -> textInput.redo();
+                    case SELECT_ALL ->
+                            textInput.selectAll();
+                    case COPY ->
+                            textInput.copy();
+                    case CUT ->
+                            textInput.cut();
+                    case PASTE ->
+                            textInput.paste();
+                    case DELETE ->
+                            textInput.clear();
+                    case DELETE_ENTRY ->
+                            textInput.deleteNextChar();
+                    case UNDO ->
+                            textInput.undo();
+                    case REDO ->
+                            textInput.redo();
                     default -> {
                         String message = "Only cut/copy/paste supported in TextInputControl but got " + action;
                         LOGGER.error(message);
@@ -77,10 +85,14 @@ public class EditAction extends SimpleCommand {
                 // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea
 
                 switch (action) {
-                    case COPY -> tabSupplier.get().copyEntry();
-                    case CUT -> tabSupplier.get().cutEntry();
-                    case PASTE -> tabSupplier.get().pasteEntry();
-                    case DELETE_ENTRY -> tabSupplier.get().deleteEntry();
+                    case COPY ->
+                            tabSupplier.get().copyEntry();
+                    case CUT ->
+                            tabSupplier.get().cutEntry();
+                    case PASTE ->
+                            tabSupplier.get().pasteEntry();
+                    case DELETE_ENTRY ->
+                            tabSupplier.get().deleteEntry();
                     case UNDO -> {
                         if (undoManager.canUndo()) {
                             undoManager.undo();
@@ -91,7 +103,8 @@ public class EditAction extends SimpleCommand {
                             undoManager.redo();
                         }
                     }
-                    default -> LOGGER.debug("Only cut/copy/paste/deleteEntry supported but got: {} and focus owner {}", action, focusOwner);
+                    default ->
+                            LOGGER.debug("Only cut/copy/paste/deleteEntry supported but got: {} and focus owner {}", action, focusOwner);
                 }
             }
         });

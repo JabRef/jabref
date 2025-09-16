@@ -45,9 +45,7 @@ class DBMSSynchronizerTest {
     private DBMSSynchronizer dbmsSynchronizer;
     private BibDatabase bibDatabase;
     private final GlobalCitationKeyPatterns pattern = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
-    private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
-    private DBMSType dbmsType;
 
     private BibEntry createExampleBibEntry(int index) {
         BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
@@ -59,10 +57,10 @@ class DBMSSynchronizerTest {
 
     @BeforeEach
     void setup() throws SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
-        this.dbmsType = TestManager.getDBMSTypeTestParameter();
-        this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(this.dbmsConnection);
-        TestManager.clearTables(this.dbmsConnection);
+        DBMSType dbmsType = TestManager.getDBMSTypeTestParameter();
+        DBMSConnection dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
+        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
+        TestManager.clearTables(dbmsConnection);
         this.dbmsProcessor.setupSharedDatabase();
 
         bibDatabase = new BibDatabase();
@@ -71,7 +69,7 @@ class DBMSSynchronizerTest {
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
 
-        dbmsSynchronizer = new DBMSSynchronizer(context, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor());
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',', fieldPreferences, pattern, new DummyFileUpdateMonitor(), "UserAndHost");
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);

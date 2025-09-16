@@ -1,6 +1,7 @@
 package org.jabref.model.entry;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -11,13 +12,13 @@ class KeywordTest {
 
     @Test
     void getPathFromRootAsStringForSimpleChain() {
-        Keyword keywordChain = Keyword.of("A", "B", "C");
+        Keyword keywordChain = Keyword.of(List.of("A", "B", "C"));
         assertEquals("A > B", keywordChain.getChild().get().getPathFromRootAsString('>'));
     }
 
     @Test
     void getAllSubchainsAsStringForSimpleChain() {
-        Keyword keywordChain = Keyword.of("A", "B", "C");
+        Keyword keywordChain = Keyword.of(List.of("A", "B", "C"));
         Set<String> expected = new HashSet<>();
         expected.add("A");
         expected.add("A > B");

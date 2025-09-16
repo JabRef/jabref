@@ -395,9 +395,12 @@ public class GroupNodeViewModel {
             // Bottom + top -> insert source row before / after this row
             // Center -> add as child
             switch (mouseLocation) {
-                case BOTTOM -> this.moveTo(targetParent.get(), targetIndex + 1);
-                case CENTER -> this.moveTo(target);
-                case TOP -> this.moveTo(targetParent.get(), targetIndex);
+                case BOTTOM ->
+                        this.moveTo(targetParent.get(), targetIndex + 1);
+                case CENTER ->
+                        this.moveTo(target);
+                case TOP ->
+                        this.moveTo(targetParent.get(), targetIndex);
             }
         } else {
             // No parent = root -> just add
@@ -461,67 +464,103 @@ public class GroupNodeViewModel {
     public boolean canBeDragged() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _, SmartGroup _ -> false;
-            case ExplicitGroup _, SearchGroup _, AutomaticKeywordGroup _, AutomaticPersonsGroup _, TexGroup _ -> true;
+            case AllEntriesGroup _,
+                 SmartGroup _ ->
+                    false;
+            case ExplicitGroup _,
+                 SearchGroup _,
+                 AutomaticKeywordGroup _,
+                 AutomaticPersonsGroup _,
+                 TexGroup _ ->
+                    true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
                     groupNode.getParent()
-                            .map(GroupTreeNode::getGroup)
-                            .map(groupParent ->
-                                    !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
-                            .orElse(false);
+                             .map(GroupTreeNode::getGroup)
+                             .map(groupParent ->
+                                     !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
+                             .orElse(false);
 
-            case null -> throw new IllegalArgumentException("Group cannot be null");
-            default -> throw new UnsupportedOperationException("canBeDragged method not yet implemented in group: " + group.getClass().getName());
+            case null ->
+                    throw new IllegalArgumentException("Group cannot be null");
+            default ->
+                    throw new UnsupportedOperationException("canBeDragged method not yet implemented in group: " + group.getClass().getName());
         };
     }
 
     public boolean canAddGroupsIn() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _, ExplicitGroup _, SearchGroup _, TexGroup _ -> true;
-            case AutomaticKeywordGroup _, AutomaticPersonsGroup _, SmartGroup _ -> false;
+            case AllEntriesGroup _,
+                 ExplicitGroup _,
+                 SearchGroup _,
+                 TexGroup _ ->
+                    true;
+            case AutomaticKeywordGroup _,
+                 AutomaticPersonsGroup _,
+                 SmartGroup _ ->
+                    false;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
                     groupNode.getParent()
-                            .map(GroupTreeNode::getGroup)
-                            .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
-                            .orElse(false);
-            case null -> throw new IllegalArgumentException("Group cannot be null");
-            default -> throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
+                             .map(GroupTreeNode::getGroup)
+                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
+                             .orElse(false);
+            case null ->
+                    throw new IllegalArgumentException("Group cannot be null");
+            default ->
+                    throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
         };
     }
 
     public boolean canRemove() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _, SmartGroup _ -> false;
-            case ExplicitGroup _, SearchGroup _, AutomaticKeywordGroup _, AutomaticPersonsGroup _, TexGroup _ -> true;
+            case AllEntriesGroup _,
+                 SmartGroup _ ->
+                    false;
+            case ExplicitGroup _,
+                 SearchGroup _,
+                 AutomaticKeywordGroup _,
+                 AutomaticPersonsGroup _,
+                 TexGroup _ ->
+                    true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
                     groupNode.getParent()
-                            .map(GroupTreeNode::getGroup)
-                            .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
-                            .orElse(false);
-            case null -> throw new IllegalArgumentException("Group cannot be null");
-            default -> throw new UnsupportedOperationException("canRemove method not yet implemented in group: " + group.getClass().getName());
+                             .map(GroupTreeNode::getGroup)
+                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
+                             .orElse(false);
+            case null ->
+                    throw new IllegalArgumentException("Group cannot be null");
+            default ->
+                    throw new UnsupportedOperationException("canRemove method not yet implemented in group: " + group.getClass().getName());
         };
     }
 
     public boolean isEditable() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _, SmartGroup _ -> false;
-            case ExplicitGroup _, SearchGroup _, AutomaticKeywordGroup _, AutomaticPersonsGroup _, TexGroup _ -> true;
+            case AllEntriesGroup _,
+                 SmartGroup _ ->
+                    false;
+            case ExplicitGroup _,
+                 SearchGroup _,
+                 AutomaticKeywordGroup _,
+                 AutomaticPersonsGroup _,
+                 TexGroup _ ->
+                    true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
                     groupNode.getParent()
-                            .map(GroupTreeNode::getGroup)
-                            .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
-                            .orElse(false);
+                             .map(GroupTreeNode::getGroup)
+                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
+                             .orElse(false);
 
-            case null -> throw new IllegalArgumentException("Group cannot be null");
-            default -> throw new UnsupportedOperationException("isEditable method not yet implemented in group: " + group.getClass().getName());
+            case null ->
+                    throw new IllegalArgumentException("Group cannot be null");
+            default ->
+                    throw new UnsupportedOperationException("isEditable method not yet implemented in group: " + group.getClass().getName());
         };
     }
 

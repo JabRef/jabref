@@ -95,10 +95,10 @@ class AuthorListParserTest {
                                 new Author("J. M.", "J. M.", null, "Carmona", null)
                         ),
                         """
-                        Alexander Artemenko
-                        I. Podadera
-                        J. M. Carmona
-                        """),
+                                Alexander Artemenko
+                                I. Podadera
+                                J. M. Carmona
+                                """),
                 Arguments.of(
                         AuthorList.of(
                                 new Author("First1", "F.", null, "Last1", null),
@@ -106,10 +106,10 @@ class AuthorListParserTest {
                                 new Author("First3", "F.", null, "Last3", null)
                         ),
                         """
-                        First1 Last1
-                            First2 Last2
-                            First3 Last3
-                        """)
+                                First1 Last1
+                                    First2 Last2
+                                    First3 Last3
+                                """)
         );
     }
 

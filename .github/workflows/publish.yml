@@ -57,7 +57,7 @@ jobs:
           fetch-depth: 0
       - name: Detect changed jablib classes or workflow
         id: changed
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             jablib/src/main/java/**/*.java
@@ -94,7 +94,7 @@ jobs:
         with:
           java-version: '24'
           distribution: 'corretto'
-          java-package: 'jdk'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key

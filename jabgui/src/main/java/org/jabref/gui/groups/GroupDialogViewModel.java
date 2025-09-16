@@ -231,8 +231,8 @@ public class GroupDialogViewModel {
                             return false;
                         }
                         return FileUtil.getFileExtension(input)
-                                .map("aux"::equalsIgnoreCase)
-                                .orElse(false);
+                                       .map("aux"::equalsIgnoreCase)
+                                       .orElse(false);
                     }
                 },
                 ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
@@ -373,7 +373,9 @@ public class GroupDialogViewModel {
                         Path.of(texGroupFilePathProperty.getValue().trim()),
                         new DefaultAuxParser(new BibDatabase()),
                         fileUpdateMonitor,
-                        currentDatabase.getMetaData());
+                        currentDatabase.getMetaData(),
+                        preferences.getFilePreferences().getUserAndHost()
+                );
             }
 
             if (resultingGroup != null) {
@@ -485,9 +487,10 @@ public class GroupDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(currentDatabase.getMetaData()
+                .withInitialDirectory(texGroupFilePathProperty.getValue().isBlank() ?
+                                      currentDatabase.getMetaData()
                                                      .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                                     .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory()))).build();
+                                                     .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory())).toString() : texGroupFilePathProperty.get()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()

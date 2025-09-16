@@ -208,7 +208,9 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
 
         int passes = 0;
 
+        // @formatter:off
         do {
+            // @formatter:on
             passes++;
             LOGGER.debug("Summarizing chunk(s) for file \"{}\" of entry {} ({} pass)", filePath, citationKey, passes);
 
