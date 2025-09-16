@@ -44,7 +44,7 @@ public class ServerCli implements Callable<Void> {
 
     @Override
     public Void call() throws InterruptedException {
-        // The server serves the last opened files (see org.jabref.http.server.LibraryResource.getLibraryPath)
+        // The server serves the last opened files (see org.jabref.http.server.resources.LibraryResource.getLibraryPath)
         final List<Path> filesToServe = new ArrayList<>(JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened());
 
         // Additionally, files can be provided as args

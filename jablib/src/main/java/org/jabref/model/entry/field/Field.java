@@ -4,7 +4,6 @@ import java.util.EnumSet;
 import java.util.Optional;
 
 import org.jabref.model.entry.EntryConverter;
-import org.jabref.model.strings.StringUtil;
 
 public interface Field {
 
@@ -15,13 +14,6 @@ public interface Field {
      * Note that this set needs to be mutable. This is required, because we allow standard fields to be modifiable via the UI.
      */
     EnumSet<FieldProperty> getProperties();
-
-    /**
-     * @return A version of the field name more suitable for display in the UI
-     */
-    default String getDisplayName() {
-        return StringUtil.capitalizeFirst(getName());
-    }
 
     /**
      * Name used for writing to .bib (or as XMP data)

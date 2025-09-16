@@ -15,6 +15,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
@@ -53,7 +54,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
                           if (identifier.isPresent()) {
                               entry.setField(field, identifier.get().asString());
                           } else {
-                              dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
+                              dialogService.notify(Localization.lang("No %0 found", FieldTextMapper.getDisplayName(field)));
                           }
                       }).onFailure(e -> handleIdentifierFetchingError(e, doiFetcher)).executeWith(taskExecutor);
     }
