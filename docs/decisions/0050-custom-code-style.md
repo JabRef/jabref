@@ -166,6 +166,6 @@ We tried out at <https://github.com/JabRef/jabref-koppor/pull/716>.
 
 * Good, because it [can be used in IntelliJ](https://github.com/krasa/EclipseCodeFormatter).
 * Good, because supported by the formatter tool [jbang-fmt](https://github.com/jbangdev/jbang-fmt).
-* Good, because JabRef has an initial 
+* Good, because JabRef has an initial Eclipse formatting configuration.
 * Bad, because the IntelliJ plugin not actively maintained.
 * Bad, because there is NOT "the" Eclipse style, the style still needs to be configured.
