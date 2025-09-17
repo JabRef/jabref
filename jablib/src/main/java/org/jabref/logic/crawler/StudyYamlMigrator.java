@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 public abstract class StudyYamlMigrator {
     protected static final String CURRENT_VERSION = "2.0";
     private static final Logger LOGGER = LoggerFactory.getLogger(StudyYamlMigrator.class);
+    private static final ObjectMapper YAML_MAPPER = new ObjectMapper(new YAMLFactory());
 
     public static StudyYamlMigrator getMigratorForVersion(String version) {
         return switch (version) {
@@ -43,9 +44,8 @@ public abstract class StudyYamlMigrator {
 
         if (CURRENT_VERSION.equals(version)) {
             // Already current version, read the file normally
-            ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
             try (InputStream fileInputStream = Files.newInputStream(studyYamlFile)) {
-                return yamlMapper.readValue(fileInputStream, Study.class);
+                return YAML_MAPPER.readValue(fileInputStream, Study.class);
             }
         }
 
