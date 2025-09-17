@@ -184,9 +184,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     private void cleanup(CleanupPreferences cleanupPreferences, List<BibEntry> entries) {
         List<JabRefException> failures = new ArrayList<>();
 
-        String editName = entries.size() == 1
-                ? Localization.lang("Clean up entry")
-                : Localization.lang("Clean up entries");
+        String editName = entries.size() == 1 ? Localization.lang("Clean up entry") : Localization.lang("Clean up entries");
         // undo granularity is on a set of all entries
         NamedCompoundEdit compoundEdit = new NamedCompoundEdit(editName);
 
