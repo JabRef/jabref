@@ -29,12 +29,7 @@ public class StudyMetadata {
         this.lastModified = lastModified;
     }
 
-    public StudyMetadata(String createdDate, String lastModified, String studyType) {
-        this.createdDate = createdDate;
-        this.lastModified = lastModified;
-    }
-
-    public StudyMetadata(String createdDate, String lastModified, String studyType, String notes) {
+    public StudyMetadata(String createdDate, String lastModified, String notes) {
         this.createdDate = createdDate;
         this.lastModified = lastModified;
         this.notes = notes;
