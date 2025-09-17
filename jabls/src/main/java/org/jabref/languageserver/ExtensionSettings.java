@@ -1,5 +1,7 @@
 package org.jabref.languageserver;
 
+import java.util.Optional;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -42,16 +44,16 @@ public class ExtensionSettings {
     private <T> T assignIfPresent(JsonObject obj, T current, Class<T> type, String... path) {
         JsonObject currentObject = obj;
         for (String key : path) {
-            JsonElement element = currentObject.get(key);
-            if (element == null || element.isJsonNull()) {
-                break;
+            Optional<JsonElement> element = Optional.ofNullable(currentObject.get(key));
+            if (element.isEmpty()) {
+                return current;
             }
-            if (element.isJsonObject()) {
-                currentObject = element.getAsJsonObject();
+            if (element.get().isJsonObject()) {
+                currentObject = element.get().getAsJsonObject();
                 continue;
             }
             try {
-                T v = gson.fromJson(element, type);
+                T v = gson.fromJson(element.get(), type);
                 if (v != null) {
                     return v;
                 }
