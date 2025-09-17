@@ -56,13 +56,13 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
     private Study convertToCurrentFormat(V1StudyFormat oldStudy, Path studyYamlFile) {
         // Convert queries - handle both simple strings and complex objects
         List<StudyQuery> newQueries = oldStudy.getQueries().stream()
-                .map(this::convertQuery)
-                .collect(Collectors.toList());
+                                              .map(this::convertQuery)
+                                              .collect(Collectors.toList());
 
         // Convert databases to catalogs
         List<StudyCatalog> catalogs = oldStudy.getDatabases().stream()
-                .map(this::convertDatabase)
-                .collect(Collectors.toList());
+                                              .map(this::convertDatabase)
+                                              .collect(Collectors.toList());
 
         // Create new study with migrated data
         Study newStudy = new Study(
@@ -83,7 +83,7 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
         }
 
         LOGGER.debug("Successfully converted v1.0 study with {} queries and {} catalogs",
-                    newQueries.size(), catalogs.size());
+                newQueries.size(), catalogs.size());
 
         return newStudy;
     }
@@ -130,8 +130,8 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
 
         if (oldStudy.getDatabases() != null) {
             long enabledDatabases = oldStudy.getDatabases().stream()
-                    .filter(db -> db.isEnabled() == null || db.isEnabled())
-                    .count();
+                                            .filter(db -> db.isEnabled() == null || db.isEnabled())
+                                            .count();
             notes.append("Configured for ").append(enabledDatabases).append(" active databases.");
         }
 

@@ -13,7 +13,6 @@ public class StudyMetadata {
     @JsonProperty("last-modified")
     private String lastModified;
 
-
     private String notes; // optional
 
     // Default constructor - no required fields
@@ -76,8 +75,8 @@ public class StudyMetadata {
 
         StudyMetadata that = (StudyMetadata) other;
         return Objects.equals(createdDate, that.createdDate) &&
-               Objects.equals(lastModified, that.lastModified) &&
-               Objects.equals(notes, that.notes);
+                Objects.equals(lastModified, that.lastModified) &&
+                Objects.equals(notes, that.notes);
     }
 
     @Override
