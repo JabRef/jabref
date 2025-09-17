@@ -35,7 +35,6 @@ public final class PullComputation {
         this.conflicts = conflicts;
     }
 
-    // --- 工厂方法 ---
     public static PullComputation of(SyncStatus syncStatus,
                                      Optional<RevCommit> base,
                                      RevCommit remote,
@@ -77,14 +76,10 @@ public final class PullComputation {
         return conflicts;
     }
 
-    // --- 便捷判断（保持现有 GUI 调用不变） ---
-
-    /** 对应“Already up to date” */
     public boolean isNoop() {
         return status == SyncStatus.UP_TO_DATE;
     }
 
-    /** 对应“Local branch is ahead of remote…” */
     public boolean isNoopAhead() {
         return status == SyncStatus.AHEAD;
     }

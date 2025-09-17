@@ -316,6 +316,10 @@ public class GitHandler {
                 pushCommand.setCredentialsProvider(credsOpt.get());
             }
             pushCommand.call();
+
+            config.setString("branch", branch, "remote", "origin");
+            config.setString("branch", branch, "merge", "refs/heads/" + branch);
+            config.save();
         }
     }
 
@@ -331,7 +335,7 @@ public class GitHandler {
             }
             pullCommand.call();
         } catch (GitAPIException e) {
-            LOGGER.info("Failed to push");
+            LOGGER.info("Failed to pull");
         }
     }
 

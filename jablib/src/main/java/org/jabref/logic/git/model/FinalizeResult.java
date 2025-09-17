@@ -2,13 +2,14 @@ package org.jabref.logic.git.model;
 
 import java.util.Optional;
 
-///  这是记账层({@link org.jabref.logic.git.merge.MergeBookkeeper})的返回值，表示 “我们是否做了 fast-forward，或者新写了一个（merge 或 single-parent）commit”
-///  它不参与任何内容合成；输入文件内容必须是 GUI 之前已经写好的合并结果。
-///  如果“本地严格落后远端且文件内容与远端完全一致”→ 快进（fast-forward），不产生新提交；
-///  否则：
-///  - BEHIND（local 是 remote 的祖先）：在 remote 之上新建单亲提交（parent=remote）；
-///  - DIVERGED：新建双亲 merge 提交（parents=[local, remote]）。
-///  Notes: 因为 UP_TO_DATE / AHEAD / CONFLICT / UNTRACKED 这些状态在 prepareMerge 前已经被 GitStatusChecker 拦掉，不会进入 finalizeMerge。
+/// This is the return value of the bookkeeping layer ({@link org.jabref.logic.git.merge.MergeBookkeeper}),
+/// indicating "whether we performed a fast-forward or created a new (merge or single-parent) commit."
+/// It does not participate in any content synthesis; the input file content must be the merge result already prepared before the GUI.
+/// If "the local is strictly behind the remote and the file content is exactly the same as the remote" → fast-forward, no new commit is created;
+/// Otherwise:
+/// - BEHIND (local is an ancestor of remote): create a new single-parent commit (parent=remote) on top of remote;
+/// - DIVERGED: create a new dual-parent merge commit (parents=[local, remote]).
+/// Notes: Because the statuses UP_TO_DATE / AHEAD / CONFLICT / UNTRACKED are already filtered out before prepareMerge by GitStatusChecker, they will not enter finalizeMerge.
 public final class FinalizeResult {
     public enum Kind {
         NOOP_UP_TO_DATE, // nothing to do (local == remote)

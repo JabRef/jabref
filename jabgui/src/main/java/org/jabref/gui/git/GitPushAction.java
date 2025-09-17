@@ -13,8 +13,10 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
-import org.jabref.logic.git.merge.GitSemanticMergePlanner;
+import org.jabref.logic.git.merge.DefaultMergeBookkeeper;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
+import org.jabref.logic.git.merge.GitSemanticMergePlanner;
+import org.jabref.logic.git.merge.MergeBookkeeper;
 import org.jabref.logic.git.model.PushResult;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
@@ -96,7 +98,7 @@ public class GitPushAction extends SimpleCommand {
                               GitStatusViewModel gitStatusViewModel,
                               GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
 
-        GitSyncService syncService = buildSyncService(bibPath, registry);
+        GitSyncService syncService = buildSyncService(registry);
         GitHandler handler = registry.get(bibPath.getParent());
         String user = guiPreferences.getGitPreferences().getUsername();
         String pat = guiPreferences.getGitPreferences().getPat();
@@ -110,11 +112,12 @@ public class GitPushAction extends SimpleCommand {
         return result;
     }
 
-    private GitSyncService buildSyncService(Path bibPath, GitHandlerRegistry handlerRegistry) throws JabRefException {
+    private GitSyncService buildSyncService(GitHandlerRegistry handlerRegistry) throws JabRefException {
         GitConflictResolverDialog dialog = new GitConflictResolverDialog(dialogService, guiPreferences);
         GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(dialog);
-        GitSemanticMergePlanner mergeExecutor = new GitSemanticMergeExecutorImpl(guiPreferences.getImportFormatPreferences());
-        return new GitSyncService(guiPreferences.getImportFormatPreferences(), handlerRegistry, resolver, mergeExecutor);
+        GitSemanticMergePlanner mergePlanner = new GitSemanticMergeExecutorImpl(guiPreferences.getImportFormatPreferences());
+        MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
+        return new GitSyncService(guiPreferences.getImportFormatPreferences(), handlerRegistry, resolver, mergePlanner, bookkeeper);
     }
 
     private void showPushError(Throwable ex) {
