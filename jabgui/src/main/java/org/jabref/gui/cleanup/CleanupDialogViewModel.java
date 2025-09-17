@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -59,7 +61,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     private final Optional<Supplier<LibraryTab>> tabSupplier;
     private final Optional<TaskExecutor> taskExecutor;
 
-    private List<BibEntry> targetEntries = List.of();
+    private ObservableList<BibEntry> targetEntries = FXCollections.observableArrayList();
     private int modifiedEntriesCount;
 
     public CleanupDialogViewModel(
@@ -82,7 +84,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     }
 
     public void setTargetEntries(List<BibEntry> entries) {
-        this.targetEntries = List.copyOf(Objects.requireNonNullElse(entries, List.of()));
+        targetEntries.setAll(Objects.requireNonNullElse(entries, List.of()));
     }
 
     public void apply(CleanupTabSelection selectedTab) {
@@ -131,9 +133,9 @@ public class CleanupDialogViewModel extends AbstractViewModel {
 
         taskExecutor.ifPresentOrElse(
                 executor -> BackgroundTask.wrap(() -> cleanup(cleanupPreset, entriesToProcess))
-                                      .onSuccess(result -> showResults())
-                                      .onFailure(dialogService::showErrorDialogAndWait)
-                                      .executeWith(executor),
+                                          .onSuccess(result -> showResults())
+                                          .onFailure(dialogService::showErrorDialogAndWait)
+                                          .executeWith(executor),
                 () -> cleanup(cleanupPreset, entriesToProcess)
         );
     }
