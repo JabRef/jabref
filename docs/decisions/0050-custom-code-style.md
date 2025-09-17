@@ -32,6 +32,7 @@ Chosen option: "Use custom code style", because comes out best (see below).
 * Good, because the style closely follows the maintainer's expectations on code formatting
 * Good, because the IntelliJ tooling works reasonably well
 * Bad, because users need to setup IntelliJ to use the code style
+* Bad, because JBang scripts cannot be formatted automatically
 
 ## Pros and Cons of the Options
 
@@ -45,6 +46,8 @@ IntelliJ offers to customize the code style and export it into an XML file.
 * Bad, because users need to setup IntelliJ to use the code style
 * Bad, because depends on IntelliJ's capabilities (and is not tool-independent)
 * Bad, because the statement after `->` is [always on the next line](https://youtrack.jetbrains.com/issue/IDEA-330487/Disable-line-breaks-after-switch-cases-on-simple-on-liner-case-blocks-in-switch-expression).
+* Bad, because JBang scripts cannot be formatted automatically.
+* Bad, because not supported by the formatter tool [jbang-fmt](https://github.com/jbangdev/jbang-fmt).
 
 ### Use prettier-java
 
@@ -79,6 +82,7 @@ Example:
   Favors short lines (80 characters); the reading is more top-to-buttom; screens are typically wider.
 * Bad, because [prettier-action cannot be used](https://github.com/creyD/prettier_action/issues/149)
 * Bad, because [has line breaks at single variables](https://github.com/jhipster/prettier-java/issues/777)
+* Bad, because not supported by the formatter tool [jbang-fmt](https://github.com/jbangdev/jbang-fmt).
 
 ## Use palantir-java-format
 
@@ -92,9 +96,15 @@ Example:
 
 * Good, because [optimized for code review](https://github.com/palantir/palantir-java-format#optimised-for-code-review)
 * Bad, because [not compatible with JDK21](https://github.com/palantir/palantir-java-format/issues/934). Especially, [does not support `_`](https://github.com/palantir/palantir-java-format/issues/1236)
+* Bad, because not supported by the formatter tool [jbang-fmt](https://github.com/jbangdev/jbang-fmt).
+
+## Use JBang style
+
+* Good, because supported by the formatter tool [jbang-fmt](https://github.com/jbangdev/jbang-fmt).
 
 ## Use google-java-format
 
+* Good, because supported by the formatter tool [jbang-fmt](https://github.com/jbangdev/jbang-fmt).
 * Bad, because [Markdown JavaDoc cannot be used](https://github.com/google/google-java-format/issues/1193)
 * Bad, because [does not support `format:off` comments](https://github.com/google/google-java-format/issues/137).
 * Bad, because not actively maintained; there are [139 opened issues](https://github.com/google/google-java-format/issues?q=sort%3Aupdated-desc%20is%3Aissue%20is%3Aopen&page=1).
@@ -106,6 +116,7 @@ The plugin is automatically activated in IntelliJ. For the code style, see <http
 
 We tried out at <https://github.com/JabRef/jabref-koppor/pull/716>.
 
+* Good, because supported by the formatter tool [jbang-fmt](https://github.com/jbangdev/jbang-fmt).
 * Neutral, because each class field is separated by an empty line:\
 
    ![empty lines between class fields](assets/0050-spring-empty-lines.png)
@@ -153,5 +164,8 @@ We tried out at <https://github.com/JabRef/jabref-koppor/pull/716>.
 
 ## Use eclipse formatter
 
-* Good, because it [can be used in IntelliJ](https://github.com/krasa/EclipseCodeFormatter)
-* Bad, because not actively maintained
+* Good, because it [can be used in IntelliJ](https://github.com/krasa/EclipseCodeFormatter).
+* Good, because supported by the formatter tool [jbang-fmt](https://github.com/jbangdev/jbang-fmt).
+* Good, because JabRef has an initial Eclipse formatting configuration.
+* Bad, because the IntelliJ plugin not actively maintained.
+* Bad, because there is NOT "the" Eclipse style, the style still needs to be configured.
