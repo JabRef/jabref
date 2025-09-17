@@ -2,6 +2,7 @@ package org.jabref.model.study;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -54,8 +55,8 @@ public class StudyQuery {
         this.lucene = lucene;
     }
 
-    public Map<String, String> getCatalogSpecific() {
-        return catalogSpecific != null ? Collections.unmodifiableMap(catalogSpecific) : null;
+    public Optional<Map<String, String>> getCatalogSpecific() {
+        return catalogSpecific != null ? Optional.of(Collections.unmodifiableMap(catalogSpecific)) : Optional.empty();
     }
 
     public void setCatalogSpecific(Map<String, String> catalogSpecific) {

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.jabref.model.study.Study;
 
@@ -24,7 +25,8 @@ public class StudyYamlService {
     }
 
     public StudyYamlService(StudyYamlParser parser) {
-        this.parser = parser;
+        Optional<StudyYamlParser> parserOpt = Optional.ofNullable(parser);
+        this.parser = parserOpt.orElse(new StudyYamlParser());
     }
 
     /**
