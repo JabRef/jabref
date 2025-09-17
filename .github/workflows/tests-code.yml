@@ -114,6 +114,18 @@ jobs:
         run: |
           ./gradlew --no-configuration-cache :rewriteDryRun
 
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: koppor/intellij-idea-format@update-to-latest-intellij
+        with:
+          file-mask: "*.java"
+          settings-file: ".idea/codeStyles/Project.xml"
+      # job should fail in case there are changes
+      - name: Check if any files changed
+        run: git diff --exit-code
+
   modernizer:
     name: Modernizer
     runs-on: ubuntu-latest
@@ -489,7 +501,7 @@ jobs:
 
       - name: Detect changed jablib classes
         id: changed-jablib-files
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             jablib/src/main/java/**/*.java
