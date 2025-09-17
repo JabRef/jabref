@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.jabref.model.study.Study;
@@ -121,21 +122,21 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
      * Generate notes for the migration
      */
     private String generateMigrationNotes(V1StudyFormat oldStudy) {
-        StringBuilder notes = new StringBuilder();
-        notes.append("Migrated from v1.0 format. ");
+        StringJoiner notes = new StringJoiner(" ");
+        notes.add("Migrated from v1.0 format.");
 
         if (oldStudy.getQueries() != null) {
-            notes.append("Contains ").append(oldStudy.getQueries().size()).append(" search queries. ");
+            notes.add("Contains " + oldStudy.getQueries().size() + " search queries.");
         }
 
         if (oldStudy.getDatabases() != null) {
             long enabledDatabases = oldStudy.getDatabases().stream()
                                             .filter(db -> db.isEnabled() == null || db.isEnabled())
                                             .count();
-            notes.append("Configured for ").append(enabledDatabases).append(" active databases.");
+            notes.add("Configured for " + enabledDatabases + " active databases.");
         }
 
-        return notes.toString().trim();
+        return notes.toString();
     }
 
     private StudyQuery convertQuery(Object queryObj) {
