@@ -188,7 +188,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         PseudoClass opacity = PseudoClass.getPseudoClass("opacity");
 
         Node icon = linkedFile.getTypeIcon().getGraphicNode();
-        icon.setOnMouseClicked(ignore -> linkedFile.open());
+        icon.setOnMouseClicked(_ -> linkedFile.open());
 
         Text link = new Text();
         link.textProperty().bind(linkedFile.linkProperty());
@@ -219,7 +219,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
         acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         acceptAutoLinkedFile.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());
-        acceptAutoLinkedFile.setOnAction(ignore -> linkedFile.acceptAsLinked());
+        acceptAutoLinkedFile.setOnAction(_ -> linkedFile.acceptAsLinked());
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
         Button writeMetadataToPdf = IconTheme.JabRefIcons.PDF_METADATA_WRITE.asButton();
@@ -234,12 +234,12 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 taskExecutor
         );
         writeMetadataToPdf.disableProperty().bind(writeMetadataToSinglePdfAction.executableProperty().not());
-        writeMetadataToPdf.setOnAction(ignore -> writeMetadataToSinglePdfAction.execute());
+        writeMetadataToPdf.setOnAction(_ -> writeMetadataToSinglePdfAction.execute());
 
         Button parsePdfMetadata = IconTheme.JabRefIcons.PDF_METADATA_READ.asButton();
         parsePdfMetadata.setTooltip(new Tooltip(Localization.lang("Parse Metadata from PDF.")));
         parsePdfMetadata.visibleProperty().bind(linkedFile.isOfflinePdfProperty());
-        parsePdfMetadata.setOnAction(ignore -> {
+        parsePdfMetadata.setOnAction(_ -> {
             GrobidUseDialogHelper.showAndWaitIfUserIsUndecided(dialogService, preferences.getGrobidPreferences());
             linkedFile.parsePdfMetadataAndShowMergeDialog();
         });
@@ -311,10 +311,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                 activeContextMenu.hide();
                 activeContextMenu = null;
             }
-            return;
-        }
-
-        if (event.getButton() == MouseButton.SECONDARY) {
+        } else if (event.getButton() == MouseButton.SECONDARY) {
             if (activeContextMenu != null) {
                 activeContextMenu.hide();
                 activeContextMenu = null;
@@ -323,7 +320,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
             ContextMenu menu = contextMenuFactory.createMenuForSelection(
                     listView.getSelectionModel().getSelectedItems());
 
-            menu.setOnHidden(ignore -> activeContextMenu = null);
+            menu.setOnHidden(_ -> activeContextMenu = null);
 
             menu.show(listView, event.getScreenX(), event.getScreenY());
             activeContextMenu = menu;

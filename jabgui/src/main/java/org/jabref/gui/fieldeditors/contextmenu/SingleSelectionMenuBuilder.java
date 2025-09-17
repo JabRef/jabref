@@ -11,7 +11,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.copyfiles.CopySingleFileAction;
+import org.jabref.gui.copyfiles.CopyLinkedFilesAction;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -92,7 +92,7 @@ record SingleSelectionMenuBuilder(
 
         items.add(factory.createMenuItem(
                 StandardActions.COPY_FILE_TO_FOLDER,
-                new CopySingleFileAction(selectedLinkedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences())));
+                new CopyLinkedFilesAction(selectedLinkedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences())));
 
         items.add(factory.createMenuItem(
                 StandardActions.REDOWNLOAD_FILE,

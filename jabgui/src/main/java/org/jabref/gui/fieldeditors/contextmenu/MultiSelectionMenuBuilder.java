@@ -63,7 +63,7 @@ record MultiSelectionMenuBuilder(
         menuItems.add(batchCommandItem(actionFactory, StandardActions.REDOWNLOAD_FILE, selection, this::hasSourceUrl));
         menuItems.add(batchCommandItem(actionFactory, StandardActions.MOVE_FILE_TO_FOLDER, selection, this::isMovableToDefaultDir));
         menuItems.add(buildCopyToFolderItem(actionFactory, selection));
-        menuItems.add(customBatchItem(actionFactory, StandardActions.REMOVE_LINKS, selection, ignored -> true,
+        menuItems.add(customBatchItem(actionFactory, StandardActions.REMOVE_LINKS, selection, _ -> true,
                 linkedFileViewModels -> linkedFileViewModels.forEach(linkedFileViewModel ->
                         new ContextAction(StandardActions.REMOVE_LINKS, linkedFileViewModel, databaseContext, bibEntry, preferences, viewModel).execute())));
         menuItems.add(batchCommandItem(actionFactory, StandardActions.DELETE_FILE, selection, this::isLocalAndExists));
