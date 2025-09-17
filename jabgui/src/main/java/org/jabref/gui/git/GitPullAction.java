@@ -27,7 +27,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class GitPullAction extends SimpleCommand {
@@ -36,15 +35,18 @@ public class GitPullAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences guiPreferences;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     public GitPullAction(DialogService dialogService,
                          StateManager stateManager,
                          GuiPreferences guiPreferences,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         GitHandlerRegistry gitHandlerRegistry) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.guiPreferences = guiPreferences;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
 
         this.executable.bind(ActionHelper.needsDatabase(stateManager).and(ActionHelper.needsGitRemoteConfigured(stateManager)));
     }
@@ -72,14 +74,13 @@ public class GitPullAction extends SimpleCommand {
 
         Path bibFilePath = bibFilePathOpt.get();
 
-        GitHandlerRegistry registry = Injector.instantiateModelOrService(GitHandlerRegistry.class);
-        GitStatusViewModel gitStatusViewModel = GitStatusViewModel.fromPathAndContext(stateManager, taskExecutor, registry, bibFilePath);
+        GitStatusViewModel gitStatusViewModel = GitStatusViewModel.fromPathAndContext(stateManager, taskExecutor, gitHandlerRegistry, bibFilePath);
 
         BackgroundTask
-                .wrap(() -> doPull(activeDatabase, bibFilePath, stateManager, registry))
+                .wrap(() -> doPull(activeDatabase, bibFilePath, gitHandlerRegistry))
                 .onSuccess(fr -> {
-                    // 刷新 Git 状态栏
-                    gitStatusViewModel.refresh(bibFilePath);
+                    //                    // 刷新 Git 状态栏
+                    //                    gitStatusViewModel.refresh(bibFilePath);
 
                     if (fr.isUpToDate()) {
                         dialogService.showInformationDialogAndWait(
@@ -111,29 +112,29 @@ public class GitPullAction extends SimpleCommand {
                         );
                     }
                 })
-                .onFailure(exception -> showPullError(exception))
+                .onFailure(this::showPullError)
                 .executeWith(taskExecutor);
-//                .onSuccess(result -> {
-//                    if (result.noop()) {
-//                        dialogService.showInformationDialogAndWait(
-//                                Localization.lang("Git Pull"),
-//                                Localization.lang("Already up to date.")
-//                        );
-//                    } else if (result.isSuccessful()) {
-//                        try {
-//                            replaceWithMergedEntries(result.getMergedEntries(), activeDatabase);
-//                            gitStatusViewModel.refresh(bibFilePath);
-//                            dialogService.showInformationDialogAndWait(
-//                                    Localization.lang("Git Pull"),
-//                                    Localization.lang("Merged and updated."));
-//                        } catch (IOException | JabRefException ex) {
-//                            showPullError(ex);
-//                        }
-//                    }
-//                })
+        //                .onSuccess(result -> {
+        //                    if (result.noop()) {
+        //                        dialogService.showInformationDialogAndWait(
+        //                                Localization.lang("Git Pull"),
+        //                                Localization.lang("Already up to date.")
+        //                        );
+        //                    } else if (result.isSuccessful()) {
+        //                        try {
+        //                            replaceWithMergedEntries(result.getMergedEntries(), activeDatabase);
+        //                            gitStatusViewModel.refresh(bibFilePath);
+        //                            dialogService.showInformationDialogAndWait(
+        //                                    Localization.lang("Git Pull"),
+        //                                    Localization.lang("Merged and updated."));
+        //                        } catch (IOException | JabRefException ex) {
+        //                            showPullError(ex);
+        //                        }
+        //                    }
+        //                })
     }
 
-    private FinalizeResult doPull(BibDatabaseContext databaseContext, Path bibPath, StateManager stateManager, GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
+    private FinalizeResult doPull(BibDatabaseContext databaseContext, Path bibPath, GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
         GitSyncService gitSyncService = buildSyncService(registry);
         GitHandler handler = registry.get(bibPath.getParent());
         String user = guiPreferences.getGitPreferences().getUsername();
@@ -175,6 +176,7 @@ public class GitPullAction extends SimpleCommand {
     }
 
     // ------------------- helpers: memory mutations -------------------
+
     /**
      * Apply (remote - base) patches safely into the in-memory DB, plus safe new/deleted entries.
      * We intentionally mutate MEMORY first so we can run the same save path as a manual save afterwards.
@@ -251,15 +253,15 @@ public class GitPullAction extends SimpleCommand {
                 new DefaultMergeBookkeeper(handlerRegistry)
         );
     }
-//
-//    // TODO: 看一下这个职责应该给谁；检查参数
-//    private GitSyncService buildSyncService(Path bibPath, GitHandlerRegistry handlerRegistry) throws JabRefException {
-//        GitConflictResolverDialog dialog = new GitConflictResolverDialog(dialogService, guiPreferences);
-//        GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(dialog);
-//        GitSemanticMergePlanner mergeExecutor = new GitSemanticMergeExecutorImpl(guiPreferences.getImportFormatPreferences());
-//
-//        return new GitSyncService(guiPreferences.getImportFormatPreferences(), handlerRegistry, resolver, mergeExecutor);
-//    }
+    //
+    //    // TODO: 看一下这个职责应该给谁；检查参数
+    //    private GitSyncService buildSyncService(Path bibPath, GitHandlerRegistry handlerRegistry) throws JabRefException {
+    //        GitConflictResolverDialog dialog = new GitConflictResolverDialog(dialogService, guiPreferences);
+    //        GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(dialog);
+    //        GitSemanticMergePlanner mergeExecutor = new GitSemanticMergeExecutorImpl(guiPreferences.getImportFormatPreferences());
+    //
+    //        return new GitSyncService(guiPreferences.getImportFormatPreferences(), handlerRegistry, resolver, mergeExecutor);
+    //    }
 
     private void showPullError(Throwable exception) {
         if (exception instanceof JabRefException e) {
@@ -286,17 +288,6 @@ public class GitPullAction extends SimpleCommand {
                     Localization.lang("Unexpected error: %0", exception.getLocalizedMessage()),
                     exception
             );
-        }
-    }
-
-    private void replaceWithMergedEntries(List<BibEntry> mergedEntries, BibDatabaseContext databaseContext) throws IOException, JabRefException {
-        List<BibEntry> currentEntries = List.copyOf(databaseContext.getDatabase().getEntries());
-        for (BibEntry entry : currentEntries) {
-            databaseContext.getDatabase().removeEntry(entry);
-        }
-
-        for (BibEntry entry : mergedEntries) {
-            databaseContext.getDatabase().insertEntry(new BibEntry(entry));
         }
     }
 }

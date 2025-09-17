@@ -446,23 +446,23 @@ public class JabRefDialogService implements DialogService {
         LOGGER.info(message);
 
         UiTaskExecutor.runInJavaFXThread(() ->
-            Notifications.create()
-                         .text(message)
-                         .position(Pos.BOTTOM_CENTER)
-                         .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
-                         .owner(mainWindow)
-                         .threshold(5,
-                            Notifications.create()
-                                         .title(Localization.lang("Last notification"))
-                                         .text(
-                                            "(" + Localization.lang("Check the event log to see all notifications") + ")"
-                                            + "\n\n" + message)
-                                         .onAction(e -> {
-                                            ErrorConsoleAction ec = new ErrorConsoleAction();
-                                            ec.execute();
-                                         }))
-                         .hideCloseButton()
-                         .show());
+                Notifications.create()
+                             .text(message)
+                             .position(Pos.BOTTOM_CENTER)
+                             .hideAfter(TOAST_MESSAGE_DISPLAY_TIME)
+                             .owner(mainWindow)
+                             .threshold(5,
+                                     Notifications.create()
+                                                  .title(Localization.lang("Last notification"))
+                                                  .text(
+                                                          "(" + Localization.lang("Check the event log to see all notifications") + ")"
+                                                                  + "\n\n" + message)
+                                                  .onAction(e -> {
+                                                      ErrorConsoleAction ec = new ErrorConsoleAction();
+                                                      ec.execute();
+                                                  }))
+                             .hideCloseButton()
+                             .show());
     }
 
     @Override
@@ -526,11 +526,11 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public void showCustomDialog(BaseDialog<?> aboutDialogView) {
-        if (aboutDialogView.getOwner() == null) {
-            aboutDialogView.initOwner(mainWindow);
+    public void showCustomDialog(BaseDialog<?> dialogView) {
+        if (dialogView.getOwner() == null) {
+            dialogView.initOwner(mainWindow);
         }
-        aboutDialogView.show();
+        dialogView.show();
     }
 
     @Override

@@ -31,6 +31,7 @@ public class CitationCountEditorViewModel extends AbstractEditorViewModel {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
     private final SearchCitationsRelationsService searchCitationsRelationsService;
+
     public CitationCountEditorViewModel(
             Field field,
             SuggestionProvider<?> suggestionProvider,

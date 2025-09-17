@@ -82,7 +82,7 @@ public class FromAuxDialogViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
-                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory()).build();
+                .withInitialDirectory(auxFileProperty.get() == null ? preferences.getFilePreferences().getWorkingDirectory().toString() : auxFileProperty.get()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> auxFileProperty.setValue(file.toAbsolutePath().toString()));
     }
 

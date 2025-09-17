@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +36,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.types.EntryType;
 
 import org.jooq.lambda.Unchecked;
@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
 public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialogViewModel.class);
-    private static final int EXTRA_COLUMNS_COUNT = 2;
 
     private final BibliographyConsistencyCheck.Result result;
     private final DialogService dialogService;
@@ -54,7 +53,6 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     private final BibEntryTypesManager entryTypesManager;
 
     private final List<Field> allReportedFields;
-    private final int columnCount;
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
     private final StringProperty selectedEntryType = new SimpleStringProperty();
 
@@ -68,11 +66,10 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         this.result = result;
 
         this.allReportedFields = result.entryTypeToResultMap().values().stream()
-                                  .flatMap(entryTypeResult -> entryTypeResult.fields().stream())
-                                  .sorted(Comparator.comparing(Field::getName))
-                                  .distinct()
-                                  .toList();
-        this.columnCount = getColumnNames().size();
+                                       .flatMap(entryTypeResult -> entryTypeResult.fields().stream())
+                                       .sorted(Comparator.comparing(Field::getName))
+                                       .distinct()
+                                       .toList();
 
         result.entryTypeToResultMap().entrySet().stream()
               .sorted(Comparator.comparing(entry -> entry.getKey().getName()))
@@ -93,11 +90,11 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         return tableData;
     }
 
-    public Set<String> getColumnNames() {
-        Set<String> result = LinkedHashSet.newLinkedHashSet(columnCount + EXTRA_COLUMNS_COUNT);
+    public List<String> getColumnNames() {
+        List<String> result = new ArrayList<>(allReportedFields.size() + 2); // there are two extra columns
         result.add("Entry Type");
         result.add("CitationKey");
-        allReportedFields.forEach(field-> result.add(field.getDisplayName().trim()));
+        allReportedFields.forEach(field -> result.add(FieldTextMapper.getDisplayName(field).trim()));
         return result;
     }
 
@@ -123,14 +120,14 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         SequencedCollection<BibEntry> bibEntries = entries.sortedEntries();
 
         bibEntries.forEach(Unchecked.consumer(bibEntry ->
-            writeBibEntry(bibEntry, entryType, requiredFields, optionalFields)
+                writeBibEntry(bibEntry, entryType, requiredFields, optionalFields)
         ));
     }
 
     private void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
         List<String> theRecord = getFindingsAsList(bibEntry, entryType, requiredFields, optionalFields);
         List<String> message = new ArrayList<>();
-        for (String s: theRecord) {
+        for (String s : theRecord) {
             String modifiedString = s.replaceAll("\\s+", " ");
             message.add(modifiedString);
         }
@@ -138,19 +135,19 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     }
 
     private List<String> getFindingsAsList(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
-        List<String> result = new ArrayList<>(columnCount + EXTRA_COLUMNS_COUNT);
+        List<String> result = new ArrayList<>(allReportedFields.size() + 2);
         result.add(entryType);
         result.add(bibEntry.getCitationKey().orElse(""));
         allReportedFields.forEach(field ->
-            result.add(bibEntry.getField(field).map(_ -> {
-                if (requiredFields.contains(field)) {
-                    return ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
-                } else if (optionalFields.contains(field)) {
-                    return ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
-                } else {
-                    return ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
-                }
-            }).orElse(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText()))
+                result.add(bibEntry.getField(field).map(_ -> {
+                    if (requiredFields.contains(field)) {
+                        return ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
+                    } else if (optionalFields.contains(field)) {
+                        return ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
+                    } else {
+                        return ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
+                    }
+                }).orElse(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText()))
         );
         return result;
     }

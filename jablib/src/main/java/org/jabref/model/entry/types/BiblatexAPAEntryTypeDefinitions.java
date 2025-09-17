@@ -35,9 +35,9 @@ public class BiblatexAPAEntryTypeDefinitions {
             .build();
 
     private static final BibEntryType LEGAL = new BibEntryTypeBuilder()
-        .withType(BiblatexApaEntryType.Legal)
-        .withRequiredFields(StandardField.TITLE, StandardField.DATE, StandardField.URI, StandardField.KEYWORDS, StandardField.PART, BiblatexApaField.SECTION)
-        .build();
+            .withType(BiblatexApaEntryType.Legal)
+            .withRequiredFields(StandardField.TITLE, StandardField.DATE, StandardField.URI, StandardField.KEYWORDS, StandardField.PART, BiblatexApaField.SECTION)
+            .build();
 
     public static final List<BibEntryType> ALL = Arrays.asList(JURISDICTION, LEGISLATION, LEGADMINMATERIAL, CONSTITUTION, LEGAL);
 }

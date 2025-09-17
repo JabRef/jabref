@@ -65,8 +65,8 @@ public class SemanticConflictDetector {
      * Detect entry-level conflicts among base, local, and remote versions of an entry.
      * <p>
      *
-     * @param base the entry in the common ancestor
-     * @param local the entry in the local version
+     * @param base   the entry in the common ancestor
+     * @param local  the entry in the local version
      * @param remote the entry in the remote version
      * @return optional conflict (if detected)
      */
@@ -180,7 +180,7 @@ public class SemanticConflictDetector {
      * This plan is meant to be applied to local during computeMergePlan:
      * result = local + (remote − base)
      *
-     * @param base The base version of the database.
+     * @param base   The base version of the database.
      * @param remote The remote version to be merged.
      * @return A {@link MergePlan} describing how to update the local copy with remote changes.
      */

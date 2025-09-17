@@ -2,6 +2,7 @@ package org.jabref.logic.git.conflicts;
 
 import java.util.List;
 
+import org.jabref.logic.git.GitSyncService;
 import org.jabref.model.entry.BibEntry;
 
 /// Strategy interface for resolving semantic entry-level conflicts during Git merges.
@@ -17,7 +18,7 @@ public interface GitConflictResolverStrategy {
      *
      * @param conflicts the list of detected three-way entry conflicts
      * @return the modified BibDatabaseContext containing resolved entries,
-     *         or empty if user canceled computeMergePlan or CLI refuses to computeMergePlan.
+     * or empty if user canceled merge or CLI refuses to merge.
      */
     List<BibEntry> resolveConflicts(List<ThreeWayEntryConflict> conflicts);
 }

@@ -32,7 +32,6 @@ import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
 public class SaveOrderConfigPanel extends VBox {
-
     @FXML private RadioButton exportInSpecifiedOrder;
     @FXML private RadioButton exportInTableOrder;
     @FXML private RadioButton exportInOriginalOrder;
@@ -61,8 +60,8 @@ public class SaveOrderConfigPanel extends VBox {
         viewModel.sortCriteriaProperty().addListener((ListChangeListener<SortCriterionViewModel>) change -> {
             while (change.next()) {
                 if (change.wasReplaced()) {
-                        clearCriterionRow(change.getFrom());
-                        createCriterionRow(change.getAddedSubList().getFirst(), change.getFrom());
+                    clearCriterionRow(change.getFrom());
+                    createCriterionRow(change.getAddedSubList().getFirst(), change.getFrom());
                 } else if (change.wasAdded()) {
                     for (SortCriterionViewModel criterionViewModel : change.getAddedSubList()) {
                         int row = change.getFrom() + change.getAddedSubList().indexOf(criterionViewModel);

@@ -17,6 +17,7 @@ import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -28,7 +29,6 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpDOI;
     @FXML private CheckBox cleanUpEprint;
     @FXML private CheckBox cleanUpURL;
-    @FXML private CheckBox cleanUpISSN;
     @FXML private CheckBox cleanUpMovePDF;
     @FXML private CheckBox cleanUpMakePathsRelative;
     @FXML private CheckBox cleanUpRenamePDF;
@@ -66,7 +66,7 @@ public class CleanupPresetPanel extends VBox {
 
         cleanUpRenamePDFonlyRelativePaths.disableProperty().bind(cleanUpRenamePDF.selectedProperty().not());
 
-        cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
+        cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", FieldTextMapper.getDisplayName(StandardField.FILE)));
 
         String currentPattern = Localization.lang("Filename format pattern (from preferences)")
                                             .concat(filePreferences.getFileNamePattern());
@@ -117,7 +117,6 @@ public class CleanupPresetPanel extends VBox {
         cleanUpTimestampToCreationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
-        cleanUpISSN.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN));
         formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFieldFormatterCleanups().isEnabled());
         formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFieldFormatterCleanups().getConfiguredActions()));
     }
@@ -136,9 +135,6 @@ public class CleanupPresetPanel extends VBox {
         }
         if (cleanUpURL.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_URL);
-        }
-        if (cleanUpISSN.isSelected()) {
-            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
         }
         if (cleanUpMakePathsRelative.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE);

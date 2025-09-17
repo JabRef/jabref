@@ -37,6 +37,7 @@ import org.jabref.languageserver.controller.LanguageServerController;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -84,6 +85,7 @@ public class JabRefGUI extends Application {
     private static ClipBoardManager clipBoardManager;
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
+    private static GitHandlerRegistry gitHandlerRegistry;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
@@ -119,7 +121,8 @@ public class JabRefGUI extends Application {
                 countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
                 clipBoardManager,
-                taskExecutor);
+                taskExecutor,
+                gitHandlerRegistry);
 
         openWindow();
 
@@ -157,6 +160,9 @@ public class JabRefGUI extends Application {
         DirectoryMonitor directoryMonitor = new DirectoryMonitor();
         Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
 
+        gitHandlerRegistry = new GitHandlerRegistry();
+        Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
+
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
         JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
@@ -181,8 +187,8 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.themeManager = new ThemeManager(
                 preferences.getWorkspacePreferences(),
-                fileUpdateMonitor,
-                Runnable::run);
+                fileUpdateMonitor
+        );
         Injector.setModelOrService(ThemeManager.class, themeManager);
 
         JabRefGUI.countingUndoManager = new CountingUndoManager();
@@ -320,7 +326,7 @@ public class JabRefGUI extends Application {
 
         // Open last edited databases
         if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)
-            && preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
+                && preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
             mainFrame.openLastEditedDatabases();
         }
 

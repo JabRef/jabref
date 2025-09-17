@@ -163,6 +163,8 @@ dependencies {
     implementation("dev.langchain4j:langchain4j-mistral-ai")
     implementation("dev.langchain4j:langchain4j-google-ai-gemini")
     implementation("dev.langchain4j:langchain4j-hugging-face")
+    implementation("dev.langchain4j:langchain4j-http-client")
+    implementation("dev.langchain4j:langchain4j-http-client-jdk")
 
     implementation("org.apache.velocity:velocity-engine-core")
     implementation("ai.djl:api")
@@ -350,6 +352,7 @@ val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
 val scienceDirectApiKey = providers.environmentVariable("SCIENCEDIRECTAPIKEY").orElse("")
 val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
 val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
+val medlineApiKey = providers.environmentVariable("MedlineApiKey").orElse("")
 
 tasks.named<ProcessResources>("processResources") {
     dependsOn(extractMaintainers)
@@ -368,6 +371,7 @@ tasks.named<ProcessResources>("processResources") {
     inputs.property("scienceDirectApiKey", scienceDirectApiKey)
     inputs.property("biodiversityHeritageApiKey", biodiversityHeritageApiKey)
     inputs.property("semanticScholarApiKey", semanticScholarApiKey)
+    inputs.property("medlineApiKey", medlineApiKey)
 
     filesMatching("build.properties") {
         expand(
@@ -381,7 +385,8 @@ tasks.named<ProcessResources>("processResources") {
                 "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
                 "scienceDirectApiKey" to inputs.properties["scienceDirectApiKey"],
                 "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
-                "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"]
+                "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"],
+                "medlineApiKey" to inputs.properties["medlineApiKey"]
             )
         )
     }
@@ -420,7 +425,8 @@ tasks.test {
     jvmArgs = listOf(
         "-javaagent:${mockitoAgent.asPath}",
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
-        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io"
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
+        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
 }
 
@@ -431,25 +437,30 @@ jmh {
     zip64  = true
 }
 
+val testSourceSet = sourceSets["test"]
+
 tasks.register<Test>("fetcherTest") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
         includeTags("FetcherTest")
     }
-
     maxParallelForks = 1
 }
 
 tasks.register<Test>("databaseTest") {
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = testSourceSet.output.classesDirs
+    classpath = testSourceSet.runtimeClasspath
     useJUnitPlatform {
         includeTags("DatabaseTest")
     }
-
     testLogging {
         // set options for log level LIFECYCLE
         events("FAILED")
         exceptionFormat = TestExceptionFormat.FULL
     }
-
     maxParallelForks = 1
 }
 

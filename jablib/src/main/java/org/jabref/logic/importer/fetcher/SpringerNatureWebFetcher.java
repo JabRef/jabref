@@ -32,19 +32,17 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Fetches data from the Springer
- *
- * @see <a href="https://dev.springernature.com/">API documentation</a> for more details
- */
+/// Fetches data from Springer Nature
+///
+/// See <https://dev.springernature.com/docs/api-endpoints/meta-api/?source=jabref> for more information
 public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Springer";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerNatureWebFetcher.class);
 
-    private static final String API_URL = "https://api.springernature.com/meta/v1/json";
+    private static final String API_URL = "https://api.springernature.com/meta/v2/json";
     // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
-    private static final String TEST_URL_WITHOUT_API_KEY = "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=";
+    private static final String TEST_URL_WITHOUT_API_KEY = "https://api.springernature.com/meta/v2/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=";
 
     private final ImporterPreferences importerPreferences;
 
@@ -53,7 +51,7 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
     }
 
     /**
-     * Convert a JSONObject obtained from <a href="http://api.springer.com/metadata/json">http://api.springer.com/metadata/json</a> to a BibEntry
+     * Convert a JSONObject obtained from <a href="https://dev.springernature.com/docs/api-endpoints/metadata-api/?source=jabref">the Metadata API</a> to a BibEntry
      *
      * @param springerJsonEntry the JSONObject from search results
      * @return the converted BibEntry
@@ -177,8 +175,8 @@ public class SpringerNatureWebFetcher implements PagedSearchBasedParserFetcher, 
     /**
      * Gets the query URL
      *
-     * @param queryNode the search query
-     * @param pageNumber  the number of the page indexed from 0
+     * @param queryNode  the search query
+     * @param pageNumber the number of the page indexed from 0
      * @return URL
      */
     @Override

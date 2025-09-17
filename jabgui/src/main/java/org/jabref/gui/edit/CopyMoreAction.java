@@ -69,7 +69,8 @@ public class CopyMoreAction extends SimpleCommand {
                     copyKeyAndTitle();
             case COPY_CITATION_KEY_AND_LINK ->
                     copyKeyAndLink();
-            case COPY_DOI, COPY_DOI_URL ->
+            case COPY_DOI,
+                 COPY_DOI_URL ->
                     copyDoi();
             case COPY_FIELD_AUTHOR ->
                     copyField(StandardField.AUTHOR, Localization.lang("Author"));
