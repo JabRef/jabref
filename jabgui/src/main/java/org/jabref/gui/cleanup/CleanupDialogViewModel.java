@@ -92,9 +92,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
             return;
         }
 
-        List<BibEntry> entriesToProcess = targetEntries.isEmpty()
-                ? List.copyOf(stateManager.getSelectedEntries())
-                : targetEntries;
+        List<BibEntry> entriesToProcess = targetEntries.isEmpty() ? List.copyOf(stateManager.getSelectedEntries()) : targetEntries;
 
         if (entriesToProcess.isEmpty()) { // None selected. Inform the user to select entries first.
             dialogService.showInformationDialogAndWait(Localization.lang("Cleanup entry"), Localization.lang("First select entries to clean up.")
