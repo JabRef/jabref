@@ -27,6 +27,7 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.field.FieldTextMapper;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.airhacks.afterburner.views.ViewLoaderResult;
@@ -97,7 +98,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                 .install(messagesTable);
         messagesTable.setItems(viewModel.getMessages());
         keyColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().entry().getCitationKey().orElse("")));
-        fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().field().getDisplayName()));
+        fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(FieldTextMapper.getDisplayName(row.getValue().field())));
         messageColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().message()));
 
         new ValueTableCellFactory<IntegrityMessage, String>()
@@ -175,7 +176,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
      * Called on:
      * (1) Dialog initialization (default load)
      * (2) User triggers Browse or Reset in BibLogSettingsPane
-     *
+     * <p>
      * This reloads .blg warnings and merges them into the main message list.
      */
     private void reloadBlgWarnings() {

@@ -68,8 +68,11 @@ gradle.properties
 
 
 # IntelliJ IDEA
-.idea/*
-!.idea/runConfigurations/
+!.idea/codeStyles
+!.idea/.gitignore
+!.idea/checkstyle-idea.xml
+!.idea/vcs.xml
+.idea
 *.ipr
 *.iml
 

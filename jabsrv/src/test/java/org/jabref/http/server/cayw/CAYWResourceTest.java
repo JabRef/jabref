@@ -25,7 +25,8 @@ class CAYWResourceTest extends ServerTest {
         addFormatterServiceToResourceConfig(resourceConfig);
 
         resourceConfig.register(new AbstractBinder() {
-            @Override protected void configure() {
+            @Override
+            protected void configure() {
                 SrvStateManager mockSrv = Mockito.mock(SrvStateManager.class);
                 BibEntry bibEntry = new BibEntry().withCitationKey("Author2023test");
                 Mockito.when(mockSrv.getSelectedEntries()).thenReturn(FXCollections.observableArrayList(bibEntry));

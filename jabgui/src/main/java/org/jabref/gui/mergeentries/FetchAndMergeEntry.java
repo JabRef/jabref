@@ -13,7 +13,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -30,6 +30,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 
@@ -79,12 +80,11 @@ public class FetchAndMergeEntry {
                 fetcher.ifPresent(idBasedFetcher -> BackgroundTask.wrap(() -> idBasedFetcher.performSearchById(fieldContent.get()))
                                                                   .onSuccess(fetchedEntry -> {
                                                                       ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
-                                                                      String type = field.getDisplayName();
                                                                       if (fetchedEntry.isPresent()) {
                                                                           cleanup.doPostCleanup(fetchedEntry.get());
                                                                           showMergeDialog(entry, fetchedEntry.get(), idBasedFetcher);
                                                                       } else {
-                                                                          dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
+                                                                          dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", FieldTextMapper.getDisplayName(field), fieldContent.get()));
                                                                       }
                                                                   })
                                                                   .onFailure(exception -> {
@@ -99,7 +99,7 @@ public class FetchAndMergeEntry {
                                                                   })
                                                                   .executeWith(taskExecutor));
             } else {
-                dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
+                dialogService.notify(Localization.lang("No %0 found", FieldTextMapper.getDisplayName(field)));
             }
         }
     }
@@ -113,7 +113,7 @@ public class FetchAndMergeEntry {
         Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog).map(EntriesMergeResult::mergedEntry);
 
         if (mergedEntry.isPresent()) {
-            NamedCompound ce = new NamedCompound(Localization.lang("Merge entry with %0 information", fetcher.getName()));
+            NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entry with %0 information", fetcher.getName()));
 
             // Updated the original entry with the new fields
             Set<Field> jointFields = new TreeSet<>(Comparator.comparing(Field::getName));
@@ -128,7 +128,7 @@ public class FetchAndMergeEntry {
 
             if (!oldType.equals(newType)) {
                 originalEntry.setType(newType);
-                ce.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
+                compoundEdit.addEdit(new UndoableChangeType(originalEntry, oldType, newType));
                 edited = true;
             }
 
@@ -138,7 +138,7 @@ public class FetchAndMergeEntry {
                 Optional<String> mergedString = mergedEntry.get().getField(field);
                 if (originalString.isEmpty() || !originalString.equals(mergedString)) {
                     originalEntry.setField(field, mergedString.get()); // mergedString always present
-                    ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.orElse(null),
+                    compoundEdit.addEdit(new UndoableFieldChange(originalEntry, field, originalString.orElse(null),
                             mergedString.get()));
                     edited = true;
                 }
@@ -149,14 +149,14 @@ public class FetchAndMergeEntry {
                 if (!jointFields.contains(field) && !FieldFactory.isInternalField(field)) {
                     Optional<String> originalString = originalEntry.getField(field);
                     originalEntry.clearField(field);
-                    ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.get(), null)); // originalString always present
+                    compoundEdit.addEdit(new UndoableFieldChange(originalEntry, field, originalString.get(), null)); // originalString always present
                     edited = true;
                 }
             }
 
             if (edited) {
-                ce.end();
-                undoManager.addEdit(ce);
+                compoundEdit.end();
+                undoManager.addEdit(compoundEdit);
                 dialogService.notify(Localization.lang("Updated entry with info from %0", fetcher.getName()));
             } else {
                 dialogService.notify(Localization.lang("No information added"));

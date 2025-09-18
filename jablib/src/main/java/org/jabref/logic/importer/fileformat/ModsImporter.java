@@ -130,8 +130,10 @@ public class ModsImporter extends Importer implements Parser {
                             entry.setType(EntryTypeFactory.parse(mapGenre(reader.getText())));
                         }
                     }
-                    case "language" -> parseLanguage(reader, fields);
-                    case "location" -> parseLocationAndUrl(reader, fields);
+                    case "language" ->
+                            parseLanguage(reader, fields);
+                    case "location" ->
+                            parseLocationAndUrl(reader, fields);
                     case "identifier" -> {
                         String type = reader.getAttributeValue(null, "type");
                         reader.next();
@@ -145,12 +147,18 @@ public class ModsImporter extends Importer implements Parser {
                             notes.add(reader.getText());
                         }
                     }
-                    case "recordInfo" -> parseRecordInfo(reader, fields);
-                    case "titleInfo" -> parseTitle(reader, fields);
-                    case "subject" -> parseSubject(reader, fields, keywords);
-                    case "originInfo" -> parseOriginInfo(reader, fields);
-                    case "name" -> parseName(reader, fields, authors);
-                    case "relatedItem" -> parseRelatedItem(reader, fields);
+                    case "recordInfo" ->
+                            parseRecordInfo(reader, fields);
+                    case "titleInfo" ->
+                            parseTitle(reader, fields);
+                    case "subject" ->
+                            parseSubject(reader, fields, keywords);
+                    case "originInfo" ->
+                            parseOriginInfo(reader, fields);
+                    case "name" ->
+                            parseName(reader, fields, authors);
+                    case "relatedItem" ->
+                            parseRelatedItem(reader, fields);
                 }
             }
 
@@ -181,8 +189,10 @@ public class ModsImporter extends Importer implements Parser {
                             putIfValueNotNull(fields, StandardField.JOURNAL, reader.getText());
                         }
                     }
-                    case "detail" -> handleDetail(reader, fields);
-                    case "extent" -> handleExtent(reader, fields);
+                    case "detail" ->
+                            handleDetail(reader, fields);
+                    case "extent" ->
+                            handleExtent(reader, fields);
                 }
             }
 
@@ -323,7 +333,10 @@ public class ModsImporter extends Importer implements Parser {
                             putIfValueNotNull(fields, StandardField.EDITION, reader.getText());
                         }
                     }
-                    case "dateIssued", "dateCreated", "dateCaptured", "dateModified" -> {
+                    case "dateIssued",
+                         "dateCreated",
+                         "dateCaptured",
+                         "dateModified" -> {
                         reader.next();
                         if (isCharacterXMLEvent(reader)) {
                             putDate(fields, elementName, reader.getText());
@@ -472,11 +485,19 @@ public class ModsImporter extends Importer implements Parser {
 
     private String mapGenre(String genre) {
         return switch (genre.toLowerCase(Locale.ROOT)) {
-            case "conference publication" -> "proceedings";
-            case "database" -> "dataset";
-            case "yearbook", "handbook" -> "book";
-            case "law report or digest", "technical report", "reporting" -> "report";
-            default -> genre;
+            case "conference publication" ->
+                    "proceedings";
+            case "database" ->
+                    "dataset";
+            case "yearbook",
+                 "handbook" ->
+                    "book";
+            case "law report or digest",
+                 "technical report",
+                 "reporting" ->
+                    "report";
+            default ->
+                    genre;
         };
     }
 
@@ -499,20 +520,22 @@ public class ModsImporter extends Importer implements Parser {
                             .ifPresent(parsedDate -> fields.put(StandardField.DATE, parsedDate.getNormalized()));
 
                     optionalParsedDate.flatMap(Date::getYear)
-                            .ifPresent(year -> fields.put(StandardField.YEAR, year.toString()));
+                                      .ifPresent(year -> fields.put(StandardField.YEAR, year.toString()));
 
                     optionalParsedDate.flatMap(Date::getMonth)
-                            .ifPresent(month -> fields.put(StandardField.MONTH, month.getJabRefFormat()));
+                                      .ifPresent(month -> fields.put(StandardField.MONTH, month.getJabRefFormat()));
                 }
                 case "dateCreated" -> {
                     // If there was no year in date issued, then take the year from date created
                     fields.computeIfAbsent(StandardField.YEAR, k -> date.substring(0, 4));
                     fields.put(new UnknownField("created"), date);
                 }
-                case "dateCaptured" -> optionalParsedDate
-                        .ifPresent(parsedDate -> fields.put(StandardField.CREATIONDATE, parsedDate.getNormalized()));
-                case "dateModified" -> optionalParsedDate
-                        .ifPresent(parsedDate -> fields.put(StandardField.MODIFICATIONDATE, parsedDate.getNormalized()));
+                case "dateCaptured" ->
+                        optionalParsedDate
+                                .ifPresent(parsedDate -> fields.put(StandardField.CREATIONDATE, parsedDate.getNormalized()));
+                case "dateModified" ->
+                        optionalParsedDate
+                                .ifPresent(parsedDate -> fields.put(StandardField.MODIFICATIONDATE, parsedDate.getNormalized()));
             }
         }
     }

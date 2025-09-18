@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests based on a BibEntry are contained in {@link CitationKeyGeneratorTest}
- *
+ * <p>
  * "Complete" entries are tested at {@link org.jabref.logic.citationkeypattern.MakeLabelWithDatabaseTest}
  */
 @Execution(ExecutionMode.CONCURRENT)
@@ -624,7 +624,6 @@ class BracketedPatternTest {
             "'CamelTitleFormatter', 'cAMEL tITLE fORMATTER'",
             "'C', 'c'"
     })
-
     void expandBracketsCamelTitleModifier(String expectedCitationKey, String title) {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.TITLE, title);
@@ -641,7 +640,6 @@ class BracketedPatternTest {
             "'V', 'V'",
             "'V', 'A v'"
     })
-
     void expandBracketsVeryShortTitleModifier(String expectedCitationKey, String title) {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.TITLE, title);
@@ -659,7 +657,6 @@ class BracketedPatternTest {
             "'Title', 'A title'",
             "'Title', 'A Title'"
     })
-
     void expandBracketsShortTitleModifier(String expectedCitationKey, String title) {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.TITLE, title);
@@ -853,7 +850,6 @@ class BracketedPatternTest {
 
             "'EUASA', '[editors]', '{European Union Aviation Safety Agency}'"
     })
-
     void editorFieldMarkers(String expectedCitationKey, String pattern, String editor) {
         BibEntry bibEntry = new BibEntry().withField(StandardField.EDITOR, editor);
         BracketedPattern bracketedPattern = new BracketedPattern(pattern);
@@ -862,22 +858,21 @@ class BracketedPatternTest {
 
     @ParameterizedTest
     @CsvSource({
-        "'', ''",
-        "The Attributed Graph Grammar System ({AGG}),AGG",
-        "'The University of Science',UniScience",
-        "'School of Business, Department of Management',BM",
-        "'Graph Systems Research Group',GSRG",
-        "'The Great Institute, 123 Main Street, Springfield',GreatInstitute",
-        "'Invalid {\\Unicode}',Invalid",
-        "'School of Electrical Engineering ({SEE}), Department of Computer Science',SEE",
-        "'{The Attributed Graph Grammar System ({AGG})}',AGG",
-        "'{The Attributed Graph Grammar System}',AGGS",
-        "'{University of Example, Department of Computer Science, Some Address}',UniExampleCS",
-        "'{Example School of Engineering, Department of Computer Science, Some Address}',SomeAddressEECS",
-        "'{Example Institute, Computer Science Department, Some Address}',ExampleInstituteCS",
-        "'{Short Part, Some Address}',ShortPart",
-        "'{Example with Several Tokens, Some Address}',EST"})
-
+            "'', ''",
+            "The Attributed Graph Grammar System ({AGG}),AGG",
+            "'The University of Science',UniScience",
+            "'School of Business, Department of Management',BM",
+            "'Graph Systems Research Group',GSRG",
+            "'The Great Institute, 123 Main Street, Springfield',GreatInstitute",
+            "'Invalid {\\Unicode}',Invalid",
+            "'School of Electrical Engineering ({SEE}), Department of Computer Science',SEE",
+            "'{The Attributed Graph Grammar System ({AGG})}',AGG",
+            "'{The Attributed Graph Grammar System}',AGGS",
+            "'{University of Example, Department of Computer Science, Some Address}',UniExampleCS",
+            "'{Example School of Engineering, Department of Computer Science, Some Address}',SomeAddressEECS",
+            "'{Example Institute, Computer Science Department, Some Address}',ExampleInstituteCS",
+            "'{Short Part, Some Address}',ShortPart",
+            "'{Example with Several Tokens, Some Address}',EST"})
     void generateInstitutionKeyTest(String input, String expected) {
         assertEquals(expected, BracketedPattern.generateInstitutionKey(input));
     }

@@ -99,7 +99,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
     /**
      * Creates an instance of {@link LinkedFile} based on the given file.
      * We try to guess the file type and relativize the path against the given file directories.
-     *
+     * <p>
      * TODO: Move this method to {@link LinkedFile} as soon as {@link CustomExternalFileType} lives in model.
      */
     public static LinkedFile fromFile(Path file, List<Path> fileDirectories, ExternalApplicationsPreferences externalApplicationsPreferences) {
