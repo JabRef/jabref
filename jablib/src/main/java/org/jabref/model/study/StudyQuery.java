@@ -39,20 +39,12 @@ public class StudyQuery {
         this.query = query;
     }
 
-    public String getDescription() {
-        return description;
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getLucene() {
-        return lucene;
-    }
-
-    public void setLucene(String lucene) {
-        this.lucene = lucene;
+    public Optional<String> getLucene() {
+        return Optional.ofNullable(lucene);
     }
 
     public Optional<Map<String, String>> getCatalogSpecific() {

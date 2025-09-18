@@ -56,21 +56,31 @@ public class StudyYamlService {
         parser.writeStudyYamlFile(study, studyYamlFile);
     }
 
-    /**
-     * Check if file needs migration by detecting version
-     */
-    private boolean needsMigration(Path studyYamlFile) throws IOException {
+    private Optional<String> getVersionFromFile(Path studyYamlFile) throws IOException {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
         try (InputStream fileInputStream = Files.newInputStream(studyYamlFile)) {
             JsonNode rootNode = yamlMapper.readTree(fileInputStream);
             JsonNode versionNode = rootNode.get("version");
+            return Optional.ofNullable(versionNode).map(JsonNode::asText);
+        }
+    }
 
-            if (versionNode != null) {
-                return !"2.0".equals(versionNode.asText());
-            }
+    /**
+     * Check if file needs migration by detecting version
+     */
+    private boolean needsMigration(Path studyYamlFile) throws IOException {
+        Optional<String> version = getVersionFromFile(studyYamlFile);
 
-            // If no version field, check for old structure indicators
+        if (version.isPresent()) {
+            return !"2.0".equals(version.get());
+        }
+
+        // If no version field, check for old structure indicators
+        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+
+        try (InputStream fileInputStream = Files.newInputStream(studyYamlFile)) {
+            JsonNode rootNode = yamlMapper.readTree(fileInputStream);
             return rootNode.has("databases") && !rootNode.has("catalogs");
         }
     }
