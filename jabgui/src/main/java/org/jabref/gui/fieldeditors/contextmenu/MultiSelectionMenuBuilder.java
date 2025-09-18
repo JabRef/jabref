@@ -83,8 +83,8 @@ record MultiSelectionMenuBuilder(
             @Override
             public void execute() {
                 var localLinkedFiles = selection.stream()
-                        .filter(MultiSelectionMenuBuilder.this::isLocalAndExists)
-                        .toList();
+                                                .filter(MultiSelectionMenuBuilder.this::isLocalAndExists)
+                                                .toList();
 
                 if (localLinkedFiles.isEmpty()) {
                     return;

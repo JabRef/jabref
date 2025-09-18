@@ -42,12 +42,12 @@ interface SelectionChecks {
 
     default void openContainingFolders(List<LinkedFileViewModel> linkedFileViewModels) {
         Map<Path, List<Path>> filesByDirectory = linkedFileViewModels.stream()
-                .map(linkedFileViewModel -> linkedFileViewModel.getFile().findIn(databaseContext(), preferences().getFilePreferences()))
-                .flatMap(Optional::stream)
-                .collect(Collectors.groupingBy(path -> {
-                    Path parent = path.getParent();
-                    return parent != null ? parent : path;
-                }));
+                                                                     .map(linkedFileViewModel -> linkedFileViewModel.getFile().findIn(databaseContext(), preferences().getFilePreferences()))
+                                                                     .flatMap(Optional::stream)
+                                                                     .collect(Collectors.groupingBy(path -> {
+                                                                         Path parent = path.getParent();
+                                                                         return parent != null ? parent : path;
+                                                                     }));
 
         for (Map.Entry<Path, List<Path>> entry : filesByDirectory.entrySet()) {
             Path fileToSelect = entry.getValue().getFirst();

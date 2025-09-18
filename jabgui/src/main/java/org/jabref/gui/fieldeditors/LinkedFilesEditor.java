@@ -94,8 +94,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         this.fieldCheckers = fieldCheckers;
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
 
         UiThreadObservableList<LinkedFileViewModel> decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
