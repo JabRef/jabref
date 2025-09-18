@@ -1,9 +1,9 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.Optional;
-
-import javax.swing.undo.UndoManager;
-
+import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+import jakarta.inject.Inject;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
@@ -11,26 +11,11 @@ import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.OverrunStyle;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.autocompleter.SuggestionProvider;
@@ -54,28 +39,35 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 
-import com.airhacks.afterburner.views.ViewLoader;
-import com.tobiasdiez.easybind.EasyBind;
-import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
-import jakarta.inject.Inject;
+import javax.swing.undo.UndoManager;
+import java.util.Optional;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
-    @FXML private ListView<LinkedFileViewModel> listView;
-    @FXML private JabRefIconView fulltextFetcher;
-    @FXML private ProgressIndicator progressIndicator;
+    @FXML
+    private ListView<LinkedFileViewModel> listView;
+    @FXML
+    private JabRefIconView fulltextFetcher;
+    @FXML
+    private ProgressIndicator progressIndicator;
 
     private final Field field;
     private final BibDatabaseContext databaseContext;
     private final SuggestionProvider<?> suggestionProvider;
     private final FieldCheckers fieldCheckers;
 
-    @Inject private DialogService dialogService;
-    @Inject private GuiPreferences preferences;
-    @Inject private BibEntryTypesManager bibEntryTypesManager;
-    @Inject private JournalAbbreviationRepository abbreviationRepository;
-    @Inject private TaskExecutor taskExecutor;
-    @Inject private UndoManager undoManager;
+    @Inject
+    private DialogService dialogService;
+    @Inject
+    private GuiPreferences preferences;
+    @Inject
+    private BibEntryTypesManager bibEntryTypesManager;
+    @Inject
+    private JournalAbbreviationRepository abbreviationRepository;
+    @Inject
+    private TaskExecutor taskExecutor;
+    @Inject
+    private UndoManager undoManager;
 
     private LinkedFilesEditorViewModel viewModel;
 

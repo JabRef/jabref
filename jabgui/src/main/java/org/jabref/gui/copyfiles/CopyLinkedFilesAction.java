@@ -60,35 +60,45 @@ public class CopyLinkedFilesAction extends SimpleCommand {
             return;
         }
 
-        List<String> failed = new ArrayList<>();
+        int copiedFiles = 0;
+        int failedCount = 0;
 
         for (LinkedFile file : linkedFiles) {
             Optional<Path> srcOpt = file.findIn(databaseContext, filePreferences);
             if (srcOpt.isEmpty()) {
+                failedCount++;
                 continue;
             }
+
             Path src = srcOpt.get();
             Path dst = resolvePathFilename.apply(exportDir.get(), src);
 
-            boolean success = FileUtil.copyFile(src, dst, false);
-            if (success) {
+            if (FileUtil.copyFile(src, dst, false)) {
                 copiedFiles++;
             } else {
-                failed.add(src.getFileName().toString());
+                failedCount++;
             }
         }
 
         String title = Localization.lang("Copy linked file");
+        String target = exportDir.map(Path::toString).orElse("");
 
         if (linkedFiles.size() == 1) {
-            dialogService.showErrorDialogAndWait(
-                    title,
-                    Localization.lang("Could not copy file to %0, maybe the file is already existing?",
-                            exportDir.map(Path::toString).orElse("")));
+            if (copiedFiles == 1) {
+                dialogService.notify(Localization.lang("Successfully copied %0 file(s) to %1.", copiedFiles, target));
+            } else {
+                dialogService.showErrorDialogAndWait(
+                        title,
+                        Localization.lang("Could not copy file to %0, maybe the file is already existing?", target));
+            }
         } else {
-            dialogService.showErrorDialogAndWait(
-                    title,
-                    Localization.lang("Could not copy selected file(s)."));
+            if (failedCount == 0) {
+                dialogService.notify(Localization.lang("Successfully copied %0 file(s) to %1.", copiedFiles, target));
+            } else {
+                dialogService.showErrorDialogAndWait(
+                        title,
+                        Localization.lang("Copied %0 file(s). Failed: %1", copiedFiles, failedCount));
+            }
         }
     }
 
