@@ -186,7 +186,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
     // endregion
 
-
     private static final String UNLINKED_FILES_SELECTED_EXTENSION = "unlinkedFilesSelectedExtension";
     private static final String UNLINKED_FILES_SELECTED_DATE_RANGE = "unlinkedFilesSelectedDateRange";
     private static final String UNLINKED_FILES_SELECTED_SORT = "unlinkedFilesSelectedSort";
@@ -1154,8 +1153,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         final int approachIndex = getInt(CREATE_ENTRY_APPROACH);
         NewEntryDialogTab approach = NewEntryDialogTab.values().length > approachIndex
-            ? NewEntryDialogTab.values()[approachIndex]
-            : NewEntryDialogTab.values()[0];
+                                     ? NewEntryDialogTab.values()[approachIndex]
+                                     : NewEntryDialogTab.values()[0];
 
         final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE);
         EntryType immediateType = StandardEntryType.Article;
@@ -1167,14 +1166,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
 
         newEntryPreferences = new NewEntryPreferences(
-            approach,
-            getBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED),
-            getBoolean(CREATE_ENTRY_EXPAND_OTHER),
-            getBoolean(CREATE_ENTRY_EXPAND_CUSTOM),
-            immediateType,
-            getBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING),
-            get(CREATE_ENTRY_ID_FETCHER_NAME),
-            get(CREATE_ENTRY_INTERPRET_PARSER_NAME));
+                approach,
+                getBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED),
+                getBoolean(CREATE_ENTRY_EXPAND_OTHER),
+                getBoolean(CREATE_ENTRY_EXPAND_CUSTOM),
+                immediateType,
+                getBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING),
+                get(CREATE_ENTRY_ID_FETCHER_NAME),
+                get(CREATE_ENTRY_INTERPRET_PARSER_NAME));
 
         EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(newValue)));
         EasyBind.listen(newEntryPreferences.typesRecommendedExpandedProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED, newValue));

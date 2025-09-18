@@ -273,13 +273,13 @@ public class PreferencesMigrations {
         // Migrate Import patterns
         // Check for prefs node for Version <= 4.0
         if (mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
-            String[] oldStylePatterns = new String[]{
+            String[] oldStylePatterns = new String[] {
                     "\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
-            String[] newStylePatterns = new String[]{"[citationkey]",
+            String[] newStylePatterns = new String[] {"[citationkey]",
                     "[citationkey] - [title]"};
 
-            String[] oldDisplayStylePattern = new String[]{"bibtexkey", "bibtexkey - title"};
+            String[] oldDisplayStylePattern = new String[] {"bibtexkey", "bibtexkey - title"};
 
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
@@ -535,8 +535,8 @@ public class PreferencesMigrations {
                 && (FieldFormatterCleanups.ENABLED.equals(formatterCleanups.getFirst())
                 || FieldFormatterCleanups.DISABLED.equals(formatterCleanups.getFirst()))) {
             prefs.putBoolean(V6_0_CLEANUP_FIELD_FORMATTERS_ENABLED, FieldFormatterCleanups.ENABLED.equals(formatterCleanups.getFirst())
-                    ? Boolean.TRUE
-                    : Boolean.FALSE);
+                                                                    ? Boolean.TRUE
+                                                                    : Boolean.FALSE);
 
             prefs.put(V6_0_CLEANUP_FIELD_FORMATTERS, String.join(OS.NEWLINE, formatterCleanups.subList(1, formatterCleanups.size() - 1)));
         }
