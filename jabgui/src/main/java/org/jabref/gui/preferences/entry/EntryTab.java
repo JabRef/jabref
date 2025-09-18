@@ -59,10 +59,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
 
         // Use TextFormatter to limit the length of the Input of keywordSeparator to 1 character only.
         UnaryOperator<TextFormatter.Change> singleCharacterFilter = change -> {
-            if (change.getControlNewText().length() <= 1) {
-                return change;
-            }
-            return null; // null means the change is rejected
+            return change;
         };
         TextFormatter<String> formatter = new TextFormatter<>(singleCharacterFilter);
 
