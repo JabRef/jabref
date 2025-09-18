@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 interface SelectionChecks {
 
-    Logger LOG = LoggerFactory.getLogger(SelectionChecks.class);
+    Logger LOGGER = LoggerFactory.getLogger(SelectionChecks.class);
 
     BibDatabaseContext databaseContext();
 
