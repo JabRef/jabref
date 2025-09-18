@@ -29,7 +29,7 @@ public class AbstractParamLayoutFormatterTest {
         String input = "arg1,arg2,arg3";
         List<String> result = ParseArgumentTester.callParseArgument(input);
         assertEquals(List.of("arg1", "arg2", "arg3"), result,
-            "Simple arguments should be split correctly by commas");
+                "Simple arguments should be split correctly by commas");
     }
 
     @Test

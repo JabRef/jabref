@@ -18,9 +18,9 @@ class BibtexEntryTypeDefinitionsTest {
     @Test
     void languageContained() {
         BibEntryType articleEntryType = BiblatexEntryTypeDefinitions.ALL.stream()
-                                                                    .filter(type -> type.getType().equals(StandardEntryType.Article))
-                                                                    .findFirst()
-                                                                    .get();
+                                                                        .filter(type -> type.getType().equals(StandardEntryType.Article))
+                                                                        .findFirst()
+                                                                        .get();
         assertTrue(articleEntryType.getDetailOptionalFields().contains(StandardField.LANGUAGE));
     }
 }

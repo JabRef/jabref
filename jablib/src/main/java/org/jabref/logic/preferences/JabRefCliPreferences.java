@@ -136,8 +136,8 @@ import org.slf4j.LoggerFactory;
  * contents of the defaults HashMap that are defined in this class.
  * There are more default parameters in this map which belong to separate preference classes.
  * <p>
- *  This class is injected into formatter using reflection to avoid tight coupling and
- *  is easier than injecting via constructor due to amount of refactoring
+ * This class is injected into formatter using reflection to avoid tight coupling and
+ * is easier than injecting via constructor due to amount of refactoring
  */
 @Singleton
 public class JabRefCliPreferences implements CliPreferences {

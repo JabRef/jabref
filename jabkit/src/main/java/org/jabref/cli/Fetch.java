@@ -25,7 +25,8 @@ import static picocli.CommandLine.ParentCommand;
 class Fetch implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Fetch.class);
 
-    record Provider(String name, String query) { }
+    record Provider(String name, String query) {
+    }
 
     @ParentCommand
     private ArgumentProcessor argumentProcessor;

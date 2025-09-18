@@ -95,8 +95,8 @@ public class AiChatComponent extends VBox {
         aiService.getIngestionService().ingest(name, ListUtil.getLinkedFiles(entries).toList(), bibDatabaseContext);
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @FXML
@@ -215,10 +215,11 @@ public class AiChatComponent extends VBox {
 
         entry.getFiles().stream().map(file -> aiService.getIngestionService().ingest(file, bibDatabaseContext)).forEach(ingestionStatus -> {
             switch (ingestionStatus.getState()) {
-                case PROCESSING -> notifications.add(new Notification(
-                    Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
-                    Localization.lang("After the file is ingested, you will be able to chat with it.")
-                ));
+                case PROCESSING ->
+                        notifications.add(new Notification(
+                                Localization.lang("File %0 is currently being processed", ingestionStatus.getObject().getLink()),
+                                Localization.lang("After the file is ingested, you will be able to chat with it.")
+                        ));
 
                 case ERROR -> {
                     assert ingestionStatus.getException().isPresent(); // When the state is ERROR, the exception must be present.
@@ -229,7 +230,8 @@ public class AiChatComponent extends VBox {
                     ));
                 }
 
-                case SUCCESS -> { }
+                case SUCCESS -> {
+                }
             }
         });
 

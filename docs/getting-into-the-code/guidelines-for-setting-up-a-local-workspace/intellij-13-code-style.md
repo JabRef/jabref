@@ -37,84 +37,6 @@ Click on "Restart" to finally restart.
 
 Wait for IntelliJ coming up again.
 
-Go to **File > Settings... > Editor > Code Style**
-
-Click on the settings wheel (next to the scheme chooser),
-then click "Import Scheme >",
-then click "IntelliJ IDEA code style XML"
-
-{% figure caption:"Location of “Import Scheme > IntelliJ IDEA code style XML”" %}
-![Location of IntelliJ IDEA code style XML](13-04-import-checkstyle.png)
-{% endfigure %}
-
-You have to browse for the directory `config` in JabRef's code.
-There is an `IntelliJ Code Style.xml`.
-
-{% figure caption:"Browsing for `config/IntelliJ Code Style.xml`" %}
-![Browsing for config/IntelliJ Code Style.xml](13-05-select-checkstyle-xml-file.png)
-{% endfigure %}
-
-Click "OK".
-
-At following dialog is "Import Scheme".
-Click there "OK", too.
-
-{% figure caption:"Import to JabRef" %}
-![Import to JabRef](13-06-code-style-import-as-jabref.png)
-{% endfigure %}
-
-Click on "Apply" to store the preferences.
-
-## Put JabRef's checkstyle configuration in place
-
-Now, put the checkstyle configuration file is in place:
-
-Go to **File > Settings... > Tools > Checkstyle > Configuration File**
-
-Trigger the import dialog of a CheckStyle style by clicking the \[+] button:
-
-{% figure caption:"Trigger the rule import dialog" %}
-![Trigger the rule import dialog](13-07-checkstyle-start-import.png)
-{% endfigure %}
-
-Then:
-
-* Put "JabRef" as description.
-* Browse for `config/checkstyle/checkstyle.xml`
-* Tick "Store relative to project location"
-* Click "Next"
-
-{% figure caption:"Filled Rule Import Dialog" %}
-![Filled Rule Import Dialog](13-08-checkstyle-import-file.png)
-{% endfigure %}
-
-Click on "Finish"
-
-Activate the CheckStyle configuration file by ticking it in the list
-
-{% figure caption:"JabRef's checkstyle config is activated" %}
-![JabRef's checkstyle config is activated](13-09-checkstyle-jabref-active.png)
-{% endfigure %}
-
-Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected (10.21.0 or higher).
-Also, set the "Scan Scope" to "Only Java sources (including tests)".
-
-{% figure caption:"Checkstyle is the highest version - and tests are also scanned" %}
-![Checkstyle is the highest version - and tests are also scanned](13-10-checkstyle-final-settings.png)
-{% endfigure %}
-
-Save settings by clicking "Apply" and then "OK"
-
-## Run checkstyle
-
-In the lower part of IntelliJ's window, click on "Checkstyle".
-In "Rules", change to "JabRef".
-Then, you can run a check on all modified files.
-
-{% figure caption:"JabRef's style is active - and we are ready to run a check on all modified files" %}
-![JabRef's style is active - and we are ready to run a check on all modified files](13-11-checkstyle-window.png)
-{% endfigure %}
-
 ## Have auto format working properly in JavaDoc
 
 To have auto format working properly in the context of JavaDoc and line wrapping, "Wrap at right margin" has to be disabled. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
@@ -125,6 +47,26 @@ At "Other", disable "Wrap at right margin"
 
 {% figure caption:"”Wrap at right margin” disabled" %}
 !["Wrap at right margin" disabled](13-12-editor-javadoc-do-not-wrap.png)
+{% endfigure %}
+
+## Enable auto formatting of your code
+
+IntelliJ can automatically reformat your code on save.
+Please make use of this functionality.
+
+Go to **File > Settings... > Tools > Actions on Save**.
+
+1. Check "Reformat on code"
+2. Click on "All file types" (on the right)
+3. Uncheck "All file types"
+4. Check "Java"
+5. Check "Optimize imports"
+6. Click on "All file types" (on the right)
+7. Uncheck "All file types" to disable it
+8. Check "Java"
+
+{% figure caption:"Enable autoformatting on save" %}
+![Enable autoformatting on save](13-12.5-auto-formatting.png)
 {% endfigure %}
 
 ## Enable proper import cleanup
@@ -150,6 +92,16 @@ At section "Java", disable "One-line methods".
 {% endfigure %}
 
 Press "OK".
+
+## Run checkstyle
+
+In the lower part of IntelliJ's window, click on "Checkstyle".
+In "Rules", change to "JabRef".
+Then, you can run a check on all modified files.
+
+{% figure caption:"JabRef's style is active - and we are ready to run a check on all modified files" %}
+![JabRef's style is active - and we are ready to run a check on all modified files](13-11-checkstyle-window.png)
+{% endfigure %}
 
 ## Final comments
 
