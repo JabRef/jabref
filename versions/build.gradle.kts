@@ -6,7 +6,7 @@ javaPlatform {
     allowDependencies()
 }
 
-val javafx = "24.0.2"
+val javafx = "25"
 val lucene = "10.2.2"
 val pdfbox = "3.0.5"
 
@@ -29,7 +29,7 @@ dependencies.constraints {
     api("org.openjfx:javafx-swing:$javafx")
     api("org.openjfx:javafx-web:$javafx")
     // from JavaFX25 onwards
-    api("org.openjfx:jdk-jsobject:25-ea+21")
+    api("org.openjfx:jdk-jsobject:$javafx")
 
     api("com.ibm.icu:icu4j:72.0.1!!")
 
@@ -107,7 +107,7 @@ dependencies.constraints {
     api("org.controlsfx:controlsfx:11.2.2")
     api("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
-    api("org.fxmisc.richtext:richtextfx:0.11.5")
+    api("org.fxmisc.richtext:richtextfx:0.11.6")
     api("org.glassfish.grizzly:grizzly-framework:4.0.2")
     api("org.glassfish.grizzly:grizzly-http-server:4.0.2")
     api("org.glassfish.hk2:hk2-api:3.1.1")

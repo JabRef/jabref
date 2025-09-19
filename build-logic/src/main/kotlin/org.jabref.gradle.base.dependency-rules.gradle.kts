@@ -552,7 +552,7 @@ extraJavaModuleInfo {
         requiresTransitive("jdk.unsupported")
     }
 
-    module("org.openjfx:jdk-jsobject", "jdk.jsobjectEmpty")
+    module("org.openjfx:jdk-jsobject", "jdk.jsobjectEmpty") {}
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
         patchRealModule()
