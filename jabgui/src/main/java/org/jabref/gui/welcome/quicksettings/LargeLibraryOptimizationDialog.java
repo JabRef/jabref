@@ -53,6 +53,6 @@ public class LargeLibraryOptimizationDialog extends FXDialog {
         disableAutosave.selectedProperty().bindBidirectional(viewModel.disableAutosaveProperty());
         disableGroupCount.selectedProperty().bindBidirectional(viewModel.disableGroupCountProperty());
 
-        helpButton.setHelpPage(URLs.PERFORMANCE_DOC);
+        helpButton.setHelpUrl(URLs.PERFORMANCE_DOC);
     }
 }

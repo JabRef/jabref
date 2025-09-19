@@ -66,9 +66,9 @@ public class OnlineServicesDialog extends FXDialog {
 
         populateFetchers();
 
-        helpButton.setHelpPage(URLs.ONLINE_SERVICES_DOC);
-        grobidHelpButton.setHelpPage(URLs.GROBID_DOC);
-        fetchersHelpButton.setHelpPage(URLs.ONLINE_SERVICES_DOC);
+        helpButton.setHelpUrl(URLs.ONLINE_SERVICES_DOC);
+        grobidHelpButton.setHelpUrl(URLs.GROBID_DOC);
+        fetchersHelpButton.setHelpUrl(URLs.ONLINE_SERVICES_DOC);
     }
 
     private void populateFetchers() {

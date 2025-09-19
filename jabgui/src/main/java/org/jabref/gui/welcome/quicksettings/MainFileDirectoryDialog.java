@@ -48,7 +48,7 @@ public class MainFileDirectoryDialog extends FXDialog {
         viewModel = new MainFileDirectoryDialogViewModel(preferences, dialogService);
 
         pathField.textProperty().bindBidirectional(viewModel.pathProperty());
-        helpButton.setHelpPage(URLs.FILE_LINKS_DOC);
+        helpButton.setHelpUrl(URLs.FILE_LINKS_DOC);
     }
 
     @FXML
