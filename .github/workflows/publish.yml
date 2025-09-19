@@ -92,8 +92,8 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v5
         with:
-          java-version: '24'
-          distribution: 'corretto'
+          java-version: 25
+          distribution: 'temurin'
           check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4

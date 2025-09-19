@@ -12,7 +12,6 @@ java {
         // - .github/workflows/binaries*.yml
         // - .github/workflows/publish.yml
         // - .github/workflows/tests*.yml
-        // - .github/workflows/update-gradle-wrapper.yml
         // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.md
         // - .sdkmanrc
         languageVersion = JavaLanguageVersion.of(24)
