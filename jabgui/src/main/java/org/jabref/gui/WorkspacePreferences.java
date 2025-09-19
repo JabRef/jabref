@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import java.util.List;
+import java.util.Locale;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -15,6 +16,16 @@ import org.jabref.gui.theme.Theme;
 import org.jabref.logic.l10n.Language;
 
 public class WorkspacePreferences {
+    public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
+    public static final String MAIN_FONT_SIZE = "mainFontSize";
+    public static final String THEME = "fxTheme";
+    public static final String THEME_SYNC_OS = "themeSyncOs";
+    public static final String OPEN_LAST_EDITED = "openLastEdited";
+    public static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
+    public static final String CONFIRM_DELETE = "confirmDelete";
+    public static final String CONFIRM_HIDE_TAB_BAR = "confirmHideTabBar";
+    public static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
+
     private final ObjectProperty<Language> language;
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
@@ -23,7 +34,6 @@ public class WorkspacePreferences {
     private final BooleanProperty themeSyncOs;
     private final BooleanProperty shouldOpenLastEdited;
     private final BooleanProperty showAdvancedHints;
-    private final BooleanProperty warnAboutDuplicatesInInspection;
     private final BooleanProperty confirmDelete;
     private final BooleanProperty confirmHideTabBar;
     private final ObservableList<String> selectedSlrCatalogs;
@@ -36,7 +46,6 @@ public class WorkspacePreferences {
                                 boolean themeSyncOs,
                                 boolean shouldOpenLastEdited,
                                 boolean showAdvancedHints,
-                                boolean warnAboutDuplicatesInInspection,
                                 boolean confirmDelete,
                                 boolean confirmHideTabBar,
                                 List<String> selectedSlrCatalogs) {
@@ -48,10 +57,41 @@ public class WorkspacePreferences {
         this.themeSyncOs = new SimpleBooleanProperty(themeSyncOs);
         this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);
         this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);
-        this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);
         this.confirmDelete = new SimpleBooleanProperty(confirmDelete);
         this.confirmHideTabBar = new SimpleBooleanProperty(confirmHideTabBar);
         this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);
+    }
+
+    /// Creates Object with default values
+    public WorkspacePreferences() {
+        this(
+                Language.getLanguageFor(Locale.getDefault().getLanguage()),
+                false,
+                9,
+                9,
+                new Theme(Theme.BASE_CSS),
+                false,
+                true,
+                true,
+                true,
+                true,
+                List.of()
+        );
+    }
+
+    public void reset() {
+        WorkspacePreferences defaults = new WorkspacePreferences();
+        this.language.set(defaults.getLanguage());
+        this.shouldOverrideDefaultFontSize.set(defaults.shouldOverrideDefaultFontSize());
+        this.mainFontSize.set(defaults.getMainFontSize());
+        this.defaultFontSize.set(defaults.getDefaultFontSize());
+        this.theme.set(defaults.getTheme());
+        this.themeSyncOs.set(defaults.shouldThemeSyncOs());
+        this.shouldOpenLastEdited.set(defaults.shouldOpenLastEdited());
+        this.showAdvancedHints.set(defaults.shouldShowAdvancedHints());
+        this.confirmDelete.set(defaults.shouldConfirmDelete());
+        this.confirmHideTabBar.set(defaults.shouldHideTabBar());
+        this.selectedSlrCatalogs.setAll(defaults.getSelectedSlrCatalogs());
     }
 
     public Language getLanguage() {
@@ -140,18 +180,6 @@ public class WorkspacePreferences {
 
     public void setShowAdvancedHints(boolean showAdvancedHints) {
         this.showAdvancedHints.set(showAdvancedHints);
-    }
-
-    public boolean shouldWarnAboutDuplicatesInInspection() {
-        return warnAboutDuplicatesInInspection.get();
-    }
-
-    public BooleanProperty warnAboutDuplicatesInInspectionProperty() {
-        return warnAboutDuplicatesInInspection;
-    }
-
-    public void setWarnAboutDuplicatesInInspection(boolean warnAboutDuplicatesInInspection) {
-        this.warnAboutDuplicatesInInspection.set(warnAboutDuplicatesInInspection);
     }
 
     public boolean shouldConfirmDelete() {

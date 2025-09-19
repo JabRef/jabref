@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 
+import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.entryeditor.CommentsTab;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
@@ -477,9 +478,9 @@ public class PreferencesMigrations {
         try {
             // some versions stored the font size as double to the **same** key
             // since the preference store is type-safe, we need to add this workaround
-            String fontSizeAsString = preferences.get(JabRefGuiPreferences.MAIN_FONT_SIZE);
+            String fontSizeAsString = preferences.get(WorkspacePreferences.MAIN_FONT_SIZE);
             int fontSizeAsInt = (int) Math.round(Double.parseDouble(fontSizeAsString));
-            preferences.putInt(JabRefGuiPreferences.MAIN_FONT_SIZE, fontSizeAsInt);
+            preferences.putInt(WorkspacePreferences.MAIN_FONT_SIZE, fontSizeAsInt);
         } catch (ClassCastException e) {
             // already an integer
         }
