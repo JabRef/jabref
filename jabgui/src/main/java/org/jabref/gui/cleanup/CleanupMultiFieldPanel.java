@@ -16,8 +16,8 @@ public class CleanupMultiFieldPanel extends VBox {
     @FXML private CheckBox cleanupDOI;
     @FXML private CheckBox cleanupEprint;
     @FXML private CheckBox cleanupURL;
-    @FXML private CheckBox cleanupBiblatex;
-    @FXML private CheckBox cleanupBibtex;
+    @FXML private CheckBox cleanupBibLaTeX;
+    @FXML private CheckBox cleanupBibTeX;
     @FXML private CheckBox cleanupTimestampToCreationDate;
     @FXML private CheckBox cleanupTimestampToModificationDate;
 
@@ -38,16 +38,16 @@ public class CleanupMultiFieldPanel extends VBox {
     }
 
     private void init(CleanupPreferences cleanupPreferences) {
-        cleanupBibtex.selectedProperty().addListener(
+        cleanupBibTeX.selectedProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue) {
-                        cleanupBiblatex.selectedProperty().setValue(false);
+                        cleanupBibLaTeX.selectedProperty().setValue(false);
                     }
                 });
-        cleanupBiblatex.selectedProperty().addListener(
+        cleanupBibLaTeX.selectedProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue) {
-                        cleanupBibtex.selectedProperty().setValue(false);
+                        cleanupBibTeX.selectedProperty().setValue(false);
                     }
                 });
 
@@ -70,8 +70,8 @@ public class CleanupMultiFieldPanel extends VBox {
         cleanupDOI.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));
         cleanupEprint.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));
         cleanupURL.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_URL));
-        cleanupBiblatex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX));
-        cleanupBibtex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
+        cleanupBibLaTeX.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX));
+        cleanupBibTeX.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
         cleanupTimestampToCreationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
         cleanupTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
         cleanupTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
@@ -89,10 +89,10 @@ public class CleanupMultiFieldPanel extends VBox {
         if (cleanupURL.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_URL);
         }
-        if (cleanupBiblatex.isSelected()) {
+        if (cleanupBibLaTeX.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX);
         }
-        if (cleanupBibtex.isSelected()) {
+        if (cleanupBibTeX.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX);
         }
         if (cleanupTimestampToCreationDate.isSelected()) {
