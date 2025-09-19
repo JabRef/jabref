@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -21,10 +22,11 @@ import org.eclipse.lsp4j.DiagnosticSeverity;
 
 public class LspConsistencyCheck {
 
-    public List<Diagnostic> check(ParserResult parserResult) {
+    public List<Diagnostic> check(BibDatabaseContext bibDatabaseContext, String content, CliPreferences cliPreferences) {
         List<Diagnostic> diagnostics = new ArrayList<>();
-        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(parserResult.getDatabaseContext(), (_, _) -> {
+        BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
+        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck(cliPreferences, bibEntryTypesManager);
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibDatabaseContext, (_, _) -> {
         });
 
         Set<Field> allReportedFields = result.entryTypeToResultMap().values().stream()

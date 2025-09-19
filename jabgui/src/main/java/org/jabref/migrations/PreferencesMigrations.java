@@ -50,13 +50,14 @@ public class PreferencesMigrations {
      */
     public static void runMigrations(JabRefGuiPreferences preferences) {
         Preferences mainPrefsNode = Preferences.userRoot().node("/org/jabref");
+        BibEntryTypesManager bibEntryTypesManager = preferences.getCustomEntryTypesRepository();
 
         upgradePrefsToOrgJabRef(mainPrefsNode);
         upgradeSortOrder(preferences);
         upgradeFaultyEncodingStrings(preferences);
         upgradeLabelPatternToCitationKeyPattern(preferences, mainPrefsNode);
         upgradeImportFileAndDirePatterns(preferences, mainPrefsNode);
-        upgradeStoredBibEntryTypes(preferences, mainPrefsNode, preferences.getCustomEntryTypesRepository());
+        upgradeStoredBibEntryTypes(preferences, mainPrefsNode, bibEntryTypesManager);
         upgradeKeyBindingsToJavaFX(preferences);
         addCrossRefRelatedFieldsForAutoComplete(preferences);
         upgradePreviewStyle(preferences);

@@ -62,7 +62,7 @@ public class ConsistencyCheckAction extends SimpleCommand {
 
                 BibDatabaseContext bibContext = databaseContext.get();
 
-                BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
+                BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck(preferences, entryTypesManager);
                 return consistencyCheck.check(bibContext, (count, total) ->
                         UiTaskExecutor.runInJavaFXThread(() -> {
                             updateProgress(count, total);

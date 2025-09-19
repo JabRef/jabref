@@ -57,6 +57,7 @@ public class JabKit {
     private static Logger LOGGER;
 
     private static final String JABKIT_BRAND = "JabKit - command line toolkit for JabRef";
+    private static final BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
 
     public static void main(String[] args) {
         initLogging(args);
@@ -68,7 +69,7 @@ public class JabKit {
             BuildInfo buildInfo = new BuildInfo();
             Injector.setModelOrService(BuildInfo.class, buildInfo);
 
-            BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
+            BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository(bibEntryTypesManager);
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);

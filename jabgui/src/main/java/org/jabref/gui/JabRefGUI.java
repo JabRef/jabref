@@ -116,13 +116,13 @@ public class JabRefGUI extends Application {
                 dialogService,
                 fileUpdateMonitor,
                 preferences,
+                gitHandlerRegistry,
                 aiService,
                 stateManager,
                 countingUndoManager,
                 Injector.instantiateModelOrService(BibEntryTypesManager.class),
                 clipBoardManager,
-                taskExecutor,
-                gitHandlerRegistry);
+                taskExecutor);
 
         openWindow();
 
@@ -164,6 +164,7 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(GitHandlerRegistry.class, gitHandlerRegistry);
 
         BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
+
         JournalAbbreviationRepository journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
         Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
         Injector.setModelOrService(JournalAbbreviationRepository.class, journalAbbreviationRepository);
