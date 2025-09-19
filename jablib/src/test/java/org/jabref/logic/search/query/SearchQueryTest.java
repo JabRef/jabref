@@ -12,6 +12,7 @@ public class SearchQueryTest {
     @ParameterizedTest
     @CsvSource({
             "term",
+            "101.1007/JHEP02(2023)082", // invalid DOI but valid search term
             "term1 term2",
             "term1 term2 term3",
             "term1 AND term2",
@@ -23,6 +24,8 @@ public class SearchQueryTest {
             "NOT (term1 AND term2)",
             "\"term\"",
             "\"term1 term2\"",
+            "termpart1\\ termpart2",
+            "termpart1\\:termpart2",
             "Breitenb{\\\"{u}}cher",
             "K{\\'{a}}lm{\\'{a}}n K{\\'{e}}pes",
             "field = value",
@@ -46,6 +49,7 @@ public class SearchQueryTest {
             "t\\~erm",
             "t\\(1\\)erm",
             "t\\\"erm",
+            "t\\ erm",
     })
     public void validSearchQuery(String searchExpression) {
         assertTrue(new SearchQuery(searchExpression).isValid());
@@ -57,6 +61,8 @@ public class SearchQueryTest {
             "t~erm",
             "t(erm",
             "term AND",
+            "field:value",
+            "field : value",
             "field CONTAINS NOT value",
     })
     public void invalidSearchQuery(String searchExpression) {
