@@ -81,7 +81,7 @@ public class ThemeDialog extends FXDialog {
         selectInitialTheme();
         updateCustomThemeVisibility(viewModel.getSelectedTheme() == ThemeTypes.CUSTOM);
 
-        helpButton.setHelpPage(URLs.CUSTOM_THEME_DOC);
+        helpButton.setHelpUrl(URLs.CUSTOM_THEME_DOC);
     }
 
     private void selectInitialTheme() {
