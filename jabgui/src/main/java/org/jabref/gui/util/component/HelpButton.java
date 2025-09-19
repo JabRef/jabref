@@ -1,5 +1,7 @@
 package org.jabref.gui.util.component;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.Button;
 
 import org.jabref.gui.DialogService;
@@ -14,6 +16,8 @@ import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
 
 public class HelpButton extends Button {
+    private StringProperty helpUrl;
+
     public HelpButton() {
         setGraphic(IconTheme.JabRefIcons.HELP.getGraphicNode());
         getStyleClass().add("icon-button");
@@ -37,5 +41,25 @@ public class HelpButton extends Button {
 
     public void setHelpFile(@NonNull HelpFile helpFile, @NonNull DialogService dialogService, @NonNull ExternalApplicationsPreferences externalApplicationsPreferences) {
         setOnAction(_ -> new HelpAction(helpFile, dialogService, externalApplicationsPreferences).execute());
+    }
+
+    public final StringProperty helpUrlProperty() {
+        if (helpUrl == null) {
+            helpUrl = new SimpleStringProperty(this, "helpUrl");
+            helpUrl.addListener((observable, oldValue, newValue) -> {
+                if (newValue != null && !newValue.isEmpty()) {
+                    setHelpPage(newValue);
+                }
+            });
+        }
+        return helpUrl;
+    }
+
+    public final String getHelpUrl() {
+        return helpUrlProperty().get();
+    }
+
+    public final void setHelpUrl(String url) {
+        helpUrlProperty().set(url);
     }
 }
