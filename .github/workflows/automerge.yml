@@ -28,7 +28,7 @@ jobs:
             exit 0
           fi
 
-          title="${{ github.event.pull_request.title }}"
+          title=${{ toJson(github.event.pull_request.title) }}
           if [[ "$actor" == "dependabot[bot]" ]] || \
             [[ "$title" == "[Bot] "* ]] || \
             [[ "$title" == "Bump "* ]] || \
