@@ -54,7 +54,7 @@ interface SelectionChecks {
             try {
                 NativeDesktop.get().openFolderAndSelectFile(fileToSelect);
             } catch (IOException e) {
-                LOG.warn("Could not open folder and select file: {}", fileToSelect, e);
+                LOGGER.warn("Could not open folder and select file: {}", fileToSelect, e);
             }
         }
     }
