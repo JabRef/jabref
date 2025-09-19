@@ -27,7 +27,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
@@ -543,11 +542,11 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     /**
      * Checks if the given TextField is the last field in the currently selected tab.
      *
-     * @param textField the TextField to check
+     * @param node the Node to check
      * @return true if this is the last field in the current tab, false otherwise
      */
-    private boolean isLastFieldInCurrentTab(TextField textField) {
-        if (textField == null || tabbed.getSelectionModel().getSelectedItem() == null) {
+    boolean isLastFieldInCurrentTab(Node node) {
+        if (node == null || tabbed.getSelectionModel().getSelectedItem() == null) {
             return false;
         }
 
@@ -557,25 +556,29 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
 
         Collection<Field> shownFields = currentTab.getShownFields();
-        if (shownFields.isEmpty() || textField.getId() == null) {
+        if (shownFields.isEmpty() || node.getId() == null) {
             return false;
         }
 
         Optional<Field> lastField = shownFields.stream()
-                                     .reduce((first, second) -> second);
+                                               .reduce((first, second) -> second);
+
+        if (node instanceof Button) {
+            return true;
+        }
 
         return lastField.map(Field::getDisplayName)
-                        .map(displayName -> displayName.equalsIgnoreCase(textField.getId()))
+                        .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
                         .orElse(false);
     }
 
     /**
      * Moves to the next tab and focuses on its first field.
      */
-    private void moveToNextTabAndFocus() {
+     void moveToNextTabAndFocus() {
         tabbed.getSelectionModel().selectNext();
 
-        UiTaskExecutor.runInJavaFXThread(() -> {
+         Platform.runLater(() -> {
             Tab selectedTab = tabbed.getSelectionModel().getSelectedItem();
             if (selectedTab instanceof FieldsEditorTab currentTab) {
                 focusFirstFieldInTab(currentTab);
