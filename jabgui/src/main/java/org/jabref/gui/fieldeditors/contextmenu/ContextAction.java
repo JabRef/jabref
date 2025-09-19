@@ -1,6 +1,12 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
+import java.util.Arrays;
+import java.util.Objects;
+
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
@@ -10,11 +16,14 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 
 public class ContextAction extends SimpleCommand {
 
+    private static final ObservableMap<Field, String> EMPTY_FIELDS =
+            FXCollections.emptyObservableMap();
     private final StandardActions command;
     private final LinkedFileViewModel linkedFile;
     private final LinkedFilesEditorViewModel viewModel;
@@ -29,6 +38,10 @@ public class ContextAction extends SimpleCommand {
         this.linkedFile = linkedFile;
         this.viewModel = viewModel;
 
+        Observable entryFieldsObservable = bibEntry.getValue()
+                                                   .map(BibEntry::getFieldsObservable)
+                                                   .orElse(EMPTY_FIELDS);
+
         this.executable.bind(
                 switch (command) {
                     case RENAME_FILE_TO_PATTERN ->
@@ -36,22 +49,42 @@ public class ContextAction extends SimpleCommand {
                                     () -> !linkedFile.getFile().isOnlineLink()
                                             && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
                                             && !linkedFile.isGeneratedNameSameAsOriginal(),
-                                    linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+                                    nonNullDependencies(
+                                            linkedFile.getFile().linkProperty(),
+                                            entryFieldsObservable
+                                    )
+                            );
+
                     case MOVE_FILE_TO_FOLDER,
                          MOVE_FILE_TO_FOLDER_AND_RENAME ->
                             Bindings.createBooleanBinding(
                                     () -> !linkedFile.getFile().isOnlineLink()
                                             && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
                                             && !linkedFile.isGeneratedPathSameAsOriginal(),
-                                    linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+                                    nonNullDependencies(
+                                            linkedFile.getFile().linkProperty(),
+                                            entryFieldsObservable
+                                    )
+                            );
+
                     case DOWNLOAD_FILE ->
                             Bindings.createBooleanBinding(
                                     () -> linkedFile.getFile().isOnlineLink(),
-                                    linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+                                    nonNullDependencies(
+                                            linkedFile.getFile().linkProperty(),
+                                            entryFieldsObservable
+                                    )
+                            );
+
                     case REDOWNLOAD_FILE ->
                             Bindings.createBooleanBinding(
                                     () -> !linkedFile.getFile().getSourceUrl().isEmpty(),
-                                    linkedFile.getFile().sourceUrlProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+                                    nonNullDependencies(
+                                            linkedFile.getFile().sourceUrlProperty(),
+                                            entryFieldsObservable
+                                    )
+                            );
+
                     case OPEN_FILE,
                          OPEN_FOLDER,
                          RENAME_FILE_TO_NAME,
@@ -59,10 +92,16 @@ public class ContextAction extends SimpleCommand {
                             Bindings.createBooleanBinding(
                                     () -> !linkedFile.getFile().isOnlineLink()
                                             && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent(),
-                                    linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
+                                    nonNullDependencies(
+                                            linkedFile.getFile().linkProperty(),
+                                            entryFieldsObservable
+                                    )
+                            );
+
                     default ->
                             BindingsHelper.constantOf(true);
-                });
+                }
+        );
     }
 
     @Override
@@ -74,10 +113,16 @@ public class ContextAction extends SimpleCommand {
                     linkedFile.open();
             case OPEN_FOLDER ->
                     linkedFile.openFolder();
-            case DOWNLOAD_FILE ->
+            case DOWNLOAD_FILE -> {
+                if (linkedFile.getFile().isOnlineLink()) {
                     linkedFile.download(true);
-            case REDOWNLOAD_FILE ->
+                }
+            }
+            case REDOWNLOAD_FILE -> {
+                if (!linkedFile.getFile().getSourceUrl().isEmpty()) {
                     linkedFile.redownload();
+                }
+            }
             case RENAME_FILE_TO_PATTERN ->
                     linkedFile.renameToSuggestion();
             case RENAME_FILE_TO_NAME ->
@@ -92,5 +137,11 @@ public class ContextAction extends SimpleCommand {
                  REMOVE_LINKS ->
                     viewModel.removeFileLink(linkedFile);
         }
+    }
+
+    private static Observable[] nonNullDependencies(Observable... deps) {
+        return Arrays.stream(deps)
+                     .filter(Objects::nonNull)
+                     .toArray(Observable[]::new);
     }
 }
