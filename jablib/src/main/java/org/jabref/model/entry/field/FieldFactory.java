@@ -39,15 +39,7 @@ public class FieldFactory {
 
     public static String serializeOrFields(OrFields fields) {
         return fields.getFields().stream()
-                     .map(field -> {
-                         if (field instanceof UnknownField unknownField) {
-                             // In case a user has put a user-defined field, the casing of that field is kept
-                             return unknownField.getDisplayName();
-                         } else {
-                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
-                             return field.getName();
-                         }
-                     })
+                     .map(Field::getName)
                      .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
@@ -101,15 +93,7 @@ public class FieldFactory {
 
     public static String serializeFieldsList(Collection<Field> fields) {
         return fields.stream()
-                     .map(field -> {
-                         if (field instanceof UnknownField unknownField) {
-                             // In case a user has put a user-defined field, the casing of that field is kept
-                             return unknownField.getDisplayName();
-                         } else {
-                             // In all fields known to JabRef, the name is used - JabRef knows better than the user how to case the field
-                             return field.getName();
-                         }
-                     })
+                     .map(Field::getName)
                      .collect(Collectors.joining(DELIMITER));
     }
 
@@ -145,7 +129,7 @@ public class FieldFactory {
                                                    BiblatexSoftwareField.fromName(type, fieldName)),
                                            BiblatexApaField.fromName(type, fieldName)),
                                    AMSField.fromName(type, fieldName))
-                           .orElse(UnknownField.fromDisplayName(fieldName));
+                           .orElse(new UnknownField(fieldName));
     }
 
     public static Field parseField(String fieldName) {
@@ -176,10 +160,10 @@ public class FieldFactory {
     }
 
     /**
-     * Returns a sorted Set of Fields (by {@link Field#getDisplayName} with all fields without internal ones
+     * Returns an alphabetically sorted Set of Fields with all fields without internal ones
      */
     public static Set<Field> getAllFieldsWithOutInternal() {
-        Set<Field> fields = new TreeSet<>(Comparator.comparing(Field::getDisplayName));
+        Set<Field> fields = new TreeSet<>(Comparator.comparing(Field::getName));
         fields.addAll(getAllFields());
         fields.removeAll(EnumSet.allOf(InternalField.class));
 

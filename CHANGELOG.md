@@ -127,6 +127,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue with double display of the library filename in the tab tooltip in the case of a changed library. [#13781](https://github.com/JabRef/jabref/pull/13781)
 - When creating a library, if you drag a PDF file containing only a single column, the dialog will now automatically close. [#13262](https://github.com/JabRef/jabref/issues/13262)
 - We fixed an issue where the tab showing the fulltext search results would appear blank after switching libraries. [#13241](https://github.com/JabRef/jabref/issues/13241)
+- We fixed an issue where field names were inconsistently capitalized. [#10590](https://github.com/JabRef/jabref/issues/10590)
 - We fixed an issue where "Copy to" was enabled even if no other library was opened. [#13280](https://github.com/JabRef/jabref/pull/13280)
 - We fixed an issue where the groups were still displayed after closing all libraries. [#13382](https://github.com/JabRef/jabref/issues/13382)
 - Enhanced field selection logic in the Merge Entries dialog when fetching from DOI to prefer valid years and entry types. [#12549](https://github.com/JabRef/jabref/issues/12549)

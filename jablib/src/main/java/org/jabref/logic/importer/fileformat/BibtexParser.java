@@ -61,6 +61,7 @@ import com.dd.plist.BinaryPropertyListParser;
 import com.dd.plist.NSArray;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
+import io.github.adr.linked.ADR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -755,10 +756,11 @@ public class BibtexParser implements Parser {
         return result;
     }
 
+    @ADR(49)
     private void parseField(BibEntry entry) throws IOException {
         int startLine = line;
         int startColumn = column;
-        Field field = FieldFactory.parseField(parseTextToken().toLowerCase(Locale.ROOT));
+        Field field = FieldFactory.parseField(parseTextToken());
 
         skipWhitespace();
         consume('=');

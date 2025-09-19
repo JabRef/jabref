@@ -100,7 +100,7 @@ jobs:
       # No checkout -> the action uses GitHub's API (which is more reliable for submodule changes due to our submodule settings)
       - name: Get all submodule changes
         id: changes
-        uses: tj-actions/changed-files@v46
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             jablib/src/main/abbrv.jabref.org
@@ -118,7 +118,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - if: github.head_ref == 'main'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
               core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read [the CONTRIBUTING guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#contributing) carefully again. 👈')

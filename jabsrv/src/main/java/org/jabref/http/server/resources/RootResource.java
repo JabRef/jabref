@@ -1,4 +1,4 @@
-package org.jabref.http.server;
+package org.jabref.http.server.resources;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
