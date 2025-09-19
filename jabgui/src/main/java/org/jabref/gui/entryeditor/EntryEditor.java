@@ -567,7 +567,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             return true;
         }
 
-        return lastField.map(Field::getDisplayName)
+        return lastField.map(Field::getName)
                         .map(displayName -> displayName.equalsIgnoreCase(node.getId()))
                         .orElse(false);
     }
@@ -593,7 +593,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             Collection<Field> shownFields = tab.getShownFields();
             if (!shownFields.isEmpty()) {
                 Field firstField = shownFields.iterator().next();
-                String firstFieldId = firstField.getDisplayName();
+                String firstFieldId = firstField.getName();
                 Optional<TextInputControl> firstTextInput = findTextInputById(parent, firstFieldId);
                 if (firstTextInput.isPresent()) {
                     firstTextInput.get().requestFocus();
