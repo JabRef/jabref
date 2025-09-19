@@ -109,8 +109,8 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     private static Stream<Arguments> getJSONWithYearVariations() {
         String baseString = "title=Ericksen-Leslie page=1 pageSize=20 must_have_pdf=false sortBy=relevance";
         List<String> withYearAndYearRange = List.of(
-                StringUtil.join(new String[]{baseString, "year=2020"}, " ", 0, 2),
-                StringUtil.join(new String[]{baseString, "year-range=2019-2023"}, " ", 0, 2)
+                StringUtil.join(new String[] {baseString, "year=2020"}, " ", 0, 2),
+                StringUtil.join(new String[] {baseString, "year-range=2019-2023"}, " ", 0, 2)
         );
 
         JSONObject expectedJson = new JSONObject();

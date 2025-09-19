@@ -61,7 +61,7 @@ public class LtwaTsvParser {
                 word = normalizeResult.get();
                 String abbreviation = NO_ABBREVIATION.equals(abbreviationStr) ? null : abbreviationStr;
                 List<String> languages = Arrays.stream(languageStr.split("\\s*,\\s*")).map(String::trim)
-                        .filter(s -> !s.isEmpty()).toList();
+                                               .filter(s -> !s.isEmpty()).toList();
 
                 entries.add(new LtwaEntry(word, abbreviation, languages));
             }

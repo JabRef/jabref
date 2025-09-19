@@ -488,9 +488,9 @@ public class GroupDialogViewModel {
                 .addExtensionFilter(StandardFileType.AUX)
                 .withDefaultExtension(StandardFileType.AUX)
                 .withInitialDirectory(texGroupFilePathProperty.getValue().isBlank() ?
-                        currentDatabase.getMetaData()
-                                       .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                       .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory())).toString() : texGroupFilePathProperty.get()).build();
+                                      currentDatabase.getMetaData()
+                                                     .getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                                     .orElse(FileUtil.getInitialDirectory(currentDatabase, preferences.getFilePreferences().getWorkingDirectory())).toString() : texGroupFilePathProperty.get()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(file -> texGroupFilePathProperty.setValue(
                              FileUtil.relativize(file.toAbsolutePath(), getFileDirectoriesAsPaths()).toString()

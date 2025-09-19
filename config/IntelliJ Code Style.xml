@@ -3,7 +3,9 @@
   <option name="SOFT_MARGINS" value="120" />
   <option name="DO_NOT_FORMAT">
     <list>
-      <fileSet type="globPattern" pattern=".jbang/*.java" />
+        <fileSet type="globPattern" pattern=".jbang/*.java" />
+        <fileSet type="globPattern" pattern="AutoCompletionTextInputBinding.java" />
+        <fileSet type="globPattern" pattern="SuggestionProvider.java" />
     </list>
   </option>
   <JavaCodeStyleSettings>

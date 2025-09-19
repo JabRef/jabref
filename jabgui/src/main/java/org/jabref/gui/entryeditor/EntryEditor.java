@@ -506,8 +506,8 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
     public void setFocusToField(Field field) {
         UiTaskExecutor.runInJavaFXThread(() -> {
-        Field actualField = field;
-        boolean fieldFound = false;
+            Field actualField = field;
+            boolean fieldFound = false;
             for (Tab tab : tabbed.getTabs()) {
                 tabbed.getSelectionModel().select(tab);
                 if ((tab instanceof FieldsEditorTab fieldsEditorTab)
@@ -608,7 +608,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
     }
 
-     // Recursively searches for a TextInputControl (TextField or TextArea) with the given ID.
+    /// Recursively searches for a TextInputControl (TextField or TextArea) with the given ID.
     private Optional<TextInputControl> findTextInputById(Parent parent, String id) {
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (child instanceof TextInputControl textInput && id.equalsIgnoreCase(textInput.getId())) {

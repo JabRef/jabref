@@ -110,8 +110,8 @@ public class Launcher {
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
         // argument parsing workflow to parse logging options e.g. --debug
         Level logLevel = Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase)
-                ? Level.DEBUG
-                : Level.INFO;
+                         ? Level.DEBUG
+                         : Level.INFO;
 
         // addLogToDisk
         // We cannot use `Injector.instantiateModelOrService(BuildInfo.class).version` here, because this initializes logging

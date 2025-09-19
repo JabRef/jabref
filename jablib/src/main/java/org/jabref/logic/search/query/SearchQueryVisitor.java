@@ -33,8 +33,8 @@ public class SearchQueryVisitor extends SearchBaseVisitor<BaseQueryNode> {
     @Override
     public BaseQueryNode visitImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx) {
         List<BaseQueryNode> children = ctx.expression().stream()
-                                      .map(this::visit)
-                                      .collect(Collectors.toList());
+                                          .map(this::visit)
+                                          .collect(Collectors.toList());
         if (children.size() == 1) {
             return children.getFirst();
         }
@@ -86,10 +86,14 @@ public class SearchQueryVisitor extends SearchBaseVisitor<BaseQueryNode> {
 
         // Pseudo-fields
         field = switch (field) {
-            case "key" -> InternalField.KEY_FIELD.getName();
-            case "anykeyword" -> StandardField.KEYWORDS.getName();
-            case "anyfield" -> "any";
-            default -> field;
+            case "key" ->
+                    InternalField.KEY_FIELD.getName();
+            case "anykeyword" ->
+                    StandardField.KEYWORDS.getName();
+            case "anyfield" ->
+                    "any";
+            default ->
+                    field;
         };
 
         if (ctx.operator() != null) {
