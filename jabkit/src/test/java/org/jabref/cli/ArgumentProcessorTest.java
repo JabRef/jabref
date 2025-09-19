@@ -2,10 +2,12 @@ package org.jabref.cli;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -30,13 +32,15 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.support.BibEntryAssert;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Answers;
 import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,6 +55,19 @@ class ArgumentProcessorTest {
 
     private CommandLine commandLine;
 
+    /**
+     * Precondition: required test resources must be available on the classpath.
+     *
+     * This is a parameterized test so failures show which specific resource is missing.
+     * Previously this was a @BeforeAll that threw an exception — switching to a test with
+     * an assertion makes the failure visible in the test report.
+     */
+    @ParameterizedTest(name = "Resource {0} is available on classpath")
+    @CsvSource({"origin.bib", "paper.aux", "ArgumentProcessorTestExportMatches.bib"})
+    void checkTestResourcesParam(String resource) {
+        assertNotNull(ArgumentProcessorTest.class.getResource(resource), "Required test resource missing from classpath: " + resource);
+    }
+
     @BeforeEach()
     void setup() {
         when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
@@ -59,31 +76,35 @@ class ArgumentProcessorTest {
         when(preferences.getExportPreferences()).thenReturn(exportPreferences);
         when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
-        when(preferences.getSearchPreferences()).thenReturn(new SearchPreferences(
-                SearchDisplayMode.FILTER,
-                EnumSet.noneOf(SearchFlags.class),
-                false,
-                false,
-                0,
-                0,
-                0));
+        when(preferences.getSearchPreferences()).thenReturn(new SearchPreferences(SearchDisplayMode.FILTER, EnumSet.noneOf(SearchFlags.class), false, false, 0, 0, 0));
 
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
         commandLine = new CommandLine(argumentProcessor);
     }
 
     @Test
-    void auxImport(@TempDir Path tempDir) throws URISyntaxException {
-        String fullBib = Path.of(ArgumentProcessorTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
-        String auxFile = Path.of(ArgumentProcessorTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
+    void auxImport(@TempDir Path tempDir) throws IOException {
+        InputStream originIs = ArgumentProcessorTest.class.getResourceAsStream("origin.bib");
+        InputStream auxIs = ArgumentProcessorTest.class.getResourceAsStream("paper.aux");
+
+        Path fullBib = tempDir.resolve("origin.bib");
+        Files.copy(originIs, fullBib, StandardCopyOption.REPLACE_EXISTING);
+
+        Path auxFilePath = tempDir.resolve("paper.aux");
+        Files.copy(auxIs, auxFilePath, StandardCopyOption.REPLACE_EXISTING);
 
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
 
-        List<String> args = List.of("generate-bib-from-aux", "--aux", auxFile, "--input", fullBib, "--output", outputBib.toString());
+        List<String> args = List.of("generate-bib-from-aux", "--aux", auxFilePath.toString(), "--input", fullBib.toString(), "--output", outputBib.toString());
 
-        commandLine.execute(args.toArray(String[]::new));
+        int rc = commandLine.execute(args.toArray(String[]::new));
+        assertEquals(0, rc, "CLI returned non-zero exit code for auxImport: " + rc);
 
-        assertTrue(Files.exists(outputBib));
+        assertTrue(Files.exists(outputBib), "Expected output bib to exist: " + outputBib);
+
+        BibtexImporter importer = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
+        List<BibEntry> entries = importer.importDatabase(outputBib).getDatabase().getEntries();
+        assertTrue(entries != null && !entries.isEmpty(), "Expected output bib to contain at least one entry");
     }
 
     @Test
@@ -92,9 +113,8 @@ class ArgumentProcessorTest {
         String originBibFile = originBib.toAbsolutePath().toString();
 
         Path expectedBib = Path.of(
-                Objects.requireNonNull(ArgumentProcessorTest.class.getResource("ArgumentProcessorTestExportMatches.bib"))
-                       .toURI()
-        );
+                                   Objects.requireNonNull(ArgumentProcessorTest.class.getResource("ArgumentProcessorTestExportMatches.bib"))
+                                          .toURI());
 
         BibtexImporter bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
         List<BibEntry> expectedEntries = bibtexImporter.importDatabase(expectedBib).getDatabase().getEntries();
@@ -103,9 +123,10 @@ class ArgumentProcessorTest {
 
         List<String> args = List.of("search", "--debug", "--query", "author=Einstein", "--input", originBibFile, "--output", outputBib.toString());
 
-        commandLine.execute(args.toArray(String[]::new));
+        int rc = commandLine.execute(args.toArray(String[]::new));
+        assertEquals(0, rc, "CLI returned non-zero exit code for search: " + rc);
 
-        assertTrue(Files.exists(outputBib));
+        assertTrue(Files.exists(outputBib), "Expected output bib to exist: " + outputBib);
         BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);
     }
 
@@ -129,13 +150,13 @@ class ArgumentProcessorTest {
 
         List<String> args = List.of("convert", "--input", originBibFile, "--input-format", "bibtex", "--output", outputHtmlFile, "--output-format", "tablerefsabsbib");
 
-        commandLine.execute(args.toArray(String[]::new));
+        int rc = commandLine.execute(args.toArray(String[]::new));
+        assertEquals(0, rc, "CLI returned non-zero exit code for convert: " + rc);
 
-        assertTrue(Files.exists(outputHtml));
+        assertTrue(Files.exists(outputHtml), "Expected output html to exist: " + outputHtml);
     }
 
     @Test
-    @Disabled("Does not work in this branch, but we did not touch it. TODO: Fix this")
     void checkConsistency() throws URISyntaxException {
         Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
@@ -143,16 +164,19 @@ class ArgumentProcessorTest {
         List<String> args = List.of("check-consistency", "--input", testBibFile, "--output-format", "txt");
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent, true));
+        PrintStream originalOut = System.out;
+        try {
+            System.setOut(new PrintStream(outContent, true));
 
-        int executionResult = commandLine.execute(args.toArray(String[]::new));
+            int executionResult = commandLine.execute(args.toArray(String[]::new));
 
-        String output = outContent.toString();
-        assertTrue(output.contains("Checking consistency for entry type 1 of 1\n"));
-        assertTrue(output.contains("Consistency check completed"));
-        assertEquals(0, executionResult);
-
-        System.setOut(System.out);
+            String output = outContent.toString();
+            assertTrue(output.contains("Checking consistency for entry type 1 of 1\n"), "Unexpected stdout:\n" + output);
+            assertTrue(output.contains("Consistency check completed"), "Unexpected stdout:\n" + output);
+            assertEquals(0, executionResult, "Non-zero exit code for check-consistency: " + executionResult + "\nstdout:\n" + output);
+        } finally {
+            System.setOut(originalOut);
+        }
     }
 
     @Test
@@ -164,14 +188,17 @@ class ArgumentProcessorTest {
         List<String> args = List.of("check-consistency", "--input", testBibFile, "--porcelain");
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
+        PrintStream originalOut = System.out;
+        try {
+            System.setOut(new PrintStream(outContent, true));
 
-        int executionResult = commandLine.execute(args.toArray(String[]::new));
+            int executionResult = commandLine.execute(args.toArray(String[]::new));
 
-        String output = outContent.toString();
-        assertEquals("", output);
-        assertEquals(0, executionResult);
-
-        System.setOut(System.out);
+            String output = outContent.toString();
+            assertEquals("", output.trim(), "Unexpected stdout for porcelain check; content:\n" + output);
+            assertEquals(0, executionResult, "Non-zero exit code for check-consistency --porcelain: " + executionResult + "\nstdout:\n" + output);
+        } finally {
+            System.setOut(originalOut);
+        }
     }
 }
