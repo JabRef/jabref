@@ -2,7 +2,6 @@ package org.jabref.model.study;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import org.jabref.logic.crawler.StudyYamlParser;
 
@@ -141,8 +140,8 @@ public class Study {
         return Objects.hash(authors, title, researchQuestions, queries, catalogs);
     }
 
-    public Optional<StudyMetadata> getMetadata() {
-        return Optional.ofNullable(metadata);
+    public StudyMetadata getMetadata() {
+        return metadata != null ? metadata : new StudyMetadata();
     }
 
     public void setMetadata(StudyMetadata metadata) {

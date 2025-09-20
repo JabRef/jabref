@@ -1,6 +1,7 @@
 package org.jabref.model.study;
 
 import java.util.Map;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -37,12 +38,12 @@ public class StudyQuery {
         this.query = query;
     }
 
-    public String getDescription() {
-        return description != null ? description : "";
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
     }
 
-    public String getLucene() {
-        return lucene != null ? lucene : "";
+    public Optional<String> getLucene() {
+        return Optional.ofNullable(lucene);
     }
 
     public Map<String, String> getCatalogSpecific() {
