@@ -1,10 +1,28 @@
 package org.jabref.model.study;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class StudyQuery {
     private String query;
+    private String description;
+    private String lucene;
+
+    @JsonProperty("catalog-specific")
+    private Map<String, String> catalogSpecific;
 
     public StudyQuery(String query) {
         this.query = query;
+    }
+
+    public StudyQuery(String query, String description, String lucene, Map<String, String> catalogSpecific) {
+        this.query = query;
+        this.description = description;
+        this.lucene = lucene;
+        this.catalogSpecific = catalogSpecific;
     }
 
     /**
@@ -19,6 +37,22 @@ public class StudyQuery {
 
     public void setQuery(String query) {
         this.query = query;
+    }
+
+    public Optional<String> getDescription() {
+        return Optional.ofNullable(description);
+    }
+
+    public Optional<String> getLucene() {
+        return Optional.ofNullable(lucene);
+    }
+
+    public Optional<Map<String, String>> getCatalogSpecific() {
+        return catalogSpecific != null ? Optional.of(Collections.unmodifiableMap(catalogSpecific)) : Optional.empty();
+    }
+
+    public void setCatalogSpecific(Map<String, String> catalogSpecific) {
+        this.catalogSpecific = catalogSpecific;
     }
 
     @Override
