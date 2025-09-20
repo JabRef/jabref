@@ -117,7 +117,8 @@ class StudyYamlV1MigratorTest {
 
         // Complex query
         StudyQuery complexQuery = queries.get(1);
-        assertEquals(Map.of("IEEE", "ieee specific query", "ACM", "acm specific query"), complexQuery.getCatalogSpecific());
+        Map<String, String> expectedCatalogSpecific = Map.of("IEEE", "ieee specific query", "ACM", "acm specific query");
+        assertEquals(expectedCatalogSpecific, complexQuery.getCatalogSpecific().orElse(Map.of()));
     }
 
     @Test
