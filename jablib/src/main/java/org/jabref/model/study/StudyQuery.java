@@ -1,6 +1,5 @@
 package org.jabref.model.study;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -48,7 +47,7 @@ public class StudyQuery {
     }
 
     public Map<String, String> getCatalogSpecific() {
-        return catalogSpecific != null ? Collections.unmodifiableMap(catalogSpecific) : Map.of();
+        return catalogSpecific != null ? catalogSpecific : Map.of();
     }
 
     public void setCatalogSpecific(Map<String, String> catalogSpecific) {
