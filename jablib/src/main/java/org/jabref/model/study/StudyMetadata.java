@@ -1,6 +1,7 @@
 package org.jabref.model.study;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -51,8 +52,8 @@ public class StudyMetadata {
         this.lastModified = lastModified;
     }
 
-    public String getNotes() {
-        return notes;
+    public Optional<String> getNotes() {
+        return Optional.ofNullable(notes);
     }
 
     public void setNotes(String notes) {

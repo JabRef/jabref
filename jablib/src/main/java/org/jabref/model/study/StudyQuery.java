@@ -47,8 +47,8 @@ public class StudyQuery {
         return Optional.ofNullable(lucene);
     }
 
-    public Optional<Map<String, String>> getCatalogSpecific() {
-        return catalogSpecific != null ? Optional.of(Collections.unmodifiableMap(catalogSpecific)) : Optional.empty();
+    public Map<String, String> getCatalogSpecific() {
+        return catalogSpecific != null ? Collections.unmodifiableMap(catalogSpecific) : Map.of();
     }
 
     public void setCatalogSpecific(Map<String, String> catalogSpecific) {

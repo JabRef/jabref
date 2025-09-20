@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyCatalog;
@@ -119,7 +118,7 @@ class StudyYamlV1MigratorTest {
         // Complex query
         StudyQuery complexQuery = queries.get(1);
         Map<String, String> expectedCatalogSpecific = Map.of("IEEE", "ieee specific query", "ACM", "acm specific query");
-        assertEquals(expectedCatalogSpecific, complexQuery.getCatalogSpecific().orElse(Map.of()));
+        assertEquals(expectedCatalogSpecific, complexQuery.getCatalogSpecific());
     }
 
     @Test
@@ -187,9 +186,10 @@ class StudyYamlV1MigratorTest {
                 new AssertionError("Expected metadata to be present after migration"));
 
         // Check migration notes
-        assertTrue(metadata.getNotes().contains("Migrated from v1.0 format"));
-        assertTrue(metadata.getNotes().contains("1 search queries"));
-        assertTrue(metadata.getNotes().contains("1 active databases"));
+        String notes = metadata.getNotes().orElse("");
+        assertTrue(notes.contains("Migrated from v1.0 format"));
+        assertTrue(notes.contains("1 search queries"));
+        assertTrue(notes.contains("1 active databases"));
     }
 
     @Test
@@ -245,8 +245,9 @@ class StudyYamlV1MigratorTest {
 
         Study migratedStudy = migrator.migrate(studyFile);
 
-        String notes = migratedStudy.getMetadata().orElseThrow(() ->
-                new AssertionError("Expected metadata to be present")).getNotes();
+        String notes = migratedStudy.getMetadata()
+                                    .flatMap(StudyMetadata::getNotes)
+                                    .orElse("");
         assertTrue(notes.contains("Migrated from v1.0 format"));
         assertTrue(notes.contains("3 search queries"));
         assertTrue(notes.contains("2 active databases"));
