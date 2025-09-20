@@ -62,6 +62,5 @@ class GitIgnoreFileFilterTest {
         Files.createFile(subDir.resolve("test.png"));
         GitIgnoreFileFilter gitIgnoreFileFilter = new GitIgnoreFileFilter(dir);
         assertFalse(gitIgnoreFileFilter.accept(subDir.resolve("test.png")));
-
     }
 }
