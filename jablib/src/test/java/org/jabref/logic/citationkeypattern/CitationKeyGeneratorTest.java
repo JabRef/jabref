@@ -887,11 +887,18 @@ class CitationKeyGeneratorTest {
         );
     }
 
-    @Test
-    void checkLegalKeyNoUnwantedCharacters() {
-        assertEquals("AAAA", CitationKeyGenerator.cleanKey("AA AA", ""));
-        assertEquals("SPECIALCHARS^", CitationKeyGenerator.cleanKey("SPECIAL CHARS#{\\\"}~,^", ""));
-        assertEquals("", CitationKeyGenerator.cleanKey("\n\t\r", ""));
+    @ParameterizedTest
+    @MethodSource("checkLegalKeyNoUnwantedCharactersData")
+    void checkLegalKeyNoUnwantedCharacters(String input, String expected) {
+        assertEquals(expected, CitationKeyGenerator.cleanKey(input, ""));
+    }
+
+    static Stream<Arguments> checkLegalKeyNoUnwantedCharactersData() {
+        return Stream.of(
+                Arguments.of("AA AA", "AAAA"),
+                Arguments.of("SPECIAL CHARS#{\\\"}~,^", "SPECIALCHARS^"),
+                Arguments.of("\n\t\r", "")
+        );
     }
 
     @Test
