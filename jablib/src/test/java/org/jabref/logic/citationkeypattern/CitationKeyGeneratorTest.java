@@ -650,22 +650,32 @@ class CitationKeyGeneratorTest {
         assertThrows(NullPointerException.class, () -> CitationKeyGenerator.firstPage(null));
     }
 
-    @Test
-    void pagePrefix() {
-        assertEquals("L", CitationKeyGenerator.pagePrefix("L7--27"));
-        assertEquals("L--", CitationKeyGenerator.pagePrefix("L--27"));
-        assertEquals("L", CitationKeyGenerator.pagePrefix("L"));
-        assertEquals("L", CitationKeyGenerator.pagePrefix("L42--111"));
-        assertEquals("L", CitationKeyGenerator.pagePrefix("L7,L41,L73--97"));
-        assertEquals("L", CitationKeyGenerator.pagePrefix("L41,L7,L73--97"));
-        assertEquals("L", CitationKeyGenerator.pagePrefix("L43+"));
-        assertEquals("", CitationKeyGenerator.pagePrefix("7--27"));
-        assertEquals("--", CitationKeyGenerator.pagePrefix("--27"));
-        assertEquals("", CitationKeyGenerator.pagePrefix(""));
-        assertEquals("", CitationKeyGenerator.pagePrefix("42--111"));
-        assertEquals("", CitationKeyGenerator.pagePrefix("7,41,73--97"));
-        assertEquals("", CitationKeyGenerator.pagePrefix("41,7,73--97"));
-        assertEquals("", CitationKeyGenerator.pagePrefix("43+"));
+    @ParameterizedTest
+    @MethodSource("pagePrefixData")
+    void pagePrefix(String input, String expected) {
+        assertEquals(expected, CitationKeyGenerator.pagePrefix(input));
+    }
+
+    static Stream<Arguments> pagePrefixData() {
+        return Stream.of(
+                // Tests with prefix L
+                Arguments.of("L7--27", "L"),
+                Arguments.of("L--27", "L--"),
+                Arguments.of("L", "L"),
+                Arguments.of("L42--111", "L"),
+                Arguments.of("L7,L41,L73--97", "L"),
+                Arguments.of("L41,L7,L73--97", "L"),
+                Arguments.of("L43+", "L"),
+
+                // Tests with no prefix
+                Arguments.of("7--27", ""),
+                Arguments.of("--27", "--"),
+                Arguments.of("", ""),
+                Arguments.of("42--111", ""),
+                Arguments.of("7,41,73--97", ""),
+                Arguments.of("41,7,73--97", ""),
+                Arguments.of("43+", "")
+        );
     }
 
     @SuppressWarnings("ConstantConditions")
