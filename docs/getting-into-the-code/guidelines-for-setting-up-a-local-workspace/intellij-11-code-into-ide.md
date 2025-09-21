@@ -85,30 +85,4 @@ You can disregard notifications
 2. Set "2500" MB (instead of 1262) and click on "Save and Restart".
 3. Wait until IntelliJ is up and running again.
 
-## Ensure that committing via IntelliJ works
-
-Unfortunately, IntelliJ has no support for ignored sub modules [[IDEA-285237](https://youtrack.jetbrains.com/issue/IDEA-285237/ignored-changes-in-submodules-are-still-visible-in-the-commit-window)].
-Fortunately, there is a workaround:
-
-Go to **File > Settings... > Version Control > Directory Mappings**.<br>
-**Note:** In some MacBooks, `Settings` can be found at the "IntelliJ" button of the app menu instead of at "File".
-
-Currently, it looks as follows:
-
-{% figure caption:"Directory Mappings unmodified" %}
-![Directory Mappings including sub modules](11-09-intellij-directory-mappings-unmodified.png)
-{% endfigure %}
-
-You need to tell IntelliJ to ignore the submodules `jablib\src\main\abbrv.jabref.org`, `jablib\src\main\resources\csl-locales`, and `jablib\src\main\resources\csl-styles`.
-Select all three (holding the <kbd>Ctrl</kbd> key).
-Then press the minus button on top.
-
-This will make these directories "Unregistered roots:", which is fine.
-
-{% figure caption:"Directory Mappings having three unregistered roots" %}
-![Directory Mappings having three repositories unregistered](11-10-intellij-directory-mappings-unregistered-roots.png)
-{% endfigure %}
-
-Click "OK"
-
 <!-- markdownlint-disable-file MD033 -->

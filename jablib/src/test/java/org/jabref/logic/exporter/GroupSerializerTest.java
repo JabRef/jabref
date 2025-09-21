@@ -78,7 +78,7 @@ class GroupSerializerTest {
     }
 
     @Test
-    // For https://github.com/JabRef/jabref/issues/1681
+        // For https://github.com/JabRef/jabref/issues/1681
     void serializeSingleExplicitGroupWithEscapedSlash() {
         ExplicitGroup group = new ExplicitGroup("B{\\\"{o}}hmer", GroupHierarchyType.INDEPENDENT, ',');
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));

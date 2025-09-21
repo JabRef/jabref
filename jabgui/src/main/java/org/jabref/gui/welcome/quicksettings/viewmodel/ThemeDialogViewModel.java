@@ -36,8 +36,10 @@ public class ThemeDialogViewModel extends AbstractViewModel {
     private void initializeFromCurrentTheme() {
         Theme currentTheme = workspacePreferences.getTheme();
         switch (currentTheme.getType()) {
-            case DEFAULT -> selectedThemeProperty.set(ThemeTypes.LIGHT);
-            case EMBEDDED -> selectedThemeProperty.set(ThemeTypes.DARK);
+            case DEFAULT ->
+                    selectedThemeProperty.set(ThemeTypes.LIGHT);
+            case EMBEDDED ->
+                    selectedThemeProperty.set(ThemeTypes.DARK);
             case CUSTOM -> {
                 selectedThemeProperty.set(ThemeTypes.CUSTOM);
                 customPathProperty.set(currentTheme.getName());
@@ -63,8 +65,8 @@ public class ThemeDialogViewModel extends AbstractViewModel {
 
     public void browseForThemeFile() {
         String fileDir = customPathProperty.get().isEmpty() ?
-                preferences.getInternalPreferences().getLastPreferencesExportPath().toString() :
-                customPathProperty.get();
+                         preferences.getInternalPreferences().getLastPreferencesExportPath().toString() :
+                         customPathProperty.get();
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CSS)
@@ -86,9 +88,12 @@ public class ThemeDialogViewModel extends AbstractViewModel {
 
     public void saveSettings() {
         Theme newTheme = switch (selectedThemeProperty.get()) {
-            case LIGHT -> Theme.light();
-            case DARK -> Theme.dark();
-            case CUSTOM -> Theme.custom(customPathProperty.get().trim());
+            case LIGHT ->
+                    Theme.light();
+            case DARK ->
+                    Theme.dark();
+            case CUSTOM ->
+                    Theme.custom(customPathProperty.get().trim());
         };
         workspacePreferences.setTheme(newTheme);
     }

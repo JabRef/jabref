@@ -84,3 +84,13 @@ origin     https://github.com/YOURUSERNAME/jabref.git (push)
 upstream     https://github.com/JabRef/jabref.git (fetch)
 upstream     https://github.com/JabRef/jabref.git (push)
 ```
+
+## Have `git blame` working
+
+You need to tell git to ignore some commits when doing `git blame`:
+
+```terminal
+git config --global blame.ignoreRevsFile .git-blame-ignore-revs
+```
+
+<!-- background: https://docs.github.com/en/repositories/working-with-files/using-files/viewing-and-understanding-files#ignore-commits-in-the-blame-view -->

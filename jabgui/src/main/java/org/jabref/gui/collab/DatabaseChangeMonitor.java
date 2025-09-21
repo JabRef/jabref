@@ -14,7 +14,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -81,10 +81,10 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
                             DatabaseChangesResolverDialog databaseChangesResolverDialog = new DatabaseChangesResolverDialog(changes, database, Localization.lang("External Changes Resolver"));
                             Optional<Boolean> areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
                             saveState = stateManager.activeTabProperty().get().get();
-                            final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
-                            changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));
-                            ce.end();
-                            undoManager.addEdit(ce);
+                            final NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merged external changes"));
+                            changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(compoundEdit));
+                            compoundEdit.end();
+                            undoManager.addEdit(compoundEdit);
                             if (areAllChangesResolved.get()) {
                                 if (databaseChangesResolverDialog.areAllChangesAccepted()) {
                                     // In case all changes of the file on disk are merged into the current in-memory file, the file on disk does not differ from the in-memory file

@@ -13,7 +13,7 @@ import org.jabref.logic.l10n.Localization;
 /**
  * Cleanup URL link.
  * <p>
- *     Expose string representations URL links clean up logic.
+ * Expose string representations URL links clean up logic.
  * </p>
  */
 public class CleanupUrlFormatter extends Formatter {
@@ -44,7 +44,6 @@ public class CleanupUrlFormatter extends Formatter {
      *
      * @param url should not be null
      * @return the decoded URL as a String representation
-     *
      * @see URLDecoder#decode(String, Charset)
      */
     @Override
@@ -67,9 +66,9 @@ public class CleanupUrlFormatter extends Formatter {
     @Override
     public String getExampleInput() {
         return "https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=11&cad=" +
-               "rja&uact=8&ved=0ahUKEwjg3ZrB_ZPXAhVGuhoKHYdOBOg4ChAWCCYwAA&url=" +
-               "http%3A%2F%2Fwww.focus.de%2Fgesundheit%2Fratgeber%2Fherz%2Ftest%2" +
-               "Flebenserwartung-werden-sie-100-jahre-alt_aid_363828.html" +
-               "&usg=AOvVaw1G6m2jf-pTHYkXceii4hXU";
+                "rja&uact=8&ved=0ahUKEwjg3ZrB_ZPXAhVGuhoKHYdOBOg4ChAWCCYwAA&url=" +
+                "http%3A%2F%2Fwww.focus.de%2Fgesundheit%2Fratgeber%2Fherz%2Ftest%2" +
+                "Flebenserwartung-werden-sie-100-jahre-alt_aid_363828.html" +
+                "&usg=AOvVaw1G6m2jf-pTHYkXceii4hXU";
     }
 }

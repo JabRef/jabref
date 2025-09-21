@@ -24,6 +24,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.identifier.Identifier;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -132,11 +133,11 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
     }
 
     public void fetchBibliographyInformation(BibEntry bibEntry) {
-        LOGGER.warn("Unable to fetch bibliography information using the '{}' identifier", field.getDisplayName());
+        LOGGER.warn("Unable to fetch bibliography information using the '{}' identifier", FieldTextMapper.getDisplayName(field));
     }
 
     public void lookupIdentifier(BibEntry bibEntry) {
-        LOGGER.warn("Unable to lookup identifier for '{}'", field.getDisplayName());
+        LOGGER.warn("Unable to lookup identifier for '{}'", FieldTextMapper.getDisplayName(field));
     }
 
     public void openExternalLink() {

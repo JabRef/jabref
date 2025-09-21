@@ -15,7 +15,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.CleanupPreferences;
@@ -109,7 +109,7 @@ public class CleanupAction extends SimpleCommand {
      *
      * @return true iff entry was modified
      */
-    private boolean doCleanup(BibDatabaseContext databaseContext, CleanupPreferences preset, BibEntry entry, NamedCompound ce) {
+    private boolean doCleanup(BibDatabaseContext databaseContext, CleanupPreferences preset, BibEntry entry, NamedCompoundEdit compoundEdit) {
         // Create and run cleaner
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
@@ -121,7 +121,7 @@ public class CleanupAction extends SimpleCommand {
 
         // Register undo action
         for (FieldChange change : changes) {
-            ce.addEdit(new UndoableFieldChange(change));
+            compoundEdit.addEdit(new UndoableFieldChange(change));
         }
 
         failures.addAll(cleaner.getFailures());
@@ -151,18 +151,18 @@ public class CleanupAction extends SimpleCommand {
         this.failures.clear();
 
         // undo granularity is on set of all entries
-        NamedCompound ce = new NamedCompound(Localization.lang("Clean up entries"));
+        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Clean up entries"));
 
         for (BibEntry entry : List.copyOf(stateManager.getSelectedEntries())) {
-            if (doCleanup(databaseContext, cleanupPreferences, entry, ce)) {
+            if (doCleanup(databaseContext, cleanupPreferences, entry, compoundEdit)) {
                 modifiedEntriesCount++;
             }
         }
 
-        ce.end();
+        compoundEdit.end();
 
-        if (ce.hasEdits()) {
-            undoManager.addEdit(ce);
+        if (compoundEdit.hasEdits()) {
+            undoManager.addEdit(compoundEdit);
         }
 
         if (!failures.isEmpty()) {

@@ -23,7 +23,7 @@ public class ExternalFilesContentImporter {
         try {
             return new PdfMergeMetadataImporter(importFormatPreferences).importDatabase(file, context, filePreferences);
         } catch (IOException e) {
-           return ParserResult.fromError(e);
+            return ParserResult.fromError(e);
         }
     }
 

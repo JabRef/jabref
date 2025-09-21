@@ -181,12 +181,18 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                                                                 .orElse(StandardEntryType.Misc);
                         entry.setType(entryType);
                     }
-                    case "contributors" -> parseContributors(reader, entry);
-                    case "titles" -> parseTitles(reader, entry);
-                    case "periodical" -> parsePeriodical(reader, entry);
-                    case "keywords" -> parseKeywords(reader, entry);
-                    case "urls" -> parseUrls(reader, entry);
-                    case "dates" -> parseDates(reader, entry);
+                    case "contributors" ->
+                            parseContributors(reader, entry);
+                    case "titles" ->
+                            parseTitles(reader, entry);
+                    case "periodical" ->
+                            parsePeriodical(reader, entry);
+                    case "keywords" ->
+                            parseKeywords(reader, entry);
+                    case "urls" ->
+                            parseUrls(reader, entry);
+                    case "dates" ->
+                            parseDates(reader, entry);
                     // TODO: Left for future work -- test files need to be adpated
                     // case "accession-num" -> {
                     //    String accessionNumber = parseElementContent(reader, "accession-num");
@@ -271,10 +277,10 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                             entry.setField(StandardField.BOOKTITLE, secondaryTitle);
                         }
                     }
-                     case "alt-title" -> {
+                    case "alt-title" -> {
                         String altTitle = parseElementContent(reader, "alt-title");
                         entry.setField(FIELD_ALT_TITLE, altTitle);
-                     }
+                    }
                 }
             }
         }
@@ -296,7 +302,10 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     private void parseJournalOrBookTitle(XMLStreamReader reader, BibEntry entry) throws XMLStreamException {
         String elementName = reader.getName().getLocalPart();
         switch (elementName) {
-            case "full-title", "abbr-2", "abbr-1", "abbr-3" -> {
+            case "full-title",
+                 "abbr-2",
+                 "abbr-1",
+                 "abbr-3" -> {
                 String title = parseElementContent(reader, elementName);
                 if (entry.getType().equals(StandardEntryType.Article)) {
                     entry.setField(StandardField.JOURNAL, title);
@@ -388,7 +397,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             if (isStartElement(reader)) {
                 String elementName = reader.getName().getLocalPart();
                 switch (elementName) {
-                    case "year", "month", "day" -> {
+                    case "year",
+                         "month",
+                         "day" -> {
                         String date = parseElementContent(reader, elementName);
                         entry.setField(StandardField.fromName(elementName).get(), date);
                     }

@@ -19,8 +19,8 @@ public class UnoCursor {
      */
     public static Optional<XTextViewCursor> getViewCursor(XTextDocument doc) {
         return UnoTextDocument.getCurrentController(doc)
-                               .flatMap(e -> UnoCast.cast(XTextViewCursorSupplier.class, e))
-                               .map(XTextViewCursorSupplier::getViewCursor);
+                              .flatMap(e -> UnoCast.cast(XTextViewCursorSupplier.class, e))
+                              .map(XTextViewCursorSupplier::getViewCursor);
     }
 
     /**

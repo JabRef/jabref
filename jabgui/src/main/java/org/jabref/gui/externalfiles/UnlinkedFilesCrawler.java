@@ -74,7 +74,6 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
      * and then sorted according to the {@link ExternalFileSorter} value.
      *
      * @param unlinkedPDFFileFilter contains a BibDatabaseContext which is used to determine whether the file is linked
-     *
      * @return FileNodeViewModel containing the data of the current directory and all subdirectories
      * @throws IOException if directory is not a directory or empty
      */
@@ -138,8 +137,8 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
 
         // create and add FileNodeViewModel to the FileNodeViewModel for the current directory
         fileNodeViewModelForCurrentDirectory.getChildren().addAll(resultingFiles.stream()
-                .map(FileNodeViewModel::new)
-                .toList());
+                                                                                .map(FileNodeViewModel::new)
+                                                                                .toList());
 
         return fileNodeViewModelForCurrentDirectory;
     }

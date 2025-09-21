@@ -4,11 +4,8 @@ import java.util.Objects;
 
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.KeywordList;
-import org.jabref.model.entry.field.StandardField;
 
-/**
- * A merger for the {@link StandardField#KEYWORDS} field
- * */
+/// A merger for the {@link org.jabref.model.entry.field.StandardField#KEYWORDS} field
 public class KeywordMerger implements FieldMerger {
     private final BibEntryPreferences bibEntryPreferences;
 

@@ -16,8 +16,8 @@ class FileMergerTest {
      * FileA and FileB are valid strings and are separated by semicolon
      *
      * @param expect Expected value
-     * @param fileA File string a
-     * @param fileB File String b
+     * @param fileA  File string a
+     * @param fileB  File String b
      */
     @ParameterizedTest
     @CsvSource(textBlock = """
