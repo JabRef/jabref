@@ -626,15 +626,22 @@ class CitationKeyGeneratorTest {
         );
     }
 
-    @Test
-    void firstPage() {
-        assertEquals("7", CitationKeyGenerator.firstPage("7--27"));
-        assertEquals("27", CitationKeyGenerator.firstPage("--27"));
-        assertEquals("", CitationKeyGenerator.firstPage(""));
-        assertEquals("42", CitationKeyGenerator.firstPage("42--111"));
-        assertEquals("7", CitationKeyGenerator.firstPage("7,41,73--97"));
-        assertEquals("7", CitationKeyGenerator.firstPage("41,7,73--97"));
-        assertEquals("43", CitationKeyGenerator.firstPage("43+"));
+    @ParameterizedTest
+    @MethodSource("firstPageData")
+    void firstPage(String input, String expected) {
+        assertEquals(expected, CitationKeyGenerator.firstPage(input));
+    }
+
+    static Stream<Arguments> firstPageData() {
+        return Stream.of(
+                Arguments.of("7--27", "7"),
+                Arguments.of("--27", "27"),
+                Arguments.of("", ""),
+                Arguments.of("42--111", "42"),
+                Arguments.of("7,41,73--97", "7"),
+                Arguments.of("41,7,73--97", "7"),
+                Arguments.of("43+", "43")
+        );
     }
 
     @SuppressWarnings("ConstantConditions")
