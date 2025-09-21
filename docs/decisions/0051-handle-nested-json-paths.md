@@ -23,7 +23,6 @@ Chosen option: "Using `org.hisp.dhis:json-tree`", because comes out best (see be
 <!-- This is an optional element. Feel free to remove. -->
 ## Pros and Cons of the Options
 
-
 ### Using `org.hisp.dhis:json-tree`
 
 ```java
