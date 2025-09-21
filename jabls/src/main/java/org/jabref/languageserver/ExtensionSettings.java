@@ -1,15 +1,13 @@
 package org.jabref.languageserver;
 
-import java.util.Optional;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import org.hisp.dhis.jsontree.JsonMixed;
+import org.slf4j.Logger;
 
 public class ExtensionSettings {
-    private final Gson gson;
+
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(ExtensionSettings.class);
+
     private boolean consistencyCheck;
     private boolean consistencyCheckRequired;
     private boolean consistencyCheckOptional;
@@ -22,46 +20,19 @@ public class ExtensionSettings {
         this.consistencyCheckOptional = true;
         this.consistencyCheckUnknown = true;
         this.integrityCheck = true;
-        this.gson = new GsonBuilder().create();
     }
 
     public static ExtensionSettings getDefaultSettings() {
         return new ExtensionSettings();
     }
 
-    public void copyFromJsonObject(JsonObject json) {
-        this.consistencyCheck = assignIfPresent(json, this.consistencyCheck, "jabref", "consistencyCheck", "enabled");
-        this.consistencyCheckRequired = assignIfPresent(json, this.consistencyCheckRequired, "jabref", "consistencyCheck", "required");
-        this.consistencyCheckOptional = assignIfPresent(json, this.consistencyCheckOptional, "jabref", "consistencyCheck", "optional");
-        this.consistencyCheckUnknown = assignIfPresent(json, this.consistencyCheckUnknown, "jabref", "consistencyCheck", "unknown");
-        this.integrityCheck = assignIfPresent(json, this.integrityCheck, "jabref", "integrityCheck", "enabled");
-    }
-
-    private boolean assignIfPresent(JsonObject obj, boolean current, String... path) {
-        return assignIfPresent(obj, current, Boolean.class, path);
-    }
-
-    private <T> T assignIfPresent(JsonObject obj, T current, Class<T> type, String... path) {
-        JsonObject currentObject = obj;
-        for (String key : path) {
-            Optional<JsonElement> element = Optional.ofNullable(currentObject.get(key));
-            if (element.isEmpty()) {
-                return current;
-            }
-            if (element.get().isJsonObject()) {
-                currentObject = element.get().getAsJsonObject();
-                continue;
-            }
-            try {
-                T v = gson.fromJson(element.get(), type);
-                if (v != null) {
-                    return v;
-                }
-            } catch (JsonParseException ignore) {
-                return current;
-            }
-        }
-        return current;
+    public void copyFromJsonObject(JsonObject object) {
+        org.hisp.dhis.jsontree.JsonObject json = JsonMixed.of(object.toString());
+        this.consistencyCheck = json.getBoolean("jabref.consistencyCheck.enabled").booleanValue(this.consistencyCheck);
+        this.consistencyCheckRequired = json.getBoolean("jabref.consistencyCheck.required").booleanValue(this.consistencyCheckRequired);
+        this.consistencyCheckOptional = json.getBoolean("jabref.consistencyCheck.optional").booleanValue(this.consistencyCheckOptional);
+        this.consistencyCheckUnknown = json.getBoolean("jabref.consistencyCheck.unknown").booleanValue(this.consistencyCheckUnknown);
+        this.integrityCheck = json.getBoolean("jabref.integrityCheck.enabled").booleanValue(this.integrityCheck);
     }
 
     public boolean isConsistencyCheck() {
