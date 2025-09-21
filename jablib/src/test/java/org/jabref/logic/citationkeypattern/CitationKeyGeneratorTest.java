@@ -684,17 +684,24 @@ class CitationKeyGeneratorTest {
         assertThrows(NullPointerException.class, () -> CitationKeyGenerator.pagePrefix(null));
     }
 
-    @Test
-    void lastPage() {
-        assertEquals("27", CitationKeyGenerator.lastPage("7--27"));
-        assertEquals("27", CitationKeyGenerator.lastPage("--27"));
-        assertEquals("", CitationKeyGenerator.lastPage(""));
-        assertEquals("111", CitationKeyGenerator.lastPage("42--111"));
-        assertEquals("97", CitationKeyGenerator.lastPage("7,41,73--97"));
-        assertEquals("97", CitationKeyGenerator.lastPage("7,41,97--73"));
-        assertEquals("43", CitationKeyGenerator.lastPage("43+"));
-        assertEquals("0", CitationKeyGenerator.lastPage("00--0"));
-        assertEquals("1", CitationKeyGenerator.lastPage("1--1"));
+    @ParameterizedTest
+    @MethodSource("lastPageData")
+    void lastPage(String input, String expected) {
+        assertEquals(expected, CitationKeyGenerator.lastPage(input));
+    }
+
+    static Stream<Arguments> lastPageData() {
+        return Stream.of(
+                Arguments.of("7--27", "27"),
+                Arguments.of("--27", "27"),
+                Arguments.of("", ""),
+                Arguments.of("42--111", "111"),
+                Arguments.of("7,41,73--97", "97"),
+                Arguments.of("7,41,97--73", "97"),
+                Arguments.of("43+", "43"),
+                Arguments.of("00--0", "0"),
+                Arguments.of("1--1", "1")
+        );
     }
 
     @SuppressWarnings("ConstantConditions")
