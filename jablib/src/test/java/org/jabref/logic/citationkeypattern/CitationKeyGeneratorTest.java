@@ -840,18 +840,23 @@ class CitationKeyGeneratorTest {
         assertEquals("w1", generateKey(entry1, "[keyword1]", database));
     }
 
-    @Test
-    void keywordsNKeywordsSeparatedBySpace() {
+    // It seems this one is the same as keywordNKeywordsSeparatedBySpace
+    @ParameterizedTest
+    @MethodSource("keywordsNData")
+    void keywordsNKeywordsSeparatedBySpace(String pattern, String expected) {
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
+        assertEquals(expected, generateKey(entry, pattern));
+    }
 
-        // all keywords
-        assertEquals("w1w2aw2bw3", generateKey(entry, "[keywords]"));
-
-        // check keywords with space
-        assertEquals("w1w2aw2b", generateKey(entry, "[keywords2]"));
-
-        // check out of range
-        assertEquals("w1w2aw2bw3", generateKey(entry, "[keywords55]"));
+    static Stream<Arguments> keywordsNData() {
+        return Stream.of(
+                // all keywords
+                Arguments.of("[keywords]", "w1w2aw2bw3"),
+                // check keywords with space
+                Arguments.of("[keywords2]", "w1w2aw2b"),
+                // check out of range
+                Arguments.of("[keywords55]", "w1w2aw2bw3")
+        );
     }
 
     @Test
