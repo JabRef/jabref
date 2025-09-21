@@ -202,8 +202,6 @@ public class ThemeManager {
         Theme theme = Objects.requireNonNull(workspacePreferences.getTheme());
 
         if (workspacePreferences.themeSyncOsProperty().getValue()) {
-            System.out.println("Theme sync OS is enabled with " + Platform.isFxApplicationThread());
-
             if (Platform.getPreferences().getColorScheme() == ColorScheme.DARK) {
                 theme = Theme.dark();
             } else {
