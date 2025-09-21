@@ -739,32 +739,27 @@ class CitationKeyGeneratorTest {
     /**
      * Tests [shortTitle]
      */
-    @Test
-    void shortTitle() {
+    @ParameterizedTest
+    @MethodSource("shortTitleData")
+    void shortTitle(String titleString, String expected) {
         // shortTitle is getTitleWords with "3" as count and removed small words
         int count = 3;
-        assertEquals("application migration effort",
+        assertEquals(expected,
                 CitationKeyGenerator.getTitleWords(count,
-                        CitationKeyGenerator.removeSmallWords(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH)));
-        assertEquals("BPEL conformance open",
-                CitationKeyGenerator.getTitleWords(count,
-                        CitationKeyGenerator.removeSmallWords(TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON)));
-        assertEquals("Process Viewing Patterns",
-                CitationKeyGenerator.getTitleWords(count,
-                        CitationKeyGenerator.removeSmallWords(TITLE_STRING_CASED)));
-        assertEquals("BPMN Conformance Open",
-                CitationKeyGenerator.getTitleWords(count,
-                        CitationKeyGenerator.removeSmallWords(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD)));
-        assertEquals("Difference Graph Based",
-                CitationKeyGenerator.getTitleWords(count,
-                        CitationKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING)));
-        assertEquals("Cloud Computing: Next",
-                CitationKeyGenerator.getTitleWords(count,
-                        CitationKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON)));
-        assertEquals("Towards Choreography based",
-                CitationKeyGenerator.getTitleWords(count, CitationKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD)));
-        assertEquals("Measurement Design Time",
-                CitationKeyGenerator.getTitleWords(count, CitationKeyGenerator.removeSmallWords(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS)));
+                        CitationKeyGenerator.removeSmallWords(titleString)));
+    }
+
+    static Stream<Arguments> shortTitleData() {
+        return Stream.of(
+                Arguments.of(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH, "application migration effort"),
+                Arguments.of(TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "BPEL conformance open"),
+                Arguments.of(TITLE_STRING_CASED, "Process Viewing Patterns"),
+                Arguments.of(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD, "BPMN Conformance Open"),
+                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING, "Difference Graph Based"),
+                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "Cloud Computing: Next"),
+                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD, "Towards Choreography based"),
+                Arguments.of(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS, "Measurement Design Time")
+        );
     }
 
     /**
