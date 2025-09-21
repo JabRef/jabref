@@ -611,16 +611,19 @@ class CitationKeyGeneratorTest {
     /**
      * Tests the [authorsN] pattern. -> [authors3]
      */
-    @Test
-    void nAuthors3() {
-        assertEquals("Newton",
-                generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORN.formatted(3)));
-        assertEquals("NewtonMaxwell",
-                generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORN.formatted(3)));
-        assertEquals("NewtonMaxwellEinstein",
-                generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORN.formatted(3)));
-        assertEquals("NewtonMaxwellEinsteinEtAl",
-                generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORN.formatted(3)));
+    @ParameterizedTest
+    @MethodSource("nAuthors3Data")
+    void nAuthors3(BibEntry entry, String expected) {
+        assertEquals(expected, generateKey(entry, AUTHORN.formatted(3)));
+    }
+
+    static Stream<Arguments> nAuthors3Data() {
+        return Stream.of(
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newton"),
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "NewtonMaxwell"),
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "NewtonMaxwellEinstein"),
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "NewtonMaxwellEinsteinEtAl")
+        );
     }
 
     @Test
