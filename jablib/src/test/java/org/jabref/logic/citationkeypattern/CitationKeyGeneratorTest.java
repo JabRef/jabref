@@ -900,12 +900,18 @@ class CitationKeyGeneratorTest {
         assertThrows(NullPointerException.class, () -> CitationKeyGenerator.cleanKey(null, DEFAULT_UNWANTED_CHARACTERS));
     }
 
-    @Test
-    void applyModifiers() {
+    @ParameterizedTest
+    @MethodSource("applyModifiersData")
+    void applyModifiers(String pattern, String expected) {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Green Scheduling of Whatever");
-        assertEquals("GSo", generateKey(entry, "[shorttitleINI]"));
-        assertEquals("GreenSchedulingWhatever", generateKey(entry, "[shorttitle]",
-                new BibDatabase()));
+        assertEquals(expected, generateKey(entry, pattern, new BibDatabase()));
+    }
+
+    static Stream<Arguments> applyModifiersData() {
+        return Stream.of(
+                Arguments.of("[shorttitleINI]", "GSo"),
+                Arguments.of("[shorttitle]", "GreenSchedulingWhatever")
+        );
     }
 
     @Test
