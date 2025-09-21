@@ -18,15 +18,21 @@ jobs:
         id: shouldrun
         shell: bash
         run: |
-          if [[ "$HEAD_REPO" != "JabRef/jabref" ]]; then
-            echo "🚫 not from JabRef/jabref"
-            echo "shouldrun=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
           if [[ "$ACTOR" == "renovate-bot" ]]; then
             echo "✅ from renote-bot"
             echo "shouldrun=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$ACTOR" == "dependabot[bot]" ]]; then
+            echo "✅ from dependabot"
+            echo "shouldrun=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$HEAD_REPO" != "JabRef/jabref" ]]; then
+            echo "🚫 not from JabRef/jabref"
+            echo "shouldrun=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
