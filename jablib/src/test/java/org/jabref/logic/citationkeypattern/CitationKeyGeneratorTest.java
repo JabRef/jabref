@@ -601,12 +601,19 @@ class CitationKeyGeneratorTest {
     /**
      * Tests the [authorsN] pattern. -> [authors1]
      */
-    @Test
-    void nAuthors1() {
-        assertEquals("Newton", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORN.formatted(1)));
-        assertEquals("NewtonEtAl", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORN.formatted(1)));
-        assertEquals("NewtonEtAl", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORN.formatted(1)));
-        assertEquals("NewtonEtAl", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORN.formatted(1)));
+    @ParameterizedTest
+    @MethodSource("nAuthors1Data")
+    void nAuthors1(BibEntry entry, String expected) {
+        assertEquals(expected, generateKey(entry, AUTHORN.formatted(1)));
+    }
+
+    static Stream<Arguments> nAuthors1Data() {
+        return Stream.of(
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newton"),
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "NewtonEtAl"),
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "NewtonEtAl"),
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "NewtonEtAl")
+        );
     }
 
     @Test
