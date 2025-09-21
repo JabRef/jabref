@@ -38,7 +38,11 @@ public class LspConsistencyCheck {
 
         result.entryTypeToResultMap().forEach((entryType, entryTypeResult) -> {
             Optional<BibEntryType> bibEntryType = new BibEntryTypesManager().enrich(entryType, parserResult.getDatabaseContext().getMode());
-            Set<Field> requiredFields = bibEntryType.map(BibEntryType::getRequiredFields).stream().flatMap(Collection::stream).flatMap(orFields -> orFields.getFields().stream()).collect(Collectors.toUnmodifiableSet());
+            Set<Field> requiredFields = bibEntryType.map(BibEntryType::getRequiredFields)
+                                                    .stream()
+                                                    .flatMap(Collection::stream)
+                                                    .flatMap(orFields -> orFields.getFields().stream())
+                                                    .collect(Collectors.toUnmodifiableSet());
 
             if (settings.isConsistencyCheckRequired()) {
                 entryTypeResult.sortedEntries().forEach(entry -> requiredFields.forEach(requiredField -> {
@@ -52,7 +56,12 @@ public class LspConsistencyCheck {
                 }));
             }
 
-            Set<Field> optionalFields = bibEntryType.map(BibEntryType::getOptionalFields).stream().flatMap(Collection::stream).map(BibField::field).filter(allReportedFields::contains).collect(Collectors.toUnmodifiableSet());
+            Set<Field> optionalFields = bibEntryType.map(BibEntryType::getOptionalFields)
+                                                    .stream()
+                                                    .flatMap(Collection::stream)
+                                                    .map(BibField::field)
+                                                    .filter(allReportedFields::contains)
+                                                    .collect(Collectors.toUnmodifiableSet());
 
             if (settings.isConsistencyCheckOptional()) {
                 optionalFields.forEach(optionalField -> entryTypeResult.sortedEntries().forEach(entry -> {
