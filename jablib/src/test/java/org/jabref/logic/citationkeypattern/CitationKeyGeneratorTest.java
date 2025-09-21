@@ -713,34 +713,27 @@ class CitationKeyGeneratorTest {
     /**
      * Tests [veryShortTitle]
      */
-    @Test
-    void veryShortTitle() {
+    @ParameterizedTest
+    @MethodSource("veryShortTitleData")
+    void veryShortTitle(String titleString, String expected) {
         // veryShortTitle is getTitleWords with "1" as count
         int count = 1;
-        assertEquals("application",
+        assertEquals(expected,
                 CitationKeyGenerator.getTitleWords(count,
-                        CitationKeyGenerator.removeSmallWords(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH)));
-        assertEquals("BPEL", CitationKeyGenerator.getTitleWords(count,
-                CitationKeyGenerator.removeSmallWords(
-                        TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON)));
-        assertEquals("Process", CitationKeyGenerator.getTitleWords(count,
-                CitationKeyGenerator.removeSmallWords(TITLE_STRING_CASED)));
-        assertEquals("BPMN",
-                CitationKeyGenerator.getTitleWords(count,
-                        CitationKeyGenerator.removeSmallWords(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD)));
-        assertEquals("Difference", CitationKeyGenerator.getTitleWords(count,
-                CitationKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING)));
-        assertEquals("Cloud",
-                CitationKeyGenerator.getTitleWords(count,
-                        CitationKeyGenerator
-                                .removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON)));
-        assertEquals("Towards",
-                CitationKeyGenerator.getTitleWords(count,
-                        CitationKeyGenerator.removeSmallWords(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD)));
-        assertEquals("Measurement",
-                CitationKeyGenerator.getTitleWords(count,
-                        CitationKeyGenerator
-                                .removeSmallWords(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS)));
+                        CitationKeyGenerator.removeSmallWords(titleString)));
+    }
+
+    static Stream<Arguments> veryShortTitleData() {
+        return Stream.of(
+                Arguments.of(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH, "application"),
+                Arguments.of(TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "BPEL"),
+                Arguments.of(TITLE_STRING_CASED, "Process"),
+                Arguments.of(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD, "BPMN"),
+                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING, "Difference"),
+                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "Cloud"),
+                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD, "Towards"),
+                Arguments.of(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS, "Measurement")
+        );
     }
 
     /**
