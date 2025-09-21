@@ -790,33 +790,25 @@ class CitationKeyGeneratorTest {
     /**
      * Tests [title]
      */
-    @Test
-    void title() {
+    @ParameterizedTest
+    @MethodSource("titleData")
+    void title(String titleString, String expected) {
         // title capitalises the significant words of the title
         // for the title case the concatenation happens at formatting, which is tested in MakeLabelWithDatabaseTest.java
-        assertEquals("Application Migration Effort in the Cloud the Case of Cloud Platforms",
-                CitationKeyGenerator
-                        .camelizeSignificantWordsInTitle(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
-        assertEquals("BPEL Conformance in Open Source Engines: the Case of Static Analysis",
-                CitationKeyGenerator.camelizeSignificantWordsInTitle(
-                        TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("Process Viewing Patterns",
-                CitationKeyGenerator.camelizeSignificantWordsInTitle(TITLE_STRING_CASED));
-        assertEquals("BPMN Conformance in Open Source Engines",
-                CitationKeyGenerator
-                        .camelizeSignificantWordsInTitle(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
-        assertEquals("The Difference between Graph Based and Block Structured Business Process Modelling Languages",
-                CitationKeyGenerator.camelizeSignificantWordsInTitle(
-                        TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
-        assertEquals("Cloud Computing: the Next Revolution in IT",
-                CitationKeyGenerator.camelizeSignificantWordsInTitle(
-                        TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("Towards Choreography Based Process Distribution in the Cloud",
-                CitationKeyGenerator
-                        .camelizeSignificantWordsInTitle(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
-        assertEquals("On the Measurement of Design Time Adaptability for Process Based Systems",
-                CitationKeyGenerator.camelizeSignificantWordsInTitle(
-                        TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
+        assertEquals(expected, CitationKeyGenerator.camelizeSignificantWordsInTitle(titleString));
+    }
+
+    static Stream<Arguments> titleData() {
+        return Stream.of(
+                Arguments.of(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH, "Application Migration Effort in the Cloud the Case of Cloud Platforms"),
+                Arguments.of(TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "BPEL Conformance in Open Source Engines: the Case of Static Analysis"),
+                Arguments.of(TITLE_STRING_CASED, "Process Viewing Patterns"),
+                Arguments.of(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD, "BPMN Conformance in Open Source Engines"),
+                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING, "The Difference between Graph Based and Block Structured Business Process Modelling Languages"),
+                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "Cloud Computing: the Next Revolution in IT"),
+                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD, "Towards Choreography Based Process Distribution in the Cloud"),
+                Arguments.of(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS, "On the Measurement of Design Time Adaptability for Process Based Systems")
+        );
     }
 
     @Test
