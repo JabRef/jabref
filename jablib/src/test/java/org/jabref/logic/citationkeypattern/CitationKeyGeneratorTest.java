@@ -765,26 +765,24 @@ class CitationKeyGeneratorTest {
     /**
      * Tests [camel]
      */
-    @Test
-    void camel() {
+    @ParameterizedTest
+    @MethodSource("camelData")
+    void camel(String titleString, String expected) {
         // camel capitalises and concatenates all the words of the title
-        assertEquals("ApplicationMigrationEffortInTheCloudTheCaseOfCloudPlatforms",
-                CitationKeyGenerator.getCamelizedTitle(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH));
-        assertEquals("BPELConformanceInOpenSourceEnginesTheCaseOfStaticAnalysis",
-                CitationKeyGenerator.getCamelizedTitle(
-                        TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("ProcessViewingPatterns", CitationKeyGenerator.getCamelizedTitle(TITLE_STRING_CASED));
-        assertEquals("BPMNConformanceInOpenSourceEngines",
-                CitationKeyGenerator.getCamelizedTitle(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD));
-        assertEquals("TheDifferenceBetweenGraphBasedAndBlockStructuredBusinessProcessModellingLanguages",
-                CitationKeyGenerator.getCamelizedTitle(
-                        TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING));
-        assertEquals("CloudComputingTheNextRevolutionInIT",
-                CitationKeyGenerator.getCamelizedTitle(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON));
-        assertEquals("TowardsChoreographyBasedProcessDistributionInTheCloud",
-                CitationKeyGenerator.getCamelizedTitle(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD));
-        assertEquals("OnTheMeasurementOfDesignTimeAdaptabilityForProcessBasedSystems",
-                CitationKeyGenerator.getCamelizedTitle(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS));
+        assertEquals(expected, CitationKeyGenerator.getCamelizedTitle(titleString));
+    }
+
+    static Stream<Arguments> camelData() {
+        return Stream.of(
+                Arguments.of(TITLE_STRING_ALL_LOWER_FOUR_SMALL_WORDS_ONE_EN_DASH, "ApplicationMigrationEffortInTheCloudTheCaseOfCloudPlatforms"),
+                Arguments.of(TITLE_STRING_ALL_LOWER_FIRST_WORD_IN_BRACKETS_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "BPELConformanceInOpenSourceEnginesTheCaseOfStaticAnalysis"),
+                Arguments.of(TITLE_STRING_CASED, "ProcessViewingPatterns"),
+                Arguments.of(TITLE_STRING_CASED_ONE_UPPER_WORD_ONE_SMALL_WORD, "BPMNConformanceInOpenSourceEngines"),
+                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AT_THE_BEGINNING, "TheDifferenceBetweenGraphBasedAndBlockStructuredBusinessProcessModellingLanguages"),
+                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_SMALL_WORD_AFTER_COLON, "CloudComputingTheNextRevolutionInIT"),
+                Arguments.of(TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD, "TowardsChoreographyBasedProcessDistributionInTheCloud"),
+                Arguments.of(TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS, "OnTheMeasurementOfDesignTimeAdaptabilityForProcessBasedSystems")
+        );
     }
 
     /**
@@ -811,17 +809,21 @@ class CitationKeyGeneratorTest {
         );
     }
 
-    @Test
-    void keywordNKeywordsSeparatedBySpace() {
+    @ParameterizedTest
+    @MethodSource("keywordNData")
+    void keywordNKeywordsSeparatedBySpace(String pattern, String expected) {
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "w1, w2a w2b, w3");
+        assertEquals(expected, generateKey(entry, pattern));
+    }
 
-        assertEquals("w1", generateKey(entry, "[keyword1]"));
-
-        // check keywords with space
-        assertEquals("w2aw2b", generateKey(entry, "[keyword2]"));
-
-        // check out of range
-        assertEquals("", generateKey(entry, "[keyword4]"));
+    static Stream<Arguments> keywordNData() {
+        return Stream.of(
+                Arguments.of("[keyword1]", "w1"),
+                // check keywords with space
+                Arguments.of("[keyword2]", "w2aw2b"),
+                // check out of range
+                Arguments.of("[keyword4]", "")
+        );
     }
 
     @Test
