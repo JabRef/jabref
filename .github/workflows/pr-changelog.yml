@@ -15,7 +15,7 @@ permissions:
 jobs:
   changelog_modification_consistency:
     name: CHANGELOG.md needs to be modified if indicated
-    if: (github.actor != 'dependabot[bot]') && (github.actor != 'renovate-bot')
+    if: (github.event.pull_request.user.login != 'dependabot[bot]') && (github.event.pull_request.user.login != 'renovate-bot')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
