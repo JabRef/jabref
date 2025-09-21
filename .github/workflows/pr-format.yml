@@ -1,4 +1,4 @@
-name: PR Format
+name: Check PR Format
 
 on:
   pull_request:
@@ -122,3 +122,13 @@ jobs:
           echo "✅ All checkboxes are present and in the correct format."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number.txt
