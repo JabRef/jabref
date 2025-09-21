@@ -463,6 +463,8 @@ extraJavaModuleInfo {
         requires("java.logging")
     }
 
+    module("org.hisp.dhis:json-tree", "json-tree")
+
     module("com.github.sialcasa.mvvmFX:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {
         exportAllPackages()
         requireAllDefinedDependencies()
