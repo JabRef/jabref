@@ -18,6 +18,8 @@ jobs:
         id: shouldrun
         shell: bash
         run: |
+          echo actor: $ACTOR
+
           if [[ "$ACTOR" == "renovate-bot" ]]; then
             echo "✅ from renote-bot"
             echo "shouldrun=true" >> "$GITHUB_OUTPUT"
