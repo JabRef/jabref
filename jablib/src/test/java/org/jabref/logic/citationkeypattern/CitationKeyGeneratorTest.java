@@ -580,16 +580,22 @@ class CitationKeyGeneratorTest {
     /**
      * Tests [authorIni]
      */
-    @Test
-    void oneAuthorPlusIni() {
-        assertEquals("Newto", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, AUTHORINI));
-        assertEquals("NewtoM", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, AUTHORINI));
-        assertEquals("NewtoME", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, AUTHORINI));
-        assertEquals("NewtoMEB", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, AUTHORINI));
-        assertEquals("NewtoMEBU", generateKey(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, AUTHORINI));
+    @ParameterizedTest
+    @MethodSource("oneAuthorPlusIniData")
+    void oneAuthorPlusIni(BibEntry entry, String expected) {
+        assertEquals(expected, generateKey(entry, AUTHORINI));
+    }
 
-        assertEquals("Aalst", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, AUTHORINI));
-        assertEquals("AalstL", generateKey(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, AUTHORINI));
+    static Stream<Arguments> oneAuthorPlusIniData() {
+        return Stream.of(
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1, "Newto"),
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2, "NewtoM"),
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, "NewtoME"),
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, "NewtoMEB"),
+                Arguments.of(AUTHOR_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_5, "NewtoMEBU"),
+                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1, "Aalst"),
+                Arguments.of(AUTHOR_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2, "AalstL")
+        );
     }
 
     /**
