@@ -15,6 +15,7 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCs
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import picocli.CommandLine.ParentCommand;
 @Command(name = "check-consistency", description = "Check consistency of the library.")
 class CheckConsistency implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckConsistency.class);
+    private static final BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
 
     @ParentCommand
     private ArgumentProcessor argumentProcessor;
@@ -64,7 +66,7 @@ class CheckConsistency implements Callable<Integer> {
 
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
 
-        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
+        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck(argumentProcessor.cliPreferences, bibEntryTypesManager);
         BibliographyConsistencyCheck.Result result = consistencyCheck.check(databaseContext, (count, total) -> {
             if (!sharedOptions.porcelain) {
                 System.out.println(Localization.lang("Checking consistency for entry type %0 of %1", count + 1, total));

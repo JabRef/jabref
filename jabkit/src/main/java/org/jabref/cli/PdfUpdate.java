@@ -37,6 +37,7 @@ import static picocli.CommandLine.ParentCommand;
 @Command(name = "update", description = "Update linked PDFs with XMP and/or embedded BibTeX.")
 class PdfUpdate implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(PdfUpdate.class);
+    private static final BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
 
     @ParentCommand
     protected Pdf pdf;
@@ -93,7 +94,7 @@ class PdfUpdate implements Runnable {
                 pdf.argumentProcessor.cliPreferences.getXmpPreferences(),
                 pdf.argumentProcessor.cliPreferences.getFilePreferences(),
                 pdf.argumentProcessor.cliPreferences.getLibraryPreferences().getDefaultBibDatabaseMode(),
-                pdf.argumentProcessor.cliPreferences.getCustomEntryTypesRepository(),
+                pdf.argumentProcessor.cliPreferences.getCustomEntryTypesRepository(bibEntryTypesManager),
                 pdf.argumentProcessor.cliPreferences.getFieldPreferences(),
                 Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                 formats.contains("xmp"),

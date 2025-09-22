@@ -57,6 +57,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     @FXML private Button addNewFieldButton;
 
     @Inject private StateManager stateManager;
+    @Inject private BibEntryTypesManager bibEntryTypesManager;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
@@ -76,7 +77,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
     public void initialize() {
         BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                            .orElse(preferences.getLibraryPreferences().getDefaultBibDatabaseMode());
-        BibEntryTypesManager entryTypesRepository = preferences.getCustomEntryTypesRepository();
+        BibEntryTypesManager entryTypesRepository = preferences.getCustomEntryTypesRepository(bibEntryTypesManager);
 
         this.viewModel = new CustomEntryTypesTabViewModel(mode, entryTypesRepository, dialogService, preferences);
 

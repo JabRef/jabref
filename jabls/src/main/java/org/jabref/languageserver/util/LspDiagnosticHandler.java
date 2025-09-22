@@ -32,7 +32,7 @@ public class LspDiagnosticHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(LspDiagnosticHandler.class);
     private static final int NO_VERSION = -1;
 
-    private final CliPreferences jabRefCliPreferences;
+    private final CliPreferences cliPreferences;
     private final LspIntegrityCheck lspIntegrityCheck;
     private final LspConsistencyCheck lspConsistencyCheck;
     private final LspClientHandler clientHandler;
@@ -43,7 +43,7 @@ public class LspDiagnosticHandler {
 
     public LspDiagnosticHandler(LspClientHandler clientHandler, CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.clientHandler = clientHandler;
-        this.jabRefCliPreferences = cliPreferences;
+        this.cliPreferences = cliPreferences;
         this.lspIntegrityCheck = new LspIntegrityCheck(cliPreferences, abbreviationRepository);
         this.lspConsistencyCheck = new LspConsistencyCheck();
         this.integrityDiagnosticsCache = new ConcurrentHashMap<>();
@@ -71,8 +71,8 @@ public class LspDiagnosticHandler {
         List<Diagnostic> diagnostics = new ArrayList<>();
         ParserResult parserResult;
         try {
-            parserResult = parserResultFromString(content, jabRefCliPreferences.getImportFormatPreferences());
-        } catch (JabRefException | IOException e) {
+            bibDatabaseContext = BibDatabaseContext.of(content, cliPreferences.getImportFormatPreferences());
+        } catch (JabRefException e) {
             Diagnostic parseDiagnostic = LspDiagnosticBuilder.create(Localization.lang(
                     "Failed to parse entries.\nThe following error was encountered:\n%0",
                     e.getMessage())).setSeverity(DiagnosticSeverity.Error).build();
@@ -90,7 +90,7 @@ public class LspDiagnosticHandler {
         }
 
         if (clientHandler.getSettings().isConsistencyCheck()) {
-            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(parserResult));
+            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(bibDatabaseContext, content, cliPreferences));
             LOGGER.debug("Cached consistency diagnostics for {}", uri);
         }
 
