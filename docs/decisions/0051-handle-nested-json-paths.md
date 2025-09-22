@@ -11,19 +11,18 @@ When trying to parse nested JSON structures in JabLS which receives the VSCode s
 
 ## Considered Options
 
-* Using `org.hisp.dhis:json-tree`
-* Using Unirest and Optional
-* Using GSON and chaining Optional
-* Using an own method to parse the path
+* Use `org.hisp.dhis:json-tree`
+* Use Unirest and Optional
+* Use GSON and chaining Optional
+* Use an own method to parse the path
 
 ## Decision Outcome
 
-Chosen option: "Using `org.hisp.dhis:json-tree`", because comes out best (see below).
+Chosen option: "Use `org.hisp.dhis:json-tree`", because comes out best (see below).
 
-<!-- This is an optional element. Feel free to remove. -->
 ## Pros and Cons of the Options
 
-### Using `org.hisp.dhis:json-tree`
+### Use `org.hisp.dhis:json-tree`
 
 ```java
 this.integrityCheck = json.getBoolean("jabref.integrityCheck.enabled").booleanValue(this.integrityCheck);
@@ -35,7 +34,7 @@ this.integrityCheck = json.getBoolean("jabref.integrityCheck.enabled").booleanVa
 * Good, because it has a fallback value
 * Bad, because it introduces a new dependency
 
-### Using Unirest and Optional
+### Use Unirest and Optional
 
 ```java
 this.integrityCheck = Optional.ofNullable(json.optJSONObject("jabref"))
@@ -49,7 +48,7 @@ this.integrityCheck = Optional.ofNullable(json.optJSONObject("jabref"))
 * Bad, because it is quite verbose
 * Bad, because it requires chaining Optional
 
-### Using GSON and chaining Optional
+### Use GSON and chaining Optional
 
 ```java
 this.integrityCheck = Optional.ofNullable(json.get("jabref"))
@@ -66,7 +65,7 @@ this.integrityCheck = Optional.ofNullable(json.get("jabref"))
 * Bad, because it is verbose
 * Bad, because it requires chaining Optional
 
-### Using an own method to parse the path
+### Use an own method to parse the path
 
 ```java
 private <T> T assignIfPresent(JsonObject obj, T current, Class<T> type, String... path) {
