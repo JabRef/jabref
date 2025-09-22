@@ -6,18 +6,17 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.io.RevisionTriple;
-import org.jabref.logic.git.merge.GitSemanticMergePlanner;
-import org.jabref.logic.git.merge.MergeAnalysis;
+import org.jabref.logic.git.merge.DefaultMergeBookkeeper;
 import org.jabref.logic.git.merge.MergeBookkeeper;
 import org.jabref.logic.git.merge.SemanticMergeAnalyzer;
 import org.jabref.logic.git.model.FinalizeResult;
+import org.jabref.logic.git.model.MergeAnalysis;
 import org.jabref.logic.git.model.MergePlan;
-import org.jabref.logic.git.model.PullComputation;
+import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.model.PushResult;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
@@ -29,8 +28,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// GitSyncService currently serves as an orchestrator for Git pull/push logic (不负责写入).
 ///
@@ -43,25 +40,26 @@ import org.slf4j.LoggerFactory;
 /// - finalizeMerge(): After the GUI has been successfully committed to disk, it is responsible for stage and commit.
 // TODO: Considering Git status -> state machine
 public class GitSyncService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GitSyncService.class);
-
-    private static final boolean AMEND = true;
     private final ImportFormatPreferences importFormatPreferences;
     private final GitHandlerRegistry gitHandlerRegistry;
-    private final GitConflictResolverStrategy gitConflictResolverStrategy;
-    private final GitSemanticMergePlanner mergePlanner;
     private final MergeBookkeeper bookkeeper;
 
-    public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandlerRegistry gitHandlerRegistry, GitConflictResolverStrategy gitConflictResolverStrategy, GitSemanticMergePlanner mergeExecutor, MergeBookkeeper bookkeeper) {
+    public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandlerRegistry gitHandlerRegistry, MergeBookkeeper bookkeeper) {
         this.importFormatPreferences = importFormatPreferences;
         this.gitHandlerRegistry = gitHandlerRegistry;
-        this.gitConflictResolverStrategy = gitConflictResolverStrategy;
-        this.mergePlanner = mergeExecutor;
         this.bookkeeper = bookkeeper;
     }
 
+    public static GitSyncService create(ImportFormatPreferences importFormatPreferences, GitHandlerRegistry registry) {
+        return new GitSyncService(
+                importFormatPreferences,
+                registry,
+                new DefaultMergeBookkeeper(registry)
+        );
+    }
+
     ///  compute computeMergePlan inputs/outputs for GUI
-    public PullComputation prepareMerge(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
+    public PullPlan prepareMerge(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
         Optional<Path> repoRoot = GitHandler.findRepositoryRoot(bibFilePath);
         if (repoRoot.isEmpty()) {
             throw new JabRefException("Pull aborted: Path is not inside a Git repository.");
@@ -85,10 +83,10 @@ public class GitSyncService {
         }
 
         if (status.syncStatus() == SyncStatus.UP_TO_DATE) {
-            return PullComputation.noop();
+            return PullPlan.noop();
         }
         if (status.syncStatus() == SyncStatus.AHEAD) {
-            return PullComputation.noopAhead();
+            return PullPlan.noopAhead();
         }
 
         try (Git git = gitHandler.open()) {
@@ -127,7 +125,7 @@ public class GitSyncService {
             MergePlan autoPlan = analysis.autoPlan();
 
             // 5) return computation (GUI will apply & save, then finalize)
-            return PullComputation.of(status.syncStatus(), baseCommitOpt, remoteCommit, localHead, autoPlan, conflicts);
+            return PullPlan.of(status.syncStatus(), baseCommitOpt, remoteCommit, localHead, autoPlan, conflicts);
         }
     }
 
@@ -144,11 +142,10 @@ public class GitSyncService {
      * - No uncommitted unrelated changes
      */
     public FinalizeResult finalizeMerge(Path bibFilePath,
-                                        PullComputation computation) throws GitAPIException, IOException, JabRefException {
+                                        PullPlan computation) throws GitAPIException, IOException, JabRefException {
         return bookkeeper.resultRecord(bibFilePath, computation);
     }
 
-    // todo: Cancel the automatic merge process
     public PushResult push(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
         Optional<Path> repoRoot = GitHandler.findRepositoryRoot(bibFilePath);
 
@@ -194,25 +191,7 @@ public class GitSyncService {
 
             case BEHIND,
                  DIVERGED -> {
-                // todo: remove fetchAndMerge
-                //                fetchAndMerge(localDatabaseContext, bibFilePath);
-                status = GitStatusChecker.checkStatus(gitHandler);
-                if (status.conflict()) {
-                    throw new JabRefException("Push aborted: Merge left conflicts unresolved.");
-                }
-                if (status.uncommittedChanges()) {
-                    throw new JabRefException("Push aborted: Merge produced uncommitted changes.");
-                }
-
-                SyncStatus after = status.syncStatus();
-                if (after == SyncStatus.AHEAD) {
-                    gitHandler.pushCommitsToRemoteRepository();
-                    return PushResult.pushed();
-                } else if (after == SyncStatus.UP_TO_DATE) {
-                    return PushResult.noopUpToDate();
-                } else {
-                    throw new JabRefException("Push aborted: Repository not ahead after computeMergePlan. Status: " + after);
-                }
+                throw new JabRefException("Push aborted: Local branch is behind or has diverged from remote. Please pull first.");
             }
             default -> {
                 throw new JabRefException("Push aborted: Unsupported sync status.");

@@ -1,40 +1,13 @@
 package org.jabref.logic.git.model;
 
-public final class PushResult implements GitOperationResult {
-
-    public enum Outcome {
-        PUSHED,
-        NOOP_UP_TO_DATE
-    }
-
-    private final boolean isSuccessful;
-    private final boolean noop;
-
-    private PushResult(boolean isSuccessful, boolean noop) {
-        this.isSuccessful = isSuccessful;
-        this.noop = noop;
-    }
-
+public record PushResult(boolean successful, boolean noop) {
+    /// Created when local branch has commits to push and the push succeeded.
     public static PushResult pushed() {
         return new PushResult(true, false);
     }
 
+    /// Created when there is nothing to push (local is up to date with remote).
     public static PushResult noopUpToDate() {
-        return new PushResult(true, true);
-    }
-
-    @Override
-    public Operation operation() {
-        return Operation.PUSH;
-    }
-
-    @Override
-    public boolean isSuccessful() {
-        return isSuccessful;
-    }
-
-    @Override
-    public boolean noop() {
-        return noop;
+        return new PushResult(false, true);
     }
 }

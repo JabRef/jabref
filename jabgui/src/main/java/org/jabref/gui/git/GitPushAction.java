@@ -12,11 +12,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.GitSyncService;
-import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
-import org.jabref.logic.git.merge.DefaultMergeBookkeeper;
-import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
-import org.jabref.logic.git.merge.GitSemanticMergePlanner;
-import org.jabref.logic.git.merge.MergeBookkeeper;
 import org.jabref.logic.git.model.PushResult;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
@@ -82,7 +77,7 @@ public class GitPushAction extends SimpleCommand {
                                 Localization.lang("Git Push"),
                                 Localization.lang("Nothing to push. Local branch is up to date.")
                         );
-                    } else if (result.isSuccessful()) {
+                    } else if (result.successful()) {
                         dialogService.showInformationDialogAndWait(
                                 Localization.lang("Git Push"),
                                 Localization.lang("Pushed successfully.")
@@ -98,7 +93,7 @@ public class GitPushAction extends SimpleCommand {
                               GitStatusViewModel gitStatusViewModel,
                               GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
 
-        GitSyncService syncService = buildSyncService(registry);
+        GitSyncService syncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), registry);
         GitHandler handler = registry.get(bibPath.getParent());
         String user = guiPreferences.getGitPreferences().getUsername();
         String pat = guiPreferences.getGitPreferences().getPat();
@@ -106,18 +101,10 @@ public class GitPushAction extends SimpleCommand {
 
         PushResult result = syncService.push(databaseContext, bibPath);
 
-        if (result.isSuccessful()) {
+        if (result.successful()) {
             gitStatusViewModel.refresh(bibPath);
         }
         return result;
-    }
-
-    private GitSyncService buildSyncService(GitHandlerRegistry handlerRegistry) throws JabRefException {
-        GitConflictResolverDialog dialog = new GitConflictResolverDialog(dialogService, guiPreferences);
-        GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(dialog);
-        GitSemanticMergePlanner mergePlanner = new GitSemanticMergeExecutorImpl(guiPreferences.getImportFormatPreferences());
-        MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
-        return new GitSyncService(guiPreferences.getImportFormatPreferences(), handlerRegistry, resolver, mergePlanner, bookkeeper);
     }
 
     private void showPushError(Throwable ex) {

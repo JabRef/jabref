@@ -16,11 +16,9 @@ import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileWriter;
-import org.jabref.logic.git.merge.DefaultMergeBookkeeper;
-import org.jabref.logic.git.merge.GitSemanticMergePlanner;
 import org.jabref.logic.git.model.FinalizeResult;
 import org.jabref.logic.git.model.MergePlan;
-import org.jabref.logic.git.model.PullComputation;
+import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -97,8 +95,14 @@ public class GitPullAction extends SimpleCommand {
 
                     MergePlan autoMergePlan = pullComputation.autoPlan();
                     List<ThreeWayEntryConflict> conflicts = pullComputation.conflicts();
+
+                    int autoNewCount = autoMergePlan.newEntries().size();
+                    int autoModifiedCount = autoMergePlan.fieldPatches().size();
+                    int autoDeletedCount = autoMergePlan.deletedEntryKeys().size();
+
                     applyAutoPlan(activeDatabase, autoMergePlan);
 
+                    int manualResolvedCount;
                     if (!conflicts.isEmpty()) {
                         // resolve via GUI (strategy jumps to FX thread internally; safe to call from background)
                         GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(
@@ -108,7 +112,10 @@ public class GitPullAction extends SimpleCommand {
                             dialogService.notify(Localization.lang("Pull canceled."));
                             return;
                         }
+                        manualResolvedCount = resolved.size();
                         applyResolved(activeDatabase, resolved);
+                    } else {
+                        manualResolvedCount = 0;
                     }
 
                     BackgroundTask.wrap(() -> saveAndFinalize(bibFilePath, activeDatabase, pullComputation))
@@ -120,9 +127,22 @@ public class GitPullAction extends SimpleCommand {
                                                   Localization.lang("Fast-forwarded to remote.")
                                           );
                                       } else {
+                                          String stats = Localization.lang(
+                                                  "Auto-applied changes: %0 new, %1 modified, %2 deleted.",
+                                                  Integer.toString(autoNewCount),
+                                                  Integer.toString(autoModifiedCount),
+                                                  Integer.toString(autoDeletedCount)
+                                          );
+                                          if (manualResolvedCount > 0) {
+                                              stats = stats + " " + Localization.lang(
+                                                      "%0 conflicts resolved.",
+                                                      Integer.toString(manualResolvedCount)
+                                              );
+                                          }
+
                                           dialogService.showInformationDialogAndWait(
                                                   Localization.lang("Git Pull"),
-                                                  Localization.lang("Merged and updated.")
+                                                  Localization.lang("Merged and updated.") + " " + stats
                                           );
                                       }
                                   })
@@ -133,8 +153,8 @@ public class GitPullAction extends SimpleCommand {
                 .executeWith(taskExecutor);
     }
 
-    private PullComputation prepareMergeResult(BibDatabaseContext databaseContext, Path bibPath, GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
-        GitSyncService gitSyncService = buildSyncService(registry);
+    private PullPlan prepareMergeResult(BibDatabaseContext databaseContext, Path bibPath, GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
+        GitSyncService gitSyncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), registry);
         GitHandler handler = registry.get(bibPath.getParent());
         String user = guiPreferences.getGitPreferences().getUsername();
         String pat = guiPreferences.getGitPreferences().getPat();
@@ -144,21 +164,17 @@ public class GitPullAction extends SimpleCommand {
 
     private FinalizeResult saveAndFinalize(Path bibPath,
                                            BibDatabaseContext databaseContext,
-                                           PullComputation pullComputation)
+                                           PullPlan pullPlan)
             throws IOException, GitAPIException, JabRefException {
-        // TODO:（可替换成 SaveDatabaseAction.save(...)，这里先沿用你现有 writer）
-        saveLikeUserSave(bibPath, databaseContext);
+        GitFileWriter.write(bibPath, databaseContext, guiPreferences.getImportFormatPreferences());
         // Git bookkeeping
-        GitSyncService gitSyncService = buildSyncService(gitHandlerRegistry);
-        return gitSyncService.finalizeMerge(bibPath, pullComputation);
+        GitSyncService gitSyncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), gitHandlerRegistry);
+        return gitSyncService.finalizeMerge(bibPath, pullPlan);
     }
 
     // ------------------- helpers: memory mutations -------------------
 
-    /**
-     * Apply (remote - base) patches safely into the in-memory DB, plus safe new/deleted entries.
-     * We intentionally mutate MEMORY first so we can run the same save path as a manual save afterwards.
-     */
+    /// Apply (remote - base) patches safely into the in-memory DB, plus safe new/deleted entries.
     private static void applyAutoPlan(BibDatabaseContext bibDatabaseContext, MergePlan plan) {
         // new entries
         for (BibEntry e : plan.newEntries()) {
@@ -204,32 +220,7 @@ public class GitPullAction extends SimpleCommand {
         }
     }
 
-    // ------------------- helpers: save & service wiring -------------------
-
-    /**
-     * Minimal save aligned with manual save behavior.
-     * Later you can swap this to the full SaveDatabaseAction pipeline to inherit formatting/backup/undo notifications,
-     * and wrap it with a “suppress external change detection” guard during this single write.
-     */
-    private void saveLikeUserSave(Path file, BibDatabaseContext ctx) throws IOException {
-        GitFileWriter.write(file, ctx, guiPreferences.getImportFormatPreferences());
-    }
-
-    /**
-     * Wire a GitSyncService that does NOT write bytes in prepare/finalize;
-     * GUI owns the write; finalize only records commit parents/FF via MergeBookkeeper.
-     */
-    private GitSyncService buildSyncService(GitHandlerRegistry handlerRegistry) {
-        GitSemanticMergePlanner unused = null;
-        return new GitSyncService(
-                guiPreferences.getImportFormatPreferences(),
-                handlerRegistry,
-                // resolver is created ad-hoc when needed; passing null here is fine
-                null,
-                unused,
-                new DefaultMergeBookkeeper(handlerRegistry)
-        );
-    }
+    // ------------------- helpers -------------------
 
     private void showPullError(Throwable exception) {
         if (exception instanceof JabRefException e) {

@@ -1,10 +1,10 @@
-package org.jabref.logic.git.merge;
+package org.jabref.logic.git.model;
 
 import java.util.List;
 
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
-import org.jabref.logic.git.model.MergePlan;
 
 public record MergeAnalysis(
         MergePlan autoPlan,
-        List<ThreeWayEntryConflict> conflicts) { }
+        List<ThreeWayEntryConflict> conflicts) {
+}

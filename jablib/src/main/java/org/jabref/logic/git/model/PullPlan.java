@@ -13,7 +13,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 ///  autoPlan: MergePlan of auto-applicable patches (no conflicts)
 ///  conflicts: List<ThreeWayEntryConflict> that require user resolution
 ///  stats: MergeStats for UX visibility
-public final class PullComputation {
+public final class PullPlan {
     private final SyncStatus status;
     private final Optional<RevCommit> base;
     private final RevCommit localHead;
@@ -21,12 +21,12 @@ public final class PullComputation {
     private final MergePlan autoPlan;
     private final List<ThreeWayEntryConflict> conflicts;
 
-    private PullComputation(SyncStatus status,
-                            Optional<RevCommit> base,
-                            RevCommit localHead,
-                            RevCommit remote,
-                            MergePlan autoPlan,
-                            List<ThreeWayEntryConflict> conflicts) {
+    private PullPlan(SyncStatus status,
+                     Optional<RevCommit> base,
+                     RevCommit localHead,
+                     RevCommit remote,
+                     MergePlan autoPlan,
+                     List<ThreeWayEntryConflict> conflicts) {
         this.status = status;
         this.base = base;
         this.localHead = localHead;
@@ -35,21 +35,21 @@ public final class PullComputation {
         this.conflicts = conflicts;
     }
 
-    public static PullComputation of(SyncStatus syncStatus,
-                                     Optional<RevCommit> base,
-                                     RevCommit remote,
-                                     RevCommit localHead,
-                                     MergePlan autoPlan,
-                                     List<ThreeWayEntryConflict> conflicts) {
-        return new PullComputation(syncStatus, base, localHead, remote, autoPlan, conflicts);
+    public static PullPlan of(SyncStatus syncStatus,
+                              Optional<RevCommit> base,
+                              RevCommit remote,
+                              RevCommit localHead,
+                              MergePlan autoPlan,
+                              List<ThreeWayEntryConflict> conflicts) {
+        return new PullPlan(syncStatus, base, localHead, remote, autoPlan, conflicts);
     }
 
-    public static PullComputation noop() {
-        return new PullComputation(SyncStatus.UP_TO_DATE, Optional.empty(), null, null, MergePlan.empty(), List.of());
+    public static PullPlan noop() {
+        return new PullPlan(SyncStatus.UP_TO_DATE, Optional.empty(), null, null, MergePlan.empty(), List.of());
     }
 
-    public static PullComputation noopAhead() {
-        return new PullComputation(SyncStatus.AHEAD, Optional.empty(), null, null, MergePlan.empty(), List.of());
+    public static PullPlan noopAhead() {
+        return new PullPlan(SyncStatus.AHEAD, Optional.empty(), null, null, MergePlan.empty(), List.of());
     }
 
     public SyncStatus status() {
@@ -82,13 +82,5 @@ public final class PullComputation {
 
     public boolean isNoopAhead() {
         return status == SyncStatus.AHEAD;
-    }
-
-    public boolean hasConflicts() {
-        return !conflicts.isEmpty();
-    }
-
-    public boolean hasAutoChanges() {
-        return autoPlan != null && !autoPlan.isEmpty();
     }
 }
