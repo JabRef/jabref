@@ -29,7 +29,7 @@ public class NormalizeDateFormatter extends Formatter {
      * "d.M.uuuu" (covers 15.1.2015)
      */
     @Override
-    public String format(String value) {
+    public String format(@NonNullString value) {
         Optional<Date> parsedDate = Date.parse(value);
         return parsedDate.map(Date::getNormalized).orElse(value);
     }

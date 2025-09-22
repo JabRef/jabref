@@ -47,7 +47,7 @@ public class CleanupUrlFormatter extends Formatter {
      * @see URLDecoder#decode(String, Charset)
      */
     @Override
-    public String format(String url) {
+    public String format(@NonNullString url) {
         String toDecode = Objects
                 .requireNonNull(url, "Null url")
                 .replaceAll("\\+", "%2b");

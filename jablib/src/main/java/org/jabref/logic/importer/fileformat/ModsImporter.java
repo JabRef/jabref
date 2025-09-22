@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -39,6 +38,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 
 import com.google.common.base.Joiner;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +70,7 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader input) throws IOException {
-        Objects.requireNonNull(input);
-
+    public ParserResult importDatabase(@NonNull BufferedReader input) throws IOException {
         List<BibEntry> bibItems = new ArrayList<>();
         try {
             XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(input);

@@ -30,7 +30,7 @@ public class LatexCleanupFormatter extends Formatter {
     }
 
     @Override
-    public String format(String oldString) {
+    public String format(@NonNullString oldString) {
         String newValue = oldString;
 
         // Remove redundant $, {, and }, but not if the } is part of a command argument: \mbox{-}{GPS} should not be adjusted

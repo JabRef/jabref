@@ -20,6 +20,7 @@ import org.jabref.model.database.BibDatabaseModeDetection;
 
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +88,7 @@ public abstract class Importer implements Comparable<Importer> {
      *
      * @param input the input to read from
      */
-    public abstract ParserResult importDatabase(BufferedReader input) throws IOException;
+    public abstract ParserResult importDatabase(@NonNull BufferedReader input) throws IOException;
 
     /**
      * Parse the database in the specified file.

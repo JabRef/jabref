@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,9 +128,7 @@ public class Date {
      * @param dateString the string to extract the date information
      * @throws DateTimeParseException if dataString is mal-formatted
      */
-    public static Optional<Date> parse(String dateString) {
-        Objects.requireNonNull(dateString);
-
+    public static Optional<Date> parse(@NonNull String dateString) {
         dateString = dateString.strip();
 
         if (dateString.isEmpty()) {

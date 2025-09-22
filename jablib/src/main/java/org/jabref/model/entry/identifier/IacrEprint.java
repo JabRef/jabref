@@ -2,7 +2,6 @@ package org.jabref.model.entry.identifier;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +11,7 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,9 +23,7 @@ public class IacrEprint implements Identifier {
     private static final String IACR_EPRINT_EXP = "\\d{4}\\/\\d{3,5}";
     private final String iacrEprint;
 
-    IacrEprint(String iacrEprint) {
-        Objects.requireNonNull(iacrEprint);
-
+    IacrEprint(@NonNull String iacrEprint) {
         String trimmedId = iacrEprint.trim();
 
         if (matchesExcepted(trimmedId)) {

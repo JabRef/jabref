@@ -37,7 +37,6 @@ class MSBibExporter extends Exporter {
     public void export(@NonNull BibDatabaseContext databaseContext,
                        @NonNull Path file,
                        @NonNull List<BibEntry> entries) throws SaveException {
-        Objects.requireNonNull(databaseContext); // required by test case
         if (entries.isEmpty()) {
             return;
         }

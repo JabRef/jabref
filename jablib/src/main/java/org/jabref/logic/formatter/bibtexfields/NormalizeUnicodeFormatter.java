@@ -32,7 +32,7 @@ public class NormalizeUnicodeFormatter extends Formatter {
     }
 
     @Override
-    public String format(String value) {
+    public String format(@NonNullString value) {
         String normalizedValue = Normalizer.normalize(value, Normalizer.Form.NFC);
         return normalizedValue;
     }
