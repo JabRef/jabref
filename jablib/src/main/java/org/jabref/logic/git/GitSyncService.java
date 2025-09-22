@@ -178,7 +178,7 @@ public class GitSyncService {
             }
 
             case CONFLICT -> {
-                throw new JabRefException("Push aborted: Local repository has unresolved computeMergePlan conflicts.");
+                throw new JabRefException("Push aborted: Local repository has unresolved merge conflicts.");
             }
 
             case UNTRACKED -> {

@@ -235,7 +235,7 @@ public class GitHandler {
                    .setMessage(commitMessage)
                    .call();
             } else if (inMerging) {
-                // No content changes, but computeMergePlan must be completed (create parent commit)
+                // No content changes, but merge must be completed (create parent commit)
                 commitCreated = true;
                 git.commit()
                    .setAmend(amend)
@@ -416,7 +416,7 @@ public class GitHandler {
     }
 
     /// Fast-forward only to <remote> (when local is strictly behind).
-    /// Equivalent to: `git computeMergePlan --ff-only <remote>`
+    /// Equivalent to: `git merge --ff-only <remote>`
     public void fastForwardTo(RevCommit remote) throws IOException, GitAPIException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             git.merge()

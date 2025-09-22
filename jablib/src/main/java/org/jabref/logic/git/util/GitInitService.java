@@ -56,7 +56,7 @@ public final class GitInitService {
 
             String branch = git.getRepository().getBranch();
             config.setString("branch", branch, "remote", "origin");
-            config.setString("branch", branch, "computeMergePlan", "refs/heads/" + branch);
+            config.setString("branch", branch, "merge", "refs/heads/" + branch);
             config.save();
         } catch (URISyntaxException | IOException | GitAPIException e) {
             throw new JabRefException("Failed to initialize repository or set remote", e);
