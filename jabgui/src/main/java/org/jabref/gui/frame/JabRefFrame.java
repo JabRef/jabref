@@ -460,7 +460,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         // Hide tab bar
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
-        EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
+        tabbedPane.getTabs().addListener((ListChangeListener<Tab>) _ -> updateTabBarVisible());
 
         stateManager.canGoBackProperty().bind(
                 stateManager.activeTabProperty().flatMap(
