@@ -1,8 +1,7 @@
 package org.jabref.logic.util.strings;
 
-import org.jabref.logic.bibtex.BibtexStandard;
-
 import com.ibm.icu.text.Transliterator;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 
 public class Transliteration {
 
@@ -18,7 +17,7 @@ public class Transliteration {
     private static String buildTransliteratorConfig() {
         StringBuilder pattern = new StringBuilder();
 
-        for (Character c : BibtexStandard.DISALLOWED_CHARACTERS) {
+        for (Character c : CitationKeyGenerator.DISALLOWED_CHARACTERS) {
             // Generally, only characters like `-` or `[` need to be escaped with a backslash,
             // but for future proofing we escape all characters.
             pattern.append("\\").append(c);

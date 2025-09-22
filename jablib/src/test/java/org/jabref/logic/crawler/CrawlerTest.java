@@ -10,6 +10,7 @@ import java.util.List;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.citationkeypattern.CitationKeyGeneratorTestUtils;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.exporter.SaveException;
@@ -60,7 +61,7 @@ class CrawlerTest {
     void setUp() throws GitAPIException, URISyntaxException {
         setUpRepository();
 
-        CitationKeyPatternPreferences citationKeyPatternPreferences = CitationKeyPatternPreferences.getInstanceForTesting();
+        CitationKeyPatternPreferences citationKeyPatternPreferences = CitationKeyGeneratorTestUtils.getInstanceForTesting();
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         importerPreferences = mock(ImporterPreferences.class);

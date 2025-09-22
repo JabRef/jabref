@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyGeneratorTestUtils;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -136,7 +136,7 @@ class IntegrityCheckTest {
 
         new IntegrityCheck(context,
                 mock(FilePreferences.class),
-                CitationKeyPatternPreferences.getInstanceForTesting(),
+                CitationKeyGeneratorTestUtils.getInstanceForTesting(),
                 JournalAbbreviationLoader.loadBuiltInRepository(),
                 false)
                 .check();
@@ -171,7 +171,7 @@ class IntegrityCheckTest {
 
         messages = new IntegrityCheck(context,
                 mock(FilePreferences.class),
-                CitationKeyPatternPreferences.getInstanceForTesting(),
+                CitationKeyGeneratorTestUtils.getInstanceForTesting(),
                 JournalAbbreviationLoader.loadBuiltInRepository(),
                 false)
                 .check();
@@ -186,7 +186,7 @@ class IntegrityCheckTest {
 
         messages = new IntegrityCheck(context,
                 filePreferencesMock,
-                CitationKeyPatternPreferences.getInstanceForTesting(),
+                CitationKeyGeneratorTestUtils.getInstanceForTesting(),
                 JournalAbbreviationLoader.loadBuiltInRepository(),
                 false)
                 .check();

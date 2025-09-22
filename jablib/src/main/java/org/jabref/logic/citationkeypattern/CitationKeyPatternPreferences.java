@@ -10,8 +10,6 @@ import javafx.beans.property.StringProperty;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
-
 public class CitationKeyPatternPreferences {
 
     public enum KeySuffix {
@@ -82,23 +80,6 @@ public class CitationKeyPatternPreferences {
                 keyPatterns,
                 defaultPattern,
                 new SimpleObjectProperty<>(keywordDelimiter));
-    }
-
-    @VisibleForTesting
-    public static CitationKeyPatternPreferences getInstanceForTesting() {
-        return new CitationKeyPatternPreferences(
-                true,
-                false,
-                false,
-                false,
-                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
-                "",
-                "",
-                DEFAULT_UNWANTED_CHARACTERS,
-                GlobalCitationKeyPatterns.fromPattern("[auth][year]"),
-                "",
-                ','
-        );
     }
 
     public boolean shouldTransliterateFields() {
