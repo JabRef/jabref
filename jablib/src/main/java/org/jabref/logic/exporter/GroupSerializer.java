@@ -3,7 +3,6 @@ package org.jabref.logic.exporter;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.groups.AbstractGroup;
