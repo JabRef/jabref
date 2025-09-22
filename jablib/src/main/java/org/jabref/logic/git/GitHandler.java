@@ -416,7 +416,7 @@ public class GitHandler {
     }
 
     /// Fast-forward only to <remote> (when local is strictly behind).
-    /// Equivalent to: `git computeMergePlan --ff-only <remote>`
+    /// Equivalent to: `git merge --ff-only <remote>`
     public void fastForwardTo(RevCommit remote) throws IOException, GitAPIException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             git.merge()
