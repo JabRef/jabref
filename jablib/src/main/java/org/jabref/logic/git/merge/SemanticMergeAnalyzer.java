@@ -12,19 +12,20 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
+import org.jabref.logic.git.model.MergeAnalysis;
 import org.jabref.logic.git.model.MergePlan;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /// Single-pass, three-way semantic merge planner:
 ///   - For each citation key that changed on either side (base→local or base→remote), we first detect semantic conflicts (entry- and field-level).
 ///   - Only if no conflict is found for that key, we generate the auto-merge plan; (remote - base) applied on local, but ONLY on fields where local kept base.
 public final class SemanticMergeAnalyzer {
-    private SemanticMergeAnalyzer() { }
+    private static final BibEntry EMPTY_ENTRY = new BibEntry(StandardEntryType.Article);
 
     public static MergeAnalysis analyze(BibDatabaseContext base,
                                         BibDatabaseContext local,
@@ -32,15 +33,26 @@ public final class SemanticMergeAnalyzer {
         // 1) union of all citationKeys that were changed (on either side)
         EntryTriples triples = EntryTriples.from(base, local, remote);
 
-        // 2) get diffs between base, local and remote
-        BibDatabaseDiff localDiff = BibDatabaseDiff.compare(base, local);
-        BibDatabaseDiff remoteDiff = BibDatabaseDiff.compare(base, remote);
+        // TODO(merge/analyze): Entry key source & the role of BibDatabaseDiff
+        //  Previous approach:
+        //  1) Run BibDatabaseDiff twice (base→local, base→remote).
+        //     BibDatabaseDiff localDiff  = BibDatabaseDiff.compare(base, local);
+        //     BibDatabaseDiff remoteDiff = BibDatabaseDiff.compare(base, remote);
+        //  2) Build citationKey→BibEntryDiff maps and use the union of their key sets as the worklist.
+        //     Map<String, BibEntryDiff> localDiffMap  = indexByCitationKey(localDiff.getEntryDifferences());
+        //     Map<String, BibEntryDiff> remoteDiffMap = indexByCitationKey(remoteDiff.getEntryDifferences());
+        //     Set<String> allKeys = union(localDiffMap.keySet(), remoteDiffMap.keySet());
+        //  3) For each key, resolve base/local/remote via the diff maps, then detect conflicts and build the auto plan.
+        //  Problem: Using only diff-derived keys misses pure deletions → E05/E08 fail.
+        //  - E05: base has 'a', local=∅, remote=∅ → compare(base, ∅) yields no entryDiff, so 'a' never enters the worklist.
+        //  - E08: base has 'a', local==base, remote=∅ → remote diff empty; 'a' is dropped.
+        //  Root cause: when the “new” DB is empty, BibDatabaseDiff returns no entryDiff.
+        //  However, should we keep BibDatabaseDiff for meta/preamble/bibstrings, logging, and potential optimizations,
 
-        Map<String, BibEntryDiff> localDiffMap = indexByCitationKey(localDiff.getEntryDifferences());
-        Map<String, BibEntryDiff> remoteDiffMap = indexByCitationKey(remoteDiff.getEntryDifferences());
-
-        Set<String> allKeys = new LinkedHashSet<>(localDiffMap.keySet());
-        allKeys.addAll(remoteDiffMap.keySet());
+        Set<String> allKeys = new LinkedHashSet<>();
+        allKeys.addAll(triples.baseMap.keySet());
+        allKeys.addAll(triples.localMap.keySet());
+        allKeys.addAll(triples.remoteMap.keySet());
 
         Map<String, Map<Field, String>> fieldPatches = new LinkedHashMap<>();
         List<BibEntry> newEntries = new ArrayList<>();
@@ -49,8 +61,8 @@ public final class SemanticMergeAnalyzer {
 
         for (String key : allKeys) {
             BibEntry baseEntry = triples.baseMap.get(key);
-            BibEntry localEntry = resolveEntry(key, localDiffMap.get(key), triples.localMap);
-            BibEntry remoteEntry = resolveEntry(key, remoteDiffMap.get(key), triples.remoteMap);
+            BibEntry localEntry = triples.localMap.get(key);
+            BibEntry remoteEntry = triples.remoteMap.get(key);
 
             // A) determining semantic conflicts first
             if (detectEntryConflict(baseEntry, localEntry, remoteEntry).isPresent()) {
@@ -73,9 +85,7 @@ public final class SemanticMergeAnalyzer {
         return new MergeAnalysis(new MergePlan(fieldPatches, newEntries, deletedEntryKeys), conflicts);
     }
 
-    // ----------------------------
-    // A) Semantic conflict detection
-    // ----------------------------
+    // ---------------------------- A) Semantic conflict detection ----------------------------
 
     /**
      * Detect entry-level conflicts among base, local, and remote versions of an entry.
@@ -208,11 +218,12 @@ public final class SemanticMergeAnalyzer {
             return patch;
         }
 
-        Stream.concat(base.getFields().stream(), remote.getFields().stream())
+        BibEntry baseSafe = (base == null) ? EMPTY_ENTRY : base;
+        Stream.concat(baseSafe.getFields().stream(), remote.getFields().stream())
               .distinct()
               .filter(field -> !isMetaField(field))
               .forEach(field -> {
-                  String baseValue = base.getField(field).orElse(null);
+                  String baseValue = baseSafe.getField(field).orElse(null);
                   String remoteValue = remote.getField(field).orElse(null);
                   String localValue = local == null ? null : local.getField(field).orElse(null);
 
@@ -230,19 +241,19 @@ public final class SemanticMergeAnalyzer {
         return patch;
     }
 
-    private static boolean isMetaField(Field f) {
-        String n = f.getName();
+    private static boolean isMetaField(Field field) {
+        String n = field.getName();
         return n.startsWith("_") || "_jabref_shared".equalsIgnoreCase(n);
     }
 
-    private static boolean hasOverlappingFieldDisagreement(BibEntry left, BibEntry right) {
-        Set<Field> overlap = new LinkedHashSet<>(left.getFields());
-        overlap.retainAll(right.getFields());
+    private static boolean hasOverlappingFieldDisagreement(BibEntry local, BibEntry remote) {
+        Set<Field> overlap = new LinkedHashSet<>(local.getFields());
+        overlap.retainAll(remote.getFields());
         overlap.removeIf(SemanticMergeAnalyzer::isMetaField);
         for (Field overlappingField : overlap) {
-            String leftFieldValue = left.getField(overlappingField).orElse(null);
-            String rightFieldValue = right.getField(overlappingField).orElse(null);
-            if (!leftFieldValue.equals(rightFieldValue)) {
+            String localFieldValue = local.getField(overlappingField).orElse(null);
+            String remoteFieldValue = remote.getField(overlappingField).orElse(null);
+            if (!localFieldValue.equals(remoteFieldValue)) {
                 return true;
             }
         }
@@ -273,7 +284,7 @@ public final class SemanticMergeAnalyzer {
     ///      B1) both added & no overlapping-field disagreement -> add union entry
     ///      B2) only remote added -> add remote entry
     ///  - base != null:
-    ///      B3) remote deleted -> accept deletion ONLY if local kept base
+    ///      B3) remote deleted -> accept deletion if local kept base OR local also deleted
     ///      B4) otherwise field-level patch: (remote − base) applied where local == base
     ///
     /// Notes:
@@ -295,8 +306,9 @@ public final class SemanticMergeAnalyzer {
             }
             // B1: both added the same key -> safe union if no overlapping-field disagreement
             if (localEntry != null && remoteEntry != null) {
-                if (!hasOverlappingFieldDisagreement(localEntry, remoteEntry)) {
-                    newEntries.add(unionEntry(localEntry, remoteEntry));
+                Map<Field, String> patch = computeFieldPatch(null, localEntry, remoteEntry);
+                if (!patch.isEmpty()) {
+                    fieldPatches.put(key, patch);
                 }
                 return;
             }
@@ -308,11 +320,11 @@ public final class SemanticMergeAnalyzer {
         }
 
         // base exists
-        // B3: remote deletion -> accept if local kept base (E08)
+        // B3: remote deletion -> accept if local kept base OR local also deleted
         if (remoteEntry == null) {
             boolean localDeleted = (localEntry == null);
             boolean localKeptBase = !localDeleted && baseEntry.getFieldMap().equals(localEntry.getFieldMap());
-            if (localKeptBase) {
+            if (localDeleted || localKeptBase) {
                 deletedEntryKeys.add(key);
             }
             return;
