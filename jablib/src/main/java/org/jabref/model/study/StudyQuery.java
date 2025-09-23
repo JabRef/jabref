@@ -79,6 +79,7 @@ public class StudyQuery {
         return catalogSpecific.orElse(Map.of());
     }
 
+    @JsonIgnore
     public Optional<Map<String, String>> getCatalogSpecificOptional() {
         return catalogSpecific;
     }
