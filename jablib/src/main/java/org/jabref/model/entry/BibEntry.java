@@ -821,7 +821,7 @@ public class BibEntry {
         return this;
     }
 
-    public Optional<FieldChange> putKeywords(List<String> keywords, @NonNull  Character delimiter) {
+    public Optional<FieldChange> putKeywords(List<String> keywords, @NonNull Character delimiter) {
         return putKeywords(new KeywordList(keywords), delimiter);
     }
 
