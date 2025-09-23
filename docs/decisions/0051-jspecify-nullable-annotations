@@ -22,7 +22,7 @@ We want to detect null-safety issues earlier at compile time and improve API cla
 ## Considered Options
 
 * Do nothing and keep status quo.
-* Use Objects.requireNonNull and defensive runtime checks.
+* Use `Objects.requireNonNull` and defensive runtime checks.
 * Adopt JSpecify annotations.
 * Use assert x == null.
 
