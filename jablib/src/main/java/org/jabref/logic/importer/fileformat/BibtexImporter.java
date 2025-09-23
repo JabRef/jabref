@@ -45,7 +45,7 @@ public class BibtexImporter extends Importer {
 
     /**
      * @return true as we have no effective way to decide whether a file is in bibtex format or not. See
-     *         https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
+     * https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
      */
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) {
@@ -55,20 +55,25 @@ public class BibtexImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
-        EncodingResult result = getEncodingResult(filePath);
+        EncodingResult encodingResult = getEncodingResult(filePath);
+        ParserResult parserResult = importDatabase(Files.newInputStream(filePath), encodingResult);
+        parserResult.setPath(filePath);
+        return parserResult;
+    }
 
+    public ParserResult importDatabase(InputStream filePath, EncodingResult result) throws IOException {
         // We replace unreadable characters
         // Unfortunately, no warning will be issued to the user
         // As this is a very seldom case, we accept that
         CharsetDecoder decoder = result.encoding().newDecoder();
         decoder.onMalformedInput(CodingErrorAction.REPLACE);
 
-        try (InputStreamReader inputStreamReader = new InputStreamReader(Files.newInputStream(filePath), decoder);
+        try (InputStreamReader inputStreamReader = new InputStreamReader(filePath, decoder);
              BufferedReader reader = new BufferedReader(inputStreamReader)) {
             ParserResult parserResult = this.importDatabase(reader);
             parserResult.getMetaData().setEncoding(result.encoding());
             parserResult.getMetaData().setEncodingExplicitlySupplied(result.encodingExplicitlySupplied());
-            parserResult.setPath(filePath);
+
             if (parserResult.getMetaData().getMode().isEmpty()) {
                 parserResult.getMetaData().setMode(BibDatabaseModeDetection.inferMode(parserResult.getDatabase()));
             }
@@ -115,7 +120,7 @@ public class BibtexImporter extends Importer {
         return new EncodingResult(encoding, encodingExplicitlySupplied);
     }
 
-    private record EncodingResult(Charset encoding, boolean encodingExplicitlySupplied) {
+    public record EncodingResult(Charset encoding, boolean encodingExplicitlySupplied) {
     }
 
     /**

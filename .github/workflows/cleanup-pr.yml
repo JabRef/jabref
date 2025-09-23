@@ -22,7 +22,7 @@ jobs:
         with:
           ignore_sha: true
           workflow_id: 160969125
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: "Check for 'dev: binaries' label"
         id: check_label
         run: |
@@ -46,7 +46,7 @@ jobs:
       - name: Get changed docker files
         # in line with dockerimages.yml -> lines 6 and 7
         id: changed-docker-files
-        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46
+        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v46
         with:
           # Avoid using single or double quotes for multiline patterns
           files: |

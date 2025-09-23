@@ -56,7 +56,7 @@ public class KeywordList implements Iterable<Keyword> {
         StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
         while (tok.hasMoreTokens()) {
             String chain = tok.nextToken();
-            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
+            Keyword chainRoot = Keyword.ofHierarchical(chain);
             keywordList.add(chainRoot);
         }
         return keywordList;

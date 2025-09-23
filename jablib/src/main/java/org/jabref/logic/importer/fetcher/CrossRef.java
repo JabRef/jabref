@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.IdParserFetcher;
@@ -27,13 +28,13 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.util.OptionalUtil;
 
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
  * A class for fetching DOIs from CrossRef
@@ -52,6 +53,11 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     }
 
     @Override
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_CROSSREF);
+    }
+
+    @Override
     public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         entry.getFieldLatexFree(StandardField.TITLE).ifPresent(title -> uriBuilder.addParameter("query.bibliographic", title));
@@ -65,9 +71,9 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     }
 
     @Override
-    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("query", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
+        uriBuilder.addParameter("query", new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse(""));
         return uriBuilder.build().toURL();
     }
 
@@ -202,7 +208,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         StringBuilder keywords = new StringBuilder();
 
         for (int i = 0; i < jsonArray.length(); i++) {
-        keywords.append(jsonArray.getString(i));
+            keywords.append(jsonArray.getString(i));
             if (i != jsonArray.length() - 1) {
                 keywords.append(", ");
             }

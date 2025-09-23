@@ -11,7 +11,7 @@ jobs:
     if: >
       (github.repository == 'JabRef/jabref') &&
       !(
-        (github.actor == 'dependabot[bot]') ||
+        (github.event.pull_request.user.login == 'dependabot[bot]') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
           startsWith(github.event.pull_request.title, 'Bump ') ||
@@ -57,7 +57,7 @@ jobs:
       contents: read
       issues: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Remove assignee
         run: |
           # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error

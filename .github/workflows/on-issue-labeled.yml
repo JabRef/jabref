@@ -78,6 +78,11 @@ jobs:
         ignored-columns: ""
         default-column: "Free to take"
         skip-if-not-in-project: true
+    - name: Remove label
+      run: |
+        gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   good-first-issue:
     name: "good first issue"
     if: "${{ github.event.label.name == 'good first issue' && github.repository_owner == 'JabRef' }}"
@@ -128,7 +133,7 @@ jobs:
           comment-tag:
             wisdom
           mode: recreate
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Remove label
         run: |
           gh issue edit ${{ github.event.issue.number }} --remove-label "dev: wisdom"

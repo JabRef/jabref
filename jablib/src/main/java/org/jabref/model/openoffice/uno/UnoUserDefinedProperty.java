@@ -40,8 +40,8 @@ public class UnoUserDefinedProperty {
 
     public static List<String> getListOfNames(XTextDocument doc) {
         return UnoUserDefinedProperty.getPropertyContainer(doc)
-                                      .map(UnoProperties::getPropertyNames)
-                                      .orElse(new ArrayList<>());
+                                     .map(UnoProperties::getPropertyNames)
+                                     .orElse(new ArrayList<>());
     }
 
     /**
@@ -53,14 +53,14 @@ public class UnoUserDefinedProperty {
             throws
             WrappedTargetException {
         Optional<XPropertySet> propertySet = UnoUserDefinedProperty.getPropertyContainer(doc)
-                                                                    .flatMap(UnoProperties::asPropertySet);
+                                                                   .flatMap(UnoProperties::asPropertySet);
         if (propertySet.isEmpty()) {
             throw new java.lang.IllegalArgumentException("getting UserDefinedProperties as XPropertySet failed");
         }
         try {
             String value = propertySet.get().getPropertyValue(property).toString();
             return Optional.ofNullable(value);
-        } catch (UnknownPropertyException ex) {
+        } catch (UnknownPropertyException _) {
             return Optional.empty();
         }
     }
@@ -95,14 +95,14 @@ public class UnoUserDefinedProperty {
             try {
                 propertySet.get().setPropertyValue(property, value);
                 return;
-            } catch (UnknownPropertyException ex) {
+            } catch (UnknownPropertyException _) {
                 // fall through to addProperty
             }
         }
 
         try {
             container.get().addProperty(property, PropertyAttribute.REMOVEABLE, new Any(Type.STRING, value));
-        } catch (PropertyExistException ex) {
+        } catch (PropertyExistException _) {
             throw new java.lang.IllegalStateException("Caught PropertyExistException for property assumed not to exist");
         }
     }
@@ -127,8 +127,7 @@ public class UnoUserDefinedProperty {
         try {
             container.get().removeProperty(property);
         } catch (UnknownPropertyException ex) {
-            LOGGER.warn("UnoUserDefinedProperty.remove(%s) This property was not there to remove".formatted(
-                    property));
+            LOGGER.warn("UnoUserDefinedProperty.remove({}) This property was not there to remove", property, ex);
         }
     }
 
@@ -151,7 +150,7 @@ public class UnoUserDefinedProperty {
 
         try {
             container.get().removeProperty(property);
-        } catch (UnknownPropertyException ex) {
+        } catch (UnknownPropertyException _) {
             // did not exist
         }
     }

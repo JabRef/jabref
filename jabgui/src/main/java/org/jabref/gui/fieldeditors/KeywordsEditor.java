@@ -109,17 +109,17 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         keywordTagsField.setTagViewFactory(this::createTag);
 
         keywordTagsField.setSuggestionProvider(request -> viewModel.getSuggestions(request.getUserText()));
-        keywordTagsField.setConverter(viewModel.getStringConverter());
+        keywordTagsField.setConverter(KeywordsEditorViewModel.getStringConverter());
         keywordTagsField.setMatcher((keyword, searchText) -> keyword.get().toLowerCase().startsWith(searchText.toLowerCase()));
         keywordTagsField.setComparator(Comparator.comparing(Keyword::get));
 
-        keywordTagsField.setNewItemProducer(searchText -> viewModel.getStringConverter().fromString(searchText));
+        keywordTagsField.setNewItemProducer(searchText -> KeywordsEditorViewModel.getStringConverter().fromString(searchText));
 
         keywordTagsField.setShowSearchIcon(false);
-        keywordTagsField.setOnMouseClicked(event -> keywordTagsField.getEditor().requestFocus());
+        keywordTagsField.setOnMouseClicked(_ -> keywordTagsField.getEditor().requestFocus());
         keywordTagsField.getEditor().getStyleClass().clear();
         keywordTagsField.getEditor().getStyleClass().add("tags-field-editor");
-        keywordTagsField.getEditor().focusedProperty().addListener((observable, oldValue, newValue) -> keywordTagsField.pseudoClassStateChanged(FOCUSED, newValue));
+        keywordTagsField.getEditor().focusedProperty().addListener((_, _, newValue) -> keywordTagsField.pseudoClassStateChanged(FOCUSED, newValue));
 
         String keywordSeparator = String.valueOf(viewModel.getKeywordSeparator());
         keywordTagsField.getEditor().setOnKeyReleased(event -> {
@@ -129,7 +129,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             }
         });
 
-        this.viewModel.keywordListProperty().addListener((observable, oldValue, newValue) -> {
+        this.viewModel.keywordListProperty().addListener((_, _, _) -> {
             if (keywordTagsField.getTags().size() < 2) {
                 isSortedTagsField = false;
             } else if ((Comparators.isInOrder(keywordTagsField.getTags(), Comparator.comparing(Keyword::get))) || isSortedTagsField) {
@@ -142,7 +142,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
 
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.PASTE, event)) {
-                String clipboardText = clipBoardManager.getContents();
+                String clipboardText = ClipBoardManager.getContents();
                 if (!clipboardText.isEmpty()) {
                     KeywordList keywordsList = KeywordList.parse(clipboardText, viewModel.getKeywordSeparator());
                     keywordsList.stream().forEach(keyword -> keywordTagsField.addTags(keyword));
@@ -159,7 +159,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         Label tagLabel = new Label();
         tagLabel.setText(keywordTagsField.getConverter().toString(keyword));
         tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
-        tagLabel.getGraphic().setOnMouseClicked(event -> keywordTagsField.removeTags(keyword));
+        tagLabel.getGraphic().setOnMouseClicked(_ -> keywordTagsField.removeTags(keyword));
         tagLabel.setContentDisplay(ContentDisplay.RIGHT);
         ContextMenu contextMenu = new ContextMenu();
         ActionFactory factory = new ActionFactory();
@@ -198,8 +198,8 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             draggedKeyword = Optional.of(keyword);
             event.consume();
         });
-        tagLabel.setOnDragEntered(event -> tagLabel.setStyle("-fx-background-color: lightgrey;"));
-        tagLabel.setOnDragExited(event -> tagLabel.setStyle(""));
+        tagLabel.setOnDragEntered(_ -> tagLabel.setStyle("-fx-background-color: lightgrey;"));
+        tagLabel.setOnDragExited(_ -> tagLabel.setStyle(""));
         tagLabel.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
             if (db.hasString() && draggedKeyword.isPresent()) {
@@ -254,18 +254,18 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 case COPY -> {
                     clipBoardManager.setContent(keyword.get());
                     dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                                                           JabRefDialogService.shortenDialogMessage(keyword.get())));
+                            JabRefDialogService.shortenDialogMessage(keyword.get())));
                 }
                 case CUT -> {
                     clipBoardManager.setContent(keyword.get());
                     dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                                                           JabRefDialogService.shortenDialogMessage(keyword.get())));
+                            JabRefDialogService.shortenDialogMessage(keyword.get())));
                     keywordTagsField.removeTags(keyword);
                 }
                 case DELETE ->
-                    keywordTagsField.removeTags(keyword);
+                        keywordTagsField.removeTags(keyword);
                 default ->
-                    LOGGER.info("Action {} not defined", command.getText());
+                        LOGGER.info("Action {} not defined", command.getText());
             }
         }
     }

@@ -1,6 +1,6 @@
 open module org.jabref {
     requires org.jabref.jablib;
-
+    requires org.jabref.jabls;
     requires org.jabref.jabsrv;
 
     // Swing
@@ -59,7 +59,7 @@ open module org.jabref {
     // endregion
 
     provides org.tinylog.writers.Writer
-    with org.jabref.gui.logging.GuiWriter;
+            with org.jabref.gui.logging.GuiWriter;
 
     // Preferences and XML
     requires java.prefs;

@@ -18,7 +18,7 @@ public class UnoUndo {
     public static Optional<XUndoManager> getXUndoManager(XTextDocument doc) {
         // https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html
         return UnoCast.cast(XUndoManagerSupplier.class, doc)
-                       .map(XUndoManagerSupplier::getUndoManager);
+                      .map(XUndoManagerSupplier::getUndoManager);
     }
 
     /**

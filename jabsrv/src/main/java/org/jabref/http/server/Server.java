@@ -14,6 +14,10 @@ import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.command.CommandResource;
+import org.jabref.http.server.resources.LibrariesResource;
+import org.jabref.http.server.resources.LibraryResource;
+import org.jabref.http.server.resources.MapResource;
+import org.jabref.http.server.resources.RootResource;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.os.OS;
 
@@ -92,11 +96,18 @@ public class Server {
         final ResourceConfig resourceConfig = new ResourceConfig();
         resourceConfig.property("jersey.config.server.wadl.disableWadl", true);
         // TODO: Add SSL
+
+        // RESTish resources
         resourceConfig.register(RootResource.class);
         resourceConfig.register(LibrariesResource.class);
         resourceConfig.register(LibraryResource.class);
-        resourceConfig.register(CAYWResource.class);
+        resourceConfig.register(MapResource.class);
+
+        // Other resources
         resourceConfig.register(CommandResource.class);
+        resourceConfig.register(CAYWResource.class);
+
+        // Supporting classes
         resourceConfig.register(CORSFilter.class);
         resourceConfig.register(GlobalExceptionMapper.class);
 

@@ -31,22 +31,21 @@ public class AutosaveManager {
     private final BibDatabaseContext bibDatabaseContext;
 
     private final EventBus eventBus;
-    private final CoarseChangeFilter changeFilter;
     private final ScheduledThreadPoolExecutor executor;
+    private final CoarseChangeFilter coarseChangeFilter;
     private boolean needsSave = false;
 
-    private AutosaveManager(BibDatabaseContext bibDatabaseContext) {
+    private AutosaveManager(BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter) {
         this.bibDatabaseContext = bibDatabaseContext;
+        this.coarseChangeFilter = coarseChangeFilter;
         this.eventBus = new EventBus();
-        this.changeFilter = new CoarseChangeFilter(bibDatabaseContext);
-        changeFilter.registerListener(this);
 
         this.executor = new ScheduledThreadPoolExecutor(2);
         this.executor.scheduleAtFixedRate(
                 () -> {
                     if (needsSave) {
-                       eventBus.post(new AutosaveEvent());
-                       needsSave = false;
+                        eventBus.post(new AutosaveEvent());
+                        needsSave = false;
                     }
                 },
                 DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS,
@@ -62,9 +61,12 @@ public class AutosaveManager {
     }
 
     private void shutdown() {
-        changeFilter.unregisterListener(this);
-        changeFilter.shutdown();
-        executor.shutdown();
+        try {
+            coarseChangeFilter.unregisterListener(this);
+        } catch (IllegalArgumentException e) {
+            // ignore exception if the listener was not registered before
+        }
+        runningInstances.remove(this);
     }
 
     /**
@@ -72,8 +74,8 @@ public class AutosaveManager {
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
-    public static AutosaveManager start(BibDatabaseContext bibDatabaseContext) {
-        AutosaveManager autosaveManager = new AutosaveManager(bibDatabaseContext);
+    public static AutosaveManager start(BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter) {
+        AutosaveManager autosaveManager = new AutosaveManager(bibDatabaseContext, coarseChangeFilter);
         runningInstances.add(autosaveManager);
         return autosaveManager;
     }
@@ -85,10 +87,7 @@ public class AutosaveManager {
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
         runningInstances.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).findAny()
-                        .ifPresent(instance -> {
-                            instance.shutdown();
-                            runningInstances.remove(instance);
-                        });
+                        .ifPresent(AutosaveManager::shutdown);
     }
 
     public void registerListener(Object listener) {
@@ -100,7 +99,7 @@ public class AutosaveManager {
             eventBus.unregister(listener);
         } catch (IllegalArgumentException e) {
             // occurs if the event source has not been registered, should not prevent shutdown
-            LOGGER.debug("Problem unregistering", e);
+            LOGGER.error("Problem unregistering", e);
         }
     }
 }

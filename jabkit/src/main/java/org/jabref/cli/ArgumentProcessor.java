@@ -41,7 +41,7 @@ import static picocli.CommandLine.Option;
         // sorted alphabetically
         subcommands = {
                 CheckConsistency.class,
-//                CheckIntegrity.class,
+                CheckIntegrity.class,
                 Convert.class,
                 Fetch.class,
                 GenerateBibFromAux.class,
@@ -156,9 +156,9 @@ public class ArgumentProcessor implements Runnable {
     }
 
     protected static void saveDatabaseContext(CliPreferences cliPreferences,
-                                       BibEntryTypesManager entryTypesManager,
-                                       BibDatabaseContext bibDatabaseContext,
-                                       Path outputFile) {
+                                              BibEntryTypesManager entryTypesManager,
+                                              BibDatabaseContext bibDatabaseContext,
+                                              Path outputFile) {
         try {
             if (!FileUtil.isBibFile(outputFile)) {
                 System.err.println(Localization.lang("Invalid output file type provided."));

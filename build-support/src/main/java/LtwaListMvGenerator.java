@@ -1,5 +1,3 @@
-///usr/bin/env jbang "$0" "$@" ; exit $?
-
 //JAVA 24
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 

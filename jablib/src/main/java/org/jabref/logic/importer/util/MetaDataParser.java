@@ -93,8 +93,8 @@ public class MetaDataParser {
     /**
      * Parses the given data map and returns a new resulting {@link MetaData} instance.
      */
-    public MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
-        return parse(new MetaData(), data, keywordSeparator);
+    public MetaData parse(Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
+        return parse(new MetaData(), data, keywordSeparator, userAndHost);
     }
 
     /**
@@ -102,7 +102,7 @@ public class MetaDataParser {
      *
      * @return the given metaData instance (which is modified, too)
      */
-    public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
+    public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator, String userAndHost) throws ParseException {
         CitationKeyPattern defaultCiteKeyPattern = CitationKeyPattern.NULL_CITATION_KEY_PATTERN;
         Map<EntryType, CitationKeyPattern> nonDefaultCiteKeyPatterns = new HashMap<>();
 
@@ -128,10 +128,9 @@ public class MetaDataParser {
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
                 metaData.setUserFileDirectory(user, parseDirectory(entry.getValue()));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY_LATEX)) {
-                // The user name starts directly after FILE_DIRECTORY_LATEX + '-'
-                String user = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
-                Path path = Path.of(parseDirectory(entry.getValue())).normalize();
-                metaData.setLatexFileDirectory(user, path);
+                // The user-host string starts directly after FILE_DIRECTORY_LATEX + '-'
+                String userHostString = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
+                metaData.setLatexFileDirectory(userHostString, parseDirectory(entry.getValue()));
             } else if (MetaData.SAVE_ACTIONS.equals(entry.getKey())) {
                 metaData.setSaveActions(fieldFormatterCleanupsParse(values));
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
@@ -147,7 +146,7 @@ public class MetaDataParser {
             } else if (MetaData.SAVE_ORDER_CONFIG.equals(entry.getKey())) {
                 metaData.setSaveOrder(SaveOrder.parse(values));
             } else if (MetaData.GROUPSTREE.equals(entry.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(entry.getKey())) {
-                metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData));
+                metaData.setGroups(GroupsParser.importGroups(values, keywordSeparator, fileMonitor, metaData, userAndHost));
             } else if (MetaData.GROUPS_SEARCH_SYNTAX_VERSION.equals(entry.getKey())) {
                 Version version = Version.parse(getSingleItem(values));
                 metaData.setGroupSearchSyntaxVersion(version);
@@ -168,10 +167,10 @@ public class MetaDataParser {
 
     /**
      * Parse the content of the value as provided by "raw" content.
-     *
+     * <p>
      * We do not use unescaped value (created by @link{#getAsList(java.lang.String)}),
      * because this leads to difficulties with UNC names.
-     *
+     * <p>
      * No normalization is done - the library-specific file directory could be passed as Mac OS X path, but the user could sit on Windows.
      *
      * @param value the raw value (as stored in the .bib file)
@@ -192,7 +191,7 @@ public class MetaDataParser {
 
     private static Comparator<? super Map.Entry<String, String>> groupsLast() {
         return (s1, s2) -> MetaData.GROUPSTREE.equals(s1.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s1.getKey()) ? 1 :
-                MetaData.GROUPSTREE.equals(s2.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s2.getKey()) ? -1 : 0;
+                           MetaData.GROUPSTREE.equals(s2.getKey()) || MetaData.GROUPSTREE_LEGACY.equals(s2.getKey()) ? -1 : 0;
     }
 
     /**
@@ -250,7 +249,7 @@ public class MetaDataParser {
                 res.append((char) c);
             }
         }
-        if (res.length() > 0) {
+        if (!res.isEmpty()) {
             return Optional.of(res.toString());
         }
         return Optional.empty();
@@ -271,7 +270,7 @@ public class MetaDataParser {
     /**
      * Handles a blgFilePath-* metadata entry. Expects exactly one valid path.
      *
-     * @param entry the metadata entry containing the user-specific .blg path.
+     * @param entry    the metadata entry containing the user-specific .blg path.
      * @param metaData the MetaData object to update.
      */
     private void handleBlgFilePathEntry(Map.Entry<String, String> entry, MetaData metaData) {

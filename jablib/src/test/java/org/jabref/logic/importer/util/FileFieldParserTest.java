@@ -51,6 +51,12 @@ class FileFieldParserTest {
                         ""
                 ),
 
+                // URL starting with www. (without protocol)
+                Arguments.of(
+                        List.of(new LinkedFile("A test", URLUtil.create("https://www.yahoo.com/abc/cde.htm"), "URL")),
+                        "A test:www.yahoo.com/abc/cde.htm:URL"
+                ),
+
                 // correct input
                 Arguments.of(
                         List.of(new LinkedFile("Desc", Path.of("File.PDF"), "PDF")),
@@ -165,24 +171,24 @@ class FileFieldParserTest {
                 // url
                 Arguments.of(
                         List.of(new LinkedFile(URLUtil.create("https://books.google.de/"), "")),
-                         "https://books.google.de/"
+                        "https://books.google.de/"
                 ),
 
                 // url with www
                 Arguments.of(
                         List.of(new LinkedFile(URLUtil.create("https://www.google.de/"), "")),
-                             "https://www.google.de/"
+                        "https://www.google.de/"
                 ),
 
                 // url as file
                 Arguments.of(
                         List.of(new LinkedFile("", URLUtil.create("http://ceur-ws.org/Vol-438"), "URL")),
-                             ":http\\://ceur-ws.org/Vol-438:URL"
+                        ":http\\://ceur-ws.org/Vol-438:URL"
                 ),
                 // url as file with desc
                 Arguments.of(
-                             List.of(new LinkedFile("desc", URLUtil.create("http://ceur-ws.org/Vol-438"), "URL")),
-                             "desc:http\\://ceur-ws.org/Vol-438:URL"
+                        List.of(new LinkedFile("desc", URLUtil.create("http://ceur-ws.org/Vol-438"), "URL")),
+                        "desc:http\\://ceur-ws.org/Vol-438:URL"
                 ),
                 // link with source url
                 Arguments.of(

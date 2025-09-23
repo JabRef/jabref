@@ -11,6 +11,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -21,8 +22,11 @@ import static org.mockito.Mockito.when;
 
 class GitFileWriterTest {
     private ImportFormatPreferences importFormatPreferences;
+
     @BeforeEach
     void setUp() {
+        SystemReader.setInstance(new NoopGitSystemReader());
+
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
     }
@@ -30,11 +34,11 @@ class GitFileWriterTest {
     @Test
     void writeThenReadBack() throws Exception {
         BibDatabaseContext inputDatabaseContext = BibDatabaseContext.of("""
-        @article{a,
-            author = {Alice},
-            title = {Test},
-        }
-        """, importFormatPreferences);
+                @article{a,
+                    author = {Alice},
+                    title = {Test},
+                }
+                """, importFormatPreferences);
 
         Path tempFile = Files.createTempFile("tempgitwriter", ".bib");
         GitFileWriter.write(tempFile, inputDatabaseContext, importFormatPreferences);

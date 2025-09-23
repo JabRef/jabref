@@ -2,6 +2,7 @@ package org.jabref.gui.externalfiles;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -73,7 +74,6 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
      * and then sorted according to the {@link ExternalFileSorter} value.
      *
      * @param unlinkedPDFFileFilter contains a BibDatabaseContext which is used to determine whether the file is linked
-     *
      * @return FileNodeViewModel containing the data of the current directory and all subdirectories
      * @throws IOException if directory is not a directory or empty
      */
@@ -90,9 +90,10 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         // Filters:
         //   1. UnlinkedPDFFileFilter
         //   2. GitIgnoreFilter
-        ChainedFilters filters = new ChainedFilters(unlinkedPDFFileFilter, new GitIgnoreFileFilter(directory));
+        ChainedFilters filters = new ChainedFilters(List.of(unlinkedPDFFileFilter, new GitIgnoreFileFilter(directory)));
         Map<Boolean, List<Path>> directoryAndFilePartition;
-        try (Stream<Path> filesStream = StreamSupport.stream(Files.newDirectoryStream(directory, filters).spliterator(), false)) {
+        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory, filters);
+             Stream<Path> filesStream = StreamSupport.stream(dirStream.spliterator(), false)) {
             directoryAndFilePartition = filesStream.collect(Collectors.partitioningBy(Files::isDirectory));
         } catch (IOException e) {
             LOGGER.error("Error while searching files", e);
@@ -136,8 +137,8 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
 
         // create and add FileNodeViewModel to the FileNodeViewModel for the current directory
         fileNodeViewModelForCurrentDirectory.getChildren().addAll(resultingFiles.stream()
-                .map(FileNodeViewModel::new)
-                .collect(Collectors.toList()));
+                                                                                .map(FileNodeViewModel::new)
+                                                                                .toList());
 
         return fileNodeViewModelForCurrentDirectory;
     }

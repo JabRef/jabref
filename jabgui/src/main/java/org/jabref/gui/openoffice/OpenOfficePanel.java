@@ -38,7 +38,7 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
@@ -517,8 +517,8 @@ public class OpenOfficePanel {
             return CitationType.INVISIBLE_CIT;
         }
         return inParenthesis
-                ? CitationType.AUTHORYEAR_PAR
-                : CitationType.AUTHORYEAR_INTEXT;
+               ? CitationType.AUTHORYEAR_PAR
+               : CitationType.AUTHORYEAR_INTEXT;
     }
 
     private void pushEntries(CitationType citationType, boolean addPageInfo) {
@@ -572,8 +572,8 @@ public class OpenOfficePanel {
 
         Optional<Update.SyncOptions> syncOptions =
                 openOfficePreferences.getSyncWhenCiting()
-                        ? Optional.of(new Update.SyncOptions(getBaseList()))
-                        : Optional.empty();
+                ? Optional.of(new Update.SyncOptions(getBaseList()))
+                : Optional.empty();
 
         // Sync options are non-null only when "Automatically sync bibliography when inserting citations" is enabled
         if (syncOptions.isPresent() && openOfficePreferences.getSyncWhenCiting()) {
@@ -619,7 +619,7 @@ public class OpenOfficePanel {
         Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
         if (citePressed && databaseContext.isPresent()) {
             // Generate keys
-            NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
+            NamedCompoundEdit undoCompound = new NamedCompoundEdit(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
                 if (entry.getCitationKey().isEmpty()) {
                     // Generate key
@@ -645,6 +645,10 @@ public class OpenOfficePanel {
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
         autoSync.selectedProperty().set(openOfficePreferences.getSyncWhenCiting());
 
+        CheckMenuItem addSpaceAfter = new CheckMenuItem(Localization.lang("Add space after citation"));
+        addSpaceAfter.selectedProperty().set(openOfficePreferences.getAddSpaceAfter());
+        addSpaceAfter.setOnAction(_ -> openOfficePreferences.setAddSpaceAfter(addSpaceAfter.isSelected()));
+
         CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at the end of bibliographic entries"));
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
         alwaysAddCitedOnPagesText.setOnAction(_ -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
@@ -658,7 +662,8 @@ public class OpenOfficePanel {
                 }
                 case CitationStyle _ ->
                         contextMenu.getItems().remove(alwaysAddCitedOnPagesText);
-                default -> { }
+                default -> {
+                }
             }
         });
 
@@ -686,6 +691,7 @@ public class OpenOfficePanel {
 
         contextMenu.getItems().addAll(
                 autoSync,
+                addSpaceAfter,
                 new SeparatorMenuItem(),
                 useActiveBase,
                 useAllBases,

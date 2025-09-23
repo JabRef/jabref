@@ -50,7 +50,7 @@ public class CleanupWorker {
 
         // Add active jobs from preset panel
         for (CleanupPreferences.CleanupStep action : preset.getActiveJobs()) {
-                jobs.add(toJob(action));
+            jobs.add(toJob(action));
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {
@@ -90,8 +90,6 @@ public class CleanupWorker {
                     new MoveFilesCleanup(() -> databaseContext, filePreferences);
             case FIX_FILE_LINKS ->
                     new FileLinksCleanup();
-            case CLEAN_UP_ISSN ->
-                    new ISSNCleanup();
             default ->
                     throw new UnsupportedOperationException(action.name());
         };

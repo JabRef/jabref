@@ -176,8 +176,8 @@ public class OOTextIntoOO {
                     formatStack.pushLayer(setCharWeight(FontWeight.BOLD));
                     expectEnd.push("/" + tagName);
                     break;
-                case "i":
-                case "em":
+                case "i",
+                     "em":
                     formatStack.pushLayer(setCharPosture(FontSlant.ITALIC));
                     expectEnd.push("/" + tagName);
                     break;
@@ -218,12 +218,12 @@ public class OOTextIntoOO {
                                 } else {
                                     if (setParagraphStyle(cursor, value)) {
                                         // Presumably tested already:
-                                        LOGGER.debug("oo:ParaStyleName=\"%s\" failed".formatted(value));
+                                        LOGGER.debug("oo:ParaStyleName=\"{}\" failed", value);
                                     }
                                 }
                                 break;
                             default:
-                                LOGGER.warn("Unexpected attribute '%s' for <%s>".formatted(key, tagName));
+                                LOGGER.warn("Unexpected attribute '{}' for <{}>", key, tagName);
                                 break;
                         }
                     }
@@ -233,8 +233,10 @@ public class OOTextIntoOO {
                         String key = pair.a;
                         String value = pair.b;
                         switch (key) {
-                            case "target" -> UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
-                            default -> LOGGER.warn("Unexpected attribute '%s' for <%s>".formatted(key, tagName));
+                            case "target" ->
+                                    UnoCrossRef.insertReferenceToPageNumberOfReferenceMark(doc, value, cursor);
+                            default ->
+                                    LOGGER.warn("Unexpected attribute '{}' for <{}>", key, tagName);
                         }
                     }
                     break;
@@ -250,11 +252,11 @@ public class OOTextIntoOO {
                         String value = pair.b;
                         switch (key) {
                             case "oo:CharStyleName" ->
-                                    // <span oo:CharStyleName="Standard">
+                                // <span oo:CharStyleName="Standard">
                                     settings.addAll(setCharStyleName(value));
                             case "lang" ->
-                                    // <span lang="zxx">
-                                    // <span lang="en-US">
+                                // <span lang="zxx">
+                                // <span lang="en-US">
                                     settings.addAll(setCharLocale(value));
                             case "style" -> {
                                 // HTML-style small-caps
@@ -262,10 +264,10 @@ public class OOTextIntoOO {
                                     settings.addAll(setCharCaseMap(CaseMap.SMALLCAPS));
                                     break;
                                 }
-                                LOGGER.warn("Unexpected value %s for attribute '%s' for <%s>".formatted(
-                                        value, key, tagName));
+                                LOGGER.warn("Unexpected value {} for attribute '{}' for <{}>", value, key, tagName);
                             }
-                            default -> LOGGER.warn("Unexpected attribute '%s' for <%s>".formatted(key, tagName));
+                            default ->
+                                    LOGGER.warn("Unexpected attribute '{}' for <{}>", key, tagName);
                         }
                     }
                     formatStack.pushLayer(settings);
@@ -284,14 +286,14 @@ public class OOTextIntoOO {
                     formatStack.popLayer();
                     String expected = expectEnd.pop();
                     if (!tagName.equals(expected)) {
-                        LOGGER.warn("expected '<%s>', found '<%s>' after '%s'".formatted(
+                        LOGGER.warn("expected '<{}>', found '<{}>' after '{}'",
                                 expected,
                                 tagName,
-                                currentSubstring));
+                                currentSubstring);
                     }
                     break;
                 default:
-                    LOGGER.warn("ignoring unknown tag '<%s>'".formatted(tagName));
+                    LOGGER.warn("ignoring unknown tag '<{}>'", tagName);
                     break;
             }
 
@@ -309,7 +311,7 @@ public class OOTextIntoOO {
             for (String s : expectEnd) {
                 rest.insert(0, "<%s>".formatted(s));
             }
-            LOGGER.warn("OOTextIntoOO.write: expectEnd stack is not empty at the end: %s%n".formatted(rest));
+            LOGGER.warn("OOTextIntoOO.write: expectEnd stack is not empty at the end: {}", rest);
         }
     }
 
@@ -329,8 +331,8 @@ public class OOTextIntoOO {
             propertySet.setPropertyValue(CHAR_STYLE_NAME, "Standard");
             xPropertyState.setPropertyToDefault("CharCaseMap");
         } catch (UnknownPropertyException |
-                PropertyVetoException |
-                WrappedTargetException ex) {
+                 PropertyVetoException |
+                 WrappedTargetException ex) {
             LOGGER.warn("exception caught", ex);
         }
 
@@ -373,7 +375,7 @@ public class OOTextIntoOO {
             if (knownToFail.contains(p.Name)) {
                 continue;
             }
-            LOGGER.warn("OOTextIntoOO.removeDirectFormatting failed on '%s'".formatted(p.Name));
+            LOGGER.warn("OOTextIntoOO.removeDirectFormatting failed on '{}'", p.Name);
         }
     }
 
@@ -511,7 +513,7 @@ public class OOTextIntoOO {
                 String name = pair.a;
                 Integer index = goodNameToIndex.get(name);
                 if (index == null) {
-                    LOGGER.warn("pushLayer: '%s' is not in goodNameToIndex".formatted(name));
+                    LOGGER.warn("pushLayer: '{}' is not in goodNameToIndex", name);
                     continue;
                 }
                 Object newValue = pair.b;
@@ -561,9 +563,9 @@ public class OOTextIntoOO {
                 mps.setPropertyValues(namesArray, values.toArray());
             } catch (UnknownPropertyException ex) {
                 LOGGER.warn("UnknownPropertyException in MyPropertyStack.apply", ex);
-            } catch (PropertyVetoException ex) {
+            } catch (PropertyVetoException _) {
                 LOGGER.warn("PropertyVetoException in MyPropertyStack.apply");
-            } catch (WrappedTargetException ex) {
+            } catch (WrappedTargetException _) {
                 LOGGER.warn("WrappedTargetException in MyPropertyStack.apply");
             }
         }
@@ -749,9 +751,9 @@ public class OOTextIntoOO {
             propertySet.setPropertyValue(PARA_STYLE_NAME, paragraphStyle);
             return PASS;
         } catch (UnknownPropertyException
-                | PropertyVetoException
-                | IllegalArgumentException
-                | WrappedTargetException ex) {
+                 | PropertyVetoException
+                 | IllegalArgumentException
+                 | WrappedTargetException ex) {
             return FAIL;
         }
     }

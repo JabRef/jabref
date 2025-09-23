@@ -28,6 +28,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
@@ -44,7 +45,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<EntryTypeViewModel> selectedEntryType = new SimpleObjectProperty<>();
     private final StringProperty entryTypeToAdd = new SimpleStringProperty("");
     private final ObjectProperty<Field> newFieldToAdd = new SimpleObjectProperty<>();
-    private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[]{extractor.entryType(), extractor.fields()});
+    private final ObservableList<EntryTypeViewModel> entryTypesWithFields = FXCollections.observableArrayList(extractor -> new Observable[] {extractor.entryType(), extractor.fields()});
     private final List<BibEntryType> entryTypesToDelete = new ArrayList<>();
 
     private final CliPreferences preferences;
@@ -75,7 +76,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
                 ValidationMessage.error(Localization.lang("Entry type cannot be empty. Please enter a name.")));
         fieldValidator = new FunctionBasedValidator<>(
                 newFieldToAdd,
-                input -> (input != null) && StringUtil.isNotBlank(input.getDisplayName()),
+                input -> (input != null) && StringUtil.isNotBlank(FieldTextMapper.getDisplayName(input)),
                 ValidationMessage.error(Localization.lang("Field cannot be empty. Please enter a name.")));
     }
 
@@ -150,12 +151,12 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     public void addNewField() {
         Field field = newFieldToAdd.getValue();
-        boolean fieldExists = displayNameExists(field.getDisplayName());
+        boolean fieldExists = displayNameExists(FieldTextMapper.getDisplayName(field));
 
         if (fieldExists) {
             dialogService.showWarningDialogAndWait(
                     Localization.lang("Duplicate fields"),
-                    Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", field.getDisplayName()));
+                    Localization.lang("Warning: You added field \"%0\" twice. Only one will be kept.", FieldTextMapper.getDisplayName(field)));
         } else {
             this.selectedEntryType.getValue().addField(new FieldViewModel(
                     field,

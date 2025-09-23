@@ -1,7 +1,6 @@
 package org.jabref.logic.git;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,10 +11,10 @@ import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
-import org.jabref.logic.git.model.MergeResult;
+import org.jabref.logic.git.model.PullResult;
+import org.jabref.logic.git.util.GitHandlerRegistry;
+import org.jabref.logic.git.util.NoopGitSystemReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -31,6 +30,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.URIish;
+import org.eclipse.jgit.util.SystemReader;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,6 +60,7 @@ class GitSyncServiceTest {
     private GitConflictResolverStrategy gitConflictResolverStrategy;
     private GitSemanticMergeExecutor mergeExecutor;
     private BibDatabaseContext context;
+    private GitHandlerRegistry gitHandlerRegistry;
 
     // These are setup by aliceBobSetting
     private RevCommit baseCommit;
@@ -73,29 +74,29 @@ class GitSyncServiceTest {
     // In the future, consider replacing with structured BibEntry construction
     // to improve semantic robustness and avoid syntax errors.
     private final String initialContent = """
-            @article{a,
-              author = {don't know the author},
-              doi = {xya},
-            }
+                @article{a,
+                  author = {don't know the author},
+                  doi = {xya},
+                }
 
-            @article{b,
-              author = {don't know the author},
-              doi = {xyz},
-            }
-        """;
+                @article{b,
+                  author = {don't know the author},
+                  doi = {xyz},
+                }
+            """;
 
     // Alice modifies a
     private final String aliceUpdatedContent = """
-            @article{a,
-              author = {author-a},
-              doi = {xya},
-            }
+                @article{a,
+                  author = {author-a},
+                  doi = {xya},
+                }
 
-            @article{b,
-              author = {don't know the author},
-              doi = {xyz},
-            }
-        """;
+                @article{b,
+                  author = {don't know the author},
+                  doi = {xyz},
+                }
+            """;
 
     // Bob reorders a and b
     private final String bobUpdatedContent = """
@@ -118,19 +119,22 @@ class GitSyncServiceTest {
      */
     @BeforeEach
     void aliceBobSimple(@TempDir Path tempDir) throws Exception {
+        SystemReader.setInstance(new NoopGitSystemReader());
+
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
         gitConflictResolverStrategy = mock(GitConflictResolverStrategy.class);
         mergeExecutor = new GitSemanticMergeExecutorImpl(importFormatPreferences);
+        gitHandlerRegistry = new GitHandlerRegistry();
 
         // create fake remote repo
         remoteDir = tempDir.resolve("remote.git");
         remoteGit = Git.init()
-                           .setBare(true)
-                           .setInitialBranch("main")
-                           .setDirectory(remoteDir.toFile())
-                           .call();
+                       .setBare(true)
+                       .setInitialBranch("main")
+                       .setDirectory(remoteDir.toFile())
+                       .call();
 
         // Alice init local repository
         aliceDir = tempDir.resolve("alice");
@@ -150,20 +154,20 @@ class GitSyncServiceTest {
                 .call();
 
         aliceGit.push()
-           .setRemote("origin")
-           .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
-           .call();
+                .setRemote("origin")
+                .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+                .call();
 
         configureTracking(aliceGit, "main", "origin");
 
         // Bob clone remote
         bobDir = tempDir.resolve("bob");
         bobGit = Git.cloneRepository()
-                        .setURI(remoteDir.toUri().toString())
-                        .setDirectory(bobDir.toFile())
-                        .setBranchesToClone(List.of("refs/heads/main"))
-                        .setBranch("main")
-                        .call();
+                    .setURI(remoteDir.toUri().toString())
+                    .setDirectory(bobDir.toFile())
+                    .setBranchesToClone(List.of("refs/heads/main"))
+                    .setBranch("main")
+                    .call();
 
         Path bobLibrary = bobDir.resolve("library.bib");
         bobCommit = writeAndCommit(bobUpdatedContent, "Exchange a with b", bob, bobLibrary, bobGit);
@@ -177,10 +181,8 @@ class GitSyncServiceTest {
         aliceGit.fetch().setRemote("origin").call();
 
         String actualContent = Files.readString(library);
-        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(Reader.of(actualContent));
-        context = new BibDatabaseContext(parsed.getDatabase(), parsed.getMetaData());
+        context = BibDatabaseContext.of(actualContent, importFormatPreferences);
         context.setDatabasePath(library);
-
         // Debug hint: Show the created git graph on the command line
         //   git log --graph --oneline --decorate --all --reflog
     }
@@ -205,48 +207,46 @@ class GitSyncServiceTest {
 
     @Test
     void pullTriggersSemanticMergeWhenNoConflicts() throws Exception {
-        GitHandler gitHandler = new GitHandler(library.getParent());
-        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolverStrategy, mergeExecutor);
-        MergeResult result = syncService.fetchAndMerge(context, library);
+        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandlerRegistry, gitConflictResolverStrategy, mergeExecutor);
+        PullResult result = syncService.fetchAndMerge(context, library);
 
         assertTrue(result.isSuccessful());
         String merged = Files.readString(library);
 
         String expected = """
-        @article{a,
-          author = {author-a},
-          doi = {xya},
-        }
+                @article{a,
+                  author = {author-a},
+                  doi = {xya},
+                }
 
-        @article{b,
-          author = {author-b},
-          doi = {xyz},
-        }
-        """;
+                @article{b,
+                  author = {author-b},
+                  doi = {xyz},
+                }
+                """;
 
         assertEquals(normalize(expected), normalize(merged));
     }
 
     @Test
     void pushTriggersMergeAndPushWhenNoConflicts() throws Exception {
-        GitHandler gitHandler = new GitHandler(library.getParent());
-        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolverStrategy, mergeExecutor);
+        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandlerRegistry, gitConflictResolverStrategy, mergeExecutor);
         syncService.push(context, library);
 
         String pushedContent = GitFileReader
                 .readFileFromCommit(aliceGit, aliceGit.log().setMaxCount(1).call().iterator().next(), Path.of("library.bib"))
                 .orElseThrow(() -> new IllegalStateException("Expected file 'library.bib' not found in commit"));
         String expected = """
-        @article{a,
-          author = {author-a},
-          doi = {xya},
-        }
+                @article{a,
+                  author = {author-a},
+                  doi = {xya},
+                }
 
-        @article{b,
-          author = {author-b},
-          doi = {xyz},
-        }
-        """;
+                @article{b,
+                  author = {author-b},
+                  doi = {xyz},
+                }
+                """;
 
         assertEquals(normalize(expected), normalize(pushedContent));
     }
@@ -255,46 +255,44 @@ class GitSyncServiceTest {
     void mergeConflictOnSameFieldTriggersDialogAndUsesUserResolution() throws Exception {
         Path bobLibrary = bobDir.resolve("library.bib");
         String bobEntry = """
-              @article{b,
-              author = {author-b},
-              doi = {xyz},
-            }
+                      @article{b,
+                      author = {author-b},
+                      doi = {xyz},
+                    }
 
-            @article{a,
-              author = {don't know the author},
-              doi = {xya},
-            }
+                    @article{a,
+                      author = {don't know the author},
+                      doi = {xya},
+                    }
 
-            @article{c,
-              author = {bob-c},
-              title = {Title C},
-            }
-        """;
+                    @article{c,
+                      author = {bob-c},
+                      title = {Title C},
+                    }
+                """;
         writeAndCommit(bobEntry, "Bob adds article-c", bob, bobLibrary, bobGit);
         bobGit.push().setRemote("origin").call();
         String aliceEntry = """
-            @article{a,
-              author = {author-a},
-              doi = {xya},
-            }
+                    @article{a,
+                      author = {author-a},
+                      doi = {xya},
+                    }
 
-            @article{b,
-              author = {don't know the author},
-              doi = {xyz},
-            }
+                    @article{b,
+                      author = {don't know the author},
+                      doi = {xyz},
+                    }
 
-            @article{c,
-              author = {alice-c},
-              title = {Title C},
-            }
-        """;
+                    @article{c,
+                      author = {alice-c},
+                      title = {Title C},
+                    }
+                """;
         writeAndCommit(aliceEntry, "Alice adds conflicting article-c", alice, library, aliceGit);
         aliceGit.fetch().setRemote("origin").call();
 
         String actualContent = Files.readString(library);
-        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(Reader.of(actualContent));
-        context = new BibDatabaseContext(parsed.getDatabase(), parsed.getMetaData());
-        context.setDatabasePath(library);
+        context = BibDatabaseContext.of(actualContent, importFormatPreferences);
 
         // Setup mock conflict resolver
         GitConflictResolverStrategy resolver = mock(GitConflictResolverStrategy.class);
@@ -308,13 +306,17 @@ class GitSyncServiceTest {
             return List.of(resolved);
         });
 
-        GitHandler handler = new GitHandler(aliceDir);
-        GitSyncService service = new GitSyncService(importFormatPreferences, handler, resolver, mergeExecutor);
-        MergeResult result = service.fetchAndMerge(context, library);
+        GitSyncService service = new GitSyncService(importFormatPreferences, gitHandlerRegistry, resolver, mergeExecutor);
+        PullResult result = service.fetchAndMerge(context, library);
 
         assertTrue(result.isSuccessful());
-        String content = Files.readString(library);
-        assertTrue(content.contains("alice-c + bob-c"));
+        List<BibEntry> merged = result.getMergedEntries();
+        BibEntry entryC = merged.stream()
+                                .filter(entry -> "c".equals(entry.getCitationKey().orElse("")))
+                                .findFirst()
+                                .orElseThrow(() -> new AssertionError("Entry 'c' not found in merged result"));
+
+        assertEquals("alice-c + bob-c", entryC.getField(StandardField.AUTHOR).orElse(""));
         verify(resolver).resolveConflicts(anyList());
     }
 

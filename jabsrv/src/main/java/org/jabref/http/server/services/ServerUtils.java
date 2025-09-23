@@ -26,10 +26,10 @@ public class ServerUtils {
 
     private static java.nio.file.Path getLibraryPath(String id, FilesToServe filesToServe) {
         return filesToServe.getFilesToServe()
-                          .stream()
-                          .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
-                          .findAny()
-                          .orElseThrow(NotFoundException::new);
+                           .stream()
+                           .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
+                           .findAny()
+                           .orElseThrow(NotFoundException::new);
     }
 
     private static java.nio.file.Path getLibraryPath(String id, SrvStateManager srvStateManager) {

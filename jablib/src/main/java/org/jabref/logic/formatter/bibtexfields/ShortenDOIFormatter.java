@@ -32,14 +32,14 @@ public class ShortenDOIFormatter extends Formatter {
     public String format(String value) {
         Objects.requireNonNull(value);
         return SHORT_DOI_FORMAT.test(value) ? value : DOI.parse(value)
-                  .map(doi -> {
-                      try {
-                          return new ShortDOIService().getShortDOI(doi).asString();
-                      } catch (ShortDOIServiceException e) {
-                          LOGGER.error(e.getMessage(), e);
-                          return value;
-                      }
-                  }).orElse(value);
+                                                         .map(doi -> {
+                                                             try {
+                                                                 return new ShortDOIService().getShortDOI(doi).asString();
+                                                             } catch (ShortDOIServiceException e) {
+                                                                 LOGGER.error(e.getMessage(), e);
+                                                                 return value;
+                                                             }
+                                                         }).orElse(value);
     }
 
     @Override

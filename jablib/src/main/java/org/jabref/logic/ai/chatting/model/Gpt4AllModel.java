@@ -42,13 +42,18 @@ public class Gpt4AllModel implements ChatModel {
         LOGGER.debug("Generating response from Gpt4All model with {} messages: {}", list.size(), list);
 
         List<Message> messages = list.stream()
-                .map(chatMessage -> switch (chatMessage) {
-                    case AiMessage aiMessage -> new Message("assistant", aiMessage.text());
-                    case SystemMessage systemMessage -> new Message("system", systemMessage.text());
-                    case ToolExecutionResultMessage toolExecutionResultMessage -> new Message("tool", toolExecutionResultMessage.text());
-                    case UserMessage userMessage -> new Message("user", userMessage.singleText());
-                    default -> throw new IllegalStateException("Unknown ChatMessage type: " + chatMessage);
-                }).collect(Collectors.toList());
+                                     .map(chatMessage -> switch (chatMessage) {
+                                         case AiMessage aiMessage ->
+                                                 new Message("assistant", aiMessage.text());
+                                         case SystemMessage systemMessage ->
+                                                 new Message("system", systemMessage.text());
+                                         case ToolExecutionResultMessage toolExecutionResultMessage ->
+                                                 new Message("tool", toolExecutionResultMessage.text());
+                                         case UserMessage userMessage ->
+                                                 new Message("user", userMessage.singleText());
+                                         default ->
+                                                 throw new IllegalStateException("Unknown ChatMessage type: " + chatMessage);
+                                     }).collect(Collectors.toList());
 
         TextGenerationRequest request = TextGenerationRequest
                 .builder()
@@ -63,11 +68,11 @@ public class Gpt4AllModel implements ChatModel {
             String baseUrl = aiPreferences.getSelectedApiBaseUrl();
             String fullUrl = baseUrl.endsWith("/") ? baseUrl + "chat/completions" : baseUrl + "/chat/completions";
             HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(URLUtil.createUri(fullUrl))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                    .timeout(Duration.ofMinutes(1))
-                    .build();
+                                                 .uri(URLUtil.createUri(fullUrl))
+                                                 .header("Content-Type", "application/json")
+                                                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                                                 .timeout(Duration.ofMinutes(1))
+                                                 .build();
 
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             LOGGER.info("Gpt4All response: {}", response.body());
@@ -144,9 +149,12 @@ public class Gpt4AllModel implements ChatModel {
         }
     }
 
-    private record TextGenerationResponse(List<Choice> choices) { }
+    private record TextGenerationResponse(List<Choice> choices) {
+    }
 
-    private record Choice(Message message) { }
+    private record Choice(Message message) {
+    }
 
-    private record Message(String role, String content) { }
+    private record Message(String role, String content) {
+    }
 }

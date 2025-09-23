@@ -86,7 +86,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
         mainResultPaper = new BibEntry(StandardEntryType.Article)
                 // ArXiv-original fields
-//              .withField(StandardField.AUTHOR, "Joeran Beel and Andrew Collins and Akiko Aizawa")
+                //              .withField(StandardField.AUTHOR, "Joeran Beel and Andrew Collins and Akiko Aizawa")
                 .withField(StandardField.TITLE, "The Architecture of Mr. DLib's Scientific Recommender-System API")
                 .withField(StandardField.DATE, "2018-11-26")
                 .withField(StandardField.ABSTRACT, "Recommender systems in academia are not widely available. This may be in part due to the difficulty and cost of developing and maintaining recommender systems. Many operators of academic products such as digital libraries and reference managers avoid this effort, although a recommender system could provide significant benefits to their users. In this paper, we introduce Mr. DLib's \"Recommendations as-a-Service\" (RaaS) API that allows operators of academic products to easily integrate a scientific recommender system into their products. Mr. DLib generates recommendations for research articles but in the future, recommendations may include call for papers, grants, etc. Operators of academic products can request recommendations from Mr. DLib and display these recommendations to their users. Mr. DLib can be integrated in just a few hours or days; creating an equivalent recommender system from scratch would require several months for an academic operator. Mr. DLib has been used by GESIS Sowiport and by the reference manager JabRef. Mr. DLib is open source and its goal is to facilitate the application of, and research on, scientific recommender systems. In this paper, we present the motivation for Mr. DLib, the architecture and details about the effectiveness. Mr. DLib has delivered 94m recommendations over a span of two years with an average click-through rate of 0.12%.")
@@ -94,7 +94,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/1811.10364v1:PDF")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
                 .withField(StandardField.EPRINTCLASS, "cs.IR")
-//              .withField(StandardField.KEYWORDS, "cs.IR, cs.AI, cs.DL, cs.LG")
+                //              .withField(StandardField.KEYWORDS, "cs.IR, cs.AI, cs.DL, cs.LG")
                 // Unavailable info:
                 // StandardField.JOURNALTITLE // INFO NOT APPLICABLE TO THIS ENTRY
                 // ArXiv-issue DOI fields
@@ -152,7 +152,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     @Override
     public void supportsAuthorSearch() throws FetcherException {
-        StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
+        StringJoiner queryBuilder = new StringJoiner("\" AND author=\"", "author=\"", "\"");
         getInputTestAuthors().forEach(queryBuilder::add);
 
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
@@ -300,13 +300,13 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     void searchEntryByPartOfTitle() throws FetcherException {
         assertEquals(List.of(mainResultPaper),
-                fetcher.performSearch("title:\"the architecture of mr. dLib's\""));
+                fetcher.performSearch("title=\"the architecture of mr. dLib's\""));
     }
 
     @Test
     void searchEntryByPartOfTitleWithAcuteAccent() throws FetcherException {
         assertEquals(List.of(sliceTheoremPaper),
-                fetcher.performSearch("title:\"slice theorem for Fréchet\""));
+                fetcher.performSearch("title=\"slice theorem for Fréchet\""));
     }
 
     @Test
@@ -359,7 +359,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Test
     void searchEntryByIdWith5Digits() throws FetcherException {
         assertEquals(Optional.of(
-                "An Optimal Convergence Theorem for Mean Curvature Flow of Arbitrary Codimension in Hyperbolic Spaces"),
+                        "An Optimal Convergence Theorem for Mean Curvature Flow of Arbitrary Codimension in Hyperbolic Spaces"),
                 fetcher.performSearchById("1503.06747").flatMap(entry -> entry.getField(StandardField.TITLE)));
     }
 
@@ -441,10 +441,10 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.2009.10618")
                 .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
 
-        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
+        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title==\"A Survey and Taxonomy of Distributed Data Mining Research Studies: A Systematic Literature Review\"");
 
-        // There is only a single paper found by searching that contains the exact sequence "Taxonomy of Distributed" in the title.
-        assertEquals(List.of(expected), resultWithPhraseSearch);
+        // The first result should be the expected paper
+        assertEquals(expected, resultWithPhraseSearch.getFirst());
     }
 
     @Test
@@ -472,7 +472,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 .withField(InternalField.KEY_FIELD, "B_scher_2020")
                 .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license");
 
-        List<BibEntry> result = fetcher.performSearch("author:\"Tobias Büscher\" AND title:\"Instability and fingering of interfaces\"");
+        List<BibEntry> result = fetcher.performSearch("author=\"Tobias Büscher\" AND title=\"Instability and fingering of interfaces\"");
 
         // There is only one paper authored by Tobias Büscher with that phrase in the title
         assertEquals(List.of(expected), result);

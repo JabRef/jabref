@@ -140,7 +140,7 @@ public class StringUtil {
      * String[] s = "ab/cd/ed".split("/"); join(s, "\\", 0, s.length) ->
      * "ab\\cd\\ed"
      *
-     * @param to        Excluding strings[to]
+     * @param to Excluding strings[to]
      */
     public static String join(String[] strings, String separator, int from, int to) {
         if ((strings.length == 0) || (from >= to)) {
@@ -289,7 +289,7 @@ public class StringUtil {
             }
             escaped = false;
         }
-        if (sb.length() > 0) {
+        if (!sb.isEmpty()) {
             thisEntry.add(sb.toString());
         }
         if (!thisEntry.isEmpty()) {
@@ -418,7 +418,7 @@ public class StringUtil {
      * Strings with escaped characters in curly braces at the beginning and end are respected, too
      *
      * @param toCheck The string to check
-     * @return True, if the check was succesful. False otherwise.
+     * @return True, if the check was successful. False otherwise.
      */
     public static boolean isInCurlyBrackets(String toCheck) {
         int count = 0;
@@ -740,6 +740,17 @@ public class StringUtil {
         return StringUtils.containsIgnoreCase(text, searchString);
     }
 
+    public static boolean equalsUnifiedLineBreak(Optional<String> stringOne, Optional<String> stringTwo) {
+        if (stringOne.isEmpty() && stringTwo.isEmpty()) {
+            return true;
+        }
+        if (stringOne.isEmpty() || stringTwo.isEmpty()) {
+            return false;
+        }
+        return StringUtil.unifyLineBreaks(stringOne.get(), OS.NEWLINE).equals(
+                StringUtil.unifyLineBreaks(stringTwo.get(), OS.NEWLINE));
+    }
+
     public static String substringBetween(String str, String open, String close) {
         return StringUtils.substringBetween(str, open, close);
     }
@@ -767,7 +778,7 @@ public class StringUtil {
      *
      * @param s The string to check
      * @return {@code True} if the given string does contain at least one whitespace character, {@code False} otherwise
-     * */
+     */
     public static boolean containsWhitespace(String s) {
         return s.chars().anyMatch(Character::isWhitespace);
     }

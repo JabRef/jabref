@@ -27,7 +27,6 @@ import javafx.scene.input.MouseButton;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -37,16 +36,12 @@ import org.jabref.model.study.Study;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class controls the user interface of the study definition management dialog. The UI elements and their layout
  * are defined in the FXML file.
  */
 public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ManageStudyDefinitionView.class);
-
     @FXML private TextField studyTitle;
     @FXML private TextField addAuthor;
     @FXML private TextField addResearchQuestion;
@@ -77,7 +72,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
     @Inject private DialogService dialogService;
     @Inject private GuiPreferences preferences;
-    @Inject private ThemeManager themeManager;
 
     private ManageStudyDefinitionViewModel viewModel;
 
@@ -104,14 +98,12 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                   .setAsDialogPane(this);
 
         setupSaveSurveyButton(false);
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     /**
      * This is used to edit an existing study.
      *
-     * @param study the study to edit
+     * @param study          the study to edit
      * @param studyDirectory the directory of the study
      */
     public ManageStudyDefinitionView(Study study, Path studyDirectory) {
@@ -124,8 +116,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                   .setAsDialogPane(this);
 
         setupSaveSurveyButton(true);
-
-        themeManager.updateFontStyle(getDialogPane().getScene());
     }
 
     private void setupSaveSurveyButton(boolean isEdit) {
@@ -138,10 +128,10 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         saveSurveyButton.disableProperty().bind(Bindings.or(Bindings.or(Bindings.or(Bindings.or(Bindings.or(
                                                 Bindings.isEmpty(viewModel.getQueries()),
                                                 Bindings.isEmpty(viewModel.getCatalogs())),
-                                                Bindings.isEmpty(viewModel.getAuthors())),
-                                                viewModel.getTitle().isEmpty()),
-                                                viewModel.getDirectory().isEmpty()),
-                                                directoryWarning.visibleProperty()));
+                                        Bindings.isEmpty(viewModel.getAuthors())),
+                                viewModel.getTitle().isEmpty()),
+                        viewModel.getDirectory().isEmpty()),
+                directoryWarning.visibleProperty()));
 
         setResultConverter(button -> {
             if (button == saveSurveyButtonType) {

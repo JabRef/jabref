@@ -204,6 +204,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String INCLUDE_CROSS_REFERENCES = "includeCrossReferences";
     private static final String ASK_FOR_INCLUDING_CROSS_REFERENCES = "askForIncludingCrossReferences";
 
+    // region Donation preferences
+    private static final String DONATION_NEVER_SHOW = "donationNeverShow";
+    private static final String DONATION_LAST_SHOWN_EPOCH_DAY = "donationLastShownEpochDay";
+    // endregion
+
     // region NewEntryPreferences
     private static final String CREATE_ENTRY_APPROACH = "latestApproach";
     private static final String CREATE_ENTRY_EXPAND_RECOMMENDED = "typesRecommendedExpanded";
@@ -236,6 +241,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private KeyBindingRepository keyBindingRepository;
     private CopyToPreferences copyToPreferences;
     private NewEntryPreferences newEntryPreferences;
+    private DonationPreferences donationPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -378,6 +384,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(ASK_FOR_INCLUDING_CROSS_REFERENCES, Boolean.TRUE);
         defaults.put(INCLUDE_CROSS_REFERENCES, Boolean.FALSE);
 
+        // region donation defaults
+        defaults.put(DONATION_NEVER_SHOW, Boolean.FALSE);
+        defaults.put(DONATION_LAST_SHOWN_EPOCH_DAY, -1);
+        // endregion
+
         // region NewEntryUnifierPreferences
         defaults.put(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(NewEntryDialogTab.CHOOSE_ENTRY_TYPE));
         defaults.put(CREATE_ENTRY_EXPAND_RECOMMENDED, true);
@@ -392,8 +403,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     /**
      * @deprecated Never ever add a call to this method. There should be only one caller.
-     *             All other usages should get the preferences passed (or injected).
-     *             The JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing this method with a strike-through.
+     * All other usages should get the preferences passed (or injected).
+     * The JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing this method with a strike-through.
      */
     @Deprecated
     public static JabRefGuiPreferences getInstance() {
@@ -1158,8 +1169,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         final int approachIndex = getInt(CREATE_ENTRY_APPROACH);
         NewEntryDialogTab approach = NewEntryDialogTab.values().length > approachIndex
-            ? NewEntryDialogTab.values()[approachIndex]
-            : NewEntryDialogTab.values()[0];
+                                     ? NewEntryDialogTab.values()[approachIndex]
+                                     : NewEntryDialogTab.values()[0];
 
         final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE);
         EntryType immediateType = StandardEntryType.Article;
@@ -1171,14 +1182,14 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
 
         newEntryPreferences = new NewEntryPreferences(
-            approach,
-            getBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED),
-            getBoolean(CREATE_ENTRY_EXPAND_OTHER),
-            getBoolean(CREATE_ENTRY_EXPAND_CUSTOM),
-            immediateType,
-            getBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING),
-            get(CREATE_ENTRY_ID_FETCHER_NAME),
-            get(CREATE_ENTRY_INTERPRET_PARSER_NAME));
+                approach,
+                getBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED),
+                getBoolean(CREATE_ENTRY_EXPAND_OTHER),
+                getBoolean(CREATE_ENTRY_EXPAND_CUSTOM),
+                immediateType,
+                getBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING),
+                get(CREATE_ENTRY_ID_FETCHER_NAME),
+                get(CREATE_ENTRY_INTERPRET_PARSER_NAME));
 
         EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(newValue)));
         EasyBind.listen(newEntryPreferences.typesRecommendedExpandedProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED, newValue));
@@ -1190,6 +1201,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(newEntryPreferences.latestInterpretParserProperty(), (_, _, newValue) -> put(CREATE_ENTRY_INTERPRET_PARSER_NAME, newValue));
 
         return newEntryPreferences;
+    }
+
+    public DonationPreferences getDonationPreferences() {
+        if (donationPreferences != null) {
+            return donationPreferences;
+        }
+
+        donationPreferences = new DonationPreferences(getBoolean(DONATION_NEVER_SHOW), getInt(DONATION_LAST_SHOWN_EPOCH_DAY));
+        EasyBind.listen(donationPreferences.neverShowAgainProperty(), (_, _, newValue) -> putBoolean(DONATION_NEVER_SHOW, newValue));
+        EasyBind.listen(donationPreferences.lastShownEpochDayProperty(), (_, _, newValue) -> putInt(DONATION_LAST_SHOWN_EPOCH_DAY, newValue.intValue()));
+        return donationPreferences;
     }
 
     /**
