@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
-import org.jabref.logic.git.merge.MergePlan;
+import org.jabref.logic.git.model.MergePlan;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;

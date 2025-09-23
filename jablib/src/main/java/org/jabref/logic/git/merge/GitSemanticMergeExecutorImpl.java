@@ -5,6 +5,7 @@ import java.nio.file.Path;
 
 import org.jabref.logic.git.conflicts.SemanticConflictDetector;
 import org.jabref.logic.git.io.GitFileWriter;
+import org.jabref.logic.git.model.MergePlan;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;

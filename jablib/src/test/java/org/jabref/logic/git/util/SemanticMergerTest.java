@@ -4,8 +4,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.git.conflicts.SemanticConflictDetector;
-import org.jabref.logic.git.merge.MergePlan;
 import org.jabref.logic.git.merge.SemanticMerger;
+import org.jabref.logic.git.model.MergePlan;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

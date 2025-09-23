@@ -12,8 +12,13 @@ import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.io.RevisionTriple;
+import org.jabref.logic.git.merge.DefaultMergeBookkeeper;
 import org.jabref.logic.git.merge.GitMergeUtil;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
+import org.jabref.logic.git.merge.MergeBookkeeper;
+import org.jabref.logic.git.model.FinalizeResult;
+import org.jabref.logic.git.model.MergePlan;
+import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.model.PullResult;
 import org.jabref.logic.git.model.PushResult;
 import org.jabref.logic.git.status.GitStatusChecker;
@@ -27,8 +32,6 @@ import org.jabref.model.entry.BibEntry;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /// GitSyncService currently serves as an orchestrator for Git pull/push logic.
 ///
@@ -36,20 +39,21 @@ import org.slf4j.LoggerFactory;
 ///     → UI merge;
 /// else
 ///     → autoMerge := local + remoteDiff
+///
+/// - finalizeMerge(): After the GUI has been successfully committed to disk, it is responsible for stage and commit.
 public class GitSyncService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GitSyncService.class);
-
-    private static final boolean AMEND = true;
     private final ImportFormatPreferences importFormatPreferences;
     private final GitHandlerRegistry gitHandlerRegistry;
     private final GitConflictResolverStrategy gitConflictResolverStrategy;
     private final GitSemanticMergeExecutor mergeExecutor;
+    private final MergeBookkeeper bookkeeper;
 
     public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandlerRegistry gitHandlerRegistry, GitConflictResolverStrategy gitConflictResolverStrategy, GitSemanticMergeExecutor mergeExecutor) {
         this.importFormatPreferences = importFormatPreferences;
         this.gitHandlerRegistry = gitHandlerRegistry;
         this.gitConflictResolverStrategy = gitConflictResolverStrategy;
         this.mergeExecutor = mergeExecutor;
+        this.bookkeeper = new DefaultMergeBookkeeper(gitHandlerRegistry);
     }
 
     public PullResult fetchAndMerge(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
@@ -95,14 +99,19 @@ public class GitSyncService {
 
             // 2. Perform semantic merge
             if (status.syncStatus() == SyncStatus.DIVERGED) {
-                try (GitHandler.MergeGuard guard = gitHandler.beginSemanticMergeGuard(remoteCommit, bibFilePath)) {
-                    PullResult result = performSemanticMerge(git, triple.base(), remoteCommit, localDatabaseContext, bibFilePath);
+                PullResult result = performSemanticMerge(git, triple.base(), remoteCommit, localDatabaseContext, bibFilePath);
 
-                    if (result.isSuccessful()) {
-                        guard.commit("Auto-merged by JabRef");
-                    }
-                    return result;
-                }
+                PullPlan planForFinalize = PullPlan.of(
+                        status.syncStatus(),
+                        triple.base(),
+                        remoteCommit,
+                        triple.local(),
+                        MergePlan.empty(),
+                        List.of()
+                );
+
+                FinalizeResult finalized = bookkeeper.resultRecord(bibFilePath, planForFinalize);
+                return result;
             }
 
             throw new JabRefException("Pull aborted: Unsupported sync status " + status.syncStatus());
@@ -225,6 +234,23 @@ public class GitSyncService {
                 throw new JabRefException("Push aborted: Unsupported sync status.");
             }
         }
+    }
+
+    /**
+     * Phase-2: finalize after GUI saved the file with applied plan.
+     * <p>
+     * Responsibilities:
+     * - (Re)open repo, stage bib file
+     * - For BEHIND: fast-forward or create commit consistent with GUI-saved tree
+     * - For DIVERGED: create computeMergePlan commit with parents (localHead, remote)
+     * <p>
+     * Preconditions:
+     * - The bib file on disk already reflects: local + autoPlan (+ resolvedPlan)
+     * - No uncommitted unrelated changes
+     */
+    public FinalizeResult finalizeMerge(Path bibFilePath,
+                                        PullPlan computation) throws GitAPIException, IOException, JabRefException {
+        return bookkeeper.resultRecord(bibFilePath, computation);
     }
 }
 

@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.jabref.logic.git.conflicts.SemanticConflictDetector;
+import org.jabref.logic.git.model.MergePlan;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;

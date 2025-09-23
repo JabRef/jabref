@@ -1,4 +1,4 @@
-package org.jabref.logic.git.merge;
+package org.jabref.logic.git.model;
 
 import java.util.List;
 import java.util.Map;
@@ -14,5 +14,10 @@ import org.jabref.model.entry.field.Field;
  */
 public record MergePlan(
         Map<String, Map<Field, String>> fieldPatches,
-        List<BibEntry> newEntries) {
+        List<BibEntry> newEntries
+) {
+
+    public static MergePlan empty() {
+        return new MergePlan(Map.of(), List.of());
+    }
 }

@@ -3,6 +3,7 @@ package org.jabref.logic.git.merge;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import org.jabref.logic.git.model.MergePlan;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.jspecify.annotations.NullMarked;

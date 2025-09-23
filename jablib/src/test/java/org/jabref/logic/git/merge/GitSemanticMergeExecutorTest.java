@@ -9,6 +9,7 @@ import java.util.Map;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.git.model.MergePlan;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
