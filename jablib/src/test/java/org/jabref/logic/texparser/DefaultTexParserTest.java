@@ -4,11 +4,15 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.texparser.LatexParserResults;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.Arguments;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,6 +25,24 @@ class DefaultTexParserTest {
     private final static String EINSTEIN_C = "Einstein1920c";
     private final static String UNRESOLVED = "UnresolvedKey";
     private final static String UNKNOWN = "UnknownKey";
+
+    private static Stream<Arguments> citeCommandsProvider() {
+      return Stream.of(
+          Arguments.of(UNRESOLVED, "\\cite[pre][post]{UnresolvedKey}", true),
+          Arguments.of(UNRESOLVED, "\\cite*{UnresolvedKey}", true),
+          Arguments.of(UNRESOLVED, "\\parencite[post]{UnresolvedKey}", true),
+          Arguments.of(EINSTEIN_C, "\\citep{Einstein1920c}", true),
+          Arguments.of(EINSTEIN_C, "\\autocite{Einstein1920c}", true),
+          Arguments.of(EINSTEIN_C, "\\Autocite{Einstein1920c}", true),
+          Arguments.of(DARWIN, "\\blockcquote[p. 28]{Darwin1888}{some text}", true),
+          Arguments.of(DARWIN, "\\textcquote[p. 18]{Darwin1888}{blablabla}", true),
+
+          Arguments.of(null, "\\citet21312{123U123n123resolvedKey}", false),
+          Arguments.of(null, "\\1cite[pr234e][post]{UnresolvedKey}", false),
+          Arguments.of(null, "\\citep55{5}UnresolvedKey}", false),
+          Arguments.of(null, "\\cit2et{UnresolvedKey}", false)
+      );
+    }
 
     private void testMatchCite(String key, String citeString) {
         Path path = Path.of("");
@@ -39,22 +61,14 @@ class DefaultTexParserTest {
         assertEquals(expectedParserResult, latexParserResult);
     }
 
-    @Test
-    void citeCommands() {
-        testMatchCite(UNRESOLVED, "\\cite[pre][post]{UnresolvedKey}");
-        testMatchCite(UNRESOLVED, "\\cite*{UnresolvedKey}");
-        testMatchCite(UNRESOLVED, "\\parencite[post]{UnresolvedKey}");
-        testMatchCite(UNRESOLVED, "\\cite[pre][post]{UnresolvedKey}");
-        testMatchCite(EINSTEIN_C, "\\citep{Einstein1920c}");
-        testMatchCite(EINSTEIN_C, "\\autocite{Einstein1920c}");
-        testMatchCite(EINSTEIN_C, "\\Autocite{Einstein1920c}");
-        testMatchCite(DARWIN, "\\blockcquote[p. 28]{Darwin1888}{some text}");
-        testMatchCite(DARWIN, "\\textcquote[p. 18]{Darwin1888}{blablabla}");
-
-        testNonMatchCite("\\citet21312{123U123n123resolvedKey}");
-        testNonMatchCite("\\1cite[pr234e][post]{UnresolvedKey}");
-        testNonMatchCite("\\citep55{5}UnresolvedKey}");
-        testNonMatchCite("\\cit2et{UnresolvedKey}");
+    @ParameterizedTest
+    @MethodSource("citeCommandsProvider")
+    void citeCommands(String expectedKey, String citeString, boolean isMatch) {
+        if (isMatch) {
+            testMatchCite(expectedKey, citeString);
+        } else {
+            testNonMatchCite(citeString);
+        }
     }
 
     @Test
