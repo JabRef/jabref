@@ -34,7 +34,7 @@ public class Study {
     @JsonProperty("catalogs")
     private List<StudyCatalog> catalogs;
 
-    private StudyMetadata metadata;
+    private Optional<StudyMetadata> metadata = Optional.empty();
 
     public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogs) {
         this.authors = authors;
@@ -42,6 +42,7 @@ public class Study {
         this.researchQuestions = researchQuestions;
         this.queries = queryEntries;
         this.catalogs = catalogs;
+        this.metadata = Optional.empty();
     }
 
     public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogs, StudyMetadata metadata) {
@@ -50,13 +51,14 @@ public class Study {
         this.researchQuestions = researchQuestions;
         this.queries = queryEntries;
         this.catalogs = catalogs;
-        this.metadata = metadata;
+        this.metadata = Optional.ofNullable(metadata);
     }
 
     /**
      * Used for Jackson deserialization
      */
     private Study() {
+        this.metadata = Optional.empty();
     }
 
     public String getVersion() {
@@ -138,14 +140,18 @@ public class Study {
 
     @Override
     public int hashCode() {
-        return Objects.hash(authors, title, researchQuestions, queries, catalogs);
+        return Objects.hash(authors, title, researchQuestions, queries, catalogs, metadata);
     }
 
     public Optional<StudyMetadata> getMetadata() {
-        return Optional.ofNullable(metadata);
+        return metadata;
+    }
+
+    public void setMetadata(Optional<StudyMetadata> metadata) {
+        this.metadata = metadata != null ? metadata : Optional.empty();
     }
 
     public void setMetadata(StudyMetadata metadata) {
-        this.metadata = metadata;
+        this.metadata = Optional.ofNullable(metadata);
     }
 }
