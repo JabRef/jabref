@@ -4,6 +4,8 @@ import java.nio.file.Path;
 
 import org.jabref.model.study.Study;
 
+import org.jspecify.annotations.NonNull;
+
 public class SlrStudyAndDirectory {
     private final Study study;
     private final Path studyDirectory;
