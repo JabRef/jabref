@@ -4,7 +4,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 public class StudyQuery {
     private String query;
@@ -49,10 +51,12 @@ public class StudyQuery {
         return description;
     }
 
+    @JsonSetter("description")
     public void setDescription(Optional<String> description) {
         this.description = description != null ? description : Optional.empty();
     }
 
+    @JsonIgnore
     public void setDescription(String description) {
         this.description = Optional.ofNullable(description);
     }
@@ -61,10 +65,12 @@ public class StudyQuery {
         return lucene;
     }
 
+    @JsonSetter("lucene")
     public void setLucene(Optional<String> lucene) {
         this.lucene = lucene != null ? lucene : Optional.empty();
     }
 
+    @JsonIgnore
     public void setLucene(String lucene) {
         this.lucene = Optional.ofNullable(lucene);
     }
@@ -77,10 +83,12 @@ public class StudyQuery {
         return catalogSpecific;
     }
 
+    @JsonSetter("catalog-specific")
     public void setCatalogSpecific(Optional<Map<String, String>> catalogSpecific) {
         this.catalogSpecific = catalogSpecific != null ? catalogSpecific : Optional.empty();
     }
 
+    @JsonIgnore
     public void setCatalogSpecific(Map<String, String> catalogSpecific) {
         this.catalogSpecific = Optional.ofNullable(catalogSpecific);
     }

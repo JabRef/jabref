@@ -6,9 +6,11 @@ import java.util.Optional;
 
 import org.jabref.logic.crawler.StudyYamlParser;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 /**
  * This class represents a scientific study.
@@ -147,10 +149,12 @@ public class Study {
         return metadata;
     }
 
+    @JsonSetter("metadata")
     public void setMetadata(Optional<StudyMetadata> metadata) {
         this.metadata = metadata != null ? metadata : Optional.empty();
     }
 
+    @JsonIgnore
     public void setMetadata(StudyMetadata metadata) {
         this.metadata = Optional.ofNullable(metadata);
     }
