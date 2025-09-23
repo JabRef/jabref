@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabase;
