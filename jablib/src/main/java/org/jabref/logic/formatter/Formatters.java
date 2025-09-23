@@ -46,26 +46,29 @@ import org.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import org.jabref.logic.formatter.minifier.TruncateFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 
 public class Formatters {
     private static final Pattern TRUNCATE_PATTERN = Pattern.compile("\\Atruncate\\d+\\z");
 
-    private static Map<String, Formatter> keyToFormatterMap;
+    private static final Map<String, Formatter> keyToFormatterMap;
 
     static {
+    // FIXME: We need to pass cli prefs down
         keyToFormatterMap = getAll().stream().collect(Collectors.toMap(Formatter::getKey, f -> f));
     }
 
     private Formatters() {
     }
 
-    public static List<Formatter> getConverters() {
+    public static List<Formatter> getConverters(CliPreferences preferences) {
         return Arrays.asList(
                 new HtmlToLatexFormatter(),
                 new HtmlToUnicodeFormatter(),
                 new LatexToUnicodeFormatter(),
                 new UnicodeToLatexFormatter(),
-                new ConvertMSCCodesFormatter()
+                new ConvertMSCCodesFormatter(preferences)
         );
     }
 
@@ -112,9 +115,9 @@ public class Formatters {
         );
     }
 
-    public static List<Formatter> getAll() {
+    public static List<Formatter> getAll(CliPreferences preferences) {
         List<Formatter> all = new ArrayList<>();
-        all.addAll(getConverters());
+        all.addAll(getConverters(preferences));
         all.addAll(getCaseChangers());
         all.addAll(getOthers());
         all.addAll(getTitleChangers());

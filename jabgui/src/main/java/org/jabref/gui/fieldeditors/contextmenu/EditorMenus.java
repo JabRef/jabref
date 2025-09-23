@@ -17,6 +17,7 @@ import org.jabref.gui.edit.CopyDoiUrlAction;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -36,14 +37,14 @@ public class EditorMenus {
      * @param textInput text-input-control that this menu will be connected to
      * @return menu containing items of the default menu and an item for normalizing person names
      */
-    public static Supplier<List<MenuItem>> getNameMenu(final TextInputControl textInput) {
+    public static Supplier<List<MenuItem>> getNameMenu(final TextInputControl textInput, CliPreferences cliPreferences) {
         return () -> {
             MenuItem normalizeNames = new MenuItem(Localization.lang("Normalize to BibTeX name format"));
             EasyBind.subscribe(textInput.textProperty(), value -> normalizeNames.setDisable(StringUtil.isNullOrEmpty(value)));
-            normalizeNames.setOnAction(event -> textInput.setText(new NormalizeNamesFormatter().format(textInput.getText())));
+            normalizeNames.setOnAction(_ -> textInput.setText(new NormalizeNamesFormatter().format(textInput.getText())));
             List<MenuItem> menuItems = new ArrayList<>(6);
             menuItems.add(normalizeNames);
-            menuItems.addAll(new DefaultMenu(textInput).get());
+            menuItems.addAll(new DefaultMenu(textInput, cliPreferences).get());
             return menuItems;
         };
     }
@@ -54,7 +55,7 @@ public class EditorMenus {
      * @param textField text-field that this menu will be connected to
      * @return menu containing items of the default menu and an item for copying a DOI/DOI URL
      */
-    public static Supplier<List<MenuItem>> getDOIMenu(TextField textField, DialogService dialogService) {
+    public static Supplier<List<MenuItem>> getDOIMenu(TextField textField, DialogService dialogService, CliPreferences cliPreferences) {
         return () -> {
             ActionFactory factory = new ActionFactory();
             ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
@@ -64,7 +65,7 @@ public class EditorMenus {
             menuItems.add(copyDoiMenuItem);
             menuItems.add(copyDoiUrlMenuItem);
             menuItems.add(new SeparatorMenuItem());
-            menuItems.addAll(new DefaultMenu(textField).get());
+            menuItems.addAll(new DefaultMenu(textField, cliPreferences).get());
             return menuItems;
         };
     }

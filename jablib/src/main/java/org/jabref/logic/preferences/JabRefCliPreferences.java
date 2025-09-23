@@ -696,7 +696,6 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));
         defaults.put(CLEANUP_FIELD_FORMATTERS_ENABLED, Boolean.FALSE);
-        defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, OS.NEWLINE));
 
         defaults.put(AUTO_RENAME_FILES_ON_CHANGE, false);
         // use citation key appended with filename as default pattern
@@ -1923,7 +1922,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (_, _, newValue) -> {
             putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
-            put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(newValue.getConfiguredActions(), OS.NEWLINE));
+            put(CLEANUP_FIELD_FORMATTERS, org.jabref.logic.cleanup.FieldFormatterCleanupsSerializer.getMetaDataString(newValue.getConfiguredActions(), OS.NEWLINE));
         });
 
         return cleanupPreferences;

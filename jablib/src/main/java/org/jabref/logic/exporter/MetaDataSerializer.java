@@ -180,7 +180,7 @@ public class MetaDataSerializer {
             stringRepresentation.add(FieldFormatterCleanups.DISABLED);
         }
 
-        String formatterString = FieldFormatterCleanups.getMetaDataString(
+        String formatterString = org.jabref.logic.cleanup.FieldFormatterCleanupsSerializer.getMetaDataString(
                 fieldFormatterCleanups.getConfiguredActions(), delimiter);
         stringRepresentation.add(formatterString);
         return stringRepresentation;

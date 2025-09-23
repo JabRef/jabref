@@ -12,6 +12,7 @@ import javafx.scene.control.TextInputControl;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -19,20 +20,22 @@ import com.tobiasdiez.easybind.EasyBind;
 public class DefaultMenu implements Supplier<List<MenuItem>> {
 
     TextInputControl textInputControl;
+    private final CliPreferences cliPreferences;
 
     /**
      * The default menu that contains functions for changing the case of text and doing several conversions.
      *
      * @param textInputControl that this menu will be connected to
      */
-    public DefaultMenu(TextInputControl textInputControl) {
+    public DefaultMenu(TextInputControl textInputControl, CliPreferences cliPreferences) {
         this.textInputControl = textInputControl;
+        this.cliPreferences = cliPreferences;
     }
 
     public List<MenuItem> get() {
         return List.of(
                 getCaseChangeMenu(textInputControl),
-                getConversionMenu(textInputControl),
+                getConversionMenu(textInputControl, cliPreferences),
                 new SeparatorMenuItem(),
                 new ProtectedTermsMenu(textInputControl),
                 new SeparatorMenuItem(),
@@ -54,10 +57,10 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
         return submenu;
     }
 
-    private static Menu getConversionMenu(TextInputControl textInputControl) {
+    private static Menu getConversionMenu(TextInputControl textInputControl, CliPreferences cliPreferences) {
         Menu submenu = new Menu(Localization.lang("Convert"));
 
-        for (Formatter converter : Formatters.getConverters()) {
+        for (Formatter converter : Formatters.getConverters(cliPreferences)) {
             MenuItem menuItem = new MenuItem(converter.getName());
             EasyBind.subscribe(textInputControl.textProperty(), value -> menuItem.setDisable(StringUtil.isNullOrEmpty(value)));
             menuItem.setOnAction(event ->

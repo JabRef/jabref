@@ -1,9 +1,14 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.model.entry.BibEntryPreferences;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ConvertMSCCodesFormatterTest {
 
@@ -11,7 +16,12 @@ public class ConvertMSCCodesFormatterTest {
 
     @BeforeEach
     void setup() {
-        formatter = new ConvertMSCCodesFormatter();
+        // Use a mock for CLiPreferences to avoid heavy initialization
+        JabRefCliPreferences prefs = mock(JabRefCliPreferences.class);
+        BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
+        when(bibEntryPreferences.getKeywordSeparator()).thenReturn(',');
+        when(prefs.getBibEntryPreferences()).thenReturn(bibEntryPreferences);
+        formatter = new ConvertMSCCodesFormatter(prefs);
     }
 
     /* Reference:

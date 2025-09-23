@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -39,6 +40,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
     @FXML private ComboBox<Formatter> addableFormatters;
 
     @Inject private StateManager stateManager;
+    @Inject private GuiPreferences preferences;
 
     private FieldFormatterCleanupsPanelViewModel viewModel;
 
@@ -50,7 +52,7 @@ public class FieldFormatterCleanupsPanel extends VBox {
 
     @FXML
     private void initialize() {
-        this.viewModel = new FieldFormatterCleanupsPanelViewModel(stateManager);
+        this.viewModel = new FieldFormatterCleanupsPanelViewModel(stateManager, preferences);
 
         setupTable();
         setupCombos();

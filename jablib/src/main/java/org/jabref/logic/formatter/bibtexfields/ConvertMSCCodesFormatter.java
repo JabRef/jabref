@@ -8,14 +8,13 @@ import java.util.List;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.logic.preferences.JabRefCliPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.exception.MscCodeLoadingException;
 import org.jabref.logic.util.MscCodeUtils;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.eclipse.jgit.annotations.NonNull;
@@ -27,8 +26,14 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
     private static final BiMap<String, String> MSCMAP;
     private static boolean conversionPossible;
 
+    private final CliPreferences cliPreferences;
+
     static {
         MSCMAP = initializeMap();
+    }
+
+    public ConvertMSCCodesFormatter(CliPreferences cliPreferences) {
+        this.cliPreferences = cliPreferences;
     }
 
     private static HashBiMap<String, String> initializeMap() {
@@ -62,10 +67,6 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
         if (text.isEmpty() || !conversionPossible) {
             return text;
         }
-
-        // Using Injector to avoid widespread refactoring for constructor injection.
-        // Class that calls formatters (FieldFormatterCleanups.java) has many usages that would need updates.
-        JabRefCliPreferences cliPreferences = Injector.instantiateModelOrService(JabRefCliPreferences.class);
 
         // get preferences for BibEntry
         BibEntryPreferences bibPreferences = cliPreferences.getBibEntryPreferences();

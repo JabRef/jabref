@@ -121,6 +121,7 @@ open module org.jabref.jablib {
     requires java.base;
 
     requires javafx.base;
+    requires afterburner.fx;
     requires com.tobiasdiez.easybind;
 
     // for java.awt.geom.Rectangle2D required by org.jabref.logic.pdf.TextExtractor

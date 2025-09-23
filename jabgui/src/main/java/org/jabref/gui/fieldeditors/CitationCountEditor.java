@@ -60,7 +60,7 @@ public class CitationCountEditor extends HBox implements FieldEditorFX {
 
         fetchCitationCountButton.setTooltip(
                 new Tooltip(Localization.lang("Look up %0", FieldTextMapper.getDisplayName(field))));
-        textField.initContextMenu(new DefaultMenu(textField), preferences.getKeyBindingRepository());
+        textField.initContextMenu(new DefaultMenu(textField, preferences), preferences.getKeyBindingRepository());
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 

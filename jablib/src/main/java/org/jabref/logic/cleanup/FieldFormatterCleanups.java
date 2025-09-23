@@ -3,11 +3,8 @@ package org.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,7 +62,7 @@ public class FieldFormatterCleanups {
                 new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
                 new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
                 new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new ReplaceUnicodeLigaturesFormatter()),
-                new FieldFormatterCleanup(StandardField.KEYWORDS, new ConvertMSCCodesFormatter()),
+                new FieldFormatterCleanup(StandardField.KEYWORDS, new ConvertMSCCodesFormatter(new org.jabref.logic.preferences.JabRefCliPreferences())),
                 new FieldFormatterCleanup(StandardField.ISSN, new NormalizeIssn()));
 
         List<FieldFormatterCleanup> recommendedBibtexFormatters = new ArrayList<>(DEFAULT_SAVE_ACTIONS);
@@ -91,37 +88,6 @@ public class FieldFormatterCleanups {
         this.actions = Objects.requireNonNull(actions);
     }
 
-    /**
-     * Note: String parsing is done at {@link FieldFormatterCleanups#parse(String)}
-     */
-    public static String getMetaDataString(List<FieldFormatterCleanup> actionList, String newLineSeparator) {
-        // First, group all formatters by the field for which they apply
-        // Order of the list should be kept
-        Map<Field, List<String>> groupedByField = new LinkedHashMap<>();
-        for (FieldFormatterCleanup cleanup : actionList) {
-            Field key = cleanup.getField();
-            // add new list into the hashmap if needed
-            groupedByField.computeIfAbsent(key, k -> new ArrayList<>());
-
-            // add the formatter to the map if it is not already there
-            List<String> formattersForKey = groupedByField.get(key);
-            if (!formattersForKey.contains(cleanup.getFormatter().getKey())) {
-                formattersForKey.add(cleanup.getFormatter().getKey());
-            }
-        }
-
-        // convert the contents of the hashmap into the correct serialization
-        StringBuilder result = new StringBuilder();
-        for (Map.Entry<Field, List<String>> entry : groupedByField.entrySet()) {
-            result.append(entry.getKey().getName());
-
-            StringJoiner joiner = new StringJoiner(",", "[", "]" + newLineSeparator);
-            entry.getValue().forEach(joiner::add);
-            result.append(joiner);
-        }
-
-        return result.toString();
-    }
 
     public boolean isEnabled() {
         return enabled;

@@ -18,6 +18,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.Formatters;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldTextMapper;
@@ -29,13 +30,14 @@ public class FieldFormatterCleanupsPanelViewModel {
     private final ObjectProperty<SelectionModel<FieldFormatterCleanup>> selectedCleanupProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
     private final ListProperty<Field> availableFieldsProperty = new SimpleListProperty<>(new SortedList<>(FXCollections.observableArrayList(FieldFactory.getCommonFields()), Comparator.comparing(FieldTextMapper::getDisplayName)));
     private final ObjectProperty<Field> selectedFieldProperty = new SimpleObjectProperty<>();
-    private final ListProperty<Formatter> availableFormattersProperty = new SimpleListProperty<>(new SortedList<>(FXCollections.observableArrayList(Formatters.getAll()), Comparator.comparing(Formatter::getName)));
+    private final ListProperty<Formatter> availableFormattersProperty;
     private final ObjectProperty<Formatter> selectedFormatterProperty = new SimpleObjectProperty<>();
 
     private final StateManager stateManager;
 
-    public FieldFormatterCleanupsPanelViewModel(StateManager stateManager) {
+    public FieldFormatterCleanupsPanelViewModel(StateManager stateManager, CliPreferences cliPreferences) {
         this.stateManager = stateManager;
+        this.availableFormattersProperty = new SimpleListProperty<>(new SortedList<>(FXCollections.observableArrayList(Formatters.getAll(cliPreferences)), Comparator.comparing(Formatter::getName)));
     }
 
     public void resetToRecommended() {
