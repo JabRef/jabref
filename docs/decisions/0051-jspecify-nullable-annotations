@@ -68,7 +68,7 @@ Chosen option: "Adopt JSpecify annotations" because comes out best (see below).
 * Bad, because it requires annotation effort.
 * Bad, because it requires developer training.
 
-### Use assert x == null
+### Use `assert x == null`
 
 * Good, because Java language native.
 * Good, because no external dependencies.
