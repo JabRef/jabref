@@ -1,6 +1,5 @@
 package org.jabref.logic.importer;
 
-import java.io.BufferedReader;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -28,23 +27,10 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ImporterTest {
-
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
-    void isRecognizedFormatWithNullForBufferedReaderThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((BufferedReader) null));
-    }
-
-    @ParameterizedTest
-    @MethodSource("instancesToTest")
-    void isRecognizedFormatWithNullForStringThrowsException(Importer format) {
-        assertThrows(NullPointerException.class, () -> format.isRecognizedFormat((String) null));
-    }
 
     @ParameterizedTest
     @MethodSource("instancesToTest")

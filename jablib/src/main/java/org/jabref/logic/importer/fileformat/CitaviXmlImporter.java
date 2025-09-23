@@ -106,7 +106,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(Path filePath) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Path filePath) throws IOException {
         try (BufferedReader reader = getReaderFromZip(filePath)) {
             String str;
             int i = 0;

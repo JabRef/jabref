@@ -49,7 +49,7 @@ public abstract class Importer implements Comparable<Importer> {
      * @return true, if the file is in a recognized format
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public boolean isRecognizedFormat(Path filePath) throws IOException {
+    public boolean isRecognizedFormat(@NonNull Path filePath) throws IOException {
         try (BufferedReader bufferedReader = getReader(filePath)) {
             return isRecognizedFormat(bufferedReader);
         }
@@ -62,7 +62,7 @@ public abstract class Importer implements Comparable<Importer> {
      * @return true, if the data is in a recognized format
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public boolean isRecognizedFormat(String data) throws IOException {
+    public boolean isRecognizedFormat(@NonNull String data) throws IOException {
         try (Reader reader = Reader.of(data);
              BufferedReader bufferedReader = new BufferedReader(reader)) {
             return isRecognizedFormat(bufferedReader);
