@@ -24,7 +24,7 @@ We want to detect null-safety issues earlier at compile time and improve API cla
 * Do nothing and keep status quo.
 * Use `Objects.requireNonNull` and defensive runtime checks.
 * Adopt JSpecify annotations.
-* Use assert x == null.
+* Use `assert x == null`.
 
 ## Decision Outcome
 
