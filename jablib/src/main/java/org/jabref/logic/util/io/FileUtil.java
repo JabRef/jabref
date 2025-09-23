@@ -330,9 +330,9 @@ public class FileUtil {
      */
     public static List<Path> getListOfLinkedFiles(@NonNull List<BibEntry> entries, @NonNull List<Path> fileDirs) {
         return entries.stream()
-                  .flatMap(entry -> entry.getFiles().stream())
-                  .flatMap(file -> file.findIn(fileDirs).stream())
-                  .toList();
+                      .flatMap(entry -> entry.getFiles().stream())
+                      .flatMap(file -> file.findIn(fileDirs).stream())
+                      .toList();
     }
 
     /**
