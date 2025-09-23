@@ -44,7 +44,7 @@ Chosen option: "Adopt JSpecify annotations" because comes out best (see below).
 * Good, because no immediate implementation work.
 * Bad, because NPEs remain runtime-only problems.
 * Bad, because a mix of different approaches leads to bad code.
-* Bad, because it increases technical dept.
+* Bad, because it increases technical debt.
 * Bad, because assumes that non-annotated symbols allow null.
 
 ### Use `Objects::requireNonNull`
