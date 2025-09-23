@@ -191,7 +191,9 @@ public class TemplateExporter extends Exporter {
     }
 
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
+    public void export(@NonNull BibDatabaseContext databaseContext,
+                       Path file,
+                       @NonNull List<BibEntry> entries) throws IOException {
         export(databaseContext, file, entries, List.of(), JournalAbbreviationLoader.loadBuiltInRepository());
     }
 

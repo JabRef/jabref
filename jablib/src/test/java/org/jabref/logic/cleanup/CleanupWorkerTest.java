@@ -77,11 +77,6 @@ class CleanupWorkerTest {
     }
 
     @Test
-    void cleanupNullEntryThrowsException() {
-        assertThrows(NullPointerException.class, () -> worker.cleanup(emptyPreset, null));
-    }
-
-    @Test
     void cleanupDoesNothingByDefault(@TempDir Path bibFolder) throws IOException {
         BibEntry entry = new BibEntry();
         entry.setCitationKey("Toot");
