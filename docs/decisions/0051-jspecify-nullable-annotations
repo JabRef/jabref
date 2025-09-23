@@ -14,7 +14,7 @@ We want to detect null-safety issues earlier at compile time and improve API cla
 
 ## Decision Drivers
 
-* Reduce NullPointerExceptions in production by shifting detection to compile time.
+* Reduce `NullPointerException`s in production by shifting detection to compile time.
 * Provide clearer API contracts.
 * Keep runtime overhead low.
 * Ensure incremental and low-risk adoption.
@@ -22,9 +22,9 @@ We want to detect null-safety issues earlier at compile time and improve API cla
 ## Considered Options
 
 * Do nothing and keep status quo.
-* Use Objects.requireNonNull and defensive runtime checks.
+* Use `Objects.requireNonNull` and defensive runtime checks.
 * Adopt JSpecify annotations.
-* Use assert x == null.
+* Use `assert x == null`.
 
 ## Decision Outcome
 
@@ -44,10 +44,10 @@ Chosen option: "Adopt JSpecify annotations" because comes out best (see below).
 * Good, because no immediate implementation work.
 * Bad, because NPEs remain runtime-only problems.
 * Bad, because a mix of different approaches leads to bad code.
-* Bad, because it increases technical dept.
+* Bad, because it increases technical debt.
 * Bad, because assumes that non-annotated symbols allow null.
 
-### Use Objects::requireNonNull
+### Use `Objects::requireNonNull`
 
 * Good, because JDK native.
 * Good, because no external dependencies.
@@ -63,12 +63,12 @@ Chosen option: "Adopt JSpecify annotations" because comes out best (see below).
 * Good, because of standardized annotations.
 * Good, because incremental adoption possible.
 * Good, because static analysis supported.
-* Good, because compatibility with Kotlin
-* Good, because it is consensus from major organizations (Google, Microsoft, Jetbrains etc)
+* Good, because compatibility with Kotlin.
+* Good, because it is the consensus among major organizations (Google, Microsoft, Jetbrains etc).
 * Bad, because it requires annotation effort.
 * Bad, because it requires developer training.
 
-### Use assert x == null
+### Use `assert x == null`
 
 * Good, because Java language native.
 * Good, because no external dependencies.
