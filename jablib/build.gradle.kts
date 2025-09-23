@@ -2,6 +2,7 @@ import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SonatypeHost
 import dev.jbang.gradle.tasks.JBangTask
+import org.checkerframework.gradle.plugin.CheckerFrameworkExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.net.URI
 import java.util.*
@@ -20,6 +21,8 @@ plugins {
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
     // Build state at https://jitpack.io/#koppor/jbang-gradle-plugin/fix-7-SNAPSHOT
     id("com.github.koppor.jbang-gradle-plugin") version "8a85836163"
+
+    id("org.checkerframework") version "0.6.59"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
@@ -224,12 +227,24 @@ dependencies {
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core")
     testImplementation("org.testfx:testfx-junit5")
+
+    annotationProcessor(
+        "org.checkerframework:checker"
+    )
 }
 /*
 jacoco {
     toolVersion = "0.8.13"
 }
  */
+
+configure<CheckerFrameworkExtension> {
+    checkers =
+        listOf(
+            "org.checkerframework.checker.nullness.NullnessChecker"
+            // "org.checkerframework.common.initializedfields.InitializedFieldsChecker"
+        )
+}
 
 tasks.generateGrammarSource {
     maxHeapSize = "64m"

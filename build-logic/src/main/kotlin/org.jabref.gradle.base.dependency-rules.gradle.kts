@@ -1,5 +1,3 @@
-import org.gradle.api.internal.artifacts.dsl.dependencies.DependenciesExtensionModule.module
-
 plugins {
     id("org.gradlex.extra-java-module-info")
     id("org.gradlex.jvm-dependency-conflict-resolution")
@@ -663,4 +661,13 @@ extraJavaModuleInfo {
     module("org.openjdk.jmh:jmh-generator-bytecode", "jmh.generator.bytecode")
     module("org.openjdk.jmh:jmh-generator-reflection", "jmh.generator.reflection")
     module("org.apache.commons:commons-math3", "commons.math3")
+
+    module(
+        "org.checkerframework:checker",
+        "org.checkerframework.checker"
+    )
+    module(
+        "org.checkerframework:checker-util",
+        "org.checkerframework.checker.util"
+    )
 }

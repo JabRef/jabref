@@ -151,4 +151,5 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-matchers:2.10.3")
     api("org.yaml:snakeyaml:2.5")
     api("tech.units:indriya:2.2.3")
+    api("org.checkerframework:checker:3.51.0")
 }
