@@ -14,7 +14,7 @@ We want to detect null-safety issues earlier at compile time and improve API cla
 
 ## Decision Drivers
 
-* Reduce NullPointerExceptions in production by shifting detection to compile time.
+* Reduce `NullPointerException`s in production by shifting detection to compile time.
 * Provide clearer API contracts.
 * Keep runtime overhead low.
 * Ensure incremental and low-risk adoption.
