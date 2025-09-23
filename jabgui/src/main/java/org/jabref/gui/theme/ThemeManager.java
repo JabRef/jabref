@@ -85,12 +85,24 @@ public class ThemeManager {
         addStylesheetToWatchlist(this.baseStyleSheet, this::baseCssLiveUpdate);
         baseCssLiveUpdate();
 
-        BindingsHelper.subscribeFuture(workspacePreferences.themeProperty(), _ -> updateThemeSettings());
-        BindingsHelper.subscribeFuture(workspacePreferences.themeSyncOsProperty(), _ -> updateThemeSettings());
-        BindingsHelper.subscribeFuture(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), _ -> updateFontSettings());
-        BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), _ -> updateFontSettings());
-        BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), _ -> updateThemeSettings());
-        updateThemeSettings();
+        if (Platform.isFxApplicationThread()) {
+            BindingsHelper.subscribeFuture(workspacePreferences.themeProperty(), _ -> updateThemeSettings());
+            BindingsHelper.subscribeFuture(workspacePreferences.themeSyncOsProperty(), _ -> updateThemeSettings());
+            BindingsHelper.subscribeFuture(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), _ -> updateFontSettings());
+            BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), _ -> updateFontSettings());
+            BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), _ -> updateThemeSettings());
+            updateThemeSettings();
+        } else {
+            // Normally ThemeManager is only instantiated by JabGui and therefore already on the FX Thread, but when it's called from a test (e.g. ThemeManagerTest) then it's not on the fx thread
+            UiTaskExecutor.runInJavaFXThread(() -> {
+                BindingsHelper.subscribeFuture(workspacePreferences.themeProperty(), _ -> updateThemeSettings());
+                BindingsHelper.subscribeFuture(workspacePreferences.themeSyncOsProperty(), _ -> updateThemeSettings());
+                BindingsHelper.subscribeFuture(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), _ -> updateFontSettings());
+                BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), _ -> updateFontSettings());
+                BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), _ -> updateThemeSettings());
+                updateThemeSettings();
+            });
+        }
     }
 
     /// Installs the base and additional css files as stylesheets in the given scene.
