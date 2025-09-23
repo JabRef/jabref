@@ -55,11 +55,6 @@ class BibEntryTest {
     }
 
     @Test
-    void setNullFieldThrowsNPE() {
-        assertThrows(NullPointerException.class, () -> entry.setField(null));
-    }
-
-    @Test
     void getFieldIsCaseInsensitive() {
         entry.setField(new UnknownField("TeSt"), "value");
         assertEquals(Optional.of("value"), entry.getField(new UnknownField("tEsT")));

@@ -262,6 +262,11 @@ public class CitaviXmlImporter extends Importer implements Parser {
                     }
                 }
                 case XMLStreamConstants.END_ELEMENT -> {
+                    if (keywordName == null) {
+                        LOGGER.error("No keyword name found for keyword with id {}. Please check if the keyword name is present in the XML file and if the keyword name is not empty.", id);
+                        return;
+                    }
+
                     if ("Keyword".equals(reader.getLocalName())) {
                         Keyword keyword = new Keyword(keywordName);
                         knownKeywords.put(id, keyword);

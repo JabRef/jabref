@@ -51,8 +51,8 @@ public class TemplateExporter extends Exporter {
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
     private final SelfContainedSaveOrder saveOrder;
+    private final BlankLineBehaviour blankLineBehaviour;
     private boolean customExport;
-    private BlankLineBehaviour blankLineBehaviour;
 
     /**
      * Initialize another export format based on templates stored in dir with layoutFile lfFilename.

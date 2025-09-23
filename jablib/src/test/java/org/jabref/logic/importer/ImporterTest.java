@@ -18,7 +18,6 @@ import org.jabref.logic.importer.fileformat.OvidImporter;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
-import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -66,7 +65,6 @@ public class ImporterTest {
     public static Stream<Importer> instancesToTest() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-        XmpPreferences xmpPreferences = mock(XmpPreferences.class);
         return Stream.of(
                 // all classes implementing {@link Importer}
                 // sorted alphabetically

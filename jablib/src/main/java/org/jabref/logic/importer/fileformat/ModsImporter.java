@@ -525,7 +525,7 @@ public class ModsImporter extends Importer implements Parser {
                 }
                 case "dateCreated" -> {
                     // If there was no year in date issued, then take the year from date created
-                    fields.computeIfAbsent(StandardField.YEAR, k -> date.substring(0, 4));
+                    fields.computeIfAbsent(StandardField.YEAR, _ -> date.substring(0, 4));
                     fields.put(new UnknownField("created"), date);
                 }
                 case "dateCaptured" ->
