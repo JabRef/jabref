@@ -108,7 +108,14 @@ public class StudyQuery {
         return Objects.equals(query, that.query) &&
                 Objects.equals(description, that.description) &&
                 Objects.equals(lucene, that.lucene) &&
-                Objects.equals(catalogSpecific, that.catalogSpecific);
+                catalogSpecificEquals(that);
+    }
+
+    private boolean catalogSpecificEquals(StudyQuery that) {
+        // Treat Optional.empty() and Optional.of(emptyMap) as equal
+        Map<String, String> thisCatalogSpecific = this.catalogSpecific.orElse(Map.of());
+        Map<String, String> thatCatalogSpecific = that.catalogSpecific.orElse(Map.of());
+        return Objects.equals(thisCatalogSpecific, thatCatalogSpecific);
     }
 
     @Override
