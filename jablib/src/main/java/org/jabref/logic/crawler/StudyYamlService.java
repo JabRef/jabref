@@ -89,7 +89,7 @@ public class StudyYamlService {
      * Creates a backup of the original file
      */
     private void createBackup(Path originalFile) throws IOException {
-        Path backupPath = originalFile.getParent().resolve(originalFile.getFileName() + ".backup");
+        Path backupPath = originalFile.getParent().resolve(Path.of(originalFile.getFileName() + ".backup"));
 
         // Delete existing backup file if it exists
         if (Files.exists(backupPath)) {

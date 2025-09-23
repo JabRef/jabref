@@ -182,7 +182,8 @@ class StudyYamlV1MigratorTest {
 
         Study migratedStudy = migrator.migrate(studyFile);
 
-        StudyMetadata metadata = migratedStudy.getMetadata();
+        StudyMetadata metadata = migratedStudy.getMetadata().orElseThrow(() ->
+                new AssertionError("Expected metadata to be present after migration"));
 
         // Check migration notes
         String notes = metadata.getNotes().orElse("");
@@ -244,7 +245,9 @@ class StudyYamlV1MigratorTest {
 
         Study migratedStudy = migrator.migrate(studyFile);
 
-        String notes = migratedStudy.getMetadata().getNotes().orElse("");
+        String notes = migratedStudy.getMetadata()
+                                    .flatMap(StudyMetadata::getNotes)
+                                    .orElse("");
         assertTrue(notes.contains("Migrated from v1.0 format"));
         assertTrue(notes.contains("3 search queries"));
         assertTrue(notes.contains("2 active databases"));
