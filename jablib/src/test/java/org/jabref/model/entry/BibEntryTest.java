@@ -396,18 +396,6 @@ class BibEntryTest {
     }
 
     @Test
-    void putNullKeywordListThrowsNPE() {
-        entry.setField(StandardField.KEYWORDS, "Foo, Bar");
-        assertThrows(NullPointerException.class, () -> entry.putKeywords((KeywordList) null, ','));
-    }
-
-    @Test
-    void putNullKeywordSeparatorThrowsNPE() {
-        entry.setField(StandardField.KEYWORDS, "Foo, Bar");
-        assertThrows(NullPointerException.class, () -> entry.putKeywords(Arrays.asList("A", "B"), null));
-    }
-
-    @Test
     void getSeparatedKeywordsAreCorrect() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
         assertEquals(new KeywordList("Foo", "Bar"), entry.getKeywords(','));

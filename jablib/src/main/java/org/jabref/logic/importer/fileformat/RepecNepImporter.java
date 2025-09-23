@@ -174,7 +174,7 @@ public class RepecNepImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
         // read the first couple of lines
         // NEP message usually contain the String 'NEP: New Economics Papers'
         // or, they are from nep.repec.org

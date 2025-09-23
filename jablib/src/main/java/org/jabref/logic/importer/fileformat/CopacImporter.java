@@ -49,7 +49,7 @@ public class CopacImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
         String str;
         while ((str = reader.readLine()) != null) {
             if (CopacImporter.COPAC_PATTERN.matcher(str).find()) {

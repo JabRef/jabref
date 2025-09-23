@@ -81,7 +81,7 @@ public class BibliographyFromPdfImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
         return input.readLine().startsWith("%PDF");
     }
 

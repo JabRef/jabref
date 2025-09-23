@@ -89,7 +89,7 @@ public class MedlineImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < 50)) {

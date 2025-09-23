@@ -29,6 +29,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 public class RisImporter extends Importer {
@@ -57,7 +58,7 @@ public class RisImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
         // Our strategy is to look for the "TY  - *" line.
         return reader.lines().anyMatch(line -> RECOGNIZED_FORMAT_PATTERN.matcher(line).find());
     }

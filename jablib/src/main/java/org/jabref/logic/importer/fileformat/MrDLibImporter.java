@@ -33,7 +33,7 @@ public class MrDLibImporter extends Importer {
     private String recommendationSetId;
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
         String recommendationsAsString = convertToString(input);
         try {
             JSONObject jsonObject = new JSONObject(recommendationsAsString);

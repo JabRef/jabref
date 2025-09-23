@@ -262,7 +262,7 @@ public class CffImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         CffFormat citation;

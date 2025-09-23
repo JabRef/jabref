@@ -63,7 +63,7 @@ public class MedlinePlainImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
 
         // Our strategy is to look for the "PMID  - *", "PMC.*-.*", or "PMCR.*-.*" line
         // (i.e., PubMed Unique Identifier, PubMed Central Identifier, PubMed Central Release)

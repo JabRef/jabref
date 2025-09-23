@@ -40,7 +40,7 @@ public abstract class Importer implements Comparable<Importer> {
      * Thus, the correct behaviour is to return false if it is certain that the file is not of the suitable type, and
      * true otherwise. Returning true is the safe choice if not certain.
      */
-    public abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
+    public abstract boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException;
 
     /**
      * Check whether the source is in the correct format for this importer.

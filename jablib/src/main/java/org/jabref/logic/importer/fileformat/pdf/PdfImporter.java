@@ -32,7 +32,7 @@ public abstract class PdfImporter extends Importer {
     public abstract List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException;
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
         return input.readLine().startsWith("%PDF");
     }
 

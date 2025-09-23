@@ -65,7 +65,7 @@ public class ModsImporter extends Importer implements Parser {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
         return input.lines().anyMatch(line -> MODS_PATTERN.matcher(line).find());
     }
 

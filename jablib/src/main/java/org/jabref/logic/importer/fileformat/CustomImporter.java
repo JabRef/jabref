@@ -72,7 +72,7 @@ public class CustomImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
         return importer.isRecognizedFormat(input);
     }
 

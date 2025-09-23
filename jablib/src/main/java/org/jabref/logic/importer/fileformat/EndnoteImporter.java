@@ -59,7 +59,7 @@ public class EndnoteImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
         // Our strategy is to look for the "%A *" line.
         String str;
         while ((str = reader.readLine()) != null) {
