@@ -219,7 +219,7 @@ public class MainTableColumnFactory {
 
     private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
         List<Color> groupColors = matchedGroups.stream()
-                                               .flatMap(group -> group.getColor().stream())
+                                               .flatMap(group -> group.getColor().map(Color::valueOf).stream())
                                                .toList();
 
         if (!groupColors.isEmpty()) {
@@ -253,7 +253,7 @@ public class MainTableColumnFactory {
     private Node createGroupIconRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
         List<JabRefIcon> groupIcons = matchedGroups.stream()
                                                    .filter(abstractGroup -> abstractGroup.getIconName().isPresent())
-                                                   .flatMap(group -> IconTheme.findIcon(group.getIconName().get(), group.getColor().orElse(IconTheme.getDefaultGroupColor())).stream()
+                                                   .flatMap(group -> IconTheme.findIcon(group.getIconName().get(), group.getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor())).stream()
                                                    )
                                                    .toList();
         if (!groupIcons.isEmpty()) {
