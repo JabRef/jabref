@@ -152,8 +152,7 @@ public class AutoSetFileLinksUtil {
                 try (Stream<Path> walk = Files.walk(directory)) {
                     walk.filter(path -> !Files.isDirectory(path))
                         .filter(path -> FileUtil.getBaseName(path).equalsIgnoreCase(wantedBase))
-                        .findFirst()
-                        .ifPresent(matches::add);
+                        .forEach(matches::add);
                 }
             }
         }

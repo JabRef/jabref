@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
@@ -41,6 +42,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -120,8 +122,7 @@ public class UnlinkedFilesDialogViewModel {
         treeRootProperty.setValue(Optional.empty());
     }
 
-    public void findAndFixBrokenLinks(Path searchDirectory, Filter<Path> fileFilter) {
-        // Get entries with broken links
+    public void findAndFixBrokenLinks(Path searchDirectory) {
         List<BibEntry> entriesWithBrokenLinks = bibDatabase.getDatabase().getEntries().stream()
                                                            .filter(entry -> entry.getFiles().stream()
                                                                                  .anyMatch(file -> {
@@ -132,45 +133,78 @@ public class UnlinkedFilesDialogViewModel {
 
         List<ImportFilesResultItemViewModel> results = new ArrayList<>();
 
-        // Create AutoSetFileLinksUtil
-        AutoSetFileLinksUtil autoLinkUtil = new AutoSetFileLinksUtil(
-                List.of(searchDirectory),
-                preferences.getExternalApplicationsPreferences(),
-                preferences.getAutoLinkPreferences());
-
-        // For each entry with broken links
         for (BibEntry entry : entriesWithBrokenLinks) {
             try {
-                // Use the existing sophisticated logic to find associated files
-                List<LinkedFile> associatedFiles = autoLinkUtil.findAssociatedNotLinkedFiles(entry);
+                List<LinkedFile> currentFiles = new ArrayList<>(entry.getFiles());
+                List<LinkedFile> filesToRemove = new ArrayList<>();
+                List<LinkedFile> filesToAdd = new ArrayList<>();
 
-                // If exactly one matching file is found, link it
-                if (associatedFiles.size() == 1) {
-                    LinkedFile newLinkedFile = associatedFiles.getFirst();
-                    entry.addFile(newLinkedFile);
+                for (LinkedFile brokenLink : currentFiles) {
+                    if (brokenLink.findIn(bibDatabase, preferences.getFilePreferences()).isPresent()) {
+                        continue;
+                    }
 
-                    // Get the actual path for the result
-                    Optional<Path> filePath = newLinkedFile.findIn(bibDatabase, preferences.getFilePreferences());
-                    filePath.ifPresent(path -> results.add(new ImportFilesResultItemViewModel(path, true, "Fixed broken link")));
+                    String exactFileName = Path.of(brokenLink.getLink()).getFileName().toString();
+                    List<Path> matches = new ArrayList<>();
+
+                    try (Stream<Path> walk = Files.walk(searchDirectory)) {
+                        walk.filter(path -> !Files.isDirectory(path))
+                            .filter(path -> path.getFileName().toString().equals(exactFileName))
+                            .forEach(matches::add);
+                    }
+
+                    // check if matches found is only one
+                    if (matches.size() != 1) {
+                        continue;
+                    }
+                    Path foundFile = matches.getFirst();
+
+                    // check if matches found is not linked to other entries
+                    if (!fileNotLinkedToOtherEntries(foundFile)) {
+                        continue;
+                    }
+
+                    // remove broken links from current files
+                    filesToRemove.add(brokenLink);
+
+                    // add found matches to current files
+                    Path relativeFilePath = FileUtil.relativize(foundFile, bibDatabase.getFileDirectories(preferences.getFilePreferences()));
+                    LinkedFile newLinkedFile = new LinkedFile(brokenLink.getDescription(), relativeFilePath, brokenLink.getFileType());
+                    filesToAdd.add(newLinkedFile);
+
+                    results.add(new ImportFilesResultItemViewModel(foundFile, true,
+                            "Fixed broken link: " + brokenLink.getLink() + " -> " + newLinkedFile.getLink()));
                 }
+
+                // update the entry's file links
+                currentFiles.removeAll(filesToRemove);
+                currentFiles.addAll(filesToAdd);
+                entry.setFiles(currentFiles);
             } catch (IOException e) {
-                LOGGER.error("Error finding associated files for entry", e);
+                LOGGER.error("Error finding associated files for entry");
             }
         }
-
-        // Update the result list directly
         resultList.clear();
         resultList.addAll(results);
     }
 
+    private boolean fileNotLinkedToOtherEntries(Path foundFile) {
+        return bibDatabase.getDatabase().getEntries().stream()
+                          .flatMap(entry -> entry.getFiles().stream())
+                          .noneMatch(linkedFile -> {
+                              Optional<Path> existingPath = linkedFile.findIn(bibDatabase, preferences.getFilePreferences());
+                              return existingPath.isPresent() && existingPath.get().equals(foundFile);
+                          });
+    }
+
     public void startSearch() {
         Path directory = this.getSearchDirectory();
+        findAndFixBrokenLinks(directory);
         Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
         DateRange selectedDateFilter = selectedDate.getValue();
         ExternalFileSorter selectedSortFilter = selectedSort.getValue();
         progressValueProperty.unbind();
         progressTextProperty.unbind();
-        findAndFixBrokenLinks(directory, selectedFileFilter);
         findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences())
                 .onRunning(() -> {
                     progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
