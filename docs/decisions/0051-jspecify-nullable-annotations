@@ -47,7 +47,7 @@ Chosen option: "Adopt JSpecify annotations" because comes out best (see below).
 * Bad, because it increases technical dept.
 * Bad, because assumes that non-annotated symbols allow null.
 
-### Use Objects::requireNonNull
+### Use `Objects::requireNonNull`
 
 * Good, because JDK native.
 * Good, because no external dependencies.
