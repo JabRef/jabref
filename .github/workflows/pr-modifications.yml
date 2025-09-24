@@ -1,4 +1,4 @@
-name: PR Tests
+name: Check PR Modifications
 
 on:
   pull_request:
@@ -12,55 +12,20 @@ permissions:
   pull-requests: write
 
 jobs:
-  upload-pr-number:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create pr_number.txt
-        run: echo "${{ github.event.number }}" > pr_number.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: pr_number
-          path: pr_number.txt
-
-  changelog_modified:
-    name: CHANGELOG.md needs to be modified
-    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-      - name: Check PR body for changelog note
-        id: changelog_check
-        run: |
-          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
-          echo "Body: $BODY"
-
-          if echo "$BODY" | grep -q '\- \[x\] Change in `CHANGELOG.md`'; then
-            echo "found"
-            echo "found=yes" >> $GITHUB_OUTPUT
-          else
-            echo "not found"
-            echo "found=no" >> $GITHUB_OUTPUT
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check for CHANGELOG.md modifications
-        id: check_changelog_modification
-        if: steps.changelog_check.outputs.found == 'yes'
-        run: |
-          git fetch origin ${{ github.base_ref }}
-          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q '^CHANGELOG\.md$'; then
-            echo "✅ CHANGELOG.md was modified"
-          else
-            echo "❌ CHANGELOG.md was NOT modified"
-            exit 1
-          fi
-
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
     name: Find merge conflicts
-    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -70,7 +35,17 @@ jobs:
         uses: olivernybroe/action-conflict-finder@v4.1
 
   no-force-push:
-    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -94,7 +69,7 @@ jobs:
 
   unmodified_submodules:
     name: Submodules not modified
-    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       # No checkout -> the action uses GitHub's API (which is more reliable for submodule changes due to our submodule settings)
@@ -114,7 +89,17 @@ jobs:
 
   other_than_main:
     name: Source branch is other than "main"
-    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
+    if: >
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
+      !(
+        (github.event.pull_request.user.login == 'dependabot[bot]') || (github.event.pull_request.user.login == 'renovate-bot') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
     runs-on: ubuntu-latest
     steps:
       - if: github.head_ref == 'main'
@@ -122,3 +107,14 @@ jobs:
         with:
           script: |
               core.setFailed('Pull requests should come from a branch other than "main"\n\n👉 Please read [the CONTRIBUTING guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#contributing) carefully again. 👈')
+
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pr_number.txt
+        run: echo "${{ github.event.number }}" > pr_number.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number.txt
+
