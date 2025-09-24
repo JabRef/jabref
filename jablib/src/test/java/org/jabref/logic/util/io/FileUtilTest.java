@@ -82,7 +82,7 @@ class FileUtilTest {
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234 - mytitle",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern).get());
     }
 
     @Test
@@ -93,7 +93,7 @@ class FileUtilTest {
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234 - mytitle",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern).get());
     }
 
     @Test
@@ -104,7 +104,7 @@ class FileUtilTest {
         entry.setField(StandardField.TITLE, "mytitle");
 
         assertEquals("1234",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern).get());
     }
 
     @Test
@@ -114,7 +114,7 @@ class FileUtilTest {
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
 
-        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern).get());
     }
 
     @Test
@@ -123,7 +123,7 @@ class FileUtilTest {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "mytitle");
 
-        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+        assertEquals(Optional.empty(), FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -132,7 +132,7 @@ class FileUtilTest {
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
 
-        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern).get());
     }
 
     @Test
@@ -140,7 +140,23 @@ class FileUtilTest {
         String fileNamePattern = "[title]";
         BibEntry entry = new BibEntry();
 
-        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+        assertEquals(Optional.empty(), FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+    }
+
+    @Test
+    void getLinkedFileNameGetOptionalEmptyIfDashAsPattern() {
+        String fileNamePattern = "-";
+        BibEntry entry = new BibEntry();
+
+        assertEquals(Optional.empty(), FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+    }
+
+    @Test
+    void getLinkedFileNameGetOptionalEmptyIfDefaultAsPattern() {
+        String fileNamePattern = "default";
+        BibEntry entry = new BibEntry();
+
+        assertEquals(Optional.empty(), FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
     }
 
     @Test
@@ -151,7 +167,7 @@ class FileUtilTest {
         entry.setField(StandardField.YEAR, "1868");
         entry.setField(StandardField.PAGES, "567-579");
 
-        assertEquals("1868_Kitsune_567", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
+        assertEquals("1868_Kitsune_567", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern).get());
     }
 
     @Test
@@ -161,8 +177,8 @@ class FileUtilTest {
                 .withCitationKey("BrayBuildingCommunity")
                 .withField(StandardField.TITLE, "Building \\mkbibquote{Community}");
         String expected = "BrayBuildingCommunity - Building Community";
-        String result = FileUtil.createFileNameFromPattern(null, entry, pattern);
-        assertEquals(expected, result);
+        Optional<String> result = FileUtil.createFileNameFromPattern(null, entry, pattern);
+        assertEquals(expected, result.get());
     }
 
     @Test
