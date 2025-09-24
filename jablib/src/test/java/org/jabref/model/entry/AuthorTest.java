@@ -11,14 +11,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AuthorTest {
 
-    @Test
-    void addDotIfAbbreviationAddDot() {
-        assertEquals("O.", Author.addDotIfAbbreviation("O"));
-        assertEquals("A. O.", Author.addDotIfAbbreviation("AO"));
-        assertEquals("A. O.", Author.addDotIfAbbreviation("AO."));
-        assertEquals("A. O.", Author.addDotIfAbbreviation("A.O."));
-        assertEquals("A.-O.", Author.addDotIfAbbreviation("A-O"));
-    }
+    @ParameterizedTest
+    @CsvSrouce({
+        "'O', 'O.'",
+        "'AO', 'A. O.'",
+        "'AO.', 'A. O.'",
+        "'A.O.', 'A. O.'",
+        "'A-O', 'A.-O.'"
+    })
+
 
     @Test
     void addDotIfAbbreviationDoesNotAddMultipleSpaces() {
