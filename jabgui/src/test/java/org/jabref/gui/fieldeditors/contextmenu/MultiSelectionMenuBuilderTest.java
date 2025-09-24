@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,6 +22,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,6 +59,12 @@ class MultiSelectionMenuBuilderTest {
         assertTrue(builder.supports(multiple), "Multiple selection should be supported");
     }
 
+    /**
+     * Test for the public contract of {@code MultiSelectionMenuBuilder}.
+     * Verifies that the multi-file context menu is built with 8 items in the expected
+     * order. Other tests assert the behavior of individual items; this
+     * pre-condition prevents accidental reordering or removal during changes.
+     */
     @Test
     void shouldBuildEightMenuItemsInExpectedOrder() {
         LinkedFilesEditorViewModel editorViewModel = mock(LinkedFilesEditorViewModel.class);
@@ -225,7 +233,7 @@ class MultiSelectionMenuBuilderTest {
         MultiSelectionMenuBuilder builder = new MultiSelectionMenuBuilder(
                 dialogService,
                 mock(BibDatabaseContext.class),
-                mockEmptyBibEntryOptional(),
+                emptyBibEntryOptional(),
                 guiPreferences,
                 editorViewModel
         );
@@ -249,18 +257,14 @@ class MultiSelectionMenuBuilderTest {
         return new MultiSelectionMenuBuilder(
                 dialogService,
                 mock(BibDatabaseContext.class),
-                mockEmptyBibEntryOptional(),
+                emptyBibEntryOptional(),
                 guiPreferences,
                 editorViewModel
         );
     }
 
-    private static ObservableOptionalValue<BibEntry> mockEmptyBibEntryOptional() {
-        @SuppressWarnings("unchecked")
-        ObservableOptionalValue<BibEntry> optional =
-                (ObservableOptionalValue<BibEntry>) mock(ObservableOptionalValue.class);
-        when(optional.getValue()).thenReturn(Optional.empty());
-        return optional;
+    private static ObservableOptionalValue<BibEntry> emptyBibEntryOptional() {
+        return EasyBind.wrapNullable(new SimpleObjectProperty<>(null));
     }
 
     private static LinkedFileViewModel mockOfflineExistingFileViewModel() {

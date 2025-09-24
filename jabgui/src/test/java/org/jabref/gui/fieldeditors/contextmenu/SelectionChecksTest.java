@@ -12,6 +12,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -48,59 +49,81 @@ class SelectionChecksTest {
         };
     }
 
-    @Test
-    void isLocalAndExistsReturnsTrueForOfflineFileFound() {
-        LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel(Path.of("a.pdf"));
-        assertTrue(checks.isLocalAndExists(fileViewModel));
+    @Nested
+    class LocalFiles {
+
+        @Test
+        void isLocalAndExistsReturnsTrueWhenOfflineFileFound() {
+            LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel(Path.of("a.pdf"));
+            assertTrue(checks.isLocalAndExists(fileViewModel));
+        }
+
+        @Test
+        void isLocalAndExistsReturnsFalseWhenOfflineMissing() {
+            LinkedFileViewModel fileViewModel = mockOfflineMissingFileViewModel();
+            assertFalse(checks.isLocalAndExists(fileViewModel));
+        }
+
+        @Test
+        void isOnlineReturnsFalseForOfflineFile() {
+            assertFalse(checks.isOnline(mockOfflineExistingFileViewModel(Path.of("b.pdf"))));
+        }
     }
 
-    @Test
-    void isLocalAndExistsReturnsFalseForOnlineLinkOrMissingFile() {
-        LinkedFileViewModel online = mockOnlineLinkViewModel("https://host/a.pdf");
-        assertFalse(checks.isLocalAndExists(online));
+    @Nested
+    class OnlineLinks {
 
-        LinkedFileViewModel offlineMissing = mockOfflineMissingFileViewModel();
-        assertFalse(checks.isLocalAndExists(offlineMissing));
+        @Test
+        void isOnlineReturnsTrueForOnlineLink() {
+            assertTrue(checks.isOnline(mockOnlineLinkViewModel("https://x")));
+        }
+
+        @Test
+        void hasSourceUrlReturnsTrueWhenPresent() {
+            LinkedFileViewModel withSource = mockOnlineLinkViewModel("https://x");
+            when(withSource.getFile().getSourceUrl()).thenReturn("https://x");
+            when(withSource.getFile().sourceUrlProperty()).thenReturn(new SimpleStringProperty("https://x"));
+            assertTrue(checks.hasSourceUrl(withSource));
+        }
+
+        @Test
+        void hasSourceUrlReturnsFalseWhenEmpty() {
+            LinkedFileViewModel withoutSource = mockOnlineLinkViewModel("");
+            when(withoutSource.getFile().getSourceUrl()).thenReturn("");
+            when(withoutSource.getFile().sourceUrlProperty()).thenReturn(new SimpleStringProperty(""));
+            assertFalse(checks.hasSourceUrl(withoutSource));
+        }
     }
 
-    @Test
-    void isOnlineReturnsTrueOnlyForOnlineLink() {
-        assertTrue(checks.isOnline(mockOnlineLinkViewModel("https://x")));
-        assertFalse(checks.isOnline(mockOfflineExistingFileViewModel(Path.of("b.pdf"))));
-    }
+    @Nested
+    class MoveToDefaultDir {
 
-    @Test
-    void hasSourceUrlReturnsTrueOnlyWhenSourceUrlPresent() {
-        LinkedFileViewModel withSource = mockOnlineLinkViewModel("https://x");
-        when(withSource.getFile().getSourceUrl()).thenReturn("https://x");
-        when(withSource.getFile().sourceUrlProperty()).thenReturn(new SimpleStringProperty("https://x"));
-        assertTrue(checks.hasSourceUrl(withSource));
+        @Test
+        void isMovableToDefaultDirReturnsTrueWhenLocalExistingAndGeneratedPathDiffers() {
+            Path path = Path.of("c.pdf");
+            LinkedFileViewModel movable = mockOfflineExistingFileViewModel(path);
+            when(movable.isGeneratedPathSameAsOriginal()).thenReturn(false);
+            assertTrue(checks.isMovableToDefaultDir(movable));
+        }
 
-        LinkedFileViewModel withoutSource = mockOnlineLinkViewModel("");
-        when(withoutSource.getFile().getSourceUrl()).thenReturn("");
-        when(withoutSource.getFile().sourceUrlProperty()).thenReturn(new SimpleStringProperty(""));
-        assertFalse(checks.hasSourceUrl(withoutSource));
-    }
+        @Test
+        void isMovableToDefaultDirReturnsFalseWhenPathsSame() {
+            Path path = Path.of("c.pdf");
+            LinkedFileViewModel samePath = mockOfflineExistingFileViewModel(path);
+            when(samePath.isGeneratedPathSameAsOriginal()).thenReturn(true);
+            assertFalse(checks.isMovableToDefaultDir(samePath));
+        }
 
-    @Test
-    void isMovableToDefaultDirTrueOnlyForLocalExistingAndGeneratedPathDiffers() {
-        Path path = Path.of("c.pdf");
-        LinkedFileViewModel movable = mockOfflineExistingFileViewModel(path);
-        when(movable.isGeneratedPathSameAsOriginal()).thenReturn(false);
-        assertTrue(checks.isMovableToDefaultDir(movable));
-
-        LinkedFileViewModel samePath = mockOfflineExistingFileViewModel(path);
-        when(samePath.isGeneratedPathSameAsOriginal()).thenReturn(true);
-        assertFalse(checks.isMovableToDefaultDir(samePath));
-
-        assertFalse(checks.isMovableToDefaultDir(mockOnlineLinkViewModel("https://x")));
+        @Test
+        void isMovableToDefaultDirReturnsFalseForOnlineLink() {
+            assertFalse(checks.isMovableToDefaultDir(mockOnlineLinkViewModel("https://x")));
+        }
     }
 
     private static LinkedFileViewModel mockOfflineExistingFileViewModel(Path path) {
         LinkedFile linkedFile = mock(LinkedFile.class, Answers.RETURNS_DEEP_STUBS);
         when(linkedFile.isOnlineLink()).thenReturn(false);
-        when(linkedFile.findIn(any(BibDatabaseContext.class), any(FilePreferences.class)))
-                .thenReturn(Optional.of(path));
+        when(linkedFile.findIn(any(BibDatabaseContext.class), any(FilePreferences.class))).thenReturn(Optional.of(path));
         when(linkedFile.linkProperty()).thenReturn(new SimpleStringProperty(path.getFileName().toString()));
         when(linkedFile.getSourceUrl()).thenReturn("");
         when(linkedFile.sourceUrlProperty()).thenReturn(new SimpleStringProperty(""));
@@ -114,8 +137,7 @@ class SelectionChecksTest {
     private static LinkedFileViewModel mockOfflineMissingFileViewModel() {
         LinkedFile linkedFile = mock(LinkedFile.class, Answers.RETURNS_DEEP_STUBS);
         when(linkedFile.isOnlineLink()).thenReturn(false);
-        when(linkedFile.findIn(any(BibDatabaseContext.class), any(FilePreferences.class)))
-                .thenReturn(Optional.empty());
+        when(linkedFile.findIn(any(BibDatabaseContext.class), any(FilePreferences.class))).thenReturn(Optional.empty());
         when(linkedFile.linkProperty()).thenReturn(new SimpleStringProperty("missing.pdf"));
         when(linkedFile.getSourceUrl()).thenReturn("");
         when(linkedFile.sourceUrlProperty()).thenReturn(new SimpleStringProperty(""));
@@ -127,15 +149,14 @@ class SelectionChecksTest {
     }
 
     private static LinkedFileViewModel mockOnlineLinkViewModel(String sourceUrl) {
-        String nonNullUrl = sourceUrl == null ? "" : sourceUrl;
+        String url = (sourceUrl == null) ? "" : sourceUrl;
 
         LinkedFile linkedFile = mock(LinkedFile.class, Answers.RETURNS_DEEP_STUBS);
         when(linkedFile.isOnlineLink()).thenReturn(true);
-        when(linkedFile.findIn(any(BibDatabaseContext.class), any(FilePreferences.class)))
-                .thenReturn(Optional.empty());
+        when(linkedFile.findIn(any(BibDatabaseContext.class), any(FilePreferences.class))).thenReturn(Optional.empty());
         when(linkedFile.linkProperty()).thenReturn(new SimpleStringProperty("https://host/file.pdf"));
-        when(linkedFile.getSourceUrl()).thenReturn(nonNullUrl);
-        when(linkedFile.sourceUrlProperty()).thenReturn(new SimpleStringProperty(nonNullUrl));
+        when(linkedFile.getSourceUrl()).thenReturn(url);
+        when(linkedFile.sourceUrlProperty()).thenReturn(new SimpleStringProperty(url));
 
         LinkedFileViewModel viewModel = mock(LinkedFileViewModel.class, Answers.RETURNS_DEEP_STUBS);
         when(viewModel.getFile()).thenReturn(linkedFile);
