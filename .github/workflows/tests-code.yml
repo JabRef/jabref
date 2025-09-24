@@ -30,6 +30,7 @@ permissions:
 
 jobs:
   upload-pr-number:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Create pr_number.txt
@@ -121,7 +122,7 @@ jobs:
       - uses: koppor/intellij-idea-format@update-to-latest-intellij
         with:
           file-mask: "*.java"
-          settings-file: "config/IntelliJ Code Style.xml"
+          settings-file: ".idea/codeStyles/Project.xml"
       # job should fail in case there are changes
       - name: Check if any files changed
         run: git diff --exit-code
@@ -501,7 +502,7 @@ jobs:
 
       - name: Detect changed jablib classes
         id: changed-jablib-files
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             jablib/src/main/java/**/*.java
