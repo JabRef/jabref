@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Other parsing tests are available in {@link org.jabref.logic.importer.AuthorListParserTest}
+ * Other parsing tests are available in {@code org.jabref.logic.importer.AuthorListParserTest}
  */
 public class AuthorListTest {
 
@@ -122,69 +122,20 @@ public class AuthorListTest {
         assertNotSame(authorList, AuthorList.parse("Smith").latexFree());
     }
 
-    @Test
-    void fixAuthorFirstNameFirstCommas() {
-        // No Commas
-        assertEquals("", AuthorList.fixAuthorFirstNameFirstCommas("", true, false));
-        assertEquals("", AuthorList.fixAuthorFirstNameFirstCommas("", false, false));
-
-        assertEquals("John Smith", AuthorList.fixAuthorFirstNameFirstCommas("John Smith",
-                false, false));
-        assertEquals("J. Smith", AuthorList.fixAuthorFirstNameFirstCommas("John Smith", true,
-                false));
-
-        // Check caching
-        assertEquals(AuthorList.fixAuthorFirstNameFirstCommas(
-                "John von Neumann and John Smith and Black Brown, Peter", true, false), AuthorList
-                .fixAuthorFirstNameFirstCommas("John von Neumann and John Smith and Black Brown, Peter", true, false));
-
-        assertEquals("John Smith and Peter Black Brown", AuthorList
-                .fixAuthorFirstNameFirstCommas("John Smith and Black Brown, Peter", false, false));
-        assertEquals("J. Smith and P. Black Brown", AuthorList.fixAuthorFirstNameFirstCommas(
-                "John Smith and Black Brown, Peter", true, false));
-
-        // Method description is different from code -> additional comma
-        // there
-        assertEquals("John von Neumann, John Smith and Peter Black Brown", AuthorList
-                .fixAuthorFirstNameFirstCommas(
-                        "John von Neumann and John Smith and Black Brown, Peter", false, false));
-        assertEquals("J. von Neumann, J. Smith and P. Black Brown", AuthorList
-                .fixAuthorFirstNameFirstCommas(
-                        "John von Neumann and John Smith and Black Brown, Peter", true, false));
-
-        assertEquals("J. P. von Neumann", AuthorList.fixAuthorFirstNameFirstCommas(
-                "John Peter von Neumann", true, false));
-        // Oxford Commas
-        assertEquals("", AuthorList.fixAuthorFirstNameFirstCommas("", true, true));
-        assertEquals("", AuthorList.fixAuthorFirstNameFirstCommas("", false, true));
-
-        assertEquals("John Smith", AuthorList.fixAuthorFirstNameFirstCommas("John Smith",
-                false, true));
-        assertEquals("J. Smith", AuthorList.fixAuthorFirstNameFirstCommas("John Smith", true,
-                true));
-
-        // Check caching
-        assertEquals(AuthorList.fixAuthorFirstNameFirstCommas(
-                "John von Neumann and John Smith and Black Brown, Peter", true, true), AuthorList
-                .fixAuthorFirstNameFirstCommas("John von Neumann and John Smith and Black Brown, Peter", true, true));
-
-        assertEquals("John Smith and Peter Black Brown", AuthorList
-                .fixAuthorFirstNameFirstCommas("John Smith and Black Brown, Peter", false, true));
-        assertEquals("J. Smith and P. Black Brown", AuthorList.fixAuthorFirstNameFirstCommas(
-                "John Smith and Black Brown, Peter", true, true));
-
-        // Method description is different than code -> additional comma
-        // there
-        assertEquals("John von Neumann, John Smith, and Peter Black Brown", AuthorList
-                .fixAuthorFirstNameFirstCommas(
-                        "John von Neumann and John Smith and Black Brown, Peter", false, true));
-        assertEquals("J. von Neumann, J. Smith, and P. Black Brown", AuthorList
-                .fixAuthorFirstNameFirstCommas(
-                        "John von Neumann and John Smith and Black Brown, Peter", true, true));
-
-        assertEquals("J. P. von Neumann", AuthorList.fixAuthorFirstNameFirstCommas(
-                "John Peter von Neumann", true, true));
-    }
+  @ParameterizedTest
+  @CsvSource({
+      "'John Smith', 'John Smith', false, false",
+      "'John Smith', 'J. Smith', true, false",
+      "'John Smith and Black Brown, Peter', 'J. Smith and P. Black Brown' true, false",
+      "'John Peter von Neumann', 'J. P. von Neumann', true, false",
+      "'John Smith', 'John Smith', false, true",
+      "'John Smith', 'J. Smith', true, true",
+      "'John Smith and Black Brown, Peter', 'J. Smith and P. Black Brown', true, true",
+      "'John Peter von Neumann', 'J. P. von Neumann', true, true"
+  })
+  void fixAuthorFirstNameFirstCommas_param(String input, String expected, boolean abbreviate, boolean oxford) {
+    assertEquals(expected, AuthorList.fixAuthorFirstNameFirstCommas(input, abbreviate, oxford));
+  }
 
     @Test
     void getAsFirstLastNamesLatexFreeEmptyAuthorStringForEmptyInputAbbreviate() {
