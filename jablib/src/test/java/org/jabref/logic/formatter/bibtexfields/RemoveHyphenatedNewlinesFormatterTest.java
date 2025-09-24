@@ -2,6 +2,9 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,11 +17,10 @@ class RemoveHyphenatedNewlinesFormatterTest {
         formatter = new RemoveHyphenatedNewlinesFormatter();
     }
 
-    @Test
-    void removeHyphensBeforeNewlines() {
-        assertEquals("water", formatter.format("wa-\nter"));
-        assertEquals("water", formatter.format("wa-\r\nter"));
-        assertEquals("water", formatter.format("wa-\rter"));
+    @ParameterizedTest
+    @ValueSource(strings = {"wa-\nter", "wa-\r\nter", "wa-\rter"})
+    void removeHyphensBeforeNewlines(String expression) {
+        assertEquals("water", formatter.format(expression));
     }
 
     @Test
