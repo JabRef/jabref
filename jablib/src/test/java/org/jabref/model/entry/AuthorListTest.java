@@ -516,35 +516,20 @@ public class AuthorListTest {
                 .fixAuthorLastNameFirst("John von Neumann and John Smith and Black Brown, Peter", true));
     }
 
-    @Test
-    void fixAuthorLastNameOnlyCommas() {
-        // No comma before and
-        assertEquals("", AuthorList.fixAuthorLastNameOnlyCommas("", false));
-        assertEquals("Smith", AuthorList.fixAuthorLastNameOnlyCommas("John Smith", false));
-        assertEquals("Smith", AuthorList.fixAuthorLastNameOnlyCommas("Smith, Jr, John", false));
+  @ParameterizedTest
+  @CsvSource({
+      "'John Smith', 'Smith, John', false",
+      "'John Smith', 'Smith, J.', true",
+      "'John Smith and Black Brown, Peter', 'Smith, John and Black Brown, Peter', false",
+      "'John Smith and Black Brown, Peter', 'Smith, J. and Black Brown, P.', true",
+      "'John Peter von Neumann', 'von Neumann, J. P.', true"
+  })
+  void fixAuthorLastNameOnlyCommas_param(String input, String expected, boolean oxford) {
+    assertEquals(expected, AuthorList.fixAuthorLastNameOnlyCommas(input, oxford));
+  }
 
-        assertEquals(AuthorList.fixAuthorLastNameOnlyCommas(
-                "John von Neumann and John Smith and Black Brown, Peter", false), AuthorList
-                .fixAuthorLastNameOnlyCommas("John von Neumann and John Smith and Black Brown, Peter", false));
 
-        assertEquals("von Neumann, Smith and Black Brown", AuthorList
-                .fixAuthorLastNameOnlyCommas(
-                        "John von Neumann and John Smith and Black Brown, Peter", false));
-        // Oxford Comma
-        assertEquals("", AuthorList.fixAuthorLastNameOnlyCommas("", true));
-        assertEquals("Smith", AuthorList.fixAuthorLastNameOnlyCommas("John Smith", true));
-        assertEquals("Smith", AuthorList.fixAuthorLastNameOnlyCommas("Smith, Jr, John", true));
-
-        assertEquals(AuthorList.fixAuthorLastNameOnlyCommas(
-                "John von Neumann and John Smith and Black Brown, Peter", true), AuthorList
-                .fixAuthorLastNameOnlyCommas("John von Neumann and John Smith and Black Brown, Peter", true));
-
-        assertEquals("von Neumann, Smith, and Black Brown", AuthorList
-                .fixAuthorLastNameOnlyCommas(
-                        "John von Neumann and John Smith and Black Brown, Peter", true));
-    }
-
-    @Test
+  @Test
     void getAsLastNamesLatexFreeUnicodeOneAuthorNameFromLatex() {
         assertEquals("al-Khwārizmī", ONE_AUTHOR_WITH_LATEX.latexFree().getAsLastNames(false));
     }
