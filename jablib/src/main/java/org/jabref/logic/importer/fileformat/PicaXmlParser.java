@@ -29,6 +29,19 @@ import org.xml.sax.SAXException;
 public class PicaXmlParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(PicaXmlParser.class);
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+    static {
+        try {
+            // This prevents XXE
+            DOCUMENT_BUILDER_FACTORY.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            DOCUMENT_BUILDER_FACTORY.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            DOCUMENT_BUILDER_FACTORY.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            DOCUMENT_BUILDER_FACTORY.setExpandEntityReferences(false);
+            // Optionally, disable XInclude
+            DOCUMENT_BUILDER_FACTORY.setXIncludeAware(false);
+        } catch (ParserConfigurationException e) {
+            throw new ExceptionInInitializerError("Failed to securely configure XML parser for PicaXmlParser: " + e.getMessage());
+        }
+    }
 
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {

@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
+import javax.xml.XMLConstants;
 import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -51,8 +51,22 @@ import org.xml.sax.SAXException;
 ///
 public class MarcXmlParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MarcXmlParser.class);
-    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
+    static {
+        DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+        try {
+            // This will completely disable DTDs and external entity expansion:
+            DOCUMENT_BUILDER_FACTORY.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            DOCUMENT_BUILDER_FACTORY.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            DOCUMENT_BUILDER_FACTORY.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            DOCUMENT_BUILDER_FACTORY.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            DOCUMENT_BUILDER_FACTORY.setXIncludeAware(false);
+            DOCUMENT_BUILDER_FACTORY.setExpandEntityReferences(false);
+        } catch (ParserConfigurationException ex) {
+            // In case of failure, log and proceed (safe fail)
+            LOGGER.error("Failed to configure XML parser securely in MarcXmlParser", ex);
+        }
+    }
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {

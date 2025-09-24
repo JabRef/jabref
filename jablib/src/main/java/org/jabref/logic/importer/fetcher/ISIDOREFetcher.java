@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
+import javax.xml.XMLConstants;
 /**
  * Fetcher for <a href="https://isidore.science">ISIDORE</a>```
  * Will take in the link to the website or the last six digits that identify the reference
@@ -47,8 +47,30 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
 
     private static final String SOURCE_WEB_SEARCH = "https://api.isidore.science/resource/search";
 
-    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-
+    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
+    static {
+        DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
+        try {
+            DOCUMENT_BUILDER_FACTORY.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        } catch (ParserConfigurationException e) {
+            LOGGER.warn("Could not disable DOCTYPE declarations on XML parser", e);
+        }
+        try {
+            DOCUMENT_BUILDER_FACTORY.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        } catch (ParserConfigurationException e) {
+            LOGGER.warn("Could not disable external general entities on XML parser", e);
+        }
+        try {
+            DOCUMENT_BUILDER_FACTORY.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        } catch (ParserConfigurationException e) {
+            LOGGER.warn("Could not disable external parameter entities on XML parser", e);
+        }
+        try {
+            DOCUMENT_BUILDER_FACTORY.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        } catch (ParserConfigurationException e) {
+            LOGGER.warn("Could not enable secure processing on XML parser", e);
+        }
+    }
     @Override
     public Parser getParser() {
         return xmlData -> {

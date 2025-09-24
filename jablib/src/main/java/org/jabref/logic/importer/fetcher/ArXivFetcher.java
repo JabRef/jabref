@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.XMLConstants;
 
 import org.jabref.logic.cleanup.EprintCleanup;
 import org.jabref.logic.help.HelpFile;
@@ -554,7 +555,14 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
             }
 
             try {
-                DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
+                DocumentBuilderFactory secureFactory = DocumentBuilderFactory.newInstance();
+                // Prevent XXE (XML External Entity) attacks
+                secureFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+                secureFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+                secureFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+                secureFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+                secureFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+                DocumentBuilder builder = secureFactory.newDocumentBuilder();
 
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 if (connection.getResponseCode() == 400) {

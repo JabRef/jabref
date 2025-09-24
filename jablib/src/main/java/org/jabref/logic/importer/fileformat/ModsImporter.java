@@ -58,10 +58,14 @@ public class ModsImporter extends Importer implements Parser {
     public ModsImporter(ImportFormatPreferences importFormatPreferences) {
         keywordSeparator = importFormatPreferences.bibEntryPreferences().getKeywordSeparator() + " ";
         xmlInputFactory = XMLInputFactory.newInstance();
-        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-        // Not supported by aalto-xml
-        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-        // xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        // Prevent XXE by disabling external entities and DTDs
+        try {
+            xmlInputFactory.setProperty("javax.xml.stream.isSupportingExternalEntities", false);
+            xmlInputFactory.setProperty("javax.xml.stream.supportDTD", false);
+        } catch (IllegalArgumentException e) {
+            // The XMLInputFactory implementation does not support these properties; log but continue
+            LOGGER.warn("Cannot disable external entities or DTD for XMLInputFactory: {}", e.getMessage());
+        }
     }
 
     @Override
