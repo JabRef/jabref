@@ -48,15 +48,16 @@ public class AuthorListTest {
         return AuthorList.parse(bibtex).getNumberOfAuthors();
     }
 
-    @Test
-    void fixAuthorNatbib() {
-        assertEquals("", AuthorList.fixAuthorNatbib(""));
-        assertEquals("Smith", AuthorList.fixAuthorNatbib("John Smith"));
-        assertEquals("Smith and Black Brown", AuthorList
-                .fixAuthorNatbib("John Smith and Black Brown, Peter"));
-        assertEquals("von Neumann et al.", AuthorList
-                .fixAuthorNatbib("John von Neumann and John Smith and Black Brown, Peter"));
-    }
+  @ParameterizedTest
+  @CsvSource({
+      "'', ''",
+      "'John Smith', 'Smith'",
+      "'John Smith and Black Brown, Peter', 'Smith and Black Brown'",
+      "'John von Neumann and John Smith and Black Brown, Peter', 'von Neumann et al.'"
+  })
+  void fixAuthorNatbib(String input, String expected) {
+    assertEquals(expected, AuthorList.fixAuthorNatbib(input));
+  }
 
     @Test
     void getAsNatbibLatexFreeEmptyAuthorStringForEmptyInput() {
