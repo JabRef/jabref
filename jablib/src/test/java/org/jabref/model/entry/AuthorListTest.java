@@ -529,6 +529,7 @@ public class AuthorListTest {
   }
 
 
+  @SuppressWarnings("checkstyle:EmptyLineSeparator")
   @Test
     void getAsLastNamesLatexFreeUnicodeOneAuthorNameFromLatex() {
         assertEquals("al-Khwārizmī", ONE_AUTHOR_WITH_LATEX.latexFree().getAsLastNames(false));
