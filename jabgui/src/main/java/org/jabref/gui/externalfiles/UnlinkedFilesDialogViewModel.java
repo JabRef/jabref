@@ -77,7 +77,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ObservableList<ExternalFileSorter> fileSortList;
 
     private final DialogService dialogService;
-    private final GuiPreferences preferences;  // Changed from CliPreferences to GuiPreferences
+    private final GuiPreferences preferences;
     private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
     private BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesBackgroundTask;
 
@@ -89,7 +89,7 @@ public class UnlinkedFilesDialogViewModel {
     public UnlinkedFilesDialogViewModel(DialogService dialogService,
                                         UndoManager undoManager,
                                         FileUpdateMonitor fileUpdateMonitor,
-                                        GuiPreferences preferences,  // Changed parameter type
+                                        GuiPreferences preferences,
                                         StateManager stateManager,
                                         TaskExecutor taskExecutor) {
         this.preferences = preferences;
@@ -173,7 +173,7 @@ public class UnlinkedFilesDialogViewModel {
                     filesToAdd.add(newLinkedFile);
 
                     results.add(new ImportFilesResultItemViewModel(foundFile, true,
-                            "Fixed broken link: " + brokenLink.getLink() + " -> " + newLinkedFile.getLink()));
+                            Localization.lang("File relinked to entry %0.", exactFileName)));
                 }
 
                 // update the entry's file links
@@ -181,9 +181,10 @@ public class UnlinkedFilesDialogViewModel {
                 currentFiles.addAll(filesToAdd);
                 entry.setFiles(currentFiles);
             } catch (IOException e) {
-                LOGGER.error("Error finding associated files for entry");
+                LOGGER.error("Error finding associated files for entry", e);
             }
         }
+
         resultList.clear();
         resultList.addAll(results);
     }
@@ -374,5 +375,10 @@ public class UnlinkedFilesDialogViewModel {
 
     public SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty() {
         return checkedFileListProperty;
+    }
+
+    // For testing purposes
+    public int resultListSize() {
+        return resultList.size();
     }
 }
