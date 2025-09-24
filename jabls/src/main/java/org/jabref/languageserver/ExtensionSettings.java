@@ -37,8 +37,8 @@ public class ExtensionSettings {
             this.consistencyCheckOptional = node.at("/jabref/consistencyCheck/optional").asBoolean(this.consistencyCheckOptional);
             this.consistencyCheckUnknown = node.at("/jabref/consistencyCheck/unknown").asBoolean(this.consistencyCheckUnknown);
             this.integrityCheck = node.at("/jabref/integrityCheck/enabled").asBoolean(this.integrityCheck);
-        } catch (JsonProcessingException e) {
-            LOGGER.error("Error parsing settings from JSON", e);
+        } catch (JsonProcessingException processingException) {
+            LOGGER.error("Error parsing settings from JSON", processingException);
         }
     }
 
