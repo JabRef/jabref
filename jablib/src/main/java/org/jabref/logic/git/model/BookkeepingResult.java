@@ -10,7 +10,7 @@ import java.util.Optional;
 /// - BEHIND (local is an ancestor of remote): create a new single-parent commit (parent=remote) on top of remote;
 /// - DIVERGED: create a new dual-parent merge commit (parents=[local, remote]).
 /// Notes: Because the statuses UP_TO_DATE / AHEAD / CONFLICT / UNTRACKED are already filtered out before prepareMerge by GitStatusChecker, they will not enter finalizeMerge.
-public final class FinalizeResult {
+public final class BookkeepingResult {
     public enum Kind {
         NOOP_UP_TO_DATE, // nothing to do (local == remote)
         NOOP_AHEAD,      // nothing to do (local ahead of remote)
@@ -21,25 +21,25 @@ public final class FinalizeResult {
     private final Kind kind;
     private final Optional<String> commitId;
 
-    private FinalizeResult(Kind kind, Optional<String> commitId) {
+    private BookkeepingResult(Kind kind, Optional<String> commitId) {
         this.kind = kind;
         this.commitId = commitId;
     }
 
-    public static FinalizeResult upToDate() {
-        return new FinalizeResult(Kind.NOOP_UP_TO_DATE, Optional.empty());
+    public static BookkeepingResult upToDate() {
+        return new BookkeepingResult(Kind.NOOP_UP_TO_DATE, Optional.empty());
     }
 
-    public static FinalizeResult ahead() {
-        return new FinalizeResult(Kind.NOOP_AHEAD, Optional.empty());
+    public static BookkeepingResult ahead() {
+        return new BookkeepingResult(Kind.NOOP_AHEAD, Optional.empty());
     }
 
-    public static FinalizeResult fastForward() {
-        return new FinalizeResult(Kind.FAST_FORWARD, Optional.empty());
+    public static BookkeepingResult fastForward() {
+        return new BookkeepingResult(Kind.FAST_FORWARD, Optional.empty());
     }
 
-    public static FinalizeResult newCommit(String commitId) {
-        return new FinalizeResult(Kind.NEW_COMMIT, Optional.ofNullable(commitId));
+    public static BookkeepingResult newCommit(String commitId) {
+        return new BookkeepingResult(Kind.NEW_COMMIT, Optional.ofNullable(commitId));
     }
 
     public Kind kind() {

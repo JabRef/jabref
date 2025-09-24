@@ -16,7 +16,7 @@ import org.jabref.logic.git.merge.DefaultMergeBookkeeper;
 import org.jabref.logic.git.merge.GitMergeUtil;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
 import org.jabref.logic.git.merge.MergeBookkeeper;
-import org.jabref.logic.git.model.FinalizeResult;
+import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.MergePlan;
 import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.model.PullResult;
@@ -110,7 +110,7 @@ public class GitSyncService {
                         List.of()
                 );
 
-                FinalizeResult finalized = bookkeeper.resultRecord(bibFilePath, planForFinalize);
+                BookkeepingResult finalized = bookkeeper.resultRecord(bibFilePath, planForFinalize);
                 return result;
             }
 
@@ -248,8 +248,8 @@ public class GitSyncService {
      * - The bib file on disk already reflects: local + autoPlan (+ resolvedPlan)
      * - No uncommitted unrelated changes
      */
-    public FinalizeResult finalizeMerge(Path bibFilePath,
-                                        PullPlan computation) throws GitAPIException, IOException, JabRefException {
+    public BookkeepingResult finalizeMerge(Path bibFilePath,
+                                           PullPlan computation) throws GitAPIException, IOException, JabRefException {
         return bookkeeper.resultRecord(bibFilePath, computation);
     }
 }
