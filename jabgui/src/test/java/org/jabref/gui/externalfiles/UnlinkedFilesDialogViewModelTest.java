@@ -349,4 +349,137 @@ public class UnlinkedFilesDialogViewModelTest {
 
         assertEquals(entryCount * filesPerEntry, viewModel.resultListSize());
     }
+
+    @Test
+    void fixBrokenLinksOfFilesInSubdirectories(@TempDir Path tempDir) throws IOException {
+        // Create a comprehensive directory structure to test deep traversal
+        Path rootDirectory = tempDir.resolve("test-files");
+
+        // Create complex nested directory structure
+        Path projectsDir = rootDirectory.resolve("projects");
+        Path archiveDir = rootDirectory.resolve("archive");
+        Path backupDir = rootDirectory.resolve("backup");
+        Path referencesDir = rootDirectory.resolve("references");
+
+        // Create subdirectories with multiple levels of nesting
+        Path project1Dir = projectsDir.resolve("project1/papers/drafts");
+        Path project2Dir = projectsDir.resolve("project2/final/submissions");
+        Path yearlyArchive = archiveDir.resolve("2082/research/publications");
+        Path monthlyBackup = backupDir.resolve("monthly/december/papers");
+        Path categoryRefs = referencesDir.resolve("category-a/subcategory-x/documents");
+        Path deepNested = rootDirectory.resolve("level1/level2/level3/level4/level5");
+
+        // Create all directory structures
+        Files.createDirectories(project1Dir);
+        Files.createDirectories(project2Dir);
+        Files.createDirectories(yearlyArchive);
+        Files.createDirectories(monthlyBackup);
+        Files.createDirectories(categoryRefs);
+        Files.createDirectories(deepNested);
+
+        // Create original files in various locations (simulating old broken paths)
+        Path originalPdf1 = tempDir.resolve("old-location/research-paper.pdf");
+        Path originalPdf2 = tempDir.resolve("old-docs/thesis.pdf");
+        Path originalDoc = tempDir.resolve("old-files/notes.docx");
+        Path originalTxt = tempDir.resolve("old-text/summary.txt");
+        Path originalPresentation = tempDir.resolve("old-ppt/presentation.pptx");
+
+        Files.createDirectories(originalPdf1.getParent());
+        Files.createDirectories(originalPdf2.getParent());
+        Files.createDirectories(originalDoc.getParent());
+        Files.createDirectories(originalTxt.getParent());
+        Files.createDirectories(originalPresentation.getParent());
+
+        Files.createFile(originalPdf1);
+        Files.createFile(originalPdf2);
+        Files.createFile(originalDoc);
+        Files.createFile(originalTxt);
+        Files.createFile(originalPresentation);
+
+        // Create BibEntries with broken links pointing to original locations
+        BibEntry entry1 = new BibEntry(StandardEntryType.Article);
+        entry1.addFile(new LinkedFile("Research Paper", originalPdf1.toString(), "PDF"));
+        entry1.addFile(new LinkedFile("Supporting Notes", originalDoc.toString(), "Word"));
+
+        BibEntry entry2 = new BibEntry(StandardEntryType.Thesis);
+        entry2.addFile(new LinkedFile("Thesis Document", originalPdf2.toString(), "PDF"));
+        entry2.addFile(new LinkedFile("Summary", originalTxt.toString(), "Text"));
+
+        BibEntry entry3 = new BibEntry(StandardEntryType.InProceedings);
+        entry3.addFile(new LinkedFile("Conference Presentation", originalPresentation.toString(), "PowerPoint"));
+
+        // Move files to various deep nested locations (simulating file reorganization)
+        Path newPdf1Location = project1Dir.resolve("research-paper.pdf");
+        Path newDocLocation = project2Dir.resolve("notes.docx");
+        Path newPdf2Location = yearlyArchive.resolve("thesis.pdf");
+        Path newTxtLocation = monthlyBackup.resolve("summary.txt");
+        Path newPptLocation = deepNested.resolve("presentation.pptx");
+
+        Files.move(originalPdf1, newPdf1Location);
+        Files.move(originalDoc, newDocLocation);
+        Files.move(originalPdf2, newPdf2Location);
+        Files.move(originalTxt, newTxtLocation);
+        Files.move(originalPresentation, newPptLocation);
+
+        // Add some additional files with similar names to test specificity
+        Files.createFile(categoryRefs.resolve("research-paper-old.pdf"));
+        Files.createFile(categoryRefs.resolve("research-paper-v2.pdf"));
+        Files.createFile(backupDir.resolve("thesis-backup.pdf"));
+        Files.createFile(archiveDir.resolve("notes-archived.docx"));
+
+        // Add files with same name but different extensions to test type matching
+        Files.createFile(projectsDir.resolve("research-paper.txt"));
+        Files.createFile(archiveDir.resolve("thesis.docx"));
+        Files.createFile(referencesDir.resolve("presentation.pdf"));
+
+        // Create some symbolic links to test link resolution
+        try {
+            Path symlinkDir = rootDirectory.resolve("symlinks");
+            Files.createDirectories(symlinkDir);
+            Files.createSymbolicLink(symlinkDir.resolve("linked-thesis.pdf"), newPdf2Location);
+        } catch (UnsupportedOperationException | SecurityException e) {
+            // Symbolic links might not be supported on all systems, continue without them
+        }
+
+        // Setup mock database and context
+        when(bibDatabaseContext.getDatabase()).thenReturn(new BibDatabase(List.of(entry1, entry2, entry3)));
+        when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(rootDirectory));
+
+        // Verify initial broken state
+        assertTrue(entry1.getFiles().stream().anyMatch(file -> file.getLink().equals(originalPdf1.toString())));
+        assertTrue(entry1.getFiles().stream().anyMatch(file -> file.getLink().equals(originalDoc.toString())));
+        assertTrue(entry2.getFiles().stream().anyMatch(file -> file.getLink().equals(originalPdf2.toString())));
+        assertTrue(entry2.getFiles().stream().anyMatch(file -> file.getLink().equals(originalTxt.toString())));
+        assertTrue(entry3.getFiles().stream().anyMatch(file -> file.getLink().equals(originalPresentation.toString())));
+
+        // Execute the fix operation
+        viewModel.findAndFixBrokenLinks(rootDirectory);
+
+        // Verify that all broken links were found and fixed
+        assertEquals(5, viewModel.resultListSize(),
+                "Should find and fix all 5 broken links across deep directory structure");
+
+        // Verify specific file links were updated to correct relative paths
+        assertTrue(entry1.getFiles().stream().anyMatch(file -> file.getLink().equals("projects/project1/papers/drafts/research-paper.pdf")),
+                "Research paper should be linked to new location in project1");
+
+        assertTrue(entry1.getFiles().stream().anyMatch(file -> file.getLink().equals("projects/project2/final/submissions/notes.docx")),
+                "Notes document should be linked to new location in project2");
+
+        assertTrue(entry2.getFiles().stream().anyMatch(file -> file.getLink().equals("archive/2082/research/publications/thesis.pdf")),
+                "Thesis should be linked to new location in yearly archive");
+
+        assertTrue(entry2.getFiles().stream().anyMatch(file -> file.getLink().equals("backup/monthly/december/papers/summary.txt")),
+                "Summary should be linked to new location in monthly backup");
+
+        assertTrue(entry3.getFiles().stream().anyMatch(file -> file.getLink().equals("level1/level2/level3/level4/level5/presentation.pptx")),
+                "Presentation should be linked to new location in deep nested structure");
+
+        // Verify that files with similar names but different extensions were not incorrectly matched
+        assertTrue(entry1.getFiles().stream().noneMatch(file -> file.getLink().contains("research-paper.txt")),
+                "Should not match files with different extensions");
+
+        assertTrue(entry2.getFiles().stream().noneMatch(file -> file.getLink().contains("thesis.docx")),
+                "Should not match files with different extensions");
+    }
 }
