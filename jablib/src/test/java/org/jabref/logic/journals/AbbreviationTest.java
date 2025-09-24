@@ -1,120 +1,139 @@
 package org.jabref.logic.journals;
 
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class AbbreviationTest {
 
-    @Test
-    void abbreviationsWithTrailingSpaces() {
-        Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.");
-
-        assertEquals("Long Name", abbreviation.getName());
-        assertEquals("L. N.", abbreviation.getAbbreviation());
-        assertEquals("L N", abbreviation.getDotlessAbbreviation());
-        assertEquals("L. N.", abbreviation.getShortestUniqueAbbreviation());
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideAbbreviationTestCases")
+    void testAbbreviationProperties(String testName, Abbreviation abbreviation,
+                                    String expectedName, String expectedAbbreviation,
+                                    String expectedDotless, String expectedShortest) {
+        assertEquals(expectedName, abbreviation.getName());
+        assertEquals(expectedAbbreviation, abbreviation.getAbbreviation());
+        assertEquals(expectedDotless, abbreviation.getDotlessAbbreviation());
+        assertEquals(expectedShortest, abbreviation.getShortestUniqueAbbreviation());
     }
 
-    @Test
-    void abbreviationsWithTrailingSpacesWithShortestUniqueAbbreviation() {
-        Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.", "LN");
-
-        assertEquals("Long Name", abbreviation.getName());
-        assertEquals("L. N.", abbreviation.getAbbreviation());
-        assertEquals("L N", abbreviation.getDotlessAbbreviation());
-        assertEquals("LN", abbreviation.getShortestUniqueAbbreviation());
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideGetNextTestCases")
+    void testGetNext(String testName, Abbreviation abbreviation, String input, String expected) {
+        assertEquals(expected, abbreviation.getNext(input));
     }
 
-    @Test
-    void abbreviationsWithSemicolons() {
-        Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.;LN;M");
-
-        assertEquals("Long Name", abbreviation.getName());
-        assertEquals("L. N.;LN;M", abbreviation.getAbbreviation());
-        assertEquals("L N ;LN;M", abbreviation.getDotlessAbbreviation());
-        assertEquals("L. N.;LN;M", abbreviation.getShortestUniqueAbbreviation());
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideEqualityTestCases")
+    void testEquality(String testName, Object obj1, Object obj2, boolean shouldBeEqual) {
+        if (shouldBeEqual) {
+            assertEquals(obj1, obj2);
+        } else {
+            assertNotEquals(obj1, obj2);
+        }
     }
 
-    @Test
-    void abbreviationsWithSemicolonsWithShortestUniqueAbbreviation() {
-        Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.;LN;M", "LNLNM");
-
-        assertEquals("Long Name", abbreviation.getName());
-        assertEquals("L. N.;LN;M", abbreviation.getAbbreviation());
-        assertEquals("L N ;LN;M", abbreviation.getDotlessAbbreviation());
-        assertEquals("LNLNM", abbreviation.getShortestUniqueAbbreviation());
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideComparisonTestCases")
+    void testComparison(String testName, Abbreviation abbrev1, Abbreviation abbrev2, int expectedComparison) {
+        assertEquals(expectedComparison, abbrev1.compareTo(abbrev2));
     }
 
-    @Test
-    void getNextElement() {
-        Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.");
-
-        assertEquals("L. N.", abbreviation.getNext("Long Name"));
-        assertEquals("L N", abbreviation.getNext("L. N."));
-        assertEquals("Long Name", abbreviation.getNext("L N"));
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideSameValueTestCases")
+    void testSameValues(String testName, Abbreviation abbreviation, String method1Result, String method2Result) {
+        assertEquals(method1Result, method2Result);
     }
 
-    @Test
-    void getNextElementWithShortestUniqueAbbreviation() {
-        Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.", "LN");
+    private static Stream<Arguments> provideAbbreviationTestCases() {
+        return Stream.of(
+                // Abbreviations with trailing spaces
+                Arguments.of("abbreviationsWithTrailingSpaces",
+                        new Abbreviation("Long Name", "L. N."),
+                        "Long Name", "L. N.", "L N", "L. N."),
 
-        assertEquals("L. N.", abbreviation.getNext("Long Name"));
-        assertEquals("L N", abbreviation.getNext("L. N."));
-        assertEquals("LN", abbreviation.getNext("L N"));
-        assertEquals("Long Name", abbreviation.getNext("LN"));
+                // Abbreviations with trailing spaces with shortest unique abbreviation
+                Arguments.of("abbreviationsWithTrailingSpacesWithShortestUniqueAbbreviation",
+                        new Abbreviation("Long Name", "L. N.", "LN"),
+                        "Long Name", "L. N.", "L N", "LN"),
+
+                // Abbreviations with semicolons
+                Arguments.of("abbreviationsWithSemicolons",
+                        new Abbreviation("Long Name", "L. N.;LN;M"),
+                        "Long Name", "L. N.;LN;M", "L N ;LN;M", "L. N.;LN;M"),
+
+                // Abbreviations with semicolons with shortest unique abbreviation
+                Arguments.of("abbreviationsWithSemicolonsWithShortestUniqueAbbreviation",
+                        new Abbreviation("Long Name", "L. N.;LN;M", "LNLNM"),
+                        "Long Name", "L. N.;LN;M", "L N ;LN;M", "LNLNM")
+        );
     }
 
-    @Test
-    void getNextElementWithTrailingSpaces() {
-        Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.");
+    private static Stream<Arguments> provideGetNextTestCases() {
+        Abbreviation abbrev1 = new Abbreviation("Long Name", "L. N.");
+        Abbreviation abbrev2 = new Abbreviation("Long Name", "L. N.", "LN");
 
-        assertEquals("L. N.", abbreviation.getNext("Long Name"));
-        assertEquals("L N", abbreviation.getNext("L. N."));
-        assertEquals("Long Name", abbreviation.getNext("L N"));
+        return Stream.of(
+                // getNextElement tests
+                Arguments.of("getNextElement - Long Name to L. N.", abbrev1, "Long Name", "L. N."),
+                Arguments.of("getNextElement - L. N. to L N", abbrev1, "L. N.", "L N"),
+                Arguments.of("getNextElement - L N to Long Name", abbrev1, "L N", "Long Name"),
+
+                // getNextElementWithShortestUniqueAbbreviation tests
+                Arguments.of("getNextElementWithShortestUniqueAbbreviation - Long Name to L. N.", abbrev2, "Long Name", "L. N."),
+                Arguments.of("getNextElementWithShortestUniqueAbbreviation - L. N. to L N", abbrev2, "L. N.", "L N"),
+                Arguments.of("getNextElementWithShortestUniqueAbbreviation - L N to LN", abbrev2, "L N", "LN"),
+                Arguments.of("getNextElementWithShortestUniqueAbbreviation - LN to Long Name", abbrev2, "LN", "Long Name"),
+
+                // getNextElementWithTrailingSpaces tests
+                Arguments.of("getNextElementWithTrailingSpaces - Long Name to L. N.", abbrev1, "Long Name", "L. N."),
+                Arguments.of("getNextElementWithTrailingSpaces - L. N. to L N", abbrev1, "L. N.", "L N"),
+                Arguments.of("getNextElementWithTrailingSpaces - L N to Long Name", abbrev1, "L N", "Long Name"),
+
+                // getNextElementWithTrailingSpacesWithShortestUniqueAbbreviation tests
+                Arguments.of("getNextElementWithTrailingSpacesWithShortestUniqueAbbreviation - Long Name to L. N.", abbrev2, "Long Name", "L. N."),
+                Arguments.of("getNextElementWithTrailingSpacesWithShortestUniqueAbbreviation - L. N. to L N", abbrev2, "L. N.", "L N"),
+                Arguments.of("getNextElementWithTrailingSpacesWithShortestUniqueAbbreviation - L N to LN", abbrev2, "L N", "LN"),
+                Arguments.of("getNextElementWithTrailingSpacesWithShortestUniqueAbbreviation - LN to Long Name", abbrev2, "LN", "Long Name")
+        );
     }
 
-    @Test
-    void getNextElementWithTrailingSpacesWithShortestUniqueAbbreviation() {
-        Abbreviation abbreviation = new Abbreviation("Long Name", "L. N.", "LN");
-
-        assertEquals("L. N.", abbreviation.getNext("Long Name"));
-        assertEquals("L N", abbreviation.getNext("L. N."));
-        assertEquals("LN", abbreviation.getNext("L N"));
-        assertEquals("Long Name", abbreviation.getNext("LN"));
-    }
-
-    @Test
-    void defaultAndMedlineAbbreviationsAreSame() {
-        Abbreviation abbreviation = new Abbreviation("Long Name", "L N");
-        assertEquals(abbreviation.getAbbreviation(), abbreviation.getDotlessAbbreviation());
-    }
-
-    @Test
-    void defaultAndMedlineAbbreviationsAreSameWithShortestUniqueAbbreviation() {
-        Abbreviation abbreviation = new Abbreviation("Long Name", "L N", "LN");
-        assertEquals(abbreviation.getAbbreviation(), abbreviation.getDotlessAbbreviation());
-    }
-
-    @Test
-    void defaultAndShortestUniqueAbbreviationsAreSame() {
-        Abbreviation abbreviation = new Abbreviation("Long Name", "L N");
-        assertEquals(abbreviation.getAbbreviation(), abbreviation.getShortestUniqueAbbreviation());
-    }
-
-    @Test
-    void equals() {
+    private static Stream<Arguments> provideEqualityTestCases() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L N", "LN");
         Abbreviation otherAbbreviation = new Abbreviation("Long Name", "L N", "LN");
-        assertEquals(abbreviation, otherAbbreviation);
-        assertNotEquals("String", abbreviation);
+
+        return Stream.of(
+                Arguments.of("equals - same abbreviations", abbreviation, otherAbbreviation, true),
+                Arguments.of("equals - abbreviation vs string", abbreviation, "String", false)
+        );
     }
 
-    @Test
-    void equalAbbrevationsWithFourComponentsAreAlsoCompareZero() {
-        Abbreviation abbreviation1 = new Abbreviation("Long Name", "L. N.", "LN");
-        Abbreviation abbreviation2 = new Abbreviation("Long Name", "L. N.", "LN");
-        assertEquals(0, abbreviation1.compareTo(abbreviation2));
+    private static Stream<Arguments> provideComparisonTestCases() {
+        return Stream.of(
+                Arguments.of("equalAbbrevationsWithFourComponentsAreAlsoCompareZero",
+                        new Abbreviation("Long Name", "L. N.", "LN"),
+                        new Abbreviation("Long Name", "L. N.", "LN"),
+                        0)
+        );
+    }
+
+    private static Stream<Arguments> provideSameValueTestCases() {
+        Abbreviation abbrev1 = new Abbreviation("Long Name", "L N");
+        Abbreviation abbrev2 = new Abbreviation("Long Name", "L N", "LN");
+        Abbreviation abbrev3 = new Abbreviation("Long Name", "L N");
+
+        return Stream.of(
+                Arguments.of("defaultAndMedlineAbbreviationsAreSame",
+                        abbrev1, abbrev1.getAbbreviation(), abbrev1.getDotlessAbbreviation()),
+                Arguments.of("defaultAndMedlineAbbreviationsAreSameWithShortestUniqueAbbreviation",
+                        abbrev2, abbrev2.getAbbreviation(), abbrev2.getDotlessAbbreviation()),
+                Arguments.of("defaultAndShortestUniqueAbbreviationsAreSame",
+                        abbrev3, abbrev3.getAbbreviation(), abbrev3.getShortestUniqueAbbreviation())
+        );
     }
 }

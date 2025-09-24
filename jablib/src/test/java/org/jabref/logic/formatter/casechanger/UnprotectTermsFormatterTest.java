@@ -1,6 +1,5 @@
 package org.jabref.logic.formatter.casechanger;
 
-import java.io.IOException;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +21,7 @@ class UnprotectTermsFormatterTest {
         formatter = new UnprotectTermsFormatter();
     }
 
-    private static Stream<Arguments> terms() throws IOException {
+    private static Stream<Arguments> terms() {
         return Stream.of(
                 Arguments.of("", ""),
                 Arguments.of("VLSI", "{VLSI}"),
