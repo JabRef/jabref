@@ -16,4 +16,5 @@ module org.jabref.jabls {
     requires org.eclipse.lsp4j.websocket;
 
     requires org.hisp.dhis.jsontree;
+    requires com.fasterxml.jackson.databind;
 }
