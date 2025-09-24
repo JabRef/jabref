@@ -25,6 +25,35 @@ import static org.mockito.Mockito.when;
 class UnlinkedFilesCrawlerTest {
 
     @Test
+    void ignoresFilesInNamedSubdirectoryAccordingToGitignore(@TempDir Path testRoot) throws IOException {
+        // This mirrors GitIgnoreFileFilterTest::checkDirectoryGitIgnoreSubDir but tests via the crawler
+        Files.writeString(testRoot.resolve(".gitignore"), """
+                ignore/.*
+                ignore/*
+                ignore/**
+                ignore/**/*
+                """);
+        Path subDir = testRoot.resolve("ignore");
+        Files.createDirectories(subDir);
+        Files.createFile(subDir.resolve("test.png"));
+        // also create a deeper subdirectory with a file which must be ignored as well
+        Path deepSubDir = subDir.resolve("nested");
+        Files.createDirectories(deepSubDir);
+        Files.createFile(deepSubDir.resolve("deep.png"));
+
+        // Allow all files at the PDF filter level so only the gitignore filter applies
+        UnlinkedPDFFileFilter unlinkedPDFFileFilter = mock(UnlinkedPDFFileFilter.class);
+        when(unlinkedPDFFileFilter.accept(any(Path.class))).thenReturn(true);
+
+        UnlinkedFilesCrawler unlinkedFilesCrawler = new UnlinkedFilesCrawler(testRoot, unlinkedPDFFileFilter, DateRange.ALL_TIME, ExternalFileSorter.DEFAULT, mock(BibDatabaseContext.class), mock(FilePreferences.class));
+
+        FileNodeViewModel fileNodeViewModel = unlinkedFilesCrawler.searchDirectory(testRoot, unlinkedPDFFileFilter);
+
+        // The ignored files must not appear in the results; thus the root node has no children
+        assertEquals(new FileNodeViewModel(testRoot), fileNodeViewModel);
+    }
+
+    @Test
     void minimalGitIgnore(@TempDir Path testRoot) throws IOException {
         Files.writeString(testRoot.resolve(".gitignore"), """
                 *.png
