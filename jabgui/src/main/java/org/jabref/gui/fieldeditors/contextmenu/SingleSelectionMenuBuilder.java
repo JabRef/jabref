@@ -2,7 +2,6 @@ package org.jabref.gui.fieldeditors.contextmenu;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.MenuItem;
@@ -19,6 +18,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+import org.jspecify.annotations.NonNull;
 
 record SingleSelectionMenuBuilder(
         DialogService dialogService,
@@ -28,16 +28,16 @@ record SingleSelectionMenuBuilder(
         LinkedFilesEditorViewModel viewModel
 ) implements ContextMenuBuilder, SelectionChecks {
 
-    SingleSelectionMenuBuilder(DialogService dialogService,
-                               BibDatabaseContext databaseContext,
-                               ObservableOptionalValue<BibEntry> bibEntry,
-                               GuiPreferences preferences,
-                               LinkedFilesEditorViewModel viewModel) {
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.databaseContext = Objects.requireNonNull(databaseContext);
-        this.bibEntry = Objects.requireNonNull(bibEntry);
-        this.preferences = Objects.requireNonNull(preferences);
-        this.viewModel = Objects.requireNonNull(viewModel);
+    SingleSelectionMenuBuilder(@NonNull DialogService dialogService,
+                               @NonNull BibDatabaseContext databaseContext,
+                               @NonNull ObservableOptionalValue<BibEntry> bibEntry,
+                               @NonNull GuiPreferences preferences,
+                               @NonNull LinkedFilesEditorViewModel viewModel) {
+        this.dialogService = dialogService;
+        this.databaseContext = databaseContext;
+        this.bibEntry = bibEntry;
+        this.preferences = preferences;
+        this.viewModel = viewModel;
     }
 
     @Override
@@ -46,8 +46,7 @@ record SingleSelectionMenuBuilder(
     }
 
     @Override
-    public List<MenuItem> buildMenu(ObservableList<LinkedFileViewModel> selection) {
-        Objects.requireNonNull(selection, "selection must not be null");
+    public List<MenuItem> buildMenu(@NonNull ObservableList<LinkedFileViewModel> selection) {
         if (selection.isEmpty()) {
             return List.of();
         }
