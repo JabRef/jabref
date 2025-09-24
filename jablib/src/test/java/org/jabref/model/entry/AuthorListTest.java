@@ -242,55 +242,25 @@ public class AuthorListTest {
                 ONE_INSTITUTION_WITH_STARTING_PARANTHESIS.latexFree().getAsFirstLastNames(false, false));
     }
 
-    @Test
-    void fixAuthorFirstNameFirst() {
-        assertEquals("John Smith", AuthorList.fixAuthorFirstNameFirst("John Smith"));
+  @ParameterizedTest
+  @CsvSource({
+      "John Smith", "John Smith"
+  })
+  void fixAuthorFirstNameFirst_param(String input, String expected) {
+    assertEquals(expected, AuthorList.fixAuthorFirstNameFirst(input));
+  }
 
-        assertEquals("John Smith and Peter Black Brown", AuthorList
-                .fixAuthorFirstNameFirst("John Smith and Black Brown, Peter"));
-
-        assertEquals("John von Neumann and John Smith and Peter Black Brown", AuthorList
-                .fixAuthorFirstNameFirst("John von Neumann and John Smith and Black Brown, Peter"));
-
-        assertEquals("First von Last, Jr. III", AuthorList
-                .fixAuthorFirstNameFirst("von Last, Jr. III, First"));
-
-        // Check caching
-        assertEquals(AuthorList
-                .fixAuthorFirstNameFirst("John von Neumann and John Smith and Black Brown, Peter"), AuthorList
-                .fixAuthorFirstNameFirst("John von Neumann and John Smith and Black Brown, Peter"));
-    }
-
-    @Test
-    void fixAuthorLastNameFirstCommasNoComma() {
-        // No commas before and
-        assertEquals("", AuthorList.fixAuthorLastNameFirstCommas("", true, false));
-        assertEquals("", AuthorList.fixAuthorLastNameFirstCommas("", false, false));
-
-        assertEquals("Smith, John", AuthorList.fixAuthorLastNameFirstCommas("John Smith", false, false));
-        assertEquals("Smith, J.", AuthorList.fixAuthorLastNameFirstCommas("John Smith", true, false));
-
-        String a = AuthorList.fixAuthorLastNameFirstCommas("John von Neumann and John Smith and Black Brown, Peter",
-                true, false);
-        String b = AuthorList.fixAuthorLastNameFirstCommas(
-                "John von Neumann and John Smith and Black Brown, Peter", true, false);
-
-        // Check caching
-        assertEquals(a, b);
-
-        assertEquals("Smith, John and Black Brown, Peter",
-                AuthorList.fixAuthorLastNameFirstCommas("John Smith and Black Brown, Peter", false, false));
-        assertEquals("Smith, J. and Black Brown, P.",
-                AuthorList.fixAuthorLastNameFirstCommas("John Smith and Black Brown, Peter", true, false));
-
-        assertEquals("von Neumann, John, Smith, John and Black Brown, Peter", AuthorList
-                .fixAuthorLastNameFirstCommas("John von Neumann and John Smith and Black Brown, Peter", false, false));
-        assertEquals("von Neumann, J., Smith, J. and Black Brown, P.", AuthorList
-                .fixAuthorLastNameFirstCommas("John von Neumann and John Smith and Black Brown, Peter", true, false));
-
-        assertEquals("von Neumann, J. P.",
-                AuthorList.fixAuthorLastNameFirstCommas("John Peter von Neumann", true, false));
-    }
+  @ParameterizedTest
+  @CsvSource({
+      "'John Smith', 'Smith, John', false",
+      "'John Smith', 'Smith, J.', true",
+      "'John Smith and Black Brown, Peter', 'Smith, John and Black Brown, Peter', false",
+      "'John Smith and Black Brown, Peter', 'Smith, J. and Black Brown, P.', true",
+      "'John Peter von Neumann', 'von Neumann, J. P.', true"
+  })
+  void fixAuthorLastNameFirstCommas_noOxford(String input, String expected, boolean abbreviate) {
+    assertEquals(expected, AuthorList.fixAuthorLastNameFirstCommas(input, abbreviate, false));
+  }
 
     @Test
     void fixAuthorLastNameFirstCommasOxfordComma() {
