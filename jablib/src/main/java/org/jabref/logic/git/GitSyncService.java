@@ -27,7 +27,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 
-/// GitSyncService currently serves as an orchestrator for Git pull/push logic (不负责写入).
+/// GitSyncService currently serves as an orchestrator for Git pull/push logic (Not responsible for writing.).
 ///
 /// if (hasConflict)
 ///     → UI computeMergePlan;

@@ -24,7 +24,7 @@ import static com.google.common.collect.Sets.union;
 /// Detects semantic merge conflicts between base, local, and remote.
 ///
 /// Strategy:
-/// Instead of computing full diffs from base to local/remote, we simulate a Git-style computeMergePlan
+/// Instead of computing full diffs from base to local/remote, we simulate a Git-style merge
 /// by applying the diff between base and remote onto local (`result := local + remoteDiff`).
 ///
 /// Caveats:
@@ -177,7 +177,7 @@ public class SemanticConflictDetector {
 
     /**
      * Compares base and remote, finds all semantic-level changes (new entries, updated fields), and builds a patch plan.
-     * This plan is meant to be applied to local during computeMergePlan:
+     * This plan is meant to be applied to local during merge:
      * result = local + (remote − base)
      *
      * @param base   The base version of the database.
@@ -267,7 +267,7 @@ public class SemanticConflictDetector {
      * and the value is the corresponding BibEntryDiff.
      * <p>
      * Notes:
-     * - Only entries with a citation key are included (entries without a key cannot be uniquely identified during computeMergePlan).
+     * - Only entries with a citation key are included (entries without a key cannot be uniquely identified during merge).
      * - Entries that represent additions (base == null) or deletions (new == null) are also included.
      * - If multiple BibEntryDiffs share the same citation key (rare), the latter one will overwrite the former.
      * <p>
