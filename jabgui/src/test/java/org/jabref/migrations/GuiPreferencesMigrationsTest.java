@@ -29,9 +29,9 @@ class GuiPreferencesMigrationsTest {
     private JabRefGuiPreferences preferences;
     private Preferences mainPrefsNode;
 
-    private final String[] oldStylePatterns = new String[]{"\\bibtexkey",
+    private final String[] oldStylePatterns = new String[] {"\\bibtexkey",
             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
-    private final String[] newStylePatterns = new String[]{"[citationkey]",
+    private final String[] newStylePatterns = new String[] {"[citationkey]",
             "[citationkey] - [title]"};
 
     @BeforeEach

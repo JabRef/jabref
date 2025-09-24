@@ -14,6 +14,7 @@ env:
   BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
+  MedlineAPiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
 
@@ -29,6 +30,7 @@ permissions:
 
 jobs:
   upload-pr-number:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Create pr_number.txt
@@ -52,6 +54,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Run checkstyle reporter
         uses: dbelyaev/action-checkstyle@master
         with:
@@ -91,6 +94,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -111,6 +115,18 @@ jobs:
         run: |
           ./gradlew --no-configuration-cache :rewriteDryRun
 
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: koppor/intellij-idea-format@update-to-latest-intellij
+        with:
+          file-mask: "*.java"
+          settings-file: ".idea/codeStyles/Project.xml"
+      # job should fail in case there are changes
+      - name: Check if any files changed
+        run: git diff --exit-code
+
   modernizer:
     name: Modernizer
     runs-on: ubuntu-latest
@@ -125,6 +141,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -242,6 +259,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -277,6 +295,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -325,6 +344,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -374,6 +394,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -422,6 +443,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -462,6 +484,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -479,7 +502,7 @@ jobs:
 
       - name: Detect changed jablib classes
         id: changed-jablib-files
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             jablib/src/main/java/**/*.java
@@ -538,6 +561,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Generate JBang cache key
@@ -583,6 +607,7 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew traceRequirements

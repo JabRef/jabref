@@ -61,9 +61,17 @@ public abstract class Exporter {
      * @param file            the file to write to
      * @param entries         a list containing all entries that should be exported
      */
-    public abstract void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException, TransformerException, ParserConfigurationException, SaveException;
+    public abstract void export(BibDatabaseContext databaseContext,
+                                Path file,
+                                List<BibEntry> entries)
+            throws IOException, TransformerException, ParserConfigurationException, SaveException;
 
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries, List<Path> fileDirForDatabase, JournalAbbreviationRepository abbreviationRepository) throws IOException, SaveException, ParserConfigurationException, TransformerException {
+    public void export(BibDatabaseContext databaseContext,
+                       Path file,
+                       List<BibEntry> entries,
+                       List<Path> fileDirForDatabase,
+                       JournalAbbreviationRepository abbreviationRepository)
+            throws IOException, SaveException, ParserConfigurationException, TransformerException {
         export(databaseContext, file, entries);
     }
 

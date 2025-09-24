@@ -24,7 +24,7 @@ public class ShortTitleFormatter extends Formatter {
 
         return title.getWords().stream()
                     .filter(Predicate.not(
-                                        Word::isSmallerWord))
+                            Word::isSmallerWord))
                     .map(Word::toString)
                     .limit(3)
                     .collect(Collectors.joining(" "));

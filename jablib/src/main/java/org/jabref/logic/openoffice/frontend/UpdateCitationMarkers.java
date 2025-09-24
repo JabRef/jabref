@@ -34,7 +34,7 @@ public class UpdateCitationMarkers {
      * <p>
      * After each fillCitationMarkInCursor call check if we lost the BIB_SECTION_NAME bookmark and recreate it if we did.
      *
-     * @param style    Bibliography style to use.
+     * @param style Bibliography style to use.
      */
     public static void applyNewCitationMarkers(XTextDocument doc, OOFrontend frontend, JStyle style)
             throws
@@ -80,8 +80,8 @@ public class UpdateCitationMarkers {
             OOText citationText2 = style.decorateCitationMarker(citationText);
             String ZERO_WIDTH_SPACE = "";
             if (style.spaceBeforeCitation()) {
-              // inject a ZERO_WIDTH_SPACE to hold the initial character format
-              ZERO_WIDTH_SPACE = "\u200b";
+                // inject a ZERO_WIDTH_SPACE to hold the initial character format
+                ZERO_WIDTH_SPACE = "\u200b";
             }
             citationText2 = OOText.fromString(ZERO_WIDTH_SPACE + citationText2.toString());
             OOTextIntoOO.write(doc, cursor, citationText2);

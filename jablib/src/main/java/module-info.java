@@ -115,6 +115,8 @@ open module org.jabref.jablib {
     exports org.jabref.logic.command;
     exports org.jabref.logic.git.util;
     exports org.jabref.logic.git.preferences;
+    exports org.jabref.logic.icore;
+    exports org.jabref.model.icore;
 
     requires java.base;
 
@@ -215,10 +217,6 @@ open module org.jabref.jablib {
     requires jvm.openai;
     requires langchain4j;
     requires langchain4j.core;
-    requires langchain4j.google.ai.gemini;
-    requires langchain4j.hugging.face;
-    requires langchain4j.mistral.ai;
-    requires langchain4j.open.ai;
     uses ai.djl.engine.EngineProvider;
     uses ai.djl.repository.RepositoryFactory;
     uses ai.djl.repository.zoo.ZooProvider;
