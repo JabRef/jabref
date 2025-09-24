@@ -16,7 +16,7 @@ import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileWriter;
-import org.jabref.logic.git.model.FinalizeResult;
+import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.MergePlan;
 import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.util.GitHandlerRegistry;
@@ -105,8 +105,7 @@ public class GitPullAction extends SimpleCommand {
                     int manualResolvedCount;
                     if (!conflicts.isEmpty()) {
                         // resolve via GUI (strategy jumps to FX thread internally; safe to call from background)
-                        GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(
-                                new GitConflictResolverDialog(dialogService, guiPreferences));
+                        GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(new GitConflictResolverDialog(dialogService, guiPreferences));
                         List<BibEntry> resolved = resolver.resolveConflicts(conflicts);
                         if (resolved.isEmpty()) {
                             dialogService.notify(Localization.lang("Pull canceled."));
@@ -162,9 +161,9 @@ public class GitPullAction extends SimpleCommand {
         return gitSyncService.prepareMerge(databaseContext, bibPath);
     }
 
-    private FinalizeResult saveAndFinalize(Path bibPath,
-                                           BibDatabaseContext databaseContext,
-                                           PullPlan pullPlan)
+    private BookkeepingResult saveAndFinalize(Path bibPath,
+                                              BibDatabaseContext databaseContext,
+                                              PullPlan pullPlan)
             throws IOException, GitAPIException, JabRefException {
         GitFileWriter.write(bibPath, databaseContext, guiPreferences.getImportFormatPreferences());
         // Git bookkeeping
@@ -177,17 +176,17 @@ public class GitPullAction extends SimpleCommand {
     /// Apply (remote - base) patches safely into the in-memory DB, plus safe new/deleted entries.
     private static void applyAutoPlan(BibDatabaseContext bibDatabaseContext, MergePlan plan) {
         // new entries
-        for (BibEntry e : plan.newEntries()) {
-            bibDatabaseContext.getDatabase().insertEntry(new BibEntry(e));
+        for (BibEntry entry : plan.newEntries()) {
+            bibDatabaseContext.getDatabase().insertEntry(new BibEntry(entry));
         }
         // field patches (null means delete field)
         plan.fieldPatches().forEach((key, patch) ->
                 bibDatabaseContext.getDatabase().getEntryByCitationKey(key).ifPresent(entry -> {
-                    patch.forEach((field, newVal) -> {
-                        if (newVal == null) {
+                    patch.forEach((field, newValue) -> {
+                        if (newValue == null) {
                             entry.clearField(field);
                         } else {
-                            entry.setField(field, newVal);
+                            entry.setField(field, newValue);
                         }
                     });
                 })
@@ -206,21 +205,17 @@ public class GitPullAction extends SimpleCommand {
         for (BibEntry merged : resolved) {
             merged.getCitationKey().ifPresent(key -> {
                 bibDatabaseContext.getDatabase().getEntryByCitationKey(key).ifPresentOrElse(existing -> {
-                    // Replace content of existing entry with the resolved one
                     existing.setType(merged.getType());
-                    // Clear fields that disappeared; then copy all fields from resolved
-                    existing.getFields().forEach(f -> {
-                        if (merged.getField(f).isEmpty()) {
-                            existing.clearField(f);
+                    existing.getFields().forEach(field -> {
+                        if (merged.getField(field).isEmpty()) {
+                            existing.clearField(field);
                         }
                     });
-                    merged.getFields().forEach(f -> merged.getField(f).ifPresent(v -> existing.setField(f, v)));
+                    merged.getFields().forEach(field -> merged.getField(field).ifPresent(value -> existing.setField(field, value)));
                 }, () -> bibDatabaseContext.getDatabase().insertEntry(new BibEntry(merged)));
             });
         }
     }
-
-    // ------------------- helpers -------------------
 
     private void showPullError(Throwable exception) {
         if (exception instanceof JabRefException e) {

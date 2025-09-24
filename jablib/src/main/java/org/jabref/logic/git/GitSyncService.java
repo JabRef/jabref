@@ -13,7 +13,7 @@ import org.jabref.logic.git.io.RevisionTriple;
 import org.jabref.logic.git.merge.DefaultMergeBookkeeper;
 import org.jabref.logic.git.merge.MergeBookkeeper;
 import org.jabref.logic.git.merge.SemanticMergeAnalyzer;
-import org.jabref.logic.git.model.FinalizeResult;
+import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.MergeAnalysis;
 import org.jabref.logic.git.model.MergePlan;
 import org.jabref.logic.git.model.PullPlan;
@@ -29,10 +29,10 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 
-/// GitSyncService currently serves as an orchestrator for Git pull/push logic (不负责写入).
+/// GitSyncService currently serves as an orchestrator for Git pull/push logic (Not responsible for writing.).
 ///
 /// if (hasConflict)
-///     → UI computeMergePlan;
+///     → UI merge;
 /// else
 ///     → autoMerge := local + remoteDiff
 ///
@@ -58,7 +58,7 @@ public class GitSyncService {
         );
     }
 
-    ///  compute computeMergePlan inputs/outputs for GUI
+    ///  compute merge inputs/outputs for GUI
     public PullPlan prepareMerge(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
         Optional<Path> repoRoot = GitHandler.findRepositoryRoot(bibFilePath);
         if (repoRoot.isEmpty()) {
@@ -74,7 +74,7 @@ public class GitSyncService {
         }
 
         if (status.conflict()) {
-            throw new JabRefException("Pull aborted: Local repository has unresolved computeMergePlan conflicts.");
+            throw new JabRefException("Pull aborted: Local repository has unresolved merge conflicts.");
         }
 
         // Prevent rollback from overwriting the user's uncommitted changes
@@ -129,20 +129,18 @@ public class GitSyncService {
         }
     }
 
-    /**
-     * Phase-2: finalize after GUI saved the file with applied plan.
-     * <p>
-     * Responsibilities:
-     * - (Re)open repo, stage bib file
-     * - For BEHIND: fast-forward or create commit consistent with GUI-saved tree
-     * - For DIVERGED: create computeMergePlan commit with parents (localHead, remote)
-     * <p>
-     * Preconditions:
-     * - The bib file on disk already reflects: local + autoPlan (+ resolvedPlan)
-     * - No uncommitted unrelated changes
-     */
-    public FinalizeResult finalizeMerge(Path bibFilePath,
-                                        PullPlan computation) throws GitAPIException, IOException, JabRefException {
+    /// Phase-2: finalize after GUI saved the file with applied plan.
+    ///
+    /// Responsibilities:
+    /// - (Re)open repo, stage bib file
+    /// - For BEHIND: fast-forward or create commit consistent with GUI-saved tree
+    /// - For DIVERGED: merge commit with parents (localHead, remote)
+    ///
+    /// Preconditions:
+    /// - The bib file on disk already reflects: local + autoPlan (+ resolvedPlan)
+    /// - No uncommitted unrelated changes
+    public BookkeepingResult finalizeMerge(Path bibFilePath,
+                                           PullPlan computation) throws GitAPIException, IOException, JabRefException {
         return bookkeeper.resultRecord(bibFilePath, computation);
     }
 

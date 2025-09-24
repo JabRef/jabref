@@ -10,7 +10,7 @@ import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.io.GitFileWriter;
-import org.jabref.logic.git.model.FinalizeResult;
+import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.MergePlan;
 import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.model.PushResult;
@@ -218,9 +218,9 @@ class GitSyncServiceTest {
 
         applyAutoPlan(context, pullPlan.autoPlan());
         GitFileWriter.write(library, context, importFormatPreferences);
-        FinalizeResult finalizeResult = syncService.finalizeMerge(library, pullPlan);
+        BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan);
 
-        assertFalse(finalizeResult.isFastForward(), "DIVERGED without conflicts should produce a merge commit");
+        assertFalse(bookkeepingResult.isFastForward(), "DIVERGED without conflicts should produce a merge commit");
         RevCommit head = aliceGit.log().setMaxCount(1).call().iterator().next();
         assertEquals(2, head.getParentCount(), "Expected a two-parent merge commit");
 
@@ -253,8 +253,8 @@ class GitSyncServiceTest {
         applyAutoPlan(context, pullPlan.autoPlan());
         GitFileWriter.write(library, context, importFormatPreferences);
 
-        FinalizeResult finalizeResult = syncService.finalizeMerge(library, pullPlan);
-        assertTrue(finalizeResult.hasNewCommit(), "Expect new commit");
+        BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan);
+        assertTrue(bookkeepingResult.hasNewCommit(), "Expect new commit");
 
         PushResult pushResult = syncService.push(context, library);
         assertTrue(pushResult.successful(), "Push should succeed");
@@ -348,8 +348,8 @@ class GitSyncServiceTest {
         applyResolved(context, resolvedEntries);
 
         GitFileWriter.write(library, context, importFormatPreferences);
-        FinalizeResult finalizeResult = syncService.finalizeMerge(library, pullPlan);
-        assertTrue(finalizeResult.hasNewCommit(), "Expect new commit");
+        BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan);
+        assertTrue(bookkeepingResult.hasNewCommit(), "Expect new commit");
 
         String mergedText = Files.readString(library);
         assertTrue(mergedText.contains("author = {author-a}"), "a.author should be author-a");

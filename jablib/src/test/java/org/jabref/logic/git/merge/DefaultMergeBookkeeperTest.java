@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.io.GitFileReader;
-import org.jabref.logic.git.model.FinalizeResult;
+import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.git.util.NoopGitSystemReader;
@@ -131,7 +131,7 @@ public class DefaultMergeBookkeeperTest {
 
         // Bookkeeping
         MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
-        FinalizeResult result = bookkeeper.resultRecord(bibPath, plan);
+        BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
 
         assertTrue(result.isFastForward(), "Expected a fast-forward");
         // assert：HEAD == origin/main
@@ -175,7 +175,7 @@ public class DefaultMergeBookkeeperTest {
         Files.writeString(bibPath, finalMerged, StandardCharsets.UTF_8);
 
         MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
-        FinalizeResult result = bookkeeper.resultRecord(bibPath, plan);
+        BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
 
         assertTrue(result.hasNewCommit(), "Expected a new single-parent commit on top of remote tip");
 
@@ -226,7 +226,7 @@ public class DefaultMergeBookkeeperTest {
         Files.writeString(bibPath, finalMerged, StandardCharsets.UTF_8);
 
         MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
-        FinalizeResult result = bookkeeper.resultRecord(bibPath, plan);
+        BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
 
         assertTrue(result.hasNewCommit(), "Expected a new merge commit");
         RevCommit head = latestCommit(localGit);

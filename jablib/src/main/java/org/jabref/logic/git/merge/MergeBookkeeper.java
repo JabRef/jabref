@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.git.model.FinalizeResult;
+import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.PullPlan;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -21,5 +21,5 @@ public interface MergeBookkeeper {
      *  - GUI has already saved the final .bib file to disk.
      *  - No unrelated unstaged changes (defensive check recommended).
      */
-    FinalizeResult resultRecord(Path bibFilePath, PullPlan computation) throws IOException, GitAPIException, JabRefException;
+    BookkeepingResult resultRecord(Path bibFilePath, PullPlan computation) throws IOException, GitAPIException, JabRefException;
 }

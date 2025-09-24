@@ -10,7 +10,7 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.io.GitRevisionLocator;
-import org.jabref.logic.git.model.FinalizeResult;
+import org.jabref.logic.git.model.BookkeepingResult;
 import org.jabref.logic.git.model.PullPlan;
 import org.jabref.logic.git.util.GitHandlerRegistry;
 
@@ -34,7 +34,7 @@ public final class DefaultMergeBookkeeper implements MergeBookkeeper {
     }
 
     @Override
-    public FinalizeResult resultRecord(Path bibFilePath, PullPlan computation)
+    public BookkeepingResult resultRecord(Path bibFilePath, PullPlan computation)
             throws IOException, GitAPIException, JabRefException {
 
         Optional<Path> repoRoot = GitHandler.findRepositoryRoot(bibFilePath);
@@ -77,7 +77,7 @@ public final class DefaultMergeBookkeeper implements MergeBookkeeper {
             if (localIsAncestorOfRemote) { // BEHIND (we know remote is ahead of local)
                 if (bibEqualsRemote) {
                     gitHandler.fastForwardTo(remote);
-                    return FinalizeResult.fastForward();
+                    return BookkeepingResult.fastForward();
                 }
                 // Local working tree != remote: The current index tree needs to be attached as a new commit on top of the remote (single parent).
                 return commitWithParents(repo, branchRef, treeId,
@@ -108,11 +108,11 @@ public final class DefaultMergeBookkeeper implements MergeBookkeeper {
         }
     }
 
-    private FinalizeResult commitWithParents(Repository repo,
-                                             String branchRef,
-                                             ObjectId treeId,
-                                             String message,
-                                             ObjectId... parents) throws IOException {
+    private BookkeepingResult commitWithParents(Repository repo,
+                                                String branchRef,
+                                                ObjectId treeId,
+                                                String message,
+                                                ObjectId... parents) throws IOException {
 
         try (ObjectInserter inserter = repo.newObjectInserter()) {
             CommitBuilder cb = new CommitBuilder();
@@ -139,7 +139,7 @@ public final class DefaultMergeBookkeeper implements MergeBookkeeper {
                 case FORCED:
                 case NO_CHANGE:
                 case RENAMED:
-                    return FinalizeResult.newCommit(newCommitId.getName());
+                    return BookkeepingResult.newCommit(newCommitId.getName());
                 default:
                     throw new IOException("Ref update failed: " + r);
             }
