@@ -8,7 +8,9 @@ import org.jabref.logic.JabRefException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.BranchConfig;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -26,9 +28,28 @@ public class GitRevisionLocator {
         ObjectId headId = repo.resolve("HEAD^{commit}");
         assert headId != null : "Local HEAD commit is missing.";
 
-        String trackingBranch = new BranchConfig(repo.getConfig(), repo.getBranch()).getTrackingBranch();
+        // Determine current branch name
+        String fullBranch = repo.getFullBranch(); // e.g. "refs/heads/main"
+        if (fullBranch == null || !fullBranch.startsWith(Constants.R_HEADS)) {
+            throw new JabRefException("Cannot determine current branch (detached HEAD).");
+        }
+        String shortenRefName = Repository.shortenRefName(fullBranch); // e.g. "main"
+        // 1) Try configured upstream (e.g., "refs/remotes/origin/main")
+        String trackingBranch = new BranchConfig(repo.getConfig(), shortenRefName).getTrackingBranch();
         ObjectId remoteId = trackingBranch != null ? repo.resolve(trackingBranch + "^{commit}") : null;
-        assert remoteId != null : "Remote tracking branch is missing.";
+
+        // 2) Fallback to "origin/<branch>" if upstream is not configured but the remote-tracking ref exists
+        if (remoteId == null) {
+            Ref ref = repo.findRef(Constants.R_REMOTES + "origin/" + shortenRefName);
+            if (ref != null) {
+                remoteId = ref.getObjectId();
+            }
+        }
+        if (remoteId == null) {
+            throw new JabRefException(
+                    "Remote tracking branch is missing for '" + shortenRefName + "'. " +
+                            "Please set upstream, e.g.: git branch --set-upstream-to=origin/" + shortenRefName + " " + shortenRefName);
+        }
 
         try (RevWalk walk = new RevWalk(git.getRepository())) {
             RevCommit local = walk.parseCommit(headId);

@@ -105,8 +105,7 @@ public class GitPullAction extends SimpleCommand {
                     int manualResolvedCount;
                     if (!conflicts.isEmpty()) {
                         // resolve via GUI (strategy jumps to FX thread internally; safe to call from background)
-                        GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(
-                                new GitConflictResolverDialog(dialogService, guiPreferences));
+                        GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(new GitConflictResolverDialog(dialogService, guiPreferences));
                         List<BibEntry> resolved = resolver.resolveConflicts(conflicts);
                         if (resolved.isEmpty()) {
                             dialogService.notify(Localization.lang("Pull canceled."));
@@ -175,24 +174,24 @@ public class GitPullAction extends SimpleCommand {
 
     private static void applyAutoPlan(BibDatabaseContext bibDatabaseContext, MergePlan plan) {
         // new entries
-        for (BibEntry e : plan.newEntries()) {
-            bibDatabaseContext.getDatabase().insertEntry(new BibEntry(e));
+        for (BibEntry entry : plan.newEntries()) {
+            bibDatabaseContext.getDatabase().insertEntry(new BibEntry(entry));
         }
         // field patches (null means delete field)
         plan.fieldPatches().forEach((key, patch) ->
                 bibDatabaseContext.getDatabase().getEntryByCitationKey(key).ifPresent(entry -> {
-                    patch.forEach((field, newVal) -> {
-                        if (newVal == null) {
+                    patch.forEach((field, newValue) -> {
+                        if (newValue == null) {
                             entry.clearField(field);
                         } else {
-                            entry.setField(field, newVal);
+                            entry.setField(field, newValue);
                         }
                     });
                 })
         );
         // deletions that are semantically safe (local kept base)
         for (String key : plan.deletedEntryKeys()) {
-            bibDatabaseContext.getDatabase().getEntryByCitationKey(key).ifPresent(e -> bibDatabaseContext.getDatabase().removeEntry(e));
+            bibDatabaseContext.getDatabase().getEntryByCitationKey(key).ifPresent(entry -> bibDatabaseContext.getDatabase().removeEntry(entry));
         }
     }
 
@@ -205,12 +204,12 @@ public class GitPullAction extends SimpleCommand {
             merged.getCitationKey().ifPresent(key -> {
                 bibDatabaseContext.getDatabase().getEntryByCitationKey(key).ifPresentOrElse(existing -> {
                     existing.setType(merged.getType());
-                    existing.getFields().forEach(f -> {
-                        if (merged.getField(f).isEmpty()) {
-                            existing.clearField(f);
+                    existing.getFields().forEach(field -> {
+                        if (merged.getField(field).isEmpty()) {
+                            existing.clearField(field);
                         }
                     });
-                    merged.getFields().forEach(f -> merged.getField(f).ifPresent(v -> existing.setField(f, v)));
+                    merged.getFields().forEach(field -> merged.getField(field).ifPresent(value -> existing.setField(field, value)));
                 }, () -> bibDatabaseContext.getDatabase().insertEntry(new BibEntry(merged)));
             });
         }
