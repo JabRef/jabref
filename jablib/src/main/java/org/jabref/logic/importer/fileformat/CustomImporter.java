@@ -14,6 +14,8 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.FileType;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Object with data for a custom importer.
  *
@@ -70,12 +72,12 @@ public class CustomImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
         return importer.isRecognizedFormat(input);
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader input) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader input) throws IOException {
         return importer.importDatabase(input);
     }
 

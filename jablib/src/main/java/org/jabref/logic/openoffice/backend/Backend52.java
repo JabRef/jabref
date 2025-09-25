@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,6 +32,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,7 +166,7 @@ public class Backend52 {
      */
     public CitationGroup createCitationGroup(XTextDocument doc,
                                              List<String> citationKeys,
-                                             List<Optional<OOText>> pageInfos,
+                                             @NonNull List<Optional<OOText>> pageInfos,
                                              CitationType citationType,
                                              XTextCursor position,
                                              boolean insertSpaceAfter)
@@ -178,7 +178,6 @@ public class Backend52 {
             PropertyVetoException,
             IllegalTypeException {
 
-        Objects.requireNonNull(pageInfos);
         if (pageInfos.size() != citationKeys.size()) {
             throw new IllegalArgumentException();
         }

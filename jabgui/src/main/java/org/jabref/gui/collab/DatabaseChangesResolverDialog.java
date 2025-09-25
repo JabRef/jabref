@@ -103,7 +103,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
         previewViewer.setDatabaseContext(database);
         DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, themeManager, preferences, entryTypesManager, previewViewer, taskExecutor);
 
-        viewModel = new ExternalChangesResolverViewModel(changes, undoManager);
+        viewModel = new ExternalChangesResolverViewModel(changes);
 
         changeName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
         askUserToResolveChangeButton.disableProperty().bind(viewModel.canAskUserToResolveChangeProperty().not());

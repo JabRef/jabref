@@ -13,6 +13,8 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jspecify.annotations.NonNull;
+
 public class ContentSelectors {
 
     public static final List<Field> DEFAULT_FIELD_NAMES = List.of(StandardField.AUTHOR, StandardField.JOURNAL, StandardField.KEYWORDS, StandardField.PUBLISHER);
@@ -35,16 +37,11 @@ public class ContentSelectors {
         });
     }
 
-    public void addContentSelector(ContentSelector contentSelector) {
-        Objects.requireNonNull(contentSelector);
-
+    public void addContentSelector(@NonNull ContentSelector contentSelector) {
         this.contentSelectors.add(contentSelector);
     }
 
-    public static ContentSelector parse(Field key, String values) {
-        Objects.requireNonNull(key);
-        Objects.requireNonNull(values);
-
+    public static ContentSelector parse(@NonNull Field key, @NonNull String values) {
         List<String> valueList = Arrays.asList(values.split(";"));
 
         return new ContentSelector(key, valueList);

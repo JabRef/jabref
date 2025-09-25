@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabase;
@@ -20,6 +19,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.jspecify.annotations.NonNull;
 
 public class BstVM {
 
@@ -66,9 +66,7 @@ public class BstVM {
      * @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
      * @return list of references in plain text form
      */
-    public String render(Collection<BibEntry> bibEntries, BibDatabase bibDatabase) {
-        Objects.requireNonNull(bibEntries);
-
+    public String render(@NonNull Collection<BibEntry> bibEntries, BibDatabase bibDatabase) {
         // needs to be modifiable due to sort operations later
         List<BstEntry> entries = bibEntries.stream().map(BstEntry::new).collect(Collectors.toList());
 

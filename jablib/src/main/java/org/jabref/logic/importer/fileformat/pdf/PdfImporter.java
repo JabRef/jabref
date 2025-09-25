@@ -15,6 +15,7 @@ import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.jspecify.annotations.NonNull;
 
 /// Intermediate class to bundle all PDF analysis steps. [PdfImporter]s are also [org.jabref.logic.importer.Importer]s,
 /// which allows user for more fine-grained control of how [BibEntry] is extracted from a PDF file.
@@ -31,12 +32,12 @@ public abstract class PdfImporter extends Importer {
     public abstract List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException;
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
         return input.readLine().startsWith("%PDF");
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         throw new UnsupportedOperationException("PdfImporter does not support importDatabase(BufferedReader reader). "
                 + "Instead use importDatabase(Path filePath).");
     }
