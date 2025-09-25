@@ -176,7 +176,7 @@ public class UnlinkedFilesDialogViewModel {
                     existingLinkedFiles.add(foundFile);
 
                     results.add(new ImportFilesResultItemViewModel(foundFile, true,
-                            Localization.lang("File relinked to entry %0", exactFileName)));
+                            Localization.lang("File relinked to entry %0.", exactFileName)));
                 }
 
                 if (!filesToRemove.isEmpty() || !filesToAdd.isEmpty()) {
