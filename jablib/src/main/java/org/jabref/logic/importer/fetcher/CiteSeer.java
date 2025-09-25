@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
@@ -24,6 +23,7 @@ import kong.unirest.core.JsonNode;
 import kong.unirest.core.Unirest;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONElement;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,9 +96,7 @@ public class CiteSeer implements SearchBasedFetcher, FulltextFetcher {
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
-        Objects.requireNonNull(entry);
-
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
         // does not use a valid DOI, but Cite Seer's id / hash available for each entry
         Optional<String> id = entry.getField(StandardField.DOI);
         if (id.isPresent()) {

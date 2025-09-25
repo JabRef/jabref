@@ -23,6 +23,8 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Imports an Ovid file.
  */
@@ -69,7 +71,7 @@ public class OvidImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
         String str;
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < MAX_ITEMS)) {
@@ -82,7 +84,7 @@ public class OvidImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         String line;

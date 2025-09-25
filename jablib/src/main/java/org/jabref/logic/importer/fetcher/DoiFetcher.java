@@ -38,6 +38,7 @@ import com.google.common.util.concurrent.RateLimiter;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,7 +204,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         Optional<String> doi = entry.getField(StandardField.DOI);
         if (doi.isPresent()) {
             return OptionalUtil.toList(performSearchById(doi.get()));

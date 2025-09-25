@@ -36,7 +36,6 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -69,16 +68,6 @@ class CleanupWorkerTest {
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
         worker = new CleanupWorker(context, fileDirPrefs, mock(TimestampPreferences.class));
-    }
-
-    @Test
-    void cleanupWithNullPresetThrowsException() {
-        assertThrows(NullPointerException.class, () -> worker.cleanup(null, new BibEntry()));
-    }
-
-    @Test
-    void cleanupNullEntryThrowsException() {
-        assertThrows(NullPointerException.class, () -> worker.cleanup(emptyPreset, null));
     }
 
     @Test
