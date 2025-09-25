@@ -1,7 +1,5 @@
 package org.jabref.gui.cleanup;
 
-import java.util.Objects;
-
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
 
@@ -11,6 +9,7 @@ import org.jabref.logic.cleanup.CleanupTabSelection;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jspecify.annotations.NonNull;
 
 public class CleanupSingleFieldPanel extends VBox {
 
@@ -19,10 +18,8 @@ public class CleanupSingleFieldPanel extends VBox {
     private final CleanupSingleFieldViewModel viewModel;
     private final CleanupDialogViewModel dialogViewModel;
 
-    public CleanupSingleFieldPanel(CleanupPreferences cleanupPreferences,
-                                   CleanupDialogViewModel dialogViewModel) {
-        Objects.requireNonNull(cleanupPreferences, "cleanupPreferences must not be null");
-        Objects.requireNonNull(dialogViewModel, "viewModel must not be null");
+    public CleanupSingleFieldPanel(@NonNull CleanupPreferences cleanupPreferences,
+                                   @NonNull CleanupDialogViewModel dialogViewModel) {
 
         this.dialogViewModel = dialogViewModel;
         this.viewModel = new CleanupSingleFieldViewModel(cleanupPreferences.getFieldFormatterCleanups());

@@ -2,7 +2,6 @@ package org.jabref.gui.cleanup;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.Optional;
 
 import javafx.fxml.FXML;
@@ -18,6 +17,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jspecify.annotations.NonNull;
 
 public class CleanupFileRelatedPanel extends VBox {
 
@@ -33,14 +33,10 @@ public class CleanupFileRelatedPanel extends VBox {
     private final CleanupFileViewModel viewModel;
     private final CleanupDialogViewModel dialogViewModel;
 
-    public CleanupFileRelatedPanel(BibDatabaseContext databaseContext,
-                                   CleanupPreferences cleanupPreferences,
-                                   FilePreferences filePreferences,
-                                   CleanupDialogViewModel dialogViewModel) {
-        Objects.requireNonNull(databaseContext, "databaseContext must not be null");
-        Objects.requireNonNull(cleanupPreferences, "cleanupPreferences must not be null");
-        Objects.requireNonNull(filePreferences, "filePreferences must not be null");
-        Objects.requireNonNull(dialogViewModel, "viewModel must not be null");
+    public CleanupFileRelatedPanel(@NonNull BibDatabaseContext databaseContext,
+                                   @NonNull CleanupPreferences cleanupPreferences,
+                                   @NonNull FilePreferences filePreferences,
+                                   @NonNull CleanupDialogViewModel dialogViewModel) {
 
         this.dialogViewModel = dialogViewModel;
         this.viewModel = new CleanupFileViewModel(cleanupPreferences);

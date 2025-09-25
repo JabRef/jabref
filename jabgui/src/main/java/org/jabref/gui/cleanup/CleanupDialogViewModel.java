@@ -31,6 +31,8 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NonNull;
+
 public class CleanupDialogViewModel extends AbstractViewModel {
 
     private final BibDatabaseContext databaseContext;
@@ -45,19 +47,19 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     private int modifiedEntriesCount;
 
     public CleanupDialogViewModel(
-            BibDatabaseContext databaseContext,
-            CliPreferences preferences,
-            DialogService dialogService,
-            StateManager stateManager,
-            UndoManager undoManager,
+            @NonNull BibDatabaseContext databaseContext,
+            @NonNull CliPreferences preferences,
+            @NonNull DialogService dialogService,
+            @NonNull StateManager stateManager,
+            @NonNull UndoManager undoManager,
             Supplier<LibraryTab> tabSupplier,
             TaskExecutor taskExecutor
     ) {
-        this.databaseContext = Objects.requireNonNull(databaseContext);
-        this.preferences = Objects.requireNonNull(preferences);
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.stateManager = Objects.requireNonNull(stateManager);
-        this.undoManager = Objects.requireNonNull(undoManager);
+        this.databaseContext = databaseContext;
+        this.preferences = preferences;
+        this.dialogService = dialogService;
+        this.stateManager = stateManager;
+        this.undoManager = undoManager;
 
         this.tabSupplier = tabSupplier; // can be null
         this.taskExecutor = taskExecutor; // can be null
