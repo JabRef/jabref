@@ -21,94 +21,39 @@ public class CleanupMultiFieldPanel extends VBox {
     @FXML private CheckBox cleanupTimestampToCreationDate;
     @FXML private CheckBox cleanupTimestampToModificationDate;
 
-    private final CleanupDialogViewModel viewModel;
+    private final CleanupMultiFieldViewModel viewModel;
+    private final CleanupDialogViewModel dialogViewModel;
 
     public CleanupMultiFieldPanel(CleanupPreferences cleanupPreferences,
-                                  CleanupDialogViewModel viewModel) {
+                                  CleanupDialogViewModel dialogViewModel) {
         Objects.requireNonNull(cleanupPreferences, "cleanupPreferences must not be null");
-        Objects.requireNonNull(viewModel, "viewModel must not be null");
+        Objects.requireNonNull(dialogViewModel, "viewModel must not be null");
 
-        this.viewModel = viewModel;
+        this.dialogViewModel = dialogViewModel;
+        this.viewModel = new CleanupMultiFieldViewModel(cleanupPreferences);
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
-        init(cleanupPreferences);
+        bindProperties();
     }
 
-    private void init(CleanupPreferences cleanupPreferences) {
-        cleanupBibTeX.selectedProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        cleanupBibLaTeX.selectedProperty().setValue(false);
-                    }
-                });
-        cleanupBibLaTeX.selectedProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        cleanupBibTeX.selectedProperty().setValue(false);
-                    }
-                });
-
-        cleanupTimestampToCreationDate.selectedProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        cleanupTimestampToModificationDate.selectedProperty().setValue(false);
-                    }
-                });
-        cleanupTimestampToModificationDate.selectedProperty().addListener(
-                (observable, oldValue, newValue) -> {
-                    if (newValue) {
-                        cleanupTimestampToCreationDate.selectedProperty().setValue(false);
-                    }
-                });
-        updateDisplay(cleanupPreferences);
-    }
-
-    private void updateDisplay(CleanupPreferences preset) {
-        cleanupDOI.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DOI));
-        cleanupEprint.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEANUP_EPRINT));
-        cleanupURL.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_URL));
-        cleanupBibLaTeX.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX));
-        cleanupBibTeX.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
-        cleanupTimestampToCreationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
-        cleanupTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
-        cleanupTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
-    }
-
-    public EnumSet<CleanupPreferences.CleanupStep> getSelectedJobs() {
-        EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
-
-        if (cleanupDOI.isSelected()) {
-            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DOI);
-        }
-        if (cleanupEprint.isSelected()) {
-            activeJobs.add(CleanupPreferences.CleanupStep.CLEANUP_EPRINT);
-        }
-        if (cleanupURL.isSelected()) {
-            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_URL);
-        }
-        if (cleanupBibLaTeX.isSelected()) {
-            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX);
-        }
-        if (cleanupBibTeX.isSelected()) {
-            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX);
-        }
-        if (cleanupTimestampToCreationDate.isSelected()) {
-            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE);
-        }
-        if (cleanupTimestampToModificationDate.isSelected()) {
-            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
-        }
-
-        return activeJobs;
+    private void bindProperties() {
+        cleanupDOI.selectedProperty().bindBidirectional(viewModel.doiSelected);
+        cleanupEprint.selectedProperty().bindBidirectional(viewModel.eprintSelected);
+        cleanupURL.selectedProperty().bindBidirectional(viewModel.urlSelected);
+        cleanupBibTeX.selectedProperty().bindBidirectional(viewModel.bibTexSelected);
+        cleanupBibLaTeX.selectedProperty().bindBidirectional(viewModel.bibLaTexSelected);
+        cleanupTimestampToCreationDate.selectedProperty().bindBidirectional(viewModel.timestampToCreationSelected);
+        cleanupTimestampToModificationDate.selectedProperty().bindBidirectional(viewModel.timestampToModificationSelected);
     }
 
     @FXML
     private void onApply() {
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupDialogViewModel.MULTI_FIELD_JOBS, getSelectedJobs());
-        viewModel.apply(selectedTab);
+        EnumSet<CleanupPreferences.CleanupStep> selectedJobs = viewModel.getSelectedJobs();
+        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupDialogViewModel.MULTI_FIELD_JOBS, selectedJobs);
+        dialogViewModel.apply(selectedTab);
         getScene().getWindow().hide();
     }
 }

@@ -30,35 +30,38 @@ public class CleanupFileRelatedPanel extends VBox {
     @FXML private CheckBox cleanupDeletedFiles;
     @FXML private CheckBox cleanupUpgradeExternalLinks;
 
-    private final CleanupDialogViewModel viewModel;
+
+    private final CleanupFileViewModel viewModel;
+    private final CleanupDialogViewModel dialogViewModel;
 
     public CleanupFileRelatedPanel(BibDatabaseContext databaseContext,
                                    CleanupPreferences cleanupPreferences,
                                    FilePreferences filePreferences,
-                                   CleanupDialogViewModel viewModel) {
+                                   CleanupDialogViewModel dialogViewModel) {
         Objects.requireNonNull(databaseContext, "databaseContext must not be null");
         Objects.requireNonNull(cleanupPreferences, "cleanupPreferences must not be null");
         Objects.requireNonNull(filePreferences, "filePreferences must not be null");
-        Objects.requireNonNull(viewModel, "viewModel must not be null");
+        Objects.requireNonNull(dialogViewModel, "viewModel must not be null");
 
-        this.viewModel = viewModel;
+        this.dialogViewModel = dialogViewModel;
+        this.viewModel = new CleanupFileViewModel(cleanupPreferences);
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
-        init(databaseContext, cleanupPreferences, filePreferences);
+        init(databaseContext, filePreferences);
+        bindProperties();
     }
 
-    private void init(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
+    private void init(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         Optional<Path> firstExistingDir = databaseContext.getFirstExistingFileDir(filePreferences);
         if (firstExistingDir.isPresent()) {
             cleanupMovePdf.setText(Localization.lang("Move linked files to default file directory %0", firstExistingDir.get().toString()));
         } else {
             cleanupMovePdf.setText(Localization.lang("Move linked files to default file directory %0", "..."));
-
-            cleanupMovePdf.setDisable(true);
-            cleanupMovePdf.setSelected(false);
+            viewModel.movePdfEnabled.set(false);
+            viewModel.movePdfSelected.set(false);
         }
 
         cleanupRenamePdfonlyRelativePaths.disableProperty().bind(cleanupRenamePdf.selectedProperty().not());
@@ -68,48 +71,24 @@ public class CleanupFileRelatedPanel extends VBox {
         String currentPattern = Localization.lang("Filename format pattern (from preferences)")
                                             .concat(filePreferences.getFileNamePattern());
         cleanupRenamePdfLabel.setText(currentPattern);
-
-        updateDisplay(cleanupPreferences);
     }
 
-    private void updateDisplay(CleanupPreferences preset) {
-        if (!cleanupMovePdf.isDisabled()) {
-            cleanupMovePdf.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MOVE_PDF));
-        }
-        cleanupMakePathsRelative.setSelected(preset.isActive(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE));
-        cleanupRenamePdf.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF));
-        cleanupRenamePdfonlyRelativePaths.setSelected(preset.isActive(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS));
-        cleanupUpgradeExternalLinks.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
-        cleanupDeletedFiles.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES));
-    }
+    private void bindProperties() {
+        cleanupMovePdf.selectedProperty().bindBidirectional(viewModel.movePdfSelected);
+        cleanupMovePdf.disableProperty().bind(viewModel.movePdfEnabled.not());
 
-    public EnumSet<CleanupPreferences.CleanupStep> getSelectedJobs() {
-        EnumSet<CleanupPreferences.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreferences.CleanupStep.class);
-
-        if (cleanupMakePathsRelative.isSelected()) {
-            activeJobs.add(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE);
-        }
-        if (cleanupRenamePdf.isSelected()) {
-            if (cleanupRenamePdfonlyRelativePaths.isSelected()) {
-                activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS);
-            } else {
-                activeJobs.add(CleanupPreferences.CleanupStep.RENAME_PDF);
-            }
-        }
-        if (cleanupUpgradeExternalLinks.isSelected()) {
-            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS);
-        }
-        if (cleanupDeletedFiles.isSelected()) {
-            activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES);
-        }
-
-        return activeJobs;
+        cleanupMakePathsRelative.selectedProperty().bindBidirectional(viewModel.makePathsRelativeSelected);
+        cleanupRenamePdf.selectedProperty().bindBidirectional(viewModel.renamePdfSelected);
+        cleanupRenamePdfonlyRelativePaths.selectedProperty().bindBidirectional(viewModel.renamePdfOnlyRelativeSelected);
+        cleanupDeletedFiles.selectedProperty().bindBidirectional(viewModel.deleteFilesSelected);
+        cleanupUpgradeExternalLinks.selectedProperty().bindBidirectional(viewModel.upgradeLinksSelected);
     }
 
     @FXML
     private void onApply() {
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupDialogViewModel.FILE_RELATED_JOBS, getSelectedJobs());
-        viewModel.apply(selectedTab);
+        EnumSet<CleanupPreferences.CleanupStep> selectedJobs = viewModel.getSelectedJobs();
+        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupDialogViewModel.FILE_RELATED_JOBS, selectedJobs);
+        dialogViewModel.apply(selectedTab);
         getScene().getWindow().hide();
     }
 }

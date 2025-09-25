@@ -2,7 +2,6 @@ package org.jabref.gui.cleanup;
 
 import java.util.Objects;
 
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
 
@@ -17,40 +16,34 @@ public class CleanupSingleFieldPanel extends VBox {
 
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
-    private final CleanupDialogViewModel viewModel;
+    private final CleanupSingleFieldViewModel viewModel;
+    private final CleanupDialogViewModel dialogViewModel;
 
     public CleanupSingleFieldPanel(CleanupPreferences cleanupPreferences,
-                                   CleanupDialogViewModel viewModel) {
+                                   CleanupDialogViewModel dialogViewModel) {
         Objects.requireNonNull(cleanupPreferences, "cleanupPreferences must not be null");
-        Objects.requireNonNull(viewModel, "viewModel must not be null");
+        Objects.requireNonNull(dialogViewModel, "viewModel must not be null");
 
-        this.viewModel = viewModel;
+        this.dialogViewModel = dialogViewModel;
+        this.viewModel = new CleanupSingleFieldViewModel(cleanupPreferences.getFieldFormatterCleanups());
 
         ViewLoader.view(this)
                   .root(this)
                   .load();
 
-        init(cleanupPreferences);
+        bindProperties();
     }
 
-    private void init(CleanupPreferences cleanupPreferences) {
-        formatterCleanupsPanel.cleanupsDisableProperty().setValue(!cleanupPreferences.getFieldFormatterCleanups().isEnabled());
-        formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(
-                cleanupPreferences.getFieldFormatterCleanups().getConfiguredActions()
-        ));
-    }
-
-    public FieldFormatterCleanups getSelectedFormatters() {
-        return new FieldFormatterCleanups(
-                !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
-                formatterCleanupsPanel.cleanupsProperty()
-        );
+    private void bindProperties() {
+        formatterCleanupsPanel.cleanupsDisableProperty().bind(viewModel.cleanupsEnabled.not());
+        formatterCleanupsPanel.cleanupsProperty().bindBidirectional(viewModel.cleanups);
     }
 
     @FXML
     private void onApply() {
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofFormatters(getSelectedFormatters());
-        viewModel.apply(selectedTab);
+        FieldFormatterCleanups selectedFormatters = viewModel.getSelectedFormatters();
+        CleanupTabSelection selectedTab = CleanupTabSelection.ofFormatters(selectedFormatters);
+        dialogViewModel.apply(selectedTab);
         getScene().getWindow().hide();
     }
 }
