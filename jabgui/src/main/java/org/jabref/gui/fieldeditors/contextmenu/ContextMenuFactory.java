@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors.contextmenu;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
@@ -40,18 +41,20 @@ public class ContextMenuFactory {
     public ContextMenu createMenuForSelection(ObservableList<LinkedFileViewModel> selection) {
         Objects.requireNonNull(selection, "selection must not be null");
 
+        ContextMenu menu = new ContextMenu();
         if (selection.isEmpty()) {
-            return new ContextMenu();
+            return menu;
         }
 
-        ContextMenuBuilder builder = menuBuilders.stream()
-                                                 .filter(b -> b.supports(selection))
-                                                 .findFirst()
-                                                 .orElseThrow(() -> new IllegalStateException(
-                                                         "No ContextMenuBuilder found for selection (size=" + selection.size() + ')'));
+        Optional<ContextMenuBuilder> builder = menuBuilders.stream()
+                                                           .filter(b -> b.supports(selection))
+                                                           .findFirst();
 
-        ContextMenu menu = new ContextMenu();
-        menu.getItems().setAll(builder.buildMenu(selection));
+        if (builder.isEmpty()) {
+            return menu;
+        }
+
+        menu.getItems().setAll(builder.get().buildMenu(selection));
         return menu;
     }
 }

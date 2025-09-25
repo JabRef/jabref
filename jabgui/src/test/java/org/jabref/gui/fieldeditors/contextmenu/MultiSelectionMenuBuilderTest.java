@@ -31,7 +31,6 @@ import org.mockito.Answers;
 import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,15 +47,26 @@ class MultiSelectionMenuBuilderTest {
 
     @Test
     void shouldSupportOnlyWhenSelectionHasMoreThanOneItem() {
-        MultiSelectionMenuBuilder builder = newBuilder(mock(LinkedFilesEditorViewModel.class), mock(DialogService.class));
-        assertFalse(builder.supports(FXCollections.observableArrayList()), "Empty selection should not be supported");
+        MultiSelectionMenuBuilder builder = newBuilder(
+                mock(LinkedFilesEditorViewModel.class),
+                mock(DialogService.class)
+        );
 
-        ObservableList<LinkedFileViewModel> single = FXCollections.observableArrayList(mock(LinkedFileViewModel.class));
-        assertFalse(builder.supports(single), "Single selection should not be supported");
+        assertEquals(false,
+                builder.supports(FXCollections.observableArrayList()),
+                "Empty selection should not be supported");
+
+        ObservableList<LinkedFileViewModel> single =
+                FXCollections.observableArrayList(mock(LinkedFileViewModel.class));
+        assertEquals(false,
+                builder.supports(single),
+                "Single selection should not be supported");
 
         ObservableList<LinkedFileViewModel> multiple = FXCollections.observableArrayList(
                 mock(LinkedFileViewModel.class), mock(LinkedFileViewModel.class));
-        assertTrue(builder.supports(multiple), "Multiple selection should be supported");
+        assertEquals(true,
+                builder.supports(multiple),
+                "Multiple selection should be supported");
     }
 
     /**
@@ -88,9 +98,12 @@ class MultiSelectionMenuBuilderTest {
         MultiSelectionMenuBuilder builder = newBuilder(editorViewModel, mock(DialogService.class));
         LinkedFileViewModel localExisting = mockOfflineExistingFileViewModel();
         LinkedFileViewModel onlineLink = mockOnlineLinkViewModel("https://host/a.pdf");
+
         ObservableList<LinkedFileViewModel> selection = FXCollections.observableArrayList(localExisting, onlineLink);
         List<MenuItem> items = builder.buildMenu(selection);
+
         items.getFirst().fire();
+
         verify(localExisting).open();
         verify(onlineLink, never()).open();
     }
@@ -100,27 +113,38 @@ class MultiSelectionMenuBuilderTest {
         LinkedFilesEditorViewModel editorViewModel = mock(LinkedFilesEditorViewModel.class);
         DialogService dialogService = mock(DialogService.class);
         MultiSelectionMenuBuilder builder = newBuilder(editorViewModel, dialogService);
+
         LinkedFileViewModel localExisting = mockOfflineExistingFileViewModel();
         LinkedFileViewModel onlineLink = mockOnlineLinkViewModel("https://host/a.pdf");
-        ObservableList<LinkedFileViewModel> selectionA = FXCollections.observableArrayList(localExisting, onlineLink);
+
+        ObservableList<LinkedFileViewModel> selectionA =
+                FXCollections.observableArrayList(localExisting, onlineLink);
         List<MenuItem> itemsA = builder.buildMenu(selectionA);
-        assertFalse(itemsA.get(1).isDisable(), "OPEN_FOLDER should be enabled when at least one local existing file is present");
+        assertEquals(false, itemsA.get(1).isDisable(),
+                "OPEN_FOLDER should be enabled when at least one local existing file is present");
+
         LinkedFileViewModel onlineLink1 = mockOnlineLinkViewModel("https://host/b.pdf");
         LinkedFileViewModel onlineLink2 = mockOnlineLinkViewModel("https://host/c.pdf");
-        ObservableList<LinkedFileViewModel> selectionB = FXCollections.observableArrayList(onlineLink1, onlineLink2);
+        ObservableList<LinkedFileViewModel> selectionB =
+                FXCollections.observableArrayList(onlineLink1, onlineLink2);
         List<MenuItem> itemsB = builder.buildMenu(selectionB);
-        assertTrue(itemsB.get(1).isDisable(), "OPEN_FOLDER should be disabled when there are no local existing files");
+        assertEquals(true, itemsB.get(1).isDisable(),
+                "OPEN_FOLDER should be disabled when there are no local existing files");
     }
 
     @Test
     void downloadItemInvokesDownloadForOnlineOnly() {
-        MultiSelectionMenuBuilder builder = newBuilder(mock(LinkedFilesEditorViewModel.class), mock(DialogService.class));
+        MultiSelectionMenuBuilder builder = newBuilder(
+                mock(LinkedFilesEditorViewModel.class),
+                mock(DialogService.class)
+        );
 
         LinkedFileViewModel onlineA = mockOnlineLinkViewModel("https://host/a.pdf");
         LinkedFileViewModel onlineB = mockOnlineLinkViewModel("https://host/b.pdf");
         LinkedFileViewModel localExisting = mockOfflineExistingFileViewModel();
 
-        ObservableList<LinkedFileViewModel> selection = FXCollections.observableArrayList(onlineA, onlineB, localExisting);
+        ObservableList<LinkedFileViewModel> selection =
+                FXCollections.observableArrayList(onlineA, onlineB, localExisting);
         List<MenuItem> items = builder.buildMenu(selection);
 
         items.get(2).fire();
@@ -132,7 +156,10 @@ class MultiSelectionMenuBuilderTest {
 
     @Test
     void redownloadItemInvokesRedownloadOnlyWhenSourceUrlPresent() {
-        MultiSelectionMenuBuilder builder = newBuilder(mock(LinkedFilesEditorViewModel.class), mock(DialogService.class));
+        MultiSelectionMenuBuilder builder = newBuilder(
+                mock(LinkedFilesEditorViewModel.class),
+                mock(DialogService.class)
+        );
 
         LinkedFileViewModel withSource = mockOnlineLinkViewModel("https://host/a.pdf");
         when(withSource.getFile().getSourceUrl()).thenReturn("https://host/a.pdf");
@@ -142,7 +169,8 @@ class MultiSelectionMenuBuilderTest {
         when(withoutSource.getFile().getSourceUrl()).thenReturn("");
         when(withoutSource.getFile().sourceUrlProperty()).thenReturn(new SimpleStringProperty(""));
 
-        ObservableList<LinkedFileViewModel> selection = FXCollections.observableArrayList(withSource, withoutSource);
+        ObservableList<LinkedFileViewModel> selection =
+                FXCollections.observableArrayList(withSource, withoutSource);
         List<MenuItem> items = builder.buildMenu(selection);
 
         items.get(3).fire();
@@ -153,7 +181,10 @@ class MultiSelectionMenuBuilderTest {
 
     @Test
     void moveFileToFolderInvokesMoveOnlyForMovableLocalFiles() {
-        MultiSelectionMenuBuilder builder = newBuilder(mock(LinkedFilesEditorViewModel.class), mock(DialogService.class));
+        MultiSelectionMenuBuilder builder = newBuilder(
+                mock(LinkedFilesEditorViewModel.class),
+                mock(DialogService.class)
+        );
 
         LinkedFileViewModel movableLocal = mockOfflineExistingFileViewModel();
         when(movableLocal.isGeneratedPathSameAsOriginal()).thenReturn(false);
@@ -163,7 +194,8 @@ class MultiSelectionMenuBuilderTest {
 
         LinkedFileViewModel onlineLink = mockOnlineLinkViewModel("https://host/x.pdf");
 
-        ObservableList<LinkedFileViewModel> selection = FXCollections.observableArrayList(movableLocal, nonMovableLocal, onlineLink);
+        ObservableList<LinkedFileViewModel> selection =
+                FXCollections.observableArrayList(movableLocal, nonMovableLocal, onlineLink);
         List<MenuItem> items = builder.buildMenu(selection);
 
         items.get(4).fire();
@@ -198,7 +230,8 @@ class MultiSelectionMenuBuilderTest {
         LinkedFileViewModel localExisting = mockOfflineExistingFileViewModel();
         LinkedFileViewModel onlineLink = mockOnlineLinkViewModel("https://host/x.pdf");
 
-        ObservableList<LinkedFileViewModel> selection = FXCollections.observableArrayList(localExisting, onlineLink);
+        ObservableList<LinkedFileViewModel> selection =
+                FXCollections.observableArrayList(localExisting, onlineLink);
         List<MenuItem> items = builder.buildMenu(selection);
 
         items.get(7).fire();
@@ -224,7 +257,6 @@ class MultiSelectionMenuBuilderTest {
         Files.writeString(sourceFile, "dummy");
 
         LinkedFileViewModel localExisting = mockOfflineExistingFileViewModel(sourceFile);
-
         LinkedFileViewModel onlineLink = mockOnlineLinkViewModel("https://host/ignore.pdf");
 
         when(dialogService.showDirectorySelectionDialog(any(DirectoryDialogConfiguration.class)))
@@ -238,7 +270,8 @@ class MultiSelectionMenuBuilderTest {
                 editorViewModel
         );
 
-        ObservableList<LinkedFileViewModel> selection = FXCollections.observableArrayList(localExisting, onlineLink);
+        ObservableList<LinkedFileViewModel> selection =
+                FXCollections.observableArrayList(localExisting, onlineLink);
         List<MenuItem> items = builder.buildMenu(selection);
 
         items.get(5).fire();
@@ -250,9 +283,11 @@ class MultiSelectionMenuBuilderTest {
         verify(dialogService, never()).showInformationDialogAndWait(anyString(), anyString());
     }
 
-    private static MultiSelectionMenuBuilder newBuilder(LinkedFilesEditorViewModel editorViewModel, DialogService dialogService) {
+    private static MultiSelectionMenuBuilder newBuilder(LinkedFilesEditorViewModel editorViewModel,
+                                                        DialogService dialogService) {
         GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(guiPreferences.getFilePreferences()).thenReturn(mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS));
+        when(guiPreferences.getFilePreferences()).thenReturn(
+                mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS));
 
         return new MultiSelectionMenuBuilder(
                 dialogService,
@@ -276,7 +311,8 @@ class MultiSelectionMenuBuilderTest {
         when(modelLinkedFile.isOnlineLink()).thenReturn(false);
         when(modelLinkedFile.findIn(any(BibDatabaseContext.class), any(FilePreferences.class)))
                 .thenReturn(Optional.of(sourcePath));
-        when(modelLinkedFile.linkProperty()).thenReturn(new SimpleStringProperty(sourcePath.getFileName().toString()));
+        when(modelLinkedFile.linkProperty())
+                .thenReturn(new SimpleStringProperty(sourcePath.getFileName().toString()));
         when(modelLinkedFile.getSourceUrl()).thenReturn("");
         when(modelLinkedFile.sourceUrlProperty()).thenReturn(new SimpleStringProperty(""));
 
@@ -305,4 +341,3 @@ class MultiSelectionMenuBuilderTest {
         return fileViewModel;
     }
 }
-
