@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Searches web resources for bibliographic information based on a {@link BibEntry}.
  * Useful to <b>complete</b> an existing entry with fetched information.
@@ -17,5 +19,5 @@ public interface EntryBasedFetcher extends WebFetcher {
      * @param entry entry to search bibliographic information for
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
-    List<BibEntry> performSearch(BibEntry entry) throws FetcherException;
+    List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException;
 }

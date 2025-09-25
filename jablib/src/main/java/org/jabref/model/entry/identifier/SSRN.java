@@ -1,13 +1,14 @@
 package org.jabref.model.entry.identifier;
 
 import java.net.URI;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.util.URLUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents an SSRN article, identified by its abstract ID.
@@ -28,8 +29,7 @@ public class SSRN extends EprintIdentifier {
      * @throws NullPointerException     If you pass a null to the constructor
      * @throws IllegalArgumentException Invalid string passed to the constructor
      */
-    public SSRN(String string) {
-        Objects.requireNonNull(string);
+    public SSRN(@NonNull String string) {
         string = string.trim();
 
         if (string.chars().allMatch(Character::isDigit)) {

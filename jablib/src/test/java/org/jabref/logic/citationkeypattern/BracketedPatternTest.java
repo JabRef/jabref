@@ -487,14 +487,6 @@ class BracketedPatternTest {
     }
 
     @Test
-    void nullBibentryBracketExpansionTest() {
-        BibDatabase another_database = null;
-        BibEntry another_bibentry = null;
-        BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
-        assertThrows(NullPointerException.class, () -> pattern.expand(another_bibentry, ';', another_database));
-    }
-
-    @Test
     void bracketedExpressionDefaultConstructorTest() {
         BibDatabase another_database = null;
         BracketedPattern pattern = new BracketedPattern();

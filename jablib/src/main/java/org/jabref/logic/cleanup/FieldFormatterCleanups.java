@@ -32,6 +32,7 @@ import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,9 +87,9 @@ public class FieldFormatterCleanups {
     private final boolean enabled;
     private final List<FieldFormatterCleanup> actions;
 
-    public FieldFormatterCleanups(boolean enabled, List<FieldFormatterCleanup> actions) {
+    public FieldFormatterCleanups(boolean enabled, @NonNull List<FieldFormatterCleanup> actions) {
         this.enabled = enabled;
-        this.actions = Objects.requireNonNull(actions);
+        this.actions = actions;
     }
 
     /**

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -70,6 +69,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +102,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     public MainTable(MainTableDataModel model,
                      LibraryTab libraryTab,
                      LibraryTabContainer tabContainer,
-                     BibDatabaseContext database,
+                     @NonNull BibDatabaseContext database,
                      GuiPreferences preferences,
                      DialogService dialogService,
                      StateManager stateManager,
@@ -114,7 +114,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         super();
         this.libraryTab = libraryTab;
         this.stateManager = stateManager;
-        this.database = Objects.requireNonNull(database);
+        this.database = database;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.model = model;

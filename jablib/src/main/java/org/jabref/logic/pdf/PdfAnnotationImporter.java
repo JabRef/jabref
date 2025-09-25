@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.pdf.FileAnnotation;
@@ -20,6 +19,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,9 +102,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToMarking);
     }
 
-    private boolean validatePath(Path path) {
-        Objects.requireNonNull(path);
-
+    private boolean validatePath(@NonNull Path path) {
         if (!path.toString().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
             LOGGER.warn("File '{}' does not end with .pdf!", path);
             return false;
