@@ -3,7 +3,6 @@ package org.jabref.gui.fieldeditors.contextmenu;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -25,6 +24,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+import org.jspecify.annotations.NonNull;
 
 record MultiSelectionMenuBuilder(
         DialogService dialogService,
@@ -34,16 +34,16 @@ record MultiSelectionMenuBuilder(
         LinkedFilesEditorViewModel viewModel
 ) implements ContextMenuBuilder, SelectionChecks {
 
-    MultiSelectionMenuBuilder(DialogService dialogService,
-                              BibDatabaseContext databaseContext,
-                              ObservableOptionalValue<BibEntry> bibEntry,
-                              GuiPreferences preferences,
-                              LinkedFilesEditorViewModel viewModel) {
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.databaseContext = Objects.requireNonNull(databaseContext);
-        this.bibEntry = Objects.requireNonNull(bibEntry);
-        this.preferences = Objects.requireNonNull(preferences);
-        this.viewModel = Objects.requireNonNull(viewModel);
+    MultiSelectionMenuBuilder(@NonNull DialogService dialogService,
+                              @NonNull BibDatabaseContext databaseContext,
+                              @NonNull ObservableOptionalValue<BibEntry> bibEntry,
+                              @NonNull GuiPreferences preferences,
+                              @NonNull LinkedFilesEditorViewModel viewModel) {
+        this.dialogService = dialogService;
+        this.databaseContext = databaseContext;
+        this.bibEntry = bibEntry;
+        this.preferences = preferences;
+        this.viewModel = viewModel;
     }
 
     @Override
