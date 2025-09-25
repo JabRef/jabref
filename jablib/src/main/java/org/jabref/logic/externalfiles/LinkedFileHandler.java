@@ -272,7 +272,7 @@ public class LinkedFileHandler {
             }
         }
 
-        String baseName = targetFileName.orElse("-");
+        String baseName = targetFileName.orElse("file");
         String suggestedName = extension.isEmpty() ? baseName : baseName + "." + extension;
 
         return FileUtil.getValidFileName(suggestedName);
