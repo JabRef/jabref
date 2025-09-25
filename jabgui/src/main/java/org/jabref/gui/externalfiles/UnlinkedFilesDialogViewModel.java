@@ -10,7 +10,9 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
@@ -39,6 +41,7 @@ import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -77,7 +80,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ObservableList<ExternalFileSorter> fileSortList;
 
     private final DialogService dialogService;
-    private final GuiPreferences preferences;
+    private final CliPreferences preferences;
     private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
     private BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesBackgroundTask;
 
@@ -123,17 +126,17 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void findAndFixBrokenLinks(Path searchDirectory) {
-        List<BibEntry> entriesWithBrokenLinks = bibDatabase.getDatabase().getEntries().stream()
-                                                           .filter(entry -> entry.getFiles().stream()
-                                                                                 .anyMatch(file -> {
-                                                                                     Optional<Path> filePath = file.findIn(bibDatabase, preferences.getFilePreferences());
-                                                                                     return filePath.isEmpty() || !Files.exists(filePath.get());
-                                                                                 }))
-                                                           .toList();
-
         List<ImportFilesResultItemViewModel> results = new ArrayList<>();
 
-        for (BibEntry entry : entriesWithBrokenLinks) {
+        // pre-build a map of all existing linked files for O(1) lookup
+        Set<Path> existingLinkedFiles = bibDatabase.getDatabase().getEntries().stream()
+                                                   .flatMap(entry -> entry.getFiles().stream())
+                                                   .map(linkedFile -> linkedFile.findIn(bibDatabase, preferences.getFilePreferences()))
+                                                   .filter(Optional::isPresent)
+                                                   .map(Optional::get)
+                                                   .collect(Collectors.toSet());
+
+        for (BibEntry entry : bibDatabase.getDatabase().getEntries()) {
             try {
                 List<LinkedFile> currentFiles = new ArrayList<>(entry.getFiles());
                 List<LinkedFile> filesToRemove = new ArrayList<>();
@@ -159,27 +162,28 @@ public class UnlinkedFilesDialogViewModel {
                     }
                     Path foundFile = matches.getFirst();
 
-                    // check if matches found is not linked to other entries
-                    if (!fileNotLinkedToOtherEntries(foundFile)) {
+                    // check if the potential file is not linked to other entries
+                    if (existingLinkedFiles.contains(foundFile)) {
                         continue;
                     }
 
-                    // remove broken links from current files
-                    filesToRemove.add(brokenLink);
+                    Path newFilePath = preferences.getFilePreferences().shouldStoreFilesRelativeToBibFile() ?
+                                       FileUtil.relativize(foundFile, bibDatabase.getFileDirectories(preferences.getFilePreferences())) :
+                                       foundFile;
 
-                    // add found matches to current files
-                    Path relativeFilePath = FileUtil.relativize(foundFile, bibDatabase.getFileDirectories(preferences.getFilePreferences()));
-                    LinkedFile newLinkedFile = new LinkedFile(brokenLink.getDescription(), relativeFilePath, brokenLink.getFileType());
-                    filesToAdd.add(newLinkedFile);
+                    filesToRemove.add(brokenLink);
+                    filesToAdd.add(new LinkedFile(brokenLink.getDescription(), newFilePath, brokenLink.getFileType()));
+                    existingLinkedFiles.add(foundFile);
 
                     results.add(new ImportFilesResultItemViewModel(foundFile, true,
-                            Localization.lang("File relinked to entry %0.", exactFileName)));
+                            Localization.lang("File relinked to entry %0", exactFileName)));
                 }
 
-                // update the entry's file links
-                currentFiles.removeAll(filesToRemove);
-                currentFiles.addAll(filesToAdd);
-                entry.setFiles(currentFiles);
+                if (!filesToRemove.isEmpty() || !filesToAdd.isEmpty()) {
+                    currentFiles.removeAll(filesToRemove);
+                    currentFiles.addAll(filesToAdd);
+                    entry.setFiles(currentFiles);
+                }
             } catch (IOException e) {
                 LOGGER.error("Error finding associated files for entry", e);
             }
@@ -187,15 +191,6 @@ public class UnlinkedFilesDialogViewModel {
 
         resultList.clear();
         resultList.addAll(results);
-    }
-
-    private boolean fileNotLinkedToOtherEntries(Path foundFile) {
-        return bibDatabase.getDatabase().getEntries().stream()
-                          .flatMap(entry -> entry.getFiles().stream())
-                          .noneMatch(linkedFile -> {
-                              Optional<Path> existingPath = linkedFile.findIn(bibDatabase, preferences.getFilePreferences());
-                              return existingPath.isPresent() && existingPath.get().equals(foundFile);
-                          });
     }
 
     public void startSearch() {
