@@ -1,12 +1,12 @@
 package org.jabref.model.openoffice.uno;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import com.sun.star.frame.XController;
 import com.sun.star.lang.XServiceInfo;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.view.XSelectionSupplier;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +56,7 @@ public class UnoSelection {
      * <p>
      * With cursor selecting an inserted image: *** XSelectionSupplier is OK *** Object initialSelection is OK *** xserviceinfo is OK *** xserviceinfo.getImplementationName: "SwXTextGraphicObject" "com.sun.star.text.BaseFrame" "com.sun.star.text.TextContent" "com.sun.star.document.LinkTarget" "com.sun.star.text.TextGraphicObject"
      */
-    public static Optional<XServiceInfo> getSelectionAsXServiceInfo(XTextDocument doc) {
-        Objects.requireNonNull(doc);
+    public static Optional<XServiceInfo> getSelectionAsXServiceInfo(@NonNull XTextDocument doc) {
         Optional<XSelectionSupplier> supplier = getSelectionSupplier(doc);
         if (supplier.isEmpty()) {
             LOGGER.warn("getSelectionSupplier returned empty");
@@ -80,8 +79,7 @@ public class UnoSelection {
      * <p>
      * Presumably result from {@code XSelectionSupplier.getSelection()} is usually OK. It also accepted {@code XTextRange newSelection = doc.getText().getStart();}
      */
-    public static void select(XTextDocument doc, Object newSelection) {
-        Objects.requireNonNull(doc);
+    public static void select(@NonNull XTextDocument doc, Object newSelection) {
         getSelectionSupplier(doc).ifPresent(e -> e.select(newSelection));
     }
 }

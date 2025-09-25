@@ -34,6 +34,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,9 +63,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
      * @throws FetcherException if the ResearchGate refuses to serve the page
      */
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
-        Objects.requireNonNull(entry);
-
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
         Document html;
         try {
             html = getHTML(entry);
@@ -275,7 +274,7 @@ public class ResearchGate implements FulltextFetcher, EntryBasedFetcher, SearchB
      * @throws FetcherException if the ResearchGate refuses to serve the page
      */
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getTitle();
         if (title.isEmpty()) {
             return new ArrayList<>();

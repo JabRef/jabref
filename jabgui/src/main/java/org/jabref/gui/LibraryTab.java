@@ -3,7 +3,6 @@ package org.jabref.gui;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -175,10 +174,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
      */
     private LibraryTab(@NonNull BibDatabaseContext bibDatabaseContext,
                        @NonNull LibraryTabContainer tabContainer,
-                       DialogService dialogService,
+                       @NonNull DialogService dialogService,
                        AiService aiService,
-                       GuiPreferences preferences,
-                       StateManager stateManager,
+                       @NonNull GuiPreferences preferences,
+                       @NonNull StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
                        BibEntryTypesManager entryTypesManager,
                        CountingUndoManager undoManager,
@@ -189,8 +188,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         this.tabContainer = tabContainer;
         this.undoManager = undoManager;
         this.dialogService = dialogService;
-        this.preferences = Objects.requireNonNull(preferences);
-        this.stateManager = Objects.requireNonNull(stateManager);
+        this.preferences = preferences;
+        this.stateManager = stateManager;
         assert bibDatabaseContext.getDatabasePath().isEmpty() || fileUpdateMonitor != null;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;

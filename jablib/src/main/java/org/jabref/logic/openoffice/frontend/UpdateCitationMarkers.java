@@ -1,7 +1,6 @@
 package org.jabref.logic.openoffice.frontend;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.openoffice.style.JStyle;
@@ -19,6 +18,7 @@ import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,18 +63,14 @@ public class UpdateCitationMarkers {
     }
 
     public static void fillCitationMarkInCursor(XTextDocument doc,
-                                                XTextCursor cursor,
-                                                OOText citationText,
+                                                @NonNull XTextCursor cursor,
+                                                @NonNull OOText citationText,
                                                 boolean withText,
-                                                JStyle style)
+                                                @NonNull JStyle style)
             throws
             WrappedTargetException,
             CreationException,
             IllegalArgumentException {
-
-        Objects.requireNonNull(cursor);
-        Objects.requireNonNull(citationText);
-        Objects.requireNonNull(style);
 
         if (withText) {
             OOText citationText2 = style.decorateCitationMarker(citationText);
@@ -101,7 +97,7 @@ public class UpdateCitationMarkers {
     public static void createAndFillCitationGroup(OOFrontend frontend,
                                                   XTextDocument doc,
                                                   List<String> citationKeys,
-                                                  List<Optional<OOText>> pageInfos,
+                                                  @NonNull List<Optional<OOText>> pageInfos,
                                                   CitationType citationType,
                                                   OOText citationText,
                                                   XTextCursor position,
@@ -116,7 +112,6 @@ public class UpdateCitationMarkers {
             NoDocumentException,
             IllegalTypeException {
 
-        Objects.requireNonNull(pageInfos);
         if (pageInfos.size() != citationKeys.size()) {
             throw new IllegalArgumentException("pageInfos.size != citationKeys.size");
         }

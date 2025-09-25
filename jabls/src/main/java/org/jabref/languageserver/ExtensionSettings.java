@@ -1,7 +1,9 @@
 package org.jabref.languageserver;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
-import org.hisp.dhis.jsontree.JsonMixed;
 import org.slf4j.Logger;
 
 public class ExtensionSettings {
@@ -27,12 +29,17 @@ public class ExtensionSettings {
     }
 
     public void copyFromJsonObject(JsonObject object) {
-        org.hisp.dhis.jsontree.JsonObject json = JsonMixed.of(object.toString());
-        this.consistencyCheck = json.getBoolean("jabref.consistencyCheck.enabled").booleanValue(this.consistencyCheck);
-        this.consistencyCheckRequired = json.getBoolean("jabref.consistencyCheck.required").booleanValue(this.consistencyCheckRequired);
-        this.consistencyCheckOptional = json.getBoolean("jabref.consistencyCheck.optional").booleanValue(this.consistencyCheckOptional);
-        this.consistencyCheckUnknown = json.getBoolean("jabref.consistencyCheck.unknown").booleanValue(this.consistencyCheckUnknown);
-        this.integrityCheck = json.getBoolean("jabref.integrityCheck.enabled").booleanValue(this.integrityCheck);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode node = mapper.readTree(object.toString());
+            this.consistencyCheck = node.at("/jabref/consistencyCheck/enabled").asBoolean(this.consistencyCheck);
+            this.consistencyCheckRequired = node.at("/jabref/consistencyCheck/required").asBoolean(this.consistencyCheckRequired);
+            this.consistencyCheckOptional = node.at("/jabref/consistencyCheck/optional").asBoolean(this.consistencyCheckOptional);
+            this.consistencyCheckUnknown = node.at("/jabref/consistencyCheck/unknown").asBoolean(this.consistencyCheckUnknown);
+            this.integrityCheck = node.at("/jabref/integrityCheck/enabled").asBoolean(this.integrityCheck);
+        } catch (JsonProcessingException processingException) {
+            LOGGER.error("Error parsing settings from JSON", processingException);
+        }
     }
 
     public boolean isConsistencyCheck() {

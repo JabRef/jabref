@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -31,12 +30,12 @@ public class LinkedFileHandler {
 
     public LinkedFileHandler(LinkedFile linkedFile,
                              BibEntry entry,
-                             BibDatabaseContext databaseContext,
-                             FilePreferences filePreferences) {
+                             @NonNull BibDatabaseContext databaseContext,
+                             @NonNull FilePreferences filePreferences) {
         this.linkedFile = linkedFile;
         this.entry = entry;
-        this.databaseContext = Objects.requireNonNull(databaseContext);
-        this.filePreferences = Objects.requireNonNull(filePreferences);
+        this.databaseContext = databaseContext;
+        this.filePreferences = filePreferences;
     }
 
     public boolean moveToDefaultDirectory() throws IOException {

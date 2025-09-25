@@ -1,6 +1,5 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import javafx.scene.control.Menu;
@@ -21,6 +20,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NonNull;
 
 class ProtectedTermsMenu extends Menu {
 
@@ -106,9 +106,7 @@ class ProtectedTermsMenu extends Menu {
     private class AddToProtectedTermsAction extends SimpleCommand {
         ProtectedTermsList list;
 
-        public AddToProtectedTermsAction(ProtectedTermsList list) {
-            Objects.requireNonNull(list);
-
+        public AddToProtectedTermsAction(@NonNull ProtectedTermsList list) {
             this.list = list;
             this.executable.bind(textInputControl.focusedProperty());
         }

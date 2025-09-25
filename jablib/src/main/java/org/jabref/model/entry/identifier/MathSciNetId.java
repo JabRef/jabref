@@ -9,15 +9,17 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Article identifier for MathSciNet (also sometimes called "MRNumber")
  */
 public class MathSciNetId implements Identifier {
 
-    private String identifier;
+    private final String identifier;
 
-    public MathSciNetId(String identifier) {
-        this.identifier = Objects.requireNonNull(identifier);
+    public MathSciNetId(@NonNull String identifier) {
+        this.identifier = identifier;
     }
 
     public static Optional<MathSciNetId> parse(String mrNumberRaw) {
