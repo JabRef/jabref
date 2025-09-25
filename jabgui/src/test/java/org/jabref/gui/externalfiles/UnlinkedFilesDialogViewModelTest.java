@@ -30,7 +30,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -138,10 +137,10 @@ public class UnlinkedFilesDialogViewModelTest {
         when(bibDatabaseContext.getDatabase()).thenReturn(new BibDatabase(List.of(entry)));
         when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(directory));
 
-        assertTrue(entry.getFiles().stream().anyMatch(file -> file.getLink().equals(oldPath.toString())));
+        assertEquals(Optional.of(oldPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
         viewModel.findAndFixBrokenLinks(directory);
         assertEquals(1, viewModel.resultListSize());
-        assertTrue(entry.getFiles().stream().anyMatch(file -> file.getLink().equals("new/minimal.pdf")));
+        assertEquals(Optional.of(newPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
     }
 
     @Test
@@ -165,12 +164,12 @@ public class UnlinkedFilesDialogViewModelTest {
         when(bibDatabaseContext.getDatabase()).thenReturn(new BibDatabase(List.of(entry, entry2)));
         when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(directory));
 
-        assertTrue(entry.getFiles().stream().anyMatch(file -> file.getLink().equals(oldPath.toString())));
-        assertTrue(entry2.getFiles().stream().anyMatch(file -> file.getLink().equals(newPath.toString())));
+        assertEquals(Optional.of(oldPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(newPath.toString()), entry2.getFiles().stream().findFirst().map(LinkedFile::getLink));
         viewModel.findAndFixBrokenLinks(directory);
         assertEquals(0, viewModel.resultListSize());
-        assertTrue(entry.getFiles().stream().anyMatch(file -> file.getLink().equals(oldPath.toString())));
-        assertTrue(entry2.getFiles().stream().anyMatch(file -> file.getLink().equals(newPath.toString())));
+        assertEquals(Optional.of(oldPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(newPath.toString()), entry2.getFiles().stream().findFirst().map(LinkedFile::getLink));
     }
 
     @Test
@@ -218,11 +217,11 @@ public class UnlinkedFilesDialogViewModelTest {
         entry.getFiles().forEach(file -> {
             String link = file.getLink();
             if (link.endsWith(".pdf")) {
-                assertEquals("new/document.pdf", link);
+                assertEquals(newPdfPath.toString(), link);
             } else if (link.endsWith(".txt")) {
-                assertEquals("new/notes.txt", link);
+                assertEquals(newTxtPath.toString(), link);
             } else if (link.endsWith(".docx")) {
-                assertEquals("new/report.docx", link);
+                assertEquals(newDocxPath.toString(), link);
             }
         });
     }
@@ -256,14 +255,14 @@ public class UnlinkedFilesDialogViewModelTest {
         when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(directory));
 
         // searching in the original directory, it should not link (because of multiple matches)
-        assertTrue(entry.getFiles().stream().anyMatch(file -> file.getLink().equals(oldPath.toString())));
+        assertEquals(Optional.of(oldPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
         viewModel.findAndFixBrokenLinks(directory);
-        assertTrue(entry.getFiles().stream().anyMatch(file -> file.getLink().equals(oldPath.toString())));
+        assertEquals(Optional.of(oldPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
         assertEquals(0, viewModel.resultListSize());
 
         // searching in a more restricted directory, it should link successfully (because only one match exists)
         viewModel.findAndFixBrokenLinks(newPath.getParent());
-        assertTrue(entry.getFiles().stream().anyMatch(file -> file.getLink().equals("new/minimal.pdf")));
+        assertEquals(Optional.of(newPath.toString()), entry.getFiles().stream().findFirst().map(LinkedFile::getLink));
         assertEquals(1, viewModel.resultListSize());
     }
 
@@ -305,16 +304,16 @@ public class UnlinkedFilesDialogViewModelTest {
         when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(directory));
 
         // Should only fix the fixable ones
-        assertTrue(fixableEntry.getFiles().stream().anyMatch(file -> file.getLink().equals(oldFixablePath.toString())));
-        assertTrue(unfixableEntry.getFiles().stream().anyMatch(file -> file.getLink().equals(oldUnFixablePath.toString())));
-        assertTrue(untouchedEntry.getFiles().stream().anyMatch(file -> file.getLink().equals(untouchedPath.toString())));
+        assertEquals(Optional.of(oldFixablePath.toString()), fixableEntry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(oldUnFixablePath.toString()), unfixableEntry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(untouchedPath.toString()), untouchedEntry.getFiles().stream().findFirst().map(LinkedFile::getLink));
 
         viewModel.findAndFixBrokenLinks(directory);
 
         assertEquals(1, viewModel.resultListSize());
-        assertTrue(fixableEntry.getFiles().stream().anyMatch(file -> file.getLink().equals("new/fixable.pdf")));
-        assertTrue(unfixableEntry.getFiles().stream().anyMatch(file -> file.getLink().equals(oldUnFixablePath.toString())));
-        assertTrue(untouchedEntry.getFiles().stream().anyMatch(file -> file.getLink().equals(untouchedPath.toString())));
+        assertEquals(Optional.of(newFixablePath.toString()), fixableEntry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(oldUnFixablePath.toString()), unfixableEntry.getFiles().stream().findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(untouchedPath.toString()), untouchedEntry.getFiles().stream().findFirst().map(LinkedFile::getLink));
     }
 
     @Test
@@ -446,40 +445,28 @@ public class UnlinkedFilesDialogViewModelTest {
         when(bibDatabaseContext.getFileDirectories(any())).thenReturn(List.of(rootDirectory));
 
         // Verify initial broken state
-        assertTrue(entry1.getFiles().stream().anyMatch(file -> file.getLink().equals(originalPdf1.toString())));
-        assertTrue(entry1.getFiles().stream().anyMatch(file -> file.getLink().equals(originalDoc.toString())));
-        assertTrue(entry2.getFiles().stream().anyMatch(file -> file.getLink().equals(originalPdf2.toString())));
-        assertTrue(entry2.getFiles().stream().anyMatch(file -> file.getLink().equals(originalTxt.toString())));
-        assertTrue(entry3.getFiles().stream().anyMatch(file -> file.getLink().equals(originalPresentation.toString())));
+        assertEquals(Optional.of(originalPdf1.toString()), entry1.getFiles().stream().filter(file -> file.getLink().equals(originalPdf1.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(originalDoc.toString()), entry1.getFiles().stream().filter(file -> file.getLink().equals(originalDoc.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(originalPdf2.toString()), entry2.getFiles().stream().filter(file -> file.getLink().equals(originalPdf2.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(originalTxt.toString()), entry2.getFiles().stream().filter(file -> file.getLink().equals(originalTxt.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(originalPresentation.toString()), entry3.getFiles().stream().filter(file -> file.getLink().equals(originalPresentation.toString())).findFirst().map(LinkedFile::getLink));
 
         // Execute the fix operation
         viewModel.findAndFixBrokenLinks(rootDirectory);
 
         // Verify that all broken links were found and fixed
-        assertEquals(5, viewModel.resultListSize(),
-                "Should find and fix all 5 broken links across deep directory structure");
+        assertEquals(5, viewModel.resultListSize());
 
         // Verify specific file links were updated to correct relative paths
-        assertTrue(entry1.getFiles().stream().anyMatch(file -> file.getLink().equals("projects/project1/papers/drafts/research-paper.pdf")),
-                "Research paper should be linked to new location in project1");
-
-        assertTrue(entry1.getFiles().stream().anyMatch(file -> file.getLink().equals("projects/project2/final/submissions/notes.docx")),
-                "Notes document should be linked to new location in project2");
-
-        assertTrue(entry2.getFiles().stream().anyMatch(file -> file.getLink().equals("archive/2082/research/publications/thesis.pdf")),
-                "Thesis should be linked to new location in yearly archive");
-
-        assertTrue(entry2.getFiles().stream().anyMatch(file -> file.getLink().equals("backup/monthly/december/papers/summary.txt")),
-                "Summary should be linked to new location in monthly backup");
-
-        assertTrue(entry3.getFiles().stream().anyMatch(file -> file.getLink().equals("level1/level2/level3/level4/level5/presentation.pptx")),
-                "Presentation should be linked to new location in deep nested structure");
+        assertEquals(Optional.of(newPdf1Location.toString()), entry1.getFiles().stream().filter(file -> file.getLink().equals(newPdf1Location.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(newDocLocation.toString()), entry1.getFiles().stream().filter(file -> file.getLink().equals(newDocLocation.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(newPdf2Location.toString()), entry2.getFiles().stream().filter(file -> file.getLink().equals(newPdf2Location.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(newTxtLocation.toString()), entry2.getFiles().stream().filter(file -> file.getLink().equals(newTxtLocation.toString())).findFirst().map(LinkedFile::getLink));
+        assertEquals(Optional.of(newPptLocation.toString()), entry3.getFiles().stream().filter(file -> file.getLink().equals(newPptLocation.toString())).findFirst().map(LinkedFile::getLink));
 
         // Verify that files with similar names but different extensions were not incorrectly matched
-        assertTrue(entry1.getFiles().stream().noneMatch(file -> file.getLink().contains("research-paper.txt")),
-                "Should not match files with different extensions");
+        assertEquals(Optional.empty(), entry1.getFiles().stream().filter(file -> file.getLink().contains("research-paper.txt")).findFirst().map(LinkedFile::getLink));
 
-        assertTrue(entry2.getFiles().stream().noneMatch(file -> file.getLink().contains("thesis.docx")),
-                "Should not match files with different extensions");
+        assertEquals(Optional.empty(), entry2.getFiles().stream().filter(file -> file.getLink().contains("thesis.docx")).findFirst().map(LinkedFile::getLink));
     }
 }
