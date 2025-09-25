@@ -26,10 +26,9 @@ public class CleanupFileRelatedPanel extends VBox {
     @FXML private CheckBox cleanupMovePdf;
     @FXML private CheckBox cleanupMakePathsRelative;
     @FXML private CheckBox cleanupRenamePdf;
-    @FXML private CheckBox cleanupRenamePdfonlyRelativePaths;
+    @FXML private CheckBox cleanupRenamePdfOnlyRelativePaths;
     @FXML private CheckBox cleanupDeletedFiles;
     @FXML private CheckBox cleanupUpgradeExternalLinks;
-
 
     private final CleanupFileViewModel viewModel;
     private final CleanupDialogViewModel dialogViewModel;
@@ -64,7 +63,7 @@ public class CleanupFileRelatedPanel extends VBox {
             viewModel.movePdfSelected.set(false);
         }
 
-        cleanupRenamePdfonlyRelativePaths.disableProperty().bind(cleanupRenamePdf.selectedProperty().not());
+        cleanupRenamePdfOnlyRelativePaths.disableProperty().bind(cleanupRenamePdf.selectedProperty().not());
 
         cleanupUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getName()));
 
@@ -76,10 +75,9 @@ public class CleanupFileRelatedPanel extends VBox {
     private void bindProperties() {
         cleanupMovePdf.selectedProperty().bindBidirectional(viewModel.movePdfSelected);
         cleanupMovePdf.disableProperty().bind(viewModel.movePdfEnabled.not());
-
         cleanupMakePathsRelative.selectedProperty().bindBidirectional(viewModel.makePathsRelativeSelected);
         cleanupRenamePdf.selectedProperty().bindBidirectional(viewModel.renamePdfSelected);
-        cleanupRenamePdfonlyRelativePaths.selectedProperty().bindBidirectional(viewModel.renamePdfOnlyRelativeSelected);
+        cleanupRenamePdfOnlyRelativePaths.selectedProperty().bindBidirectional(viewModel.renamePdfOnlyRelativeSelected);
         cleanupDeletedFiles.selectedProperty().bindBidirectional(viewModel.deleteFilesSelected);
         cleanupUpgradeExternalLinks.selectedProperty().bindBidirectional(viewModel.upgradeLinksSelected);
     }
@@ -87,7 +85,7 @@ public class CleanupFileRelatedPanel extends VBox {
     @FXML
     private void onApply() {
         EnumSet<CleanupPreferences.CleanupStep> selectedJobs = viewModel.getSelectedJobs();
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupDialogViewModel.FILE_RELATED_JOBS, selectedJobs);
+        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupFileViewModel.FILE_RELATED_JOBS, selectedJobs);
         dialogViewModel.apply(selectedTab);
         getScene().getWindow().hide();
     }

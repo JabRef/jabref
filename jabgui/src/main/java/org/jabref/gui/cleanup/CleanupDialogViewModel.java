@@ -33,25 +33,6 @@ import org.jabref.model.entry.BibEntry;
 
 public class CleanupDialogViewModel extends AbstractViewModel {
 
-    public static final EnumSet<CleanupPreferences.CleanupStep> FILE_RELATED_JOBS = EnumSet.of(
-            CleanupPreferences.CleanupStep.MOVE_PDF,
-            CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE,
-            CleanupPreferences.CleanupStep.RENAME_PDF,
-            CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
-            CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
-            CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES
-    );
-
-    public static final EnumSet<CleanupPreferences.CleanupStep> MULTI_FIELD_JOBS = EnumSet.of(
-            CleanupPreferences.CleanupStep.CLEAN_UP_DOI,
-            CleanupPreferences.CleanupStep.CLEANUP_EPRINT,
-            CleanupPreferences.CleanupStep.CLEAN_UP_URL,
-            CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
-            CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX,
-            CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE,
-            CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE
-    );
-
     private final BibDatabaseContext databaseContext;
     private final CliPreferences preferences;
     private final DialogService dialogService;
@@ -60,7 +41,7 @@ public class CleanupDialogViewModel extends AbstractViewModel {
     private final Supplier<LibraryTab> tabSupplier;
     private final TaskExecutor taskExecutor;
 
-    private ObservableList<BibEntry> targetEntries = FXCollections.observableArrayList();
+    private final ObservableList<BibEntry> targetEntries = FXCollections.observableArrayList();
     private int modifiedEntriesCount;
 
     public CleanupDialogViewModel(

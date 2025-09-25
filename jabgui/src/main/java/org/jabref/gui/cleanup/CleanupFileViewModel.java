@@ -9,6 +9,15 @@ import org.jabref.logic.cleanup.CleanupPreferences;
 
 public class CleanupFileViewModel {
 
+    public static final EnumSet<CleanupPreferences.CleanupStep> FILE_RELATED_JOBS = EnumSet.of(
+            CleanupPreferences.CleanupStep.MOVE_PDF,
+            CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE,
+            CleanupPreferences.CleanupStep.RENAME_PDF,
+            CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+            CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+            CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES
+    );
+
     public final BooleanProperty movePdfSelected = new SimpleBooleanProperty();
     public final BooleanProperty makePathsRelativeSelected = new SimpleBooleanProperty();
     public final BooleanProperty renamePdfSelected = new SimpleBooleanProperty();

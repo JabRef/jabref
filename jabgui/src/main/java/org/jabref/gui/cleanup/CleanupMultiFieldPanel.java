@@ -13,9 +13,9 @@ import org.jabref.logic.cleanup.CleanupTabSelection;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class CleanupMultiFieldPanel extends VBox {
-    @FXML private CheckBox cleanupDOI;
+    @FXML private CheckBox cleanupDoi;
     @FXML private CheckBox cleanupEprint;
-    @FXML private CheckBox cleanupURL;
+    @FXML private CheckBox cleanupUrl;
     @FXML private CheckBox cleanupBibLaTeX;
     @FXML private CheckBox cleanupBibTeX;
     @FXML private CheckBox cleanupTimestampToCreationDate;
@@ -40,9 +40,9 @@ public class CleanupMultiFieldPanel extends VBox {
     }
 
     private void bindProperties() {
-        cleanupDOI.selectedProperty().bindBidirectional(viewModel.doiSelected);
+        cleanupDoi.selectedProperty().bindBidirectional(viewModel.doiSelected);
         cleanupEprint.selectedProperty().bindBidirectional(viewModel.eprintSelected);
-        cleanupURL.selectedProperty().bindBidirectional(viewModel.urlSelected);
+        cleanupUrl.selectedProperty().bindBidirectional(viewModel.urlSelected);
         cleanupBibTeX.selectedProperty().bindBidirectional(viewModel.bibTexSelected);
         cleanupBibLaTeX.selectedProperty().bindBidirectional(viewModel.bibLaTexSelected);
         cleanupTimestampToCreationDate.selectedProperty().bindBidirectional(viewModel.timestampToCreationSelected);
@@ -52,7 +52,7 @@ public class CleanupMultiFieldPanel extends VBox {
     @FXML
     private void onApply() {
         EnumSet<CleanupPreferences.CleanupStep> selectedJobs = viewModel.getSelectedJobs();
-        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupDialogViewModel.MULTI_FIELD_JOBS, selectedJobs);
+        CleanupTabSelection selectedTab = CleanupTabSelection.ofJobs(CleanupMultiFieldViewModel.MULTI_FIELD_JOBS, selectedJobs);
         dialogViewModel.apply(selectedTab);
         getScene().getWindow().hide();
     }

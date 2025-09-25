@@ -9,6 +9,16 @@ import org.jabref.logic.cleanup.CleanupPreferences;
 
 public class CleanupMultiFieldViewModel {
 
+    public static final EnumSet<CleanupPreferences.CleanupStep> MULTI_FIELD_JOBS = EnumSet.of(
+            CleanupPreferences.CleanupStep.CLEAN_UP_DOI,
+            CleanupPreferences.CleanupStep.CLEANUP_EPRINT,
+            CleanupPreferences.CleanupStep.CLEAN_UP_URL,
+            CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
+            CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX,
+            CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE,
+            CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE
+    );
+
     public final BooleanProperty doiSelected = new SimpleBooleanProperty();
     public final BooleanProperty eprintSelected = new SimpleBooleanProperty();
     public final BooleanProperty urlSelected = new SimpleBooleanProperty();

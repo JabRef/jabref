@@ -20,7 +20,7 @@
         <CheckBox fx:id="cleanupRenamePdf" text="%Rename files to configured filename format pattern" />
         <VBox prefHeight="40.0" prefWidth="451.0" spacing="10.0">
             <Label fx:id="cleanupRenamePdfLabel" />
-            <CheckBox fx:id="cleanupRenamePdfonlyRelativePaths" text="%Only rename files that have a relative path" />
+            <CheckBox fx:id="cleanupRenamePdfOnlyRelativePaths" text="%Only rename files that have a relative path" />
             <VBox.margin>
                 <Insets left="20.0" />
             </VBox.margin>
