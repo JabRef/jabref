@@ -16,7 +16,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,18 +55,18 @@ class SelectionChecksTest {
         @Test
         void isLocalAndExistsReturnsTrueWhenOfflineFileFound() {
             LinkedFileViewModel fileViewModel = mockOfflineExistingFileViewModel(Path.of("a.pdf"));
-            assertEquals(true, checks.isLocalAndExists(fileViewModel));
+            assertTrue(checks.isLocalAndExists(fileViewModel));
         }
 
         @Test
         void isLocalAndExistsReturnsFalseWhenOfflineMissing() {
             LinkedFileViewModel fileViewModel = mockOfflineMissingFileViewModel();
-            assertEquals(false, checks.isLocalAndExists(fileViewModel));
+            assertFalse(checks.isLocalAndExists(fileViewModel));
         }
 
         @Test
         void isOnlineReturnsFalseForOfflineFile() {
-            assertEquals(false, checks.isOnline(mockOfflineExistingFileViewModel(Path.of("b.pdf"))));
+            assertFalse(checks.isOnline(mockOfflineExistingFileViewModel(Path.of("b.pdf"))));
         }
     }
 
@@ -74,7 +75,7 @@ class SelectionChecksTest {
 
         @Test
         void isOnlineReturnsTrueForOnlineLink() {
-            assertEquals(true, checks.isOnline(mockOnlineLinkViewModel("https://x")));
+            assertTrue(checks.isOnline(mockOnlineLinkViewModel("https://x")));
         }
 
         @Test
@@ -82,7 +83,7 @@ class SelectionChecksTest {
             LinkedFileViewModel withSource = mockOnlineLinkViewModel("https://x");
             when(withSource.getFile().getSourceUrl()).thenReturn("https://x");
             when(withSource.getFile().sourceUrlProperty()).thenReturn(new SimpleStringProperty("https://x"));
-            assertEquals(true, checks.hasSourceUrl(withSource));
+            assertTrue(checks.hasSourceUrl(withSource));
         }
 
         @Test
@@ -90,7 +91,7 @@ class SelectionChecksTest {
             LinkedFileViewModel withoutSource = mockOnlineLinkViewModel("");
             when(withoutSource.getFile().getSourceUrl()).thenReturn("");
             when(withoutSource.getFile().sourceUrlProperty()).thenReturn(new SimpleStringProperty(""));
-            assertEquals(false, checks.hasSourceUrl(withoutSource));
+            assertFalse(checks.hasSourceUrl(withoutSource));
         }
     }
 
@@ -102,7 +103,7 @@ class SelectionChecksTest {
             Path path = Path.of("c.pdf");
             LinkedFileViewModel movable = mockOfflineExistingFileViewModel(path);
             when(movable.isGeneratedPathSameAsOriginal()).thenReturn(false);
-            assertEquals(true, checks.isMovableToDefaultDir(movable));
+            assertTrue(checks.isMovableToDefaultDir(movable));
         }
 
         @Test
@@ -110,12 +111,12 @@ class SelectionChecksTest {
             Path path = Path.of("c.pdf");
             LinkedFileViewModel samePath = mockOfflineExistingFileViewModel(path);
             when(samePath.isGeneratedPathSameAsOriginal()).thenReturn(true);
-            assertEquals(false, checks.isMovableToDefaultDir(samePath));
+            assertFalse(checks.isMovableToDefaultDir(samePath));
         }
 
         @Test
         void isMovableToDefaultDirReturnsFalseForOnlineLink() {
-            assertEquals(false, checks.isMovableToDefaultDir(mockOnlineLinkViewModel("https://x")));
+            assertFalse(checks.isMovableToDefaultDir(mockOnlineLinkViewModel("https://x")));
         }
     }
 
