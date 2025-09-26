@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -8,6 +7,8 @@ import java.util.regex.Pattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 public class MonthChecker implements ValueChecker {
 
@@ -19,8 +20,8 @@ public class MonthChecker implements ValueChecker {
 
     private final BibDatabaseContext bibDatabaseContextMonth;
 
-    public MonthChecker(BibDatabaseContext bibDatabaseContext) {
-        this.bibDatabaseContextMonth = Objects.requireNonNull(bibDatabaseContext);
+    public MonthChecker(@NonNull BibDatabaseContext bibDatabaseContext) {
+        this.bibDatabaseContextMonth = bibDatabaseContext;
     }
 
     /**

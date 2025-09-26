@@ -16,8 +16,6 @@ dependencies {
 
     implementation("com.google.guava:guava")
 
-    implementation("org.hisp.dhis:json-tree")
-
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
     testImplementation("org.slf4j:jul-to-slf4j")
 }

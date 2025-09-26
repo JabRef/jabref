@@ -8,6 +8,8 @@ import java.util.stream.Stream;
 
 import org.jabref.model.ChainNode;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Represents a keyword in a chain of keywords.
  * For example, "JabRef" in "Bibliographic manager > Awesome ones > JabRef"
@@ -17,9 +19,9 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
     public static Character DEFAULT_HIERARCHICAL_DELIMITER = '>';
     private final String keyword;
 
-    public Keyword(String keyword) {
+    public Keyword(@NonNull String keyword) {
         super(Keyword.class);
-        this.keyword = Objects.requireNonNull(keyword).trim();
+        this.keyword = keyword.trim();
     }
 
     /// Connects all the given keywords into one chain and returns its root,
