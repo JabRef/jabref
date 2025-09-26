@@ -20,7 +20,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -393,7 +392,6 @@ class BracketedPatternTest {
 
         assertEquals(" - ",
                 BracketedPattern.expandBrackets("[author] - [year]", ';', bibEntry, database));
-        assertNotNull(BracketedPattern.expandBrackets("[author] - [year]", ';', bibEntry, database));
     }
 
     @Test
