@@ -38,4 +38,7 @@ public class URLs {
     public static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/main/LICENSE";
     public static final String CONTRIBUTORS_URL = "https://github.com/JabRef/jabref/graphs/contributors";
     public static final String PRIVACY_POLICY_URL = "https://github.com/JabRef/jabref/blob/main/PRIVACY.md";
+
+    public static final String COURSE_URL = "https://patrickschniderunibas.github.io/software-engineering/";
+
 }

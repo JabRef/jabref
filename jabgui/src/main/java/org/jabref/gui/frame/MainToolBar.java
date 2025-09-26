@@ -45,6 +45,10 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
+import org.jabref.gui.util.URLs;
+import java.awt.Desktop;
+import java.net.URI;
+
 
 public class MainToolBar extends ToolBar {
     private final LibraryTabContainer frame;
@@ -161,7 +165,23 @@ public class MainToolBar extends ToolBar {
         HBox.setHgrow(globalSearchBar, Priority.ALWAYS);
         HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
 
-        getStyleClass().add("mainToolbar");
+
+        // --- SE course button ---
+        Button courseBtn = new Button("SE");
+        courseBtn.setOnAction(e -> {
+            try {
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().browse(new URI(URLs.COURSE_URL));
+                }
+            } catch (Exception ignored) {
+                // optional: log error
+            }
+        });
+
+        getItems().add(new Separator());
+        getItems().add(courseBtn);
+
+    getStyleClass().add("mainToolbar");
     }
 
     Group createTaskIndicator() {
