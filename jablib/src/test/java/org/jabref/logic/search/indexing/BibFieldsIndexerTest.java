@@ -65,7 +65,6 @@ public class BibFieldsIndexerTest {
         indexer.addToIndex(List.of(entry), dummyTask);
         indexer.addToIndex(List.of(entry), dummyTask);
 
-
         // Verify that there's exactly one row for (entryid, 'citationkey')
         String tableRef = PostgreConstants.getMainTableSchemaReference(indexer.getTable());
         String sql = "SELECT COUNT(*) FROM " + tableRef + " WHERE \"" + PostgreConstants.ENTRY_ID + "\" = ? AND \"" + PostgreConstants.FIELD_NAME + "\" = ?";
