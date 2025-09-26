@@ -15,23 +15,17 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+import org.jspecify.annotations.NonNull;
 
 public class ContextMenuFactory {
 
     private final List<ContextMenuBuilder> menuBuilders;
 
-    public ContextMenuFactory(DialogService dialogService,
-                              GuiPreferences preferences,
-                              BibDatabaseContext databaseContext,
-                              ObservableOptionalValue<BibEntry> bibEntry,
-                              LinkedFilesEditorViewModel viewModel) {
-
-        Objects.requireNonNull(dialogService);
-        Objects.requireNonNull(preferences);
-        Objects.requireNonNull(databaseContext);
-        Objects.requireNonNull(bibEntry);
-        Objects.requireNonNull(viewModel);
-
+    public ContextMenuFactory(@NonNull DialogService dialogService,
+                              @NonNull GuiPreferences preferences,
+                              @NonNull BibDatabaseContext databaseContext,
+                              @NonNull ObservableOptionalValue<BibEntry> bibEntry,
+                              @NonNull LinkedFilesEditorViewModel viewModel) {
         this.menuBuilders = List.of(
                 new SingleSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel),
                 new MultiSelectionMenuBuilder(dialogService, databaseContext, bibEntry, preferences, viewModel)
