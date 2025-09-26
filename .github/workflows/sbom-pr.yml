@@ -21,8 +21,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          distribution: 'corretto'
-          java-version: '24'
+          distribution: 'temurin'
+          java-version: 25
           check-latest: true
           cache: 'gradle'
 

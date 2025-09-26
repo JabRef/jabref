@@ -52,8 +52,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
+          java-version: 25
+          distribution: 'temurin'
           check-latest: true
       - name: Run checkstyle reporter
         uses: dbelyaev/action-checkstyle@master
@@ -92,8 +92,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
+          java-version: 25
+          distribution: 'temurin'
           check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -139,8 +139,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
+          java-version: 25
+          distribution: 'temurin'
           check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -257,8 +257,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
+          java-version: 25
+          distribution: 'temurin'
           check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -293,8 +293,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
+          java-version: 25
+          distribution: 'temurin'
           check-latest: true
       - name: Generate JBang cache key
         id: cache-key
@@ -342,8 +342,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
+          java-version: 25
+          distribution: 'temurin'
           check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -392,8 +392,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
+          java-version: 25
+          distribution: 'temurin'
           check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -441,8 +441,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
+          java-version: 25
+          distribution: 'temurin'
           check-latest: true
       - name: Generate JBang cache key
         id: cache-key
@@ -482,8 +482,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
+          java-version: 25
+          distribution: 'temurin'
           check-latest: true
       - name: Generate JBang cache key
         id: cache-key
@@ -559,8 +559,8 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
+          java-version: 25
+          distribution: 'temurin'
           check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -605,8 +605,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5
         with:
-          java-version: 24
-          distribution: 'corretto'
+          java-version: 25
+          distribution: 'temurin'
           check-latest: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
