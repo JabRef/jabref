@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
 class ContextMenuFactoryTest {
 
     @Test
-    void createMenuForSelection_throwsNPE_whenSelectionIsNull() {
+    void createMenuForSelectionThrowsNPEWhenSelectionIsNull() {
         DialogService dialogService = mock(DialogService.class);
         GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
@@ -52,7 +52,7 @@ class ContextMenuFactoryTest {
     }
 
     @Test
-    void createMenuForSelection_returnsEmptyMenu_whenSelectionIsEmpty() {
+    void createMenuForSelectionReturnsEmptyMenuWhenSelectionIsEmpty() {
         DialogService dialogService = mock(DialogService.class);
         GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
@@ -70,7 +70,7 @@ class ContextMenuFactoryTest {
     }
 
     @Test
-    void createMenuForSelection_returnsNonEmptyMenu_forSingleSelection_offlineExistingFile() {
+    void createMenuForSelectionReturnsNonEmptyMenuForSingleSelectionOfflineExistingFile() {
         DialogService dialogService = mock(DialogService.class);
         GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -96,7 +96,7 @@ class ContextMenuFactoryTest {
     }
 
     @Test
-    void createMenuForSelection_returnsNonEmptyMenu_andContainsExpectedItems_forMultiSelection_mixed() {
+    void createMenuForSelectionReturnsNonEmptyMenuAndContainsExpectedItemsForMultiSelectionMixed() {
         DialogService dialogService = mock(DialogService.class);
         GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
