@@ -7,7 +7,7 @@ public class URLs {
     public static final String BLOG_URL = "https://blog.jabref.org/";
     public static final String LINKEDIN_URL = "https://linkedin.com/company/jabref/";
     public static final String FACEBOOK_URL = "https://www.facebook.com/JabRef/";
-    public static final String GITHUB_URL = "https://github.com/JabRef/jabref";
+    public static final String GITHUB_URL = "https://github.com/kemalyoenet/jabref";
     public static final String MASTODON_URL = "https://foojay.social/@jabref";
     public static final String DONATE_URL = "https://donations.jabref.org";
     public static final String DEV_VERSION_LINK_URL = "https://builds.jabref.org/master/";
