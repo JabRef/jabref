@@ -1,6 +1,6 @@
 package org.jabref.logic.l10n;
 
-import java.util.Objects;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Model for a localization to translate. The key is the English text.
@@ -29,14 +29,14 @@ public class LocalizationKey {
     /**
      * @param key plain key - no escaping. E.g., "Copy \cite{key}" or "Newline follows\nsecond line" are valid parameters.
      */
-    public static LocalizationKey fromKey(String key) {
-        return new LocalizationKey(Objects.requireNonNull(key));
+    public static LocalizationKey fromKey(@NonNull String key) {
+        return new LocalizationKey(key);
     }
 
-    public static LocalizationKey fromEscapedJavaString(String key) {
+    public static LocalizationKey fromEscapedJavaString(@NonNull String key) {
         // "\n" in the string is an escaped newline. That needs to be kept.
         // "\\" in the string can stay --> needs to be kept
-        return new LocalizationKey(Objects.requireNonNull(key));
+        return new LocalizationKey(key);
     }
 
     /*

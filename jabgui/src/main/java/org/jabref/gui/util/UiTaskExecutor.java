@@ -1,6 +1,5 @@
 package org.jabref.gui.util;
 
-import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -23,6 +22,7 @@ import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +68,7 @@ public class UiTaskExecutor implements TaskExecutor {
      * @param action the {@link Runnable} to run
      * @throws NullPointerException if {@code action} is {@code null}
      */
-    public static void runAndWaitInJavaFXThread(Runnable action) {
-        Objects.requireNonNull(action);
-
+    public static void runAndWaitInJavaFXThread(@NonNull Runnable action) {
         // Run synchronously on JavaFX thread
         if (Platform.isFxApplicationThread()) {
             action.run();

@@ -1,11 +1,12 @@
 package org.jabref.gui.importer;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Class for generating a dialog showing warnings from ParserResult
@@ -20,9 +21,8 @@ public class ParserResultWarningDialog {
      *
      * @param parserResult - ParserResult for the current import/open
      */
-    public static void showParserResultWarningDialog(final ParserResult parserResult,
-                                                     final DialogService dialogService) {
-        Objects.requireNonNull(parserResult);
+    public static void showParserResultWarningDialog(@NonNull final ParserResult parserResult,
+                                                     @NonNull final DialogService dialogService) {
         // Return if no warnings
         if (!parserResult.hasWarnings()) {
             return;

@@ -6,7 +6,7 @@ javaPlatform {
     allowDependencies()
 }
 
-val javafx = "24.0.2"
+val javafx = "25"
 val lucene = "10.2.2"
 val pdfbox = "3.0.5"
 
@@ -29,11 +29,11 @@ dependencies.constraints {
     api("org.openjfx:javafx-swing:$javafx")
     api("org.openjfx:javafx-web:$javafx")
     // from JavaFX25 onwards
-    api("org.openjfx:jdk-jsobject:25-ea+21")
+    api("org.openjfx:jdk-jsobject:$javafx")
 
     api("com.ibm.icu:icu4j:72.0.1!!")
 
-    api("com.dlsc.gemsfx:gemsfx:3.4.2")
+    api("com.dlsc.gemsfx:gemsfx:3.5.7")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
@@ -107,7 +107,7 @@ dependencies.constraints {
     api("org.controlsfx:controlsfx:11.2.2")
     api("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
-    api("org.fxmisc.richtext:richtextfx:0.11.5")
+    api("org.fxmisc.richtext:richtextfx:0.11.6")
     api("org.glassfish.grizzly:grizzly-framework:4.0.2")
     api("org.glassfish.grizzly:grizzly-http-server:4.0.2")
     api("org.glassfish.hk2:hk2-api:3.1.1")
@@ -120,6 +120,7 @@ dependencies.constraints {
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.0.1.Final")
+    api("org.hisp.dhis:json-tree:1.8")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
     api("org.jetbrains:annotations:26.0.2")

@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,6 +22,7 @@ import org.jabref.model.metadata.MetaData;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import org.jspecify.annotations.NonNull;
 
 public class ParserResult {
     private final Set<BibEntryType> entryTypes;
@@ -48,10 +48,12 @@ public class ParserResult {
         this(database, new MetaData(), new HashSet<>());
     }
 
-    public ParserResult(BibDatabase database, MetaData metaData, Set<BibEntryType> entryTypes) {
-        this.database = Objects.requireNonNull(database);
-        this.metaData = Objects.requireNonNull(metaData);
-        this.entryTypes = Objects.requireNonNull(entryTypes);
+    public ParserResult(@NonNull BibDatabase database,
+                        @NonNull MetaData metaData,
+                        @NonNull Set<BibEntryType> entryTypes) {
+        this.database = database;
+        this.metaData = metaData;
+        this.entryTypes = entryTypes;
         this.warnings = MultimapBuilder.hashKeys().hashSetValues().build();
     }
 
@@ -144,8 +146,7 @@ public class ParserResult {
         return new BibDatabaseContext(database, metaData, file);
     }
 
-    public void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
-        Objects.requireNonNull(bibDatabaseContext);
+    public void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
         database = bibDatabaseContext.getDatabase();
         metaData = bibDatabaseContext.getMetaData();
         file = bibDatabaseContext.getDatabasePath().orElse(null);

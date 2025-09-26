@@ -4,9 +4,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Contains all supported languages.
@@ -51,9 +52,7 @@ public enum Language {
         this.id = id;
     }
 
-    public static Optional<Locale> convertToSupportedLocale(Language language) {
-        Objects.requireNonNull(language);
-
+    public static Optional<Locale> convertToSupportedLocale(@NonNull Language language) {
         // Very important to split languages like pt_BR into two parts, because otherwise the country would be treated lowercase and create problems in loading
         String[] languageParts = language.getId().split("_");
         Locale locale;

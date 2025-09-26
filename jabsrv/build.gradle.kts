@@ -36,9 +36,6 @@ dependencies {
     implementation("jakarta.validation:jakarta.validation-api")
     implementation("org.hibernate.validator:hibernate-validator")
 
-    // LSP4J for LSP Server
-    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j")
-
     implementation("com.konghq:unirest-modules-gson")
 
     // Allow objects "magically" to be mapped to JSON using GSON
