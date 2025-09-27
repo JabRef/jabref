@@ -48,7 +48,7 @@ public final class AutoPlan {
             }
             // B2: only remote added -> add remote entry
             if (localEntry == null && remoteEntry != null) {
-                newEntries.add(remoteEntry); // consider cloning if you want stronger immutability guarantees
+                newEntries.add(remoteEntry); // Intentionally do not clone: assume remoteEntry will not be mutated later
             }
             return;
         }
