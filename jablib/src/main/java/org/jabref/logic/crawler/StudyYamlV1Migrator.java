@@ -143,7 +143,9 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
         if (queryObj instanceof String string) {
             // Simple string query
             return new StudyQuery(string);
-        } else if (queryObj instanceof Map<String, Object> queryMap) {
+        } else if (queryObj instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> queryMap = (Map<String, Object>) queryObj;
 
             String query = (String) queryMap.get("query");
             String description = (String) queryMap.get("description");
