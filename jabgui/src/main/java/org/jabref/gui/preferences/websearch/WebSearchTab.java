@@ -57,7 +57,6 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                   .load();
     }
 
-
     @Override
     public List<String> getSearchKeywords() {
         return List.of(
@@ -69,7 +68,6 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                 "apikey"
         );
     }
-
 
     @Override
     public String getTabName() {
