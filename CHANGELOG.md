@@ -99,6 +99,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Fixed
 
 - We fixed an issue where pressing <kbd>Tab</kbd> in the last text field of a tab did not move the focus to the next tab in the entry editor. [#11937](https://github.com/JabRef/jabref/issues/11937)
+- When filename pattern is missing for linked files, pattern handling has been introduced to avoid suggesting meaningless filenames like "-". [#13735](https://github.com/JabRef/jabref/issues/13735)
 - We fixed an issue where "Specify Bib(La)TeX" tab was not focused when Bib(La)TeX was in the clipboard [#13597](https://github.com/JabRef/jabref/issues/13597)
 - We fixed an issue whereby the 'About' dialog was not honouring the user's configured font preferences. [#13558](https://github.com/JabRef/jabref/issues/13558)
 - We fixed an issue where the Pagetotal column was sorting the values alphabetically instead of numerically. [#12533](https://github.com/JabRef/jabref/issues/12533)
@@ -140,6 +141,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where hierarchical keywords would only show the parent keyword in the entry editor. [#11390](https://github.com/JabRef/jabref/issues/11390)
 - We fixed an issue where some file choosers regarding LaTeX-aux files did not open in the directory of the last selected file. [#13861](https://github.com/JabRef/jabref/pull/13861)
 - We fixed an issue where the LaTeX file directory was not stored correctly in combination with the usage of groups from aux files. [#8344](https://github.com/JabRef/jabref/issues/8344)
+- We fixed an issue where ignoring of subdirectories via `.gitingore` patterns did not work in the "Find unlinked files dialog". [forum#5425](https://discourse.jabref.org/t/set-list-of-ignored-folders-paths/5425/6)
 
 ### Removed
 

@@ -1,7 +1,6 @@
 package org.jabref.languageserver;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.jabref.languageserver.util.LspDiagnosticHandler;
@@ -16,6 +15,7 @@ import org.eclipse.lsp4j.DidSaveTextDocumentParams;
 import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.eclipse.lsp4j.services.TextDocumentService;
+import org.jspecify.annotations.NonNull;
 
 public class BibtexTextDocumentService implements TextDocumentService {
 
@@ -23,8 +23,8 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
     private LanguageClient client;
 
-    public BibtexTextDocumentService(LspDiagnosticHandler diagnosticHandler) {
-        this.diagnosticHandler = Objects.requireNonNull(diagnosticHandler);
+    public BibtexTextDocumentService(@NonNull LspDiagnosticHandler diagnosticHandler) {
+        this.diagnosticHandler = diagnosticHandler;
     }
 
     public void setClient(LanguageClient client) {

@@ -2,8 +2,12 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/jablib/src/main/abbrv.jabref.org" vcs="" />
     <mapping directory="$PROJECT_DIR$/jablib/src/main/resources/csl-locales" vcs="" />
     <mapping directory="$PROJECT_DIR$/jablib/src/main/resources/csl-styles" vcs="" />
   </component>
+    <component name="VcsProjectSettings">
+        <option name="detectVcsMappingsAutomatically" value="false" />
+    </component>
 </project>

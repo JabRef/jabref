@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -45,6 +44,7 @@ import org.jabref.model.search.query.SearchQuery;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.PreboundBinding;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,8 +144,7 @@ public class JabRefGuiStateManager implements StateManager {
     }
 
     @Override
-    public void setSelectedGroups(BibDatabaseContext context, List<GroupTreeNode> newSelectedGroups) {
-        Objects.requireNonNull(newSelectedGroups);
+    public void setSelectedGroups(BibDatabaseContext context, @NonNull List<GroupTreeNode> newSelectedGroups) {
         selectedGroups.computeIfAbsent(context.getUid(), k -> FXCollections.observableArrayList()).setAll(newSelectedGroups);
     }
 

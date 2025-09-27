@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -30,6 +29,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,8 +51,8 @@ public class TemplateExporter extends Exporter {
     private final String directory;
     private final LayoutFormatterPreferences layoutPreferences;
     private final SelfContainedSaveOrder saveOrder;
+    private final BlankLineBehaviour blankLineBehaviour;
     private boolean customExport;
-    private BlankLineBehaviour blankLineBehaviour;
 
     /**
      * Initialize another export format based on templates stored in dir with layoutFile lfFilename.
@@ -124,14 +124,14 @@ public class TemplateExporter extends Exporter {
      */
     public TemplateExporter(String displayName,
                             String consoleName,
-                            String lfFileName,
+                            @NonNull String lfFileName,
                             String directory,
                             FileType extension,
                             LayoutFormatterPreferences layoutPreferences,
                             SelfContainedSaveOrder saveOrder,
                             BlankLineBehaviour blankLineBehaviour) {
         super(consoleName, displayName, extension);
-        if (Objects.requireNonNull(lfFileName).endsWith(LAYOUT_EXTENSION)) {
+        if (lfFileName.endsWith(LAYOUT_EXTENSION)) {
             this.lfFileName = lfFileName.substring(0, lfFileName.length() - LAYOUT_EXTENSION.length());
         } else {
             this.lfFileName = lfFileName;
@@ -191,19 +191,18 @@ public class TemplateExporter extends Exporter {
     }
 
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
+    public void export(@NonNull BibDatabaseContext databaseContext,
+                       Path file,
+                       @NonNull List<BibEntry> entries) throws IOException {
         export(databaseContext, file, entries, List.of(), JournalAbbreviationLoader.loadBuiltInRepository());
     }
 
     @Override
-    public void export(final BibDatabaseContext databaseContext,
+    public void export(@NonNull final BibDatabaseContext databaseContext,
                        final Path file,
-                       List<BibEntry> entries,
+                       @NonNull List<BibEntry> entries,
                        List<Path> fileDirForDatabase,
                        JournalAbbreviationRepository abbreviationRepository) throws IOException {
-        Objects.requireNonNull(databaseContext);
-        Objects.requireNonNull(entries);
-
         Charset encodingToUse = StandardCharsets.UTF_8;
 
         if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text

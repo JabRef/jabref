@@ -30,6 +30,7 @@ permissions:
 
 jobs:
   upload-pr-number:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Create pr_number.txt
