@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.websearch;
 
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.InvalidationListener;
@@ -55,6 +56,20 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
                   .root(this)
                   .load();
     }
+
+
+    @Override
+    public List<String> getSearchKeywords() {
+        return List.of(
+                getTabName(),
+                Localization.lang("Configure API key"),
+                Localization.lang("Custom API key"),
+                "api",
+                "api key",
+                "apikey"
+        );
+    }
+
 
     @Override
     public String getTabName() {
