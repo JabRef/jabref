@@ -168,15 +168,13 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
 
         setupDragAndDrop();
 
-        EditorTextField.setupTabNavigation(
-                this::isLastFieldInCurrentTab,
-                this::moveToNextTabAndFocus
-        );
-
         EasyBind.subscribe(tabbed.getSelectionModel().selectedItemProperty(), tab -> {
             EntryEditorTab activeTab = (EntryEditorTab) tab;
             if (activeTab != null) {
                 activeTab.notifyAboutFocus(currentlyEditedEntry);
+                if (activeTab instanceof FieldsEditorTab fieldsTab) {
+                    Platform.runLater(() -> setupNavigationForTab(fieldsTab));
+                }
             }
         });
 
@@ -230,6 +228,24 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
             event.setDropCompleted(success);
             event.consume();
         });
+    }
+
+    private void setupNavigationForTab(FieldsEditorTab tab) {
+        Node content = tab.getContent();
+        if (content instanceof Parent parent) {
+            findAndSetupEditorTextFields(parent);
+        }
+    }
+
+    private void findAndSetupEditorTextFields(Parent parent) {
+        for (Node child : parent.getChildrenUnmodifiable()) {
+            if (child instanceof EditorTextField editor) {
+                System.out.println("Setting up navigation for EditorTextField: " + editor.getId());
+                editor.setupTabNavigation(this::isLastFieldInCurrentTab, this::moveToNextTabAndFocus);
+            } else if (child instanceof Parent childParent) {
+                findAndSetupEditorTextFields(childParent);
+            }
+        }
     }
 
     /**
@@ -455,6 +471,14 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
             tabbed.getSelectionModel().select(sourceTab);
         }
+        Platform.runLater(() -> {
+            for (Tab tab : tabbed.getTabs()) {
+                System.out.println("Processing tab: " + tab.getText());
+                if (tab instanceof FieldsEditorTab fieldsTab) {
+                    setupNavigationForTab(fieldsTab);
+                }
+            }
+        });
     }
 
     private EntryEditorTab getSelectedTab() {

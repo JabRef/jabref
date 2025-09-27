@@ -22,8 +22,8 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 
 public class EditorTextField extends TextField implements Initializable, ContextMenuAddable {
 
-    private static Runnable nextTabSelector;
-    private static Predicate<TextField> isLastFieldChecker;
+    private Runnable nextTabSelector;
+    private Predicate<TextField> isLastFieldChecker;
     private final ContextMenu contextMenu = new ContextMenu();
 
     private Runnable additionalPasteActionHandler = () -> {
@@ -54,9 +54,9 @@ public class EditorTextField extends TextField implements Initializable, Context
         ClipBoardManager.addX11Support(this);
     }
 
-    public static void setupTabNavigation(Predicate<TextField> isLastFieldChecker, Runnable nextTabSelector) {
-        EditorTextField.isLastFieldChecker = isLastFieldChecker;
-        EditorTextField.nextTabSelector = nextTabSelector;
+    public void setupTabNavigation(Predicate<TextField> isLastFieldChecker, Runnable nextTabSelector) {
+        this.isLastFieldChecker = isLastFieldChecker;
+        this.nextTabSelector = nextTabSelector;
     }
 
     @Override
