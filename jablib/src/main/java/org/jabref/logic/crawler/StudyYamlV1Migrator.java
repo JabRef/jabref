@@ -51,6 +51,7 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
     }
 
     @Override
+    @NonNull
     protected String getSourceVersion() {
         return "1.0";
     }
