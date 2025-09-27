@@ -63,7 +63,7 @@ public class PushApplicationDialog extends FXDialog {
 
         pathField.textProperty().bindBidirectional(viewModel.pathProperty());
         pathField.textProperty().addListener((_, _, newText) -> updatePathValidation(newText));
-        helpButton.setHelpPage(URLs.PUSH_TO_APPLICATIONS_DOC);
+        helpButton.setHelpUrl(URLs.PUSH_TO_APPLICATIONS_DOC);
     }
 
     private void updatePathValidation(String newText) {
