@@ -65,7 +65,9 @@ public class MedlineImporter extends Importer implements Parser {
         xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
         // TODO: decide if necessary, if disabled MedlineImporterTestNbib fails
         xmlInputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, true);
+        // Prevent XXE attacks: disable external entity processing and DTD support
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
     }
 
     @Override
