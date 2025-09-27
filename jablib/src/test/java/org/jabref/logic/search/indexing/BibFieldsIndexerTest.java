@@ -3,7 +3,6 @@ package org.jabref.logic.search.indexing;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import org.jabref.logic.search.PostgreServer;
@@ -43,7 +42,7 @@ public class BibFieldsIndexerTest {
     }
 
     @Test
-    void addToIndexIsIdempotentForSameEntry() throws Exception^ {
+    void addToIndexIsIdempotentForSameEntry() throws Exception {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         Connection connection = postgreServer.getConnection();
         BibFieldsIndexer indexer = new BibFieldsIndexer(bibEntryPreferences, databaseContext, connection);
