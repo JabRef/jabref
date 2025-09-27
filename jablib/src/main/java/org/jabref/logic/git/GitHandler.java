@@ -23,7 +23,6 @@ import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.errors.NoRemoteRepositoryException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -212,11 +211,8 @@ public class GitHandler {
         boolean commitCreated = false;
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Status status = git.status().call();
-            boolean dirty = !status.isClean();
-            RepositoryState state = git.getRepository().getRepositoryState();
-            boolean inMerging = (state == RepositoryState.MERGING) || (state == RepositoryState.MERGING_RESOLVED);
 
-            if (dirty) {
+            if (!status.isClean()) {
                 commitCreated = true;
                 // Add new and changed files to index
                 git.add()
@@ -232,14 +228,6 @@ public class GitHandler {
                 git.commit()
                    .setAmend(amend)
                    .setAllowEmpty(false)
-                   .setMessage(commitMessage)
-                   .call();
-            } else if (inMerging) {
-                // No content changes, but merge must be completed (create parent commit)
-                commitCreated = true;
-                git.commit()
-                   .setAmend(amend)
-                   .setAllowEmpty(true)
                    .setMessage(commitMessage)
                    .call();
             }
