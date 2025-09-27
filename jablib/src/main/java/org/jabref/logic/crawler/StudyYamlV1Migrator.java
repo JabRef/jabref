@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +93,7 @@ public class StudyYamlV1Migrator extends StudyYamlMigrator {
     /**
      * Creates metadata by extracting information from file and existing data
      */
+    @NonNull
     private StudyMetadata createMetadata(Path studyYamlFile, V1StudyFormat oldStudy) throws IOException {
         StudyMetadata metadata = new StudyMetadata();
 

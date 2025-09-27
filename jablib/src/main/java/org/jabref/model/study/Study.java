@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.jabref.logic.crawler.StudyYamlParser;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -36,7 +35,7 @@ public class Study {
     @JsonProperty("catalogs")
     private List<StudyCatalog> catalogs;
 
-    private Optional<StudyMetadata> metadata = Optional.empty();
+    private StudyMetadata metadata;
 
     public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogs) {
         this.authors = authors;
@@ -44,7 +43,6 @@ public class Study {
         this.researchQuestions = researchQuestions;
         this.queries = queryEntries;
         this.catalogs = catalogs;
-        this.metadata = Optional.empty();
     }
 
     public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyCatalog> catalogs, StudyMetadata metadata) {
@@ -53,14 +51,11 @@ public class Study {
         this.researchQuestions = researchQuestions;
         this.queries = queryEntries;
         this.catalogs = catalogs;
-        this.metadata = Optional.ofNullable(metadata);
+        this.metadata = metadata;
     }
 
-    /**
-     * Used for Jackson deserialization
-     */
-    private Study() {
-        this.metadata = Optional.empty();
+    // For deserialization
+    public Study() {
     }
 
     public String getVersion() {
@@ -146,16 +141,11 @@ public class Study {
     }
 
     public Optional<StudyMetadata> getMetadata() {
-        return metadata;
+        return Optional.ofNullable(metadata);
     }
 
     @JsonSetter("metadata")
-    public void setMetadata(Optional<StudyMetadata> metadata) {
-        this.metadata = metadata != null ? metadata : Optional.empty();
-    }
-
-    @JsonIgnore
     public void setMetadata(StudyMetadata metadata) {
-        this.metadata = Optional.ofNullable(metadata);
+        this.metadata = metadata;
     }
 }
