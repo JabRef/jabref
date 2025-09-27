@@ -119,12 +119,12 @@ public class DefaultMergeBookkeeperTest {
         advanceRemote(remoteAdvance, "remote advance");
 
         // Local: Prepare PullPlan (local BEHIND)
-        GitSyncService sync = GitSyncService.create(importPrefs, handlerRegistry);
+        GitSyncService gitSyncService = GitSyncService.create(importPrefs, handlerRegistry);
         String aliceContent = Files.readString(bibPath);
-        BibDatabaseContext ctx = BibDatabaseContext.of(aliceContent, importPrefs);
-        ctx.setDatabasePath(bibPath);
+        BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(aliceContent, importPrefs);
+        bibDatabaseContext.setDatabasePath(bibPath);
 
-        PullPlan plan = sync.prepareMerge(ctx, bibPath);
+        PullPlan plan = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
 
         // The final content saved in the GUI == remote content (fast-forward scenario)
         Files.writeString(bibPath, remoteAdvance, StandardCharsets.UTF_8);
@@ -133,7 +133,7 @@ public class DefaultMergeBookkeeperTest {
         MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
         BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
 
-        assertTrue(result.isFastForward(), "Expected a fast-forward");
+        assertEquals(BookkeepingResult.Kind.FAST_FORWARD, result.kind(), "Expected a fast-forward");
         // assert：HEAD == origin/main
         RevCommit headNow = latestCommit(localGit);
         assertEquals(plan.remote().getId(), headNow.getId(), "HEAD must equal remote commit after FF");
@@ -155,11 +155,11 @@ public class DefaultMergeBookkeeperTest {
                 """;
         advanceRemote(remoteAdvance, "remote advance");
 
-        GitSyncService sync = GitSyncService.create(importPrefs, handlerRegistry);
+        GitSyncService gitSyncService = GitSyncService.create(importPrefs, handlerRegistry);
         String localContent = Files.readString(bibPath);
-        BibDatabaseContext ctx = BibDatabaseContext.of(localContent, importPrefs);
-        ctx.setDatabasePath(bibPath);
-        PullPlan plan = sync.prepareMerge(ctx, bibPath);
+        BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(localContent, importPrefs);
+        bibDatabaseContext.setDatabasePath(bibPath);
+        PullPlan plan = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
 
         // GUI layer has already written the final merged content to disk;
         // in this scenario it intentionally differs from the remote tip
@@ -177,7 +177,9 @@ public class DefaultMergeBookkeeperTest {
         MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
         BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
 
-        assertTrue(result.hasNewCommit(), "Expected a new single-parent commit on top of remote tip");
+        assertEquals(BookkeepingResult.Kind.NEW_COMMIT,
+                result.kind(),
+                "Expected a new single-parent commit on top of remote tip");
 
         // Assert: The new submitted parent == old tip of origin/main; parentCount == 1
         RevCommit head = latestCommit(localGit);
@@ -211,11 +213,11 @@ public class DefaultMergeBookkeeperTest {
         // equals to `git fetch origin`, only update remote references without modifying the working directory
         localGit.fetch().setRemote("origin").call();
 
-        GitSyncService sync = GitSyncService.create(importPrefs, handlerRegistry);
+        GitSyncService gitSyncService = GitSyncService.create(importPrefs, handlerRegistry);
         String content = Files.readString(bibPath);
-        BibDatabaseContext ctx = BibDatabaseContext.of(content, importPrefs);
-        ctx.setDatabasePath(bibPath);
-        PullPlan plan = sync.prepareMerge(ctx, bibPath);
+        BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(content, importPrefs);
+        bibDatabaseContext.setDatabasePath(bibPath);
+        PullPlan plan = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
 
         // GUI saved merged final content
         String finalMerged = """
@@ -227,17 +229,13 @@ public class DefaultMergeBookkeeperTest {
 
         MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
         BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
+        assertEquals(BookkeepingResult.Kind.NEW_COMMIT,
+                result.kind(),
+                "Expected a new single-parent commit on top of remote tip");
 
-        assertTrue(result.hasNewCommit(), "Expected a new merge commit");
         RevCommit head = latestCommit(localGit);
         assertEquals(2, head.getParentCount(), "Should be a two-parent merge commit");
 
-        RevCommit parent0 = head.getParent(0);
-        RevCommit parent1 = head.getParent(1);
-        RevCommit localPrev = parent0;
-        RevCommit remotePrev = parent1;
-
-        RevCommit localBeforeMerge = head.getParent(0);
         RevCommit remoteTip = latestCommitOnRemoteTracking(localGit);
         List<String> parentIds = List.of(head.getParent(0).getId().name(), head.getParent(1).getId().name());
         assertTrue(parentIds.contains(remoteTip.getId().name()), "One parent must be origin/main tip");

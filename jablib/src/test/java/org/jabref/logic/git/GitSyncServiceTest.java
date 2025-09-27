@@ -41,7 +41,6 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -211,7 +210,7 @@ class GitSyncServiceTest {
         GitSyncService syncService = GitSyncService.create(importFormatPreferences, gitHandlerRegistry);
         PullPlan pullPlan = syncService.prepareMerge(context, library);
 
-        assertTrue(pullPlan.conflicts().isEmpty(), "Expected no conflicts");
+        assertEquals(List.of(), pullPlan.conflicts(), "Expected no conflicts");
         assertFalse(pullPlan.autoPlan().isEmpty(), "Expected auto changes from remote");
         assertFalse(pullPlan.isNoop(), "Should not be UP_TO_DATE");
         assertFalse(pullPlan.isNoopAhead(), "Should not be AHEAD");
@@ -248,16 +247,16 @@ class GitSyncServiceTest {
 
         assertFalse(pullPlan.isNoop(), "Should not be up to date");
         assertFalse(pullPlan.isNoopAhead(), "Should not be ahead");
-        assertTrue(pullPlan.conflicts().isEmpty(), "This case expects an auto-merge only");
+        assertEquals(List.of(), pullPlan.conflicts(), "This case expects an auto-merge only");
 
         applyAutoPlan(context, pullPlan.autoPlan());
         GitFileWriter.write(library, context, importFormatPreferences);
 
         BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan);
-        assertTrue(bookkeepingResult.hasNewCommit(), "Expect new commit");
+        assertEquals(BookkeepingResult.Kind.NEW_COMMIT, bookkeepingResult.kind(), "Expected bookkeeping to create a new commit");
 
         PushResult pushResult = syncService.push(context, library);
-        assertTrue(pushResult.successful(), "Push should succeed");
+        assertEquals(new PushResult(true, false), pushResult, "Expected pushResult to indicate a successful push");
 
         aliceGit.fetch().setRemote("origin").call();
         String pushedContent = GitFileReader
@@ -349,12 +348,27 @@ class GitSyncServiceTest {
 
         GitFileWriter.write(library, context, importFormatPreferences);
         BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan);
-        assertTrue(bookkeepingResult.hasNewCommit(), "Expect new commit");
+        assertEquals(BookkeepingResult.Kind.NEW_COMMIT, bookkeepingResult.kind(), "Expected bookkeeping to create a new commit");
 
         String mergedText = Files.readString(library);
-        assertTrue(mergedText.contains("author = {author-a}"), "a.author should be author-a");
-        assertTrue(mergedText.contains("author = {author-b}"), "b.author should be author-b (auto)");
-        assertTrue(mergedText.contains("author = {alice-c + bob-c}"), "c.author should be resolved value");
+
+        String expectedMerged = """
+                    @article{a,
+                    author = {author-a},
+                    doi = {xya},
+                    }
+
+                    @article{b,
+                    author = {author-b},
+                    doi = {xyz},
+                    }
+
+                    @article{c,
+                    author = {alice-c + bob-c},
+                    title = {Title C},
+                    }
+                """;
+        assertEquals(normalize(expectedMerged), normalize(mergedText), "Merged content did not match expected result");
     }
 
     @Test
