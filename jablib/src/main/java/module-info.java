@@ -258,5 +258,6 @@ open module org.jabref.jablib {
     requires org.jooq.jool;
     requires org.libreoffice.uno;
     requires transitive org.jspecify;
+    requires com.fasterxml.jackson.datatype.jdk8;
     // endregion
 }
