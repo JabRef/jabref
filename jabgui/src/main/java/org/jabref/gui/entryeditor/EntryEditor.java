@@ -240,7 +240,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
     private void findAndSetupEditorTextFields(Parent parent) {
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (child instanceof EditorTextField editor) {
-                System.out.println("Setting up navigation for EditorTextField: " + editor.getId());
                 editor.setupTabNavigation(this::isLastFieldInCurrentTab, this::moveToNextTabAndFocus);
             } else if (child instanceof Parent childParent) {
                 findAndSetupEditorTextFields(childParent);
@@ -473,7 +472,6 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
         Platform.runLater(() -> {
             for (Tab tab : tabbed.getTabs()) {
-                System.out.println("Processing tab: " + tab.getText());
                 if (tab instanceof FieldsEditorTab fieldsTab) {
                     setupNavigationForTab(fieldsTab);
                 }
