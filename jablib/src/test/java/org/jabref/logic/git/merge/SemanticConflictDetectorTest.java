@@ -1,4 +1,4 @@
-package org.jabref.logic.git.util;
+package org.jabref.logic.git.merge;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -10,7 +10,8 @@ import java.util.stream.Stream;
 import org.jabref.logic.git.conflicts.SemanticConflictDetector;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
-import org.jabref.logic.git.merge.MergePlan;
+import org.jabref.logic.git.model.MergePlan;
+import org.jabref.logic.git.util.NoopGitSystemReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
