@@ -15,6 +15,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -28,7 +29,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -209,7 +209,7 @@ public class DefaultMergeBookkeeperTest {
                   author = {local-1},
                 }
                 """;
-        writeAndCommit(localGit, bibPath, localAdvance, "local advance", localUser);
+        RevCommit localBeforeMerge = writeAndCommit(localGit, bibPath, localAdvance, "local advance", localUser);
         // equals to `git fetch origin`, only update remote references without modifying the working directory
         localGit.fetch().setRemote("origin").call();
 
@@ -231,15 +231,24 @@ public class DefaultMergeBookkeeperTest {
         BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
         assertEquals(BookkeepingResult.Kind.NEW_COMMIT,
                 result.kind(),
-                "Expected a new single-parent commit on top of remote tip");
+                "Expected a merge commit");
 
         RevCommit head = latestCommit(localGit);
         assertEquals(2, head.getParentCount(), "Should be a two-parent merge commit");
 
         RevCommit remoteTip = latestCommitOnRemoteTracking(localGit);
         List<String> parentIds = List.of(head.getParent(0).getId().name(), head.getParent(1).getId().name());
-        assertTrue(parentIds.contains(remoteTip.getId().name()), "One parent must be origin/main tip");
 
+        RevCommit parent0 = head.getParent(0);
+        RevCommit parent1 = head.getParent(1);
+        List<ObjectId> actualParents = List.of(parent0.getId(), parent1.getId());
+
+        assertEquals(
+                List.of(localBeforeMerge.getId(), remoteTip.getId()).stream().sorted().toList(),
+                actualParents.stream().sorted().toList(),
+                "Parents should be [local before merge, origin/main tip]"
+        );
+        
         String committed = GitFileReader
                 .readFileFromCommit(localGit, head, Path.of("library.bib"))
                 .orElseThrow(() -> new IllegalStateException("library.bib missing in commit"));

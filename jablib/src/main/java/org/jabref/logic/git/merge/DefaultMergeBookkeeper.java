@@ -92,9 +92,9 @@ public final class DefaultMergeBookkeeper implements MergeBookkeeper {
         }
     }
 
-    private static boolean blobEqualsCommitPath(Git git, RevCommit commit, String relPath, Path file) {
+    private static boolean blobEqualsCommitPath(Git git, RevCommit commit, String relativePath, Path file) {
         try {
-            Optional<String> content = GitFileReader.readFileFromCommit(git, commit, Path.of(relPath));
+            Optional<String> content = GitFileReader.readFileFromCommit(git, commit, Path.of(relativePath));
             if (content.isEmpty()) {
                 return false;
             }

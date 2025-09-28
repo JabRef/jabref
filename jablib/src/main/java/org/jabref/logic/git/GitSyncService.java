@@ -38,7 +38,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 ///
 /// - prepareMerge(): Perform only fetch/status/locate commits/read three databases/detect conflicts/generate automatic patches (MergePlan) and statistics; do not write to disk.
 /// - finalizeMerge(): After the GUI has been successfully committed to disk, it is responsible for stage and commit.
-// TODO: Considering Git status -> state machine
 public class GitSyncService {
     private final ImportFormatPreferences importFormatPreferences;
     private final GitHandlerRegistry gitHandlerRegistry;
