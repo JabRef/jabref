@@ -37,19 +37,11 @@ public final class PullPlan {
 
     public static PullPlan of(SyncStatus syncStatus,
                               Optional<RevCommit> base,
-                              RevCommit remote,
                               RevCommit localHead,
+                              RevCommit remote,
                               MergePlan autoPlan,
                               List<ThreeWayEntryConflict> conflicts) {
         return new PullPlan(syncStatus, base, localHead, remote, autoPlan, conflicts);
-    }
-
-    public static PullPlan noop() {
-        return new PullPlan(SyncStatus.UP_TO_DATE, Optional.empty(), null, null, MergePlan.empty(), List.of());
-    }
-
-    public static PullPlan noopAhead() {
-        return new PullPlan(SyncStatus.AHEAD, Optional.empty(), null, null, MergePlan.empty(), List.of());
     }
 
     public SyncStatus status() {

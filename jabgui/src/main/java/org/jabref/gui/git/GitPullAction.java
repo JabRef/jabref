@@ -77,24 +77,18 @@ public class GitPullAction extends SimpleCommand {
 
         BackgroundTask
                 .wrap(() -> prepareMergeResult(activeDatabase, bibFilePath, gitHandlerRegistry))
-                .onSuccess(pullComputation -> {
-                    if (pullComputation.isNoop()) {
+                .onSuccess(pullPlanOpt -> {
+                    if (pullPlanOpt.isEmpty()) {
                         dialogService.showInformationDialogAndWait(
                                 Localization.lang("Git Pull"),
-                                Localization.lang("Already up to date.")
-                        );
-                        return;
-                    }
-                    if (pullComputation.isNoopAhead()) {
-                        dialogService.showInformationDialogAndWait(
-                                Localization.lang("Git Pull"),
-                                Localization.lang("Local branch is ahead of remote. No changes were made.")
+                                Localization.lang("Already up to date or local branch is ahead.")
                         );
                         return;
                     }
 
-                    MergePlan autoMergePlan = pullComputation.autoPlan();
-                    List<ThreeWayEntryConflict> conflicts = pullComputation.conflicts();
+                    PullPlan pullPlan = pullPlanOpt.get();
+                    MergePlan autoMergePlan = pullPlan.autoPlan();
+                    List<ThreeWayEntryConflict> conflicts = pullPlan.conflicts();
 
                     int autoNewCount = autoMergePlan.newEntries().size();
                     int autoModifiedCount = autoMergePlan.fieldPatches().size();
@@ -117,7 +111,7 @@ public class GitPullAction extends SimpleCommand {
                         manualResolvedCount = 0;
                     }
 
-                    BackgroundTask.wrap(() -> saveAndFinalize(bibFilePath, activeDatabase, pullComputation))
+                    BackgroundTask.wrap(() -> saveAndFinalize(bibFilePath, activeDatabase, pullPlan))
                                   .onSuccess(finalizeResult -> {
                                       gitStatusViewModel.refresh(bibFilePath);
                                       if (finalizeResult.isFastForward()) {
@@ -152,7 +146,7 @@ public class GitPullAction extends SimpleCommand {
                 .executeWith(taskExecutor);
     }
 
-    private PullPlan prepareMergeResult(BibDatabaseContext databaseContext, Path bibPath, GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
+    private Optional<PullPlan> prepareMergeResult(BibDatabaseContext databaseContext, Path bibPath, GitHandlerRegistry registry) throws IOException, GitAPIException, JabRefException {
         GitSyncService gitSyncService = GitSyncService.create(guiPreferences.getImportFormatPreferences(), registry);
         GitHandler handler = registry.get(bibPath.getParent());
         String user = guiPreferences.getGitPreferences().getUsername();

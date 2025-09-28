@@ -58,7 +58,7 @@ public class GitSyncService {
     }
 
     ///  compute merge inputs/outputs for GUI
-    public PullPlan prepareMerge(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
+    public Optional<PullPlan> prepareMerge(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
         Optional<Path> repoRoot = GitHandler.findRepositoryRoot(bibFilePath);
         if (repoRoot.isEmpty()) {
             throw new JabRefException("Pull aborted: Path is not inside a Git repository.");
@@ -82,10 +82,10 @@ public class GitSyncService {
         }
 
         if (status.syncStatus() == SyncStatus.UP_TO_DATE) {
-            return PullPlan.noop();
+            return Optional.empty();
         }
         if (status.syncStatus() == SyncStatus.AHEAD) {
-            return PullPlan.noopAhead();
+            return Optional.empty();
         }
 
         try (Git git = gitHandler.open()) {
@@ -124,7 +124,7 @@ public class GitSyncService {
             MergePlan autoPlan = analysis.autoPlan();
 
             // 5) return computation (GUI will apply & save, then finalize)
-            return PullPlan.of(status.syncStatus(), baseCommitOpt, remoteCommit, localHead, autoPlan, conflicts);
+            return Optional.of(PullPlan.of(status.syncStatus(), baseCommitOpt, localHead, remoteCommit, autoPlan, conflicts));
         }
     }
 
