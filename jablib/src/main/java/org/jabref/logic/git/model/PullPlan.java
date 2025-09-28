@@ -8,11 +8,10 @@ import org.jabref.logic.git.status.SyncStatus;
 
 import org.eclipse.jgit.revwalk.RevCommit;
 
-/// PullComputation contains:
+/// PullPlan contains:
 ///  base / remote / localHead commits (for finalize)
 ///  autoPlan: MergePlan of auto-applicable patches (no conflicts)
 ///  conflicts: List<ThreeWayEntryConflict> that require user resolution
-///  stats: MergeStats for UX visibility
 public final class PullPlan {
     private final SyncStatus status;
     private final Optional<RevCommit> base;

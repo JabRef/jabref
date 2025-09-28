@@ -322,7 +322,7 @@ public class GitHandler {
             }
             pullCommand.call();
         } catch (GitAPIException e) {
-            LOGGER.info("Failed to pull");
+            LOGGER.info("Failed to pull.");
         }
     }
 
