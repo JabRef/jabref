@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- Made "Configure API key" option in the Web Search preferences tab searchable via preferences search. [#13929](https://github.com/JabRef/jabref/issues/13929)
 - We added the integrity check to the jabkit cli application. [#13848](https://github.com/JabRef/jabref/issues/13848)
 - We added support for Cygwin-file paths on a Windows Operating System. [#13274](https://github.com/JabRef/jabref/issues/13274)
 - We fixed an issue where "Print preview" would throw a `NullPointerException` if no printers were available. [#13708](https://github.com/JabRef/jabref/issues/13708)
@@ -153,7 +154,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- Made "Configure API key" option in the Web Search preferences tab searchable via preferences search. [#13929](https://github.com/JabRef/jabref/issues/13929)
 - We added a button in Privacy notice and Mr. DLib Privacy settings notice for hiding related tabs. [#11707](https://github.com/JabRef/jabref/issues/11707)
 - We added buttons "Add example entry" and "Import existing PDFs" when a library is empty, making it easier for new users to get started. [#12662](https://github.com/JabRef/jabref/issues/12662)
 - In the Open/LibreOffice integration, we added the provision to modify the bibliography title and its format for CSL styles, in the "Select style" dialog. [#12663](https://github.com/JabRef/jabref/issues/12663)
