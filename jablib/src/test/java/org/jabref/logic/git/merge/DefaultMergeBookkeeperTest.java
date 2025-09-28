@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.io.GitFileReader;
@@ -124,7 +125,11 @@ public class DefaultMergeBookkeeperTest {
         BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(aliceContent, importPrefs);
         bibDatabaseContext.setDatabasePath(bibPath);
 
-        PullPlan plan = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
+        Optional<PullPlan> planOpt = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
+        if (planOpt.isEmpty()) {
+            throw new IllegalStateException("PullPlan must not be empty");
+        }
+        PullPlan plan = planOpt.get();
 
         // The final content saved in the GUI == remote content (fast-forward scenario)
         Files.writeString(bibPath, remoteAdvance, StandardCharsets.UTF_8);
@@ -159,7 +164,11 @@ public class DefaultMergeBookkeeperTest {
         String localContent = Files.readString(bibPath);
         BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(localContent, importPrefs);
         bibDatabaseContext.setDatabasePath(bibPath);
-        PullPlan plan = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
+        Optional<PullPlan> planOpt = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
+        if (planOpt.isEmpty()) {
+            throw new IllegalStateException("PullPlan must not be empty");
+        }
+        PullPlan plan = planOpt.get();
 
         // GUI layer has already written the final merged content to disk;
         // in this scenario it intentionally differs from the remote tip
@@ -217,7 +226,11 @@ public class DefaultMergeBookkeeperTest {
         String content = Files.readString(bibPath);
         BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(content, importPrefs);
         bibDatabaseContext.setDatabasePath(bibPath);
-        PullPlan plan = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
+        Optional<PullPlan> planOpt = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
+        if (planOpt.isEmpty()) {
+            throw new IllegalStateException("PullPlan must not be empty");
+        }
+        PullPlan plan = planOpt.get();
 
         // GUI saved merged final content
         String finalMerged = """
@@ -248,7 +261,7 @@ public class DefaultMergeBookkeeperTest {
                 actualParents.stream().sorted().toList(),
                 "Parents should be [local before merge, origin/main tip]"
         );
-        
+
         String committed = GitFileReader
                 .readFileFromCommit(localGit, head, Path.of("library.bib"))
                 .orElseThrow(() -> new IllegalStateException("library.bib missing in commit"));

@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
@@ -208,16 +209,16 @@ class GitSyncServiceTest {
     @Test
     void pullTriggersSemanticMergeWhenNoConflicts() throws Exception {
         GitSyncService syncService = GitSyncService.create(importFormatPreferences, gitHandlerRegistry);
-        PullPlan pullPlan = syncService.prepareMerge(context, library);
+        Optional<PullPlan> pullPlan = syncService.prepareMerge(context, library);
 
-        assertEquals(List.of(), pullPlan.conflicts(), "Expected no conflicts");
-        assertFalse(pullPlan.autoPlan().isEmpty(), "Expected auto changes from remote");
-        assertFalse(pullPlan.isNoop(), "Should not be UP_TO_DATE");
-        assertFalse(pullPlan.isNoopAhead(), "Should not be AHEAD");
+        assertEquals(List.of(), pullPlan.get().conflicts(), "Expected no conflicts");
+        assertFalse(pullPlan.get().autoPlan().isEmpty(), "Expected auto changes from remote");
+        assertFalse(pullPlan.get().isNoop(), "Should not be UP_TO_DATE");
+        assertFalse(pullPlan.get().isNoopAhead(), "Should not be AHEAD");
 
-        applyAutoPlan(context, pullPlan.autoPlan());
+        applyAutoPlan(context, pullPlan.get().autoPlan());
         GitFileWriter.write(library, context, importFormatPreferences);
-        BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan);
+        BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
 
         assertFalse(bookkeepingResult.isFastForward(), "DIVERGED without conflicts should produce a merge commit");
         RevCommit head = aliceGit.log().setMaxCount(1).call().iterator().next();
@@ -243,16 +244,16 @@ class GitSyncServiceTest {
     @Test
     void pushTriggersMergeAndPushWhenNoConflicts() throws Exception {
         GitSyncService syncService = GitSyncService.create(importFormatPreferences, gitHandlerRegistry);
-        PullPlan pullPlan = syncService.prepareMerge(context, library);
+        Optional<PullPlan> pullPlan = syncService.prepareMerge(context, library);
 
-        assertFalse(pullPlan.isNoop(), "Should not be up to date");
-        assertFalse(pullPlan.isNoopAhead(), "Should not be ahead");
-        assertEquals(List.of(), pullPlan.conflicts(), "This case expects an auto-merge only");
+        assertFalse(pullPlan.get().isNoop(), "Should not be up to date");
+        assertFalse(pullPlan.get().isNoopAhead(), "Should not be ahead");
+        assertEquals(List.of(), pullPlan.get().conflicts(), "This case expects an auto-merge only");
 
-        applyAutoPlan(context, pullPlan.autoPlan());
+        applyAutoPlan(context, pullPlan.get().autoPlan());
         GitFileWriter.write(library, context, importFormatPreferences);
 
-        BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan);
+        BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
         assertEquals(BookkeepingResult.Kind.NEW_COMMIT, bookkeepingResult.kind(), "Expected bookkeeping to create a new commit");
 
         PushResult pushResult = syncService.push(context, library);
@@ -324,12 +325,12 @@ class GitSyncServiceTest {
         String actualContent = Files.readString(library);
         context = BibDatabaseContext.of(actualContent, importFormatPreferences);
 
-        PullPlan pullPlan = syncService.prepareMerge(context, library);
-        assertFalse(pullPlan.isNoop(), "Should not be up to date");
-        assertFalse(pullPlan.isNoopAhead(), "Should not be ahead");
-        assertFalse(pullPlan.conflicts().isEmpty(), "This case expects a conflict");
+        Optional<PullPlan> pullPlan = syncService.prepareMerge(context, library);
+        assertFalse(pullPlan.get().isNoop(), "Should not be up to date");
+        assertFalse(pullPlan.get().isNoopAhead(), "Should not be ahead");
+        assertFalse(pullPlan.get().conflicts().isEmpty(), "This case expects a conflict");
 
-        applyAutoPlan(context, pullPlan.autoPlan());
+        applyAutoPlan(context, pullPlan.get().autoPlan());
         // Setup mock conflict resolver
         GitConflictResolverStrategy resolver = mock(GitConflictResolverStrategy.class);
         when(resolver.resolveConflicts(anyList())).thenAnswer(invocation -> {
@@ -342,12 +343,12 @@ class GitSyncServiceTest {
             return List.of(resolved);
         });
 
-        List<BibEntry> resolvedEntries = resolver.resolveConflicts(pullPlan.conflicts());
+        List<BibEntry> resolvedEntries = resolver.resolveConflicts(pullPlan.get().conflicts());
         verify(resolver).resolveConflicts(anyList());
         applyResolved(context, resolvedEntries);
 
         GitFileWriter.write(library, context, importFormatPreferences);
-        BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan);
+        BookkeepingResult bookkeepingResult = syncService.finalizeMerge(library, pullPlan.orElse(null));
         assertEquals(BookkeepingResult.Kind.NEW_COMMIT, bookkeepingResult.kind(), "Expected bookkeeping to create a new commit");
 
         String mergedText = Files.readString(library);
