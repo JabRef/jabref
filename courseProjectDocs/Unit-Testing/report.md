@@ -1,7 +1,7 @@
 ## To Run Tests
 
 ### New test cases
-These test cases were added in order to assist with the lack of code coverage on certain branches: specifcally, the citationstyle and formatter modules.
+These test cases were added in order to assist with the lack of code coverage on certain branches: specifically, the citationstyle and formatter modules.
 
 In order to recreate the following: 
 - Import assertThrows and assertNotEquals
@@ -10,10 +10,12 @@ In order to recreate the following:
 
 ### Test Cases
 
-| JabRefDataItemProvider | FormatterTest | 
-| toJsonMultipleAuthorOneEntry  | getFormatTestWhiteSpace  |
-| toJsonNoEntryType      | getHugeInputSize  |
-|       -     |  testNonASCIICharacters  | 
+JabRefDataItemProvider             | FormatterTest
+----------------------------------|---------------------------
+| toJsonMultipleAuthorOneEntry       | getFormatTestWhiteSpace |
+| toJsonNoEntryType                  | getHugeInputSize |
+| -                                 | testNonASCIICharacters |
+
 
 ## To replicate JabRefDataItemProvider: 
 - **toJsonMultipleAuthorOneEntry**
