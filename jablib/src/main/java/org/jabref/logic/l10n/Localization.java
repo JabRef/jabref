@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseStandardStreams;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.LoggerFactory;
 
 /// Provides handling for messages and menu entries in the preferred language of the user.
@@ -138,9 +139,7 @@ public class Localization {
      * @param params The parameters that should be inserted into the message
      * @return The final message with replaced parameters.
      */
-    private static String lookup(LocalizationBundle bundle, String key, String... params) {
-        Objects.requireNonNull(key);
-
+    private static String lookup(@NonNull LocalizationBundle bundle, @NonNull String key, String... params) {
         String translation = bundle.containsKey(key) ? bundle.getString(key) : "";
         if (translation.isEmpty()) {
             LoggerFactory.getLogger(Localization.class).warn("Warning: could not get translation for \"{}\" for locale {}", key, Locale.getDefault());
@@ -161,8 +160,7 @@ public class Localization {
         }
 
         @Override
-        public final Object handleGetObject(String key) {
-            Objects.requireNonNull(key);
+        public final Object handleGetObject(@NonNull String key) {
             return Optional.ofNullable(lookup.get(key))
                            .orElse(key);
         }

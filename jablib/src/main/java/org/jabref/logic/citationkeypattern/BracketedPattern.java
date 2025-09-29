@@ -164,8 +164,7 @@ public class BracketedPattern {
      * @param database The database to use for string-lookups and cross-refs. May be null.
      * @return The expanded pattern. The empty string is returned, if it could not be expanded.
      */
-    public String expand(BibEntry bibentry, BibDatabase database) {
-        Objects.requireNonNull(bibentry);
+    public String expand(@NonNull BibEntry bibentry, BibDatabase database) {
         Character keywordDelimiter = ';';
         return expand(bibentry, keywordDelimiter, database);
     }
@@ -178,8 +177,7 @@ public class BracketedPattern {
      * @param database         The database to use for string-lookups and cross-refs. May be null.
      * @return The expanded pattern. The empty string is returned, if it could not be expanded.
      */
-    public String expand(BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
-        Objects.requireNonNull(bibentry);
+    public String expand(@NonNull BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
         return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);
     }
 

@@ -1,12 +1,13 @@
 package org.jabref.logic.integrity;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.OptionalUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * This is a "proxy" to use a {@link ValueChecker} as {@link EntryChecker}.
@@ -16,9 +17,9 @@ public class FieldChecker implements EntryChecker {
     protected final Field field;
     private final ValueChecker checker;
 
-    public FieldChecker(Field field, ValueChecker checker) {
+    public FieldChecker(Field field, @NonNull ValueChecker checker) {
         this.field = field;
-        this.checker = Objects.requireNonNull(checker);
+        this.checker = checker;
     }
 
     @Override

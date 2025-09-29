@@ -3,7 +3,6 @@ package org.jabref.gui.maintable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -46,6 +45,7 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.groups.AbstractGroup;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,15 +64,15 @@ public class MainTableColumnFactory {
     private final StateManager stateManager;
     private final MainTableTooltip tooltip;
 
-    public MainTableColumnFactory(BibDatabaseContext database,
-                                  GuiPreferences preferences,
+    public MainTableColumnFactory(@NonNull BibDatabaseContext database,
+                                  @NonNull GuiPreferences preferences,
                                   ColumnPreferences abstractColumnPrefs,
                                   UndoManager undoManager,
                                   DialogService dialogService,
                                   StateManager stateManager,
                                   TaskExecutor taskExecutor) {
-        this.database = Objects.requireNonNull(database);
-        this.preferences = Objects.requireNonNull(preferences);
+        this.database = database;
+        this.preferences = preferences;
         this.columnPreferences = abstractColumnPrefs;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
@@ -219,7 +219,7 @@ public class MainTableColumnFactory {
 
     private Node createGroupColorRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
         List<Color> groupColors = matchedGroups.stream()
-                                               .flatMap(group -> group.getColor().stream())
+                                               .flatMap(group -> group.getColor().map(Color::valueOf).stream())
                                                .toList();
 
         if (!groupColors.isEmpty()) {
@@ -253,7 +253,7 @@ public class MainTableColumnFactory {
     private Node createGroupIconRegion(BibEntryTableViewModel entry, List<AbstractGroup> matchedGroups) {
         List<JabRefIcon> groupIcons = matchedGroups.stream()
                                                    .filter(abstractGroup -> abstractGroup.getIconName().isPresent())
-                                                   .flatMap(group -> IconTheme.findIcon(group.getIconName().get(), group.getColor().orElse(IconTheme.getDefaultGroupColor())).stream()
+                                                   .flatMap(group -> IconTheme.findIcon(group.getIconName().get(), group.getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor())).stream()
                                                    )
                                                    .toList();
         if (!groupIcons.isEmpty()) {

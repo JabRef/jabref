@@ -1,6 +1,5 @@
 package org.jabref.gui.edit;
 
-import java.util.Objects;
 import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
@@ -17,21 +16,22 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
+import org.jspecify.annotations.NonNull;
+
 public class ReplaceStringViewModel extends AbstractViewModel {
     private boolean allFieldReplace;
     private String findString;
     private String replaceString;
     private Set<Field> fields;
-    private LibraryTab panel;
+    private final LibraryTab panel;
 
-    private StringProperty findStringProperty = new SimpleStringProperty();
-    private StringProperty replaceStringProperty = new SimpleStringProperty();
-    private StringProperty fieldStringProperty = new SimpleStringProperty();
-    private BooleanProperty allFieldReplaceProperty = new SimpleBooleanProperty();
-    private BooleanProperty selectOnlyProperty = new SimpleBooleanProperty();
+    private final StringProperty findStringProperty = new SimpleStringProperty();
+    private final StringProperty replaceStringProperty = new SimpleStringProperty();
+    private final StringProperty fieldStringProperty = new SimpleStringProperty();
+    private final BooleanProperty allFieldReplaceProperty = new SimpleBooleanProperty();
+    private final BooleanProperty selectOnlyProperty = new SimpleBooleanProperty();
 
-    public ReplaceStringViewModel(LibraryTab libraryTab) {
-        Objects.requireNonNull(libraryTab);
+    public ReplaceStringViewModel(@NonNull LibraryTab libraryTab) {
         this.panel = libraryTab;
     }
 

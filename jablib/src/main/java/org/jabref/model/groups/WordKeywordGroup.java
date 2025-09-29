@@ -18,6 +18,8 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.ListUtil;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Matches entries if a given field contains a specified word.
  */
@@ -65,9 +67,7 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     }
 
     @Override
-    public List<FieldChange> add(Collection<BibEntry> entriesToAdd) {
-        Objects.requireNonNull(entriesToAdd);
-
+    public List<FieldChange> add(@NonNull Collection<BibEntry> entriesToAdd) {
         List<FieldChange> changes = new ArrayList<>();
         for (BibEntry entry : new ArrayList<>(entriesToAdd)) {
             if (!contains(entry)) {
@@ -82,8 +82,7 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     }
 
     @Override
-    public List<FieldChange> remove(List<BibEntry> entriesToRemove) {
-        Objects.requireNonNull(entriesToRemove);
+    public List<FieldChange> remove(@NonNull List<BibEntry> entriesToRemove) {
         List<FieldChange> changes = new ArrayList<>();
         for (BibEntry entry : new ArrayList<>(entriesToRemove)) {
             if (contains(entry)) {
