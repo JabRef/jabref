@@ -6,10 +6,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.util.io.FileUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /// URL utilities for URLs in the JabRef logic.
 ///
@@ -38,9 +39,7 @@ public class URLUtil {
      * @param url the Google search URL string
      * @return the cleaned Google URL or @code{url} if no search URL was detected
      */
-    public static String cleanGoogleSearchURL(String url) {
-        Objects.requireNonNull(url);
-
+    public static String cleanGoogleSearchURL(@NonNull String url) {
         if (!url.matches(GOOGLE_SEARCH_EXP)) {
             return url;
         }

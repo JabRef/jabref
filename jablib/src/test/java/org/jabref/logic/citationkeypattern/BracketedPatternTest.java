@@ -386,6 +386,15 @@ class BracketedPatternTest {
     }
 
     @Test
+    void expandBracketsWithMissingAuthorAndYear() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "").withField(StandardField.YEAR, "");
+
+        assertEquals(" - ",
+                BracketedPattern.expandBrackets("[author] - [year]", ';', bibEntry, database));
+    }
+
+    @Test
     void bibentryExpansionTest() {
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
         assertEquals("2017_Kitsune_213", pattern.expand(bibentry));
@@ -484,14 +493,6 @@ class BracketedPatternTest {
                 .withField(StandardField.YEAR, "2017")
                 .withField(StandardField.PAGES, "213--216");
         assertEquals("2017_Gražulis_213", pattern.expand(another_bibentry, ';', another_database));
-    }
-
-    @Test
-    void nullBibentryBracketExpansionTest() {
-        BibDatabase another_database = null;
-        BibEntry another_bibentry = null;
-        BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
-        assertThrows(NullPointerException.class, () -> pattern.expand(another_bibentry, ';', another_database));
     }
 
     @Test

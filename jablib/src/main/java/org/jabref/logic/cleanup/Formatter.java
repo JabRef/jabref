@@ -1,5 +1,7 @@
 package org.jabref.logic.cleanup;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * The Formatter is used for a Filter design-pattern. Extending classes have to accept a String and returned a formatted
  * version of it. Implementations have to reside in the logic package.
@@ -26,13 +28,11 @@ public abstract class Formatter {
 
     /**
      * Formats a field value by with a particular formatter transformation.
-     * <p>
-     * Calling this method with a null argument results in a NullPointerException.
      *
      * @param value the input String
      * @return the formatted output String
      */
-    public abstract String format(String value);
+    public abstract String format(@NonNull String value);
 
     /**
      * Returns a description of the formatter.

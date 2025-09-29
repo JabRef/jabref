@@ -2,10 +2,11 @@ package org.jabref.model.entry.identifier;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents an RFC identifier, which can be used to fetch bibliographic information about the RFC document.
@@ -22,8 +23,8 @@ public class RFC extends EprintIdentifier {
      * @param rfcString The RFC ID or URL, which will be converted to lowercase and trimmed.
      * @throws NullPointerException if the given rfcString is null.
      */
-    public RFC(String rfcString) {
-        this.rfcString = Objects.requireNonNull(rfcString).trim().toLowerCase();
+    public RFC(@NonNull String rfcString) {
+        this.rfcString = rfcString.trim().toLowerCase();
     }
 
     /**
