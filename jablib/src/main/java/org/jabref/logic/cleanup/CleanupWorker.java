@@ -57,6 +57,10 @@ public class CleanupWorker {
             jobs.addAll(preset.getFieldFormatterCleanups().getConfiguredActions());
         }
 
+        if (preset.getBooktitleCleanups().isEnabled()) {
+            jobs.add(preset.getBooktitleCleanups());
+        }
+
         return jobs;
     }
 
