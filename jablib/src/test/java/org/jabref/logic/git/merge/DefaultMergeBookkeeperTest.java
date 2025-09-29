@@ -125,19 +125,23 @@ public class DefaultMergeBookkeeperTest {
         BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(aliceContent, importPrefs);
         bibDatabaseContext.setDatabasePath(bibPath);
 
-        Optional<PullPlan> plan = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
+        Optional<PullPlan> planOpt = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
+        if (planOpt.isEmpty()) {
+            throw new IllegalStateException("PullPlan must not be empty");
+        }
+        PullPlan plan = planOpt.get();
 
         // The final content saved in the GUI == remote content (fast-forward scenario)
         Files.writeString(bibPath, remoteAdvance, StandardCharsets.UTF_8);
 
         // Bookkeeping
         MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
-        BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan.orElse(null));
+        BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
 
         assertEquals(BookkeepingResult.Kind.FAST_FORWARD, result.kind(), "Expected a fast-forward");
         // assert：HEAD == origin/main
         RevCommit headNow = latestCommit(localGit);
-        assertEquals(plan.get().remote().getId(), headNow.getId(), "HEAD must equal remote commit after FF");
+        assertEquals(plan.remote().getId(), headNow.getId(), "HEAD must equal remote commit after FF");
         Ref head = localGit.getRepository().exactRef("refs/heads/main");
         Ref origin = localGit.getRepository().exactRef("refs/remotes/origin/main");
         assertEquals(origin.getObjectId(), head.getObjectId(), "HEAD should fast-forward to origin/main");
@@ -160,7 +164,11 @@ public class DefaultMergeBookkeeperTest {
         String localContent = Files.readString(bibPath);
         BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(localContent, importPrefs);
         bibDatabaseContext.setDatabasePath(bibPath);
-        Optional<PullPlan> plan = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
+        Optional<PullPlan> planOpt = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
+        if (planOpt.isEmpty()) {
+            throw new IllegalStateException("PullPlan must not be empty");
+        }
+        PullPlan plan = planOpt.get();
 
         // GUI layer has already written the final merged content to disk;
         // in this scenario it intentionally differs from the remote tip
@@ -176,7 +184,7 @@ public class DefaultMergeBookkeeperTest {
         Files.writeString(bibPath, finalMerged, StandardCharsets.UTF_8);
 
         MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
-        BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan.orElse(null));
+        BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
 
         assertEquals(BookkeepingResult.Kind.NEW_COMMIT,
                 result.kind(),
@@ -218,7 +226,11 @@ public class DefaultMergeBookkeeperTest {
         String content = Files.readString(bibPath);
         BibDatabaseContext bibDatabaseContext = BibDatabaseContext.of(content, importPrefs);
         bibDatabaseContext.setDatabasePath(bibPath);
-        Optional<PullPlan> plan = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
+        Optional<PullPlan> planOpt = gitSyncService.prepareMerge(bibDatabaseContext, bibPath);
+        if (planOpt.isEmpty()) {
+            throw new IllegalStateException("PullPlan must not be empty");
+        }
+        PullPlan plan = planOpt.get();
 
         // GUI saved merged final content
         String finalMerged = """
@@ -229,7 +241,7 @@ public class DefaultMergeBookkeeperTest {
         Files.writeString(bibPath, finalMerged, StandardCharsets.UTF_8);
 
         MergeBookkeeper bookkeeper = new DefaultMergeBookkeeper(handlerRegistry);
-        BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan.orElse(null));
+        BookkeepingResult result = bookkeeper.resultRecord(bibPath, plan);
         assertEquals(BookkeepingResult.Kind.NEW_COMMIT,
                 result.kind(),
                 "Expected a merge commit");
