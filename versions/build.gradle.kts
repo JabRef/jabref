@@ -123,7 +123,7 @@ dependencies.constraints {
     api("org.hisp.dhis:json-tree:1.8")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.3.0")
-    api("org.jetbrains:annotations:26.0.2")
+    api("org.jetbrains:annotations:26.0.2-1")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.20.1")
