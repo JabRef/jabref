@@ -36,5 +36,5 @@ JabRefDataItemProvider             | FormatterTest
   - assertNotThrow non-ascii
 
 ## Test Results
-
+![image](test_results.png)
 Coverage improvement analysis (compare with Baseline)
