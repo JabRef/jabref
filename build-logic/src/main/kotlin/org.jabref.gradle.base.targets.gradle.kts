@@ -11,7 +11,8 @@ javaModulePackaging {
         "--ignore-signing-information",
         "--compress", "zip-6",
         "--no-header-files",
-        "--no-man-pages"
+        "--no-man-pages",
+        "--bind-services",
     )
 
     target("ubuntu-22.04") {
