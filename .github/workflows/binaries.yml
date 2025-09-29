@@ -221,7 +221,7 @@ jobs:
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
-          keychain-password: jabref
+          keychain-password: tEmPoRaRY-PaeSWD
       - name: Setup macOS key chain for app id cert
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
@@ -229,7 +229,7 @@ jobs:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
-          keychain-password: jabref
+          keychain-password: tEmPoRaRY-PaeSWD
       - name: Build runtime image and installer
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
