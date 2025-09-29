@@ -20,22 +20,22 @@ public class BooktitleLocationCheckerTest {
     static void setUpLocationChecker() throws JabRefException {
         // Create test location data - major cities and countries for testing
         String testLocationData = """
-            paris
-            london
-            new york
-            san francisco
-            hong kong
-            st petersburg
-            al-kharijah
-            'abas abad
-            los angeles
-            berlin
-            vienna
-            prague
-            tokyo
-            seoul
-            fort st. john
-            """;
+                paris
+                london
+                new york
+                san francisco
+                hong kong
+                st petersburg
+                al-kharijah
+                'abas abad
+                los angeles
+                berlin
+                vienna
+                prague
+                tokyo
+                seoul
+                fort st. john
+                """;
 
         LocationDetector detector = LocationDetector.createTestInstance(
                 new ByteArrayInputStream(testLocationData.getBytes(StandardCharsets.UTF_8))

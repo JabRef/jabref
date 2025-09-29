@@ -59,8 +59,8 @@ public class BooktitleCleanupPanel extends VBox {
 
     public BooktitleCleanupPanel() {
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @FXML

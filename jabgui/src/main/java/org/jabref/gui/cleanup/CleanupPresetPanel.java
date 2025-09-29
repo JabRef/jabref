@@ -175,8 +175,8 @@ public class CleanupPresetPanel extends VBox {
         return new CleanupPreferences(
                 activeJobs,
                 new FieldFormatterCleanups(
-                    !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
-                    formatterCleanupsPanel.cleanupsProperty()
+                        !formatterCleanupsPanel.cleanupsDisableProperty().getValue(),
+                        formatterCleanupsPanel.cleanupsProperty()
                 ),
                 booktitleCleanupPanel.createCleanupAction()
         );

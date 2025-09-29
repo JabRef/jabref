@@ -21,10 +21,10 @@ import org.jspecify.annotations.NonNull;
 
 public class BooktitleCleanups implements CleanupJob {
     private static final Pattern CLEANUP = Pattern.compile(
-        "\\s{2,}"                               // 1. multiple spaces
-        + "|\\s*(?:[,.;!?]\\s*)*([,.;!?])"      // 2. staggered punctuation (with optional spaces)
-        + "|\\s+([)}\\]])"                      // 3. space(s) before a closing bracket/paren
-        + "|([({\\[])[ \\s]+"                   // 4. space(s) after an opening bracket/paren
+            "\\s{2,}"                               // 1. multiple spaces
+                    + "|\\s*(?:[,.;!?]\\s*)*([,.;!?])"      // 2. staggered punctuation (with optional spaces)
+                    + "|\\s+([)}\\]])"                      // 3. space(s) before a closing bracket/paren
+                    + "|([({\\[])[ \\s]+"                   // 4. space(s) after an opening bracket/paren
     );
 
     private final BooktitleCleanupAction yearAction;
@@ -209,8 +209,8 @@ public class BooktitleCleanups implements CleanupJob {
     private static String removeLocationsFromTitle(Set<String> foundLocations, String title) {
         // Construct a regex string to match all found locations
         String locationRegex = foundLocations.stream()
-                                               .map(location -> Pattern.quote(location).replace("\\ ", "\\\\s+"))
-                                               .collect(Collectors.joining("|", "\\b(?:", ")\\b"));
+                                             .map(location -> Pattern.quote(location).replace("\\ ", "\\\\s+"))
+                                             .collect(Collectors.joining("|", "\\b(?:", ")\\b"));
 
         return Pattern.compile(locationRegex, Pattern.CASE_INSENSITIVE)
                       .matcher(title)
