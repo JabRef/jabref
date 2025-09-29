@@ -174,6 +174,8 @@ class JournalAbbreviationRepositoryTest {
 
     @Test
     void abbreviationsWithEscapedAmpersand() {
+        String key = "ACS Applied Materials & Interfaces";
+        assertTrue(repository.get("ACS Applied Materials & Interfaces").isPresent(), "Missing abbreviation for key " + key);
         assertEquals(new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces"), repository.get("ACS Applied Materials & Interfaces").get());
         assertEquals(new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces"), repository.get("ACS Applied Materials \\& Interfaces").get());
         assertEquals(new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Signaling"), repository.get("Antioxidants & Redox Signaling").get());
