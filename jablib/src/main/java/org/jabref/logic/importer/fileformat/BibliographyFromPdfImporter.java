@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,6 +35,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,13 +81,12 @@ public class BibliographyFromPdfImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader input) throws IOException {
         return input.readLine().startsWith("%PDF");
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         throw new UnsupportedOperationException("BibliopgraphyFromPdfImporter does not support importDatabase(BufferedReader reader)."
                 + "Instead use importDatabase(Path filePath).");
     }
@@ -209,7 +208,7 @@ public class BibliographyFromPdfImporter extends Importer {
     /**
      * Example: <code>J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016, 2017. doi:10.1088/ 1741-4326/aa6a6a</code>
      *
-     * @param number     The number of the reference - used for logging only
+     * @param number The number of the reference - used for logging only
      */
     @VisibleForTesting
     BibEntry parseReference(String number, String reference) {

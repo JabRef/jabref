@@ -1,11 +1,14 @@
 package org.jabref.model.entry;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.model.ChainNode;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents a keyword in a chain of keywords.
@@ -16,25 +19,30 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
     public static Character DEFAULT_HIERARCHICAL_DELIMITER = '>';
     private final String keyword;
 
-    public Keyword(String keyword) {
+    public Keyword(@NonNull String keyword) {
         super(Keyword.class);
-        this.keyword = Objects.requireNonNull(keyword).trim();
+        this.keyword = keyword.trim();
     }
 
-    /**
-     * Connects all the given keywords into one chain and returns its root,
-     * e.g. "A", "B", "C" is transformed into "A > B > C".
-     */
-    public static Keyword of(String... keywords) {
-        if (keywords.length == 0) {
+    /// Connects all the given keywords into one chain and returns its root,
+    /// e.g. "A", "B", "C" is transformed into "A > B > C".
+    public static Keyword of(List<String> keywords) {
+        if (keywords.isEmpty()) {
             return new Keyword("");
         }
 
-        Keyword root = new Keyword(keywords[0]);
-        for (int i = 1; i < keywords.length; i++) {
-            root.addAtEnd(keywords[i]);
+        Keyword root = new Keyword(keywords.getFirst());
+        for (int i = 1; i < keywords.size(); i++) {
+            root.addAtEnd(keywords.get(i));
         }
         return root;
+    }
+
+    /// Converts a raw String to a single Keyword
+    public static Keyword ofHierarchical(String rawString) {
+        return Keyword.of(Stream.of(rawString.split(Keyword.DEFAULT_HIERARCHICAL_DELIMITER.toString()))
+                                .map(String::trim)
+                                .toList());
     }
 
     @Override

@@ -40,8 +40,8 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
     /**
      * Constructs a URL based on the query, size and page number.
      *
-     * @param queryNode the first search node
-     * @param pageNumber  the number of the page indexed from 0
+     * @param queryNode  the first search node
+     * @param pageNumber the number of the page indexed from 0
      */
     URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException;
 

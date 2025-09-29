@@ -24,7 +24,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +39,7 @@ public class ExporterTest {
 
         Collection<Object[]> result = new ArrayList<>();
         for (Exporter format : exporterFactory.getExporters()) {
-            result.add(new Object[]{format, format.getName()});
+            result.add(new Object[] {format, format.getName()});
         }
         return result.stream();
     }
@@ -52,15 +51,5 @@ public class ExporterTest {
         Files.createFile(tmpFile);
         exportFormat.export(new BibDatabaseContext(), tmpFile, List.of());
         assertEquals(List.of(), Files.readAllLines(tmpFile));
-    }
-
-    @ParameterizedTest
-    @MethodSource("exportFormats")
-    void exportingNullDatabaseThrowsNPE(Exporter exportFormat, String name, @TempDir Path testFolder) {
-        assertThrows(NullPointerException.class, () -> {
-            Path tmpFile = testFolder.resolve("ARandomlyNamedFile");
-            Files.createFile(tmpFile);
-            exportFormat.export(null, tmpFile, List.of());
-        });
     }
 }

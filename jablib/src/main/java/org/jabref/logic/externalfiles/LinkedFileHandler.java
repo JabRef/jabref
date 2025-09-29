@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -31,12 +30,12 @@ public class LinkedFileHandler {
 
     public LinkedFileHandler(LinkedFile linkedFile,
                              BibEntry entry,
-                             BibDatabaseContext databaseContext,
-                             FilePreferences filePreferences) {
+                             @NonNull BibDatabaseContext databaseContext,
+                             @NonNull FilePreferences filePreferences) {
         this.linkedFile = linkedFile;
         this.entry = entry;
-        this.databaseContext = Objects.requireNonNull(databaseContext);
-        this.filePreferences = Objects.requireNonNull(filePreferences);
+        this.databaseContext = databaseContext;
+        this.filePreferences = filePreferences;
     }
 
     public boolean moveToDefaultDirectory() throws IOException {
@@ -136,7 +135,9 @@ public class LinkedFileHandler {
             }
             Integer count = 1;
             boolean exists = false;
+            // @formatter:off
             do {
+                // @formatter:on
                 targetPath = targetDirectory.resolve(sourcePath.getFileName() + " (" + count + ")");
                 exists = Files.exists(targetPath);
                 if (exists && Files.mismatch(sourcePath, targetPath) == -1) {
@@ -247,10 +248,8 @@ public class LinkedFileHandler {
      * @return A filename based on the pattern specified in the preferences and valid for the file system.
      */
     public String getSuggestedFileName(@NonNull String extension) {
-        String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).trim();
-        if ((targetFileName.isEmpty() || "-".equals(targetFileName)) && linkedFile.isOnlineLink()) {
-            // "-" is part of the default pattern (org.jabref.logic.FilePreferences.DEFAULT_FILENAME_PATTERNS) and is returned if no fields have been replaced.
-            // All other patterns are not yet handled. See <https://github.com/jabref/jabref/issues/13735> for a sketch of a solution.
+        Optional<String> targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern());
+        if (targetFileName.isEmpty() && linkedFile.isOnlineLink()) {
             String oldFileName = linkedFile.getLink();
             int lastSlashIndex = oldFileName.lastIndexOf('/');
             if (lastSlashIndex >= 0 && lastSlashIndex < oldFileName.length() - 1) {
@@ -259,20 +258,23 @@ public class LinkedFileHandler {
                 if (queryIndex > 0) {
                     fileNameFromUrl = fileNameFromUrl.substring(0, queryIndex);
                 }
-                if (!extension.isEmpty()) {
-                    Optional<String> existingExtension = FileUtil.getFileExtension(fileNameFromUrl);
-                    if (existingExtension.isEmpty() || !existingExtension.get().equalsIgnoreCase(extension)) {
-                        String baseName = FileUtil.getBaseName(fileNameFromUrl);
-                        fileNameFromUrl = baseName + "." + extension;
+                if (!fileNameFromUrl.isEmpty()) {
+                    if (!extension.isEmpty()) {
+                        Optional<String> existingExtension = FileUtil.getFileExtension(fileNameFromUrl);
+                        if (existingExtension.isEmpty() || !existingExtension.get().equalsIgnoreCase(extension)) {
+                            String baseName = FileUtil.getBaseName(fileNameFromUrl);
+                            fileNameFromUrl = baseName + "." + extension;
+                        }
                     }
+                    return FileUtil.getValidFileName(fileNameFromUrl);
                 }
-                return FileUtil.getValidFileName(fileNameFromUrl);
             }
         }
-        if (!extension.isEmpty()) {
-            targetFileName = targetFileName + '.' + extension;
-        }
-        return FileUtil.getValidFileName(targetFileName);
+
+        String baseName = targetFileName.orElse("file");
+        String suggestedName = extension.isEmpty() ? baseName : baseName + "." + extension;
+
+        return FileUtil.getValidFileName(suggestedName);
     }
 
     /**
@@ -284,7 +286,7 @@ public class LinkedFileHandler {
     public Optional<Path> findExistingFile(LinkedFile linkedFile, BibEntry entry, String targetFileName) {
         // The .get() is legal without check because the method will always return a value.
         Path targetFilePath = linkedFile.findIn(databaseContext, filePreferences)
-                                     .get().getParent().resolve(targetFileName);
+                                        .get().getParent().resolve(targetFileName);
         Path oldFilePath = linkedFile.findIn(databaseContext, filePreferences).get();
         // Check if file already exists in directory with different case.
         // This is necessary because other entries may have such a file.

@@ -29,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.HashBiMap;
+import org.jspecify.annotations.NonNull;
 
 public class CffImporter extends Importer {
 
@@ -169,7 +170,7 @@ public class CffImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         CffFormat citation = mapper.readValue(reader, CffFormat.class);
         List<BibEntry> entriesList = new ArrayList<>();
@@ -196,8 +197,8 @@ public class CffImporter extends Importer {
         // Select DOI to keep
         if ((entryMap.get(StandardField.DOI) == null) && (citation.ids != null)) {
             List<CffIdentifier> doiIds = citation.ids.stream()
-                            .filter(id -> "doi".equals(id.type))
-                            .toList();
+                                                     .filter(id -> "doi".equals(id.type))
+                                                     .toList();
             if (doiIds.size() == 1) {
                 entryMap.put(StandardField.DOI, doiIds.getFirst().value);
             }
@@ -206,9 +207,9 @@ public class CffImporter extends Importer {
         // Select SWHID to keep
         if (citation.ids != null) {
             List<String> swhIds = citation.ids.stream()
-                                           .filter(id -> "swh".equals(id.type))
-                                           .map(id -> id.value)
-                                           .toList();
+                                              .filter(id -> "swh".equals(id.type))
+                                              .map(id -> id.value)
+                                              .toList();
 
             if (swhIds.size() == 1) {
                 entryMap.put(BiblatexSoftwareField.SWHID, swhIds.getFirst());
@@ -261,7 +262,7 @@ public class CffImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         CffFormat citation;
@@ -278,9 +279,9 @@ public class CffImporter extends Importer {
         return authors.stream()
                       .map(author -> author.values)
                       .map(vals -> vals.get("name") != null ?
-                              new Author(vals.get("name"), "", "", "", "") :
-                              new Author(vals.get("given-names"), null, vals.get("name-particle"),
-                                      vals.get("family-names"), vals.get("name-suffix")))
+                                   new Author(vals.get("name"), "", "", "", "") :
+                                   new Author(vals.get("given-names"), null, vals.get("name-particle"),
+                                           vals.get("family-names"), vals.get("name-suffix")))
                       .collect(AuthorList.collect())
                       .getAsFirstLastNamesWithAnd();
     }

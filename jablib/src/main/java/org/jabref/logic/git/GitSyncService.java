@@ -110,10 +110,10 @@ public class GitSyncService {
     }
 
     public PullResult performSemanticMerge(Git git,
-                                            Optional<RevCommit> baseCommitOpt,
-                                            RevCommit remoteCommit,
-                                            BibDatabaseContext localDatabaseContext,
-                                            Path bibFilePath) throws IOException, JabRefException, GitAPIException {
+                                           Optional<RevCommit> baseCommitOpt,
+                                           RevCommit remoteCommit,
+                                           BibDatabaseContext localDatabaseContext,
+                                           Path bibFilePath) throws IOException, JabRefException, GitAPIException {
 
         Path bibPath = bibFilePath.toRealPath();
         Path workTree = git.getRepository().getWorkTree().toPath().toRealPath();
@@ -200,7 +200,8 @@ public class GitSyncService {
                 throw new JabRefException("Push aborted: Unknown Git status.");
             }
 
-            case BEHIND, DIVERGED -> {
+            case BEHIND,
+                 DIVERGED -> {
                 fetchAndMerge(localDatabaseContext, bibFilePath);
                 status = GitStatusChecker.checkStatus(gitHandler);
                 if (status.conflict()) {

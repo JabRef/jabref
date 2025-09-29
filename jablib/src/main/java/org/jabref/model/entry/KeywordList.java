@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 
 import org.jabref.model.strings.StringUtil;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Represents a list of keyword chains.
  * For example, "Type > A, Type > B, Something else".
@@ -43,34 +45,27 @@ public class KeywordList implements Iterable<Keyword> {
         this(Arrays.asList(keywordChains));
     }
 
-    public static KeywordList parse(String keywordString, Character delimiter, Character hierarchicalDelimiter) {
+    /**
+     * Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
+     *
+     * @param keywordString a String of keywordChains
+     * @param delimiter     The delimiter used for separating the keywords
+     * @return a parsed list containing the keywordChains
+     */
+    public static KeywordList parse(@NonNull String keywordString, @NonNull Character delimiter) {
         if (StringUtil.isBlank(keywordString)) {
             return new KeywordList();
         }
-
-        Objects.requireNonNull(delimiter);
-        Objects.requireNonNull(hierarchicalDelimiter);
 
         KeywordList keywordList = new KeywordList();
 
         StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
         while (tok.hasMoreTokens()) {
             String chain = tok.nextToken();
-            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
+            Keyword chainRoot = Keyword.ofHierarchical(chain);
             keywordList.add(chainRoot);
         }
         return keywordList;
-    }
-
-    /**
-     * Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
-     *
-     * @param keywordString a String of keywordChains
-     * @param delimiter     The delimiter used for separating the keywords
-     * @return an parsed list containing the keywordChains
-     */
-    public static KeywordList parse(String keywordString, Character delimiter) {
-        return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
     }
 
     public static String serialize(List<Keyword> keywords, Character delimiter) {
@@ -88,9 +83,7 @@ public class KeywordList implements Iterable<Keyword> {
         return new KeywordList(this.keywordChains);
     }
 
-    public void replaceAll(KeywordList keywordsToReplace, Keyword newValue) {
-        Objects.requireNonNull(newValue);
-
+    public void replaceAll(KeywordList keywordsToReplace, @NonNull Keyword newValue) {
         // Remove keywordChains which should be replaced
         int foundPosition = -1; // remember position of the last found keyword
         for (Keyword specialFieldKeyword : keywordsToReplace) {

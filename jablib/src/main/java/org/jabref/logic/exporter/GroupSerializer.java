@@ -3,8 +3,6 @@ package org.jabref.logic.exporter;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.paint.Color;
-
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.groups.AbstractGroup;
@@ -97,7 +95,7 @@ public class GroupSerializer {
     private void appendGroupDetails(StringBuilder builder, AbstractGroup group) {
         builder.append(StringUtil.booleanToBinaryString(group.isExpanded()));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        builder.append(group.getColor().map(Color::toString).orElse(""));
+        builder.append(group.getColor().orElse(""));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         builder.append(group.getIconName().orElse(""));
         builder.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
@@ -129,16 +127,26 @@ public class GroupSerializer {
 
     private String serializeGroup(AbstractGroup group) {
         return switch (group) {
-            case AllEntriesGroup _ -> serializeAllEntriesGroup();
-            case SmartGroup smartGroup -> serializeSmartGroup(smartGroup);
-            case ExplicitGroup explicitGroup -> serializeExplicitGroup(explicitGroup);
-            case KeywordGroup keywordGroup -> serializeKeywordGroup(keywordGroup);
-            case SearchGroup searchGroup -> serializeSearchGroup(searchGroup);
-            case AutomaticKeywordGroup keywordGroup -> serializeAutomaticKeywordGroup(keywordGroup);
-            case AutomaticPersonsGroup personsGroup -> serializeAutomaticPersonsGroup(personsGroup);
-            case TexGroup texGroup -> serializeTexGroup(texGroup);
-            case null -> throw new IllegalArgumentException("Group cannot be null");
-            default -> throw new UnsupportedOperationException("Don't know how to serialize group" + group.getClass().getName());
+            case AllEntriesGroup _ ->
+                    serializeAllEntriesGroup();
+            case SmartGroup smartGroup ->
+                    serializeSmartGroup(smartGroup);
+            case ExplicitGroup explicitGroup ->
+                    serializeExplicitGroup(explicitGroup);
+            case KeywordGroup keywordGroup ->
+                    serializeKeywordGroup(keywordGroup);
+            case SearchGroup searchGroup ->
+                    serializeSearchGroup(searchGroup);
+            case AutomaticKeywordGroup keywordGroup ->
+                    serializeAutomaticKeywordGroup(keywordGroup);
+            case AutomaticPersonsGroup personsGroup ->
+                    serializeAutomaticPersonsGroup(personsGroup);
+            case TexGroup texGroup ->
+                    serializeTexGroup(texGroup);
+            case null ->
+                    throw new IllegalArgumentException("Group cannot be null");
+            default ->
+                    throw new UnsupportedOperationException("Don't know how to serialize group" + group.getClass().getName());
         };
     }
 

@@ -1,5 +1,7 @@
 package org.jabref.gui.importer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -49,6 +51,8 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -62,6 +66,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @FXML private Label pageNumberLabel;
     @FXML private CheckListView<BibEntry> entriesListView;
     @FXML private ComboBox<BibDatabaseContext> libraryListView;
+    @FXML private ComboBox<GroupTreeNode> groupListView;
     @FXML private ButtonType importButton;
     @FXML private Label totalItems;
     @FXML private Label selectedItems;
@@ -110,9 +115,9 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
      * This constructor is used for importing entries that support pagination and require search queries.
      *
      * @param database database where the imported entries will be added
-     * @param task task that handles parsing and loading entries from the search results
-     * @param fetcher the search-based fetcher implementation used to retrieve entries from the web source
-     * @param query the search string used to find relevant entries
+     * @param task     task that handles parsing and loading entries from the search results
+     * @param fetcher  the search-based fetcher implementation used to retrieve entries from the web source
+     * @param query    the search string used to find relevant entries
      */
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, SearchBasedFetcher fetcher, String query) {
         this.database = database;
@@ -146,6 +151,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         });
 
         libraryListView.setEditable(false);
+        groupListView.setEditable(false);
         libraryListView.getItems().addAll(stateManager.getOpenDatabases());
         new ViewModelListCellFactory<BibDatabaseContext>()
                 .withText(database -> {
@@ -162,6 +168,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                 .install(libraryListView);
         viewModel.selectedDbProperty().bind(libraryListView.getSelectionModel().selectedItemProperty());
         stateManager.getActiveDatabase().ifPresent(database1 -> libraryListView.getSelectionModel().select(database1));
+        setupGroupListView();
 
         PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
         new ViewModelListCellFactory<BibEntry>()
@@ -220,6 +227,48 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         }
     }
 
+    private void setupGroupListView() {
+        groupListView.setVisibleRowCount(5);
+        updateGroupList();
+        libraryListView.getSelectionModel().selectedItemProperty()
+                       .addListener((_, _, _) -> {
+                           updateGroupList();
+                       });
+
+        new ViewModelListCellFactory<GroupTreeNode>()
+                .withText(group -> group != null ? group.getName() : Localization.lang("No group"))
+                .install(groupListView);
+    }
+
+    private void updateGroupList() {
+        groupListView.getItems().clear();
+
+        BibDatabaseContext selectedDb = libraryListView.getSelectionModel().getSelectedItem();
+        if (selectedDb.getMetaData().getGroups().isPresent()) {
+            GroupTreeNode rootGroup = selectedDb.getMetaData().getGroups().get();
+            groupListView.getItems().add(rootGroup);
+
+            List<GroupTreeNode> allGroups = new ArrayList<>();
+            collectGroupsFromTree(rootGroup, allGroups);
+            allGroups.sort((g1, g2) -> g1.getName().compareToIgnoreCase(g2.getName()));
+
+            groupListView.getItems().addAll(allGroups);
+            groupListView.getSelectionModel().select(stateManager.getSelectedGroups(selectedDb).getFirst());
+        } else {
+            // No groups defined -> only "All entries"
+            GroupTreeNode noGroup = new GroupTreeNode(new AllEntriesGroup(Localization.lang("All entries")));
+            groupListView.getItems().add(noGroup);
+            groupListView.getSelectionModel().select(noGroup);
+        }
+    }
+
+    private void collectGroupsFromTree(GroupTreeNode parent, List<GroupTreeNode> groupList) {
+        for (GroupTreeNode child : parent.getChildren()) {
+            groupList.add(child);
+            collectGroupsFromTree(child, groupList);
+        }
+    }
+
     private void initializeDialog() {
         ViewLoader.view(this)
                   .load()
@@ -236,7 +285,15 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
         setResultConverter(button -> {
             if (button == importButton) {
-                viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
+                if (groupListView.getItems().size() > 1) {
+                    // 1 is the "All entries" group, so if more than 1, we have groups defined
+                    GroupTreeNode prevSelectedGroup = stateManager.getSelectedGroups(stateManager.getActiveDatabase().orElse(null)).getFirst();
+                    stateManager.setSelectedGroups(libraryListView.getSelectionModel().getSelectedItem(), List.of(groupListView.getSelectionModel().getSelectedItem()));
+                    viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
+                    stateManager.setSelectedGroups(stateManager.getActiveDatabase().orElse(null), List.of(prevSelectedGroup));
+                } else {
+                    viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
+                }
             } else {
                 dialogService.notify(Localization.lang("Import canceled"));
             }
@@ -256,62 +313,62 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         }, viewModel.currentPageProperty(), viewModel.totalPagesProperty());
 
         BooleanBinding isPagedFetcher = Bindings.createBooleanBinding(() ->
-            searchBasedFetcher.isPresent() && searchBasedFetcher.get() instanceof PagedSearchBasedFetcher
+                searchBasedFetcher.isPresent() && searchBasedFetcher.get() instanceof PagedSearchBasedFetcher
         );
 
         // Disable: during loading OR when on the last page for non-paged fetchers
         // OR when the initial load is not complete for paged fetchers
         nextPageButton.disableProperty().bind(
-            loading.or(isOnLastPage.and(isPagedFetcher.not()))
-               .or(isPagedFetcher.and(initialLoadComplete.not()))
+                loading.or(isOnLastPage.and(isPagedFetcher.not()))
+                       .or(isPagedFetcher.and(initialLoadComplete.not()))
         );
         prevPageButton.disableProperty().bind(loading.or(viewModel.currentPageProperty().isEqualTo(0)));
 
         prevPageButton.textProperty().bind(
-            Bindings.when(loading)
-                .then("< " + Localization.lang("Loading..."))
-                .otherwise("< " + Localization.lang("Previous"))
+                Bindings.when(loading)
+                        .then("< " + Localization.lang("Loading..."))
+                        .otherwise("< " + Localization.lang("Previous"))
         );
 
         nextPageButton.textProperty().bind(
-            Bindings.when(loading)
-                .then(Localization.lang("Loading...") + " >")
-                .otherwise(
-                    Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
-                        .then(Localization.lang("Loading initial entries..."))
+                Bindings.when(loading)
+                        .then(Localization.lang("Loading...") + " >")
                         .otherwise(
-                            Bindings.when(isOnLastPage)
-                                .then(
-                                    Bindings.when(isPagedFetcher)
-                                        .then(Localization.lang("Load More") + " >>")
-                                        .otherwise(Localization.lang("No more entries"))
-                                )
-                                .otherwise(Localization.lang("Next") + " >")
+                                Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
+                                        .then(Localization.lang("Loading initial entries..."))
+                                        .otherwise(
+                                                Bindings.when(isOnLastPage)
+                                                        .then(
+                                                                Bindings.when(isPagedFetcher)
+                                                                        .then(Localization.lang("Load More") + " >>")
+                                                                        .otherwise(Localization.lang("No more entries"))
+                                                        )
+                                                        .otherwise(Localization.lang("Next") + " >")
+                                        )
                         )
-            )
         );
 
         statusLabel.textProperty().bind(
-            Bindings.when(loading)
-                .then(Localization.lang("Fetching more entries..."))
-                .otherwise(
-                    Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
-                        .then(Localization.lang("Loading initial results..."))
+                Bindings.when(loading)
+                        .then(Localization.lang("Fetching more entries..."))
                         .otherwise(
-                            Bindings.when(isOnLastPage)
-                                .then(
-                                    Bindings.when(isPagedFetcher)
-                                        .then(Localization.lang("Click 'Load More' to fetch additional entries"))
-                                        .otherwise(Bindings.createStringBinding(() -> {
-                                            int totalEntries = viewModel.getAllEntries().size();
-                                            return totalEntries > 0 ?
-                                                Localization.lang("All %0 entries loaded", String.valueOf(totalEntries)) :
-                                                Localization.lang("No entries available");
-                                        }, viewModel.getAllEntries()))
-                                )
-                                .otherwise("")
+                                Bindings.when(initialLoadComplete.not().and(isPagedFetcher))
+                                        .then(Localization.lang("Loading initial results..."))
+                                        .otherwise(
+                                                Bindings.when(isOnLastPage)
+                                                        .then(
+                                                                Bindings.when(isPagedFetcher)
+                                                                        .then(Localization.lang("Click 'Load More' to fetch additional entries"))
+                                                                        .otherwise(Bindings.createStringBinding(() -> {
+                                                                            int totalEntries = viewModel.getAllEntries().size();
+                                                                            return totalEntries > 0 ?
+                                                                                   Localization.lang("All %0 entries loaded", String.valueOf(totalEntries)) :
+                                                                                   Localization.lang("No entries available");
+                                                                        }, viewModel.getAllEntries()))
+                                                        )
+                                                        .otherwise("")
+                                        )
                         )
-                )
         );
 
         loading.addListener((_, _, newVal) -> {
@@ -325,7 +382,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                 statusLabel.getStyleClass().remove("info-message");
             }
         });
-}
+    }
 
     private void updatePageUI() {
         pageNumberLabel.textProperty().bind(Bindings.createStringBinding(() -> {

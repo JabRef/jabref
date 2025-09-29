@@ -11,9 +11,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * This class represents a scientific study.
- *
+ * <p>
  * This class defines all aspects of a scientific study relevant to the application. It is a proxy for the file based study definition.
- *
+ * <p>
  * The file is parsed using by {@link StudyYamlParser}
  */
 @JsonPropertyOrder({"authors", "title", "research-questions", "queries", "databases"})

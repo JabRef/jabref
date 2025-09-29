@@ -213,7 +213,7 @@ class JournalAbbreviationRepositoryTest {
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(repository, AbbreviationType.DEFAULT, false);
 
         BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
+                .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces");
 
         undoableAbbreviator.abbreviate(bibDatabase, entryWithoutEscapedAmpersandInJournal, StandardField.JOURNAL, new CompoundEdit());
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
@@ -226,8 +226,8 @@ class JournalAbbreviationRepositoryTest {
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(repository, AbbreviationType.DEFAULT, true);
 
         BibEntry entryWithoutEscapedAmpersandInJournal = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces")
-            .withField(AMSField.FJOURNAL, "&nbsp;");
+                .withField(StandardField.JOURNAL, "ACS Applied Materials & Interfaces")
+                .withField(AMSField.FJOURNAL, "&nbsp;");
 
         undoableAbbreviator.abbreviate(bibDatabase, entryWithoutEscapedAmpersandInJournal, StandardField.JOURNAL, new CompoundEdit());
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
@@ -239,7 +239,7 @@ class JournalAbbreviationRepositoryTest {
     @Test
     void unabbreviateWithJournalExistsAndFJournalNot() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
+                .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces");
 
         undoableUnabbreviator.unabbreviate(bibDatabase, abbreviatedJournalEntry, StandardField.JOURNAL, new CompoundEdit());
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
@@ -250,8 +250,8 @@ class JournalAbbreviationRepositoryTest {
     @Test
     void unabbreviateWithJournalExistsAndFJournalExists() {
         BibEntry abbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces")
-            .withField(AMSField.FJOURNAL, "ACS Applied Materials & Interfaces");
+                .withField(StandardField.JOURNAL, "ACS Appl. Mater. Interfaces")
+                .withField(AMSField.FJOURNAL, "ACS Applied Materials & Interfaces");
 
         undoableUnabbreviator.unabbreviate(bibDatabase, abbreviatedJournalEntry, StandardField.JOURNAL, new CompoundEdit());
         BibEntry expectedAbbreviatedJournalEntry = new BibEntry(StandardEntryType.Article)

@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -38,6 +37,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,9 +64,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
      * @throws FetcherException if the received page differs from what was expected
      */
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
-        Objects.requireNonNull(entry);
-
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
         Optional<ArXivIdentifier> arXiv = entry.getField(StandardField.EPRINT).flatMap(ArXivIdentifier::parse);
 
@@ -95,10 +93,10 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             }
             String source = SOURCE_ID_SEARCH + arXivString;
             Connection jsoupRequest = Jsoup.connect(getURLBySource(source))
-                                    .userAgent(URLDownload.USER_AGENT)
-                                    .referrer("https://www.google.com")
-                                    .header("Accept", "text/html; charset=utf-8")
-                                    .ignoreHttpErrors(true);
+                                           .userAgent(URLDownload.USER_AGENT)
+                                           .referrer("https://www.google.com")
+                                           .header("Accept", "text/html; charset=utf-8")
+                                           .ignoreHttpErrors(true);
             importerPreferences.getApiKey(getName()).ifPresent(
                     key -> jsoupRequest.header("x-api-key", key));
             html = jsoupRequest.get();
@@ -233,7 +231,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
      * @throws FetcherException if an error linked to the Fetcher applies
      */
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         Optional<String> title = entry.getTitle();
         if (title.isEmpty()) {
             return new ArrayList<>();

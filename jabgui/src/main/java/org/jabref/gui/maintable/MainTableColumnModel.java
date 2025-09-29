@@ -22,6 +22,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.metadata.SaveOrder;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,7 @@ public class MainTableColumnModel {
     public static final Character COLUMNS_QUALIFIER_DELIMITER = ':';
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnModel.class);
+
     public enum Type {
         MATCH_CATEGORY("match_category"), // Not localized, because this column is always hidden
         INDEX("index", Localization.lang("Index")),
@@ -46,7 +48,6 @@ public class MainTableColumnModel {
         NORMALFIELD("field"),
         SPECIALFIELD("special", Localization.lang("Special")),
         LIBRARY_NAME("library", Localization.lang("Library"));
-
 
         public static final EnumSet<Type> ICON_COLUMNS = EnumSet.of(EXTRAFILE, FILES, GROUPS, GROUP_ICONS, LINKED_IDENTIFIER);
 
@@ -84,9 +85,9 @@ public class MainTableColumnModel {
         @Override
         public String toString() {
             return "Type{" +
-                   "name='" + name + '\'' +
-                   ", displayName='" + displayName + '\'' +
-                   '}';
+                    "name='" + name + '\'' +
+                    ", displayName='" + displayName + '\'' +
+                    '}';
         }
     }
 
@@ -104,10 +105,7 @@ public class MainTableColumnModel {
      * @param type      the {@code MainTableColumnModel.Type} of the column, e.g. "NORMALFIELD" or "EXTRAFILE"
      * @param qualifier the stored qualifier of the column, e.g. "author/editor"
      */
-    public MainTableColumnModel(Type type, String qualifier) {
-        Objects.requireNonNull(type);
-        Objects.requireNonNull(qualifier);
-
+    public MainTableColumnModel(@NonNull Type type, @NonNull String qualifier) {
         this.typeProperty.setValue(type);
         this.qualifierProperty.setValue(qualifier);
         this.sortTypeProperty.setValue(TableColumn.SortType.ASCENDING);
@@ -195,15 +193,15 @@ public class MainTableColumnModel {
      * Returns a list of sort cirteria based on the fields the current column displays.
      * In case it is single field, a single SortCriterion is returned.
      * In case of multiple fields, for each field, there is a SortCriterion contained in the list.
-     *
+     * <p>
      * Implementation reason: We want to have SortCriterion handle a single field, because the UI allows for handling
      * "plain" fields only.
      */
     public List<SaveOrder.SortCriterion> getSortCriteria() {
         boolean descending = getSortType() == TableColumn.SortType.DESCENDING;
         return FieldFactory.parseOrFields(getQualifier()).getFields().stream()
-                .map(field -> new SaveOrder.SortCriterion(field, descending))
-                .toList();
+                           .map(field -> new SaveOrder.SortCriterion(field, descending))
+                           .toList();
     }
 
     @Override
@@ -232,9 +230,9 @@ public class MainTableColumnModel {
     @Override
     public String toString() {
         return "MainTableColumnModel{" +
-               "qualifierProperty=" + qualifierProperty +
-               ", typeProperty=" + typeProperty +
-               '}';
+                "qualifierProperty=" + qualifierProperty +
+                ", typeProperty=" + typeProperty +
+                '}';
     }
 
     /**
@@ -243,8 +241,7 @@ public class MainTableColumnModel {
      * @param rawColumnName the name of the column, e.g. "field:author", or "author"
      * @return A new {@code MainTableColumnModel}
      */
-    public static MainTableColumnModel parse(String rawColumnName) {
-        Objects.requireNonNull(rawColumnName);
+    public static MainTableColumnModel parse(@NonNull String rawColumnName) {
         String[] splittedName = rawColumnName.split(COLUMNS_QUALIFIER_DELIMITER.toString());
 
         Type type = Type.fromString(splittedName[0]);

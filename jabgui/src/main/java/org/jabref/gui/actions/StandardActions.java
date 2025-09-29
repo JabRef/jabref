@@ -1,12 +1,13 @@
 package org.jabref.gui.actions;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
+
+import org.jspecify.annotations.NonNull;
 
 public enum StandardActions implements Action {
 
@@ -94,6 +95,9 @@ public enum StandardActions implements Action {
     REPLACE_ALL(Localization.lang("Find and replace"), KeyBinding.REPLACE_STRING),
     MANAGE_KEYWORDS(Localization.lang("Manage keywords")),
     MASS_SET_FIELDS(Localization.lang("Manage field names & content")),
+
+    BACK(Localization.lang("Back"), IconTheme.JabRefIcons.LEFT, KeyBinding.BACK),
+    FORWARD(Localization.lang("Forward"), Localization.lang("Forward"), IconTheme.JabRefIcons.RIGHT, KeyBinding.FORWARD),
 
     AUTOMATIC_FIELD_EDITOR(Localization.lang("Automatic field editor")),
     TOGGLE_GROUPS(Localization.lang("Groups"), IconTheme.JabRefIcons.TOGGLE_GROUPS, KeyBinding.TOGGLE_GROUPS_INTERFACE),
@@ -309,8 +313,8 @@ public enum StandardActions implements Action {
         return description;
     }
 
-    public Action withText(String text) {
-        this.text = Objects.requireNonNull(text);
+    public Action withText(@NonNull String text) {
+        this.text = text;
         return this;
     }
 }

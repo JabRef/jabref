@@ -42,7 +42,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.NoSelectionModel;
@@ -121,12 +121,12 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.searchCitationsRelationsService = searchCitationsRelationsService;
 
         this.citationsRelationsTabViewModel = new CitationsRelationsTabViewModel(
-            preferences,
-            undoManager,
-            stateManager,
-            dialogService,
-            fileUpdateMonitor,
-            taskExecutor
+                preferences,
+                undoManager,
+                stateManager,
+                dialogService,
+                fileUpdateMonitor,
+                taskExecutor
         );
     }
 
@@ -515,18 +515,18 @@ public class CitationRelationsTab extends EntryEditorTab {
      * TODO: Make the method return a callable and let the calling method create the background task.
      */
     private BackgroundTask<List<BibEntry>> createBackgroundTask(
-        BibEntry entry, CitationFetcher.SearchType searchType
+            BibEntry entry, CitationFetcher.SearchType searchType
     ) {
         return switch (searchType) {
             case CitationFetcher.SearchType.CITES -> {
                 citingTask = BackgroundTask.wrap(
-                    () -> this.searchCitationsRelationsService.searchCites(entry)
+                        () -> this.searchCitationsRelationsService.searchCites(entry)
                 );
                 yield citingTask;
             }
             case CitationFetcher.SearchType.CITED_BY -> {
                 citedByTask = BackgroundTask.wrap(
-                    () -> this.searchCitationsRelationsService.searchCitedBy(entry)
+                        () -> this.searchCitationsRelationsService.searchCitedBy(entry)
                 );
                 yield citedByTask;
             }
@@ -603,7 +603,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * Function to open possible duplicate entries window to compare duplicate entries
      *
      * @param citationRelationItem duplicate in the citation relations tab
-     * @param listView CheckListView to display citations
+     * @param listView             CheckListView to display citations
      */
     private void openPossibleDuplicateEntriesWindow(CitationRelationItem citationRelationItem, CheckListView<CitationRelationItem> listView) {
         BibEntry libraryEntry = citationRelationItem.localEntry();
@@ -633,12 +633,12 @@ public class CitationRelationsTab extends EntryEditorTab {
             libraryTab.get().getMainTable().setCitationMergeMode(true);
             database.insertEntry(mergedEntry);
 
-            NamedCompound ce = new NamedCompound(Localization.lang("Merge entries"));
-            ce.addEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
-            ce.addEdit(new UndoableInsertEntries(database, mergedEntry));
-            ce.end();
+            NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang("Merge entries"));
+            compoundEdit.addEdit(new UndoableRemoveEntries(database, mergeResult.originalLeftEntry()));
+            compoundEdit.addEdit(new UndoableInsertEntries(database, mergedEntry));
+            compoundEdit.end();
 
-            undoManager.addEdit(ce);
+            undoManager.addEdit(compoundEdit);
 
             dialogService.notify(Localization.lang("Merged entries"));
         }, () -> dialogService.notify(Localization.lang("Canceled merging entries")));

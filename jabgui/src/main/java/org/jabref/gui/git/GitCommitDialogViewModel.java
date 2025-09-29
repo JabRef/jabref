@@ -59,7 +59,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     public void commit(Runnable onSuccess) {
         commitTask()
-                .onSuccess(_-> {
+                .onSuccess(_ -> {
                     dialogService.notify(Localization.lang("Committed successfully"));
                     onSuccess.run();
                 })

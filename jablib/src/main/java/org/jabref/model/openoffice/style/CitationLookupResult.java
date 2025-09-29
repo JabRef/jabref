@@ -5,14 +5,14 @@ import java.util.Objects;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NonNull;
+
 public class CitationLookupResult {
 
     public final BibEntry entry;
     public final BibDatabase database;
 
-    public CitationLookupResult(BibEntry entry, BibDatabase database) {
-        Objects.requireNonNull(entry);
-        Objects.requireNonNull(database);
+    public CitationLookupResult(@NonNull BibEntry entry, @NonNull BibDatabase database) {
         this.entry = entry;
         this.database = database;
     }

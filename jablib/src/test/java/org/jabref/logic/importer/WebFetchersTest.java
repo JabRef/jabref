@@ -57,14 +57,14 @@ class WebFetchersTest {
 
     private Set<Class<?>> getIgnoredInaccessibleClasses() {
         return IGNORED_INACCESSIBLE_FETCHERS.stream()
-                     .map(classPath -> {
-                         try {
-                             return Class.forName(classPath);
-                         } catch (ClassNotFoundException e) {
-                             LOGGER.error("Some of the ignored classes were not found", e);
-                             return null;
-                         }
-                     }).filter(Objects::nonNull).collect(Collectors.toSet());
+                                            .map(classPath -> {
+                                                try {
+                                                    return Class.forName(classPath);
+                                                } catch (ClassNotFoundException e) {
+                                                    LOGGER.error("Some of the ignored classes were not found", e);
+                                                    return null;
+                                                }
+                                            }).filter(Objects::nonNull).collect(Collectors.toSet());
     }
 
     @Test

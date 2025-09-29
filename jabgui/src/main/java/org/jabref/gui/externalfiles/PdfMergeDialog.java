@@ -28,9 +28,9 @@ public class PdfMergeDialog {
      * Thus, JabRef provides this merge dialog that collects the results of all {@link PdfImporter}s
      * and gives user a choice between field values.
      *
-     * @param entry the entry to merge with
-     * @param filePath the path to the PDF file. This PDF is used as the source for the {@link PdfImporter}s.
-     * @param preferences the preferences to use. Full preference object is required, because of current implementation of {@link MultiMergeEntriesView}.
+     * @param entry        the entry to merge with
+     * @param filePath     the path to the PDF file. This PDF is used as the source for the {@link PdfImporter}s.
+     * @param preferences  the preferences to use. Full preference object is required, because of current implementation of {@link MultiMergeEntriesView}.
      * @param taskExecutor the task executor to use when the multi merge dialog executes the importers.
      */
     public static MultiMergeEntriesView createMergeDialog(BibEntry entry, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {

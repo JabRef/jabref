@@ -1,7 +1,6 @@
 package org.jabref.logic.openoffice.frontend;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.openoffice.style.JStyle;
@@ -19,6 +18,7 @@ import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class UpdateCitationMarkers {
      * <p>
      * After each fillCitationMarkInCursor call check if we lost the BIB_SECTION_NAME bookmark and recreate it if we did.
      *
-     * @param style    Bibliography style to use.
+     * @param style Bibliography style to use.
      */
     public static void applyNewCitationMarkers(XTextDocument doc, OOFrontend frontend, JStyle style)
             throws
@@ -63,25 +63,21 @@ public class UpdateCitationMarkers {
     }
 
     public static void fillCitationMarkInCursor(XTextDocument doc,
-                                                XTextCursor cursor,
-                                                OOText citationText,
+                                                @NonNull XTextCursor cursor,
+                                                @NonNull OOText citationText,
                                                 boolean withText,
-                                                JStyle style)
+                                                @NonNull JStyle style)
             throws
             WrappedTargetException,
             CreationException,
             IllegalArgumentException {
 
-        Objects.requireNonNull(cursor);
-        Objects.requireNonNull(citationText);
-        Objects.requireNonNull(style);
-
         if (withText) {
             OOText citationText2 = style.decorateCitationMarker(citationText);
             String ZERO_WIDTH_SPACE = "";
             if (style.spaceBeforeCitation()) {
-              // inject a ZERO_WIDTH_SPACE to hold the initial character format
-              ZERO_WIDTH_SPACE = "\u200b";
+                // inject a ZERO_WIDTH_SPACE to hold the initial character format
+                ZERO_WIDTH_SPACE = "\u200b";
             }
             citationText2 = OOText.fromString(ZERO_WIDTH_SPACE + citationText2.toString());
             OOTextIntoOO.write(doc, cursor, citationText2);
@@ -101,7 +97,7 @@ public class UpdateCitationMarkers {
     public static void createAndFillCitationGroup(OOFrontend frontend,
                                                   XTextDocument doc,
                                                   List<String> citationKeys,
-                                                  List<Optional<OOText>> pageInfos,
+                                                  @NonNull List<Optional<OOText>> pageInfos,
                                                   CitationType citationType,
                                                   OOText citationText,
                                                   XTextCursor position,
@@ -116,7 +112,6 @@ public class UpdateCitationMarkers {
             NoDocumentException,
             IllegalTypeException {
 
-        Objects.requireNonNull(pageInfos);
         if (pageInfos.size() != citationKeys.size()) {
             throw new IllegalArgumentException("pageInfos.size != citationKeys.size");
         }
