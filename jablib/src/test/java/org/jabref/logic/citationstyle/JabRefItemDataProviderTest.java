@@ -11,6 +11,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class JabRefItemDataProviderTest {
 
@@ -57,9 +58,25 @@ class JabRefItemDataProviderTest {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
         JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();
         jabRefItemDataProvider.setData(bibDatabaseContext, new BibEntryTypesManager());
-        System.out.println(jabRefItemDataProvider.toJson());
         assertEquals("""
                 [{"id":"key","type":"article","author":[{"family":"Doe","given":"Test"},{"family":"Author","given":"Second"}]}]""",
                 jabRefItemDataProvider.toJson());
+    }
+
+    @Test
+    void toJsonNoEntryType() {
+        BibDatabase bibDatabase = new BibDatabase(List.of(
+                new BibEntry()
+                        .withCitationKey("key")
+                        .withField(StandardField.TITLE, "Chewbaca")
+                        .withField(StandardField.AUTHOR, "Jr. Senor Hubert")
+        ));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
+        JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();
+        jabRefItemDataProvider.setData(bibDatabaseContext, new BibEntryTypesManager());
+        // [{"id":"key","type":"article","author":[{"family":"Hubert","given":"Jr. Senor"}],"title":"Chewbaca"}]
+        assertNotEquals("""
+                        [{"id":"key","type":"book","author":[{"family":"Jr. ","given":"Jr. Senor"}]}]""",
+                    jabRefItemDataProvider.toJson());
     }
 }
