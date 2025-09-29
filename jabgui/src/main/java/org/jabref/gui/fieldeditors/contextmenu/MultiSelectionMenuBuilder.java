@@ -32,7 +32,7 @@ record MultiSelectionMenuBuilder(
         ObservableOptionalValue<BibEntry> bibEntry,
         GuiPreferences preferences,
         LinkedFilesEditorViewModel viewModel
-) implements ContextMenuBuilder, SelectionChecks {
+) implements ContextMenuBuilder {
 
     MultiSelectionMenuBuilder(@NonNull DialogService dialogService,
                               @NonNull BibDatabaseContext databaseContext,
@@ -56,34 +56,36 @@ record MultiSelectionMenuBuilder(
         ActionFactory actionFactory = new ActionFactory();
         List<MenuItem> menuItems = new ArrayList<>();
 
-        menuItems.add(batchCommandItem(actionFactory, StandardActions.OPEN_FILE, selection, this::isLocalAndExists));
-        menuItems.add(customBatchItem(actionFactory, StandardActions.OPEN_FOLDER, selection, this::isLocalAndExists,
-                this::openContainingFolders));
-        menuItems.add(batchCommandItem(actionFactory, StandardActions.DOWNLOAD_FILE, selection, this::isOnline));
-        menuItems.add(batchCommandItem(actionFactory, StandardActions.REDOWNLOAD_FILE, selection, this::hasSourceUrl));
-        menuItems.add(batchCommandItem(actionFactory, StandardActions.MOVE_FILE_TO_FOLDER, selection, this::isMovableToDefaultDir));
-        menuItems.add(buildCopyToFolderItem(actionFactory, selection));
+        SelectionChecks checks = new SelectionChecks(databaseContext, preferences);
+
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.OPEN_FILE, selection, _ -> true));
+        menuItems.add(customBatchItem(actionFactory, StandardActions.OPEN_FOLDER, selection, checks::isLocalAndExists, checks::openContainingFolders));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.DOWNLOAD_FILE, selection, checks::isOnline));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.REDOWNLOAD_FILE, selection, checks::hasSourceUrl));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.MOVE_FILE_TO_FOLDER, selection, checks::isMovableToDefaultDir));
+        menuItems.add(buildCopyToFolderItem(actionFactory, selection, checks));
         menuItems.add(customBatchItem(actionFactory, StandardActions.REMOVE_LINKS, selection, _ -> true,
                 linkedFileViewModels -> linkedFileViewModels.forEach(linkedFileViewModel ->
                         new ContextAction(StandardActions.REMOVE_LINKS, linkedFileViewModel, databaseContext, bibEntry, preferences, viewModel).execute())));
-        menuItems.add(batchCommandItem(actionFactory, StandardActions.DELETE_FILE, selection, this::isLocalAndExists));
+        menuItems.add(batchCommandItem(actionFactory, StandardActions.DELETE_FILE, selection, checks::isLocalAndExists));
 
         return menuItems;
     }
 
     private MenuItem buildCopyToFolderItem(ActionFactory actionFactory,
-                                           ObservableList<LinkedFileViewModel> selection) {
+                                           ObservableList<LinkedFileViewModel> selection,
+                                           SelectionChecks checks) {
         SimpleCommand copyCommand = new SimpleCommand() {
             {
                 executable.bind(Bindings.createBooleanBinding(
-                        () -> selection.stream().anyMatch(MultiSelectionMenuBuilder.this::isLocalAndExists),
+                        () -> selection.stream().anyMatch(checks::isLocalAndExists),
                         selection));
             }
 
             @Override
             public void execute() {
                 var localLinkedFiles = selection.stream()
-                                                .filter(MultiSelectionMenuBuilder.this::isLocalAndExists)
+                                                .filter(checks::isLocalAndExists)
                                                 .toList();
 
                 if (localLinkedFiles.isEmpty()) {
@@ -113,8 +115,8 @@ record MultiSelectionMenuBuilder(
                     Path target = exportPath.resolve(source.getFileName());
 
                     boolean replaceExisting = false;
-
                     boolean copySucceeded = FileUtil.copyFile(source, target, replaceExisting);
+
                     if (copySucceeded) {
                         copiedCount++;
                     } else {

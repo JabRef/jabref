@@ -105,7 +105,7 @@ class MultiSelectionMenuBuilderTest {
         items.getFirst().fire();
 
         verify(localExisting).open();
-        verify(onlineLink, never()).open();
+        verify(onlineLink).open();
     }
 
     @Test

@@ -24,29 +24,17 @@ import static org.mockito.Mockito.when;
 
 class SelectionChecksTest {
 
-    private GuiPreferences guiPreferences;
-    private BibDatabaseContext databaseContext;
     private SelectionChecks checks;
 
     @BeforeEach
     void setUp() {
-        guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
         FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
 
-        databaseContext = mock(BibDatabaseContext.class);
+        BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
 
-        checks = new SelectionChecks() {
-            @Override
-            public GuiPreferences preferences() {
-                return guiPreferences;
-            }
-
-            @Override
-            public BibDatabaseContext databaseContext() {
-                return databaseContext;
-            }
-        };
+        checks = new SelectionChecks(databaseContext, guiPreferences);
     }
 
     @Nested

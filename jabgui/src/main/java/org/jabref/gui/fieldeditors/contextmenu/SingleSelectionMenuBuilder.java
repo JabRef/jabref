@@ -26,7 +26,7 @@ record SingleSelectionMenuBuilder(
         ObservableOptionalValue<BibEntry> bibEntry,
         GuiPreferences preferences,
         LinkedFilesEditorViewModel viewModel
-) implements ContextMenuBuilder, SelectionChecks {
+) implements ContextMenuBuilder {
 
     SingleSelectionMenuBuilder(@NonNull DialogService dialogService,
                                @NonNull BibDatabaseContext databaseContext,

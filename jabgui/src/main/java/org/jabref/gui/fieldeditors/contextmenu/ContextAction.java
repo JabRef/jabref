@@ -22,8 +22,6 @@ import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 
 public class ContextAction extends SimpleCommand {
 
-    private static final ObservableMap<Field, String> EMPTY_FIELDS =
-            FXCollections.emptyObservableMap();
     private final StandardActions command;
     private final LinkedFileViewModel linkedFile;
     private final LinkedFilesEditorViewModel viewModel;
@@ -38,9 +36,9 @@ public class ContextAction extends SimpleCommand {
         this.linkedFile = linkedFile;
         this.viewModel = viewModel;
 
-        Observable entryFieldsObservable = bibEntry.getValue()
-                                                   .map(BibEntry::getFieldsObservable)
-                                                   .orElse(EMPTY_FIELDS);
+        ObservableMap<Field, String> entryFieldsObservable = bibEntry.getValue()
+                                                                     .map(BibEntry::getFieldsObservable)
+                                                                     .orElse(FXCollections.emptyObservableMap());
 
         this.executable.bind(
                 switch (command) {
