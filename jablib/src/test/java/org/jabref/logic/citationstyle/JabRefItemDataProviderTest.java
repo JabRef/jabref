@@ -46,4 +46,20 @@ class JabRefItemDataProviderTest {
                         [{"id":"key","type":"article","author":[{"family":"Author","given":"Test"}]},{"id":"key2","type":"article","author":[{"family":"Author","given":"Second"}]}]""",
                 jabRefItemDataProvider.toJson());
     }
+    // SWEN 755 test add - multiple authories in one entry test
+    @Test
+    void toJsonMultipleAuthorOneEntry() {
+        BibDatabase bibDatabase = new BibDatabase(List.of(
+           new BibEntry()
+                   .withCitationKey("key")
+                   .withField(StandardField.AUTHOR, "Test Doe and Second Author")
+        ));
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(bibDatabase);
+        JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();
+        jabRefItemDataProvider.setData(bibDatabaseContext, new BibEntryTypesManager());
+        System.out.println(jabRefItemDataProvider.toJson());
+        assertEquals("""
+                [{"id":"key","type":"article","author":[{"family":"Doe","given":"Test"},{"family":"Author","given":"Second"}]}]""",
+                jabRefItemDataProvider.toJson());
+    }
 }
