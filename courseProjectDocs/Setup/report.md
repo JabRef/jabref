@@ -16,3 +16,5 @@
    - Branch Coverage: 0% (241/26072)
 
    #### ReadMe Analysis:
+        The tests mainly cover if the main features work, rather than. 
+                                                                                                            

@@ -376,4 +376,31 @@ class JournalAbbreviationRepositoryTest {
                 )
         );
     }
+    @Test
+    void noMatch_returnsOriginal() {
+        repository.addCustomAbbreviations(List.of(new Abbreviation("Journal of Physics A", "J. Phys. A", "JPA")));
+
+        String input = "Completely Unknown";
+        assertEquals(input, String.valueOf(repository.getDefaultAbbreviation(input)));
+        assertEquals(input, String.valueOf(repository.getDefaultAbbreviation("XYZ")));
+    }
+
+    @Test
+    void multipleSameScore_tieBreakDeterministic() {
+
+        repository.addCustomAbbreviations(List.of(
+                new Abbreviation("Alpha Beta", "A. B.", "AB"),
+                new Abbreviation("Alpha Beta Journal", "A. B. J.", "ABJ")
+        ));
+        String r1 = String.valueOf(repository.get(("Alpha Beta")));
+        String r2 = String.valueOf(repository.get("Alpha Beta"));
+        assertEquals(r1, r2);
+    }
+
+
+    @Test
+    void trimsWhitespaceAndPunctuation() {
+        repository.addCustomAbbreviation(new Abbreviation("Journal of Physics", "J. Phys.", "JP"));
+        assertEquals("J. Phys.", String.valueOf(repository.get("  Journal of Physics , ")));
+    }
 }
