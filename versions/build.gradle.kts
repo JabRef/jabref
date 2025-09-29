@@ -42,8 +42,8 @@ dependencies.constraints {
     api("org.eclipse.lsp4j:org.eclipse.lsp4j.websocket:0.24.0")
     api("com.github.javakeyring:java-keyring:1.0.4")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.27.0")
-    api("com.github.jknack:handlebars-helpers:4.3.1") // Required by Wiremock - and our patching of Wiremock
-    api("com.github.jknack:handlebars:4.3.1") // Required by Wiremock - and our patching of Wiremock
+    api("com.github.jknack:handlebars-helpers:4.5.0") // Required by Wiremock - and our patching of Wiremock
+    api("com.github.jknack:handlebars:4.5.0") // Required by Wiremock - and our patching of Wiremock
     api("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
     api("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
     api("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
