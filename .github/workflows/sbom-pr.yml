@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'corretto'
-          java-version: '24'
+          java-version: 25
           check-latest: true
           cache: 'gradle'
 
