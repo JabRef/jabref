@@ -3,6 +3,8 @@ package org.jabref.gui.entryeditor.citationrelationtab;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +16,12 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -28,9 +34,12 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -38,6 +47,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.entrychange.PreviewWithSourceTab;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.entryeditor.SciteTallyModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
@@ -72,6 +82,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
+import org.controlsfx.control.HyperlinkLabel;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
@@ -83,6 +94,10 @@ import org.slf4j.LoggerFactory;
 public class CitationRelationsTab extends EntryEditorTab {
 
     public static final String NAME = "Citation relations";
+
+    private static final String SEMANTIC_SCHOLAR_URL = "https://www.semanticscholar.org/";
+    private static final String SCITE_REPORTS_URL_BASE = "https://scite.ai/reports/";
+    private static final String SCITE_URL = "https://scite.ai/";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
 
@@ -99,6 +114,9 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final StateManager stateManager;
     private final UndoManager undoManager;
 
+    private final ProgressIndicator progressIndicator;
+    private final GridPane sciteResultsPane;
+
     public CitationRelationsTab(DialogService dialogService,
                                 UndoManager undoManager,
                                 StateManager stateManager,
@@ -112,7 +130,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.taskExecutor = taskExecutor;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        setText(Localization.lang("Citation relations"));
+        setText(Localization.lang("Citations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
         setId("citationRelationsTab");
 
@@ -128,6 +146,181 @@ public class CitationRelationsTab extends EntryEditorTab {
                 fileUpdateMonitor,
                 taskExecutor
         );
+
+        this.progressIndicator = new ProgressIndicator();
+        this.sciteResultsPane = new GridPane();
+        setSciteResultsPane();
+    }
+
+    private VBox getTopLabel() {
+        Hyperlink link = new Hyperlink("Semantic Scholar Information");
+        link.setOnAction(event -> {
+            if (event.getSource() instanceof Hyperlink) {
+                try {
+                    NativeDesktop.openBrowser(SEMANTIC_SCHOLAR_URL, preferences.getExternalApplicationsPreferences());
+                } catch (IOException ioex) {
+                    // Can't throw a checked exception from here, so display a message to the user instead.
+                    dialogService.showErrorDialogAndWait(
+                            "An error occurred opening web browser",
+                            "JabRef was unable to open a web browser for link:\n\n" + SEMANTIC_SCHOLAR_URL + "\n\nError Message:\n\n" + ioex.getMessage(),
+                            ioex
+                    );
+                }
+            }
+        });
+        return new VBox(30, link);
+    }
+
+    private void setSciteResultsPane() {
+        progressIndicator.setMaxSize(100, 100);
+        sciteResultsPane.add(progressIndicator, 0, 0);
+
+        ColumnConstraints column = new ColumnConstraints();
+        column.setPercentWidth(100);
+        column.setHalignment(HPos.CENTER);
+
+        sciteResultsPane.getColumnConstraints().setAll(column);
+        sciteResultsPane.setId("scitePane");
+        setContent(sciteResultsPane);
+
+        EasyBind.subscribe(citationsRelationsTabViewModel.statusProperty(), status -> {
+            sciteResultsPane.getChildren().clear();
+            switch (status) {
+                case IN_PROGRESS ->
+                        onSciteLookUp();
+                case FOUND ->
+                        citationsRelationsTabViewModel.getCurrentResult().ifPresent(result -> sciteResultsPane.add(getTalliesPane(result), 0, 0));
+                case ERROR ->
+                        sciteResultsPane.add(getErrorPane(), 0, 0);
+                case DOI_MISSING ->
+                        onDoiMissing();
+                case DOI_LOOK_UP ->
+                        onDoiLookUp();
+                case DOI_LOOK_UP_ERROR ->
+                        onDoiLookUpError();
+            }
+        });
+    }
+
+    private void onDoiLookUpError() {
+        onDoiMissing();
+        dialogService.notify(Localization.lang("No DOI found."));
+    }
+
+    private void onSciteLookUp() {
+        sciteResultsPane.getChildren().clear();
+
+        VBox vBox = new VBox();
+        vBox.getChildren().add(progressIndicator);
+        vBox.setStyle("-fx-alignment: center;");
+
+        sciteResultsPane.add(vBox, 0, 0);
+
+        GridPane.setHalignment(vBox, HPos.CENTER);
+        GridPane.setValignment(vBox, VPos.CENTER);
+
+        GridPane.setHgrow(vBox, Priority.ALWAYS);
+        GridPane.setVgrow(vBox, Priority.ALWAYS);
+    }
+
+    private void onDoiLookUp() {
+        sciteResultsPane.getChildren().clear();
+
+        Label label = new Label(Localization.lang("Looking up DOI..."));
+
+        VBox vBox = new VBox();
+        vBox.getChildren().add(progressIndicator);
+        vBox.getChildren().add(label);
+        vBox.setSpacing(2d);
+        vBox.setStyle("-fx-alignment: center;");
+
+        sciteResultsPane.add(vBox, 0, 0);
+
+        GridPane.setHalignment(vBox, HPos.CENTER);
+        GridPane.setValignment(vBox, VPos.CENTER);
+
+        GridPane.setHgrow(vBox, Priority.ALWAYS);
+        GridPane.setVgrow(vBox, Priority.ALWAYS);
+    }
+
+    private void onDoiMissing() {
+        sciteResultsPane.getChildren().clear();
+
+        Label label = new Label(Localization.lang("The selected entry doesn't have a DOI linked to it."));
+        Hyperlink link = new Hyperlink(Localization.lang("Look up a DOI and try again."));
+        link.setOnAction(doiLookUp());
+
+        HBox hBox = new HBox();
+        hBox.getChildren().add(label);
+        hBox.getChildren().add(link);
+        hBox.setSpacing(2d);
+        hBox.setStyle("-fx-alignment: center;");
+
+        sciteResultsPane.add(hBox, 0, 0);
+
+        GridPane.setHalignment(hBox, HPos.CENTER);
+        GridPane.setValignment(hBox, VPos.CENTER);
+
+        GridPane.setHgrow(hBox, Priority.ALWAYS);
+        GridPane.setVgrow(hBox, Priority.ALWAYS);
+    }
+
+    private EventHandler<ActionEvent> doiLookUp() {
+        return actionEvent -> {
+            citationsRelationsTabViewModel.lookUpDoi(currentEntry);
+        };
+    }
+
+    private VBox getErrorPane() {
+        Label titleLabel = new Label(Localization.lang("Error"));
+        titleLabel.setId("scite-error-label");
+        Text errorMessageText = new Text(citationsRelationsTabViewModel.searchErrorProperty().get());
+        VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);
+        errorMessageBox.getStyleClass().add("scite-error-box");
+        return errorMessageBox;
+    }
+
+    private VBox getTalliesPane(SciteTallyModel tallModel) {
+        Text message = new Text(Localization.lang(
+                "Total Citations: %0 | Supporting: %1 | Contradicting: %2 | Mentioning: %3 | Unclassified: %4 | Citing Publications: %5",
+                tallModel.total(),
+                tallModel.supporting(),
+                tallModel.contradicting(),
+                tallModel.mentioning(),
+                tallModel.unclassified(),
+                tallModel.citingPublications()
+        ));
+        String url = SCITE_REPORTS_URL_BASE + URLEncoder.encode(tallModel.doi(), StandardCharsets.UTF_8);
+        VBox messageBox = getMessageBox(url, message);
+        messageBox.getStyleClass().add("scite-message-box");
+        return messageBox;
+    }
+
+    private VBox getMessageBox(String url, Text message) {
+        HyperlinkLabel link = new HyperlinkLabel(Localization.lang("metrics provided by [%0] - See full report at [%1]", "scite.ai", url));
+        link.setOnAction(event -> {
+            if (event.getSource() instanceof Hyperlink) {
+                Hyperlink clickedLink = (Hyperlink) event.getSource();
+                String clickedUrl;
+                if (clickedLink.getText().equals("scite.ai")) {
+                    clickedUrl = SCITE_URL;
+                } else {
+                    clickedUrl = url;
+                }
+                try {
+                    NativeDesktop.openBrowser(clickedUrl, preferences.getExternalApplicationsPreferences());
+                } catch (IOException ioex) {
+                    // Can't throw a checked exception from here, so display a message to the user instead.
+                    dialogService.showErrorDialogAndWait(
+                            "An error occurred opening web browser",
+                            "JabRef was unable to open a web browser for link:\n\n" + url + "\n\nError Message:\n\n" + ioex.getMessage(),
+                            ioex
+                    );
+                }
+            }
+        });
+
+        return new VBox(30, message, link);
     }
 
     /**
@@ -413,7 +606,9 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        setContent(getPaneAndStartSearch(entry));
+        citationsRelationsTabViewModel.bindToEntry(entry);
+        VBox entirePanel = new VBox(getTopLabel(), getPaneAndStartSearch(entry), sciteResultsPane);
+        setContent(entirePanel);
     }
 
     private void searchForRelations(CitationComponents citationComponents,
