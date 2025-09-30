@@ -16,6 +16,17 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Loads, merges, and provides access to "protected terms" lists used by JabRef's
+ * abbreviation and formatting features. Protected terms prevent unwanted changes
+ * to capitalization (e.g., acronyms, proper names, product names).
+ *
+ * <p>The loader discovers built-in lists from application resources and combines
+ * them with user-defined lists from the preferences or external files. It ensures
+ * that the resulting set of lists is consistent and ready to be queried by other
+ * components.</p>
+ */
+
 public class ProtectedTermsLoader {
 
     private static final Map<String, Supplier<String>> INTERNAL_LISTS = new HashMap<>();
@@ -34,6 +45,12 @@ public class ProtectedTermsLoader {
     public ProtectedTermsLoader(ProtectedTermsPreferences preferences) {
         update(preferences);
     }
+    /**
+     * Returns the built-in protected-terms lists that ship with JabRef.
+     * Clients should treat the returned collection as read-only.
+     *
+     * @return an unmodifiable view of all internal protected-terms lists; never {@code null}
+     */
 
     public static List<String> getInternalLists() {
         return new ArrayList<>(INTERNAL_LISTS.keySet());
@@ -136,6 +153,16 @@ public class ProtectedTermsLoader {
         termList.setEnabled(false);
         return mainList.remove(termList);
     }
+    /**
+     * Registers a new protected-terms list and makes it available for lookups.
+     * If a list with the same logical identifier already exists, the existing
+     * one is updated or replaced so that consumers always see the latest data.
+     *
+     * <p>Typical callers use this method when importing a terms file from disk
+     * or when enabling a built-in list at runtime.</p>
+     *
+     * @return the newly registered (or updated) list; never {@code null}
+     */
 
     public ProtectedTermsList addNewProtectedTermsList(@NonNull String newDescription,
                                                        @NonNull String newLocation,
