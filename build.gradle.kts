@@ -4,6 +4,9 @@ plugins {
     id("org.openrewrite.rewrite") version "7.17.0"
     id("org.itsallcode.openfasttrace") version "3.1.0"
     id("org.cyclonedx.bom") version "3.0.0-alpha-1"
+
+    id("com.github.jk1.dependency-license-report") version "2.8"
+
 }
 
 // OpenRewrite should rewrite all sources
@@ -66,3 +69,4 @@ tasks.cyclonedxBom {
     componentVersion = project.version.toString()
     componentGroup = "org.jabref"
 }
+

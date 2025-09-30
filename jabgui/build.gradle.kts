@@ -4,7 +4,7 @@
 plugins {
     id("org.jabref.gradle.module")
     id("application")
-    id("com.github.jk1.dependency-license-report") version "2.9"
+
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
     // id("com.redock.classpathtofile") version "0.1.0"
@@ -112,6 +112,9 @@ dependencies {
 
     runtimeOnly("com.opencsv:opencsv:5.12.0")
 
+    implementation("commons-beanutils:commons-beanutils:1.9.4")
+
+
     testImplementation(project(":test-support"))
 
     testImplementation("io.github.classgraph:classgraph")
@@ -135,6 +138,14 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
 }
+
+configurations.all {
+    resolutionStrategy {
+        force("commons-beanutils:commons-beanutils:1.9.4")
+    }
+}
+
+
 // Keep existing module descriptors to avoid transform errors
 extraJavaModuleInfo {
     module("com.opencsv:opencsv", "com.opencsv") {
