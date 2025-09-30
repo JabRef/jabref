@@ -34,6 +34,12 @@ JabRefDataItemProvider             | FormatterTest
   - Initalize a large input then assertNotNull(result)
 - **getFormatTestWhiteSpace**
   - assertNotThrow non-ascii
+**Rationale**:
+- The Multiple author one entry test was created as the current tests lacked testing of multiple authors in a single entry, only one author per entry (even two authories one entry)
+- The no entry type checks that a field that does not match the result field from the jabref object.
+- testNonASCIICharacters, they test plain text so far, so added a test to check different unicodes.
+- There is no performance tests so far, so added an input one.
+- No one tested if the user simply enters a white space, no need to compute power...
 
 ## Test Results
 ![image](test_results.png)
