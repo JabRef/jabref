@@ -200,7 +200,7 @@ javaModulePackaging {
             options.addAll(
                 "--mac-sign",
                 "--mac-signing-key-user-name", "JabRef e.V. (6792V39SK3)",
-                "--mac-package-signing-prefix", "org.jabref",
+                "--mac-package-signing-prefix", "org.jabref.",
             )
         }
         targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {
