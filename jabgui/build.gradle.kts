@@ -104,6 +104,10 @@ dependencies {
 
     implementation("de.undercouch:citeproc-java")
 
+    implementation("ch.unibas.informatik.sweng:swenglib:2.0")
+
+    runtimeOnly("com.opencsv:opencsv:5.12.0")
+
     testImplementation(project(":test-support"))
 
     testImplementation("io.github.classgraph:classgraph")
@@ -127,6 +131,16 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
 }
+// Keep existing module descriptors to avoid transform errors
+extraJavaModuleInfo {
+    module("com.opencsv:opencsv", "com.opencsv") {
+        preserveExisting()
+    }
+    module("commons-beanutils:commons-beanutils", "commons.beanutils") {
+        preserveExisting()
+    }
+}
+
 
 application {
     mainClass.set("org.jabref.Launcher")

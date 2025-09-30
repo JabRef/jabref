@@ -3,6 +3,8 @@ open module org.jabref {
     requires org.jabref.jabls;
     requires org.jabref.jabsrv;
 
+    requires swenglib;
+
     // Swing
     requires java.desktop;
 
@@ -193,4 +195,6 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     // endregion
+
+
 }

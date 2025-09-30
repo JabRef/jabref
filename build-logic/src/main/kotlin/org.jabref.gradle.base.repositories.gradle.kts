@@ -11,4 +11,7 @@ repositories {
     maven { url = uri("https://sandec.jfrog.io/artifactory/repo") }
 
     maven { url = rootDir.resolve("jablib/lib").toURI() }
+    // Repository for swenglib
+    maven { url = uri("https://shapemodelling.cs.unibas.ch/repo") }
+
 }
