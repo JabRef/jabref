@@ -204,6 +204,7 @@ javaModulePackaging {
             )
         }
         targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {
+            include("*.icns")
             include("Resources/**")
         })
     }
