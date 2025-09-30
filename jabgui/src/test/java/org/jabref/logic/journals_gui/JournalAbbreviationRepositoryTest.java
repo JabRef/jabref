@@ -376,15 +376,17 @@ class JournalAbbreviationRepositoryTest {
                 )
         );
     }
+    //Swen 777 test
     @Test
     void noMatch_returnsOriginal() {
         repository.addCustomAbbreviations(List.of(new Abbreviation("Journal of Physics A", "J. Phys. A", "JPA")));
 
         String input = "Completely Unknown";
-        assertEquals(input, String.valueOf(repository.getDefaultAbbreviation(input)));
-        assertEquals(input, String.valueOf(repository.getDefaultAbbreviation("XYZ")));
+        assertTrue(repository.getDefaultAbbreviation(input).isEmpty());
+        assertTrue(repository.getDefaultAbbreviation("XYZ").isEmpty());
     }
 
+    //Swen 777 test
     @Test
     void multipleSameScore_tieBreakDeterministic() {
 
@@ -392,15 +394,15 @@ class JournalAbbreviationRepositoryTest {
                 new Abbreviation("Alpha Beta", "A. B.", "AB"),
                 new Abbreviation("Alpha Beta Journal", "A. B. J.", "ABJ")
         ));
-        String r1 = String.valueOf(repository.get(("Alpha Beta")));
-        String r2 = String.valueOf(repository.get("Alpha Beta"));
+        String r1 = repository.getDefaultAbbreviation("Alpha Beta").orElse("WRONG");
+        String r2 = repository.getDefaultAbbreviation("Alpha Beta").orElse("WRONG");
         assertEquals(r1, r2);
     }
 
-
+    //Swen 777 test
     @Test
     void trimsWhitespaceAndPunctuation() {
         repository.addCustomAbbreviation(new Abbreviation("Journal of Physics", "J. Phys.", "JP"));
-        assertEquals("J. Phys.", String.valueOf(repository.get("  Journal of Physics , ")));
+        assertEquals("J. Phys.", repository.getDefaultAbbreviation("  Journal of Physics , ").orElse("WRONG"));
     }
 }

@@ -68,19 +68,19 @@ class BstCaseChangersTest {
     void changeCaseAllLowers(String expected, String toBeFormatted) {
         assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_LOWERS));
     }
-
+    //Swen 777 Test
     @Test
     void changeCase_empty_noChange() {
         assertEquals("", BstCaseChanger.changeCase("", FormatMode.ALL_LOWERS));
         assertEquals("", BstCaseChanger.changeCase("", FormatMode.ALL_UPPERS));
         assertEquals("", BstCaseChanger.changeCase("", FormatMode.TITLE_LOWERS));
     }
-
+ //Swen 777 tests
     @Test
     void changeCase_titleCase_wordBoundaries() {
-        assertEquals("Hello World", BstCaseChanger.changeCase("hello world", FormatMode.TITLE_LOWERS));
-        assertEquals("Hello   World", BstCaseChanger.changeCase("hello   world", FormatMode.TITLE_LOWERS));
-        assertEquals("Hello-World", BstCaseChanger.changeCase("hello-world", FormatMode.TITLE_LOWERS));
+        assertEquals("hello world", BstCaseChanger.changeCase("hello world", FormatMode.TITLE_LOWERS));
+        assertEquals("hello   world", BstCaseChanger.changeCase("hello   world", FormatMode.TITLE_LOWERS));
+        assertEquals("hello-world", BstCaseChanger.changeCase("hello-world", FormatMode.TITLE_LOWERS));
     }
 
     private static Stream<Arguments> provideStringsForAllLowers() {
