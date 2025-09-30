@@ -1,6 +1,10 @@
+// Gradle License Report plugin: generates a report of all 3rd-party dependencies and their licenses
+// Used for auditing/compliance when distributing the application.
+
 plugins {
     id("org.jabref.gradle.module")
     id("application")
+    id("com.github.jk1.dependency-license-report") version "2.9"
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
     // id("com.redock.classpathtofile") version "0.1.0"
