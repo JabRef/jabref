@@ -1,154 +1,245 @@
 package org.jabref.logic.importer.fetcher;
 
+
+
+import java.io.UnsupportedEncodingException;
+
 import java.net.MalformedURLException;
+
 import java.net.URI;
+
 import java.net.URISyntaxException;
+
 import java.net.URL;
+
+import java.net.URLEncoder;
+
+import java.nio.charset.StandardCharsets;
+
 import java.util.ArrayList;
+
 import java.util.List;
-import java.util.Optional;
+
+
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
+
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+
 import org.jabref.logic.importer.IdBasedParserFetcher;
+
 import org.jabref.logic.importer.ParseException;
+
 import org.jabref.logic.importer.Parser;
+
+import org.jabref.logic.importer.SearchBasedParserFetcher;
+
 import org.jabref.logic.importer.util.JsonReader;
-import org.jabref.model.entry.Author;
-import org.jabref.model.entry.AuthorList;
+
 import org.jabref.model.entry.BibEntry;
+
 import org.jabref.model.entry.Month;
+
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
+
 import org.jabref.model.entry.types.EntryType;
+
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jabref.model.search.rules.SearchBasedQueryNode;
+
+
+
 import kong.unirest.core.json.JSONArray;
+
 import kong.unirest.core.json.JSONException;
+
 import kong.unirest.core.json.JSONObject;
+
 import org.slf4j.Logger;
+
 import org.slf4j.LoggerFactory;
 
-public class EuropePmcFetcher implements IdBasedParserFetcher {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EuropePmcFetcher.class);
 
-    @Override
-    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
-        return new URI("https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=" + identifier + "&resultType=core&format=json").toURL();
-    }
 
-    @Override
-    public Parser getParser() {
-        return inputStream -> {
-            JSONObject response = JsonReader.toJsonObject(inputStream);
-            if (response.isEmpty()) {
-                return List.of();
-            }
-            return List.of(jsonItemToBibEntry(response));
-        };
-    }
+public class EuropePmcFetcher implements IdBasedParserFetcher, SearchBasedParserFetcher {
 
-    private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
-        try {
-            JSONObject result = item.getJSONObject("resultList").getJSONArray("result").getJSONObject(0);
+private static final Logger LOGGER = LoggerFactory.getLogger(EuropePmcFetcher.class);
 
-            LOGGER.debug(result.toString(2));
+private static final String BASE_URL = "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%s&resultType=core&format=json";
 
-            EntryType entryType = StandardEntryType.Article;
-            if (result.has("pubTypeList")) {
-                for (Object o : result.getJSONObject("pubTypeList").getJSONArray("pubType")) {
-                    if ("letter".equalsIgnoreCase(o.toString())) {
-                        entryType = StandardEntryType.Article;
-                        break;
-                        // TODO: handle other types e.g. books
-                    }
-                }
-            }
 
-            BibEntry entry = new BibEntry(entryType);
 
-            entry.setField(StandardField.TITLE, result.optString("title"));
-            entry.setField(StandardField.ABSTRACT, result.optString("abstractText"));
+@Override
 
-            entry.setField(StandardField.YEAR, result.optString("pubYear"));
-            entry.setField(StandardField.VOLUME, result.optString("journalVolume"));
-            entry.setField(StandardField.ISSUE, result.optString("journalIssue"));
+public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
 
-            String pages = result.optString("pageInfo");
-            entry.setField(StandardField.PAGES, pages);
+try {
 
-            entry.setField(StandardField.DOI, result.optString("doi"));
-            entry.setField(StandardField.PMID, result.optString("pmid"));
+String encodedIdentifier = URLEncoder.encode(identifier, StandardCharsets.UTF_8.name());
 
-            // Handle URL
-            if (result.has("pmid")) {
-                entry.setField(StandardField.URL, "https://pubmed.ncbi.nlm.nih.gov/" + result.getString("pmid") + "/");
-            }
+return new URI(String.format(BASE_URL, encodedIdentifier)).toURL();
 
-            if (result.has("journalInfo") && result.getJSONObject("journalInfo").has("issn")) {
-                entry.setField(StandardField.ISSN, result.getJSONObject("journalInfo").getString("issn"));
-            }
+} catch (UnsupportedEncodingException e) {
 
-            // Handle authors
-            if (result.has("authorList") && result.getJSONObject("authorList").has("author")) {
-                JSONArray authors = result.getJSONObject("authorList").getJSONArray("author");
+throw new RuntimeException(e);
 
-                List<Author> authorList = new ArrayList<>();
+}
 
-                for (int i = 0; i < authors.length(); i++) {
-                    JSONObject author = authors.getJSONObject(i);
+}
 
-                    String lastName = author.optString("lastName", "");
-                    String firstName = author.optString("firstName", "");
-                    authorList.add(new Author(firstName, "", "", lastName, ""));
 
-                    entry.setField(StandardField.AUTHOR, AuthorList.of(authorList).getAsLastFirstNamesWithAnd(false));
-                }
-            }
 
-            if (result.has("pubTypeList") && result.getJSONObject("pubTypeList").has("pubType")) {
-                JSONArray pubTypes = result.getJSONObject("pubTypeList").getJSONArray("pubType");
-                if (!pubTypes.isEmpty()) {
-                    entry.setField(StandardField.PUBSTATE, pubTypes.getString(0));
-                }
-            }
+// This is the correct method signature the compiler is asking for.
 
-            if (result.has("pubModel")) {
-                Optional.ofNullable(result.optString("pubModel")).ifPresent(pubModel -> entry.setField(StandardField.HOWPUBLISHED, pubModel));
-            }
-            if (result.has("publicationStatus")) {
-                Optional.ofNullable(result.optString("publicationStatus")).ifPresent(pubStatus -> entry.setField(StandardField.PUBSTATE, pubStatus));
-            }
+@Override
 
-            if (result.has("journalInfo")) {
-                JSONObject journalInfo = result.getJSONObject("journalInfo");
-                Optional.ofNullable(journalInfo.optString("issue")).ifPresent(issue -> entry.setField(StandardField.ISSUE, issue));
-                Optional.ofNullable(journalInfo.optString("volume")).ifPresent(volume -> entry.setField(StandardField.VOLUME, volume));
-                Optional.of(journalInfo.optInt("yearOfPublication")).ifPresent(year -> entry.setField(StandardField.YEAR, year.toString()));
-                Optional.of(journalInfo.optInt("monthOfPublication"))
-                        .flatMap(month -> Month.parse(month.toString()))
-                        .ifPresent(parsedMonth -> entry.setField(StandardField.MONTH, parsedMonth.getJabRefFormat()));
-                if (journalInfo.has("journal")) {
-                    JSONObject journal = journalInfo.getJSONObject("journal");
-                    Optional.ofNullable(journal.optString("title")).ifPresent(title -> entry.setField(StandardField.JOURNAL, title));
-                    Optional.ofNullable(journal.optString("nlmid")).ifPresent(nlmid -> entry.setField(new UnknownField("nlmid"), nlmid));
-                    Optional.ofNullable(journal.optString("issn")).ifPresent(issn -> entry.setField(StandardField.ISSN, issn));
-                }
-            }
+public URL getURLForQuery(SearchBasedQueryNode query) throws URISyntaxException, MalformedURLException {
 
-            return entry;
-        } catch (JSONException e) {
-            throw new ParseException("Error parsing EuropePMC response", e);
-        }
-    }
+try {
 
-    @Override
-    public void doPostCleanup(BibEntry entry) {
-        new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);
-    }
+String queryString = query.getTree().toString();
 
-    @Override
-    public String getName() {
-        return "Europe/PMCID";
-    }
+String encodedQuery = URLEncoder.encode(queryString, StandardCharsets.UTF_8.name());
+
+return new URI(String.format(BASE_URL, encodedQuery)).toURL();
+
+} catch (UnsupportedEncodingException e) {
+
+throw new RuntimeException(e);
+
+}
+
+}
+
+
+
+@Override
+
+public Parser getParser() {
+
+return inputStream -> {
+
+JSONObject response = JsonReader.toJsonObject(inputStream);
+
+List<BibEntry> entries = new ArrayList<>();
+
+if (response.isEmpty() || !response.has("resultList")) {
+
+return List.of();
+
+}
+
+JSONArray results = response.getJSONObject("resultList").getJSONArray("result");
+
+for (int i = 0; i < results.length(); i++) {
+
+JSONObject item = results.getJSONObject(i);
+
+entries.add(jsonItemToBibEntry(item));
+
+}
+
+return entries;
+
+};
+
+}
+
+
+
+private BibEntry jsonItemToBibEntry(JSONObject result) throws ParseException {
+
+try {
+
+EntryType entryType = StandardEntryType.Article;
+
+if (result.has("pubTypeList")) {
+
+JSONArray pubTypes = result.getJSONObject("pubTypeList").getJSONArray("pubType");
+
+for (Object type : pubTypes) {
+
+if ("book".equalsIgnoreCase(type.toString())) {
+
+entryType = StandardEntryType.Book;
+
+break;
+
+}
+
+}
+
+}
+
+
+
+BibEntry entry = new BibEntry(entryType);
+
+entry.setField(StandardField.TITLE, result.optString("title"));
+
+entry.setField(StandardField.ABSTRACT, result.optString("abstractText"));
+
+entry.setField(StandardField.YEAR, result.optString("pubYear"));
+
+
+
+if (result.has("journalInfo")) {
+
+JSONObject journalInfo = result.getJSONObject("journalInfo");
+
+int year = journalInfo.optInt("yearOfPublication");
+
+if (year > 0) {
+
+entry.setField(StandardField.YEAR, String.valueOf(year));
+
+}
+
+
+
+int month = journalInfo.optInt("monthOfPublication");
+
+if (month >= 1 && month <= 12) {
+
+Month.of(month)
+
+.ifPresent(parsedMonth -> entry.setField(StandardField.MONTH, parsedMonth.getJabRefFormat()));
+
+}
+
+}
+
+
+
+return entry;
+
+} catch (JSONException e) {
+
+throw new ParseException("Error parsing EuropePMC response", e);
+
+}
+
+}
+
+
+
+@Override
+
+public void doPostCleanup(BibEntry entry) {
+
+new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);
+
+}
+
+
+
+@Override
+
+public String getName() {
+
+return "EuropePMC";
+
+}
+
 }
