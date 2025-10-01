@@ -2,6 +2,8 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,41 +19,31 @@ class OrdinalsToSuperscriptFormatterTest {
         formatter = new OrdinalsToSuperscriptFormatter();
     }
 
-    @Test
-    void replacesSuperscript() {
-        expectCorrect("1st", "1\\textsuperscript{st}");
-        expectCorrect("2nd", "2\\textsuperscript{nd}");
-        expectCorrect("3rd", "3\\textsuperscript{rd}");
-        expectCorrect("4th", "4\\textsuperscript{th}");
-        expectCorrect("21th", "21\\textsuperscript{th}");
-    }
+    @ParameterizedTest
+    @CsvSource({
+            // Basic ordinal replacements
+            "1\\textsuperscript{st}, 1st",
+            "2\\textsuperscript{nd}, 2nd",
+            "3\\textsuperscript{rd}, 3rd,",
+            "4\\textsuperscript{th}, 4th",
+            "21\\textsuperscript{th}, 21th",
 
-    @Test
-    void replaceSuperscriptsIgnoresCase() {
-        expectCorrect("1st", "1\\textsuperscript{st}");
-        expectCorrect("1ST", "1\\textsuperscript{ST}");
-        expectCorrect("1sT", "1\\textsuperscript{sT}");
-    }
+            // Case-insensitive replacements
+            "1\\textsuperscript{st}, 1st",
+            "1\\textsuperscript{ST}, 1ST",
+            "1\\textsuperscript{sT}, 1sT",
 
-    @Test
-    void replaceSuperscriptsInMultilineStrings() {
-        expectCorrect(
-                "replace on 1st line\nand on 2nd line.",
-                "replace on 1\\textsuperscript{st} line\nand on 2\\textsuperscript{nd} line."
-        );
-    }
+            // Multiline
+            "'replace on 1\\textsuperscript{st} line\nand on 2\\textsuperscript{nd} line.', 'replace on 1st line\nand on 2nd line.'",
 
-    @Test
-    void replaceAllSuperscripts() {
-        expectCorrect(
-                "1st 2nd 3rd 4th",
-                "1\\textsuperscript{st} 2\\textsuperscript{nd} 3\\textsuperscript{rd} 4\\textsuperscript{th}"
-        );
-    }
+            // Replace all superscripts
+            "'1\\textsuperscript{st} 2\\textsuperscript{nd} 3\\textsuperscript{rd} 4\\textsuperscript{th}', '1st 2nd 3rd 4th'",
 
-    @Test
-    void ignoreSuperscriptsInsideWords() {
-        expectCorrect("1st 1stword words1st inside1stwords", "1\\textsuperscript{st} 1stword words1st inside1stwords");
+            // Ignore superscripts inside words
+            "'1\\textsuperscript{st} 1stword words1st inside1stwords', '1st 1stword words1st inside1stwords'"
+    })
+    void replacesSuperscript(String expected, String input) {
+        expectCorrect(expected, input);
     }
 
     @Test
@@ -59,7 +51,7 @@ class OrdinalsToSuperscriptFormatterTest {
         assertEquals("11\\textsuperscript{th}", formatter.format(formatter.getExampleInput()));
     }
 
-    private void expectCorrect(String input, String expected) {
+    private void expectCorrect(String expected, String input) {
         assertEquals(expected, formatter.format(input));
     }
 }
