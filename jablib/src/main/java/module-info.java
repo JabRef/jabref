@@ -228,7 +228,7 @@ open module org.jabref.jablib {
     /*
      * In case the version is updated, please also increment {@link org.jabref.model.search.LinkedFilesConstants.VERSION} to trigger reindexing.
      */
-    uses org.apache.lucene.codecs.lucene101.Lucene101Codec;
+    uses org.apache.lucene.codecs.lucene103.Lucene103Codec;
     requires org.apache.lucene.analysis.common;
     requires org.apache.lucene.core;
     requires org.apache.lucene.highlighter;
