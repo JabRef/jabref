@@ -1,4 +1,4 @@
-//JAVA 24
+//JAVA 25+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS com.fasterxml.jackson.core:jackson-databind:2.17.1

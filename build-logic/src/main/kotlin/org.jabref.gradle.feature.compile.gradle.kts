@@ -14,6 +14,7 @@ java {
         // - .jbang/Jab*.java
         // - .moderne/moderne.yml
         // - .sdkmanrc
+        // - build-support/src/main/java/*.java
         // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.md
         languageVersion = JavaLanguageVersion.of(25)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
