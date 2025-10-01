@@ -2,6 +2,7 @@ package org.jabref.logic.bibtex;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.StringJoiner;
 
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
@@ -54,11 +55,11 @@ public class FieldWriter {
 
             if (!isEscaped(text, i)) {
                 if (item == '{') {
-                    queue.add(String.format("Line %d, column %d (index %d): in '%s'",
+                    queue.add("Line %d, column %d (index %d): in '%s'".formatted(
                             line + 1, i - lastLineIndex + 1, i, getErrorContextSnippet(text, i)));
                 } else if (item == '}') {
                     if (queue.pollLast() == null) {
-                        String errorMessage = String.format("Unescaped '}' without matching opening bracket found at line %d, column %d (index %d): in '%s'",
+                        String errorMessage = "Unescaped '}' without matching opening bracket found at line %d, column %d (index %d): in '%s'".formatted(
                                 line + 1, i - lastLineIndex + 1, i, getErrorContextSnippet(text, i));
                         LOGGER.error(errorMessage);
                         throw new InvalidFieldValueException(errorMessage);
@@ -68,7 +69,11 @@ public class FieldWriter {
         }
 
         if (!queue.isEmpty()) {
-            String errorMessage = String.format(" The following unescaped '{' do not have matching closing bracket:\n%s", String.join("\n", queue));
+            StringJoiner joiner = new StringJoiner("\n");
+            for (String error : queue) {
+                joiner.add(error);
+            }
+            String errorMessage = "The following unescaped '{' do not have matching closing bracket:\n%s".formatted(joiner);
             LOGGER.error(errorMessage);
             throw new InvalidFieldValueException(errorMessage);
         }
