@@ -248,10 +248,8 @@ public class LinkedFileHandler {
      * @return A filename based on the pattern specified in the preferences and valid for the file system.
      */
     public String getSuggestedFileName(@NonNull String extension) {
-        String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).trim();
-        if ((targetFileName.isEmpty() || "-".equals(targetFileName)) && linkedFile.isOnlineLink()) {
-            // "-" is part of the default pattern (org.jabref.logic.FilePreferences.DEFAULT_FILENAME_PATTERNS) and is returned if no fields have been replaced.
-            // All other patterns are not yet handled. See <https://github.com/jabref/jabref/issues/13735> for a sketch of a solution.
+        Optional<String> targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern());
+        if (targetFileName.isEmpty() && linkedFile.isOnlineLink()) {
             String oldFileName = linkedFile.getLink();
             int lastSlashIndex = oldFileName.lastIndexOf('/');
             if (lastSlashIndex >= 0 && lastSlashIndex < oldFileName.length() - 1) {
@@ -260,20 +258,23 @@ public class LinkedFileHandler {
                 if (queryIndex > 0) {
                     fileNameFromUrl = fileNameFromUrl.substring(0, queryIndex);
                 }
-                if (!extension.isEmpty()) {
-                    Optional<String> existingExtension = FileUtil.getFileExtension(fileNameFromUrl);
-                    if (existingExtension.isEmpty() || !existingExtension.get().equalsIgnoreCase(extension)) {
-                        String baseName = FileUtil.getBaseName(fileNameFromUrl);
-                        fileNameFromUrl = baseName + "." + extension;
+                if (!fileNameFromUrl.isEmpty()) {
+                    if (!extension.isEmpty()) {
+                        Optional<String> existingExtension = FileUtil.getFileExtension(fileNameFromUrl);
+                        if (existingExtension.isEmpty() || !existingExtension.get().equalsIgnoreCase(extension)) {
+                            String baseName = FileUtil.getBaseName(fileNameFromUrl);
+                            fileNameFromUrl = baseName + "." + extension;
+                        }
                     }
+                    return FileUtil.getValidFileName(fileNameFromUrl);
                 }
-                return FileUtil.getValidFileName(fileNameFromUrl);
             }
         }
-        if (!extension.isEmpty()) {
-            targetFileName = targetFileName + '.' + extension;
-        }
-        return FileUtil.getValidFileName(targetFileName);
+
+        String baseName = targetFileName.orElse("file");
+        String suggestedName = extension.isEmpty() ? baseName : baseName + "." + extension;
+
+        return FileUtil.getValidFileName(suggestedName);
     }
 
     /**

@@ -28,7 +28,7 @@ public class WalkthroughScroller {
         LOGGER.debug("Setting up scrollable parent monitoring for node: {}", node.getClass().getSimpleName());
         List<Node> scrollableParents = findScrollableParents(node);
         LOGGER.debug("Found {} scrollable parents", scrollableParents.size());
-        debouncedScroller = WalkthroughUtils.debounced((_) -> scrollNodeIntoView(node, scrollableParents));
+        debouncedScroller = WalkthroughUtils.debounced(_ -> scrollNodeIntoView(node, scrollableParents));
 
         scrollableParents
                 .stream()

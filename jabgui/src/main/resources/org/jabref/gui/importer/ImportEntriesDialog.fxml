@@ -44,6 +44,7 @@
                     <HBox spacing="4" alignment="CENTER_LEFT">
                         <Label text="%Library to import into"/>
                         <ComboBox fx:id="libraryListView" layoutX="16.0" layoutY="52.0"/>
+                        <ComboBox fx:id="groupListView" layoutX="16.0" layoutY="52.0"/>
                     </HBox>
                 </VBox>
                 <HBox HBox.hgrow="ALWAYS"/>
