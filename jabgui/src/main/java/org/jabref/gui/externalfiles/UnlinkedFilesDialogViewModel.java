@@ -7,9 +7,13 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
@@ -41,7 +45,10 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -118,14 +125,82 @@ public class UnlinkedFilesDialogViewModel {
         treeRootProperty.setValue(Optional.empty());
     }
 
+    public void findAndFixBrokenLinks(Path searchDirectory) {
+        List<ImportFilesResultItemViewModel> results = new ArrayList<>();
+
+        // pre-build a map of all existing linked files for O(1) lookup
+        Set<Path> existingLinkedFiles = bibDatabase.getDatabase().getEntries().stream()
+                                                   .flatMap(entry -> entry.getFiles().stream())
+                                                   .map(linkedFile -> linkedFile.findIn(bibDatabase, preferences.getFilePreferences()))
+                                                   .filter(Optional::isPresent)
+                                                   .map(Optional::get)
+                                                   .collect(Collectors.toSet());
+
+        for (BibEntry entry : bibDatabase.getDatabase().getEntries()) {
+            try {
+                List<LinkedFile> currentFiles = new ArrayList<>(entry.getFiles());
+                List<LinkedFile> filesToRemove = new ArrayList<>();
+                List<LinkedFile> filesToAdd = new ArrayList<>();
+
+                for (LinkedFile brokenLink : currentFiles) {
+                    if (brokenLink.findIn(bibDatabase, preferences.getFilePreferences()).isPresent()) {
+                        continue;
+                    }
+
+                    String exactFileName = Path.of(brokenLink.getLink()).getFileName().toString();
+                    List<Path> matches = new ArrayList<>();
+
+                    try (Stream<Path> walk = Files.walk(searchDirectory)) {
+                        walk.filter(path -> !Files.isDirectory(path))
+                            .filter(path -> path.getFileName().toString().equals(exactFileName))
+                            .forEach(matches::add);
+                    }
+
+                    // check if matches found is only one
+                    if (matches.size() != 1) {
+                        continue;
+                    }
+                    Path foundFile = matches.getFirst();
+
+                    // check if the potential file is not linked to other entries
+                    if (existingLinkedFiles.contains(foundFile)) {
+                        continue;
+                    }
+
+                    Path newFilePath = preferences.getFilePreferences().shouldStoreFilesRelativeToBibFile() ?
+                                       FileUtil.relativize(foundFile, bibDatabase.getFileDirectories(preferences.getFilePreferences())) :
+                                       foundFile;
+
+                    filesToRemove.add(brokenLink);
+                    filesToAdd.add(new LinkedFile(brokenLink.getDescription(), newFilePath, brokenLink.getFileType()));
+                    existingLinkedFiles.add(foundFile);
+
+                    results.add(new ImportFilesResultItemViewModel(foundFile, true,
+                            Localization.lang("File relinked to entry %0.", exactFileName)));
+                }
+
+                if (!filesToRemove.isEmpty() || !filesToAdd.isEmpty()) {
+                    currentFiles.removeAll(filesToRemove);
+                    currentFiles.addAll(filesToAdd);
+                    entry.setFiles(currentFiles);
+                }
+            } catch (IOException e) {
+                LOGGER.error("Error finding associated files for entry", e);
+            }
+        }
+
+        resultList.clear();
+        resultList.addAll(results);
+    }
+
     public void startSearch() {
         Path directory = this.getSearchDirectory();
+        findAndFixBrokenLinks(directory);
         Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
         DateRange selectedDateFilter = selectedDate.getValue();
         ExternalFileSorter selectedSortFilter = selectedSort.getValue();
         progressValueProperty.unbind();
         progressTextProperty.unbind();
-
         findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences())
                 .onRunning(() -> {
                     progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
@@ -295,5 +370,10 @@ public class UnlinkedFilesDialogViewModel {
 
     public SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty() {
         return checkedFileListProperty;
+    }
+
+    // For testing purposes
+    public int resultListSize() {
+        return resultList.size();
     }
 }
