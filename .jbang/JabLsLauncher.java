@@ -2,7 +2,7 @@
 
 //DESCRIPTION jabls - start a bibtex languageserver
 
-//JAVA 24
+//JAVA 25
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //SOURCES ../jabls-cli/src/main/java/org/jabref/languageserver/cli/ServerCli.java

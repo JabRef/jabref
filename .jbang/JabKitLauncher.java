@@ -2,7 +2,7 @@
 
 //DESCRIPTION jabkit - mange BibTeX files using JabRef
 
-//JAVA 24
+//JAVA 25
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //SOURCES ../jabkit/src/main/java/org/jabref/cli/converter/CygWinPathConverter.java

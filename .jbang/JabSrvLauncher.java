@@ -2,7 +2,7 @@
 
 //DESCRIPTION jabsrv - serve BibTeX files using JabRef
 
-//JAVA 24
+//JAVA 25
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //SOURCES ../jabsrv-cli/src/main/java/org/jabref/http/server/cli/ServerCli.java
