@@ -97,6 +97,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved the event viewer for debugging [#13783](https://github.com/JabRef/jabref/pull/13783).
 - We improved "REDACTED" replacement of API key value in web fetcher search URL [#13796](https://github.com/JabRef/jabref/issues/13796)
 - When the pin "Keep dialog always on top" in the global search dialog is selected, the search window stays open when double-clicking on an entry. [#13840](https://github.com/JabRef/jabref/issues/13840)
+- We improved the way we check for matching curly braces in BibTeX fields and made error messages easier to understand. [#12605](https://github.com/JabRef/jabref/issues/12605)
 
 ### Fixed
 
