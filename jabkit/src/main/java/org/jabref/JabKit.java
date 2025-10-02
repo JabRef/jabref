@@ -58,7 +58,7 @@ public class JabKit {
 
     private static final String JABKIT_BRAND = "JabKit - command line toolkit for JabRef";
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         initLogging(args);
 
         try {

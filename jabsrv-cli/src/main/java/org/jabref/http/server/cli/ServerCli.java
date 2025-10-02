@@ -35,7 +35,7 @@ public class ServerCli implements Callable<Void> {
      * Starts an http server serving the last files opened in JabRef<br>
      * More files can be provided as args.
      */
-    public static void main(final String[] args) throws InterruptedException {
+    static void main(final String[] args) throws InterruptedException {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 

@@ -19,7 +19,7 @@ public class ServerCli implements Callable<Void> {
     @CommandLine.Option(names = {"-p", "--port"}, description = "the port")
     private Integer port = 2087;
 
-    public static void main(final String[] args) throws InterruptedException {
+    static void main(final String[] args) throws InterruptedException {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
