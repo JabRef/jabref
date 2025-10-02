@@ -48,7 +48,7 @@ public class JournalListMvGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalListMvGenerator.class);
 
-    public static void main(String[] args) throws IOException {
+    static void main(String[] args) throws IOException {
         boolean verbose = (args.length == 1) && ("--verbose".equals(args[0]));
 
         Path abbreviationsDirectory = Path.of("jablib", "src", "main", "abbrv.jabref.org", "journals");

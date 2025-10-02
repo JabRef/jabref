@@ -90,7 +90,7 @@
 
 /// This class is required for [jbang](https://www.jbang.dev/)
 public class JabSrvLauncher {
-    public static void main(String[] args) throws Exception {
+    static void main(String[] args) throws Exception {
         org.jabref.http.server.cli.ServerCli.main(args);
     }
 }

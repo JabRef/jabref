@@ -45,7 +45,7 @@ public class CitationStyleCatalogGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleCatalogGenerator.class);
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         generateCitationStyleCatalog();
     }
 

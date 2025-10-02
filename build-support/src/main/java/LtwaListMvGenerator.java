@@ -46,7 +46,7 @@ public class LtwaListMvGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LtwaListMvGenerator.class);
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         try {
             Path tempCsvFile = Path.of("jablib", "build", "tmp", "ltwa_20210702.csv");
             if (!Files.exists(tempCsvFile)) {

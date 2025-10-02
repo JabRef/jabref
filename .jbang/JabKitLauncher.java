@@ -41,7 +41,7 @@ import org.jabref.JabKit;
 
 /// This class is required for [jbang](https://www.jbang.dev/)
 public class JabKitLauncher {
-    public static void main(String[] args) {
+    static void main(String[] args) {
         org.jabref.JabKit.main(args);
     }
 }

@@ -9,7 +9,7 @@ import java.nio.file.Path;
 //DEPS org.eclipse.jgit:org.eclipse.jgit.pgm:7.3.0.202506031305-r
 
 public class CloneJabRef {
-    public static void main(String[] args) throws Exception {
+    static void main(String[] args) throws Exception {
         Path targetDir;
         if (args.length == 1) {
             targetDir = Path.of(args[0]).toAbsolutePath();
