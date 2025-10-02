@@ -58,7 +58,8 @@ public class JabKit {
 
     private static final String JABKIT_BRAND = "JabKit - command line toolkit for JabRef";
 
-    static void main(String[] args) {
+    /// @implNote method needs to be public, because JabKitLauncher calls it.
+    public static void main(String[] args) {
         initLogging(args);
 
         try {
