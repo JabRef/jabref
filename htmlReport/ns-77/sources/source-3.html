@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GuiPushToApplicationCommand</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.push</a>
+</div>
+
+<h1>Coverage Summary for Class: GuiPushToApplicationCommand (org.jabref.gui.push)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GuiPushToApplicationCommand</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.push;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import javafx.scene.control.ButtonBase;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.Action;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * An Action class representing the process of invoking a PushToApplication operation.
+&nbsp; */
+&nbsp;public class GuiPushToApplicationCommand extends SimpleCommand {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(GuiPushToApplicationCommand.class);</b>
+&nbsp;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    private final List&lt;Object&gt; reconfigurableControls = new ArrayList&lt;&gt;();</b>
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    private GuiPushToApplication application;
+&nbsp;
+<b class="nc">&nbsp;    public GuiPushToApplicationCommand(StateManager stateManager, DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        setApplication(preferences.getPushToApplicationPreferences()</b>
+<b class="nc">&nbsp;                                  .getActiveApplicationName());</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(preferences.getPushToApplicationPreferences().activeApplicationNameProperty(),</b>
+&nbsp;                this::setApplication);
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(ActionHelper.needsDatabase(stateManager).and(ActionHelper.needsEntriesSelected(stateManager)));</b>
+<b class="nc">&nbsp;        this.statusMessage.bind(BindingsHelper.ifThenElse(</b>
+&nbsp;                this.executable,
+&nbsp;                &quot;&quot;,
+<b class="nc">&nbsp;                Localization.lang(&quot;This operation requires one or more entries to be selected.&quot;)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void registerReconfigurable(Object node) {
+<b class="nc">&nbsp;        if (!(node instanceof MenuItem) &amp;&amp; !(node instanceof ButtonBase)) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Node must be either a MenuItem or a ButtonBase&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.reconfigurableControls.add(node);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setApplication(String applicationName) {
+<b class="nc">&nbsp;        final ActionFactory factory = new ActionFactory();</b>
+<b class="nc">&nbsp;        GuiPushToApplication application = GuiPushToApplications.getGUIApplicationByName(</b>
+&nbsp;                                                                        applicationName,
+&nbsp;                                                                        dialogService,
+<b class="nc">&nbsp;                                                                        preferences.getPushToApplicationPreferences())</b>
+<b class="nc">&nbsp;                                                                .orElseGet(() -&gt; new GuiPushToEmacs(dialogService, preferences.getPushToApplicationPreferences()));</b>
+&nbsp;
+<b class="nc">&nbsp;        preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());</b>
+<b class="nc">&nbsp;        this.application = Objects.requireNonNull(application);</b>
+&nbsp;
+<b class="nc">&nbsp;        reconfigurableControls.forEach(object -&gt; {</b>
+<b class="nc">&nbsp;            if (object instanceof MenuItem item) {</b>
+<b class="nc">&nbsp;                factory.configureMenuItem(application.getAction(), this, item);</b>
+<b class="nc">&nbsp;            } else if (object instanceof ButtonBase base) {</b>
+<b class="nc">&nbsp;                factory.configureIconButton(application.getAction(), this, base);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public Action getAction() {
+<b class="nc">&nbsp;        return application.getAction();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+&nbsp;        // If required, check that all entries have citation keys defined:
+<b class="nc">&nbsp;        if (application.requiresCitationKeys()) {</b>
+<b class="nc">&nbsp;            for (BibEntry entry : stateManager.getSelectedEntries()) {</b>
+<b class="nc">&nbsp;                if (StringUtil.isBlank(entry.getCitationKey())) {</b>
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                            application.getDisplayName(),</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;This operation requires all selected entries to have citation keys defined.&quot;));</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // All set, call the operation in a new thread:
+<b class="nc">&nbsp;        BackgroundTask.wrap(this::pushEntries)</b>
+<b class="nc">&nbsp;                      .onSuccess(s -&gt; application.onOperationCompleted())</b>
+<b class="nc">&nbsp;                      .onFailure(ex -&gt; LOGGER.error(&quot;Error pushing citation&quot;, ex))</b>
+<b class="nc">&nbsp;                      .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void pushEntries() {
+<b class="nc">&nbsp;        application.pushEntries(stateManager.getSelectedEntries());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

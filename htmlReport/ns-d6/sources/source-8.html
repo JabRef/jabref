@@ -1,0 +1,170 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MathMLParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.util</a>
+</div>
+
+<h1>Coverage Summary for Class: MathMLParser (org.jabref.logic.importer.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MathMLParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.util;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.Reader;
+&nbsp;import java.io.StringWriter;
+&nbsp;
+&nbsp;import javax.xml.stream.XMLStreamException;
+&nbsp;import javax.xml.stream.XMLStreamReader;
+&nbsp;import javax.xml.transform.Result;
+&nbsp;import javax.xml.transform.Source;
+&nbsp;import javax.xml.transform.Transformer;
+&nbsp;import javax.xml.transform.TransformerException;
+&nbsp;import javax.xml.transform.TransformerFactory;
+&nbsp;import javax.xml.transform.stream.StreamResult;
+&nbsp;import javax.xml.transform.stream.StreamSource;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseClassGetResource;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;@AllowedToUseClassGetResource(&quot;to determine the root directory&quot;)
+<b class="nc">&nbsp;public class MathMLParser {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MathMLParser.class);</b>
+&nbsp;    private static final String XSLT_FILE_PATH = &quot;/xslt/mathml_latex/mmltex.xsl&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the MathML element into its corresponding
+&nbsp;     * LaTeX representation, using an XSLT transformation file
+&nbsp;     *
+&nbsp;     * @param reader the stream reader
+&nbsp;     * @return Returns the LaTeX representation
+&nbsp;     */
+&nbsp;    public static String parse(XMLStreamReader reader) {
+<b class="nc">&nbsp;        String xmlContent = &quot;&quot;;</b>
+&nbsp;        String latexResult;
+&nbsp;
+<b class="nc">&nbsp;        try (InputStream xsltResource = MathMLParser.class.getResourceAsStream(XSLT_FILE_PATH)) {</b>
+&nbsp;            // extract XML content
+<b class="nc">&nbsp;            xmlContent = StaxParser.getXMLContent(reader);</b>
+&nbsp;
+&nbsp;            // convert to LaTeX using XSLT file
+<b class="nc">&nbsp;            Source xmlSource = new StreamSource(Reader.of(xmlContent));</b>
+&nbsp;
+&nbsp;            // No SystemId required, because no relative URLs need to be resolved
+<b class="nc">&nbsp;            Source xsltSource = new StreamSource(xsltResource, MathMLParser.class.getResource(XSLT_FILE_PATH).toExternalForm());</b>
+&nbsp;
+<b class="nc">&nbsp;            TransformerFactory transformerFactory = TransformerFactory.newInstance();</b>
+<b class="nc">&nbsp;            Transformer transformer = transformerFactory.newTransformer(xsltSource);</b>
+&nbsp;
+<b class="nc">&nbsp;            StringWriter writer = new StringWriter();</b>
+<b class="nc">&nbsp;            Result result = new StreamResult(writer);</b>
+<b class="nc">&nbsp;            transformer.transform(xmlSource, result);</b>
+&nbsp;
+<b class="nc">&nbsp;            latexResult = writer.getBuffer().toString();</b>
+&nbsp;        } catch (XMLStreamException
+&nbsp;                 | TransformerException
+&nbsp;                 | IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not transform&quot;, e);</b>
+<b class="nc">&nbsp;            return &quot;&lt;Unsupported MathML expression&gt;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return latexResult;</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

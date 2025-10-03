@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SearchBasedParserFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer</a>
+</div>
+
+<h1>Coverage Summary for Class: SearchBasedParserFetcher (org.jabref.logic.importer)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SearchBasedParserFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides a convenient interface for search-based fetcher, which follows the usual three-step procedure:
+&nbsp; * &lt;ol&gt;
+&nbsp; *     &lt;li&gt;Open a URL based on the search query&lt;/li&gt;
+&nbsp; *     &lt;li&gt;Parse the response to get a list of {@link BibEntry}&lt;/li&gt;
+&nbsp; *     &lt;li&gt;Post-process fetched entries&lt;/li&gt;
+&nbsp; * &lt;/ol&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; *     This interface is used for web resources which do NOT provide BibTeX data {@link BibEntry}.
+&nbsp; *     JabRef&#39;s infrastructure to convert arbitrary input data to BibTeX is {@link Parser}.
+&nbsp; * &lt;/p&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; *     This interface inherits {@link SearchBasedFetcher}, because the methods &lt;code&gt;performSearch&lt;/code&gt; have to be provided by both.
+&nbsp; *     As non-BibTeX web fetcher one could do &quot;magic&quot; stuff without this helper interface and directly use {@link WebFetcher}, but this is more work.
+&nbsp; * &lt;/p&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; *     Note that this interface &quot;should&quot; be an abstract class.
+&nbsp; *     However, Java does not support multi inheritance with classes (but with interfaces).
+&nbsp; *     We need multi inheritance, because a fetcher might implement multiple query types (such as id fetching {@link IdBasedFetcher}), complete entry {@link EntryBasedFetcher}, and search-based fetcher (this class).
+&nbsp; * &lt;/p&gt;
+&nbsp; */
+&nbsp;
+&nbsp;public interface SearchBasedParserFetcher extends SearchBasedFetcher, ParserFetcher {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is used to send queries with advanced URL parameters.
+&nbsp;     * This method is necessary as the performSearch method does not support certain URL parameters that are used for
+&nbsp;     * fielded search, such as a title, author, or year parameter.
+&nbsp;     *
+&nbsp;     * @param queryNode the first search node
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    default List&lt;BibEntry&gt; performSearch(BaseQueryNode queryNode) throws FetcherException {
+&nbsp;        // ADR-0014
+&nbsp;        URL urlForQuery;
+&nbsp;        try {
+<b class="nc">&nbsp;            urlForQuery = getURLForQuery(queryNode);</b>
+&nbsp;        } catch (URISyntaxException | MalformedURLException | FetcherException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Search URI crafted from complex search query is malformed&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return getBibEntries(urlForQuery);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntry&gt; getBibEntries(URL urlForQuery) throws FetcherException {
+<b class="nc">&nbsp;        try (InputStream stream = getUrlDownload(urlForQuery).asInputStream()) {</b>
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; fetchedEntries = getParser().parseEntries(stream);</b>
+<b class="nc">&nbsp;            fetchedEntries.forEach(this::doPostCleanup);</b>
+<b class="nc">&nbsp;            return fetchedEntries;</b>
+&nbsp;        } catch (IOException e) {
+&nbsp;            // Regular expression to redact API keys from the error message
+<b class="nc">&nbsp;            throw new FetcherException(urlForQuery, e);</b>
+&nbsp;        } catch (ParseException e) {
+&nbsp;            // Regular expression to redact API keys from the error message
+<b class="nc">&nbsp;            throw new FetcherException(urlForQuery, &quot;An internal parser error occurred while fetching&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the parser used to convert the response to a list of {@link BibEntry}.
+&nbsp;     */
+&nbsp;    Parser getParser();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructs a URL based on the lucene query.
+&nbsp;     *
+&nbsp;     * @param queryList the list that contains the parsed nodes
+&nbsp;     */
+&nbsp;    URL getURLForQuery(BaseQueryNode queryList) throws URISyntaxException, MalformedURLException, FetcherException;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

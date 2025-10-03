@@ -1,0 +1,203 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IEEEQueryTransformer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher.transformers</a>
+</div>
+
+<h1>Coverage Summary for Class: IEEEQueryTransformer (org.jabref.logic.importer.fetcher.transformers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IEEEQueryTransformer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher.transformers;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.formatter.casechanger.Word;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;/**
+&nbsp; * Needs to be instantiated for each new query
+&nbsp; * &lt;p&gt;
+&nbsp; * Stop words are ignored. See ADR-0022.
+&nbsp; */
+<b class="nc">&nbsp;public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {</b>
+&nbsp;    // These have to be integrated into the IEEE query URL as these are just supported as query parameters
+&nbsp;    // Journal is wrapped in quotes by the transformer
+&nbsp;    private String journal;
+&nbsp;    private String articleNumber;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String getLogicalAndOperator() {
+<b class="nc">&nbsp;        return &quot; AND &quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String getLogicalOrOperator() {
+<b class="nc">&nbsp;        return &quot; OR &quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String getLogicalNotOperator() {
+<b class="nc">&nbsp;        return &quot;NOT &quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleAuthor(String author) {
+<b class="nc">&nbsp;        return createKeyValuePair(&quot;author&quot;, author);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleTitle(String title) {
+<b class="nc">&nbsp;        return createKeyValuePair(&quot;article_title&quot;, title);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleJournal(String journal) {
+<b class="nc">&nbsp;        this.journal = journal;</b>
+<b class="nc">&nbsp;        return StringUtil.quoteStringIfSpaceIsContained(journal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleYear(String year) {
+<b class="nc">&nbsp;        startYear = Math.min(startYear, Integer.parseInt(year));</b>
+<b class="nc">&nbsp;        endYear = Math.max(endYear, Integer.parseInt(year));</b>
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected Optional&lt;String&gt; handleOtherField(String fieldAsString, String term) {
+<b class="nc">&nbsp;        return switch (fieldAsString) {</b>
+&nbsp;            case &quot;article_number&quot; -&gt;
+<b class="nc">&nbsp;                    handleArticleNumber(term);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    super.handleOtherField(fieldAsString, term);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected Optional&lt;String&gt; handleUnFieldedTerm(String term) {
+<b class="nc">&nbsp;        if (Word.SMALLER_WORDS.contains(term)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return super.handleUnFieldedTerm(term);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;String&gt; handleArticleNumber(String term) {
+<b class="nc">&nbsp;        articleNumber = term;</b>
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getJournal() {
+<b class="nc">&nbsp;        return journal == null ? Optional.empty() : Optional.of(journal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getArticleNumber() {
+<b class="nc">&nbsp;        return articleNumber == null ? Optional.empty() : Optional.of(articleNumber);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

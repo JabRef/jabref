@@ -1,0 +1,258 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ContentSelectors</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.metadata</a>
+</div>
+
+<h1>Coverage Summary for Class: ContentSelectors (org.jabref.model.metadata)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ContentSelectors</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.metadata;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.SortedSet;
+&nbsp;import java.util.TreeSet;
+&nbsp;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldProperty;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;public class ContentSelectors {
+&nbsp;
+<b class="nc">&nbsp;    public static final List&lt;Field&gt; DEFAULT_FIELD_NAMES = List.of(StandardField.AUTHOR, StandardField.JOURNAL, StandardField.KEYWORDS, StandardField.PUBLISHER);</b>
+&nbsp;
+&nbsp;    private final SortedSet&lt;ContentSelector&gt; contentSelectors;
+&nbsp;
+<b class="nc">&nbsp;    public ContentSelectors() {</b>
+<b class="nc">&nbsp;        contentSelectors = new TreeSet&lt;&gt;((o1, o2) -&gt; {</b>
+&nbsp;            // First, check the field name
+<b class="nc">&nbsp;            int result = o1.getField().getName().compareTo(o2.getField().getName());</b>
+<b class="nc">&nbsp;            if (result != 0) {</b>
+<b class="nc">&nbsp;                return result;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // If the field names are equal, compare the properties
+&nbsp;            // We did not find any other way to compare enum sets, so we convert them to lists and compare them using the toString method
+<b class="nc">&nbsp;            List&lt;FieldProperty&gt; properties1 = o1.getField().getProperties().stream().sorted().toList();</b>
+<b class="nc">&nbsp;            List&lt;FieldProperty&gt; properties2 = o2.getField().getProperties().stream().sorted().toList();</b>
+<b class="nc">&nbsp;            return properties1.toString().compareTo(properties2.toString());</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addContentSelector(ContentSelector contentSelector) {
+<b class="nc">&nbsp;        Objects.requireNonNull(contentSelector);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.contentSelectors.add(contentSelector);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ContentSelector parse(Field key, String values) {
+<b class="nc">&nbsp;        Objects.requireNonNull(key);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(values);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; valueList = Arrays.asList(values.split(&quot;;&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        return new ContentSelector(key, valueList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getSelectorValuesForField(Field field) {
+<b class="nc">&nbsp;        for (ContentSelector selector : contentSelectors) {</b>
+<b class="nc">&nbsp;            if (selector.getField().equals(field)) {</b>
+<b class="nc">&nbsp;                return selector.getValues();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return List.of();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SortedSet&lt;ContentSelector&gt; getContentSelectors() {
+<b class="nc">&nbsp;        return contentSelectors;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeSelector(Field field) {
+<b class="nc">&nbsp;        ContentSelector toRemove = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (ContentSelector selector : contentSelectors) {</b>
+<b class="nc">&nbsp;            if (selector.getField().equals(field)) {</b>
+<b class="nc">&nbsp;                toRemove = selector;</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (toRemove != null) {</b>
+<b class="nc">&nbsp;            contentSelectors.remove(toRemove);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Field&gt; getFieldsWithSelectors() {
+<b class="nc">&nbsp;        List&lt;Field&gt; result = new ArrayList&lt;&gt;(contentSelectors.size());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (ContentSelector selector : contentSelectors) {</b>
+<b class="nc">&nbsp;            result.add(selector.getField());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (o == null || getClass() != o.getClass()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        ContentSelectors that = (ContentSelectors) o;</b>
+<b class="nc">&nbsp;        return Objects.equals(contentSelectors, that.contentSelectors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(contentSelectors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;ContentSelectors{&quot; +</b>
+&nbsp;                &quot;contentSelectors=&quot; + contentSelectors +
+<b class="nc">&nbsp;                &quot;, fieldsWithSelectors=&quot; + getFieldsWithSelectors() +</b>
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks whether the given map is the default map, i.e. contains only the default field names and no associated keywords.
+&nbsp;     */
+&nbsp;    public static boolean isDefaultMap(Map&lt;Field, List&lt;String&gt;&gt; fieldKeywordsMap) {
+<b class="nc">&nbsp;        if (fieldKeywordsMap.size() != ContentSelectors.DEFAULT_FIELD_NAMES.size()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (Field field : ContentSelectors.DEFAULT_FIELD_NAMES) {</b>
+<b class="nc">&nbsp;            if (!fieldKeywordsMap.containsKey(field)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (!fieldKeywordsMap.get(field).isEmpty()) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Map&lt;Field, List&lt;String&gt;&gt; getFieldKeywordsMap(SortedSet&lt;ContentSelector&gt; contentSelectors) {
+<b class="nc">&nbsp;        final Map&lt;Field, List&lt;String&gt;&gt; fieldKeywordsMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        contentSelectors.forEach(</b>
+<b class="nc">&nbsp;                existingContentSelector -&gt; fieldKeywordsMap.put(existingContentSelector.getField(), new ArrayList&lt;&gt;(existingContentSelector.getValues()))</b>
+&nbsp;        );
+<b class="nc">&nbsp;        return fieldKeywordsMap;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

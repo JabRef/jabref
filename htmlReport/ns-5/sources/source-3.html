@@ -1,0 +1,222 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CoreGuiPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui</a>
+</div>
+
+<h1>Coverage Summary for Class: CoreGuiPreferences (org.jabref.gui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CoreGuiPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.DoubleProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleDoubleProperty;
+&nbsp;
+&nbsp;public class CoreGuiPreferences {
+&nbsp;    private final DoubleProperty positionX;
+&nbsp;    private final DoubleProperty positionY;
+&nbsp;    private final DoubleProperty sizeX;
+&nbsp;    private final DoubleProperty sizeY;
+&nbsp;
+&nbsp;    private final BooleanProperty windowMaximised;
+&nbsp;
+&nbsp;    private final DoubleProperty horizontalDividerPosition;
+&nbsp;    private final DoubleProperty verticalDividerPosition;
+&nbsp;
+&nbsp;    public CoreGuiPreferences(double positionX,
+&nbsp;                              double positionY,
+&nbsp;                              double sizeX,
+&nbsp;                              double sizeY,
+&nbsp;                              boolean windowMaximised,
+&nbsp;                              double horizontalDividerPosition,
+<b class="nc">&nbsp;                              double verticalDividerPosition) {</b>
+<b class="nc">&nbsp;        this.positionX = new SimpleDoubleProperty(positionX);</b>
+<b class="nc">&nbsp;        this.positionY = new SimpleDoubleProperty(positionY);</b>
+<b class="nc">&nbsp;        this.sizeX = new SimpleDoubleProperty(sizeX);</b>
+<b class="nc">&nbsp;        this.sizeY = new SimpleDoubleProperty(sizeY);</b>
+<b class="nc">&nbsp;        this.windowMaximised = new SimpleBooleanProperty(windowMaximised);</b>
+<b class="nc">&nbsp;        this.horizontalDividerPosition = new SimpleDoubleProperty(horizontalDividerPosition);</b>
+<b class="nc">&nbsp;        this.verticalDividerPosition = new SimpleDoubleProperty(verticalDividerPosition);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getPositionX() {
+<b class="nc">&nbsp;        return positionX.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty positionXProperty() {
+<b class="nc">&nbsp;        return positionX;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPositionX(double positionX) {
+<b class="nc">&nbsp;        this.positionX.set(positionX);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getPositionY() {
+<b class="nc">&nbsp;        return positionY.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty positionYProperty() {
+<b class="nc">&nbsp;        return positionY;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPositionY(double positionY) {
+<b class="nc">&nbsp;        this.positionY.set(positionY);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getSizeX() {
+<b class="nc">&nbsp;        return sizeX.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty sizeXProperty() {
+<b class="nc">&nbsp;        return sizeX;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSizeX(double sizeX) {
+<b class="nc">&nbsp;        this.sizeX.set(sizeX);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getSizeY() {
+<b class="nc">&nbsp;        return sizeY.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty sizeYProperty() {
+<b class="nc">&nbsp;        return sizeY;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSizeY(double sizeY) {
+<b class="nc">&nbsp;        this.sizeY.set(sizeY);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isWindowMaximised() {
+<b class="nc">&nbsp;        return windowMaximised.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty windowMaximisedProperty() {
+<b class="nc">&nbsp;        return windowMaximised;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setWindowMaximised(boolean windowMaximised) {
+<b class="nc">&nbsp;        this.windowMaximised.set(windowMaximised);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getHorizontalDividerPosition() {
+<b class="nc">&nbsp;        return horizontalDividerPosition.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty horizontalDividerPositionProperty() {
+<b class="nc">&nbsp;        return horizontalDividerPosition;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setHorizontalDividerPosition(double horizontalDividerPosition) {
+<b class="nc">&nbsp;        this.horizontalDividerPosition.set(horizontalDividerPosition);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getVerticalDividerPosition() {
+<b class="nc">&nbsp;        return verticalDividerPosition.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty getVerticalDividerPositionProperty() {
+<b class="nc">&nbsp;        return verticalDividerPosition;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setVerticalDividerPosition(double dividerPosition) {
+<b class="nc">&nbsp;        this.verticalDividerPosition.set(dividerPosition);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

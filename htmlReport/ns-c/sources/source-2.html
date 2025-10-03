@@ -1,0 +1,235 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PrivacyNoticeComponent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.ai.components.privacynotice</a>
+</div>
+
+<h1>Coverage Summary for Class: PrivacyNoticeComponent (org.jabref.gui.ai.components.privacynotice)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PrivacyNoticeComponent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.ai.components.privacynotice;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.DoubleBinding;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Hyperlink;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.layout.GridPane;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.entryeditor.AdaptVisibleTabs;
+&nbsp;import org.jabref.gui.entryeditor.EntryEditorPreferences;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;import org.jabref.model.ai.AiProvider;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class PrivacyNoticeComponent extends ScrollPane {
+<b class="nc">&nbsp;    private final Logger LOGGER = LoggerFactory.getLogger(PrivacyNoticeComponent.class);</b>
+&nbsp;
+&nbsp;    @FXML private VBox text;
+&nbsp;    @FXML private GridPane aiPolicies;
+&nbsp;    @FXML private Text embeddingModelText;
+&nbsp;
+&nbsp;    private final AiPreferences aiPreferences;
+&nbsp;    private final Runnable onIAgreeButtonClickCallback;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final AdaptVisibleTabs adaptVisibleTabs;
+&nbsp;    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+&nbsp;
+&nbsp;    @Inject private GuiPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    public PrivacyNoticeComponent(AiPreferences aiPreferences, Runnable onIAgreeButtonClickCallback, ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService, AdaptVisibleTabs adaptVisibleTabs) {</b>
+<b class="nc">&nbsp;        this.aiPreferences = aiPreferences;</b>
+<b class="nc">&nbsp;        this.onIAgreeButtonClickCallback = onIAgreeButtonClickCallback;</b>
+<b class="nc">&nbsp;        this.externalApplicationsPreferences = externalApplicationsPreferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.adaptVisibleTabs = adaptVisibleTabs;</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        addPrivacyHyperlink(aiPolicies, AiProvider.OPEN_AI);</b>
+<b class="nc">&nbsp;        addPrivacyHyperlink(aiPolicies, AiProvider.MISTRAL_AI);</b>
+<b class="nc">&nbsp;        addPrivacyHyperlink(aiPolicies, AiProvider.GEMINI);</b>
+<b class="nc">&nbsp;        addPrivacyHyperlink(aiPolicies, AiProvider.HUGGING_FACE);</b>
+<b class="nc">&nbsp;        addPrivacyHyperlink(aiPolicies, AiProvider.GPT4ALL);</b>
+&nbsp;
+<b class="nc">&nbsp;        String newEmbeddingModelText = embeddingModelText.getText().replaceAll(&quot;%0&quot;, aiPreferences.getEmbeddingModel().sizeInfo());</b>
+<b class="nc">&nbsp;        embeddingModelText.setText(newEmbeddingModelText);</b>
+&nbsp;
+&nbsp;        // Because of the https://bugs.openjdk.org/browse/JDK-8090400 bug, the text in the privacy policy cannot be
+&nbsp;        // fully wrapped.
+&nbsp;
+<b class="nc">&nbsp;        DoubleBinding textWidth = Bindings.subtract(this.widthProperty(), 88d);</b>
+<b class="nc">&nbsp;        text.getChildren().forEach(child -&gt; {</b>
+<b class="nc">&nbsp;            if (child instanceof Text line) {</b>
+<b class="nc">&nbsp;                line.wrappingWidthProperty().bind(textWidth);</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        aiPolicies.prefWidthProperty().bind(textWidth);</b>
+<b class="nc">&nbsp;        embeddingModelText.wrappingWidthProperty().bind(textWidth);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addPrivacyHyperlink(GridPane gridPane, AiProvider aiProvider) {
+<b class="nc">&nbsp;        int row = gridPane.getRowCount();</b>
+<b class="nc">&nbsp;        Label aiName = new Label(aiProvider.getLabel());</b>
+<b class="nc">&nbsp;        gridPane.add(aiName, 0, row);</b>
+&nbsp;
+<b class="nc">&nbsp;        Hyperlink hyperlink = new Hyperlink(aiProvider.getPrivacyPolicyUrl());</b>
+<b class="nc">&nbsp;        hyperlink.setWrapText(true);</b>
+&nbsp;        // hyperlink.setFont(aiName.getFont());
+<b class="nc">&nbsp;        hyperlink.setOnAction(event -&gt; openBrowser(aiProvider.getApiUrl()));</b>
+<b class="nc">&nbsp;        gridPane.add(hyperlink, 1, row);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void onIAgreeButtonClick() {
+<b class="nc">&nbsp;        aiPreferences.setEnableAi(true);</b>
+<b class="nc">&nbsp;        onIAgreeButtonClickCallback.run();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void onDjlPrivacyPolicyClick() {
+<b class="nc">&nbsp;        openBrowser(&quot;https://github.com/deepjavalibrary/djl/discussions/3370#discussioncomment-10233632&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void openBrowser(String link) {
+&nbsp;        try {
+<b class="nc">&nbsp;            NativeDesktop.openBrowser(link, externalApplicationsPreferences);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error opening the browser to the Privacy Policy page of the AI provider.&quot;, e);</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void hideAITabs() {
+<b class="nc">&nbsp;        EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();</b>
+<b class="nc">&nbsp;        entryEditorPreferences.setShouldShowAiSummaryTab(false);</b>
+<b class="nc">&nbsp;        entryEditorPreferences.setShouldShowAiChatTab(false);</b>
+<b class="nc">&nbsp;        adaptVisibleTabs.adaptVisibleTabs();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

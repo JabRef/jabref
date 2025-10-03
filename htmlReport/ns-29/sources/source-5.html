@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EditAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.edit</a>
+</div>
+
+<h1>Coverage Summary for Class: EditAction (org.jabref.gui.edit)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EditAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EditAction$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.edit;
+&nbsp;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.scene.control.TextInputControl;
+&nbsp;import javafx.scene.web.WebView;
+&nbsp;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;
+&nbsp;import org.fxmisc.richtext.CodeArea;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class for handling general actions; cut, copy and paste. The focused component is kept track of by
+&nbsp; * Globals.focusListener, and we call the action stored under the relevant name in its action map.
+&nbsp; */
+&nbsp;public class EditAction extends SimpleCommand {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(EditAction.class);</b>
+&nbsp;
+&nbsp;    private final Supplier&lt;LibraryTab&gt; tabSupplier;
+&nbsp;    private final StandardActions action;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;
+<b class="nc">&nbsp;    public EditAction(StandardActions action, Supplier&lt;LibraryTab&gt; tabSupplier, StateManager stateManager, UndoManager undoManager) {</b>
+<b class="nc">&nbsp;        this.action = action;</b>
+<b class="nc">&nbsp;        this.tabSupplier = tabSupplier;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (action == StandardActions.PASTE) {</b>
+<b class="nc">&nbsp;            this.executable.bind(ActionHelper.needsDatabase(stateManager));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return this.action.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        stateManager.getFocusOwner().ifPresent(focusOwner -&gt; {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;focusOwner: {}; Action: {}&quot;, focusOwner, action.getText());</b>
+<b class="nc">&nbsp;            if (focusOwner instanceof TextInputControl textInput) {</b>
+&nbsp;                // Focus is on text field -&gt; copy/paste/cut selected text
+&nbsp;                // DELETE_ENTRY in text field should do forward delete
+<b class="nc">&nbsp;                switch (action) {</b>
+&nbsp;                    case SELECT_ALL -&gt;
+<b class="nc">&nbsp;                            textInput.selectAll();</b>
+&nbsp;                    case COPY -&gt;
+<b class="nc">&nbsp;                            textInput.copy();</b>
+&nbsp;                    case CUT -&gt;
+<b class="nc">&nbsp;                            textInput.cut();</b>
+&nbsp;                    case PASTE -&gt;
+<b class="nc">&nbsp;                            textInput.paste();</b>
+&nbsp;                    case DELETE -&gt;
+<b class="nc">&nbsp;                            textInput.clear();</b>
+&nbsp;                    case DELETE_ENTRY -&gt;
+<b class="nc">&nbsp;                            textInput.deleteNextChar();</b>
+&nbsp;                    case UNDO -&gt;
+<b class="nc">&nbsp;                            textInput.undo();</b>
+&nbsp;                    case REDO -&gt;
+<b class="nc">&nbsp;                            textInput.redo();</b>
+&nbsp;                    default -&gt; {
+<b class="nc">&nbsp;                        String message = &quot;Only cut/copy/paste supported in TextInputControl but got &quot; + action;</b>
+<b class="nc">&nbsp;                        LOGGER.error(message);</b>
+<b class="nc">&nbsp;                        throw new IllegalStateException(message);</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            } else if ((focusOwner instanceof CodeArea) || (focusOwner instanceof WebView)) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Ignoring request in CodeArea or WebView&quot;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Else: {}&quot;, focusOwner.getClass().getSimpleName());</b>
+&nbsp;                // Not sure what is selected -&gt; copy/paste/cut selected entries except for Preview and CodeArea
+&nbsp;
+<b class="nc">&nbsp;                switch (action) {</b>
+&nbsp;                    case COPY -&gt;
+<b class="nc">&nbsp;                            tabSupplier.get().copyEntry();</b>
+&nbsp;                    case CUT -&gt;
+<b class="nc">&nbsp;                            tabSupplier.get().cutEntry();</b>
+&nbsp;                    case PASTE -&gt;
+<b class="nc">&nbsp;                            tabSupplier.get().pasteEntry();</b>
+&nbsp;                    case DELETE_ENTRY -&gt;
+<b class="nc">&nbsp;                            tabSupplier.get().deleteEntry();</b>
+&nbsp;                    case UNDO -&gt; {
+<b class="nc">&nbsp;                        if (undoManager.canUndo()) {</b>
+<b class="nc">&nbsp;                            undoManager.undo();</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    case REDO -&gt; {
+<b class="nc">&nbsp;                        if (undoManager.canRedo()) {</b>
+<b class="nc">&nbsp;                            undoManager.redo();</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    default -&gt;
+<b class="nc">&nbsp;                            LOGGER.debug(&quot;Only cut/copy/paste/deleteEntry supported but got: {} and focus owner {}&quot;, action, focusOwner);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,228 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OOResult</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.openoffice.util</a>
+</div>
+
+<h1>Coverage Summary for Class: OOResult (org.jabref.model.openoffice.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OOResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.openoffice.util;
+&nbsp;
+&nbsp;import java.util.NoSuchElementException;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;/*
+&nbsp; * An instance of this class represents either the result of a computation, or an error
+&nbsp; * value. Neither of these is allowed to be null.
+&nbsp; *
+&nbsp; * Void is not allowed for R, use OOVoidResult instead.
+&nbsp; *
+&nbsp; * Out of `isPresent()` and `isError()` exactly one is true.
+&nbsp; */
+&nbsp;public class OOResult&lt;R, E&gt; {
+&nbsp;
+&nbsp;    private final Optional&lt;R&gt; result;
+&nbsp;    private final Optional&lt;E&gt; error;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exactly one of the arguments should be Optional.empty()
+&nbsp;     */
+<b class="nc">&nbsp;    private OOResult(Optional&lt;R&gt; result, Optional&lt;E&gt; error) {</b>
+<b class="nc">&nbsp;        this.result = result;</b>
+<b class="nc">&nbsp;        this.error = error;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;R, E&gt; OOResult&lt;R, E&gt; ok(R result) {
+<b class="nc">&nbsp;        return new OOResult&lt;&gt;(Optional.of(result), Optional.empty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;R, E&gt; OOResult&lt;R, E&gt; error(E error) {
+<b class="nc">&nbsp;        return new OOResult&lt;&gt;(Optional.empty(), Optional.of(error));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isPresent() {
+<b class="nc">&nbsp;        return result.isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isEmpty() {
+<b class="nc">&nbsp;        return !isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isError() {
+<b class="nc">&nbsp;        return error.isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isOK() {
+<b class="nc">&nbsp;        return !isError();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public R get() {
+<b class="nc">&nbsp;        if (isError()) {</b>
+<b class="nc">&nbsp;            throw new NoSuchElementException(&quot;Cannot get from error&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public E getError() {
+<b class="nc">&nbsp;        return error.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OOResult&lt;R, E&gt; ifPresent(Consumer&lt;R&gt; fun) {
+<b class="nc">&nbsp;        if (isPresent()) {</b>
+<b class="nc">&nbsp;            fun.accept(get());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OOResult&lt;R, E&gt; ifError(Consumer&lt;E&gt; fun) {
+<b class="nc">&nbsp;        if (isError()) {</b>
+<b class="nc">&nbsp;            fun.accept(getError());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public &lt;S&gt; OOResult&lt;S, E&gt; map(Function&lt;R, S&gt; fun) {
+<b class="nc">&nbsp;        if (isError()) {</b>
+<b class="nc">&nbsp;            return error(getError());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return ok(fun.apply(get()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public &lt;F&gt; OOResult&lt;R, F&gt; mapError(Function&lt;E, F&gt; fun) {
+<b class="nc">&nbsp;        if (isError()) {</b>
+<b class="nc">&nbsp;            return error(fun.apply(getError()));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return ok(get());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Throw away the error part.
+&nbsp;     */
+&nbsp;    public Optional&lt;R&gt; getOptional() {
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Throw away the result part.
+&nbsp;     */
+&nbsp;    public OOVoidResult&lt;E&gt; asVoidResult() {
+<b class="nc">&nbsp;        if (isError()) {</b>
+<b class="nc">&nbsp;            return OOVoidResult.error(getError());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return OOVoidResult.ok();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

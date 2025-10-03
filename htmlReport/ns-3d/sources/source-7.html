@@ -1,0 +1,792 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GroupNodeViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.groups</a>
+</div>
+
+<h1>Coverage Summary for Class: GroupNodeViewModel (org.jabref.gui.groups)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GroupNodeViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/177)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/204)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GroupNodeViewModel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GroupNodeViewModel$SearchIndexListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/193)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/227)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.groups;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.InvalidationListener;
+&nbsp;import javafx.beans.WeakInvalidationListener;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.BooleanBinding;
+&nbsp;import javafx.beans.binding.IntegerBinding;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.collections.ObservableSet;
+&nbsp;import javafx.scene.input.Dragboard;
+&nbsp;import javafx.scene.paint.Color;
+&nbsp;
+&nbsp;import org.jabref.gui.DragAndDropDataFormats;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.icon.JabRefIcon;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.CustomLocalDragboard;
+&nbsp;import org.jabref.gui.util.DroppingMouseLocation;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.groups.DefaultGroupsFactory;
+&nbsp;import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.FieldChange;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.groups.AbstractGroup;
+&nbsp;import org.jabref.model.groups.AllEntriesGroup;
+&nbsp;import org.jabref.model.groups.AutomaticGroup;
+&nbsp;import org.jabref.model.groups.AutomaticKeywordGroup;
+&nbsp;import org.jabref.model.groups.AutomaticPersonsGroup;
+&nbsp;import org.jabref.model.groups.ExplicitGroup;
+&nbsp;import org.jabref.model.groups.GroupEntryChanger;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;import org.jabref.model.groups.KeywordGroup;
+&nbsp;import org.jabref.model.groups.LastNameGroup;
+&nbsp;import org.jabref.model.groups.RegexKeywordGroup;
+&nbsp;import org.jabref.model.groups.SearchGroup;
+&nbsp;import org.jabref.model.groups.SmartGroup;
+&nbsp;import org.jabref.model.groups.TexGroup;
+&nbsp;import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
+&nbsp;import org.jabref.model.search.event.IndexClosedEvent;
+&nbsp;import org.jabref.model.search.event.IndexRemovedEvent;
+&nbsp;import org.jabref.model.search.event.IndexStartedEvent;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import com.google.common.eventbus.Subscribe;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import com.tobiasdiez.easybind.EasyObservableList;
+&nbsp;import io.github.adr.linked.ADR;
+&nbsp;
+&nbsp;public class GroupNodeViewModel {
+&nbsp;
+&nbsp;    private final SimpleObjectProperty&lt;String&gt; displayName;
+&nbsp;    private final boolean isRoot;
+&nbsp;    private final ObservableList&lt;GroupNodeViewModel&gt; children;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final GroupTreeNode groupNode;
+<b class="nc">&nbsp;    @ADR(38)</b>
+<b class="nc">&nbsp;    private final ObservableSet&lt;String&gt; matchedEntries = FXCollections.observableSet();</b>
+&nbsp;    private final SimpleBooleanProperty hasChildren;
+<b class="nc">&nbsp;    private final SimpleBooleanProperty expandedProperty = new SimpleBooleanProperty();</b>
+&nbsp;    private final BooleanBinding anySelectedEntriesMatched;
+&nbsp;    private final BooleanBinding allSelectedEntriesMatched;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final CustomLocalDragboard localDragBoard;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    @SuppressWarnings(&quot;FieldCanBeLocal&quot;)
+&nbsp;    private final ObservableList&lt;BibEntry&gt; entriesList;
+<b class="nc">&nbsp;    @SuppressWarnings(&quot;FieldCanBeLocal&quot;)</b>
+<b class="nc">&nbsp;    private final InvalidationListener onInvalidatedGroup = _ -&gt; refreshGroup();</b>
+&nbsp;
+<b class="nc">&nbsp;    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.databaseContext = Objects.requireNonNull(databaseContext);</b>
+<b class="nc">&nbsp;        this.taskExecutor = Objects.requireNonNull(taskExecutor);</b>
+<b class="nc">&nbsp;        this.stateManager = Objects.requireNonNull(stateManager);</b>
+<b class="nc">&nbsp;        this.groupNode = Objects.requireNonNull(groupNode);</b>
+<b class="nc">&nbsp;        this.localDragBoard = Objects.requireNonNull(localDragBoard);</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        displayName = new SimpleObjectProperty&lt;&gt;(new LatexToUnicodeFormatter().format(groupNode.getName()));</b>
+<b class="nc">&nbsp;        isRoot = groupNode.isRoot();</b>
+<b class="nc">&nbsp;        if (groupNode.getGroup() instanceof AutomaticGroup automaticGroup) {</b>
+<b class="nc">&nbsp;            children = automaticGroup.createSubgroups(this.databaseContext.getDatabase().getEntries())</b>
+<b class="nc">&nbsp;                                     .stream()</b>
+<b class="nc">&nbsp;                                     .map(this::toViewModel)</b>
+<b class="nc">&nbsp;                                     .sorted((group1, group2) -&gt; group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))</b>
+<b class="nc">&nbsp;                                     .collect(Collectors.toCollection(FXCollections::observableArrayList));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (groupNode.getGroup() instanceof TexGroup) {</b>
+<b class="nc">&nbsp;            databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));</b>
+<b class="nc">&nbsp;        } else if (groupNode.getGroup() instanceof SearchGroup searchGroup) {</b>
+<b class="nc">&nbsp;            stateManager.getIndexManager(databaseContext).ifPresent(indexManager -&gt; {</b>
+<b class="nc">&nbsp;                searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());</b>
+<b class="nc">&nbsp;                refreshGroup();</b>
+<b class="nc">&nbsp;                databaseContext.getMetaData().groupsBinding().invalidate();</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        hasChildren = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;        hasChildren.bind(Bindings.isNotEmpty(children));</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(preferences.getGroupsPreferences().displayGroupCountProperty(), _ -&gt; updateMatchedEntries());</b>
+<b class="nc">&nbsp;        expandedProperty.set(groupNode.getGroup().isExpanded());</b>
+<b class="nc">&nbsp;        expandedProperty.addListener((_, _, newValue) -&gt; groupNode.getGroup().setExpanded(newValue));</b>
+&nbsp;
+&nbsp;        // Register listener
+&nbsp;        // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
+<b class="nc">&nbsp;        entriesList = databaseContext.getDatabase().getEntries();</b>
+<b class="nc">&nbsp;        entriesList.addListener(this::onDatabaseChanged);</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyObservableList&lt;Boolean&gt; selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);</b>
+<b class="nc">&nbsp;        anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -&gt; matched);</b>
+&nbsp;        // &#39;all&#39; returns &#39;true&#39; for empty streams, so this has to be checked explicitly
+<b class="nc">&nbsp;        allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -&gt; matched));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.databaseContext.getDatabase().registerListener(new SearchIndexListener());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, AbstractGroup group, CustomLocalDragboard localDragboard, GuiPreferences preferences) {
+<b class="nc">&nbsp;        this(databaseContext, stateManager, taskExecutor, new GroupTreeNode(group), localDragboard, preferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {
+<b class="nc">&nbsp;        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup(), localDragBoard, preferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private GroupNodeViewModel toViewModel(GroupTreeNode child) {
+<b class="nc">&nbsp;        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, child, localDragBoard, preferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;FieldChange&gt; addEntriesToGroup(List&lt;BibEntry&gt; entries) {
+&nbsp;        // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
+&nbsp;        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
+&nbsp;        // {
+&nbsp;        //    return; // user aborted operation
+&nbsp;        // }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;FieldChange&gt; changes = groupNode.addEntriesToGroup(entries);</b>
+&nbsp;
+&nbsp;        // Update appearance of group
+<b class="nc">&nbsp;        anySelectedEntriesMatched.invalidate();</b>
+<b class="nc">&nbsp;        allSelectedEntriesMatched.invalidate();</b>
+&nbsp;
+<b class="nc">&nbsp;        return changes;</b>
+&nbsp;        // TODO: Store undo
+&nbsp;        // if (!undo.isEmpty()) {
+&nbsp;        // groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo), target.getNode(), assignedEntries);
+&nbsp;    }
+&nbsp;
+&nbsp;    public SimpleBooleanProperty expandedProperty() {
+<b class="nc">&nbsp;        return expandedProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanBinding anySelectedEntriesMatchedProperty() {
+<b class="nc">&nbsp;        return anySelectedEntriesMatched;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanBinding allSelectedEntriesMatchedProperty() {
+<b class="nc">&nbsp;        return allSelectedEntriesMatched;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SimpleBooleanProperty hasChildrenProperty() {
+<b class="nc">&nbsp;        return hasChildren;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return displayName.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDisplayName(String newName) {
+<b class="nc">&nbsp;        displayName.set(newName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isRoot() {
+<b class="nc">&nbsp;        return isRoot;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return groupNode.getGroup().getDescription().orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegerBinding getHits() {
+<b class="nc">&nbsp;        return Bindings.size(matchedEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((o == null) || (getClass() != o.getClass())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        GroupNodeViewModel that = (GroupNodeViewModel) o;</b>
+&nbsp;
+<b class="nc">&nbsp;        return groupNode.equals(that.groupNode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;GroupNodeViewModel{&quot; +</b>
+&nbsp;                &quot;displayName=&#39;&quot; + displayName + &#39;\&#39;&#39; +
+&nbsp;                &quot;, isRoot=&quot; + isRoot +
+<b class="nc">&nbsp;                &quot;, icon=&#39;&quot; + getIcon() + &#39;\&#39;&#39; +</b>
+&nbsp;                &quot;, children=&quot; + children +
+&nbsp;                &quot;, databaseContext=&quot; + databaseContext +
+&nbsp;                &quot;, groupNode=&quot; + groupNode +
+&nbsp;                &quot;, matchedEntries=&quot; + matchedEntries +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return groupNode.hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JabRefIcon getIcon() {
+<b class="nc">&nbsp;        Optional&lt;String&gt; iconName = groupNode.getGroup().getIconName();</b>
+<b class="nc">&nbsp;        return iconName.flatMap(this::parseIcon)</b>
+<b class="nc">&nbsp;                       .orElseGet(this::createDefaultIcon);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private JabRefIcon createDefaultIcon() {
+<b class="nc">&nbsp;        Color color = groupNode.getGroup().getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor());</b>
+<b class="nc">&nbsp;        return IconTheme.JabRefIcons.DEFAULT_GROUP_ICON_COLORED.withColor(color);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;JabRefIcon&gt; parseIcon(String iconCode) {
+<b class="nc">&nbsp;        return IconTheme.findIcon(iconCode, getColor());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;GroupNodeViewModel&gt; getChildren() {
+<b class="nc">&nbsp;        return children;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public GroupTreeNode getGroupNode() {
+<b class="nc">&nbsp;        return groupNode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets invoked if an entry in the current database changes.
+&nbsp;     *
+&nbsp;     * @implNote Search groups are updated in {@link SearchIndexListener}.
+&nbsp;     */
+&nbsp;    private void onDatabaseChanged(ListChangeListener.Change&lt;? extends BibEntry&gt; change) {
+<b class="nc">&nbsp;        if (groupNode.getGroup() instanceof SearchGroup) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        while (change.next()) {</b>
+<b class="nc">&nbsp;            if (change.wasPermutated()) {</b>
+&nbsp;                // Nothing to do, as permutation doesn&#39;t change matched entries
+<b class="nc">&nbsp;            } else if (change.wasUpdated()) {</b>
+<b class="nc">&nbsp;                for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {</b>
+<b class="nc">&nbsp;                    if (groupNode.matches(changedEntry)) {</b>
+&nbsp;                        // ADR-0038
+<b class="nc">&nbsp;                        matchedEntries.add(changedEntry.getId());</b>
+&nbsp;                    } else {
+&nbsp;                        // ADR-0038
+<b class="nc">&nbsp;                        matchedEntries.remove(changedEntry.getId());</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                for (BibEntry removedEntry : change.getRemoved()) {</b>
+&nbsp;                    // ADR-0038
+<b class="nc">&nbsp;                    matchedEntries.remove(removedEntry.getId());</b>
+&nbsp;                }
+<b class="nc">&nbsp;                for (BibEntry addedEntry : change.getAddedSubList()) {</b>
+<b class="nc">&nbsp;                    if (groupNode.matches(addedEntry)) {</b>
+&nbsp;                        // ADR-0038
+<b class="nc">&nbsp;                        matchedEntries.add(addedEntry.getId());</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void refreshGroup() {
+<b class="nc">&nbsp;        UiTaskExecutor.runInJavaFXThread(() -&gt; {</b>
+<b class="nc">&nbsp;            updateMatchedEntries(); // Update the entries matched by the group</b>
+&nbsp;            // &quot;Re-add&quot; to the selected groups if it were selected, this refreshes the entries the user views
+<b class="nc">&nbsp;            ObservableList&lt;GroupTreeNode&gt; selectedGroups = this.stateManager.getSelectedGroups(this.databaseContext);</b>
+<b class="nc">&nbsp;            if (selectedGroups.remove(this.groupNode)) {</b>
+<b class="nc">&nbsp;                selectedGroups.add(this.groupNode);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateMatchedEntries() {
+&nbsp;        // We calculate the new hit value
+&nbsp;        // We could be more intelligent and try to figure out the new number of hits based on the entry change
+&nbsp;        // for example, a previously matched entry gets removed -&gt; hits = hits - 1
+<b class="nc">&nbsp;        if (preferences.getGroupsPreferences().shouldDisplayGroupCount()) {</b>
+<b class="nc">&nbsp;            BackgroundTask</b>
+<b class="nc">&nbsp;                    .wrap(() -&gt; groupNode.findMatches(databaseContext.getDatabase()))</b>
+<b class="nc">&nbsp;                    .onSuccess(entries -&gt; {</b>
+<b class="nc">&nbsp;                        matchedEntries.clear();</b>
+&nbsp;                        // ADR-0038
+<b class="nc">&nbsp;                        entries.forEach(entry -&gt; matchedEntries.add(entry.getId()));</b>
+&nbsp;                    })
+<b class="nc">&nbsp;                    .executeWith(taskExecutor);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public GroupTreeNode addSubgroup(AbstractGroup subgroup) {
+<b class="nc">&nbsp;        return groupNode.addSubgroup(subgroup);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void toggleExpansion() {
+<b class="nc">&nbsp;        expandedProperty().set(!expandedProperty().get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    boolean isMatchedBy(String searchString) {
+<b class="nc">&nbsp;        return StringUtil.isBlank(searchString) || StringUtil.containsIgnoreCase(getDisplayName(), searchString);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Color getColor() {
+<b class="nc">&nbsp;        return groupNode.getGroup().getColor().map(Color::valueOf).orElse(IconTheme.getDefaultGroupColor());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getPath() {
+<b class="nc">&nbsp;        return groupNode.getPath();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;GroupNodeViewModel&gt; getChildByPath(String pathToSource) {
+<b class="nc">&nbsp;        return groupNode.getChildByPath(pathToSource).map(this::toViewModel);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Decides if the content stored in the given {@link Dragboard} can be dropped on the given target row. Currently, the following sources are allowed:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *     &lt;li&gt;another group (will be added as subgroup on drop)&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     */
+&nbsp;    public boolean acceptableDrop(Dragboard dragboard) {
+&nbsp;        // TODO: we should also check isNodeDescendant
+<b class="nc">&nbsp;        boolean canDropOtherGroup = dragboard.hasContent(DragAndDropDataFormats.GROUP);</b>
+<b class="nc">&nbsp;        boolean canDropEntries = localDragBoard.hasBibEntries() &amp;&amp; (groupNode.getGroup() instanceof GroupEntryChanger);</b>
+<b class="nc">&nbsp;        boolean canDropFiles = dragboard.hasFiles();</b>
+<b class="nc">&nbsp;        return canDropOtherGroup || canDropEntries || canDropFiles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void moveTo(GroupNodeViewModel target) {
+&nbsp;        // TODO: Add undo and display message
+&nbsp;        // MoveGroupChange undo = new MoveGroupChange(((GroupTreeNodeViewModel)source.getParent()).getNode(),
+&nbsp;        //        source.getNode().getPositionInParent(), target.getNode(), target.getChildCount());
+&nbsp;
+<b class="nc">&nbsp;        getGroupNode().moveTo(target.getGroupNode());</b>
+&nbsp;        // panel.getUndoManager().addEdit(new UndoableMoveGroup(this.groupsRoot, moveChange));
+&nbsp;        // panel.markBaseChanged();
+&nbsp;        // frame.output(Localization.lang(&quot;Moved group \&quot;%0\&quot;.&quot;, node.getNode().getGroup().getName()));
+&nbsp;    }
+&nbsp;
+&nbsp;    public void moveTo(GroupTreeNode target, int targetIndex) {
+<b class="nc">&nbsp;        getGroupNode().moveTo(target, targetIndex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;GroupTreeNode&gt; getParent() {
+<b class="nc">&nbsp;        return groupNode.getParent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void draggedOn(GroupNodeViewModel target, DroppingMouseLocation mouseLocation) {
+&nbsp;        // No action, if the target is the same as the source
+<b class="nc">&nbsp;        if (this.equals(target)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;GroupTreeNode&gt; targetParent = target.getParent();</b>
+<b class="nc">&nbsp;        if (targetParent.isPresent()) {</b>
+<b class="nc">&nbsp;            int targetIndex = target.getPositionInParent();</b>
+&nbsp;            // In case we want to move an item in the same parent
+&nbsp;            // and the item is moved down, we need to adjust the target index
+<b class="nc">&nbsp;            if (targetParent.equals(getParent())) {</b>
+<b class="nc">&nbsp;                int sourceIndex = this.getPositionInParent();</b>
+<b class="nc">&nbsp;                if (sourceIndex &lt; targetIndex) {</b>
+<b class="nc">&nbsp;                    targetIndex--;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // Different actions depending on where the user releases the drop in the target row
+&nbsp;            // Bottom + top -&gt; insert source row before / after this row
+&nbsp;            // Center -&gt; add as child
+<b class="nc">&nbsp;            switch (mouseLocation) {</b>
+&nbsp;                case BOTTOM -&gt;
+<b class="nc">&nbsp;                        this.moveTo(targetParent.get(), targetIndex + 1);</b>
+&nbsp;                case CENTER -&gt;
+<b class="nc">&nbsp;                        this.moveTo(target);</b>
+&nbsp;                case TOP -&gt;
+<b class="nc">&nbsp;                        this.moveTo(targetParent.get(), targetIndex);</b>
+&nbsp;            }
+&nbsp;        } else {
+&nbsp;            // No parent = root -&gt; just add
+<b class="nc">&nbsp;            this.moveTo(target);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private int getPositionInParent() {
+<b class="nc">&nbsp;        return groupNode.getPositionInParent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasSubgroups() {
+<b class="nc">&nbsp;        return !getChildren().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isAllEntriesGroup() {
+<b class="nc">&nbsp;        return groupNode.getGroup() instanceof AllEntriesGroup;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasSimilarSearchGroup(SearchGroup searchGroup) {
+<b class="nc">&nbsp;        return getChildren().stream()</b>
+<b class="nc">&nbsp;                            .filter(child -&gt; child.getGroupNode().getGroup() instanceof SearchGroup)</b>
+<b class="nc">&nbsp;                            .map(child -&gt; (SearchGroup) child.getGroupNode().getGroup())</b>
+<b class="nc">&nbsp;                            .anyMatch(group -&gt; group.equals(searchGroup));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasAllSuggestedGroups() {
+<b class="nc">&nbsp;        return hasSimilarSearchGroup(JabRefSuggestedGroups.createWithoutFilesGroup())</b>
+<b class="nc">&nbsp;                &amp;&amp; hasSimilarSearchGroup(JabRefSuggestedGroups.createWithoutGroupsGroup());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canAddEntriesIn() {
+<b class="nc">&nbsp;        AbstractGroup group = groupNode.getGroup();</b>
+<b class="nc">&nbsp;        if (group instanceof AllEntriesGroup) {</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="nc">&nbsp;        } else if (group instanceof SmartGroup) {</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="nc">&nbsp;        } else if (group instanceof ExplicitGroup) {</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {</b>
+<b class="nc">&nbsp;            return groupNode.getParent()</b>
+<b class="nc">&nbsp;                            .map(GroupTreeNode::getGroup)</b>
+<b class="nc">&nbsp;                            .map(groupParent -&gt; groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup)</b>
+<b class="nc">&nbsp;                            .orElse(false);</b>
+<b class="nc">&nbsp;        } else if (group instanceof KeywordGroup) {</b>
+&nbsp;            // also covers WordKeywordGroup
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } else if (group instanceof SearchGroup) {</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="nc">&nbsp;        } else if (group instanceof AutomaticKeywordGroup) {</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="nc">&nbsp;        } else if (group instanceof AutomaticPersonsGroup) {</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="nc">&nbsp;        } else if (group instanceof TexGroup) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new UnsupportedOperationException(&quot;canAddEntriesIn method not yet implemented in group: &quot; + group.getClass().getName());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canBeDragged() {
+<b class="nc">&nbsp;        AbstractGroup group = groupNode.getGroup();</b>
+<b class="nc">&nbsp;        return switch (group) {</b>
+<b class="nc">&nbsp;            case AllEntriesGroup _,</b>
+&nbsp;                 SmartGroup _ -&gt;
+<b class="nc">&nbsp;                    false;</b>
+<b class="nc">&nbsp;            case ExplicitGroup _,</b>
+&nbsp;                 SearchGroup _,
+&nbsp;                 AutomaticKeywordGroup _,
+&nbsp;                 AutomaticPersonsGroup _,
+&nbsp;                 TexGroup _ -&gt;
+<b class="nc">&nbsp;                    true;</b>
+&nbsp;            case KeywordGroup _ -&gt;
+&nbsp;                // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
+<b class="nc">&nbsp;                    groupNode.getParent()</b>
+<b class="nc">&nbsp;                             .map(GroupTreeNode::getGroup)</b>
+<b class="nc">&nbsp;                             .map(groupParent -&gt;</b>
+<b class="nc">&nbsp;                                     !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))</b>
+<b class="nc">&nbsp;                             .orElse(false);</b>
+&nbsp;
+&nbsp;            case null -&gt;
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Group cannot be null&quot;);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    throw new UnsupportedOperationException(&quot;canBeDragged method not yet implemented in group: &quot; + group.getClass().getName());</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canAddGroupsIn() {
+<b class="nc">&nbsp;        AbstractGroup group = groupNode.getGroup();</b>
+<b class="nc">&nbsp;        return switch (group) {</b>
+<b class="nc">&nbsp;            case AllEntriesGroup _,</b>
+&nbsp;                 ExplicitGroup _,
+&nbsp;                 SearchGroup _,
+&nbsp;                 TexGroup _ -&gt;
+<b class="nc">&nbsp;                    true;</b>
+<b class="nc">&nbsp;            case AutomaticKeywordGroup _,</b>
+&nbsp;                 AutomaticPersonsGroup _,
+&nbsp;                 SmartGroup _ -&gt;
+<b class="nc">&nbsp;                    false;</b>
+&nbsp;            case KeywordGroup _ -&gt;
+&nbsp;                // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
+<b class="nc">&nbsp;                    groupNode.getParent()</b>
+<b class="nc">&nbsp;                             .map(GroupTreeNode::getGroup)</b>
+<b class="nc">&nbsp;                             .map(groupParent -&gt; !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))</b>
+<b class="nc">&nbsp;                             .orElse(false);</b>
+&nbsp;            case null -&gt;
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Group cannot be null&quot;);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    throw new UnsupportedOperationException(&quot;canAddGroupsIn method not yet implemented in group: &quot; + group.getClass().getName());</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canRemove() {
+<b class="nc">&nbsp;        AbstractGroup group = groupNode.getGroup();</b>
+<b class="nc">&nbsp;        return switch (group) {</b>
+<b class="nc">&nbsp;            case AllEntriesGroup _,</b>
+&nbsp;                 SmartGroup _ -&gt;
+<b class="nc">&nbsp;                    false;</b>
+<b class="nc">&nbsp;            case ExplicitGroup _,</b>
+&nbsp;                 SearchGroup _,
+&nbsp;                 AutomaticKeywordGroup _,
+&nbsp;                 AutomaticPersonsGroup _,
+&nbsp;                 TexGroup _ -&gt;
+<b class="nc">&nbsp;                    true;</b>
+&nbsp;            case KeywordGroup _ -&gt;
+&nbsp;                // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
+<b class="nc">&nbsp;                    groupNode.getParent()</b>
+<b class="nc">&nbsp;                             .map(GroupTreeNode::getGroup)</b>
+<b class="nc">&nbsp;                             .map(groupParent -&gt; !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))</b>
+<b class="nc">&nbsp;                             .orElse(false);</b>
+&nbsp;            case null -&gt;
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Group cannot be null&quot;);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    throw new UnsupportedOperationException(&quot;canRemove method not yet implemented in group: &quot; + group.getClass().getName());</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isEditable() {
+<b class="nc">&nbsp;        AbstractGroup group = groupNode.getGroup();</b>
+<b class="nc">&nbsp;        return switch (group) {</b>
+<b class="nc">&nbsp;            case AllEntriesGroup _,</b>
+&nbsp;                 SmartGroup _ -&gt;
+<b class="nc">&nbsp;                    false;</b>
+<b class="nc">&nbsp;            case ExplicitGroup _,</b>
+&nbsp;                 SearchGroup _,
+&nbsp;                 AutomaticKeywordGroup _,
+&nbsp;                 AutomaticPersonsGroup _,
+&nbsp;                 TexGroup _ -&gt;
+<b class="nc">&nbsp;                    true;</b>
+&nbsp;            case KeywordGroup _ -&gt;
+&nbsp;                // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
+<b class="nc">&nbsp;                    groupNode.getParent()</b>
+<b class="nc">&nbsp;                             .map(GroupTreeNode::getGroup)</b>
+<b class="nc">&nbsp;                             .map(groupParent -&gt; !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))</b>
+<b class="nc">&nbsp;                             .orElse(false);</b>
+&nbsp;
+&nbsp;            case null -&gt;
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Group cannot be null&quot;);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    throw new UnsupportedOperationException(&quot;isEditable method not yet implemented in group: &quot; + group.getClass().getName());</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    class SearchIndexListener {</b>
+&nbsp;        @Subscribe
+&nbsp;        public void listen(IndexStartedEvent event) {
+<b class="nc">&nbsp;            if (groupNode.getGroup() instanceof SearchGroup searchGroup) {</b>
+<b class="nc">&nbsp;                stateManager.getIndexManager(databaseContext).ifPresent(indexManager -&gt; {</b>
+<b class="nc">&nbsp;                    searchGroup.setMatchedEntries(indexManager.search(searchGroup.getSearchQuery()).getMatchedEntries());</b>
+<b class="nc">&nbsp;                    refreshGroup();</b>
+<b class="nc">&nbsp;                    databaseContext.getMetaData().groupsBinding().invalidate();</b>
+&nbsp;                });
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        public void listen(IndexAddedOrUpdatedEvent event) {
+<b class="nc">&nbsp;            if (groupNode.getGroup() instanceof SearchGroup searchGroup) {</b>
+<b class="nc">&nbsp;                stateManager.getIndexManager(databaseContext).ifPresent(indexManager -&gt; BackgroundTask.wrap(() -&gt; {</b>
+<b class="nc">&nbsp;                    for (BibEntry entry : event.entries()) {</b>
+<b class="nc">&nbsp;                        searchGroup.updateMatches(entry, indexManager.isEntryMatched(entry, searchGroup.getSearchQuery()));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                }).onFinished(() -&gt; {</b>
+<b class="nc">&nbsp;                    for (BibEntry entry : event.entries()) {</b>
+<b class="nc">&nbsp;                        if (groupNode.matches(entry)) {</b>
+<b class="nc">&nbsp;                            matchedEntries.add(entry.getId());</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            matchedEntries.remove(entry.getId());</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                }).executeWith(taskExecutor));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        public void listen(IndexRemovedEvent event) {
+<b class="nc">&nbsp;            if (groupNode.getGroup() instanceof SearchGroup searchGroup) {</b>
+<b class="nc">&nbsp;                for (BibEntry entry : event.entries()) {</b>
+<b class="nc">&nbsp;                    searchGroup.updateMatches(entry, false);</b>
+<b class="nc">&nbsp;                    matchedEntries.remove(entry.getId());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        public void listen(IndexClosedEvent event) {
+<b class="nc">&nbsp;            if (groupNode.getGroup() instanceof SearchGroup group) {</b>
+<b class="nc">&nbsp;                databaseContext.getDatabase().unregisterListener(this);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

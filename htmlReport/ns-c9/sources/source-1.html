@@ -1,0 +1,342 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConferenceRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.icore</a>
+</div>
+
+<h1>Coverage Summary for Class: ConferenceRepository (org.jabref.logic.icore)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConferenceRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/86)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.icore;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.util.strings.StringSimilarity;
+&nbsp;import org.jabref.model.icore.ConferenceEntry;
+&nbsp;
+&nbsp;import org.apache.commons.csv.CSVFormat;
+&nbsp;import org.apache.commons.csv.CSVRecord;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A Repository that loads and stores the latest ICORE Conference Ranking Data and allows lookups using a conference&#39;s
+&nbsp; * acronym or title.
+&nbsp; * &lt;p&gt;
+&nbsp; * The ranking data is sourced from &lt;a href=&quot;https://portal.core.edu.au/conf-ranks/&quot;&gt;the ICORE Conference Ranking Portal&lt;/a&gt;.
+&nbsp; * Since the website does not expose an API endpoint to fetch this data programmatically, it must be manually exported
+&nbsp; * from the website and stored as a resource. This means that when new ranking data is released, the old data must be
+&nbsp; * replaced and the &lt;code&gt;ICORE_RANK_DATA_FILE&lt;/code&gt; variable must be modified to point to the new data file.
+&nbsp; * &lt;/p&gt;
+&nbsp; */
+&nbsp;public class ConferenceRepository {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ConferenceRepository.class);</b>
+&nbsp;    private static final String ICORE_RANK_DATA_FILE = &quot;/icore/ICORE2023.csv&quot;;
+&nbsp;    private static final double LEVENSHTEIN_THRESHOLD = 0.9;
+&nbsp;    private static final double COMBINED_LCS_LEV_THRESHOLD = 0.75;
+&nbsp;    private static final double EPSILON = 1e-6;
+<b class="nc">&nbsp;    private static final StringSimilarity LEVENSHTEIN_MATCHER = new StringSimilarity();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;String, ConferenceEntry&gt; acronymToConference = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;String, ConferenceEntry&gt; titleToConference = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;String, ConferenceEntry&gt; normalizedTitleToConference = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private int maxAcronymLength = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;    public ConferenceRepository() throws JabRefException {</b>
+<b class="nc">&nbsp;        InputStream inputStream = getClass().getResourceAsStream(ICORE_RANK_DATA_FILE);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (inputStream == null) {</b>
+<b class="nc">&nbsp;            throw new JabRefException(&quot;ICORE rank data file not found in resources&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        loadConferenceDataFromInputStream(inputStream);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Constructor to allow loading in test data
+<b class="nc">&nbsp;    public ConferenceRepository(InputStream testFileInputStream) throws JabRefException {</b>
+<b class="nc">&nbsp;        loadConferenceDataFromInputStream(testFileInputStream);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void loadConferenceDataFromInputStream(InputStream inputStream) throws JabRefException {
+<b class="nc">&nbsp;        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));</b>
+&nbsp;
+<b class="nc">&nbsp;        try (inputStream; reader) {</b>
+<b class="nc">&nbsp;            Iterable&lt;CSVRecord&gt; records = CSVFormat.DEFAULT.builder()</b>
+<b class="nc">&nbsp;                                                           .setHeader()</b>
+<b class="nc">&nbsp;                                                           .setSkipHeaderRecord(true)</b>
+<b class="nc">&nbsp;                                                           .get()</b>
+<b class="nc">&nbsp;                                                           .parse(reader);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (CSVRecord record : records) {</b>
+<b class="nc">&nbsp;                String id = record.get(&quot;Id&quot;).strip();</b>
+<b class="nc">&nbsp;                String title = record.get(&quot;Title&quot;).strip().toLowerCase();</b>
+<b class="nc">&nbsp;                String acronym = record.get(&quot;Acronym&quot;).strip().toLowerCase();</b>
+<b class="nc">&nbsp;                String rank = record.get(&quot;Rank&quot;).strip();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (id.isEmpty() || title.isEmpty() || acronym.isEmpty() || rank.isEmpty()) {</b>
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Missing fields in row in ICORE rank data: {}&quot;, record);</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (title.indexOf(&#39;(&#39;) &gt;= 0) {</b>
+&nbsp;                    // remove any extra alias strings in parentheses
+<b class="nc">&nbsp;                    title = ConferenceUtils.removeAllParenthesesWithContent(title);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                ConferenceEntry conferenceEntry = new ConferenceEntry(id, title, acronym, rank);</b>
+<b class="nc">&nbsp;                acronymToConference.put(acronym, conferenceEntry);</b>
+<b class="nc">&nbsp;                titleToConference.put(title, conferenceEntry);</b>
+<b class="nc">&nbsp;                normalizedTitleToConference.put(ConferenceUtils.normalize(title), conferenceEntry);</b>
+<b class="nc">&nbsp;                if (acronym.length() &gt;= maxAcronymLength) {</b>
+<b class="nc">&nbsp;                    maxAcronymLength = acronym.length();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            throw new JabRefException(&quot;I/O Error while reading ICORE data from resource&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Max acronym length seen in data: {}&quot;, maxAcronymLength);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Searches the given query against the ICORE conference ranking data and returns a match, if found.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * While searching, we first look for a conference acronym present inside parentheses, like &lt;code&gt;(ICSE)&lt;/code&gt;
+&nbsp;     * or &lt;code&gt;(ICSE 2022)&lt;/code&gt;. If acronym lookup fails, the query is processed further and matched against the list
+&nbsp;     * of conference titles.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param bookTitle the string to search, must not be {@code null}
+&nbsp;     * @return an {@code Optional} conference entry, if found
+&nbsp;     * or {@code Optional.empty()} if no conference entry is found
+&nbsp;     * @implNote see {@link ConferenceRepository#fuzzySearchConferenceTitles} for more details on matching
+&nbsp;     */
+&nbsp;    public Optional&lt;ConferenceEntry&gt; getConferenceFromBookTitle(@NonNull String bookTitle) {
+<b class="nc">&nbsp;        String query = bookTitle.strip().toLowerCase();</b>
+&nbsp;        ConferenceEntry conference;
+&nbsp;
+<b class="nc">&nbsp;        conference = acronymToConference.get(query);</b>
+<b class="nc">&nbsp;        if (conference != null) {</b>
+<b class="nc">&nbsp;            return Optional.of(conference);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        conference = titleToConference.get(query);</b>
+<b class="nc">&nbsp;        if (conference != null) {</b>
+<b class="nc">&nbsp;            return Optional.of(conference);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;ConferenceEntry&gt; acronymConference = getConferenceFromAcronym(query);</b>
+<b class="nc">&nbsp;        if (acronymConference.isPresent()) {</b>
+<b class="nc">&nbsp;            return acronymConference;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return fuzzySearchConferenceTitles(query);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;ConferenceEntry&gt; getConferenceFromAcronym(String query) {
+<b class="nc">&nbsp;        Optional&lt;String&gt; acronym = ConferenceUtils.extractStringFromParentheses(query);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (acronym.isPresent()) {</b>
+&nbsp;            ConferenceEntry conference;
+<b class="nc">&nbsp;            Set&lt;String&gt; acronymCandidates = ConferenceUtils.generateAcronymCandidates(acronym.get(), maxAcronymLength);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Extracted acronym string: {}, Acronym candidates: {}&quot;, acronym.get(), acronymCandidates);</b>
+<b class="nc">&nbsp;            for (String candidate : acronymCandidates) {</b>
+<b class="nc">&nbsp;                conference = acronymToConference.get(candidate);</b>
+<b class="nc">&nbsp;                if (conference != null) {</b>
+<b class="nc">&nbsp;                    return Optional.of(conference);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Searches the conference data for the given query string using a combination of Levenshtein similarity
+&nbsp;     * {@link StringSimilarity#similarity} and Longest Common Substring (LCS) similarity {@link StringSimilarity#LCSSimilarity}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The input query is first fed through the normalizer at {@link ConferenceUtils#normalize} which strips away much of the
+&nbsp;     * noise.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * While searching, the function computes Levenshtein similarity and LCS similarity between the query and the current conference
+&nbsp;     * title (also normalized) and prioritizes them in the following order:
+&nbsp;     * &lt;ol&gt;
+&nbsp;     *     &lt;li&gt;Whenever LCS similarity returns &lt;code&gt;1.0&lt;/code&gt;, i.e., a conference title is found entirely as a substring in the query.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;Whenever Levenshtein similarity exceeds the threshold defined by the &lt;code&gt;LEVENSHTEIN_THRESHOLD&lt;/code&gt; constant.&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;The combined weighted score of both LCS and Levenshtein similarities exceeds the &lt;code&gt;COMBINED_LCS_LEV_THRESHOLD&lt;/code&gt;.&lt;/li&gt;
+&nbsp;     * &lt;/ol&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The combined score is calculated as follows:
+&nbsp;     * &lt;code&gt;(0.6 * Levenshtein similarity) + (0.4 * LCS similarity)&lt;/code&gt;
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param query The query string to be searched
+&nbsp;     * @return an {@code Optional} conference entry, if found
+&nbsp;     * or {@code Optional.empty()} if no conference entry is found
+&nbsp;     */
+&nbsp;    private Optional&lt;ConferenceEntry&gt; fuzzySearchConferenceTitles(String query) {
+<b class="nc">&nbsp;        String bestMatch = &quot;&quot;;</b>
+<b class="nc">&nbsp;        double bestScore = 0.0;</b>
+<b class="nc">&nbsp;        String normalizedQuery = ConferenceUtils.normalize(query);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (normalizedQuery.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ConferenceEntry acronymConference = acronymToConference.get(normalizedQuery);</b>
+<b class="nc">&nbsp;        if (acronymConference != null) {</b>
+<b class="nc">&nbsp;            return Optional.of(acronymConference);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        acronymConference = normalizedTitleToConference.get(normalizedQuery);</b>
+<b class="nc">&nbsp;        if (acronymConference != null) {</b>
+<b class="nc">&nbsp;            return Optional.of(acronymConference);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (String conferenceTitle : normalizedTitleToConference.keySet()) {</b>
+&nbsp;            // only match for queries longer than the current conference title
+&nbsp;            // this will safeguard against overfitting common prefixes
+<b class="nc">&nbsp;            if (normalizedQuery.length() &gt;= conferenceTitle.length()) {</b>
+<b class="nc">&nbsp;                double levSimilarity = LEVENSHTEIN_MATCHER.similarity(normalizedQuery, conferenceTitle);</b>
+<b class="nc">&nbsp;                double LCSSimilarity = StringSimilarity.LCSSimilarity(normalizedQuery, conferenceTitle);</b>
+<b class="nc">&nbsp;                double combinedScore = levSimilarity * 0.6 + LCSSimilarity * 0.4;</b>
+<b class="nc">&nbsp;                boolean exactSubstringMatch = Math.abs(LCSSimilarity - 1.0) &lt;= EPSILON;</b>
+&nbsp;
+<b class="nc">&nbsp;                if (exactSubstringMatch) {</b>
+<b class="nc">&nbsp;                    return Optional.of(normalizedTitleToConference.get(conferenceTitle));</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (levSimilarity &gt;= LEVENSHTEIN_THRESHOLD) {</b>
+<b class="nc">&nbsp;                    return Optional.of(normalizedTitleToConference.get(conferenceTitle));</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (combinedScore &gt;= COMBINED_LCS_LEV_THRESHOLD &amp;&amp; combinedScore &gt;= bestScore) {</b>
+<b class="nc">&nbsp;                    bestMatch = conferenceTitle;</b>
+<b class="nc">&nbsp;                    bestScore = combinedScore;</b>
+<b class="nc">&nbsp;                    LOGGER.debug(&quot;Matched query: {} with title: {} with combinedScore: {} and LEV: {} and LCS: {}&quot;,</b>
+<b class="nc">&nbsp;                            normalizedQuery, conferenceTitle, combinedScore, levSimilarity, LCSSimilarity);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!bestMatch.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.of(normalizedTitleToConference.get(bestMatch));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

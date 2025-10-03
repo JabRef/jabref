@@ -1,0 +1,256 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FromAuxDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.auximport</a>
+</div>
+
+<h1>Coverage Summary for Class: FromAuxDialogViewModel (org.jabref.gui.auximport)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FromAuxDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.auximport;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.ReadOnlyListProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.logic.auxparser.AuxParser;
+&nbsp;import org.jabref.logic.auxparser.AuxParserResult;
+&nbsp;import org.jabref.logic.auxparser.AuxParserStatisticsProvider;
+&nbsp;import org.jabref.logic.auxparser.DefaultAuxParser;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.shared.DatabaseLocation;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;
+&nbsp;public class FromAuxDialogViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty parseFailedProperty = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final StringProperty auxFileProperty = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty statusTextProperty = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;String&gt; notFoundList = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;BibDatabaseContext&gt; librariesProperty = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;BibDatabaseContext&gt; selectedLibraryProperty = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final LibraryTabContainer tabContainer;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+&nbsp;    private AuxParserResult auxParserResult;
+&nbsp;
+&nbsp;    public FromAuxDialogViewModel(LibraryTabContainer tabContainer,
+&nbsp;                                  DialogService dialogService,
+&nbsp;                                  CliPreferences preferences,
+<b class="nc">&nbsp;                                  StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.tabContainer = tabContainer;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+&nbsp;
+<b class="nc">&nbsp;        librariesProperty.setAll(stateManager.getOpenDatabases());</b>
+<b class="nc">&nbsp;        selectedLibraryProperty.set(tabContainer.getCurrentLibraryTab().getBibDatabaseContext());</b>
+<b class="nc">&nbsp;        EasyBind.listen(selectedLibraryProperty, (obs, oldValue, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            if (auxParserResult != null) {</b>
+<b class="nc">&nbsp;                parse();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDatabaseName(BibDatabaseContext databaseContext) {
+<b class="nc">&nbsp;        Optional&lt;String&gt; dbOpt = Optional.empty();</b>
+<b class="nc">&nbsp;        if (databaseContext.getDatabasePath().isPresent()) {</b>
+<b class="nc">&nbsp;            dbOpt = FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), databaseContext.getDatabasePath().get());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (databaseContext.getLocation() == DatabaseLocation.SHARED) {</b>
+<b class="nc">&nbsp;            return databaseContext.getDBMSSynchronizer().getDBName() + &quot; [&quot; + Localization.lang(&quot;shared&quot;) + &quot;]&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return dbOpt.orElse(Localization.lang(&quot;untitled&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void browse() {
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .addExtensionFilter(StandardFileType.AUX)</b>
+<b class="nc">&nbsp;                .withDefaultExtension(StandardFileType.AUX)</b>
+<b class="nc">&nbsp;                .withInitialDirectory(auxFileProperty.get() == null ? preferences.getFilePreferences().getWorkingDirectory().toString() : auxFileProperty.get()).build();</b>
+<b class="nc">&nbsp;        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -&gt; auxFileProperty.setValue(file.toAbsolutePath().toString()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void parse() {
+<b class="nc">&nbsp;        parseFailedProperty.set(false);</b>
+<b class="nc">&nbsp;        notFoundList.clear();</b>
+<b class="nc">&nbsp;        statusTextProperty.setValue(&quot;&quot;);</b>
+<b class="nc">&nbsp;        BibDatabase referenceDatabase = selectedLibraryProperty.get().getDatabase();</b>
+<b class="nc">&nbsp;        String auxName = auxFileProperty.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        if ((auxName != null) &amp;&amp; (referenceDatabase != null) &amp;&amp; !auxName.isEmpty()) {</b>
+<b class="nc">&nbsp;            AuxParser auxParser = new DefaultAuxParser(referenceDatabase);</b>
+<b class="nc">&nbsp;            auxParserResult = auxParser.parse(Path.of(auxName));</b>
+<b class="nc">&nbsp;            notFoundList.setAll(auxParserResult.getUnresolvedKeys());</b>
+<b class="nc">&nbsp;            statusTextProperty.set(new AuxParserStatisticsProvider(auxParserResult).getInformation(false));</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!auxParserResult.getGeneratedBibDatabase().hasEntries()) {</b>
+&nbsp;                // The generated database contains no entries -&gt; no active generate-button
+<b class="nc">&nbsp;                statusTextProperty.set(statusTextProperty.get() + &quot;\n&quot; + Localization.lang(&quot;empty library&quot;));</b>
+<b class="nc">&nbsp;                parseFailedProperty.set(true);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            parseFailedProperty.set(true);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addResultToTabContainer() {
+<b class="nc">&nbsp;        BibDatabaseContext context = new BibDatabaseContext(auxParserResult.getGeneratedBibDatabase());</b>
+<b class="nc">&nbsp;        tabContainer.addTab(context, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty parseFailedProperty() {
+<b class="nc">&nbsp;        return parseFailedProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty auxFileProperty() {
+<b class="nc">&nbsp;        return auxFileProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty statusTextProperty() {
+<b class="nc">&nbsp;        return statusTextProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyListProperty&lt;String&gt; notFoundList() {
+<b class="nc">&nbsp;        return notFoundList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyListProperty&lt;BibDatabaseContext&gt; librariesProperty() {
+<b class="nc">&nbsp;        return librariesProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;BibDatabaseContext&gt; selectedLibraryProperty() {
+<b class="nc">&nbsp;        return selectedLibraryProperty;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

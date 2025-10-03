@@ -1,0 +1,307 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JournalInfoViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors.journalinfo</a>
+</div>
+
+<h1>Coverage Summary for Class: JournalInfoViewModel (org.jabref.gui.fieldeditors.journalinfo)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JournalInfoViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/73)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors.journalinfo;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.property.ReadOnlyStringWrapper;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.chart.XYChart;
+&nbsp;import javafx.util.Pair;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.fetcher.JournalInformationFetcher;
+&nbsp;import org.jabref.logic.journals.JournalInformation;
+&nbsp;
+<b class="nc">&nbsp;public class JournalInfoViewModel extends AbstractViewModel {</b>
+<b class="nc">&nbsp;    private final ReadOnlyStringWrapper title = new ReadOnlyStringWrapper();</b>
+<b class="nc">&nbsp;    private final ReadOnlyStringWrapper country = new ReadOnlyStringWrapper();</b>
+<b class="nc">&nbsp;    private final ReadOnlyStringWrapper categories = new ReadOnlyStringWrapper();</b>
+<b class="nc">&nbsp;    private final ReadOnlyStringWrapper publisher = new ReadOnlyStringWrapper();</b>
+<b class="nc">&nbsp;    private final ReadOnlyStringWrapper scimagoId = new ReadOnlyStringWrapper();</b>
+<b class="nc">&nbsp;    private final ReadOnlyStringWrapper hIndex = new ReadOnlyStringWrapper();</b>
+<b class="nc">&nbsp;    private final ReadOnlyStringWrapper issn = new ReadOnlyStringWrapper();</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; sjrData = FXCollections.observableArrayList();</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; snipData = FXCollections.observableArrayList();</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; citableDocsPrevious3YearsData = FXCollections.observableArrayList();</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; citesOutgoingData = FXCollections.observableArrayList();</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; citesOutgoingPerDocData = FXCollections.observableArrayList();</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; citesIncomingByRecentlyPublishedData = FXCollections.observableArrayList();</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; docsThisYearData = FXCollections.observableArrayList();</b>
+&nbsp;
+&nbsp;    public void populateJournalInformation(String issn, String journalName) throws FetcherException {
+<b class="nc">&nbsp;        Optional&lt;JournalInformation&gt; journalInformationOptional = new JournalInformationFetcher().getJournalInformation(issn, journalName);</b>
+&nbsp;
+<b class="nc">&nbsp;        journalInformationOptional.ifPresent(journalInformation -&gt; {</b>
+<b class="nc">&nbsp;            setTitle(journalInformation.title());</b>
+<b class="nc">&nbsp;            setCountry(journalInformation.country());</b>
+<b class="nc">&nbsp;            setCategories(getFormattedCategories(journalInformation));</b>
+<b class="nc">&nbsp;            setPublisher(getFormattedPublisher(journalInformation));</b>
+<b class="nc">&nbsp;            setScimagoId(journalInformation.scimagoId());</b>
+<b class="nc">&nbsp;            sethIndex(journalInformation.hIndex());</b>
+<b class="nc">&nbsp;            setIssn(journalInformation.issn());</b>
+<b class="nc">&nbsp;            sjrData.add(convertToSeries(journalInformation.sjrArray()));</b>
+<b class="nc">&nbsp;            snipData.add(convertToSeries(journalInformation.snipArray()));</b>
+<b class="nc">&nbsp;            citableDocsPrevious3YearsData.add(convertToSeries(journalInformation.citableDocsPrevious3Years()));</b>
+<b class="nc">&nbsp;            citesOutgoingData.add(convertToSeries(journalInformation.citesOutgoing()));</b>
+<b class="nc">&nbsp;            citesOutgoingPerDocData.add(convertToSeries(journalInformation.citesOutgoingPerDoc()));</b>
+<b class="nc">&nbsp;            citesIncomingByRecentlyPublishedData.add(convertToSeries(journalInformation.citesIncomingByRecentlyPublished()));</b>
+<b class="nc">&nbsp;            docsThisYearData.add(convertToSeries(journalInformation.docsThisYear()));</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTitle() {
+<b class="nc">&nbsp;        return title.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringWrapper titleProperty() {
+<b class="nc">&nbsp;        return title;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setTitle(String title) {
+<b class="nc">&nbsp;        this.title.set(title);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCountry() {
+<b class="nc">&nbsp;        return country.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringWrapper countryProperty() {
+<b class="nc">&nbsp;        return country;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCountry(String country) {
+<b class="nc">&nbsp;        this.country.set(country);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCategories() {
+<b class="nc">&nbsp;        return categories.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringWrapper categoriesProperty() {
+<b class="nc">&nbsp;        return categories;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCategories(String categories) {
+<b class="nc">&nbsp;        this.categories.set(categories);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getPublisher() {
+<b class="nc">&nbsp;        return publisher.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringWrapper publisherProperty() {
+<b class="nc">&nbsp;        return publisher;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPublisher(String publisher) {
+<b class="nc">&nbsp;        this.publisher.set(publisher);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getScimagoId() {
+<b class="nc">&nbsp;        return scimagoId.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringWrapper scimagoIdProperty() {
+<b class="nc">&nbsp;        return scimagoId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setScimagoId(String scimagoId) {
+<b class="nc">&nbsp;        this.scimagoId.set(scimagoId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String gethIndex() {
+<b class="nc">&nbsp;        return hIndex.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringWrapper hIndexProperty() {
+<b class="nc">&nbsp;        return hIndex;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void sethIndex(String hIndex) {
+<b class="nc">&nbsp;        this.hIndex.set(hIndex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getIssn() {
+<b class="nc">&nbsp;        return issn.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyStringWrapper issnProperty() {
+<b class="nc">&nbsp;        return issn;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setIssn(String issn) {
+<b class="nc">&nbsp;        this.issn.set(issn);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; getSjrData() {
+<b class="nc">&nbsp;        return sjrData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; getSnipData() {
+<b class="nc">&nbsp;        return snipData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; getCitableDocsPrevious3YearsData() {
+<b class="nc">&nbsp;        return citableDocsPrevious3YearsData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; getCitesOutgoingData() {
+<b class="nc">&nbsp;        return citesOutgoingData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; getCitesOutgoingPerDocData() {
+<b class="nc">&nbsp;        return citesOutgoingPerDocData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; getCitesIncomingByRecentlyPublishedData() {
+<b class="nc">&nbsp;        return citesIncomingByRecentlyPublishedData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;XYChart.Series&lt;String, Double&gt;&gt; getDocsThisYearData() {
+<b class="nc">&nbsp;        return docsThisYearData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public XYChart.Series&lt;String, Double&gt; convertToSeries(List&lt;Pair&lt;Integer, Double&gt;&gt; data) {
+<b class="nc">&nbsp;        XYChart.Series&lt;String, Double&gt; series = new XYChart.Series&lt;&gt;();</b>
+<b class="nc">&nbsp;        data.stream()</b>
+<b class="nc">&nbsp;            .map(pair -&gt; new XYChart.Data&lt;&gt;(pair.getKey().toString(), pair.getValue()))</b>
+<b class="nc">&nbsp;            .forEach(series.getData()::add);</b>
+<b class="nc">&nbsp;        return series;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getFormattedCategories(JournalInformation journalInformation) {
+<b class="nc">&nbsp;        return Arrays.stream(journalInformation.categories().split(&quot;,&quot;))</b>
+<b class="nc">&nbsp;                     .map(String::trim)</b>
+<b class="nc">&nbsp;                     .collect(Collectors.joining(&quot;\n&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getFormattedPublisher(JournalInformation journalInformation) {
+<b class="nc">&nbsp;        StringBuilder publisher = new StringBuilder();</b>
+<b class="nc">&nbsp;        publisher.append(journalInformation.publisher());</b>
+<b class="nc">&nbsp;        String country = journalInformation.country();</b>
+<b class="nc">&nbsp;        if (!country.isBlank()) {</b>
+<b class="nc">&nbsp;            publisher.append(&quot; (&quot;).append(country).append(&quot;)&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return publisher.toString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

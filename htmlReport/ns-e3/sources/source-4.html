@@ -1,0 +1,257 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UpdateCitationMarkers</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.frontend</a>
+</div>
+
+<h1>Coverage Summary for Class: UpdateCitationMarkers (org.jabref.logic.openoffice.frontend)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UpdateCitationMarkers</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.frontend;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.openoffice.style.JStyle;
+&nbsp;import org.jabref.model.openoffice.ootext.OOText;
+&nbsp;import org.jabref.model.openoffice.ootext.OOTextIntoOO;
+&nbsp;import org.jabref.model.openoffice.style.CitationGroup;
+&nbsp;import org.jabref.model.openoffice.style.CitationGroups;
+&nbsp;import org.jabref.model.openoffice.style.CitationType;
+&nbsp;import org.jabref.model.openoffice.uno.CreationException;
+&nbsp;import org.jabref.model.openoffice.uno.NoDocumentException;
+&nbsp;
+&nbsp;import com.sun.star.beans.IllegalTypeException;
+&nbsp;import com.sun.star.beans.NotRemoveableException;
+&nbsp;import com.sun.star.beans.PropertyVetoException;
+&nbsp;import com.sun.star.lang.WrappedTargetException;
+&nbsp;import com.sun.star.text.XTextCursor;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class UpdateCitationMarkers {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateCitationMarkers.class);</b>
+&nbsp;
+&nbsp;    private UpdateCitationMarkers() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Visit each reference mark in referenceMarkNames, overwrite its text content.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * After each fillCitationMarkInCursor call check if we lost the BIB_SECTION_NAME bookmark and recreate it if we did.
+&nbsp;     *
+&nbsp;     * @param style Bibliography style to use.
+&nbsp;     */
+&nbsp;    public static void applyNewCitationMarkers(XTextDocument doc, OOFrontend frontend, JStyle style)
+&nbsp;            throws
+&nbsp;            NoDocumentException,
+&nbsp;            CreationException,
+&nbsp;            WrappedTargetException {
+&nbsp;
+<b class="nc">&nbsp;        CitationGroups citationGroups = frontend.citationGroups;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (CitationGroup group : citationGroups.getCitationGroupsUnordered()) {</b>
+<b class="nc">&nbsp;            boolean withText = group.citationType != CitationType.INVISIBLE_CIT;</b>
+<b class="nc">&nbsp;            Optional&lt;OOText&gt; marker = group.getCitationMarker();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (marker.isEmpty()) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;applyNewCitationMarkers: no marker for {}&quot;,</b>
+<b class="nc">&nbsp;                        group.groupId.citationGroupIdAsString());</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (withText &amp;&amp; marker.isPresent()) {</b>
+<b class="nc">&nbsp;                XTextCursor cursor = frontend.getFillCursorForCitationGroup(doc, group);</b>
+<b class="nc">&nbsp;                fillCitationMarkInCursor(doc, cursor, marker.get(), withText, style);</b>
+<b class="nc">&nbsp;                frontend.cleanFillCursorForCitationGroup(doc, group);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void fillCitationMarkInCursor(XTextDocument doc,
+&nbsp;                                                XTextCursor cursor,
+&nbsp;                                                OOText citationText,
+&nbsp;                                                boolean withText,
+&nbsp;                                                JStyle style)
+&nbsp;            throws
+&nbsp;            WrappedTargetException,
+&nbsp;            CreationException,
+&nbsp;            IllegalArgumentException {
+&nbsp;
+<b class="nc">&nbsp;        Objects.requireNonNull(cursor);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(citationText);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(style);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (withText) {</b>
+<b class="nc">&nbsp;            OOText citationText2 = style.decorateCitationMarker(citationText);</b>
+<b class="nc">&nbsp;            String ZERO_WIDTH_SPACE = &quot;&quot;;</b>
+<b class="nc">&nbsp;            if (style.spaceBeforeCitation()) {</b>
+&nbsp;                // inject a ZERO_WIDTH_SPACE to hold the initial character format
+<b class="nc">&nbsp;                ZERO_WIDTH_SPACE = &quot;\u200b&quot;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            citationText2 = OOText.fromString(ZERO_WIDTH_SPACE + citationText2.toString());</b>
+<b class="nc">&nbsp;            OOTextIntoOO.write(doc, cursor, citationText2);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            cursor.setString(&quot;&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inserts a citation group in the document: creates and fills it.
+&nbsp;     *
+&nbsp;     * @param citationKeys     BibTeX keys of
+&nbsp;     * @param citationText     Text for the citation. A citation mark or placeholder if not yet available.
+&nbsp;     * @param position         Location to insert at.
+&nbsp;     * @param insertSpaceAfter A space inserted after the reference mark makes it easier to separate from the text coming after. But is not wanted when we recreate a reference mark.
+&nbsp;     */
+&nbsp;    public static void createAndFillCitationGroup(OOFrontend frontend,
+&nbsp;                                                  XTextDocument doc,
+&nbsp;                                                  List&lt;String&gt; citationKeys,
+&nbsp;                                                  List&lt;Optional&lt;OOText&gt;&gt; pageInfos,
+&nbsp;                                                  CitationType citationType,
+&nbsp;                                                  OOText citationText,
+&nbsp;                                                  XTextCursor position,
+&nbsp;                                                  JStyle style,
+&nbsp;                                                  boolean insertSpaceAfter)
+&nbsp;            throws
+&nbsp;            NotRemoveableException,
+&nbsp;            WrappedTargetException,
+&nbsp;            PropertyVetoException,
+&nbsp;            IllegalArgumentException,
+&nbsp;            CreationException,
+&nbsp;            NoDocumentException,
+&nbsp;            IllegalTypeException {
+&nbsp;
+<b class="nc">&nbsp;        Objects.requireNonNull(pageInfos);</b>
+<b class="nc">&nbsp;        if (pageInfos.size() != citationKeys.size()) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;pageInfos.size != citationKeys.size&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        CitationGroup group = frontend.createCitationGroup(doc,</b>
+&nbsp;                citationKeys,
+&nbsp;                pageInfos,
+&nbsp;                citationType,
+&nbsp;                position,
+&nbsp;                insertSpaceAfter);
+&nbsp;
+<b class="nc">&nbsp;        final boolean withText = citationType.withText();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (withText) {</b>
+<b class="nc">&nbsp;            XTextCursor fillCursor = frontend.getFillCursorForCitationGroup(doc, group);</b>
+&nbsp;
+<b class="nc">&nbsp;            UpdateCitationMarkers.fillCitationMarkInCursor(doc, fillCursor, citationText, withText, style);</b>
+&nbsp;
+<b class="nc">&nbsp;            frontend.cleanFillCursorForCitationGroup(doc, group);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        position.collapseToEnd();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

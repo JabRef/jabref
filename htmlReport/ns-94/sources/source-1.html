@@ -1,0 +1,168 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HttpServerManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.http.manager</a>
+</div>
+
+<h1>Coverage Summary for Class: HttpServerManager (org.jabref.http.manager)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HttpServerManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (5/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.http.manager;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;
+&nbsp;import org.jabref.http.SrvStateManager;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/// Manages the HttpServerThread through typical life cycle methods.
+&nbsp;///
+&nbsp;/// open -&gt; start -&gt; stop
+&nbsp;/// openAndStart -&gt; stop
+&nbsp;///
+&nbsp;/// Observer: isOpen, isNotStartedBefore
+<b class="fc">&nbsp;public class HttpServerManager implements AutoCloseable {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerManager.class);</b>
+&nbsp;
+&nbsp;    private HttpServerThread httpServerThread;
+&nbsp;
+&nbsp;    public synchronized void start(SrvStateManager srvStateManager, URI uri) {
+<b class="nc">&nbsp;        if (httpServerThread != null) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;HTTP server manager already started, cannot start again.&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        httpServerThread = new HttpServerThread(srvStateManager, uri);</b>
+&nbsp;        // This enqueues the thread to run in the background
+&nbsp;        // The JVM will take care of running it at some point in time in the future
+&nbsp;        // Thus, we cannot check directly if it really runs
+<b class="nc">&nbsp;        httpServerThread.start();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Triggered HTTP server start up.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void stop() {
+<b class="fc">&nbsp;        LOGGER.debug(&quot;Stopping HTTP server manager...&quot;);</b>
+<b class="pc">&nbsp;        if (httpServerThread != null) {</b>
+<b class="nc">&nbsp;            httpServerThread.interrupt();</b>
+<b class="nc">&nbsp;            httpServerThread = null;</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;HTTP server stopped successfully.&quot;);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            LOGGER.debug(&quot;HTTP server is not started, nothing to stop.&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Closing HTTP server manager...&quot;);</b>
+<b class="nc">&nbsp;        stop();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

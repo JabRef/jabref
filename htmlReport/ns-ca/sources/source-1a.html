@@ -1,0 +1,368 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ParserResult</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer</a>
+</div>
+
+<h1>Coverage Summary for Class: ParserResult (org.jabref.logic.importer)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ParserResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ParserResult$Range</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/66)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.IdentityHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.BibDatabases;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.metadata.MetaData;
+&nbsp;
+&nbsp;import com.google.common.collect.Multimap;
+&nbsp;import com.google.common.collect.MultimapBuilder;
+&nbsp;
+&nbsp;public class ParserResult {
+&nbsp;    private final Set&lt;BibEntryType&gt; entryTypes;
+&nbsp;    private final Multimap&lt;Range, String&gt; warnings;
+&nbsp;    private BibDatabase database;
+&nbsp;    private MetaData metaData;
+&nbsp;    private Path file;
+&nbsp;    private boolean invalid;
+<b class="nc">&nbsp;    private boolean changedOnMigration = false;</b>
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;BibEntry, Range&gt; articleRanges = new IdentityHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;BibEntry, Map&lt;Field, Range&gt;&gt; fieldRanges = new IdentityHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public ParserResult() {
+<b class="nc">&nbsp;        this(List.of());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ParserResult(Collection&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        this(new BibDatabase(BibDatabases.purgeEmptyEntries(entries)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ParserResult(BibDatabase database) {
+<b class="nc">&nbsp;        this(database, new MetaData(), new HashSet&lt;&gt;());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public ParserResult(BibDatabase database, MetaData metaData, Set&lt;BibEntryType&gt; entryTypes) {</b>
+<b class="nc">&nbsp;        this.database = Objects.requireNonNull(database);</b>
+<b class="nc">&nbsp;        this.metaData = Objects.requireNonNull(metaData);</b>
+<b class="nc">&nbsp;        this.entryTypes = Objects.requireNonNull(entryTypes);</b>
+<b class="nc">&nbsp;        this.warnings = MultimapBuilder.hashKeys().hashSetValues().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ParserResult fromErrorMessage(String message) {
+<b class="nc">&nbsp;        ParserResult parserResult = new ParserResult();</b>
+<b class="nc">&nbsp;        parserResult.addWarning(Range.NULL_RANGE, message);</b>
+<b class="nc">&nbsp;        parserResult.setInvalid(true);</b>
+<b class="nc">&nbsp;        return parserResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getErrorMessage(Exception exception) {
+<b class="nc">&nbsp;        String errorMessage = exception.getLocalizedMessage();</b>
+<b class="nc">&nbsp;        if (exception.getCause() != null) {</b>
+<b class="nc">&nbsp;            errorMessage += &quot; Caused by: &quot; + exception.getCause().getLocalizedMessage();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return errorMessage;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ParserResult fromError(Exception exception) {
+<b class="nc">&nbsp;        return fromErrorMessage(getErrorMessage(exception));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibDatabase getDatabase() {
+<b class="nc">&nbsp;        return database;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MetaData getMetaData() {
+<b class="nc">&nbsp;        return metaData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMetaData(MetaData md) {
+<b class="nc">&nbsp;        this.metaData = md;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Set&lt;BibEntryType&gt; getEntryTypes() {
+<b class="nc">&nbsp;        return entryTypes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Path&gt; getPath() {
+<b class="nc">&nbsp;        return Optional.ofNullable(file);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPath(Path path) {
+<b class="nc">&nbsp;        file = path;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Add a parser warning.
+&nbsp;     *
+&nbsp;     * @param s String Warning text. Must be pre-translated. Only added if there isn&#39;t already a dupe.
+&nbsp;     */
+&nbsp;    public void addWarning(String s) {
+<b class="nc">&nbsp;        addWarning(Range.NULL_RANGE, s);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addWarning(Range range, String s) {
+<b class="nc">&nbsp;        warnings.put(range, s);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addException(Range range, Exception exception) {
+<b class="nc">&nbsp;        String errorMessage = getErrorMessage(exception);</b>
+<b class="nc">&nbsp;        addWarning(range, errorMessage);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasWarnings() {
+<b class="nc">&nbsp;        return !warnings.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; warnings() {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(warnings.values());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Multimap&lt;Range, String&gt; getWarningsMap() {
+<b class="nc">&nbsp;        return warnings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isInvalid() {
+<b class="nc">&nbsp;        return invalid;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setInvalid(boolean invalid) {
+<b class="nc">&nbsp;        this.invalid = invalid;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getErrorMessage() {
+<b class="nc">&nbsp;        return String.join(&quot;\n&quot;, warnings());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibDatabaseContext getDatabaseContext() {
+<b class="nc">&nbsp;        return new BibDatabaseContext(database, metaData, file);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        Objects.requireNonNull(bibDatabaseContext);</b>
+<b class="nc">&nbsp;        database = bibDatabaseContext.getDatabase();</b>
+<b class="nc">&nbsp;        metaData = bibDatabaseContext.getMetaData();</b>
+<b class="nc">&nbsp;        file = bibDatabaseContext.getDatabasePath().orElse(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isEmpty() {
+<b class="nc">&nbsp;        return !this.getDatabase().hasEntries() &amp;&amp;</b>
+<b class="nc">&nbsp;                this.getDatabase().hasNoStrings() &amp;&amp;</b>
+<b class="nc">&nbsp;                this.getDatabase().getPreamble().isEmpty() &amp;&amp;</b>
+<b class="nc">&nbsp;                this.getMetaData().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getChangedOnMigration() {
+<b class="nc">&nbsp;        return changedOnMigration;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setChangedOnMigration(boolean wasChangedOnMigration) {
+<b class="nc">&nbsp;        this.changedOnMigration = wasChangedOnMigration;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;BibEntry, Map&lt;Field, Range&gt;&gt; getFieldRanges() {
+<b class="nc">&nbsp;        return fieldRanges;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;BibEntry, Range&gt; getArticleRanges() {
+<b class="nc">&nbsp;        return articleRanges;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record Range(</b>
+&nbsp;            int startLine,
+&nbsp;            int startColumn,
+&nbsp;            int endLine,
+&nbsp;            int endColumn) {
+<b class="nc">&nbsp;        public static final Range NULL_RANGE = new Range(0, 0, 0, 0);</b>
+&nbsp;
+&nbsp;        public Range(int startLine, int startColumn) {
+<b class="nc">&nbsp;            this(startLine, startColumn, startLine, startColumn);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
+&nbsp;    public Range getFieldRange(BibEntry entry, Field field) {
+<b class="nc">&nbsp;        Map&lt;Field, Range&gt; rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (rangeMap.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Range.NULL_RANGE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Range range = rangeMap.get(field);</b>
+<b class="nc">&nbsp;        if (range != null) {</b>
+<b class="nc">&nbsp;            return range;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return field.getAlias()</b>
+<b class="nc">&nbsp;                    .map(rangeMap::get)</b>
+<b class="nc">&nbsp;                    .orElseGet(() -&gt; getCompleteEntryIndicator(entry));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Returns a `Range` indicating that a complete entry is hit. We use the line of the key. No key is found, the complete entry range is used.
+&nbsp;    public Range getCompleteEntryIndicator(BibEntry entry) {
+<b class="nc">&nbsp;        Map&lt;Field, Range&gt; rangeMap = fieldRanges.getOrDefault(entry, Collections.emptyMap());</b>
+<b class="nc">&nbsp;        Range range = rangeMap.get(InternalField.KEY_FIELD);</b>
+<b class="nc">&nbsp;        if (range != null) {</b>
+&nbsp;            // this ensures that the line is highlighted from the beginning of the entry so it highlights &quot;@Article{key,&quot; (but only if on the same line) and not just the citation key
+<b class="nc">&nbsp;            return new Range(range.startLine(), 0, range.endLine(), range.endColumn());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return articleRanges.getOrDefault(entry, Range.NULL_RANGE);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

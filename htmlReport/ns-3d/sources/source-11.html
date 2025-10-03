@@ -1,0 +1,186 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UndoableModifySubtree</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.groups</a>
+</div>
+
+<h1>Coverage Summary for Class: UndoableModifySubtree (org.jabref.gui.groups)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UndoableModifySubtree</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.groups;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.gui.undo.AbstractUndoableJabRefEdit;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;
+&nbsp;public class UndoableModifySubtree extends AbstractUndoableJabRefEdit {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A backup of the groups before the modification
+&nbsp;     */
+&nbsp;    private final GroupTreeNode m_groupRoot;
+&nbsp;
+&nbsp;    private final GroupTreeNode m_subtreeBackup;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The path to the global groups root node
+&nbsp;     */
+&nbsp;    private final List&lt;Integer&gt; m_subtreeRootPath;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This holds the new subtree (the root&#39;s modified children) to allow redo.
+&nbsp;     */
+<b class="nc">&nbsp;    private final List&lt;GroupTreeNode&gt; m_modifiedSubtree = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final String m_name;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param subtree The root node of the subtree that was modified (this node may not be modified, it is just used as a convenience handle).
+&nbsp;     */
+&nbsp;    public UndoableModifySubtree(GroupTreeNodeViewModel groupRoot,
+<b class="nc">&nbsp;                                 GroupTreeNodeViewModel subtree, String name) {</b>
+<b class="nc">&nbsp;        m_subtreeBackup = subtree.getNode().copySubtree();</b>
+<b class="nc">&nbsp;        m_groupRoot = groupRoot.getNode();</b>
+<b class="nc">&nbsp;        m_subtreeRootPath = subtree.getNode().getIndexedPathFromRoot();</b>
+<b class="nc">&nbsp;        m_name = name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getPresentationName() {
+<b class="nc">&nbsp;        return m_name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void undo() {
+<b class="nc">&nbsp;        super.undo();</b>
+&nbsp;        // remember modified children for redo
+<b class="nc">&nbsp;        m_modifiedSubtree.clear();</b>
+&nbsp;        // get node to edit
+<b class="nc">&nbsp;        final GroupTreeNode subtreeRoot = m_groupRoot.getDescendant(m_subtreeRootPath).get(); // TODO: NULL</b>
+<b class="nc">&nbsp;        m_modifiedSubtree.addAll(subtreeRoot.getChildren());</b>
+&nbsp;        // keep subtree handle, but restore everything else from backup
+<b class="nc">&nbsp;        subtreeRoot.removeAllChildren();</b>
+<b class="nc">&nbsp;        for (GroupTreeNode child : m_subtreeBackup.getChildren()) {</b>
+<b class="nc">&nbsp;            child.copySubtree().moveTo(subtreeRoot);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void redo() {
+<b class="nc">&nbsp;        super.redo();</b>
+<b class="nc">&nbsp;        final GroupTreeNode subtreeRoot = m_groupRoot.getDescendant(m_subtreeRootPath).get(); // TODO: NULL</b>
+<b class="nc">&nbsp;        subtreeRoot.removeAllChildren();</b>
+<b class="nc">&nbsp;        for (GroupTreeNode modifiedNode : m_modifiedSubtree) {</b>
+<b class="nc">&nbsp;            modifiedNode.moveTo(subtreeRoot);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

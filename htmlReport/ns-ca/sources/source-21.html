@@ -1,0 +1,102 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FulltextFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer</a>
+</div>
+
+<h1>Coverage Summary for Class: FulltextFetcher (org.jabref.logic.importer)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">FulltextFetcher</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.fetcher.TrustLevel;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;/**
+&nbsp; * This interface is used for classes that try to resolve a full-text PDF url for a BibTex entry.
+&nbsp; * Implementing classes should specialize on specific article sites.
+&nbsp; * See e.g. @link{http://libguides.mit.edu/apis}.
+&nbsp; */
+&nbsp;public interface FulltextFetcher {
+&nbsp;    /**
+&nbsp;     * Tries to find a fulltext URL for a given BibTex entry.
+&nbsp;     *
+&nbsp;     * @param entry The Bibtex entry
+&nbsp;     * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
+&nbsp;     * @throws NullPointerException if no BibTex entry is given
+&nbsp;     * @throws java.io.IOException  if an IO operation has failed
+&nbsp;     * @throws FetcherException     if a fetcher-specific error occurred
+&nbsp;     */
+&nbsp;    Optional&lt;URL&gt; findFullText(BibEntry entry) throws IOException, FetcherException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the level of trust for this fetcher.
+&nbsp;     * We distinguish between publishers and meta search engines for example.
+&nbsp;     *
+&nbsp;     * @return The trust level of the fetcher, the higher the better
+&nbsp;     */
+&nbsp;    TrustLevel getTrustLevel();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

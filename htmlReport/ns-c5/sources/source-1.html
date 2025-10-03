@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitStatusChecker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.git.status</a>
+</div>
+
+<h1>Coverage Summary for Class: GitStatusChecker (org.jabref.logic.git.status)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitStatusChecker</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.git.status;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.git.GitHandler;
+&nbsp;import org.jabref.logic.git.io.GitRevisionLocator;
+&nbsp;
+&nbsp;import org.eclipse.jgit.api.Git;
+&nbsp;import org.eclipse.jgit.api.Status;
+&nbsp;import org.eclipse.jgit.api.errors.GitAPIException;
+&nbsp;import org.eclipse.jgit.lib.BranchConfig;
+&nbsp;import org.eclipse.jgit.lib.ObjectId;
+&nbsp;import org.eclipse.jgit.lib.Ref;
+&nbsp;import org.eclipse.jgit.lib.Repository;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class is used to determine the status of a Git repository from any given path inside it.
+&nbsp; * If no repository is found, it returns a {@link GitStatusSnapshot} with tracking = false.
+&nbsp; * Otherwise, it returns a full snapshot including tracking status, sync status, and conflict state.
+&nbsp; */
+<b class="nc">&nbsp;public class GitStatusChecker {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(GitStatusChecker.class);</b>
+&nbsp;
+&nbsp;    public static GitStatusSnapshot checkStatus(GitHandler gitHandler) {
+<b class="nc">&nbsp;        try (Git git = Git.open(gitHandler.getRepositoryPathAsFile())) {</b>
+<b class="nc">&nbsp;            Repository repo = git.getRepository();</b>
+<b class="nc">&nbsp;            Status status = git.status().call();</b>
+<b class="nc">&nbsp;            boolean hasConflict = !status.getConflicting().isEmpty();</b>
+<b class="nc">&nbsp;            boolean hasUncommittedChanges = !status.isClean();</b>
+&nbsp;
+<b class="nc">&nbsp;            ObjectId localHead = repo.resolve(&quot;HEAD&quot;);</b>
+<b class="nc">&nbsp;            String trackingBranch = new BranchConfig(repo.getConfig(), repo.getBranch()).getTrackingBranch();</b>
+<b class="nc">&nbsp;            ObjectId remoteHead = trackingBranch != null ? repo.resolve(trackingBranch) : null;</b>
+&nbsp;
+&nbsp;            SyncStatus syncStatus;
+&nbsp;
+<b class="nc">&nbsp;            if (remoteHead == null) {</b>
+<b class="nc">&nbsp;                boolean remoteEmpty = isRemoteEmpty(gitHandler);</b>
+<b class="nc">&nbsp;                if (remoteEmpty) {</b>
+<b class="nc">&nbsp;                    LOGGER.debug(&quot;Remote has NO heads -&gt; REMOTE_EMPTY&quot;);</b>
+<b class="nc">&nbsp;                    syncStatus = SyncStatus.REMOTE_EMPTY;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.debug(&quot;Remote is NOT empty but remoteHead unresolved -&gt; UNKNOWN&quot;);</b>
+<b class="nc">&nbsp;                    syncStatus = SyncStatus.UNKNOWN;</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                syncStatus = determineSyncStatus(repo, localHead, remoteHead);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return new GitStatusSnapshot(</b>
+&nbsp;                    GitStatusSnapshot.TRACKING,
+&nbsp;                    syncStatus,
+&nbsp;                    hasConflict,
+&nbsp;                    hasUncommittedChanges,
+<b class="nc">&nbsp;                    Optional.ofNullable(localHead).map(ObjectId::getName)</b>
+&nbsp;            );
+&nbsp;        } catch (IOException | GitAPIException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Failed to check Git status&quot;, e);</b>
+<b class="nc">&nbsp;            return new GitStatusSnapshot(</b>
+&nbsp;                    GitStatusSnapshot.TRACKING,
+&nbsp;                    SyncStatus.UNKNOWN,
+&nbsp;                    !GitStatusSnapshot.CONFLICT,
+&nbsp;                    !GitStatusSnapshot.UNCOMMITTED,
+<b class="nc">&nbsp;                    Optional.empty()</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static GitStatusSnapshot checkStatus(Path anyPathInsideRepo) {
+<b class="nc">&nbsp;        return GitHandler.fromAnyPath(anyPathInsideRepo)</b>
+<b class="nc">&nbsp;                         .map(GitStatusChecker::checkStatus)</b>
+<b class="nc">&nbsp;                         .orElse(new GitStatusSnapshot(</b>
+&nbsp;                                 !GitStatusSnapshot.TRACKING,
+&nbsp;                                 SyncStatus.UNTRACKED,
+&nbsp;                                 !GitStatusSnapshot.CONFLICT,
+&nbsp;                                 !GitStatusSnapshot.UNCOMMITTED,
+<b class="nc">&nbsp;                                 Optional.empty()</b>
+&nbsp;                         ));
+&nbsp;    }
+&nbsp;
+&nbsp;    public static GitStatusSnapshot checkStatusAndFetch(GitHandler gitHandler) throws IOException, JabRefException {
+<b class="nc">&nbsp;        gitHandler.fetchOnCurrentBranch();</b>
+<b class="nc">&nbsp;        return checkStatus(gitHandler);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static SyncStatus determineSyncStatus(Repository repo, ObjectId localHead, ObjectId remoteHead) throws IOException {
+<b class="nc">&nbsp;        if (localHead == null || remoteHead == null) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;localHead or remoteHead null&quot;);</b>
+<b class="nc">&nbsp;            return SyncStatus.UNKNOWN;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (localHead.equals(remoteHead)) {</b>
+<b class="nc">&nbsp;            return SyncStatus.UP_TO_DATE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean remoteInLocal = GitRevisionLocator.isAncestor(repo, remoteHead, localHead);</b>
+<b class="nc">&nbsp;        boolean localInRemote = GitRevisionLocator.isAncestor(repo, localHead, remoteHead);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (remoteInLocal &amp;&amp; localInRemote) {</b>
+<b class="nc">&nbsp;            return SyncStatus.UP_TO_DATE;</b>
+<b class="nc">&nbsp;        } else if (remoteInLocal) {</b>
+<b class="nc">&nbsp;            return SyncStatus.AHEAD;</b>
+<b class="nc">&nbsp;        } else if (localInRemote) {</b>
+<b class="nc">&nbsp;            return SyncStatus.BEHIND;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return SyncStatus.DIVERGED;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isRemoteEmpty(GitHandler gitHandler) {
+<b class="nc">&nbsp;        try (Git git = Git.open(gitHandler.getRepositoryPathAsFile())) {</b>
+<b class="nc">&nbsp;            Iterable&lt;Ref&gt; heads = git.lsRemote()</b>
+<b class="nc">&nbsp;                                     .setRemote(&quot;origin&quot;)</b>
+<b class="nc">&nbsp;                                     .setHeads(true)</b>
+<b class="nc">&nbsp;                                     .call();</b>
+<b class="nc">&nbsp;            boolean empty = (heads == null) || !heads.iterator().hasNext();</b>
+<b class="nc">&nbsp;            if (empty) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;ls-remote: origin has NO heads.&quot;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.debug(&quot;ls-remote: origin has heads.&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return empty;</b>
+&nbsp;        } catch (IOException | GitAPIException e) {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;ls-remote failed when checking remote emptiness; assume NOT empty.&quot;, e);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

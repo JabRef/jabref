@@ -1,0 +1,164 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AiPrivacyNoticeGuardedComponent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.ai.components.privacynotice</a>
+</div>
+
+<h1>Coverage Summary for Class: AiPrivacyNoticeGuardedComponent (org.jabref.gui.ai.components.privacynotice)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AiPrivacyNoticeGuardedComponent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.ai.components.privacynotice;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
+&nbsp;import org.jabref.gui.entryeditor.AdaptVisibleTabs;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.gui.util.DynamicallyChangeableNode;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;
+&nbsp;/**
+&nbsp; * A class that guards a component, before AI privacy policy is accepted.
+&nbsp; * Remember to call rebuildUi() method after initializing the guarded component. See {@link AiChatGuardedComponent} to look how it works.
+&nbsp; */
+&nbsp;public abstract class AiPrivacyNoticeGuardedComponent extends DynamicallyChangeableNode {
+&nbsp;    private final AiPreferences aiPreferences;
+&nbsp;    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final AdaptVisibleTabs adaptVisibleTabs;
+&nbsp;
+<b class="nc">&nbsp;    public AiPrivacyNoticeGuardedComponent(AiPreferences aiPreferences, ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService, AdaptVisibleTabs adaptVisibleTabs) {</b>
+<b class="nc">&nbsp;        this.aiPreferences = aiPreferences;</b>
+<b class="nc">&nbsp;        this.externalApplicationsPreferences = externalApplicationsPreferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.adaptVisibleTabs = adaptVisibleTabs;</b>
+&nbsp;
+<b class="nc">&nbsp;        aiPreferences.enableAiProperty().addListener(observable -&gt; rebuildUi());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public final void rebuildUi() {
+<b class="nc">&nbsp;        if (aiPreferences.getEnableAi()) {</b>
+<b class="nc">&nbsp;            setContent(showPrivacyPolicyGuardedContent());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            setContent(</b>
+&nbsp;                    new PrivacyNoticeComponent(
+&nbsp;                            aiPreferences,
+&nbsp;                            this::rebuildUi,
+&nbsp;                            externalApplicationsPreferences,
+&nbsp;                            dialogService,
+&nbsp;                            adaptVisibleTabs
+&nbsp;                    )
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract Node showPrivacyPolicyGuardedContent();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

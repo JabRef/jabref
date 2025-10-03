@@ -1,0 +1,256 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpecialFieldValueViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.specialfields</a>
+</div>
+
+<h1>Coverage Summary for Class: SpecialFieldValueViewModel (org.jabref.gui.specialfields)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpecialFieldValueViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SpecialFieldValueViewModel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.specialfields;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.gui.actions.Action;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.icon.JabRefIcon;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.field.SpecialFieldValue;
+&nbsp;
+&nbsp;public class SpecialFieldValueViewModel {
+&nbsp;
+&nbsp;    private final SpecialFieldValue value;
+&nbsp;
+<b class="nc">&nbsp;    public SpecialFieldValueViewModel(SpecialFieldValue value) {</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(value);</b>
+<b class="nc">&nbsp;        this.value = value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SpecialFieldValue getValue() {
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;JabRefIcon&gt; getIcon() {
+<b class="nc">&nbsp;        return getAction().getIcon();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getMenuString() {
+<b class="nc">&nbsp;        return getAction().getText();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getToolTipText() {
+<b class="nc">&nbsp;        return switch (value) {</b>
+&nbsp;            case PRINTED -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Toggle print status&quot;);</b>
+&nbsp;            case CLEAR_PRIORITY -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;No priority information&quot;);</b>
+&nbsp;            case PRIORITY_HIGH -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Priority high&quot;);</b>
+&nbsp;            case PRIORITY_MEDIUM -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Priority medium&quot;);</b>
+&nbsp;            case PRIORITY_LOW -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Priority low&quot;);</b>
+&nbsp;            case QUALITY_ASSURED -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Toggle quality assured&quot;);</b>
+&nbsp;            case CLEAR_RANK -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;No rank information&quot;);</b>
+&nbsp;            case RANK_1 -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;One star&quot;);</b>
+&nbsp;            case RANK_2 -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Two stars&quot;);</b>
+&nbsp;            case RANK_3 -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Three stars&quot;);</b>
+&nbsp;            case RANK_4 -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Four stars&quot;);</b>
+&nbsp;            case RANK_5 -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Five stars&quot;);</b>
+&nbsp;            case CLEAR_READ_STATUS -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;No read status information&quot;);</b>
+&nbsp;            case READ -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Read status read&quot;);</b>
+&nbsp;            case SKIMMED -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Read status skimmed&quot;);</b>
+&nbsp;            case RELEVANT -&gt;
+<b class="nc">&nbsp;                    Localization.lang(&quot;Toggle relevance&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public Action getAction() {
+<b class="nc">&nbsp;        return switch (value) {</b>
+&nbsp;            case PRINTED -&gt;
+<b class="nc">&nbsp;                    StandardActions.TOGGLE_PRINTED;</b>
+&nbsp;            case CLEAR_PRIORITY -&gt;
+<b class="nc">&nbsp;                    StandardActions.CLEAR_PRIORITY;</b>
+&nbsp;            case PRIORITY_HIGH -&gt;
+<b class="nc">&nbsp;                    StandardActions.PRIORITY_HIGH;</b>
+&nbsp;            case PRIORITY_MEDIUM -&gt;
+<b class="nc">&nbsp;                    StandardActions.PRIORITY_MEDIUM;</b>
+&nbsp;            case PRIORITY_LOW -&gt;
+<b class="nc">&nbsp;                    StandardActions.PRIORITY_LOW;</b>
+&nbsp;            case QUALITY_ASSURED -&gt;
+<b class="nc">&nbsp;                    StandardActions.QUALITY_ASSURED;</b>
+&nbsp;            case CLEAR_RANK -&gt;
+<b class="nc">&nbsp;                    StandardActions.CLEAR_RANK;</b>
+&nbsp;            case RANK_1 -&gt;
+<b class="nc">&nbsp;                    StandardActions.RANK_1;</b>
+&nbsp;            case RANK_2 -&gt;
+<b class="nc">&nbsp;                    StandardActions.RANK_2;</b>
+&nbsp;            case RANK_3 -&gt;
+<b class="nc">&nbsp;                    StandardActions.RANK_3;</b>
+&nbsp;            case RANK_4 -&gt;
+<b class="nc">&nbsp;                    StandardActions.RANK_4;</b>
+&nbsp;            case RANK_5 -&gt;
+<b class="nc">&nbsp;                    StandardActions.RANK_5;</b>
+&nbsp;            case CLEAR_READ_STATUS -&gt;
+<b class="nc">&nbsp;                    StandardActions.CLEAR_READ_STATUS;</b>
+&nbsp;            case READ -&gt;
+<b class="nc">&nbsp;                    StandardActions.READ;</b>
+&nbsp;            case SKIMMED -&gt;
+<b class="nc">&nbsp;                    StandardActions.SKIMMED;</b>
+&nbsp;            case RELEVANT -&gt;
+<b class="nc">&nbsp;                    StandardActions.RELEVANT;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

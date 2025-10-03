@@ -1,0 +1,161 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ModifyCSLBibliographyPropertiesDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.openoffice</a>
+</div>
+
+<h1>Coverage Summary for Class: ModifyCSLBibliographyPropertiesDialogViewModel (org.jabref.gui.openoffice)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ModifyCSLBibliographyPropertiesDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.openoffice;
+&nbsp;
+&nbsp;import javafx.beans.property.ReadOnlyListProperty;
+&nbsp;import javafx.beans.property.ReadOnlyListWrapper;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;
+&nbsp;import org.jabref.logic.openoffice.OpenOfficePreferences;
+&nbsp;import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
+&nbsp;
+&nbsp;public class ModifyCSLBibliographyPropertiesDialogViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty cslBibliographyTitle = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty cslBibliographySelectedHeaderFormat = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty cslBibliographySelectedBodyFormat = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final ReadOnlyListProperty&lt;String&gt; headerFormatListProperty =</b>
+<b class="nc">&nbsp;            new ReadOnlyListWrapper&lt;&gt;(FXCollections.observableArrayList(CSLFormatUtils.BIBLIOGRAPHY_TITLE_FORMATS));</b>
+<b class="nc">&nbsp;    private final ReadOnlyListProperty&lt;String&gt; bodyFormatListProperty =</b>
+<b class="nc">&nbsp;            new ReadOnlyListWrapper&lt;&gt;(FXCollections.observableArrayList(CSLFormatUtils.BIBLIOGRAPHY_BODY_FORMATS));</b>
+&nbsp;
+&nbsp;    private final OpenOfficePreferences openOfficePreferences;
+&nbsp;
+<b class="nc">&nbsp;    public ModifyCSLBibliographyPropertiesDialogViewModel(OpenOfficePreferences openOfficePreferences) {</b>
+<b class="nc">&nbsp;        this.openOfficePreferences = openOfficePreferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.cslBibliographyTitle.set(openOfficePreferences.getCslBibliographyTitle());</b>
+<b class="nc">&nbsp;        this.cslBibliographySelectedHeaderFormat.set(openOfficePreferences.getCslBibliographyHeaderFormat());</b>
+<b class="nc">&nbsp;        this.cslBibliographySelectedBodyFormat.set(openOfficePreferences.getCslBibliographyBodyFormat());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void savePreferences() {
+<b class="nc">&nbsp;        openOfficePreferences.setCslBibliographyTitle(cslBibliographyTitle.get());</b>
+<b class="nc">&nbsp;        openOfficePreferences.setCslBibliographyHeaderFormat(cslBibliographySelectedHeaderFormat.get());</b>
+<b class="nc">&nbsp;        openOfficePreferences.setCslBibliographyBodyFormat(cslBibliographySelectedBodyFormat.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty cslBibliographyTitleProperty() {
+<b class="nc">&nbsp;        return cslBibliographyTitle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty cslBibliographySelectedHeaderFormatProperty() {
+<b class="nc">&nbsp;        return cslBibliographySelectedHeaderFormat;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyListProperty&lt;String&gt; headerFormatListProperty() {
+<b class="nc">&nbsp;        return headerFormatListProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty cslBibliographySelectedBodyFormatProperty() {
+<b class="nc">&nbsp;        return cslBibliographySelectedBodyFormat;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyListProperty&lt;String&gt; bodyFormatListProperty() {
+<b class="nc">&nbsp;        return bodyFormatListProperty;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

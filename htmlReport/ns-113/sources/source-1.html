@@ -1,0 +1,259 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FunctionalTextViewCursor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.openoffice.rangesort</a>
+</div>
+
+<h1>Coverage Summary for Class: FunctionalTextViewCursor (org.jabref.model.openoffice.rangesort)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FunctionalTextViewCursor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.openoffice.rangesort;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.model.openoffice.uno.UnoCursor;
+&nbsp;import org.jabref.model.openoffice.uno.UnoSelection;
+&nbsp;import org.jabref.model.openoffice.util.OOResult;
+&nbsp;
+&nbsp;import com.sun.star.lang.XServiceInfo;
+&nbsp;import com.sun.star.text.XTextDocument;
+&nbsp;import com.sun.star.text.XTextRange;
+&nbsp;import com.sun.star.text.XTextViewCursor;
+&nbsp;import com.sun.star.uno.RuntimeException;
+&nbsp;
+&nbsp;/*
+&nbsp; * A problem with XTextViewCursor: if it is not in text, then we get a crippled version that does
+&nbsp; * not support viewCursor.getStart() or viewCursor.gotoRange(range,false), and will throw an
+&nbsp; * exception instead.
+&nbsp; *
+&nbsp; * Here we manipulate the cursor via XSelectionSupplier.getSelection and XSelectionSupplier.select
+&nbsp; * to move it to the text.
+&nbsp; *
+&nbsp; * Seems to work when the user selected a frame or image.
+&nbsp; * In these cases restoring the selection works, too.
+&nbsp; *
+&nbsp; * When the cursor is in a comment (referred to as &quot;annotation&quot; in OO API) then initialSelection is
+&nbsp; * null, and select() fails to get a functional viewCursor.
+&nbsp; *
+&nbsp; * If FunctionalTextViewCursor.get() reports error, we have to ask the user to move the cursor into
+&nbsp; * the text part of the document.
+&nbsp; *
+&nbsp; * Usage:
+&nbsp; *
+&nbsp; *  OOResult&lt;FunctionalTextViewCursor, String&gt; fcursor = FunctionalTextViewCursor.get(doc, msg);
+&nbsp; *  if (fcursor.isError()) {
+&nbsp; *     ...
+&nbsp; *  } else {
+&nbsp; *      XTextViewCursor viewCursor = fcursor.get().getViewCursor();
+&nbsp; *      ...
+&nbsp; *      fc.restore();
+&nbsp; *  }
+&nbsp; *
+&nbsp; */
+&nbsp;public class FunctionalTextViewCursor {
+&nbsp;
+&nbsp;    /* The initial position of the cursor or null. */
+&nbsp;    private final XTextRange initialPosition;
+&nbsp;
+&nbsp;    /* The initial selection in the document or null. */
+&nbsp;    private final XServiceInfo initialSelection;
+&nbsp;
+&nbsp;    /* The view cursor, potentially moved from its original location. */
+&nbsp;    private final XTextViewCursor viewCursor;
+&nbsp;
+&nbsp;    private FunctionalTextViewCursor(XTextRange initialPosition,
+&nbsp;                                     XServiceInfo initialSelection,
+<b class="nc">&nbsp;                                     XTextViewCursor viewCursor) {</b>
+<b class="nc">&nbsp;        this.initialPosition = initialPosition;</b>
+<b class="nc">&nbsp;        this.initialSelection = initialSelection;</b>
+<b class="nc">&nbsp;        this.viewCursor = viewCursor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Get a functional XTextViewCursor or an error message.
+&nbsp;     *
+&nbsp;     * The cursor position may differ from the location provided by the user.
+&nbsp;     *
+&nbsp;     * On failure the constructor restores the selection. On success, the caller may want to call
+&nbsp;     * instance.restore() after finished using the cursor.
+&nbsp;     */
+&nbsp;    public static OOResult&lt;FunctionalTextViewCursor, String&gt; get(XTextDocument doc) {
+<b class="nc">&nbsp;        Objects.requireNonNull(doc);</b>
+&nbsp;
+<b class="nc">&nbsp;        XTextRange initialPosition = null;</b>
+<b class="nc">&nbsp;        XServiceInfo initialSelection = UnoSelection.getSelectionAsXServiceInfo(doc).orElse(null);</b>
+<b class="nc">&nbsp;        XTextViewCursor viewCursor = UnoCursor.getViewCursor(doc).orElse(null);</b>
+<b class="nc">&nbsp;        if (viewCursor != null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                initialPosition = UnoCursor.createTextCursorByRange(viewCursor);</b>
+<b class="nc">&nbsp;                viewCursor.getStart();</b>
+<b class="nc">&nbsp;                return OOResult.ok(new FunctionalTextViewCursor(initialPosition, initialSelection, viewCursor));</b>
+&nbsp;            } catch (RuntimeException ex) {
+&nbsp;                // bad cursor
+<b class="nc">&nbsp;                viewCursor = null;</b>
+<b class="nc">&nbsp;                initialPosition = null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (initialSelection == null) {</b>
+<b class="nc">&nbsp;            String errorMessage = &quot;Selection is not available: cannot provide a functional view cursor&quot;;</b>
+<b class="nc">&nbsp;            return OOResult.error(errorMessage);</b>
+<b class="nc">&nbsp;        } else if (Arrays.stream(initialSelection.getSupportedServiceNames())</b>
+<b class="nc">&nbsp;                         .noneMatch(&quot;com.sun.star.text.TextRanges&quot;::equals)) {</b>
+&nbsp;            // initialSelection does not support TextRanges.
+&nbsp;            // We need to change it (and the viewCursor with it).
+<b class="nc">&nbsp;            XTextRange newSelection = doc.getText().getStart();</b>
+<b class="nc">&nbsp;            UnoSelection.select(doc, newSelection);</b>
+<b class="nc">&nbsp;            viewCursor = UnoCursor.getViewCursor(doc).orElse(null);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (viewCursor == null) {</b>
+<b class="nc">&nbsp;            restore(doc, initialPosition, initialSelection);</b>
+<b class="nc">&nbsp;            String errorMessage = &quot;Could not get the view cursor&quot;;</b>
+<b class="nc">&nbsp;            return OOResult.error(errorMessage);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            viewCursor.getStart();</b>
+&nbsp;        } catch (RuntimeException ex) {
+<b class="nc">&nbsp;            restore(doc, initialPosition, initialSelection);</b>
+<b class="nc">&nbsp;            String errorMessage = &quot;The view cursor failed the functionality test&quot;;</b>
+<b class="nc">&nbsp;            return OOResult.error(errorMessage);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return OOResult.ok(new FunctionalTextViewCursor(initialPosition, initialSelection, viewCursor));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public XTextViewCursor getViewCursor() {
+<b class="nc">&nbsp;        return viewCursor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void restore(XTextDocument doc,
+&nbsp;                                XTextRange initialPosition,
+&nbsp;                                XServiceInfo initialSelection) {
+&nbsp;
+<b class="nc">&nbsp;        if (initialPosition != null) {</b>
+<b class="nc">&nbsp;            XTextViewCursor viewCursor = UnoCursor.getViewCursor(doc).orElse(null);</b>
+<b class="nc">&nbsp;            if (viewCursor != null) {</b>
+<b class="nc">&nbsp;                viewCursor.gotoRange(initialPosition, false);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (initialSelection != null) {</b>
+<b class="nc">&nbsp;            UnoSelection.select(doc, initialSelection);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /* Restore initial state of viewCursor (possibly by restoring selection) if possible. */
+&nbsp;    public void restore(XTextDocument doc) {
+<b class="nc">&nbsp;        FunctionalTextViewCursor.restore(doc, initialPosition, initialSelection);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

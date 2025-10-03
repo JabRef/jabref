@@ -1,0 +1,270 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EuropePmcFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: EuropePmcFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EuropePmcFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanup;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+&nbsp;import org.jabref.logic.importer.IdBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.util.JsonReader;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Month;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONException;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class EuropePmcFetcher implements IdBasedParserFetcher {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(EuropePmcFetcher.class);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        return new URI(&quot;https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=&quot; + identifier + &quot;&amp;resultType=core&amp;format=json&quot;).toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return inputStream -&gt; {</b>
+<b class="nc">&nbsp;            JSONObject response = JsonReader.toJsonObject(inputStream);</b>
+<b class="nc">&nbsp;            if (response.isEmpty()) {</b>
+<b class="nc">&nbsp;                return List.of();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return List.of(jsonItemToBibEntry(response));</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
+&nbsp;        try {
+<b class="nc">&nbsp;            JSONObject result = item.getJSONObject(&quot;resultList&quot;).getJSONArray(&quot;result&quot;).getJSONObject(0);</b>
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.debug(result.toString(2));</b>
+&nbsp;
+<b class="nc">&nbsp;            EntryType entryType = StandardEntryType.Article;</b>
+<b class="nc">&nbsp;            if (result.has(&quot;pubTypeList&quot;)) {</b>
+<b class="nc">&nbsp;                for (Object o : result.getJSONObject(&quot;pubTypeList&quot;).getJSONArray(&quot;pubType&quot;)) {</b>
+<b class="nc">&nbsp;                    if (&quot;letter&quot;.equalsIgnoreCase(o.toString())) {</b>
+<b class="nc">&nbsp;                        entryType = StandardEntryType.Article;</b>
+&nbsp;                        break;
+&nbsp;                        // TODO: handle other types e.g. books
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            BibEntry entry = new BibEntry(entryType);</b>
+&nbsp;
+<b class="nc">&nbsp;            entry.setField(StandardField.TITLE, result.optString(&quot;title&quot;));</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.ABSTRACT, result.optString(&quot;abstractText&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;            entry.setField(StandardField.YEAR, result.optString(&quot;pubYear&quot;));</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.VOLUME, result.optString(&quot;journalVolume&quot;));</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.ISSUE, result.optString(&quot;journalIssue&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;            String pages = result.optString(&quot;pageInfo&quot;);</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.PAGES, pages);</b>
+&nbsp;
+<b class="nc">&nbsp;            entry.setField(StandardField.DOI, result.optString(&quot;doi&quot;));</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.PMID, result.optString(&quot;pmid&quot;));</b>
+&nbsp;
+&nbsp;            // Handle URL
+<b class="nc">&nbsp;            if (result.has(&quot;pmid&quot;)) {</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.URL, &quot;https://pubmed.ncbi.nlm.nih.gov/&quot; + result.getString(&quot;pmid&quot;) + &quot;/&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (result.has(&quot;journalInfo&quot;) &amp;&amp; result.getJSONObject(&quot;journalInfo&quot;).has(&quot;issn&quot;)) {</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.ISSN, result.getJSONObject(&quot;journalInfo&quot;).getString(&quot;issn&quot;));</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Handle authors
+<b class="nc">&nbsp;            if (result.has(&quot;authorList&quot;) &amp;&amp; result.getJSONObject(&quot;authorList&quot;).has(&quot;author&quot;)) {</b>
+<b class="nc">&nbsp;                JSONArray authors = result.getJSONObject(&quot;authorList&quot;).getJSONArray(&quot;author&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;                List&lt;Author&gt; authorList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;                for (int i = 0; i &lt; authors.length(); i++) {</b>
+<b class="nc">&nbsp;                    JSONObject author = authors.getJSONObject(i);</b>
+&nbsp;
+<b class="nc">&nbsp;                    String lastName = author.optString(&quot;lastName&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;                    String firstName = author.optString(&quot;firstName&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;                    authorList.add(new Author(firstName, &quot;&quot;, &quot;&quot;, lastName, &quot;&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                    entry.setField(StandardField.AUTHOR, AuthorList.of(authorList).getAsLastFirstNamesWithAnd(false));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (result.has(&quot;pubTypeList&quot;) &amp;&amp; result.getJSONObject(&quot;pubTypeList&quot;).has(&quot;pubType&quot;)) {</b>
+<b class="nc">&nbsp;                JSONArray pubTypes = result.getJSONObject(&quot;pubTypeList&quot;).getJSONArray(&quot;pubType&quot;);</b>
+<b class="nc">&nbsp;                if (!pubTypes.isEmpty()) {</b>
+<b class="nc">&nbsp;                    entry.setField(StandardField.PUBSTATE, pubTypes.getString(0));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (result.has(&quot;pubModel&quot;)) {</b>
+<b class="nc">&nbsp;                Optional.ofNullable(result.optString(&quot;pubModel&quot;)).ifPresent(pubModel -&gt; entry.setField(StandardField.HOWPUBLISHED, pubModel));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (result.has(&quot;publicationStatus&quot;)) {</b>
+<b class="nc">&nbsp;                Optional.ofNullable(result.optString(&quot;publicationStatus&quot;)).ifPresent(pubStatus -&gt; entry.setField(StandardField.PUBSTATE, pubStatus));</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (result.has(&quot;journalInfo&quot;)) {</b>
+<b class="nc">&nbsp;                JSONObject journalInfo = result.getJSONObject(&quot;journalInfo&quot;);</b>
+<b class="nc">&nbsp;                Optional.ofNullable(journalInfo.optString(&quot;issue&quot;)).ifPresent(issue -&gt; entry.setField(StandardField.ISSUE, issue));</b>
+<b class="nc">&nbsp;                Optional.ofNullable(journalInfo.optString(&quot;volume&quot;)).ifPresent(volume -&gt; entry.setField(StandardField.VOLUME, volume));</b>
+<b class="nc">&nbsp;                Optional.of(journalInfo.optInt(&quot;yearOfPublication&quot;)).ifPresent(year -&gt; entry.setField(StandardField.YEAR, year.toString()));</b>
+<b class="nc">&nbsp;                Optional.of(journalInfo.optInt(&quot;monthOfPublication&quot;))</b>
+<b class="nc">&nbsp;                        .flatMap(month -&gt; Month.parse(month.toString()))</b>
+<b class="nc">&nbsp;                        .ifPresent(parsedMonth -&gt; entry.setField(StandardField.MONTH, parsedMonth.getJabRefFormat()));</b>
+<b class="nc">&nbsp;                if (journalInfo.has(&quot;journal&quot;)) {</b>
+<b class="nc">&nbsp;                    JSONObject journal = journalInfo.getJSONObject(&quot;journal&quot;);</b>
+<b class="nc">&nbsp;                    Optional.ofNullable(journal.optString(&quot;title&quot;)).ifPresent(title -&gt; entry.setField(StandardField.JOURNAL, title));</b>
+<b class="nc">&nbsp;                    Optional.ofNullable(journal.optString(&quot;nlmid&quot;)).ifPresent(nlmid -&gt; entry.setField(new UnknownField(&quot;nlmid&quot;), nlmid));</b>
+<b class="nc">&nbsp;                    Optional.ofNullable(journal.optString(&quot;issn&quot;)).ifPresent(issn -&gt; entry.setField(StandardField.ISSN, issn));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return entry;</b>
+&nbsp;        } catch (JSONException e) {
+<b class="nc">&nbsp;            throw new ParseException(&quot;Error parsing EuropePMC response&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doPostCleanup(BibEntry entry) {
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;Europe/PMCID&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

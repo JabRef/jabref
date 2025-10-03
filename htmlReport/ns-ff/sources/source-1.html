@@ -1,0 +1,221 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DocumentInformationExtractor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.xmp</a>
+</div>
+
+<h1>Coverage Summary for Class: DocumentInformationExtractor (org.jabref.logic.xmp)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DocumentInformationExtractor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.xmp;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.AuthorListParser;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Month;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryTypeFactory;
+&nbsp;
+&nbsp;import org.apache.pdfbox.cos.COSBase;
+&nbsp;import org.apache.pdfbox.cos.COSDictionary;
+&nbsp;import org.apache.pdfbox.cos.COSName;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+&nbsp;
+&nbsp;/**
+&nbsp; * Related class: {@link org.jabref.logic.xmp.DublinCoreExtractor}
+&nbsp; */
+&nbsp;public class DocumentInformationExtractor {
+&nbsp;
+<b class="nc">&nbsp;    private static final Map&lt;COSName, Field&gt; FIELD_MAPPING = Map.ofEntries(</b>
+<b class="nc">&nbsp;            Map.entry(COSName.TITLE, StandardField.TITLE),</b>
+<b class="nc">&nbsp;            Map.entry(COSName.SUBJECT, StandardField.ABSTRACT),</b>
+<b class="nc">&nbsp;            Map.entry(COSName.KEYWORDS, StandardField.KEYWORDS),</b>
+<b class="nc">&nbsp;            Map.entry(COSName.DATE, StandardField.DATE),</b>
+<b class="nc">&nbsp;            Map.entry(COSName.COLLECTION, StandardField.BOOKTITLE),</b>
+<b class="nc">&nbsp;            Map.entry(COSName.PAGES, StandardField.PAGES),</b>
+<b class="nc">&nbsp;            Map.entry(COSName.PAGE, StandardField.PAGES),</b>
+<b class="nc">&nbsp;            Map.entry(COSName.URL, StandardField.URL),</b>
+<b class="nc">&nbsp;            Map.entry(COSName.VOLUME, StandardField.VOLUME),</b>
+<b class="nc">&nbsp;            Map.entry(COSName.VERSION, StandardField.VERSION),</b>
+<b class="nc">&nbsp;            Map.entry(COSName.ISSUER, StandardField.EDITOR)</b>
+&nbsp;    );
+&nbsp;
+&nbsp;    private final PDDocumentInformation documentInformation;
+&nbsp;
+&nbsp;    private final BibEntry bibEntry;
+&nbsp;
+<b class="nc">&nbsp;    public DocumentInformationExtractor(PDDocumentInformation documentInformation) {</b>
+<b class="nc">&nbsp;        this.documentInformation = documentInformation;</b>
+<b class="nc">&nbsp;        this.bibEntry = new BibEntry();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void extractAuthor() {
+<b class="nc">&nbsp;        String s = documentInformation.getAuthor();</b>
+<b class="nc">&nbsp;        if (s != null) {</b>
+<b class="nc">&nbsp;            s = AuthorListParser.normalizeSimply(s).orElse(s);</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.AUTHOR, s);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void extractOtherFields() {
+<b class="nc">&nbsp;        COSDictionary dict = documentInformation.getCOSObject();</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;COSName, COSBase&gt; o : dict.entrySet()) {</b>
+<b class="nc">&nbsp;            String key = o.getKey().getName();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (FIELD_MAPPING.containsKey(o.getKey())) {</b>
+<b class="nc">&nbsp;                Field field = FIELD_MAPPING.get(o.getKey());</b>
+<b class="nc">&nbsp;                bibEntry.setField(field, dict.getString(key));</b>
+<b class="nc">&nbsp;            } else if (key.startsWith(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX)) {</b>
+<b class="nc">&nbsp;                String value = dict.getString(key);</b>
+&nbsp;
+<b class="nc">&nbsp;                String fieldName = key.substring(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX.length());</b>
+<b class="nc">&nbsp;                Field field = FieldFactory.parseField(fieldName);</b>
+<b class="nc">&nbsp;                switch (field) {</b>
+&nbsp;                    case InternalField.TYPE_HEADER -&gt;
+<b class="nc">&nbsp;                            bibEntry.setType(EntryTypeFactory.parse(value));</b>
+&nbsp;                    case StandardField.MONTH -&gt; {
+<b class="nc">&nbsp;                        value = Month.parse(value).map(Month::getJabRefFormat).orElse(value);</b>
+<b class="nc">&nbsp;                        bibEntry.setField(StandardField.MONTH, value);</b>
+&nbsp;                    }
+&nbsp;                    default -&gt;
+<b class="nc">&nbsp;                            bibEntry.setField(field, value);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Function for retrieving a BibEntry from the
+&nbsp;     * PDDocumentInformation in a PDF file.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * To understand how to get hold of a PDDocumentInformation have a look in
+&nbsp;     * the test cases for XMPUtilTest.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The BibEntry is build by mapping individual fields in the document
+&nbsp;     * information (like author, title, keywords) to fields in a bibtex entry.
+&nbsp;     *
+&nbsp;     * @return The bibtex entry found in the document information.
+&nbsp;     */
+&nbsp;    public Optional&lt;BibEntry&gt; extractBibtexEntry() {
+<b class="nc">&nbsp;        this.extractAuthor();</b>
+<b class="nc">&nbsp;        this.extractOtherFields();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (bibEntry.getFields().isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.of(bibEntry);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

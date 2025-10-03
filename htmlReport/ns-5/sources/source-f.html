@@ -1,0 +1,108 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LibraryTabContainer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui</a>
+</div>
+
+<h1>Coverage Summary for Class: LibraryTabContainer (org.jabref.gui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">LibraryTabContainer</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.NullMarked;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;
+&nbsp;@NullMarked
+&nbsp;public interface LibraryTabContainer {
+&nbsp;    ObservableList&lt;LibraryTab&gt; getLibraryTabs();
+&nbsp;
+&nbsp;    @Nullable
+&nbsp;    LibraryTab getCurrentLibraryTab();
+&nbsp;
+&nbsp;    void showLibraryTab(LibraryTab libraryTab);
+&nbsp;
+&nbsp;    void addTab(BibDatabaseContext bibDatabaseContext, boolean raisePanel);
+&nbsp;
+&nbsp;    void addTab(LibraryTab libraryTab, boolean raisePanel);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Closes a designated libraryTab
+&nbsp;     *
+&nbsp;     * @param tab to be closed.
+&nbsp;     * @return true if closing the tab was successful
+&nbsp;     */
+&nbsp;    boolean closeTab(@Nullable LibraryTab tab);
+&nbsp;
+&nbsp;    boolean closeTabs(@NonNull List&lt;LibraryTab&gt; tabs);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Refreshes the ui after changes to the preferences
+&nbsp;     */
+&nbsp;    void refresh();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

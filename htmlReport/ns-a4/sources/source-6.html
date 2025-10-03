@@ -1,0 +1,193 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LowLevelIngestor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.ingestion</a>
+</div>
+
+<h1>Coverage Summary for Class: LowLevelIngestor (org.jabref.logic.ai.ingestion)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LowLevelIngestor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.ingestion;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.beans.property.IntegerProperty;
+&nbsp;import javafx.beans.property.ReadOnlyBooleanProperty;
+&nbsp;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;
+&nbsp;import dev.langchain4j.data.document.DefaultDocument;
+&nbsp;import dev.langchain4j.data.document.Document;
+&nbsp;import dev.langchain4j.data.document.DocumentSplitter;
+&nbsp;import dev.langchain4j.data.document.splitter.DocumentSplitters;
+&nbsp;import dev.langchain4j.data.segment.TextSegment;
+&nbsp;import dev.langchain4j.model.embedding.EmbeddingModel;
+&nbsp;import dev.langchain4j.store.embedding.EmbeddingStore;
+&nbsp;import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
+&nbsp;
+&nbsp;public class LowLevelIngestor {
+&nbsp;    private final AiPreferences aiPreferences;
+&nbsp;
+&nbsp;    private final EmbeddingStore&lt;TextSegment&gt; embeddingStore;
+&nbsp;    private final EmbeddingModel embeddingModel;
+&nbsp;
+&nbsp;    private EmbeddingStoreIngestor ingestor;
+&nbsp;    private DocumentSplitter documentSplitter;
+&nbsp;
+<b class="nc">&nbsp;    public LowLevelIngestor(AiPreferences aiPreferences, EmbeddingStore&lt;TextSegment&gt; embeddingStore, EmbeddingModel embeddingModel) {</b>
+<b class="nc">&nbsp;        this.aiPreferences = aiPreferences;</b>
+<b class="nc">&nbsp;        this.embeddingStore = embeddingStore;</b>
+<b class="nc">&nbsp;        this.embeddingModel = embeddingModel;</b>
+&nbsp;
+<b class="nc">&nbsp;        rebuild();</b>
+&nbsp;
+<b class="nc">&nbsp;        setupListeningToPreferencesChanges();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void rebuild() {
+<b class="nc">&nbsp;        this.documentSplitter = DocumentSplitters</b>
+<b class="nc">&nbsp;                .recursive(aiPreferences.getDocumentSplitterChunkSize(),</b>
+<b class="nc">&nbsp;                        aiPreferences.getDocumentSplitterOverlapSize());</b>
+&nbsp;
+<b class="nc">&nbsp;        this.ingestor = EmbeddingStoreIngestor</b>
+<b class="nc">&nbsp;                .builder()</b>
+<b class="nc">&nbsp;                .embeddingStore(embeddingStore)</b>
+<b class="nc">&nbsp;                .embeddingModel(embeddingModel)</b>
+<b class="nc">&nbsp;                .documentSplitter(documentSplitter)</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupListeningToPreferencesChanges() {
+<b class="nc">&nbsp;        aiPreferences.customizeExpertSettingsProperty().addListener(_ -&gt; rebuild());</b>
+<b class="nc">&nbsp;        aiPreferences.addListenerToEmbeddingsParametersChange(this::rebuild);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Add document to embedding store.
+&nbsp;     * This method does not check if file was already ingested.
+&nbsp;     *
+&nbsp;     * @param document     - document to add.
+&nbsp;     * @param stopProperty - in case you want to stop the ingestion process, set this property to true.
+&nbsp;     */
+&nbsp;    public void ingestDocument(Document document, ReadOnlyBooleanProperty stopProperty, IntegerProperty workDone, IntegerProperty workMax) throws InterruptedException {
+<b class="nc">&nbsp;        List&lt;TextSegment&gt; textSegments = documentSplitter.split(document);</b>
+<b class="nc">&nbsp;        workMax.set(textSegments.size());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (TextSegment documentPart : textSegments) {</b>
+<b class="nc">&nbsp;            if (stopProperty.get()) {</b>
+<b class="nc">&nbsp;                throw new InterruptedException();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            ingestor.ingest(new DefaultDocument(documentPart.text(), document.metadata()));</b>
+&nbsp;
+<b class="nc">&nbsp;            workDone.set(workDone.get() + 1);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

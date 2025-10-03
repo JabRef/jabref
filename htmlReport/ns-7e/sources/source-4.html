@@ -1,0 +1,334 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ParseLatexDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.texparser</a>
+</div>
+
+<h1>Coverage Summary for Class: ParseLatexDialogViewModel (org.jabref.gui.texparser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ParseLatexDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/86)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.texparser;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.FileSystemException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.ReadOnlyListWrapper;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.control.TreeItem;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.util.DirectoryDialogConfiguration;
+&nbsp;import org.jabref.gui.util.FileNodeViewModel;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.texparser.DefaultLatexParser;
+&nbsp;import org.jabref.logic.texparser.TexBibEntriesResolver;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class ParseLatexDialogViewModel extends AbstractViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ParseLatexDialogViewModel.class);</b>
+&nbsp;    private static final String TEX_EXT = &quot;.tex&quot;;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;    private final FileUpdateMonitor fileMonitor;
+&nbsp;    private final StringProperty latexFileDirectory;
+&nbsp;    private final Validator latexDirectoryValidator;
+&nbsp;    private final ObjectProperty&lt;FileNodeViewModel&gt; root;
+&nbsp;    private final ObservableList&lt;TreeItem&lt;FileNodeViewModel&gt;&gt; checkedFileList;
+&nbsp;    private final BooleanProperty noFilesFound;
+&nbsp;    private final BooleanProperty searchInProgress;
+&nbsp;    private final BooleanProperty successfulSearch;
+&nbsp;
+&nbsp;    public ParseLatexDialogViewModel(BibDatabaseContext databaseContext,
+&nbsp;                                     DialogService dialogService,
+&nbsp;                                     TaskExecutor taskExecutor,
+&nbsp;                                     CliPreferences preferences,
+<b class="nc">&nbsp;                                     FileUpdateMonitor fileMonitor) {</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.fileMonitor = fileMonitor;</b>
+<b class="nc">&nbsp;        this.latexFileDirectory = new SimpleStringProperty(databaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())</b>
+<b class="nc">&nbsp;                                                                          .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()))</b>
+<b class="nc">&nbsp;                                                                          .toAbsolutePath().toString());</b>
+<b class="nc">&nbsp;        this.root = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;        this.checkedFileList = FXCollections.observableArrayList();</b>
+<b class="nc">&nbsp;        this.noFilesFound = new SimpleBooleanProperty(true);</b>
+<b class="nc">&nbsp;        this.searchInProgress = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;        this.successfulSearch = new SimpleBooleanProperty(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        Predicate&lt;String&gt; isDirectory = path -&gt; Path.of(path).toFile().isDirectory();</b>
+<b class="nc">&nbsp;        latexDirectoryValidator = new FunctionBasedValidator&lt;&gt;(latexFileDirectory, isDirectory,</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Please enter a valid file path.&quot;)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty latexFileDirectoryProperty() {
+<b class="nc">&nbsp;        return latexFileDirectory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus latexDirectoryValidation() {
+<b class="nc">&nbsp;        return latexDirectoryValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;FileNodeViewModel&gt; rootProperty() {
+<b class="nc">&nbsp;        return root;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;TreeItem&lt;FileNodeViewModel&gt;&gt; getCheckedFileList() {
+<b class="nc">&nbsp;        return new ReadOnlyListWrapper&lt;&gt;(checkedFileList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty noFilesFoundProperty() {
+<b class="nc">&nbsp;        return noFilesFound;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty searchInProgressProperty() {
+<b class="nc">&nbsp;        return searchInProgress;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty successfulSearchProperty() {
+<b class="nc">&nbsp;        return successfulSearch;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void browseButtonClicked() {
+<b class="nc">&nbsp;        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .withInitialDirectory(Path.of(latexFileDirectory.get())).build();</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -&gt; {</b>
+<b class="nc">&nbsp;            latexFileDirectory.set(selectedDirectory.toAbsolutePath().toString());</b>
+<b class="nc">&nbsp;            preferences.getFilePreferences().setWorkingDirectory(selectedDirectory.toAbsolutePath());</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Run a recursive search in a background task.
+&nbsp;     */
+&nbsp;    public void searchButtonClicked() {
+<b class="nc">&nbsp;        BackgroundTask.wrap(() -&gt; searchDirectory(Path.of(latexFileDirectory.get())))</b>
+<b class="nc">&nbsp;                      .onRunning(() -&gt; {</b>
+<b class="nc">&nbsp;                          root.set(null);</b>
+<b class="nc">&nbsp;                          noFilesFound.set(true);</b>
+<b class="nc">&nbsp;                          searchInProgress.set(true);</b>
+<b class="nc">&nbsp;                          successfulSearch.set(false);</b>
+&nbsp;                      })
+<b class="nc">&nbsp;                      .onFinished(() -&gt; searchInProgress.set(false))</b>
+<b class="nc">&nbsp;                      .onSuccess(newRoot -&gt; {</b>
+<b class="nc">&nbsp;                          root.set(newRoot);</b>
+<b class="nc">&nbsp;                          noFilesFound.set(false);</b>
+<b class="nc">&nbsp;                          successfulSearch.set(true);</b>
+&nbsp;                      })
+<b class="nc">&nbsp;                      .onFailure(this::handleFailure)</b>
+<b class="nc">&nbsp;                      .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleFailure(Exception exception) {
+<b class="nc">&nbsp;        final boolean permissionProblem = (exception instanceof IOException) &amp;&amp; (exception.getCause() instanceof FileSystemException) &amp;&amp; exception.getCause().getMessage().endsWith(&quot;Operation not permitted&quot;);</b>
+<b class="nc">&nbsp;        if (permissionProblem) {</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;JabRef does not have permission to access %s&quot;).formatted(exception.getCause().getMessage()));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(exception);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private FileNodeViewModel searchDirectory(Path directory) throws IOException {
+<b class="nc">&nbsp;        if ((directory == null) || !directory.toFile().isDirectory()) {</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;Invalid directory for searching: %s&quot;.formatted(directory));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        FileNodeViewModel parent = new FileNodeViewModel(directory);</b>
+&nbsp;        Map&lt;Boolean, List&lt;Path&gt;&gt; fileListPartition;
+&nbsp;
+<b class="nc">&nbsp;        try (Stream&lt;Path&gt; filesStream = Files.list(directory)) {</b>
+<b class="nc">&nbsp;            fileListPartition = filesStream.collect(Collectors.partitioningBy(path -&gt; path.toFile().isDirectory()));</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error searching files&quot;, e);</b>
+<b class="nc">&nbsp;            return parent;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Path&gt; subDirectories = fileListPartition.get(true);</b>
+<b class="nc">&nbsp;        List&lt;Path&gt; files = fileListPartition.get(false)</b>
+<b class="nc">&nbsp;                                            .stream()</b>
+<b class="nc">&nbsp;                                            .filter(path -&gt; path.toString().endsWith(TEX_EXT))</b>
+<b class="nc">&nbsp;                                            .toList();</b>
+<b class="nc">&nbsp;        int fileCount = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Path subDirectory : subDirectories) {</b>
+<b class="nc">&nbsp;            FileNodeViewModel subRoot = searchDirectory(subDirectory);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!subRoot.getChildren().isEmpty()) {</b>
+<b class="nc">&nbsp;                fileCount += subRoot.getFileCount();</b>
+<b class="nc">&nbsp;                parent.getChildren().add(subRoot);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        parent.setFileCount(files.size() + fileCount);</b>
+<b class="nc">&nbsp;        parent.getChildren().addAll(files.stream()</b>
+<b class="nc">&nbsp;                                         .map(FileNodeViewModel::new)</b>
+<b class="nc">&nbsp;                                         .toList());</b>
+<b class="nc">&nbsp;        return parent;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse all checked files in a background task.
+&nbsp;     */
+&nbsp;    public void parseButtonClicked() {
+<b class="nc">&nbsp;        List&lt;Path&gt; fileList = checkedFileList.stream()</b>
+<b class="nc">&nbsp;                                             .map(item -&gt; item.getValue().getPath())</b>
+<b class="nc">&nbsp;                                             .filter(path -&gt; path.toFile().isFile())</b>
+<b class="nc">&nbsp;                                             .toList();</b>
+<b class="nc">&nbsp;        if (fileList.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;There are no valid files checked&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(</b>
+<b class="nc">&nbsp;                databaseContext.getDatabase(),</b>
+<b class="nc">&nbsp;                preferences.getImportFormatPreferences(),</b>
+&nbsp;                fileMonitor);
+&nbsp;
+<b class="nc">&nbsp;        BackgroundTask.wrap(() -&gt; entriesResolver.resolve(new DefaultLatexParser().parse(fileList)))</b>
+<b class="nc">&nbsp;                      .onRunning(() -&gt; searchInProgress.set(true))</b>
+<b class="nc">&nbsp;                      .onFinished(() -&gt; searchInProgress.set(false))</b>
+<b class="nc">&nbsp;                      .onSuccess(result -&gt; dialogService.showCustomDialogAndWait(</b>
+<b class="nc">&nbsp;                              new ParseLatexResultView(result, databaseContext, Path.of(latexFileDirectory.get()))))</b>
+<b class="nc">&nbsp;                      .onFailure(dialogService::showErrorDialogAndWait)</b>
+<b class="nc">&nbsp;                      .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

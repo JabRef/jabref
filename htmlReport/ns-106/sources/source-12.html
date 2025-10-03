@@ -1,0 +1,324 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Month</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry</a>
+</div>
+
+<h1>Coverage Summary for Class: Month (org.jabref.model.entry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Month</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.FieldWriter;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a Month of the Year.
+&nbsp; */
+<b class="nc">&nbsp;public enum Month {</b>
+&nbsp;
+<b class="nc">&nbsp;    JANUARY(&quot;January&quot;, &quot;jan&quot;, 1),</b>
+<b class="nc">&nbsp;    FEBRUARY(&quot;February&quot;, &quot;feb&quot;, 2),</b>
+<b class="nc">&nbsp;    MARCH(&quot;March&quot;, &quot;mar&quot;, 3),</b>
+<b class="nc">&nbsp;    APRIL(&quot;April&quot;, &quot;apr&quot;, 4),</b>
+<b class="nc">&nbsp;    MAY(&quot;May&quot;, &quot;may&quot;, 5),</b>
+<b class="nc">&nbsp;    JUNE(&quot;June&quot;, &quot;jun&quot;, 6),</b>
+<b class="nc">&nbsp;    JULY(&quot;July&quot;, &quot;jul&quot;, 7),</b>
+<b class="nc">&nbsp;    AUGUST(&quot;August&quot;, &quot;aug&quot;, 8),</b>
+<b class="nc">&nbsp;    SEPTEMBER(&quot;September&quot;, &quot;sep&quot;, 9),</b>
+<b class="nc">&nbsp;    OCTOBER(&quot;October&quot;, &quot;oct&quot;, 10),</b>
+<b class="nc">&nbsp;    NOVEMBER(&quot;November&quot;, &quot;nov&quot;, 11),</b>
+<b class="nc">&nbsp;    DECEMBER(&quot;December&quot;, &quot;dec&quot;, 12);</b>
+&nbsp;
+&nbsp;    private final String fullName;
+&nbsp;    private final String shortName;
+&nbsp;    private final String twoDigitNumber;
+&nbsp;    private final int number;
+&nbsp;
+<b class="nc">&nbsp;    Month(String fullName, String shortName, int number) {</b>
+<b class="nc">&nbsp;        this.fullName = fullName;</b>
+<b class="nc">&nbsp;        this.shortName = shortName;</b>
+<b class="nc">&nbsp;        this.twoDigitNumber = &quot;%02d&quot;.formatted(number);</b>
+<b class="nc">&nbsp;        this.number = number;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find month by one-based number.
+&nbsp;     * If the number is not in the valid range, then an empty Optional is returned.
+&nbsp;     *
+&nbsp;     * @param number 1-12 is valid
+&nbsp;     */
+&nbsp;    public static Optional&lt;Month&gt; getMonthByNumber(int number) {
+<b class="nc">&nbsp;        for (Month month : Month.values()) {</b>
+<b class="nc">&nbsp;            if (month.number == number) {</b>
+<b class="nc">&nbsp;                return Optional.of(month);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find month by shortName (3 letters) case-insensitive.
+&nbsp;     * If no matching month is found, then an empty Optional is returned.
+&nbsp;     *
+&nbsp;     * @param shortName &quot;jan&quot;, &quot;feb&quot;, ...
+&nbsp;     */
+&nbsp;    public static Optional&lt;Month&gt; getMonthByShortName(String shortName) {
+<b class="nc">&nbsp;        for (Month month : Month.values()) {</b>
+<b class="nc">&nbsp;            if (month.shortName.equalsIgnoreCase(shortName)) {</b>
+<b class="nc">&nbsp;                return Optional.of(month);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method accepts three types of months:
+&nbsp;     * - Single and Double Digit months from 1 to 12 (01 to 12)
+&nbsp;     * - 3 Digit BibTeX strings (jan, feb, mar...) possibly with # prepended
+&nbsp;     * - Full English Month identifiers.
+&nbsp;     *
+&nbsp;     * @param value the given value
+&nbsp;     * @return the corresponding Month instance
+&nbsp;     */
+&nbsp;    public static Optional&lt;Month&gt; parse(String value) {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(value)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Much more liberal matching covering most known abbreviations etc.
+<b class="nc">&nbsp;        String testString = value.replace(&quot;#&quot;, &quot;&quot;).trim();</b>
+<b class="nc">&nbsp;        if (testString.length() &gt; 3) {</b>
+<b class="nc">&nbsp;            testString = testString.substring(0, 3);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Month&gt; month = Month.getMonthByShortName(testString);</b>
+<b class="nc">&nbsp;        if (month.isPresent()) {</b>
+<b class="nc">&nbsp;            return month;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        month = Month.parseGermanShortMonth(testString);</b>
+<b class="nc">&nbsp;        if (month.isPresent()) {</b>
+<b class="nc">&nbsp;            return month;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            int number = Integer.parseInt(value);</b>
+<b class="nc">&nbsp;            return Month.getMonthByNumber(number);</b>
+&nbsp;        } catch (NumberFormatException e) {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses a month having the string in German standard form such as
+&nbsp;     * &quot;Oktober&quot; or in German short form such as &quot;Okt&quot;
+&nbsp;     *
+&nbsp;     * @param value a String that represents a month in German form
+&nbsp;     * @return the corresponding month instance, empty if input is not in German
+&nbsp;     * form
+&nbsp;     */
+&nbsp;    static Optional&lt;Month&gt; parseGermanShortMonth(String value) {
+<b class="nc">&nbsp;        value = value.toLowerCase();</b>
+<b class="nc">&nbsp;        return switch (value) {</b>
+&nbsp;            case &quot;jan&quot;,
+&nbsp;                 &quot;januar&quot; -&gt;
+<b class="nc">&nbsp;                    Month.getMonthByNumber(1);</b>
+&nbsp;            case &quot;feb&quot;,
+&nbsp;                 &quot;februar&quot; -&gt;
+<b class="nc">&nbsp;                    Month.getMonthByNumber(2);</b>
+&nbsp;            case &quot;mär&quot;,
+&nbsp;                 &quot;mae&quot;,
+&nbsp;                 &quot;märz&quot;,
+&nbsp;                 &quot;maerz&quot; -&gt;
+<b class="nc">&nbsp;                    Month.getMonthByNumber(3);</b>
+&nbsp;            case &quot;apr&quot;,
+&nbsp;                 &quot;april&quot; -&gt;
+<b class="nc">&nbsp;                    Month.getMonthByNumber(4);</b>
+&nbsp;            case &quot;mai&quot; -&gt;
+<b class="nc">&nbsp;                    Month.getMonthByNumber(5);</b>
+&nbsp;            case &quot;jun&quot;,
+&nbsp;                 &quot;juni&quot; -&gt;
+<b class="nc">&nbsp;                    Month.getMonthByNumber(6);</b>
+&nbsp;            case &quot;jul&quot;,
+&nbsp;                 &quot;juli&quot; -&gt;
+<b class="nc">&nbsp;                    Month.getMonthByNumber(7);</b>
+&nbsp;            case &quot;aug&quot;,
+&nbsp;                 &quot;august&quot; -&gt;
+<b class="nc">&nbsp;                    Month.getMonthByNumber(8);</b>
+&nbsp;            case &quot;sep&quot;,
+&nbsp;                 &quot;september&quot; -&gt;
+<b class="nc">&nbsp;                    Month.getMonthByNumber(9);</b>
+&nbsp;            case &quot;okt&quot;,
+&nbsp;                 &quot;oktober&quot; -&gt;
+<b class="nc">&nbsp;                    Month.getMonthByNumber(10);</b>
+&nbsp;            case &quot;nov&quot;,
+&nbsp;                 &quot;november&quot; -&gt;
+<b class="nc">&nbsp;                    Month.getMonthByNumber(11);</b>
+&nbsp;            case &quot;dez&quot;,
+&nbsp;                 &quot;dezember&quot; -&gt;
+<b class="nc">&nbsp;                    Month.getMonthByNumber(12);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    Optional.empty();</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the name of a Month in a short (3-letter) format. (jan, feb, mar, ...)
+&nbsp;     *
+&nbsp;     * @return 3-letter identifier for a Month
+&nbsp;     */
+&nbsp;    public String getShortName() {
+<b class="nc">&nbsp;        return shortName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the month in JabRef format. The format is the short 3-digit name surrounded by a &#39;#&#39; (FieldWriter.BIBTEX_STRING_START_END_SYMBOL).
+&nbsp;     * Example: #jan#, #feb#, etc.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * See &lt;a href=&quot;https://github.com/JabRef/jabref/issues/263#issuecomment-151246595&quot;&gt;Issue 263&lt;/a&gt; for a discussion on that thing.
+&nbsp;     * This seems to be an &lt;em&gt;invalid&lt;/em&gt; format in terms of plain BiBTeX, but a &lt;em&gt;valid&lt;/em&gt; format in the case of JabRef.
+&nbsp;     * The documentation is available at the &lt;a href=&quot;https://docs.jabref.org/fields/strings&quot;&gt;Strings help&lt;/a&gt; of JabRef.
+&nbsp;     *
+&nbsp;     * @return Month in JabRef format
+&nbsp;     */
+&nbsp;    public String getJabRefFormat() {
+<b class="nc">&nbsp;        return (FieldWriter.BIBTEX_STRING_START_END_SYMBOL + &quot;%s&quot; + FieldWriter.BIBTEX_STRING_START_END_SYMBOL).formatted(shortName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of the Month in a 1-indexed fashion: 1 -&gt; January, 2 -&gt; February etc.
+&nbsp;     *
+&nbsp;     * @return number of the month in the Year
+&nbsp;     */
+&nbsp;    public int getNumber() {
+<b class="nc">&nbsp;        return number;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the name of the long in unabbreviated english.
+&nbsp;     *
+&nbsp;     * @return Month
+&nbsp;     */
+&nbsp;    public String getFullName() {
+<b class="nc">&nbsp;        return fullName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of the Month in a 1-indexed fashion using exactly two digits: 01 -&gt; January, 02 -&gt; February...
+&nbsp;     *
+&nbsp;     * @return number of the month in the Year with two digits
+&nbsp;     */
+&nbsp;    public String getTwoDigitNumber() {
+<b class="nc">&nbsp;        return twoDigitNumber;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

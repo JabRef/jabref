@@ -1,0 +1,299 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GeneralTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.general</a>
+</div>
+
+<h1>Coverage Summary for Class: GeneralTab (org.jabref.gui.preferences.general)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GeneralTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/73)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.general;
+&nbsp;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.Spinner;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;import javafx.scene.control.TextFormatter;
+&nbsp;import javafx.util.converter.IntegerStringConverter;
+&nbsp;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.help.HelpAction;
+&nbsp;import org.jabref.gui.preferences.AbstractPreferenceTabView;
+&nbsp;import org.jabref.gui.preferences.PreferencesTab;
+&nbsp;import org.jabref.gui.theme.ThemeTypes;
+&nbsp;import org.jabref.gui.util.IconValidationDecorator;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.l10n.Language;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class GeneralTab extends AbstractPreferenceTabView&lt;GeneralTabViewModel&gt; implements PreferencesTab {
+&nbsp;
+&nbsp;    @FXML private ComboBox&lt;Language&gt; language;
+&nbsp;    @FXML private ComboBox&lt;ThemeTypes&gt; theme;
+&nbsp;    @FXML private CheckBox themeSyncOs;
+&nbsp;    @FXML private TextField customThemePath;
+&nbsp;    @FXML private Button customThemeBrowse;
+&nbsp;    @FXML private CheckBox fontOverride;
+&nbsp;    @FXML private Spinner&lt;Integer&gt; fontSize;
+&nbsp;    @FXML private CheckBox openLastStartup;
+&nbsp;    @FXML private CheckBox showAdvancedHints;
+&nbsp;    @FXML private CheckBox inspectionWarningDuplicate;
+&nbsp;
+&nbsp;    @FXML private CheckBox confirmDelete;
+&nbsp;    @FXML private CheckBox shouldAskForIncludingCrossReferences;
+&nbsp;    @FXML private CheckBox confirmHideTabBar;
+&nbsp;    @FXML private CheckBox donationNeverShow;
+&nbsp;    @FXML private ComboBox&lt;BibDatabaseMode&gt; biblatexMode;
+&nbsp;    @FXML private CheckBox alwaysReformatBib;
+&nbsp;    @FXML private CheckBox autosaveLocalLibraries;
+&nbsp;    @FXML private Button autosaveLocalLibrariesHelp;
+&nbsp;    @FXML private CheckBox createBackup;
+&nbsp;    @FXML private TextField backupDirectory;
+&nbsp;    @FXML private CheckBox remoteServer;
+&nbsp;    @FXML private TextField remotePort;
+&nbsp;    @FXML private CheckBox enableHttpServer;
+&nbsp;    @FXML private TextField httpServerPort;
+&nbsp;    @FXML private CheckBox enableLanguageServer;
+&nbsp;    @FXML private TextField languageServerPort;
+&nbsp;    @FXML private Button remoteHelp;
+&nbsp;    @Inject private FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    @Inject private BibEntryTypesManager entryTypesManager;
+&nbsp;
+<b class="nc">&nbsp;    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();</b>
+&nbsp;
+&nbsp;    // The fontSizeFormatter formats the input given to the fontSize spinner so that non valid values cannot be entered.
+<b class="nc">&nbsp;    private final TextFormatter&lt;Integer&gt; fontSizeFormatter = new TextFormatter&lt;&gt;(new IntegerStringConverter(), 9,</b>
+&nbsp;            c -&gt; {
+<b class="nc">&nbsp;                if (Pattern.matches(&quot;\\d*&quot;, c.getText())) {</b>
+<b class="nc">&nbsp;                    return c;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                c.setText(&quot;0&quot;);</b>
+<b class="nc">&nbsp;                return c;</b>
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;    public GeneralTab() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;General&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new GeneralTabViewModel(dialogService, preferences, fileUpdateMonitor);</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;Language&gt;()</b>
+<b class="nc">&nbsp;                .withText(Language::getDisplayName)</b>
+<b class="nc">&nbsp;                .install(language);</b>
+<b class="nc">&nbsp;        language.itemsProperty().bind(viewModel.languagesListProperty());</b>
+<b class="nc">&nbsp;        language.valueProperty().bindBidirectional(viewModel.selectedLanguageProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        fontOverride.selectedProperty().bindBidirectional(viewModel.fontOverrideProperty());</b>
+&nbsp;
+&nbsp;        // Spinner does neither support alignment nor disableProperty in FXML
+<b class="nc">&nbsp;        fontSize.disableProperty().bind(fontOverride.selectedProperty().not());</b>
+<b class="nc">&nbsp;        fontSize.getEditor().setAlignment(Pos.CENTER_RIGHT);</b>
+<b class="nc">&nbsp;        fontSize.setValueFactory(GeneralTabViewModel.fontSizeValueFactory);</b>
+<b class="nc">&nbsp;        fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());</b>
+<b class="nc">&nbsp;        fontSize.getEditor().setTextFormatter(fontSizeFormatter);</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;ThemeTypes&gt;()</b>
+<b class="nc">&nbsp;                .withText(ThemeTypes::getDisplayName)</b>
+<b class="nc">&nbsp;                .install(theme);</b>
+<b class="nc">&nbsp;        theme.itemsProperty().bind(viewModel.themesListProperty());</b>
+<b class="nc">&nbsp;        theme.valueProperty().bindBidirectional(viewModel.selectedThemeProperty());</b>
+<b class="nc">&nbsp;        themeSyncOs.selectedProperty().bindBidirectional(viewModel.themeSyncOsProperty());</b>
+<b class="nc">&nbsp;        customThemePath.textProperty().bindBidirectional(viewModel.customPathToThemeProperty());</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.selectedThemeProperty(), theme -&gt; {</b>
+<b class="nc">&nbsp;            boolean isCustomTheme = theme == ThemeTypes.CUSTOM;</b>
+<b class="nc">&nbsp;            customThemePath.disableProperty().set(!isCustomTheme);</b>
+<b class="nc">&nbsp;            customThemeBrowse.disableProperty().set(!isCustomTheme);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        validationVisualizer.setDecoration(new IconValidationDecorator());</b>
+&nbsp;
+<b class="nc">&nbsp;        openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());</b>
+<b class="nc">&nbsp;        showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());</b>
+<b class="nc">&nbsp;        inspectionWarningDuplicate.selectedProperty().bindBidirectional(viewModel.inspectionWarningDuplicateProperty());</b>
+<b class="nc">&nbsp;        confirmDelete.selectedProperty().bindBidirectional(viewModel.confirmDeleteProperty());</b>
+<b class="nc">&nbsp;        shouldAskForIncludingCrossReferences.selectedProperty().bindBidirectional(viewModel.shouldAskForIncludingCrossReferences());</b>
+<b class="nc">&nbsp;        confirmHideTabBar.selectedProperty().bindBidirectional(viewModel.confirmHideTabBarProperty());</b>
+<b class="nc">&nbsp;        donationNeverShow.selectedProperty().bindBidirectional(viewModel.donationNeverShowProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;BibDatabaseMode&gt;()</b>
+<b class="nc">&nbsp;                .withText(BibDatabaseMode::getFormattedName)</b>
+<b class="nc">&nbsp;                .install(biblatexMode);</b>
+<b class="nc">&nbsp;        biblatexMode.itemsProperty().bind(viewModel.biblatexModeListProperty());</b>
+<b class="nc">&nbsp;        biblatexMode.valueProperty().bindBidirectional(viewModel.selectedBiblatexModeProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());</b>
+<b class="nc">&nbsp;        autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());</b>
+<b class="nc">&nbsp;        ActionFactory actionFactory = new ActionFactory();</b>
+<b class="nc">&nbsp;        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService, preferences.getExternalApplicationsPreferences()), autosaveLocalLibrariesHelp);</b>
+<b class="nc">&nbsp;        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferences.getExternalApplicationsPreferences()), remoteHelp);</b>
+&nbsp;
+<b class="nc">&nbsp;        createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());</b>
+<b class="nc">&nbsp;        backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());</b>
+<b class="nc">&nbsp;        backupDirectory.disableProperty().bind(viewModel.createBackupProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;            validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);</b>
+<b class="nc">&nbsp;            validationVisualizer.initVisualization(viewModel.httpPortValidationStatus(), httpServerPort);</b>
+<b class="nc">&nbsp;            validationVisualizer.initVisualization(viewModel.languageServerPortValidationStatus(), languageServerPort);</b>
+<b class="nc">&nbsp;            validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);</b>
+<b class="nc">&nbsp;            validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());</b>
+<b class="nc">&nbsp;        remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());</b>
+<b class="nc">&nbsp;        remotePort.disableProperty().bind(remoteServer.selectedProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        enableHttpServer.selectedProperty().bindBidirectional(viewModel.enableHttpServerProperty());</b>
+<b class="nc">&nbsp;        httpServerPort.textProperty().bindBidirectional(viewModel.httpPortProperty());</b>
+<b class="nc">&nbsp;        httpServerPort.disableProperty().bind(enableHttpServer.selectedProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        enableLanguageServer.selectedProperty().bindBidirectional(viewModel.enableLanguageServerProperty());</b>
+<b class="nc">&nbsp;        languageServerPort.textProperty().bindBidirectional(viewModel.languageServerPortProperty());</b>
+<b class="nc">&nbsp;        languageServerPort.disableProperty().bind(enableLanguageServer.selectedProperty().not());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void importTheme() {
+<b class="nc">&nbsp;        viewModel.importCSSFile();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void backupFileDirBrowse() {
+<b class="nc">&nbsp;        viewModel.backupFileDirBrowse();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void openBrowser() {
+<b class="nc">&nbsp;        viewModel.openBrowser();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

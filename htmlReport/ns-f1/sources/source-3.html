@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PostgreServer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.search</a>
+</div>
+
+<h1>Coverage Summary for Class: PostgreServer (org.jabref.logic.search)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PostgreServer</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (7/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    58.3%
+  </span>
+  <span class="absValue">
+    (7/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.3%
+  </span>
+  <span class="absValue">
+    (29/38)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.search;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.SQLException;
+&nbsp;
+&nbsp;import javax.sql.DataSource;
+&nbsp;
+&nbsp;import org.jabref.model.search.PostgreConstants;
+&nbsp;
+&nbsp;import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import static org.jabref.model.search.PostgreConstants.BIB_FIELDS_SCHEME;
+&nbsp;
+&nbsp;public class PostgreServer {
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PostgreServer.class);</b>
+&nbsp;    private final EmbeddedPostgres embeddedPostgres;
+&nbsp;    private final DataSource dataSource;
+&nbsp;
+<b class="fc">&nbsp;    public PostgreServer() {</b>
+&nbsp;        EmbeddedPostgres embeddedPostgres;
+&nbsp;        try {
+<b class="fc">&nbsp;            embeddedPostgres = EmbeddedPostgres.builder()</b>
+<b class="fc">&nbsp;                                               .setOutputRedirector(ProcessBuilder.Redirect.DISCARD)</b>
+<b class="fc">&nbsp;                                               .start();</b>
+<b class="fc">&nbsp;            LOGGER.info(&quot;Postgres server started, connection port: {}&quot;, embeddedPostgres.getPort());</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not start Postgres server&quot;, e);</b>
+<b class="nc">&nbsp;            this.embeddedPostgres = null;</b>
+<b class="nc">&nbsp;            this.dataSource = null;</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        this.embeddedPostgres = embeddedPostgres;</b>
+<b class="fc">&nbsp;        this.dataSource = embeddedPostgres.getPostgresDatabase();</b>
+<b class="fc">&nbsp;        addTrigramExtension();</b>
+<b class="fc">&nbsp;        createScheme();</b>
+<b class="fc">&nbsp;        addFunctions();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createScheme() {
+<b class="fc">&nbsp;        try (Connection connection = getConnection()) {</b>
+<b class="pc">&nbsp;            if (connection != null) {</b>
+<b class="fc">&nbsp;                LOGGER.debug(&quot;Creating scheme for bib fields&quot;);</b>
+<b class="fc">&nbsp;                connection.createStatement().execute(&quot;DROP SCHEMA IF EXISTS &quot; + BIB_FIELDS_SCHEME);</b>
+<b class="fc">&nbsp;                connection.createStatement().execute(&quot;CREATE SCHEMA &quot; + BIB_FIELDS_SCHEME);</b>
+&nbsp;            }
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not create scheme for bib fields&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addTrigramExtension() {
+<b class="fc">&nbsp;        try (Connection connection = getConnection()) {</b>
+<b class="pc">&nbsp;            if (connection != null) {</b>
+<b class="fc">&nbsp;                LOGGER.debug(&quot;Adding trigram extension to Postgres server&quot;);</b>
+<b class="fc">&nbsp;                connection.createStatement().execute(&quot;CREATE EXTENSION IF NOT EXISTS pg_trgm&quot;);</b>
+&nbsp;            }
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not add trigram extension to Postgres server&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addFunctions() {
+<b class="fc">&nbsp;        try (Connection connection = getConnection()) {</b>
+<b class="pc">&nbsp;            if (connection != null) {</b>
+<b class="fc">&nbsp;                LOGGER.debug(&quot;Adding functions to Postgres server&quot;);</b>
+<b class="fc">&nbsp;                for (String function : PostgreConstants.POSTGRES_FUNCTIONS) {</b>
+<b class="fc">&nbsp;                    connection.createStatement().execute(function);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not add functions to Postgres server&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Connection getConnection() {
+<b class="pc">&nbsp;        if (dataSource != null) {</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                return dataSource.getConnection();</b>
+&nbsp;            } catch (SQLException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Could not get connection to Postgres server&quot;, e);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void shutdown() {
+<b class="pc">&nbsp;        if (embeddedPostgres != null) {</b>
+&nbsp;            try {
+<b class="fc">&nbsp;                embeddedPostgres.close();</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Could not shutdown Postgres server&quot;, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

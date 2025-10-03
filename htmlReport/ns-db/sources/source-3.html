@@ -1,0 +1,821 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LayoutEntry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout</a>
+</div>
+
+<h1>Coverage Summary for Class: LayoutEntry (org.jabref.logic.layout)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LayoutEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/244)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/279)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout;
+&nbsp;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.layout.format.AuthorAbbreviator;
+&nbsp;import org.jabref.logic.layout.format.AuthorAndToSemicolonReplacer;
+&nbsp;import org.jabref.logic.layout.format.AuthorAndsCommaReplacer;
+&nbsp;import org.jabref.logic.layout.format.AuthorAndsReplacer;
+&nbsp;import org.jabref.logic.layout.format.AuthorFirstAbbrLastCommas;
+&nbsp;import org.jabref.logic.layout.format.AuthorFirstAbbrLastOxfordCommas;
+&nbsp;import org.jabref.logic.layout.format.AuthorFirstFirst;
+&nbsp;import org.jabref.logic.layout.format.AuthorFirstFirstCommas;
+&nbsp;import org.jabref.logic.layout.format.AuthorFirstLastCommas;
+&nbsp;import org.jabref.logic.layout.format.AuthorFirstLastOxfordCommas;
+&nbsp;import org.jabref.logic.layout.format.AuthorLF_FF;
+&nbsp;import org.jabref.logic.layout.format.AuthorLF_FFAbbr;
+&nbsp;import org.jabref.logic.layout.format.AuthorLastFirst;
+&nbsp;import org.jabref.logic.layout.format.AuthorLastFirstAbbrCommas;
+&nbsp;import org.jabref.logic.layout.format.AuthorLastFirstAbbrOxfordCommas;
+&nbsp;import org.jabref.logic.layout.format.AuthorLastFirstAbbreviator;
+&nbsp;import org.jabref.logic.layout.format.AuthorLastFirstCommas;
+&nbsp;import org.jabref.logic.layout.format.AuthorLastFirstOxfordCommas;
+&nbsp;import org.jabref.logic.layout.format.AuthorNatBib;
+&nbsp;import org.jabref.logic.layout.format.AuthorOrgSci;
+&nbsp;import org.jabref.logic.layout.format.Authors;
+&nbsp;import org.jabref.logic.layout.format.CSLType;
+&nbsp;import org.jabref.logic.layout.format.CompositeFormat;
+&nbsp;import org.jabref.logic.layout.format.CreateBibORDFAuthors;
+&nbsp;import org.jabref.logic.layout.format.CreateDocBook4Authors;
+&nbsp;import org.jabref.logic.layout.format.CreateDocBook4Editors;
+&nbsp;import org.jabref.logic.layout.format.CreateDocBook5Authors;
+&nbsp;import org.jabref.logic.layout.format.CreateDocBook5Editors;
+&nbsp;import org.jabref.logic.layout.format.CurrentDate;
+&nbsp;import org.jabref.logic.layout.format.DOICheck;
+&nbsp;import org.jabref.logic.layout.format.DOIStrip;
+&nbsp;import org.jabref.logic.layout.format.DateFormatter;
+&nbsp;import org.jabref.logic.layout.format.Default;
+&nbsp;import org.jabref.logic.layout.format.EntryTypeFormatter;
+&nbsp;import org.jabref.logic.layout.format.FileLink;
+&nbsp;import org.jabref.logic.layout.format.FirstPage;
+&nbsp;import org.jabref.logic.layout.format.FormatPagesForHTML;
+&nbsp;import org.jabref.logic.layout.format.FormatPagesForXML;
+&nbsp;import org.jabref.logic.layout.format.GetOpenOfficeType;
+&nbsp;import org.jabref.logic.layout.format.HTMLChars;
+&nbsp;import org.jabref.logic.layout.format.HTMLParagraphs;
+&nbsp;import org.jabref.logic.layout.format.HayagrivaType;
+&nbsp;import org.jabref.logic.layout.format.IfPlural;
+&nbsp;import org.jabref.logic.layout.format.Iso690FormatDate;
+&nbsp;import org.jabref.logic.layout.format.Iso690NamesAuthors;
+&nbsp;import org.jabref.logic.layout.format.JournalAbbreviator;
+&nbsp;import org.jabref.logic.layout.format.LastPage;
+&nbsp;import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+&nbsp;import org.jabref.logic.layout.format.MarkdownFormatter;
+&nbsp;import org.jabref.logic.layout.format.NameFormatter;
+&nbsp;import org.jabref.logic.layout.format.NoSpaceBetweenAbbreviations;
+&nbsp;import org.jabref.logic.layout.format.NonSpaceWhitespaceRemover;
+&nbsp;import org.jabref.logic.layout.format.NotFoundFormatter;
+&nbsp;import org.jabref.logic.layout.format.Number;
+&nbsp;import org.jabref.logic.layout.format.Ordinal;
+&nbsp;import org.jabref.logic.layout.format.RTFChars;
+&nbsp;import org.jabref.logic.layout.format.RemoveBrackets;
+&nbsp;import org.jabref.logic.layout.format.RemoveBracketsAddComma;
+&nbsp;import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+&nbsp;import org.jabref.logic.layout.format.RemoveTilde;
+&nbsp;import org.jabref.logic.layout.format.Replace;
+&nbsp;import org.jabref.logic.layout.format.ReplaceWithEscapedDoubleQuotes;
+&nbsp;import org.jabref.logic.layout.format.RisAuthors;
+&nbsp;import org.jabref.logic.layout.format.RisKeywords;
+&nbsp;import org.jabref.logic.layout.format.RisMonth;
+&nbsp;import org.jabref.logic.layout.format.ShortMonthFormatter;
+&nbsp;import org.jabref.logic.layout.format.ToLowerCase;
+&nbsp;import org.jabref.logic.layout.format.ToUpperCase;
+&nbsp;import org.jabref.logic.layout.format.WrapContent;
+&nbsp;import org.jabref.logic.layout.format.WrapFileLinks;
+&nbsp;import org.jabref.logic.layout.format.XMLChars;
+&nbsp;import org.jabref.logic.openoffice.style.OOPreFormatter;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;class LayoutEntry {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LayoutEntry.class);</b>
+&nbsp;
+&nbsp;    private List&lt;LayoutFormatter&gt; option;
+&nbsp;    // Formatter to be run after other formatters:
+&nbsp;    private LayoutFormatter postFormatter;
+&nbsp;
+&nbsp;    private String text;
+&nbsp;    private List&lt;LayoutEntry&gt; layoutEntries;
+&nbsp;    private final int type;
+<b class="nc">&nbsp;    private final List&lt;String&gt; invalidFormatter = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final List&lt;Path&gt; fileDirForDatabase;
+&nbsp;    private final LayoutFormatterPreferences preferences;
+&nbsp;    private final JournalAbbreviationRepository abbreviationRepository;
+&nbsp;
+&nbsp;    public LayoutEntry(StringInt si,
+&nbsp;                       List&lt;Path&gt; fileDirForDatabase,
+&nbsp;                       LayoutFormatterPreferences preferences,
+<b class="nc">&nbsp;                       JournalAbbreviationRepository abbreviationRepository) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+<b class="nc">&nbsp;        this.fileDirForDatabase = Objects.requireNonNullElse(fileDirForDatabase, List.of());</b>
+&nbsp;
+<b class="nc">&nbsp;        type = si.i;</b>
+<b class="nc">&nbsp;        switch (type) {</b>
+&nbsp;            case LayoutHelper.IS_LAYOUT_TEXT -&gt;
+<b class="nc">&nbsp;                    text = si.s;</b>
+&nbsp;            case LayoutHelper.IS_SIMPLE_COMMAND -&gt;
+<b class="nc">&nbsp;                    text = si.s.trim();</b>
+&nbsp;            case LayoutHelper.IS_OPTION_FIELD -&gt;
+<b class="nc">&nbsp;                    doOptionField(si.s);</b>
+&nbsp;            default -&gt; {
+&nbsp;                // IS_FIELD_START and IS_FIELD_END
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public LayoutEntry(List&lt;StringInt&gt; parsedEntries,
+&nbsp;                       int layoutType,
+&nbsp;                       List&lt;Path&gt; fileDirForDatabase,
+&nbsp;                       LayoutFormatterPreferences preferences,
+<b class="nc">&nbsp;                       JournalAbbreviationRepository abbreviationRepository) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+<b class="nc">&nbsp;        this.fileDirForDatabase = Objects.requireNonNullElse(fileDirForDatabase, List.of());</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;LayoutEntry&gt; tmpEntries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        String blockStart = parsedEntries.getFirst().s;</b>
+<b class="nc">&nbsp;        String blockEnd = parsedEntries.getLast().s;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!blockStart.equals(blockEnd)) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Field start and end entry must be equal.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        type = layoutType;</b>
+<b class="nc">&nbsp;        text = blockEnd;</b>
+<b class="nc">&nbsp;        List&lt;StringInt&gt; blockEntries = null;</b>
+<b class="nc">&nbsp;        for (StringInt parsedEntry : parsedEntries.subList(1, parsedEntries.size() - 1)) {</b>
+<b class="nc">&nbsp;            switch (parsedEntry.i) {</b>
+&nbsp;                case LayoutHelper.IS_FIELD_START:
+&nbsp;                case LayoutHelper.IS_GROUP_START:
+<b class="nc">&nbsp;                    blockEntries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;                    blockStart = parsedEntry.s;</b>
+&nbsp;                    break;
+&nbsp;                case LayoutHelper.IS_FIELD_END:
+&nbsp;                case LayoutHelper.IS_GROUP_END:
+<b class="nc">&nbsp;                    if (blockStart.equals(parsedEntry.s)) {</b>
+<b class="nc">&nbsp;                        blockEntries.add(parsedEntry);</b>
+<b class="nc">&nbsp;                        int groupType = parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START :</b>
+<b class="nc">&nbsp;                                        LayoutHelper.IS_FIELD_START;</b>
+<b class="nc">&nbsp;                        LayoutEntry le = new LayoutEntry(blockEntries, groupType, fileDirForDatabase, preferences, abbreviationRepository);</b>
+<b class="nc">&nbsp;                        tmpEntries.add(le);</b>
+<b class="nc">&nbsp;                        blockEntries = null;</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        LOGGER.warn(&quot;Nested field entries are not implemented!&quot;);</b>
+&nbsp;                    }
+&nbsp;                    break;
+&nbsp;                case LayoutHelper.IS_LAYOUT_TEXT:
+&nbsp;                case LayoutHelper.IS_SIMPLE_COMMAND:
+&nbsp;                case LayoutHelper.IS_OPTION_FIELD:
+&nbsp;                default:
+&nbsp;                    // Do nothing
+&nbsp;                    break;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (blockEntries == null) {</b>
+<b class="nc">&nbsp;                tmpEntries.add(new LayoutEntry(parsedEntry, fileDirForDatabase, preferences, abbreviationRepository));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                blockEntries.add(parsedEntry);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        layoutEntries = new ArrayList&lt;&gt;(tmpEntries);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (LayoutEntry layoutEntry : layoutEntries) {</b>
+<b class="nc">&nbsp;            invalidFormatter.addAll(layoutEntry.getInvalidFormatters());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPostFormatter(LayoutFormatter formatter) {
+<b class="nc">&nbsp;        this.postFormatter = formatter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String doLayout(BibEntry bibEntry, BibDatabase database) {
+<b class="nc">&nbsp;        switch (type) {</b>
+&nbsp;            case LayoutHelper.IS_LAYOUT_TEXT:
+<b class="nc">&nbsp;                return text;</b>
+&nbsp;            case LayoutHelper.IS_SIMPLE_COMMAND:
+<b class="nc">&nbsp;                String value = bibEntry.getResolvedFieldOrAlias(FieldFactory.parseField(text), database).orElse(&quot;&quot;);</b>
+&nbsp;
+&nbsp;                // If a post formatter has been set, call it:
+<b class="nc">&nbsp;                if (postFormatter != null) {</b>
+<b class="nc">&nbsp;                    value = postFormatter.format(value);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return value;</b>
+&nbsp;            case LayoutHelper.IS_FIELD_START:
+&nbsp;            case LayoutHelper.IS_GROUP_START:
+<b class="nc">&nbsp;                return handleFieldOrGroupStart(bibEntry, database);</b>
+&nbsp;            case LayoutHelper.IS_OPTION_FIELD:
+<b class="nc">&nbsp;                return handleOptionField(bibEntry, database);</b>
+&nbsp;            case LayoutHelper.IS_ENCODING_NAME:
+&nbsp;                // Printing the encoding name is not supported in entry layouts, only
+&nbsp;                // in begin/end layouts. This prevents breakage if some users depend
+&nbsp;                // on a field called &quot;encoding&quot;. We simply return this field instead:
+<b class="nc">&nbsp;                return bibEntry.getResolvedFieldOrAlias(new UnknownField(&quot;encoding&quot;), database).orElse(null);</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String resolveFieldEntry(BibEntry bidEntry, BibDatabase database) {
+&nbsp;        // resolve field (recognized by leading backslash) or text
+<b class="nc">&nbsp;        if (text.startsWith(&quot;\\&quot;)) {</b>
+<b class="nc">&nbsp;            return bidEntry.getResolvedFieldOrAlias(FieldFactory.parseField(text.substring(1)), database)</b>
+<b class="nc">&nbsp;                           .orElse(&quot;&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (database == null) {</b>
+<b class="nc">&nbsp;            return text;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return database.resolveForStrings(text);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String handleOptionField(BibEntry bibtex, BibDatabase database) {
+&nbsp;        String fieldEntry;
+&nbsp;
+<b class="nc">&nbsp;        if (InternalField.TYPE_HEADER.getName().equals(text)) {</b>
+<b class="nc">&nbsp;            fieldEntry = bibtex.getType().getDisplayName();</b>
+<b class="nc">&nbsp;        } else if (InternalField.OBSOLETE_TYPE_HEADER.getName().equals(text)) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;&#39;{}&#39; is an obsolete name for the entry type. Please update your layout to use &#39;{}&#39; instead.&quot;, InternalField.OBSOLETE_TYPE_HEADER, InternalField.TYPE_HEADER);</b>
+<b class="nc">&nbsp;            fieldEntry = bibtex.getType().getDisplayName();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            fieldEntry = resolveFieldEntry(bibtex, database);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (option != null) {</b>
+<b class="nc">&nbsp;            for (LayoutFormatter anOption : option) {</b>
+<b class="nc">&nbsp;                fieldEntry = anOption.format(fieldEntry);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // If a post formatter has been set, call it:
+<b class="nc">&nbsp;        if (postFormatter != null) {</b>
+<b class="nc">&nbsp;            fieldEntry = postFormatter.format(fieldEntry);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return fieldEntry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database) {
+&nbsp;        Optional&lt;String&gt; field;
+<b class="nc">&nbsp;        boolean negated = false;</b>
+<b class="nc">&nbsp;        if (type == LayoutHelper.IS_GROUP_START) {</b>
+<b class="nc">&nbsp;            field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(text), database);</b>
+<b class="nc">&nbsp;        } else if (text.matches(&quot;.*(;|(\\&amp;+)).*&quot;)) {</b>
+&nbsp;            // split the strings along &amp;, &amp;&amp; or ; for AND formatter
+<b class="nc">&nbsp;            String[] parts = text.split(&quot;\\s*(;|(\\&amp;+))\\s*&quot;);</b>
+<b class="nc">&nbsp;            field = Optional.empty();</b>
+<b class="nc">&nbsp;            for (String part : parts) {</b>
+<b class="nc">&nbsp;                negated = part.startsWith(&quot;!&quot;);</b>
+<b class="nc">&nbsp;                field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(negated ? part.substring(1).trim() : part), database);</b>
+<b class="nc">&nbsp;                if (field.isPresent() == negated) {</b>
+&nbsp;                    break;
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } else {
+&nbsp;            // split the strings along |, ||  for OR formatter
+<b class="nc">&nbsp;            String[] parts = text.split(&quot;\\s*(\\|+)\\s*&quot;);</b>
+<b class="nc">&nbsp;            field = Optional.empty();</b>
+<b class="nc">&nbsp;            for (String part : parts) {</b>
+<b class="nc">&nbsp;                negated = part.startsWith(&quot;!&quot;);</b>
+<b class="nc">&nbsp;                field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(negated ? part.substring(1).trim() : part), database);</b>
+<b class="nc">&nbsp;                if (field.isPresent() ^ negated) {</b>
+&nbsp;                    break;
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if ((field.isPresent() == negated) || ((type == LayoutHelper.IS_GROUP_START)</b>
+<b class="nc">&nbsp;                &amp;&amp; field.get().equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (type == LayoutHelper.IS_GROUP_START) {</b>
+<b class="nc">&nbsp;                LayoutHelper.setCurrentGroup(field.get());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            StringBuilder sb = new StringBuilder(100);</b>
+&nbsp;            String fieldText;
+<b class="nc">&nbsp;            boolean previousSkipped = false;</b>
+&nbsp;
+<b class="nc">&nbsp;            for (int i = 0; i &lt; layoutEntries.size(); i++) {</b>
+<b class="nc">&nbsp;                fieldText = layoutEntries.get(i).doLayout(bibtex, database);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (fieldText == null) {</b>
+<b class="nc">&nbsp;                    if ((i + 1) &lt; layoutEntries.size()) {</b>
+<b class="nc">&nbsp;                        if (layoutEntries.get(i + 1).doLayout(bibtex, database).trim().isEmpty()) {</b>
+<b class="nc">&nbsp;                            i++;</b>
+<b class="nc">&nbsp;                            previousSkipped = true;</b>
+&nbsp;                            continue;
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                } else {
+&nbsp;                    // if previous was skipped --&gt; remove leading line
+&nbsp;                    // breaks
+<b class="nc">&nbsp;                    if (previousSkipped) {</b>
+<b class="nc">&nbsp;                        int eol = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;                        while ((eol &lt; fieldText.length())</b>
+<b class="nc">&nbsp;                                &amp;&amp; ((fieldText.charAt(eol) == &#39;\n&#39;) || (fieldText.charAt(eol) == &#39;\r&#39;))) {</b>
+<b class="nc">&nbsp;                            eol++;</b>
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        if (eol &lt; fieldText.length()) {</b>
+<b class="nc">&nbsp;                            sb.append(fieldText.substring(eol));</b>
+&nbsp;                        }
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        sb.append(fieldText);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                previousSkipped = false;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return sb.toString();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Do layout for general formatters (no bibtex-entry fields).
+&nbsp;     *
+&nbsp;     * @param databaseContext Bibtex Database
+&nbsp;     */
+&nbsp;    public String doLayout(BibDatabaseContext databaseContext, Charset encoding) {
+<b class="nc">&nbsp;        switch (type) {</b>
+&nbsp;            case LayoutHelper.IS_LAYOUT_TEXT:
+<b class="nc">&nbsp;                return text;</b>
+&nbsp;
+&nbsp;            case LayoutHelper.IS_SIMPLE_COMMAND:
+<b class="nc">&nbsp;                throw new UnsupportedOperationException(&quot;bibtex entry fields not allowed in begin or end layout&quot;);</b>
+&nbsp;
+&nbsp;            case LayoutHelper.IS_FIELD_START:
+&nbsp;            case LayoutHelper.IS_GROUP_START:
+<b class="nc">&nbsp;                throw new UnsupportedOperationException(&quot;field and group starts not allowed in begin or end layout&quot;);</b>
+&nbsp;
+&nbsp;            case LayoutHelper.IS_FIELD_END:
+&nbsp;            case LayoutHelper.IS_GROUP_END:
+<b class="nc">&nbsp;                throw new UnsupportedOperationException(&quot;field and group ends not allowed in begin or end layout&quot;);</b>
+&nbsp;
+&nbsp;            case LayoutHelper.IS_OPTION_FIELD:
+<b class="nc">&nbsp;                String field = Optional.ofNullable(databaseContext.getDatabase())</b>
+<b class="nc">&nbsp;                                       .map(db -&gt; db.resolveForStrings(text))</b>
+<b class="nc">&nbsp;                                       .orElse(text);</b>
+<b class="nc">&nbsp;                if (option != null) {</b>
+<b class="nc">&nbsp;                    for (LayoutFormatter anOption : option) {</b>
+<b class="nc">&nbsp;                        field = anOption.format(field);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                // If a post formatter has been set, call it:
+<b class="nc">&nbsp;                if (postFormatter != null) {</b>
+<b class="nc">&nbsp;                    field = postFormatter.format(field);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                return field;</b>
+&nbsp;
+&nbsp;            case LayoutHelper.IS_ENCODING_NAME:
+<b class="nc">&nbsp;                return encoding.displayName();</b>
+&nbsp;
+&nbsp;            case LayoutHelper.IS_FILENAME:
+&nbsp;            case LayoutHelper.IS_FILEPATH:
+<b class="nc">&nbsp;                return databaseContext.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).orElse(&quot;&quot;);</b>
+&nbsp;
+&nbsp;            default:
+&nbsp;                break;
+&nbsp;        }
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void doOptionField(String s) {
+<b class="nc">&nbsp;        List&lt;String&gt; v = StringUtil.tokenizeToList(s, &quot;\n&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (v.size() == 1) {</b>
+<b class="nc">&nbsp;            text = v.getFirst();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            text = v.getFirst().trim();</b>
+&nbsp;
+<b class="nc">&nbsp;            option = getOptionalLayout(v.get(1));</b>
+&nbsp;            // See if there was an undefined formatter:
+<b class="nc">&nbsp;            for (LayoutFormatter anOption : option) {</b>
+<b class="nc">&nbsp;                if (anOption instanceof NotFoundFormatter formatter) {</b>
+<b class="nc">&nbsp;                    String notFound = formatter.getNotFound();</b>
+&nbsp;
+<b class="nc">&nbsp;                    invalidFormatter.add(notFound);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private LayoutFormatter getLayoutFormatterByName(String name) {
+<b class="nc">&nbsp;        return switch (name) {</b>
+&nbsp;            // For backward compatibility
+&nbsp;            case &quot;HTMLToLatexFormatter&quot;,
+&nbsp;                 &quot;HtmlToLatex&quot; -&gt;
+<b class="nc">&nbsp;                    new HtmlToLatexFormatter();</b>
+&nbsp;            // For backward compatibility
+&nbsp;            case &quot;UnicodeToLatexFormatter&quot;,
+&nbsp;                 &quot;UnicodeToLatex&quot; -&gt;
+<b class="nc">&nbsp;                    new UnicodeToLatexFormatter();</b>
+&nbsp;            case &quot;OOPreFormatter&quot; -&gt;
+<b class="nc">&nbsp;                    new OOPreFormatter();</b>
+&nbsp;            case &quot;AuthorAbbreviator&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorAbbreviator();</b>
+&nbsp;            case &quot;AuthorAndToSemicolonReplacer&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorAndToSemicolonReplacer();</b>
+&nbsp;            case &quot;AuthorAndsCommaReplacer&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorAndsCommaReplacer();</b>
+&nbsp;            case &quot;AuthorAndsReplacer&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorAndsReplacer();</b>
+&nbsp;            case &quot;AuthorFirstAbbrLastCommas&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorFirstAbbrLastCommas();</b>
+&nbsp;            case &quot;AuthorFirstAbbrLastOxfordCommas&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorFirstAbbrLastOxfordCommas();</b>
+&nbsp;            case &quot;AuthorFirstFirst&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorFirstFirst();</b>
+&nbsp;            case &quot;AuthorFirstFirstCommas&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorFirstFirstCommas();</b>
+&nbsp;            case &quot;AuthorFirstLastCommas&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorFirstLastCommas();</b>
+&nbsp;            case &quot;AuthorFirstLastOxfordCommas&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorFirstLastOxfordCommas();</b>
+&nbsp;            case &quot;AuthorLastFirst&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorLastFirst();</b>
+&nbsp;            case &quot;AuthorLastFirstAbbrCommas&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorLastFirstAbbrCommas();</b>
+&nbsp;            case &quot;AuthorLastFirstAbbreviator&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorLastFirstAbbreviator();</b>
+&nbsp;            case &quot;AuthorLastFirstAbbrOxfordCommas&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorLastFirstAbbrOxfordCommas();</b>
+&nbsp;            case &quot;AuthorLastFirstCommas&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorLastFirstCommas();</b>
+&nbsp;            case &quot;AuthorLastFirstOxfordCommas&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorLastFirstOxfordCommas();</b>
+&nbsp;            case &quot;AuthorLF_FF&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorLF_FF();</b>
+&nbsp;            case &quot;AuthorLF_FFAbbr&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorLF_FFAbbr();</b>
+&nbsp;            case &quot;AuthorNatBib&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorNatBib();</b>
+&nbsp;            case &quot;AuthorOrgSci&quot; -&gt;
+<b class="nc">&nbsp;                    new AuthorOrgSci();</b>
+&nbsp;            case &quot;CompositeFormat&quot; -&gt;
+<b class="nc">&nbsp;                    new CompositeFormat();</b>
+&nbsp;            case &quot;CreateBibORDFAuthors&quot; -&gt;
+<b class="nc">&nbsp;                    new CreateBibORDFAuthors();</b>
+&nbsp;            case &quot;CreateDocBook4Authors&quot; -&gt;
+<b class="nc">&nbsp;                    new CreateDocBook4Authors();</b>
+&nbsp;            case &quot;CreateDocBook4Editors&quot; -&gt;
+<b class="nc">&nbsp;                    new CreateDocBook4Editors();</b>
+&nbsp;            case &quot;CreateDocBook5Authors&quot; -&gt;
+<b class="nc">&nbsp;                    new CreateDocBook5Authors();</b>
+&nbsp;            case &quot;CreateDocBook5Editors&quot; -&gt;
+<b class="nc">&nbsp;                    new CreateDocBook5Editors();</b>
+&nbsp;            case &quot;CurrentDate&quot; -&gt;
+<b class="nc">&nbsp;                    new CurrentDate();</b>
+&nbsp;            case &quot;DateFormatter&quot; -&gt;
+<b class="nc">&nbsp;                    new DateFormatter();</b>
+&nbsp;            case &quot;DOICheck&quot; -&gt;
+<b class="nc">&nbsp;                    new DOICheck(preferences.getDoiPreferences());</b>
+&nbsp;            case &quot;DOIStrip&quot; -&gt;
+<b class="nc">&nbsp;                    new DOIStrip();</b>
+&nbsp;            case &quot;EntryTypeFormatter&quot; -&gt;
+<b class="nc">&nbsp;                    new EntryTypeFormatter();</b>
+&nbsp;            case &quot;FirstPage&quot; -&gt;
+<b class="nc">&nbsp;                    new FirstPage();</b>
+&nbsp;            case &quot;FormatPagesForHTML&quot; -&gt;
+<b class="nc">&nbsp;                    new FormatPagesForHTML();</b>
+&nbsp;            case &quot;FormatPagesForXML&quot; -&gt;
+<b class="nc">&nbsp;                    new FormatPagesForXML();</b>
+&nbsp;            case &quot;GetOpenOfficeType&quot; -&gt;
+<b class="nc">&nbsp;                    new GetOpenOfficeType();</b>
+&nbsp;            case &quot;HTMLChars&quot; -&gt;
+<b class="nc">&nbsp;                    new HTMLChars();</b>
+&nbsp;            case &quot;HTMLParagraphs&quot; -&gt;
+<b class="nc">&nbsp;                    new HTMLParagraphs();</b>
+&nbsp;            case &quot;Iso690FormatDate&quot; -&gt;
+<b class="nc">&nbsp;                    new Iso690FormatDate();</b>
+&nbsp;            case &quot;Iso690NamesAuthors&quot; -&gt;
+<b class="nc">&nbsp;                    new Iso690NamesAuthors();</b>
+&nbsp;            case &quot;JournalAbbreviator&quot; -&gt;
+<b class="nc">&nbsp;                    new JournalAbbreviator(abbreviationRepository);</b>
+&nbsp;            case &quot;LastPage&quot; -&gt;
+<b class="nc">&nbsp;                    new LastPage();</b>
+&nbsp;            // For backward compatibility
+&nbsp;            case &quot;FormatChars&quot;,
+&nbsp;                 &quot;LatexToUnicode&quot; -&gt;
+<b class="nc">&nbsp;                    new LatexToUnicodeFormatter();</b>
+&nbsp;            case &quot;NameFormatter&quot; -&gt;
+<b class="nc">&nbsp;                    new NameFormatter();</b>
+&nbsp;            case &quot;NoSpaceBetweenAbbreviations&quot; -&gt;
+<b class="nc">&nbsp;                    new NoSpaceBetweenAbbreviations();</b>
+&nbsp;            case &quot;Ordinal&quot; -&gt;
+<b class="nc">&nbsp;                    new Ordinal();</b>
+&nbsp;            case &quot;RemoveBrackets&quot; -&gt;
+<b class="nc">&nbsp;                    new RemoveBrackets();</b>
+&nbsp;            case &quot;RemoveBracketsAddComma&quot; -&gt;
+<b class="nc">&nbsp;                    new RemoveBracketsAddComma();</b>
+&nbsp;            case &quot;RemoveLatexCommands&quot; -&gt;
+<b class="nc">&nbsp;                    new RemoveLatexCommandsFormatter();</b>
+&nbsp;            case &quot;RemoveTilde&quot; -&gt;
+<b class="nc">&nbsp;                    new RemoveTilde();</b>
+&nbsp;            case &quot;RemoveWhitespace&quot; -&gt;
+<b class="nc">&nbsp;                    new NonSpaceWhitespaceRemover();</b>
+&nbsp;            case &quot;RisKeywords&quot; -&gt;
+<b class="nc">&nbsp;                    new RisKeywords();</b>
+&nbsp;            case &quot;RisMonth&quot; -&gt;
+<b class="nc">&nbsp;                    new RisMonth();</b>
+&nbsp;            case &quot;RTFChars&quot; -&gt;
+<b class="nc">&nbsp;                    new RTFChars();</b>
+&nbsp;            case &quot;ToLowerCase&quot; -&gt;
+<b class="nc">&nbsp;                    new ToLowerCase();</b>
+&nbsp;            case &quot;ToUpperCase&quot; -&gt;
+<b class="nc">&nbsp;                    new ToUpperCase();</b>
+&nbsp;            case &quot;XMLChars&quot; -&gt;
+<b class="nc">&nbsp;                    new XMLChars();</b>
+&nbsp;            case &quot;Default&quot; -&gt;
+<b class="nc">&nbsp;                    new Default();</b>
+&nbsp;            case &quot;FileLink&quot; -&gt;
+<b class="nc">&nbsp;                    new FileLink(fileDirForDatabase, preferences.getMainFileDirectory());</b>
+&nbsp;            case &quot;Number&quot; -&gt;
+<b class="nc">&nbsp;                    new Number();</b>
+&nbsp;            case &quot;RisAuthors&quot; -&gt;
+<b class="nc">&nbsp;                    new RisAuthors();</b>
+&nbsp;            case &quot;Authors&quot; -&gt;
+<b class="nc">&nbsp;                    new Authors();</b>
+&nbsp;            case &quot;IfPlural&quot; -&gt;
+<b class="nc">&nbsp;                    new IfPlural();</b>
+&nbsp;            case &quot;Replace&quot; -&gt;
+<b class="nc">&nbsp;                    new Replace();</b>
+&nbsp;            case &quot;WrapContent&quot; -&gt;
+<b class="nc">&nbsp;                    new WrapContent();</b>
+&nbsp;            case &quot;WrapFileLinks&quot; -&gt;
+<b class="nc">&nbsp;                    new WrapFileLinks(fileDirForDatabase, preferences.getMainFileDirectory());</b>
+&nbsp;            case &quot;Markdown&quot; -&gt;
+<b class="nc">&nbsp;                    new MarkdownFormatter();</b>
+&nbsp;            case &quot;CSLType&quot; -&gt;
+<b class="nc">&nbsp;                    new CSLType();</b>
+&nbsp;            case &quot;ShortMonth&quot; -&gt;
+<b class="nc">&nbsp;                    new ShortMonthFormatter();</b>
+&nbsp;            case &quot;ReplaceWithEscapedDoubleQuotes&quot; -&gt;
+<b class="nc">&nbsp;                    new ReplaceWithEscapedDoubleQuotes();</b>
+&nbsp;            case &quot;HayagrivaType&quot; -&gt;
+<b class="nc">&nbsp;                    new HayagrivaType();</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    null;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return an array of LayoutFormatters found in the given formatterName string (in order of appearance).
+&nbsp;     */
+&nbsp;    private List&lt;LayoutFormatter&gt; getOptionalLayout(String formatterName) {
+<b class="nc">&nbsp;        List&lt;List&lt;String&gt;&gt; formatterStrings = parseMethodsCalls(formatterName);</b>
+<b class="nc">&nbsp;        List&lt;LayoutFormatter&gt; results = new ArrayList&lt;&gt;(formatterStrings.size());</b>
+<b class="nc">&nbsp;        Map&lt;String, String&gt; userNameFormatter = NameFormatter.getNameFormatters(preferences.getNameFormatterPreferences());</b>
+<b class="nc">&nbsp;        for (List&lt;String&gt; strings : formatterStrings) {</b>
+<b class="nc">&nbsp;            String nameFormatterName = strings.getFirst().trim();</b>
+&nbsp;
+&nbsp;            // Check if this is a name formatter defined by this export filter:
+<b class="nc">&nbsp;            Optional&lt;String&gt; contents = preferences.getCustomExportNameFormatter(nameFormatterName);</b>
+<b class="nc">&nbsp;            if (contents.isPresent()) {</b>
+<b class="nc">&nbsp;                NameFormatter nf = new NameFormatter();</b>
+<b class="nc">&nbsp;                nf.setParameter(contents.get());</b>
+<b class="nc">&nbsp;                results.add(nf);</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+&nbsp;            // Try to load from formatters in formatter folder
+<b class="nc">&nbsp;            LayoutFormatter formatter = getLayoutFormatterByName(nameFormatterName);</b>
+<b class="nc">&nbsp;            if (formatter != null) {</b>
+&nbsp;                // If this formatter accepts an argument, check if we have one, and set it if so
+<b class="nc">&nbsp;                if ((formatter instanceof ParamLayoutFormatter layoutFormatter) &amp;&amp; (strings.size() &gt;= 2)) {</b>
+<b class="nc">&nbsp;                    layoutFormatter.setArgument(strings.get(1));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                results.add(formatter);</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+&nbsp;            // Then check whether this is a user defined formatter
+<b class="nc">&nbsp;            String formatterParameter = userNameFormatter.get(nameFormatterName);</b>
+<b class="nc">&nbsp;            if (formatterParameter != null) {</b>
+<b class="nc">&nbsp;                NameFormatter nf = new NameFormatter();</b>
+<b class="nc">&nbsp;                nf.setParameter(formatterParameter);</b>
+<b class="nc">&nbsp;                results.add(nf);</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            results.add(new NotFoundFormatter(nameFormatterName));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return results;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getInvalidFormatters() {
+<b class="nc">&nbsp;        return invalidFormatter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;List&lt;String&gt;&gt; parseMethodsCalls(String calls) {
+<b class="nc">&nbsp;        List&lt;List&lt;String&gt;&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        char[] c = calls.toCharArray();</b>
+&nbsp;
+<b class="nc">&nbsp;        int i = 0;</b>
+<b class="nc">&nbsp;        while (i &lt; c.length) {</b>
+<b class="nc">&nbsp;            int start = i;</b>
+<b class="nc">&nbsp;            if (Character.isJavaIdentifierStart(c[i])) {</b>
+<b class="nc">&nbsp;                i++;</b>
+<b class="nc">&nbsp;                while ((i &lt; c.length) &amp;&amp; (Character.isJavaIdentifierPart(c[i]) || (c[i] == &#39;.&#39;))) {</b>
+<b class="nc">&nbsp;                    i++;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if ((i &lt; c.length) &amp;&amp; (c[i] == &#39;(&#39;)) {</b>
+<b class="nc">&nbsp;                    String method = calls.substring(start, i);</b>
+&nbsp;
+&nbsp;                    // Skip the brace
+<b class="nc">&nbsp;                    i++;</b>
+<b class="nc">&nbsp;                    int bracelevel = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (i &lt; c.length) {</b>
+<b class="nc">&nbsp;                        if (c[i] == &#39;&quot;&#39;) {</b>
+&nbsp;                            // Parameter is in format &quot;xxx&quot;
+&nbsp;
+&nbsp;                            // Skip &quot;
+<b class="nc">&nbsp;                            i++;</b>
+&nbsp;
+<b class="nc">&nbsp;                            int startParam = i;</b>
+<b class="nc">&nbsp;                            i++;</b>
+<b class="nc">&nbsp;                            boolean escaped = false;</b>
+<b class="nc">&nbsp;                            while (((i + 1) &lt; c.length)</b>
+&nbsp;                                    &amp;&amp; !(!escaped &amp;&amp; (c[i] == &#39;&quot;&#39;) &amp;&amp; (c[i + 1] == &#39;)&#39;) &amp;&amp; (bracelevel == 0))) {
+<b class="nc">&nbsp;                                if (c[i] == &#39;\\&#39;) {</b>
+<b class="nc">&nbsp;                                    escaped = !escaped;</b>
+<b class="nc">&nbsp;                                } else if (c[i] == &#39;(&#39;) {</b>
+<b class="nc">&nbsp;                                    bracelevel++;</b>
+<b class="nc">&nbsp;                                } else if (c[i] == &#39;)&#39;) {</b>
+<b class="nc">&nbsp;                                    bracelevel--;</b>
+&nbsp;                                } else {
+<b class="nc">&nbsp;                                    escaped = false;</b>
+&nbsp;                                }
+<b class="nc">&nbsp;                                i++;</b>
+&nbsp;                            }
+&nbsp;
+<b class="nc">&nbsp;                            String param = calls.substring(startParam, i);</b>
+&nbsp;
+<b class="nc">&nbsp;                            result.add(Arrays.asList(method, param));</b>
+&nbsp;                        } else {
+&nbsp;                            // Parameter is in format xxx
+&nbsp;
+<b class="nc">&nbsp;                            int startParam = i;</b>
+&nbsp;
+<b class="nc">&nbsp;                            while ((i &lt; c.length) &amp;&amp; (!((c[i] == &#39;)&#39;) &amp;&amp; (bracelevel == 0)))) {</b>
+<b class="nc">&nbsp;                                if (c[i] == &#39;(&#39;) {</b>
+<b class="nc">&nbsp;                                    bracelevel++;</b>
+<b class="nc">&nbsp;                                } else if (c[i] == &#39;)&#39;) {</b>
+<b class="nc">&nbsp;                                    bracelevel--;</b>
+&nbsp;                                }
+<b class="nc">&nbsp;                                i++;</b>
+&nbsp;                            }
+&nbsp;
+<b class="nc">&nbsp;                            String param = calls.substring(startParam, i);</b>
+&nbsp;
+<b class="nc">&nbsp;                            result.add(Arrays.asList(method, param));</b>
+&nbsp;                        }
+&nbsp;                    } else {
+&nbsp;                        // Incorrectly terminated open brace
+<b class="nc">&nbsp;                        result.add(List.of(method));</b>
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    String method = calls.substring(start, i);</b>
+<b class="nc">&nbsp;                    result.add(List.of(method));</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getText() {
+<b class="nc">&nbsp;        return text;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

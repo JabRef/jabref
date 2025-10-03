@@ -1,0 +1,133 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Command</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.http.server.command</a>
+</div>
+
+<h1>Coverage Summary for Class: Command (org.jabref.http.server.command)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Command</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.http.server.command;
+&nbsp;
+&nbsp;import org.jabref.http.SrvStateManager;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonSubTypes;
+&nbsp;import com.fasterxml.jackson.annotation.JsonTypeInfo;
+&nbsp;import jakarta.ws.rs.core.Response;
+&nbsp;import org.glassfish.hk2.api.ServiceLocator;
+&nbsp;
+&nbsp;@JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
+&nbsp;        include = JsonTypeInfo.As.PROPERTY,
+&nbsp;        property = &quot;commandId&quot;)
+&nbsp;@JsonSubTypes({
+&nbsp;        @JsonSubTypes.Type(value = SelectEntriesCommand.class, name = &quot;selectentries&quot;)
+&nbsp;})
+&nbsp;public interface Command {
+&nbsp;
+&nbsp;    default Response execute() {
+<b class="nc">&nbsp;        return Response.serverError().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void setServiceLocator(ServiceLocator serviceLocator);
+&nbsp;
+&nbsp;    ServiceLocator getServiceLocator();
+&nbsp;
+&nbsp;    default SrvStateManager getSrvStateManager() {
+<b class="nc">&nbsp;        return getServiceLocator().getService(SrvStateManager.class);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

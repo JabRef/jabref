@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Theme</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.theme</a>
+</div>
+
+<h1>Coverage Summary for Class: Theme (org.jabref.gui.theme)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Theme</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (5/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (3/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (11/33)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Theme$Type</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    58.3%
+  </span>
+  <span class="absValue">
+    (7/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (3/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.1%
+  </span>
+  <span class="absValue">
+    (13/35)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.theme;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents one of three types of a css based Theme for JabRef:
+&nbsp; * &lt;p&gt;
+&nbsp; * The Default type of theme is the light theme (which is in fact the absence of any theme), the dark theme is currently
+&nbsp; * the only embedded theme and the custom themes, that can be created by loading a proper css file.
+&nbsp; */
+&nbsp;public class Theme {
+&nbsp;
+<b class="fc">&nbsp;    public enum Type {</b>
+<b class="fc">&nbsp;        DEFAULT, EMBEDDED, CUSTOM</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static final String BASE_CSS = &quot;Base.css&quot;;
+&nbsp;    public static final String EMBEDDED_DARK_CSS = &quot;Dark.css&quot;;
+&nbsp;
+&nbsp;    private final Type type;
+&nbsp;    private final String name;
+&nbsp;    private final Optional&lt;StyleSheet&gt; additionalStylesheet;
+&nbsp;
+<b class="fc">&nbsp;    public Theme(String name) {</b>
+<b class="fc">&nbsp;        Objects.requireNonNull(name);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (name.isEmpty() || BASE_CSS.equalsIgnoreCase(name)) {</b>
+<b class="fc">&nbsp;            this.additionalStylesheet = Optional.empty();</b>
+<b class="fc">&nbsp;            this.type = Type.DEFAULT;</b>
+<b class="fc">&nbsp;            this.name = &quot;&quot;;</b>
+<b class="nc">&nbsp;        } else if (EMBEDDED_DARK_CSS.equalsIgnoreCase(name)) {</b>
+<b class="nc">&nbsp;            this.additionalStylesheet = StyleSheet.create(EMBEDDED_DARK_CSS);</b>
+<b class="nc">&nbsp;            if (this.additionalStylesheet.isPresent()) {</b>
+<b class="nc">&nbsp;                this.type = Type.EMBEDDED;</b>
+<b class="nc">&nbsp;                this.name = EMBEDDED_DARK_CSS;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                this.type = Type.DEFAULT;</b>
+<b class="nc">&nbsp;                this.name = &quot;&quot;;</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.additionalStylesheet = StyleSheet.create(name);</b>
+<b class="nc">&nbsp;            if (this.additionalStylesheet.isPresent()) {</b>
+<b class="nc">&nbsp;                this.type = Type.CUSTOM;</b>
+<b class="nc">&nbsp;                this.name = name;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                this.type = Type.DEFAULT;</b>
+<b class="nc">&nbsp;                this.name = &quot;&quot;;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Theme light() {
+<b class="nc">&nbsp;        return new Theme(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Theme dark() {
+<b class="nc">&nbsp;        return new Theme(EMBEDDED_DARK_CSS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Theme custom(String name) {
+<b class="nc">&nbsp;        return new Theme(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return the Theme type. Guaranteed to be non-null.
+&nbsp;     */
+&nbsp;    public Type getType() {
+<b class="nc">&nbsp;        return type;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Provides the name of the CSS, either for a built in theme, or for a raw, configured custom CSS location.
+&nbsp;     * This should be a file system path, but the raw string is
+&nbsp;     * returned even if it is not valid in some way. For this reason, the main use case for this getter is to
+&nbsp;     * storing or display the user preference, rather than to read and use the CSS file.
+&nbsp;     *
+&nbsp;     * @return the raw configured CSS location. Guaranteed to be non-null.
+&nbsp;     */
+&nbsp;    public String getName() {
+<b class="fc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method allows callers to obtain the theme&#39;s additional stylesheet.
+&nbsp;     *
+&nbsp;     * @return called with the stylesheet location if there is an additional stylesheet present and available. The
+&nbsp;     * location will be a local URL. Typically it will be a {@code &#39;data:&#39;} URL where the CSS is embedded. However for
+&nbsp;     * large themes it can be {@code &#39;file:&#39;}.
+&nbsp;     */
+&nbsp;    public Optional&lt;StyleSheet&gt; getAdditionalStylesheet() {
+<b class="fc">&nbsp;        return additionalStylesheet;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="pc">&nbsp;        if (this == o) {</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (o == null || getClass() != o.getClass()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Theme that = (Theme) o;</b>
+<b class="nc">&nbsp;        return type == that.type &amp;&amp; name.equals(that.name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(type, name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="fc">&nbsp;        return &quot;Theme{&quot; +</b>
+&nbsp;                &quot;type=&quot; + type +
+&nbsp;                &quot;, name=&#39;&quot; + name + &#39;\&#39;&#39; +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

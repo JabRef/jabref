@@ -1,0 +1,154 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AuxParserStatisticsProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.auxparser</a>
+</div>
+
+<h1>Coverage Summary for Class: AuxParserStatisticsProvider (org.jabref.logic.auxparser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AuxParserStatisticsProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.auxparser;
+&nbsp;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;public class AuxParserStatisticsProvider {
+&nbsp;
+&nbsp;    private AuxParserResult auxParserResult;
+&nbsp;
+<b class="nc">&nbsp;    public AuxParserStatisticsProvider(AuxParserResult auxParserResult) {</b>
+<b class="nc">&nbsp;        this.auxParserResult = auxParserResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Prints parsing statistics
+&nbsp;     *
+&nbsp;     * @param includeMissingEntries shows the missing entries as text (the GUI renderes them at another place)
+&nbsp;     */
+&nbsp;    public String getInformation(boolean includeMissingEntries) {
+<b class="nc">&nbsp;        String missingEntries = &quot;&quot;;</b>
+<b class="nc">&nbsp;        if (includeMissingEntries &amp;&amp; (this.auxParserResult.getUnresolvedKeysCount() &gt; 0)) {</b>
+<b class="nc">&nbsp;            missingEntries = this.auxParserResult.getUnresolvedKeys().stream().collect(Collectors.joining(&quot;, &quot;, &quot; (&quot;, &quot;)&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder result = new StringBuilder();</b>
+<b class="nc">&nbsp;        result.append(Localization.lang(&quot;keys in library&quot;)).append(&#39; &#39;).append(this.auxParserResult.getMasterDatabase().getEntryCount()).append(&#39;\n&#39;)</b>
+<b class="nc">&nbsp;              .append(Localization.lang(&quot;found in AUX file&quot;)).append(&#39; &#39;).append(this.auxParserResult.getFoundKeysInAux()).append(&#39;\n&#39;)</b>
+<b class="nc">&nbsp;              .append(Localization.lang(&quot;resolved&quot;)).append(&#39; &#39;).append(this.auxParserResult.getResolvedKeysCount()).append(&#39;\n&#39;)</b>
+<b class="nc">&nbsp;              .append(Localization.lang(&quot;not found&quot;)).append(&#39; &#39;).append(this.auxParserResult.getUnresolvedKeysCount()).append(missingEntries).append(&#39;\n&#39;)</b>
+<b class="nc">&nbsp;              .append(Localization.lang(&quot;crossreferenced entries included&quot;)).append(&#39; &#39;).append(this.auxParserResult.getCrossRefEntriesCount()).append(&#39;\n&#39;)</b>
+<b class="nc">&nbsp;              .append(Localization.lang(&quot;strings included&quot;)).append(&#39; &#39;).append(this.auxParserResult.getInsertedStrings()).append(&#39;\n&#39;);</b>
+<b class="nc">&nbsp;        if (this.auxParserResult.getNestedAuxCount() &gt; 0) {</b>
+<b class="nc">&nbsp;            result.append(Localization.lang(&quot;nested AUX files&quot;)).append(&#39; &#39;).append(this.auxParserResult.getNestedAuxCount());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result.toString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

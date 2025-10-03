@@ -1,0 +1,149 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PreambleChangeDetailsView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.collab.preamblechange</a>
+</div>
+
+<h1>Coverage Summary for Class: PreambleChangeDetailsView (org.jabref.gui.collab.preamblechange)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PreambleChangeDetailsView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.collab.preamblechange;
+&nbsp;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.collab.DatabaseChangeDetailsView;
+&nbsp;import org.jabref.logic.bibtex.comparator.PreambleDiff;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;public final class PreambleChangeDetailsView extends DatabaseChangeDetailsView {
+&nbsp;
+<b class="nc">&nbsp;    public PreambleChangeDetailsView(PreambleChange preambleChange) {</b>
+<b class="nc">&nbsp;        PreambleDiff preambleDiff = preambleChange.getPreambleDiff();</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox container = new VBox();</b>
+<b class="nc">&nbsp;        Label header = new Label(Localization.lang(&quot;Changed preamble&quot;));</b>
+<b class="nc">&nbsp;        header.getStyleClass().add(&quot;sectionHeader&quot;);</b>
+<b class="nc">&nbsp;        container.getChildren().add(header);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(preambleDiff.getOriginalPreamble())) {</b>
+<b class="nc">&nbsp;            container.getChildren().add(new Label(Localization.lang(&quot;Current value: %0&quot;, preambleDiff.getOriginalPreamble())));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(preambleDiff.getNewPreamble())) {</b>
+<b class="nc">&nbsp;            container.getChildren().add(new Label(Localization.lang(&quot;Value set externally: %0&quot;, preambleDiff.getNewPreamble())));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            container.getChildren().add(new Label(Localization.lang(&quot;Value cleared externally&quot;)));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.setAllAnchorsAndAttachChild(container);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

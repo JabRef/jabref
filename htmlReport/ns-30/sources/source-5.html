@@ -1,0 +1,314 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FulltextSearchResultsTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor.fileannotationtab</a>
+</div>
+
+<h1>Coverage Summary for Class: FulltextSearchResultsTab (org.jabref.gui.entryeditor.fileannotationtab)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FulltextSearchResultsTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor.fileannotationtab;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.geometry.Insets;
+&nbsp;import javafx.geometry.Orientation;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.control.Separator;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.input.MouseButton;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;import javafx.scene.text.TextFlow;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.documentviewer.DocumentViewerView;
+&nbsp;import org.jabref.gui.entryeditor.EntryEditor;
+&nbsp;import org.jabref.gui.entryeditor.EntryEditorTab;
+&nbsp;import org.jabref.gui.maintable.OpenFolderAction;
+&nbsp;import org.jabref.gui.maintable.OpenSingleExternalFileAction;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.search.SearchType;
+&nbsp;import org.jabref.gui.util.TooltipTextUtil;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.search.SearchFlags;
+&nbsp;import org.jabref.model.search.query.SearchResult;
+&nbsp;import org.jabref.model.search.query.SearchResults;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class FulltextSearchResultsTab extends EntryEditorTab {
+&nbsp;
+&nbsp;    public static final String NAME = &quot;Search results&quot;;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(FulltextSearchResultsTab.class);</b>
+&nbsp;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final ActionFactory actionFactory;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final EntryEditor entryEditor;
+&nbsp;    private final TextFlow content;
+&nbsp;
+&nbsp;    private BibEntry entry;
+&nbsp;    private DocumentViewerView documentViewerView;
+&nbsp;
+&nbsp;    public FulltextSearchResultsTab(StateManager stateManager,
+&nbsp;                                    GuiPreferences preferences,
+&nbsp;                                    DialogService dialogService,
+&nbsp;                                    TaskExecutor taskExecutor,
+<b class="nc">&nbsp;                                    EntryEditor entryEditor) {</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.actionFactory = new ActionFactory();</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.entryEditor = entryEditor;</b>
+&nbsp;
+<b class="nc">&nbsp;        content = new TextFlow();</b>
+<b class="nc">&nbsp;        ScrollPane scrollPane = new ScrollPane(content);</b>
+<b class="nc">&nbsp;        scrollPane.setFitToWidth(true);</b>
+<b class="nc">&nbsp;        content.setPadding(new Insets(10));</b>
+<b class="nc">&nbsp;        setContent(scrollPane);</b>
+<b class="nc">&nbsp;        setText(Localization.lang(&quot;Search results&quot;));</b>
+&nbsp;
+&nbsp;        // Rebinding is necessary because of re-rendering of highlighting of matched text
+<b class="nc">&nbsp;        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener((_, _, _) -&gt; updateSearch());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean shouldShow(BibEntry entry) {
+<b class="nc">&nbsp;        return stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()</b>
+<b class="nc">&nbsp;                           .map(query -&gt; query.isValid() &amp;&amp; query.getSearchFlags().contains(SearchFlags.FULLTEXT))</b>
+<b class="nc">&nbsp;                           .orElse(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        if (entry == null || !shouldShow(entry)) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        this.entry = entry;</b>
+<b class="nc">&nbsp;        updateSearch();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateSearch() {
+<b class="nc">&nbsp;        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(searchQuery -&gt; {</b>
+<b class="nc">&nbsp;            SearchResults searchResults = searchQuery.getSearchResults();</b>
+<b class="nc">&nbsp;            if (searchResults != null &amp;&amp; entry != null) {</b>
+<b class="nc">&nbsp;                Map&lt;String, List&lt;SearchResult&gt;&gt; searchResultsForEntry = searchResults.getFileSearchResultsForEntry(entry);</b>
+<b class="nc">&nbsp;                content.getChildren().clear();</b>
+<b class="nc">&nbsp;                if (searchResultsForEntry.isEmpty()) {</b>
+<b class="nc">&nbsp;                    content.getChildren().add(new Text(Localization.lang(&quot;No search matches.&quot;)));</b>
+&nbsp;                } else {
+&nbsp;                    // Iterate through files with search hits
+<b class="nc">&nbsp;                    for (Map.Entry&lt;String, List&lt;SearchResult&gt;&gt; iterator : searchResultsForEntry.entrySet()) {</b>
+<b class="nc">&nbsp;                        entry.getFiles().stream().filter(file -&gt; file.getLink().equals(iterator.getKey())).findFirst().ifPresent(linkedFile -&gt; {</b>
+<b class="nc">&nbsp;                            content.getChildren().addAll(createFileLink(linkedFile), lineSeparator());</b>
+&nbsp;                            // Iterate through pages (within file) with search hits
+<b class="nc">&nbsp;                            for (SearchResult searchResult : iterator.getValue()) {</b>
+<b class="nc">&nbsp;                                for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {</b>
+<b class="nc">&nbsp;                                    content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace(&quot;&lt;/b&gt; &lt;b&gt;&quot;, &quot; &quot;)));</b>
+<b class="nc">&nbsp;                                    content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber(), searchQuery.getSearchExpression()));</b>
+&nbsp;                                }
+<b class="nc">&nbsp;                                if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {</b>
+<b class="nc">&nbsp;                                    Text annotationsText = new Text(System.lineSeparator() + Localization.lang(&quot;Found matches in annotations:&quot;) + System.lineSeparator() + System.lineSeparator());</b>
+<b class="nc">&nbsp;                                    annotationsText.setStyle(&quot;-fx-font-style: italic;&quot;);</b>
+<b class="nc">&nbsp;                                    content.getChildren().add(annotationsText);</b>
+&nbsp;
+<b class="nc">&nbsp;                                    for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {</b>
+<b class="nc">&nbsp;                                        content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace(&quot;&lt;/b&gt; &lt;b&gt;&quot;, &quot; &quot;)));</b>
+<b class="nc">&nbsp;                                        content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber(), searchQuery.getSearchExpression()));</b>
+&nbsp;                                    }
+&nbsp;                                }
+&nbsp;                            }
+&nbsp;                        });
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        Platform.runLater(entryEditor::adaptVisibleTabs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Text createFileLink(LinkedFile linkedFile) {
+<b class="nc">&nbsp;        Text fileLinkText = new Text(Localization.lang(&quot;Found match in %0&quot;, linkedFile.getLink()) + System.lineSeparator() + System.lineSeparator());</b>
+<b class="nc">&nbsp;        fileLinkText.setStyle(&quot;-fx-font-weight: bold;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        ContextMenu fileContextMenu = getFileContextMenu(linkedFile);</b>
+<b class="nc">&nbsp;        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());</b>
+<b class="nc">&nbsp;        Path resolvedPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).orElse(Path.of(linkedFile.getLink()));</b>
+<b class="nc">&nbsp;        Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());</b>
+<b class="nc">&nbsp;        Tooltip.install(fileLinkText, fileLinkTooltip);</b>
+<b class="nc">&nbsp;        fileLinkText.setOnMouseClicked(event -&gt; {</b>
+<b class="nc">&nbsp;            if (MouseButton.PRIMARY == event.getButton()) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    NativeDesktop.openBrowser(resolvedPath.toUri(), preferences.getExternalApplicationsPreferences());</b>
+&nbsp;                } catch (IOException e) {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Cannot open {}.&quot;, resolvedPath, e);</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                fileContextMenu.show(fileLinkText, event.getScreenX(), event.getScreenY());</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        return fileLinkText;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Text createPageLink(LinkedFile linkedFile, int pageNumber, String searchExpression) {
+<b class="nc">&nbsp;        Text pageLink = new Text(Localization.lang(&quot;On page %0&quot;, pageNumber) + System.lineSeparator() + System.lineSeparator());</b>
+<b class="nc">&nbsp;        pageLink.setStyle(&quot;-fx-font-style: italic; -fx-font-weight: bold;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        pageLink.setOnMouseClicked(event -&gt; {</b>
+<b class="nc">&nbsp;            if (MouseButton.PRIMARY == event.getButton()) {</b>
+<b class="nc">&nbsp;                if (documentViewerView == null) {</b>
+<b class="nc">&nbsp;                    documentViewerView = new DocumentViewerView();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                documentViewerView.switchToFile(linkedFile);</b>
+<b class="nc">&nbsp;                documentViewerView.gotoPage(pageNumber);</b>
+<b class="nc">&nbsp;                documentViewerView.highlightText(searchExpression);</b>
+<b class="nc">&nbsp;                documentViewerView.disableLiveMode();</b>
+<b class="nc">&nbsp;                dialogService.showCustomDialog(documentViewerView);</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        return pageLink;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ContextMenu getFileContextMenu(LinkedFile file) {
+<b class="nc">&nbsp;        ContextMenu fileContextMenu = new ContextMenu();</b>
+<b class="nc">&nbsp;        fileContextMenu.getItems().add(actionFactory.createMenuItem(</b>
+&nbsp;                StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, entry, file, taskExecutor)));
+<b class="nc">&nbsp;        fileContextMenu.getItems().add(actionFactory.createMenuItem(</b>
+&nbsp;                StandardActions.OPEN_EXTERNAL_FILE, new OpenSingleExternalFileAction(dialogService, preferences, entry, file, taskExecutor, stateManager)));
+<b class="nc">&nbsp;        return fileContextMenu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Separator lineSeparator() {
+<b class="nc">&nbsp;        return lineSeparator(1.0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Separator lineSeparator(double widthMultiplier) {
+<b class="nc">&nbsp;        Separator lineSeparator = new Separator(Orientation.HORIZONTAL);</b>
+<b class="nc">&nbsp;        lineSeparator.prefWidthProperty().bind(content.widthProperty().multiply(widthMultiplier));</b>
+<b class="nc">&nbsp;        lineSeparator.setPrefHeight(15);</b>
+<b class="nc">&nbsp;        return lineSeparator;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

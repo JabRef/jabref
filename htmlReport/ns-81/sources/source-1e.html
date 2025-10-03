@@ -1,0 +1,292 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SelectableTextFlow</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: SelectableTextFlow (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SelectableTextFlow</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/74)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import javafx.geometry.Point2D;
+&nbsp;import javafx.scene.Cursor;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.scene.layout.Pane;
+&nbsp;import javafx.scene.paint.Color;
+&nbsp;import javafx.scene.shape.Path;
+&nbsp;import javafx.scene.shape.PathElement;
+&nbsp;import javafx.scene.text.HitInfo;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;import javafx.scene.text.TextFlow;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;
+<b class="nc">&nbsp;public class SelectableTextFlow extends TextFlow {</b>
+&nbsp;    @Nullable private HitInfo startHit;
+&nbsp;    @Nullable private HitInfo endHit;
+&nbsp;    @Nullable private Path selectionPath;
+&nbsp;
+&nbsp;    private final Pane parentPane;
+<b class="nc">&nbsp;    private boolean isDragging = false;</b>
+<b class="nc">&nbsp;    private boolean justFinishedDrag = false;</b>
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;
+<b class="nc">&nbsp;    public SelectableTextFlow(Pane parent) {</b>
+<b class="nc">&nbsp;        this.parentPane = parent;</b>
+<b class="nc">&nbsp;        clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);</b>
+<b class="nc">&nbsp;        setCursor(Cursor.TEXT);</b>
+<b class="nc">&nbsp;        setFocusTraversable(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        addEventFilter(MouseEvent.MOUSE_PRESSED, this::onMousePressed);</b>
+<b class="nc">&nbsp;        addEventFilter(MouseEvent.MOUSE_DRAGGED, this::onMouseDragged);</b>
+<b class="nc">&nbsp;        addEventFilter(MouseEvent.MOUSE_RELEASED, this::onMouseReleased);</b>
+<b class="nc">&nbsp;        addEventFilter(MouseEvent.MOUSE_CLICKED, this::onMouseClicked);</b>
+&nbsp;
+<b class="nc">&nbsp;        focusedProperty().addListener((_, _, newFocus) -&gt; {</b>
+<b class="nc">&nbsp;            if (!newFocus) {</b>
+<b class="nc">&nbsp;                clearSelection();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void copySelectedText() {
+<b class="nc">&nbsp;        if (!isSelectionActive()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int startIndex = getSelectionStartIndex();</b>
+<b class="nc">&nbsp;        int endIndex = getSelectionEndIndex();</b>
+&nbsp;
+<b class="nc">&nbsp;        String fullText = getTextFlowContent();</b>
+<b class="nc">&nbsp;        if (startIndex &lt; 0 || endIndex &gt; fullText.length() || startIndex &gt;= endIndex) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String selectedText = fullText.substring(startIndex, endIndex);</b>
+<b class="nc">&nbsp;        clipBoardManager.setContent(selectedText);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectAll() {
+<b class="nc">&nbsp;        if (getChildren().isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        startHit = hitTest(new Point2D(0, 0));</b>
+<b class="nc">&nbsp;        endHit = hitTest(new Point2D(getLayoutBounds().getWidth(), getLayoutBounds().getHeight()));</b>
+<b class="nc">&nbsp;        updateSelectionHighlight();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearSelection() {
+<b class="nc">&nbsp;        startHit = null;</b>
+<b class="nc">&nbsp;        endHit = null;</b>
+<b class="nc">&nbsp;        removeHighlight();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isSelectionActive() {
+<b class="nc">&nbsp;        return startHit != null &amp;&amp; endHit != null &amp;&amp; startHit.getCharIndex() != endHit.getCharIndex();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Returns the start index of the selection. Assumes that the selection is active.
+&nbsp;    public int getSelectionStartIndex() {
+<b class="nc">&nbsp;        assert isSelectionActive();</b>
+<b class="nc">&nbsp;        return Math.min(startHit.getCharIndex(), endHit.getCharIndex());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Returns the end index of the selection. Assumes that the selection is active.
+&nbsp;    public int getSelectionEndIndex() {
+<b class="nc">&nbsp;        assert isSelectionActive();</b>
+<b class="nc">&nbsp;        return Math.max(startHit.getCharIndex() + 1, endHit.getCharIndex() + 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getTextFlowContent() {
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (Node node : getChildren()) {</b>
+<b class="nc">&nbsp;            if (node instanceof Text text) {</b>
+<b class="nc">&nbsp;                sb.append(text.getText());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateSelectionHighlight() {
+<b class="nc">&nbsp;        removeHighlight();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!isSelectionActive()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        PathElement[] elements = rangeShape(getSelectionStartIndex(), getSelectionEndIndex());</b>
+&nbsp;
+<b class="nc">&nbsp;        Path path = new Path();</b>
+<b class="nc">&nbsp;        path.getElements().addAll(elements);</b>
+<b class="nc">&nbsp;        path.setFill(Color.LIGHTBLUE.deriveColor(0, 1, 1, 0.5));</b>
+<b class="nc">&nbsp;        path.setStroke(null);</b>
+<b class="nc">&nbsp;        path.setCursor(Cursor.TEXT);</b>
+<b class="nc">&nbsp;        path.setOnMouseClicked(_ -&gt; removeHighlight());</b>
+<b class="nc">&nbsp;        path.getTransforms().add(getLocalToParentTransform());</b>
+<b class="nc">&nbsp;        path.setManaged(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        parentPane.getChildren().add(path);</b>
+<b class="nc">&nbsp;        selectionPath = path;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onMousePressed(MouseEvent event) {
+<b class="nc">&nbsp;        event.consume();</b>
+<b class="nc">&nbsp;        requestFocus();</b>
+&nbsp;
+<b class="nc">&nbsp;        startHit = hitTest(new Point2D(event.getX(), event.getY()));</b>
+<b class="nc">&nbsp;        endHit = startHit;</b>
+<b class="nc">&nbsp;        isDragging = false;</b>
+<b class="nc">&nbsp;        justFinishedDrag = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        removeHighlight();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onMouseDragged(MouseEvent event) {
+<b class="nc">&nbsp;        if (startHit == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        event.consume();</b>
+<b class="nc">&nbsp;        isDragging = true;</b>
+<b class="nc">&nbsp;        endHit = hitTest(new Point2D(event.getX(), event.getY()));</b>
+<b class="nc">&nbsp;        updateSelectionHighlight();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onMouseReleased(MouseEvent event) {
+<b class="nc">&nbsp;        if (isDragging) {</b>
+<b class="nc">&nbsp;            justFinishedDrag = true;</b>
+<b class="nc">&nbsp;            isDragging = false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onMouseClicked(MouseEvent event) {
+&nbsp;        // NOTE: When drag event is finished, a mouse click event at the same position
+&nbsp;        // of the drag will be triggered.
+<b class="nc">&nbsp;        if (justFinishedDrag) {</b>
+<b class="nc">&nbsp;            justFinishedDrag = false;</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        event.consume();</b>
+<b class="nc">&nbsp;        removeHighlight();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeHighlight() {
+<b class="nc">&nbsp;        if (selectionPath == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        parentPane.getChildren().remove(selectionPath);</b>
+<b class="nc">&nbsp;        selectionPath = null;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

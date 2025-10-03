@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > KeyBindingsTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.keybindings</a>
+</div>
+
+<h1>Coverage Summary for Class: KeyBindingsTabViewModel (org.jabref.gui.preferences.keybindings)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">KeyBindingsTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.keybindings;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.scene.control.Alert;
+&nbsp;import javafx.scene.control.ButtonBar;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingCategory;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preferences.PreferenceTabViewModel;
+&nbsp;import org.jabref.gui.preferences.keybindings.presets.BashKeyBindingPreset;
+&nbsp;import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
+&nbsp;import org.jabref.gui.preferences.keybindings.presets.NewEntryBindingPreset;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.OptionalObjectProperty;
+&nbsp;
+&nbsp;public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
+&nbsp;
+&nbsp;    private final KeyBindingRepository keyBindingRepository;
+&nbsp;    private final GuiPreferences preferences;
+<b class="nc">&nbsp;    private final OptionalObjectProperty&lt;KeyBindingViewModel&gt; selectedKeyBinding = OptionalObjectProperty.empty();</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;KeyBindingViewModel&gt; rootKeyBinding = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;KeyBindingPreset&gt; keyBindingPresets = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;
+<b class="nc">&nbsp;    private final List&lt;String&gt; restartWarning = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    public KeyBindingsTabViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, GuiPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.keyBindingRepository = new KeyBindingRepository(keyBindingRepository.getKeyBindings());</b>
+<b class="nc">&nbsp;        this.dialogService = Objects.requireNonNull(dialogService);</b>
+<b class="nc">&nbsp;        this.preferences = Objects.requireNonNull(preferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        keyBindingPresets.add(new BashKeyBindingPreset());</b>
+<b class="nc">&nbsp;        keyBindingPresets.add(new NewEntryBindingPreset());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Read all keybindings from the keybinding repository and create table keybinding models for them
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        KeyBindingViewModel root = new KeyBindingViewModel(keyBindingRepository, KeyBindingCategory.FILE);</b>
+<b class="nc">&nbsp;        rootKeyBinding.set(root);</b>
+<b class="nc">&nbsp;        filterValues(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void filterValues(String term) {
+<b class="nc">&nbsp;        KeyBindingViewModel root = rootKeyBinding.get();</b>
+<b class="nc">&nbsp;        root.clear();</b>
+<b class="nc">&nbsp;        root.getChildren().clear();</b>
+<b class="nc">&nbsp;        for (KeyBindingCategory category : KeyBindingCategory.values()) {</b>
+<b class="nc">&nbsp;            KeyBindingViewModel categoryItem = new KeyBindingViewModel(keyBindingRepository, category);</b>
+<b class="nc">&nbsp;            keyBindingRepository.getKeyBindings().forEach((keyBinding, bind) -&gt; {</b>
+<b class="nc">&nbsp;                if (keyBinding.getCategory() != category) {</b>
+&nbsp;                    return;
+&nbsp;                }
+<b class="nc">&nbsp;                if (matchesSearchTerm(keyBinding, term.toLowerCase())) {</b>
+<b class="nc">&nbsp;                    KeyBindingViewModel keyBindViewModel = new KeyBindingViewModel(keyBindingRepository, keyBinding, bind);</b>
+<b class="nc">&nbsp;                    categoryItem.getChildren().add(keyBindViewModel);</b>
+&nbsp;                }
+&nbsp;            });
+<b class="nc">&nbsp;            if (!categoryItem.getChildren().isEmpty()) {</b>
+<b class="nc">&nbsp;                root.getChildren().add(categoryItem);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Searches for the term in the keybinding&#39;s localization, category, or key combination
+&nbsp;     *
+&nbsp;     * @param keyBinding keybinding to search in
+&nbsp;     * @param searchTerm term to search for
+&nbsp;     * @return true if the term is found in the keybinding
+&nbsp;     */
+&nbsp;    private boolean matchesSearchTerm(KeyBinding keyBinding, String searchTerm) {
+<b class="nc">&nbsp;        if (keyBinding.getLocalization().toLowerCase().contains(searchTerm) ||</b>
+<b class="nc">&nbsp;                keyBinding.getCategory().getName().toLowerCase().contains(searchTerm)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (keyBindingRepository.getKeyCombination(keyBinding).isPresent()) {</b>
+<b class="nc">&nbsp;            return keyBindingRepository.getKeyCombination(keyBinding).get().toString().toLowerCase().contains(searchTerm);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setNewBindingForCurrent(KeyEvent event) {
+<b class="nc">&nbsp;        Optional&lt;KeyBindingViewModel&gt; selectedKeyBindingValue = selectedKeyBinding.getValue();</b>
+<b class="nc">&nbsp;        if (selectedKeyBindingValue.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        KeyBindingViewModel selectedEntry = selectedKeyBindingValue.get();</b>
+<b class="nc">&nbsp;        if (selectedEntry.isCategory()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (selectedEntry.setNewBinding(event)) {</b>
+<b class="nc">&nbsp;            keyBindingRepository.put(selectedEntry.getKeyBinding(), selectedEntry.getBinding());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        if (!keyBindingRepository.equals(preferences.getKeyBindingRepository())) {</b>
+<b class="nc">&nbsp;            preferences.getKeyBindingRepository().getBindingsProperty().set(keyBindingRepository.getBindingsProperty());</b>
+<b class="nc">&nbsp;            restartWarning.add(Localization.lang(&quot;Keyboard shortcuts changed&quot;));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetToDefault() {
+<b class="nc">&nbsp;        String title = Localization.lang(&quot;Resetting all keyboard shortcuts&quot;);</b>
+<b class="nc">&nbsp;        String content = Localization.lang(&quot;All keyboard shortcuts will be reset to their defaults.&quot;);</b>
+<b class="nc">&nbsp;        ButtonType resetButtonType = new ButtonType(&quot;Reset&quot;, ButtonBar.ButtonData.OK_DONE);</b>
+<b class="nc">&nbsp;        dialogService.showCustomButtonDialogAndWait(Alert.AlertType.INFORMATION, title, content, resetButtonType,</b>
+<b class="nc">&nbsp;                ButtonType.CANCEL).ifPresent(response -&gt; {</b>
+<b class="nc">&nbsp;            if (response == resetButtonType) {</b>
+<b class="nc">&nbsp;                keyBindingRepository.resetToDefault();</b>
+<b class="nc">&nbsp;                setValues();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void loadPreset(KeyBindingPreset preset) {
+<b class="nc">&nbsp;        if (preset == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        preset.getKeyBindings().forEach(keyBindingRepository::put);</b>
+<b class="nc">&nbsp;        setValues();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;KeyBindingPreset&gt; keyBindingPresets() {
+<b class="nc">&nbsp;        return keyBindingPresets;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; getRestartWarnings() {
+<b class="nc">&nbsp;        return restartWarning;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OptionalObjectProperty&lt;KeyBindingViewModel&gt; selectedKeyBindingProperty() {
+<b class="nc">&nbsp;        return selectedKeyBinding;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;KeyBindingViewModel&gt; rootKeyBindingProperty() {
+<b class="nc">&nbsp;        return rootKeyBinding;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeyBindingRepository getKeyBindingRepository() {
+<b class="nc">&nbsp;        return keyBindingRepository;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

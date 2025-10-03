@@ -1,0 +1,318 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GroupTreeNodeViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.groups</a>
+</div>
+
+<h1>Coverage Summary for Class: GroupTreeNodeViewModel (org.jabref.gui.groups)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GroupTreeNodeViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/73)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.groups;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import javax.swing.undo.AbstractUndoableEdit;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import org.jabref.gui.undo.CountingUndoManager;
+&nbsp;import org.jabref.model.FieldChange;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.groups.AbstractGroup;
+&nbsp;import org.jabref.model.groups.AllEntriesGroup;
+&nbsp;import org.jabref.model.groups.ExplicitGroup;
+&nbsp;import org.jabref.model.groups.GroupEntryChanger;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;import org.jabref.model.groups.KeywordGroup;
+&nbsp;import org.jabref.model.groups.SearchGroup;
+&nbsp;import org.jabref.model.groups.SmartGroup;
+&nbsp;
+&nbsp;public class GroupTreeNodeViewModel {
+&nbsp;    private final GroupTreeNode node;
+&nbsp;
+<b class="nc">&nbsp;    public GroupTreeNodeViewModel(GroupTreeNode node) {</b>
+<b class="nc">&nbsp;        this.node = node;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;GroupTreeNodeViewModel{&quot; + &quot;node=&quot; + node + &#39;}&#39;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public GroupTreeNode getNode() {
+<b class="nc">&nbsp;        return node;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;GroupTreeNodeViewModel&gt; getChildren() {
+<b class="nc">&nbsp;        List&lt;GroupTreeNodeViewModel&gt; children = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (GroupTreeNode child : node.getChildren()) {</b>
+<b class="nc">&nbsp;            children.add(new GroupTreeNodeViewModel(child));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return children;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected boolean printInItalics() {
+<b class="nc">&nbsp;        return node.getGroup().isDynamic();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        AbstractGroup group = node.getGroup();</b>
+<b class="nc">&nbsp;        String shortDescription = &quot;&quot;;</b>
+<b class="nc">&nbsp;        boolean showDynamic = true;</b>
+<b class="nc">&nbsp;        shortDescription = switch (group) {</b>
+<b class="nc">&nbsp;            case SmartGroup smartGroup -&gt;</b>
+<b class="nc">&nbsp;                    GroupDescriptions.getShortDescriptionSmartGroup(smartGroup);</b>
+<b class="nc">&nbsp;            case ExplicitGroup explicitGroup -&gt;</b>
+<b class="nc">&nbsp;                    GroupDescriptions.getShortDescriptionExplicitGroup(explicitGroup);</b>
+<b class="nc">&nbsp;            case KeywordGroup keywordGroup -&gt;</b>
+<b class="nc">&nbsp;                    GroupDescriptions.getShortDescriptionKeywordGroup(keywordGroup, showDynamic);</b>
+<b class="nc">&nbsp;            case SearchGroup searchGroup -&gt;</b>
+<b class="nc">&nbsp;                    GroupDescriptions.getShortDescription(searchGroup, showDynamic);</b>
+&nbsp;            case null,
+&nbsp;                 default -&gt;
+<b class="nc">&nbsp;                    GroupDescriptions.getShortDescriptionAllEntriesGroup();</b>
+<b class="nc">&nbsp;        };</b>
+<b class="nc">&nbsp;        return &quot;&lt;html&gt;&quot; + shortDescription + &quot;&lt;/html&gt;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canAddEntries(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        return (getNode().getGroup() instanceof GroupEntryChanger) &amp;&amp; !getNode().getGroup().containsAll(entries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canRemoveEntries(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        return (getNode().getGroup() instanceof GroupEntryChanger) &amp;&amp; getNode().getGroup().containsAny(entries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void sortChildrenByName(boolean recursive) {
+<b class="nc">&nbsp;        getNode().sortChildren(</b>
+<b class="nc">&nbsp;                (node1, node2) -&gt; node1.getGroup().getName().compareToIgnoreCase(node2.getGroup().getName()),</b>
+&nbsp;                recursive);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((o == null) || (getClass() != o.getClass())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        GroupTreeNodeViewModel viewModel = (GroupTreeNodeViewModel) o;</b>
+<b class="nc">&nbsp;        return node.equals(viewModel.node);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return node.hashCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return getNode().getGroup().getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canBeEdited() {
+<b class="nc">&nbsp;        return getNode().getGroup() instanceof AllEntriesGroup;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canMoveUp() {
+<b class="nc">&nbsp;        return (getNode().getPreviousSibling().isPresent())</b>
+<b class="nc">&nbsp;                &amp;&amp; !(getNode().getGroup() instanceof AllEntriesGroup);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canMoveDown() {
+<b class="nc">&nbsp;        return (getNode().getNextSibling().isPresent())</b>
+<b class="nc">&nbsp;                &amp;&amp; !(getNode().getGroup() instanceof AllEntriesGroup);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canMoveLeft() {
+<b class="nc">&nbsp;        return !(getNode().getGroup() instanceof AllEntriesGroup)</b>
+&nbsp;                // TODO: Null!
+<b class="nc">&nbsp;                &amp;&amp; !(getNode().getParent().get().getGroup() instanceof AllEntriesGroup);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canMoveRight() {
+<b class="nc">&nbsp;        return (getNode().getPreviousSibling().isPresent())</b>
+<b class="nc">&nbsp;                &amp;&amp; !(getNode().getGroup() instanceof AllEntriesGroup);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void changeEntriesTo(List&lt;BibEntry&gt; entries, UndoManager undoManager) {
+<b class="nc">&nbsp;        AbstractGroup group = node.getGroup();</b>
+<b class="nc">&nbsp;        List&lt;FieldChange&gt; changesRemove = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;FieldChange&gt; changesAdd = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Sort entries into current members and non-members of the group
+&nbsp;        // Current members will be removed
+&nbsp;        // Current non-members will be added
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; toRemove = new ArrayList&lt;&gt;(entries.size());</b>
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; toAdd = new ArrayList&lt;&gt;(entries.size());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+&nbsp;            // Sort according to current state of the entries
+<b class="nc">&nbsp;            if (group.contains(entry)) {</b>
+<b class="nc">&nbsp;                toRemove.add(entry);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                toAdd.add(entry);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // If there are entries to remove
+<b class="nc">&nbsp;        if (!toRemove.isEmpty()) {</b>
+<b class="nc">&nbsp;            changesRemove = removeEntriesFromGroup(toRemove);</b>
+&nbsp;        }
+&nbsp;        // If there are entries to add
+<b class="nc">&nbsp;        if (!toAdd.isEmpty()) {</b>
+<b class="nc">&nbsp;            changesAdd = addEntriesToGroup(toAdd);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Remember undo information
+<b class="nc">&nbsp;        if (!changesRemove.isEmpty()) {</b>
+<b class="nc">&nbsp;            AbstractUndoableEdit undoRemove = UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesRemove);</b>
+<b class="nc">&nbsp;            if (!changesAdd.isEmpty() &amp;&amp; (undoRemove != null)) {</b>
+&nbsp;                // we removed and added entries
+<b class="nc">&nbsp;                undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            undoManager.addEdit(undoRemove);</b>
+<b class="nc">&nbsp;        } else if (!changesAdd.isEmpty()) {</b>
+<b class="nc">&nbsp;            undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;FieldChange&gt; removeEntriesFromGroup(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        return node.removeEntriesFromGroup(entries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isAllEntriesGroup() {
+<b class="nc">&nbsp;        return getNode().getGroup() instanceof AllEntriesGroup;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addNewGroup(AbstractGroup newGroup, CountingUndoManager undoManager) {
+<b class="nc">&nbsp;        GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);</b>
+<b class="nc">&nbsp;        this.getNode().addChild(newNode);</b>
+&nbsp;
+<b class="nc">&nbsp;        UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(</b>
+&nbsp;                this,
+&nbsp;                new GroupTreeNodeViewModel(newNode),
+&nbsp;                UndoableAddOrRemoveGroup.ADD_NODE);
+<b class="nc">&nbsp;        undoManager.addEdit(undo);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds the given entries to this node&#39;s group.
+&nbsp;     */
+&nbsp;    public List&lt;FieldChange&gt; addEntriesToGroup(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        return node.addEntriesToGroup(entries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void subscribeToDescendantChanged(Consumer&lt;GroupTreeNodeViewModel&gt; subscriber) {
+<b class="nc">&nbsp;        getNode().subscribeToDescendantChanged(node -&gt; subscriber.accept(new GroupTreeNodeViewModel(node)));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

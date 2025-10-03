@@ -1,0 +1,260 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Ping</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough.effects</a>
+</div>
+
+<h1>Coverage Summary for Class: Ping (org.jabref.gui.walkthrough.effects)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Ping</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/66)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough.effects;
+&nbsp;
+&nbsp;import javafx.animation.Interpolator;
+&nbsp;import javafx.animation.KeyFrame;
+&nbsp;import javafx.animation.KeyValue;
+&nbsp;import javafx.animation.Timeline;
+&nbsp;import javafx.geometry.Bounds;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.layout.Pane;
+&nbsp;import javafx.scene.shape.Circle;
+&nbsp;import javafx.util.Duration;
+&nbsp;
+&nbsp;import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;
+&nbsp;public final class Ping extends BaseWindowEffect {
+&nbsp;    public static final int INDICATOR_OFFSET = 4;
+<b class="nc">&nbsp;    private static final Duration TRANSITION_DURATION = Duration.millis(300);</b>
+&nbsp;
+&nbsp;    private Circle ping;
+&nbsp;    private Timeline pingAnimation;
+&nbsp;    private Timeline transitionAnimation;
+&nbsp;    private Node node;
+&nbsp;
+&nbsp;    public Ping(@NonNull Pane pane) {
+<b class="nc">&nbsp;        super(pane);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void attach(@NonNull Node node) {
+<b class="nc">&nbsp;        if (this.node != null) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Ping effect is already attached to a node. Detach it first.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ping = new Circle(8);</b>
+<b class="nc">&nbsp;        ping.setMouseTransparent(true);</b>
+<b class="nc">&nbsp;        ping.setManaged(false);</b>
+<b class="nc">&nbsp;        ping.getStyleClass().add(&quot;walkthrough-ping&quot;);</b>
+<b class="nc">&nbsp;        pane.getChildren().add(ping);</b>
+&nbsp;
+<b class="nc">&nbsp;        pingAnimation = new Timeline(</b>
+&nbsp;                new KeyFrame(Duration.ZERO,
+<b class="nc">&nbsp;                        new KeyValue(ping.opacityProperty(), 1.0),</b>
+<b class="nc">&nbsp;                        new KeyValue(ping.scaleXProperty(), 1.0),</b>
+<b class="nc">&nbsp;                        new KeyValue(ping.scaleYProperty(), 1.0)),</b>
+<b class="nc">&nbsp;                new KeyFrame(Duration.seconds(0.5),</b>
+<b class="nc">&nbsp;                        new KeyValue(ping.opacityProperty(), 0.6),</b>
+<b class="nc">&nbsp;                        new KeyValue(ping.scaleXProperty(), 1.3),</b>
+<b class="nc">&nbsp;                        new KeyValue(ping.scaleYProperty(), 1.3)),</b>
+<b class="nc">&nbsp;                new KeyFrame(Duration.seconds(1.0),</b>
+<b class="nc">&nbsp;                        new KeyValue(ping.opacityProperty(), 1.0),</b>
+<b class="nc">&nbsp;                        new KeyValue(ping.scaleXProperty(), 1.0),</b>
+<b class="nc">&nbsp;                        new KeyValue(ping.scaleYProperty(), 1.0))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        pingAnimation.setCycleCount(Timeline.INDEFINITE);</b>
+<b class="nc">&nbsp;        pingAnimation.play();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.node = node;</b>
+<b class="nc">&nbsp;        setupListeners(this.node);</b>
+<b class="nc">&nbsp;        setupPaneListeners();</b>
+<b class="nc">&nbsp;        updateLayout();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void transitionTo(@NonNull Node newNode) {
+<b class="nc">&nbsp;        if (ping == null || !ping.isVisible()) {</b>
+<b class="nc">&nbsp;            attach(newNode);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (transitionAnimation != null) {</b>
+<b class="nc">&nbsp;            transitionAnimation.stop();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Bounds newBounds = newNode.localToScene(newNode.getBoundsInLocal());</b>
+<b class="nc">&nbsp;        Bounds newBoundsInPane = pane.sceneToLocal(newBounds);</b>
+&nbsp;
+<b class="nc">&nbsp;        double targetX = newBoundsInPane.getMaxX() - INDICATOR_OFFSET;</b>
+<b class="nc">&nbsp;        double targetY = newBoundsInPane.getMinY() + INDICATOR_OFFSET;</b>
+&nbsp;
+<b class="nc">&nbsp;        transitionAnimation = new Timeline(</b>
+&nbsp;                new KeyFrame(TRANSITION_DURATION,
+<b class="nc">&nbsp;                        new KeyValue(ping.layoutXProperty(), targetX, Interpolator.EASE_BOTH),</b>
+<b class="nc">&nbsp;                        new KeyValue(ping.layoutYProperty(), targetY, Interpolator.EASE_BOTH)</b>
+&nbsp;                )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        transitionAnimation.setOnFinished(_ -&gt; {</b>
+<b class="nc">&nbsp;            if (this.node != null) {</b>
+<b class="nc">&nbsp;                cleanupListeners();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            this.node = newNode;</b>
+<b class="nc">&nbsp;            setupListeners(this.node);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        transitionAnimation.play();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void detach() {
+<b class="nc">&nbsp;        if (pingAnimation != null) {</b>
+<b class="nc">&nbsp;            pingAnimation.stop();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (transitionAnimation != null) {</b>
+<b class="nc">&nbsp;            transitionAnimation.stop();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (ping != null &amp;&amp; ping.getParent() instanceof Pane parentPane) {</b>
+<b class="nc">&nbsp;            parentPane.getChildren().remove(ping);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        super.detach();</b>
+<b class="nc">&nbsp;        node = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void updateLayout() {
+<b class="nc">&nbsp;        if (WalkthroughUtils.cannotPositionNode(node)) {</b>
+<b class="nc">&nbsp;            hideEffect();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Bounds localBounds = node.getBoundsInLocal();</b>
+<b class="nc">&nbsp;        Bounds targetBounds = pane.sceneToLocal(node.localToScene(localBounds));</b>
+<b class="nc">&nbsp;        if (targetBounds == null) {</b>
+<b class="nc">&nbsp;            hideEffect();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ping.setVisible(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        double indicatorX = targetBounds.getMaxX() - INDICATOR_OFFSET;</b>
+<b class="nc">&nbsp;        double indicatorY = targetBounds.getMinY() + INDICATOR_OFFSET;</b>
+&nbsp;
+<b class="nc">&nbsp;        ping.setLayoutX(indicatorX);</b>
+<b class="nc">&nbsp;        ping.setLayoutY(indicatorY);</b>
+<b class="nc">&nbsp;        ping.toFront();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void hideEffect() {
+<b class="nc">&nbsp;        if (ping != null) {</b>
+<b class="nc">&nbsp;            ping.setVisible(false);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

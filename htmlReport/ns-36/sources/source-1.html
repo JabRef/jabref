@@ -1,0 +1,246 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ContextAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors.contextmenu</a>
+</div>
+
+<h1>Coverage Summary for Class: ContextAction (org.jabref.gui.fieldeditors.contextmenu)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ContextAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ContextAction$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors.contextmenu;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+&nbsp;import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+&nbsp;
+&nbsp;public class ContextAction extends SimpleCommand {
+&nbsp;
+&nbsp;    private final StandardActions command;
+&nbsp;    private final LinkedFileViewModel linkedFile;
+&nbsp;    private final LinkedFilesEditorViewModel viewModel;
+&nbsp;
+&nbsp;    public ContextAction(StandardActions command,
+&nbsp;                         LinkedFileViewModel linkedFile,
+&nbsp;                         BibDatabaseContext databaseContext,
+&nbsp;                         ObservableOptionalValue&lt;BibEntry&gt; bibEntry,
+&nbsp;                         GuiPreferences preferences,
+<b class="nc">&nbsp;                         LinkedFilesEditorViewModel viewModel) {</b>
+<b class="nc">&nbsp;        this.command = command;</b>
+<b class="nc">&nbsp;        this.linkedFile = linkedFile;</b>
+<b class="nc">&nbsp;        this.viewModel = viewModel;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(</b>
+<b class="nc">&nbsp;                switch (command) {</b>
+&nbsp;                    case RENAME_FILE_TO_PATTERN -&gt;
+<b class="nc">&nbsp;                            Bindings.createBooleanBinding(</b>
+<b class="nc">&nbsp;                                    () -&gt; !linkedFile.getFile().isOnlineLink()</b>
+<b class="nc">&nbsp;                                            &amp;&amp; linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()</b>
+<b class="nc">&nbsp;                                            &amp;&amp; !linkedFile.isGeneratedNameSameAsOriginal(),</b>
+<b class="nc">&nbsp;                                    linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));</b>
+&nbsp;                    case MOVE_FILE_TO_FOLDER,
+&nbsp;                         MOVE_FILE_TO_FOLDER_AND_RENAME -&gt;
+<b class="nc">&nbsp;                            Bindings.createBooleanBinding(</b>
+<b class="nc">&nbsp;                                    () -&gt; !linkedFile.getFile().isOnlineLink()</b>
+<b class="nc">&nbsp;                                            &amp;&amp; linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()</b>
+<b class="nc">&nbsp;                                            &amp;&amp; !linkedFile.isGeneratedPathSameAsOriginal(),</b>
+<b class="nc">&nbsp;                                    linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));</b>
+&nbsp;                    case DOWNLOAD_FILE -&gt;
+<b class="nc">&nbsp;                            Bindings.createBooleanBinding(</b>
+<b class="nc">&nbsp;                                    () -&gt; linkedFile.getFile().isOnlineLink(),</b>
+<b class="nc">&nbsp;                                    linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));</b>
+&nbsp;                    case REDOWNLOAD_FILE -&gt;
+<b class="nc">&nbsp;                            Bindings.createBooleanBinding(</b>
+<b class="nc">&nbsp;                                    () -&gt; !linkedFile.getFile().getSourceUrl().isEmpty(),</b>
+<b class="nc">&nbsp;                                    linkedFile.getFile().sourceUrlProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));</b>
+&nbsp;                    case OPEN_FILE,
+&nbsp;                         OPEN_FOLDER,
+&nbsp;                         RENAME_FILE_TO_NAME,
+&nbsp;                         DELETE_FILE -&gt;
+<b class="nc">&nbsp;                            Bindings.createBooleanBinding(</b>
+<b class="nc">&nbsp;                                    () -&gt; !linkedFile.getFile().isOnlineLink()</b>
+<b class="nc">&nbsp;                                            &amp;&amp; linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent(),</b>
+<b class="nc">&nbsp;                                    linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));</b>
+&nbsp;                    default -&gt;
+<b class="nc">&nbsp;                            BindingsHelper.constantOf(true);</b>
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        switch (command) {</b>
+&nbsp;            case EDIT_FILE_LINK -&gt;
+<b class="nc">&nbsp;                    linkedFile.edit();</b>
+&nbsp;            case OPEN_FILE -&gt;
+<b class="nc">&nbsp;                    linkedFile.open();</b>
+&nbsp;            case OPEN_FOLDER -&gt;
+<b class="nc">&nbsp;                    linkedFile.openFolder();</b>
+&nbsp;            case DOWNLOAD_FILE -&gt;
+<b class="nc">&nbsp;                    linkedFile.download(true);</b>
+&nbsp;            case REDOWNLOAD_FILE -&gt;
+<b class="nc">&nbsp;                    linkedFile.redownload();</b>
+&nbsp;            case RENAME_FILE_TO_PATTERN -&gt;
+<b class="nc">&nbsp;                    linkedFile.renameToSuggestion();</b>
+&nbsp;            case RENAME_FILE_TO_NAME -&gt;
+<b class="nc">&nbsp;                    linkedFile.askForNameAndRename();</b>
+&nbsp;            case MOVE_FILE_TO_FOLDER -&gt;
+<b class="nc">&nbsp;                    linkedFile.moveToDefaultDirectory();</b>
+&nbsp;            case MOVE_FILE_TO_FOLDER_AND_RENAME -&gt;
+<b class="nc">&nbsp;                    linkedFile.moveToDefaultDirectoryAndRename();</b>
+&nbsp;            case DELETE_FILE -&gt;
+<b class="nc">&nbsp;                    viewModel.deleteFile(linkedFile);</b>
+&nbsp;            case REMOVE_LINK,
+&nbsp;                 REMOVE_LINKS -&gt;
+<b class="nc">&nbsp;                    viewModel.removeFileLink(linkedFile);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,612 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MarcXmlParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: MarcXmlParser (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MarcXmlParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/179)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/235)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.time.DateTimeException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.LinkedList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.xml.parsers.DocumentBuilder;
+&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+&nbsp;import javax.xml.parsers.ParserConfigurationException;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.AuthorListParser;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Date;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.w3c.dom.Element;
+&nbsp;import org.w3c.dom.Node;
+&nbsp;import org.w3c.dom.NodeList;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;
+&nbsp;/// A parser for the bavarian flavour (Bibliotheksverbund Bayern) of the marc xml standard
+&nbsp;///
+&nbsp;/// See [Feldbeschreibung der Titeldaten bei der Deutschen Nationalbibliothek](https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html)
+&nbsp;///
+&nbsp;/// For further information see
+&nbsp;///
+&nbsp;///   - https://www.bib-bvb.de/web/kkb-online/rda-felderverzeichnis-des-b3kat-aseq
+&nbsp;///   - https://www.loc.gov/marc/bibliographic/ for detailed documentation
+&nbsp;///   - for modifications in B3Kat https://www.bib-bvb.de/documents/10792/9f51a033-5ca1-42e2-b2d3-a75e7f1512d4
+&nbsp;///   - https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html
+&nbsp;///   - https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/AGV/marc21VereinbarungDatentauschTeil1.pdf?__blob=publicationFile&amp;v=2
+&nbsp;///   - about multiple books in a series https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/marc21FormatumstiegAbbildungBegrenzterWerke2008.pdf?__blob=publicationFile&amp;v=2&gt;
+&nbsp;///
+<b class="nc">&nbsp;public class MarcXmlParser implements Parser {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MarcXmlParser.class);</b>
+<b class="nc">&nbsp;    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BibEntry&gt; parseEntries(InputStream inputStream) throws ParseException {
+&nbsp;        try {
+<b class="nc">&nbsp;            DocumentBuilder documentBuilder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();</b>
+<b class="nc">&nbsp;            Document content = documentBuilder.parse(inputStream);</b>
+<b class="nc">&nbsp;            return this.parseEntries(content);</b>
+&nbsp;        } catch (ParserConfigurationException | SAXException | IOException exception) {
+<b class="nc">&nbsp;            throw new ParseException(exception);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntry&gt; parseEntries(Document content) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; result = new LinkedList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        Element root = (Element) content.getElementsByTagName(&quot;zs:searchRetrieveResponse&quot;).item(0);</b>
+<b class="nc">&nbsp;        Element srwrecords = getChild(&quot;zs:records&quot;, root);</b>
+<b class="nc">&nbsp;        if (srwrecords == null) {</b>
+&nbsp;            // no records found, so return the empty list
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        List&lt;Element&gt; records = getChildren(&quot;zs:record&quot;, srwrecords);</b>
+<b class="nc">&nbsp;        for (Element element : records) {</b>
+<b class="nc">&nbsp;            Element e = getChild(&quot;zs:recordData&quot;, element);</b>
+<b class="nc">&nbsp;            if (e != null) {</b>
+<b class="nc">&nbsp;                e = getChild(&quot;record&quot;, e);</b>
+<b class="nc">&nbsp;                if (e != null) {</b>
+<b class="nc">&nbsp;                    result.add(parseEntry(e));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibEntry parseEntry(Element element) {
+<b class="nc">&nbsp;        BibEntry bibEntry = new BibEntry(BibEntry.DEFAULT_TYPE);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Element&gt; datafields = getChildren(&quot;datafield&quot;, element);</b>
+<b class="nc">&nbsp;        for (Element datafield : datafields) {</b>
+<b class="nc">&nbsp;            String tag = datafield.getAttribute(&quot;tag&quot;);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;tag: {}&quot;, tag);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (&quot;020&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putIsbn(bibEntry, datafield);</b>
+<b class="nc">&nbsp;            } else if (&quot;100&quot;.equals(tag) || &quot;700&quot;.equals(tag) || &quot;710&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putPersonalName(bibEntry, datafield); // Author, Editor, Publisher</b>
+<b class="nc">&nbsp;            } else if (&quot;111&quot;.equals(tag)) {</b>
+&nbsp;                // FixMe: Conference Information also in Subtitle (245) &amp; Author (710)
+<b class="nc">&nbsp;                putConferenceDetail(bibEntry, datafield);</b>
+<b class="nc">&nbsp;            } else if (&quot;245&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putTitle(bibEntry, datafield);</b>
+<b class="nc">&nbsp;            } else if (&quot;250&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putEdition(bibEntry, datafield);</b>
+<b class="nc">&nbsp;            } else if (&quot;264&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putPublication(bibEntry, datafield);</b>
+<b class="nc">&nbsp;            } else if (&quot;300&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putPhysicalDescription(bibEntry, datafield);</b>
+<b class="nc">&nbsp;            } else if (&quot;490&quot;.equals(tag) || &quot;830&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putSeries(bibEntry, datafield);</b>
+<b class="nc">&nbsp;            } else if (&quot;502&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putThesisDescription(bibEntry, datafield); // Master&#39;s thesis, PhD thesis, Thesis</b>
+<b class="nc">&nbsp;            } else if (&quot;520&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putSummary(bibEntry, datafield);</b>
+<b class="nc">&nbsp;            } else if (&quot;653&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putKeywords(bibEntry, datafield);</b>
+<b class="nc">&nbsp;            } else if (&quot;773&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putIssue(bibEntry, datafield);</b>
+<b class="nc">&nbsp;            } else if (&quot;856&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putElectronicLocation(bibEntry, datafield);</b>
+<b class="nc">&nbsp;            } else if (&quot;966&quot;.equals(tag)) {</b>
+<b class="nc">&nbsp;                putDoi(bibEntry, datafield);</b>
+<b class="nc">&nbsp;            } else if (Integer.parseInt(tag) &gt;= 546 &amp;&amp; Integer.parseInt(tag) &lt;= 599) {</b>
+&nbsp;                // Notes
+&nbsp;                // FixMe: Some notes seem to have tags lower than 546
+<b class="nc">&nbsp;                putNotes(bibEntry, datafield);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Unparsed tag: {}&quot;, tag);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return bibEntry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putIsbn(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        String isbn = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;        if (StringUtil.isNullOrEmpty(isbn)) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Empty ISBN recieved&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int length = isbn.length();</b>
+<b class="nc">&nbsp;        if (length != 10 &amp;&amp; length != 13) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Malformed ISBN recieved, length: {}&quot;, length);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;String&gt; field = bibEntry.getField(StandardField.ISBN);</b>
+<b class="nc">&nbsp;        if (field.isPresent()) {</b>
+&nbsp;            // Only overwrite the field, if it&#39;s ISBN13
+<b class="nc">&nbsp;            if (field.get().length() == 13) {</b>
+<b class="nc">&nbsp;                bibEntry.setField(StandardField.ISBN, isbn);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.ISBN, isbn);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putPersonalName(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        String author = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;        String relation = getSubfield(&quot;4&quot;, datafield);</b>
+&nbsp;        AuthorList name;
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(author) &amp;&amp; StringUtil.isNotBlank(relation)) {</b>
+<b class="nc">&nbsp;            name = new AuthorListParser().parse(author);</b>
+<b class="nc">&nbsp;            Optional&lt;StandardField&gt; field = Optional.ofNullable(</b>
+<b class="nc">&nbsp;                    switch (relation) {</b>
+&nbsp;                        case &quot;aut&quot; -&gt;
+<b class="nc">&nbsp;                                StandardField.AUTHOR;</b>
+&nbsp;                        case &quot;edt&quot; -&gt;
+<b class="nc">&nbsp;                                StandardField.EDITOR;</b>
+&nbsp;                        case &quot;pbl&quot; -&gt;
+<b class="nc">&nbsp;                                StandardField.PUBLISHER;</b>
+&nbsp;                        default -&gt;
+<b class="nc">&nbsp;                                null;</b>
+&nbsp;                    });
+&nbsp;
+<b class="nc">&nbsp;            if (field.isPresent()) {</b>
+<b class="nc">&nbsp;                String ind1 = datafield.getAttribute(&quot;ind1&quot;);</b>
+&nbsp;                String brackedName;
+<b class="nc">&nbsp;                if (field.get() == StandardField.PUBLISHER &amp;&amp; StringUtil.isNotBlank(ind1) &amp;&amp; &quot;2&quot;.equals(ind1)) {</b>
+&nbsp;                    // ind == 2 -&gt; Corporate publisher
+<b class="nc">&nbsp;                    brackedName = &quot;{&quot; + name.getAsFirstLastNamesWithAnd() + &quot;}&quot;;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    brackedName = name.getAsLastFirstNamesWithAnd(false);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (bibEntry.getField(field.get()).isPresent()) {</b>
+<b class="nc">&nbsp;                    bibEntry.setField(field.get(), bibEntry.getField(field.get()).get().concat(&quot; and &quot; + brackedName));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    bibEntry.setField(field.get(), brackedName);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putConferenceDetail(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        String conference = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;        bibEntry.setType(StandardEntryType.Proceedings);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(conference)) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.EVENTTITLE, conference);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putTitle(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        String title = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;        String subtitle = getSubfield(&quot;b&quot;, datafield);</b>
+<b class="nc">&nbsp;        String responsibility = getSubfield(&quot;c&quot;, datafield);</b>
+<b class="nc">&nbsp;        String number = getSubfield(&quot;n&quot;, datafield);</b>
+<b class="nc">&nbsp;        String part = getSubfield(&quot;p&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(title)) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.TITLE, title);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(subtitle)) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.SUBTITLE, subtitle);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(responsibility)) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.TITLEADDON, responsibility);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(number)) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.NUMBER, number);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(part)) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.PART, part);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putEdition(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        String edition = getSubfield(&quot;a&quot;, datafield); // e.g. &#39;1st ed. 2020&#39;</b>
+<b class="nc">&nbsp;        String editionAddendum = getSubfield(&quot;b&quot;, datafield); // e.g. &#39;revised by N.N.&#39;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNullOrEmpty(edition)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(editionAddendum)) {</b>
+<b class="nc">&nbsp;            edition = edition.concat(&quot;, &quot; + editionAddendum);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        bibEntry.setField(StandardField.EDITION, edition);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putPublication(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        String ind2 = datafield.getAttribute(&quot;ind2&quot;);</b>
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(ind2) &amp;&amp; &quot;1&quot;.equals(ind2)) { // Publisher</b>
+<b class="nc">&nbsp;            String place = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;            String name = getSubfield(&quot;b&quot;, datafield);</b>
+<b class="nc">&nbsp;            String date = getSubfield(&quot;c&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (StringUtil.isNotBlank(place)) {</b>
+<b class="nc">&nbsp;                bibEntry.setField(StandardField.ADDRESS, place);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (StringUtil.isNotBlank(name)) {</b>
+<b class="nc">&nbsp;                bibEntry.setField(StandardField.PUBLISHER, &quot;{&quot; + name + &quot;}&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (StringUtil.isNotBlank(date)) {</b>
+<b class="nc">&nbsp;                String strippedDate = StringUtil.stripBrackets(date);</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    Date.parse(strippedDate).ifPresent(bibEntry::setDate);</b>
+&nbsp;                } catch (DateTimeException exception) {
+&nbsp;                    // cannot read date value, just copy it in plain text
+<b class="nc">&nbsp;                    LOGGER.info(&quot;Cannot parse date &#39;{}&#39;&quot;, strippedDate);</b>
+<b class="nc">&nbsp;                    bibEntry.setField(StandardField.DATE, StringUtil.stripBrackets(strippedDate));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putPhysicalDescription(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        String pagetotal = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(pagetotal) &amp;&amp; (pagetotal.contains(&quot;pages&quot;) || pagetotal.contains(&quot;p.&quot;) || pagetotal.contains(&quot;S&quot;) || pagetotal.contains(&quot;Seiten&quot;))) {</b>
+<b class="nc">&nbsp;            pagetotal = pagetotal.replaceAll(&quot;.*?(\\d+)(?:\\s*Seiten|\\s*S|\\s*pages|\\s*p).*&quot;, &quot;$1&quot;);</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.PAGETOTAL, pagetotal);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putSeries(BibEntry bibEntry, Element datafield) {
+&nbsp;        // tag 490 - Series
+&nbsp;        // tag 830 - Series Added Entry
+&nbsp;
+<b class="nc">&nbsp;        String name = getSubfield(&quot;a&quot;, datafield);</b>
+<b class="nc">&nbsp;        String volume = getSubfield(&quot;v&quot;, datafield);</b>
+<b class="nc">&nbsp;        String issn = getSubfield(&quot;x&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(name)) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.SERIES, name);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(volume)) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.VOLUME, volume);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(issn)) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.ISSN, issn);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putThesisDescription(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        String thesisDegree = getSubfield(&quot;b&quot;, datafield);</b>
+<b class="nc">&nbsp;        String school = getSubfield(&quot;c&quot;, datafield);</b>
+<b class="nc">&nbsp;        bibEntry.setType(StandardEntryType.MastersThesis);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(school)) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.SCHOOL, school);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (&quot;Dissertation&quot;.equals(thesisDegree)) {</b>
+<b class="nc">&nbsp;            bibEntry.setType(StandardEntryType.PhdThesis);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putSummary(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        String summary = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;        String ind1 = datafield.getAttribute(&quot;ind1&quot;);</b>
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(summary) &amp;&amp; StringUtil.isNotBlank(ind1) &amp;&amp; &quot;3&quot;.equals(ind1)) { // Abstract</b>
+<b class="nc">&nbsp;            if (bibEntry.getField(StandardField.ABSTRACT).isPresent()) {</b>
+<b class="nc">&nbsp;                bibEntry.setField(StandardField.ABSTRACT, bibEntry.getField(StandardField.ABSTRACT).get().concat(summary));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                bibEntry.setField(StandardField.ABSTRACT, summary);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putKeywords(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        String keyword = getSubfield(&quot;a&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(keyword)) {</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; keywords = bibEntry.getField(StandardField.KEYWORDS);</b>
+<b class="nc">&nbsp;            if (keywords.isPresent()) {</b>
+<b class="nc">&nbsp;                bibEntry.setField(StandardField.KEYWORDS, keywords.get() + &quot;, &quot; + keyword);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                bibEntry.setField(StandardField.KEYWORDS, keyword);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putIssue(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        bibEntry.setType(StandardEntryType.Article);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; issues = getSubfields(&quot;g&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String issue : issues) {</b>
+<b class="nc">&nbsp;            String[] parts = issue.split(&quot;:&quot;);</b>
+<b class="nc">&nbsp;            if (parts.length == 2) {</b>
+<b class="nc">&nbsp;                String key = parts[0].trim();</b>
+<b class="nc">&nbsp;                String value = parts[1].trim();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (StringUtil.isNotBlank(value)) {</b>
+<b class="nc">&nbsp;                    switch (key) {</b>
+&nbsp;                        case &quot;number&quot; -&gt;
+<b class="nc">&nbsp;                                bibEntry.setField(StandardField.NUMBER, value);</b>
+&nbsp;                        case &quot;year&quot; -&gt;
+<b class="nc">&nbsp;                                bibEntry.setField(StandardField.YEAR, value);</b>
+&nbsp;                        case &quot;pages&quot; -&gt;
+<b class="nc">&nbsp;                                bibEntry.setField(StandardField.PAGES, value);</b>
+&nbsp;                        case &quot;volume&quot; -&gt;
+<b class="nc">&nbsp;                                bibEntry.setField(StandardField.VOLUME, value);</b>
+&nbsp;                        case &quot;day&quot; -&gt;
+<b class="nc">&nbsp;                                bibEntry.setField(StandardField.DAY, value);</b>
+&nbsp;                        case &quot;month&quot; -&gt;
+<b class="nc">&nbsp;                                bibEntry.setField(StandardField.MONTH, value);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putDoi(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        String ind1 = datafield.getAttribute(&quot;ind1&quot;);</b>
+<b class="nc">&nbsp;        String resource = getSubfield(&quot;u&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (&quot;e&quot;.equals(ind1) &amp;&amp; StringUtil.isNotBlank(&quot;u&quot;) &amp;&amp; StringUtil.isNotBlank(resource)) { // DOI</b>
+<b class="nc">&nbsp;            String fulltext = getSubfield(&quot;3&quot;, datafield);</b>
+<b class="nc">&nbsp;            handleVolltext(bibEntry, fulltext, resource, StandardField.DOI);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putElectronicLocation(BibEntry bibEntry, Element datafield) {
+&nbsp;        // 856 - fulltext pdf url
+<b class="nc">&nbsp;        String ind1 = datafield.getAttribute(&quot;ind1&quot;);</b>
+<b class="nc">&nbsp;        String ind2 = datafield.getAttribute(&quot;ind2&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (&quot;4&quot;.equals(ind1) &amp;&amp; &quot;0&quot;.equals(ind2)) {</b>
+<b class="nc">&nbsp;            String fulltext = getSubfield(&quot;3&quot;, datafield);</b>
+<b class="nc">&nbsp;            String resource = getSubfield(&quot;u&quot;, datafield);</b>
+<b class="nc">&nbsp;            handleVolltext(bibEntry, fulltext, resource, StandardField.URL);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void handleVolltext(BibEntry bibEntry, String fieldName, String resource, Field fallBackField) {
+<b class="nc">&nbsp;        if (&quot;Volltext&quot;.equals(fieldName) &amp;&amp; StringUtil.isNotBlank(resource)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                LinkedFile linkedFile = new LinkedFile(&quot;&quot;, URLUtil.create(resource), StandardFileType.PDF.getName());</b>
+<b class="nc">&nbsp;                bibEntry.setFiles(List.of(linkedFile));</b>
+&nbsp;            } catch (MalformedURLException | IllegalArgumentException e) {
+<b class="nc">&nbsp;                LOGGER.info(&quot;Malformed URL: {}&quot;, resource);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            bibEntry.setField(fallBackField, resource);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void putNotes(BibEntry bibEntry, Element datafield) {
+<b class="nc">&nbsp;        String[] notes = new String[] {</b>
+<b class="nc">&nbsp;                getSubfield(&quot;a&quot;, datafield),</b>
+<b class="nc">&nbsp;                getSubfield(&quot;0&quot;, datafield),</b>
+<b class="nc">&nbsp;                getSubfield(&quot;h&quot;, datafield),</b>
+<b class="nc">&nbsp;                getSubfield(&quot;S&quot;, datafield),</b>
+<b class="nc">&nbsp;                getSubfield(&quot;c&quot;, datafield),</b>
+<b class="nc">&nbsp;                getSubfield(&quot;f&quot;, datafield),</b>
+<b class="nc">&nbsp;                getSubfield(&quot;i&quot;, datafield),</b>
+<b class="nc">&nbsp;                getSubfield(&quot;k&quot;, datafield),</b>
+<b class="nc">&nbsp;                getSubfield(&quot;l&quot;, datafield),</b>
+<b class="nc">&nbsp;                getSubfield(&quot;z&quot;, datafield),</b>
+<b class="nc">&nbsp;                getSubfield(&quot;3&quot;, datafield),</b>
+<b class="nc">&nbsp;                getSubfield(&quot;5&quot;, datafield)</b>
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        String notesJoined = Arrays.stream(notes)</b>
+<b class="nc">&nbsp;                                   .filter(StringUtil::isNotBlank)</b>
+<b class="nc">&nbsp;                                   .collect(Collectors.joining(&quot;\n\n&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (bibEntry.getField(StandardField.NOTE).isPresent()) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.NOTE, bibEntry.getField(StandardField.NOTE).get().concat(notesJoined));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.NOTE, notesJoined);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getSubfield(String a, Element datafield) {
+<b class="nc">&nbsp;        List&lt;Element&gt; subfields = getChildren(&quot;subfield&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Element subfield : subfields) {</b>
+<b class="nc">&nbsp;            if (subfield.getAttribute(&quot;code&quot;).equals(a)) {</b>
+<b class="nc">&nbsp;                return subfield.getTextContent();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;String&gt; getSubfields(String a, Element datafield) {
+<b class="nc">&nbsp;        List&lt;Element&gt; subfields = getChildren(&quot;subfield&quot;, datafield);</b>
+&nbsp;
+<b class="nc">&nbsp;        return subfields.stream().filter(field -&gt; field.getAttribute(&quot;code&quot;).equals(a)).map(Node::getTextContent).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Element getChild(String name, Element e) {
+<b class="nc">&nbsp;        if (e == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        NodeList children = e.getChildNodes();</b>
+&nbsp;
+<b class="nc">&nbsp;        int j = children.getLength();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; j; i++) {</b>
+<b class="nc">&nbsp;            Node test = children.item(i);</b>
+<b class="nc">&nbsp;            if (test.getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="nc">&nbsp;                Element entry = (Element) test;</b>
+<b class="nc">&nbsp;                if (entry.getTagName().equals(name)) {</b>
+<b class="nc">&nbsp;                    return entry;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Element&gt; getChildren(String name, Element e) {
+<b class="nc">&nbsp;        List&lt;Element&gt; result = new LinkedList&lt;&gt;();</b>
+<b class="nc">&nbsp;        NodeList children = e.getChildNodes();</b>
+&nbsp;
+<b class="nc">&nbsp;        int j = children.getLength();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; j; i++) {</b>
+<b class="nc">&nbsp;            Node test = children.item(i);</b>
+<b class="nc">&nbsp;            if (test.getNodeType() == Node.ELEMENT_NODE) {</b>
+<b class="nc">&nbsp;                Element entry = (Element) test;</b>
+<b class="nc">&nbsp;                if (entry.getTagName().equals(name)) {</b>
+<b class="nc">&nbsp;                    result.add(entry);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

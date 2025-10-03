@@ -1,0 +1,316 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GenerateCitationKeyAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.citationkeypattern</a>
+</div>
+
+<h1>Coverage Summary for Class: GenerateCitationKeyAction (org.jabref.gui.citationkeypattern)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GenerateCitationKeyAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GenerateCitationKeyAction$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.citationkeypattern;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.gui.undo.UndoableKeyChange;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;public class GenerateCitationKeyAction extends SimpleCommand {
+&nbsp;
+&nbsp;    private final Supplier&lt;LibraryTab&gt; tabSupplier;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+&nbsp;    private List&lt;BibEntry&gt; entries;
+&nbsp;    private boolean isCanceled;
+&nbsp;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;
+&nbsp;    public GenerateCitationKeyAction(Supplier&lt;LibraryTab&gt; tabSupplier,
+&nbsp;                                     DialogService dialogService,
+&nbsp;                                     StateManager stateManager,
+&nbsp;                                     TaskExecutor taskExecutor,
+&nbsp;                                     CliPreferences preferences,
+<b class="nc">&nbsp;                                     UndoManager undoManager) {</b>
+<b class="nc">&nbsp;        this.tabSupplier = tabSupplier;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        entries = stateManager.getSelectedEntries();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entries.isEmpty()) {</b>
+<b class="nc">&nbsp;            dialogService.showWarningDialogAndWait(Localization.lang(&quot;Autogenerate citation keys&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;First select the entries you want keys to be generated for.&quot;));</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        dialogService.notify(formatOutputMessage(Localization.lang(&quot;Generating citation key for&quot;), entries.size()));</b>
+&nbsp;
+<b class="nc">&nbsp;        checkOverwriteKeysChosen();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!this.isCanceled) {</b>
+<b class="nc">&nbsp;            BackgroundTask&lt;Void&gt; backgroundTask = this.generateKeysInBackground();</b>
+<b class="nc">&nbsp;            backgroundTask.showToUser(true);</b>
+<b class="nc">&nbsp;            backgroundTask.titleProperty().set(Localization.lang(&quot;Autogenerate citation keys&quot;));</b>
+<b class="nc">&nbsp;            backgroundTask.messageProperty().set(Localization.lang(&quot;%0/%1 entries&quot;, 0, entries.size()));</b>
+&nbsp;
+<b class="nc">&nbsp;            backgroundTask.executeWith(this.taskExecutor);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean confirmOverwriteKeys(DialogService dialogService, CliPreferences preferences) {
+<b class="nc">&nbsp;        if (preferences.getCitationKeyPatternPreferences().shouldWarnBeforeOverwriteCiteKey()) {</b>
+<b class="nc">&nbsp;            return dialogService.showConfirmationDialogWithOptOutAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Overwrite keys&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;One or more keys will be overwritten. Continue?&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Overwrite keys&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Cancel&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Do not ask again&quot;),</b>
+<b class="nc">&nbsp;                    optOut -&gt; preferences.getCitationKeyPatternPreferences().setWarnBeforeOverwriteCiteKey(!optOut));</b>
+&nbsp;        } else {
+&nbsp;            // Always overwrite keys by default
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void checkOverwriteKeysChosen() {
+&nbsp;        // We don&#39;t want to generate keys for entries which already have one thus remove the entries
+<b class="nc">&nbsp;        if (this.preferences.getCitationKeyPatternPreferences().shouldAvoidOverwriteCiteKey()) {</b>
+<b class="nc">&nbsp;            entries.removeIf(BibEntry::hasCitationKey);</b>
+&nbsp;            // if we&#39;re going to override some citation keys warn the user about it
+<b class="nc">&nbsp;        } else if (entries.parallelStream().anyMatch(BibEntry::hasCitationKey)) {</b>
+<b class="nc">&nbsp;            boolean overwriteKeys = confirmOverwriteKeys(dialogService, this.preferences);</b>
+&nbsp;
+&nbsp;            // The user doesn&#39;t want to override citation keys
+<b class="nc">&nbsp;            if (!overwriteKeys) {</b>
+<b class="nc">&nbsp;                isCanceled = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private BackgroundTask&lt;Void&gt; generateKeysInBackground() {
+<b class="nc">&nbsp;        return new BackgroundTask&lt;&gt;() {</b>
+&nbsp;            private NamedCompoundEdit compound;
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public Void call() {
+<b class="nc">&nbsp;                if (isCanceled) {</b>
+<b class="nc">&nbsp;                    return null;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                UiTaskExecutor.runInJavaFXThread(() -&gt; {</b>
+<b class="nc">&nbsp;                    updateProgress(0, entries.size());</b>
+<b class="nc">&nbsp;                    messageProperty().set(Localization.lang(&quot;%0/%1 entries&quot;, 0, entries.size()));</b>
+&nbsp;                });
+<b class="nc">&nbsp;                stateManager.getActiveDatabase().ifPresent(databaseContext -&gt; {</b>
+&nbsp;                    // generate the new citation keys for each entry
+<b class="nc">&nbsp;                    compound = new NamedCompoundEdit(Localization.lang(&quot;Autogenerate citation keys&quot;));</b>
+<b class="nc">&nbsp;                    CitationKeyGenerator keyGenerator =</b>
+<b class="nc">&nbsp;                            new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());</b>
+<b class="nc">&nbsp;                    int entriesDone = 0;</b>
+<b class="nc">&nbsp;                    for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;                        keyGenerator.generateAndSetKey(entry)</b>
+<b class="nc">&nbsp;                                    .ifPresent(fieldChange -&gt; compound.addEdit(new UndoableKeyChange(fieldChange)));</b>
+<b class="nc">&nbsp;                        entriesDone++;</b>
+<b class="nc">&nbsp;                        int finalEntriesDone = entriesDone;</b>
+<b class="nc">&nbsp;                        UiTaskExecutor.runInJavaFXThread(() -&gt; {</b>
+<b class="nc">&nbsp;                            updateProgress(finalEntriesDone, entries.size());</b>
+<b class="nc">&nbsp;                            messageProperty().set(Localization.lang(&quot;%0/%1 entries&quot;, finalEntriesDone, entries.size()));</b>
+&nbsp;                        });
+&nbsp;                    }
+<b class="nc">&nbsp;                    compound.end();</b>
+&nbsp;                });
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public BackgroundTask&lt;Void&gt; onSuccess(Consumer&lt;Void&gt; onSuccess) {
+&nbsp;                // register the undo event only if new citation keys were generated
+<b class="nc">&nbsp;                if (compound.hasEdits()) {</b>
+<b class="nc">&nbsp;                    undoManager.addEdit(compound);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                tabSupplier.get().markBaseChanged();</b>
+<b class="nc">&nbsp;                dialogService.notify(formatOutputMessage(Localization.lang(&quot;Generated citation key for&quot;), entries.size()));</b>
+<b class="nc">&nbsp;                return super.onSuccess(onSuccess);</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private String formatOutputMessage(String start, int count) {
+<b class="nc">&nbsp;        return &quot;%s %d %s.&quot;.formatted(start, count,</b>
+<b class="nc">&nbsp;                count &gt; 1 ? Localization.lang(&quot;entries&quot;) : Localization.lang(&quot;entry&quot;));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

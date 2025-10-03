@@ -1,0 +1,380 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UiTaskExecutor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: UiTaskExecutor (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UiTaskExecutor</td>
+<td class="coverageStat">
+  <span class="percent">
+    26.7%
+  </span>
+  <span class="absValue">
+    (4/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5.6%
+  </span>
+  <span class="absValue">
+    (1/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    19.7%
+  </span>
+  <span class="absValue">
+    (12/61)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UiTaskExecutor$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    22.2%
+  </span>
+  <span class="absValue">
+    (4/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    5%
+  </span>
+  <span class="absValue">
+    (1/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (12/72)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.WeakHashMap;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;import java.util.concurrent.CountDownLatch;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.Executors;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;import java.util.concurrent.FutureTask;
+&nbsp;import java.util.concurrent.ScheduledExecutorService;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.concurrent.Task;
+&nbsp;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.DelayTaskThrottler;
+&nbsp;import org.jabref.logic.util.HeadlessExecutorService;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A very simple implementation of the {@link TaskExecutor} interface.
+&nbsp; * Every submitted task is invoked in a separate thread.
+&nbsp; * &lt;p&gt;
+&nbsp; * In case something does not interact well with JavaFX, you can use the {@link HeadlessExecutorService}
+&nbsp; */
+<b class="fc">&nbsp;public class UiTaskExecutor implements TaskExecutor {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(UiTaskExecutor.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    private final ExecutorService executor = Executors.newFixedThreadPool(5);</b>
+<b class="fc">&nbsp;    private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);</b>
+<b class="fc">&nbsp;    private final WeakHashMap&lt;DelayTaskThrottler, Void&gt; throttlers = new WeakHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public static &lt;V&gt; V runInJavaFXThread(Callable&lt;V&gt; callable) {
+<b class="nc">&nbsp;        if (Platform.isFxApplicationThread()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return callable.call();</b>
+&nbsp;            } catch (Exception e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Problem executing call&quot;, e);</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        FutureTask&lt;V&gt; task = new FutureTask&lt;&gt;(callable);</b>
+&nbsp;
+<b class="nc">&nbsp;        Platform.runLater(task);</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return task.get();</b>
+&nbsp;        } catch (InterruptedException | ExecutionException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Problem running in fx thread&quot;, e);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Runs the specified {@link Runnable} on the JavaFX application thread and waits for completion.
+&nbsp;     *
+&nbsp;     * @param action the {@link Runnable} to run
+&nbsp;     * @throws NullPointerException if {@code action} is {@code null}
+&nbsp;     */
+&nbsp;    public static void runAndWaitInJavaFXThread(Runnable action) {
+<b class="nc">&nbsp;        Objects.requireNonNull(action);</b>
+&nbsp;
+&nbsp;        // Run synchronously on JavaFX thread
+<b class="nc">&nbsp;        if (Platform.isFxApplicationThread()) {</b>
+<b class="nc">&nbsp;            action.run();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // Queue on JavaFX thread and wait for completion
+<b class="nc">&nbsp;        final CountDownLatch doneLatch = new CountDownLatch(1);</b>
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                action.run();</b>
+&nbsp;            } finally {
+<b class="nc">&nbsp;                doneLatch.countDown();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            doneLatch.await();</b>
+&nbsp;        } catch (InterruptedException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Problem running action on JavaFX thread&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void runInJavaFXThread(Runnable runnable) {
+<b class="fc">&nbsp;        Platform.runLater(runnable);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This will convert the given {@link BackgroundTask} to a JavaFX {@link Task}
+&nbsp;     * The JavaFX task executes the call method a background thread and the onFailed onSucceed on the FX UI thread
+&nbsp;     *
+&nbsp;     * @param task the BackgroundTask to run
+&nbsp;     * @param &lt;V&gt;  The background task type
+&nbsp;     * @return Future of a JavaFX Task which will execute the call method a background thread
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public &lt;V&gt; Future&lt;V&gt; execute(BackgroundTask&lt;V&gt; task) {
+<b class="nc">&nbsp;        Task&lt;V&gt; javafxTask = getJavaFXTask(task);</b>
+&nbsp;
+<b class="nc">&nbsp;        StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);</b>
+<b class="nc">&nbsp;        task.showToUserProperty().subscribe(showToUser -&gt; {</b>
+<b class="nc">&nbsp;            if (showToUser) {</b>
+<b class="nc">&nbsp;                if (stateManager != null) {</b>
+<b class="nc">&nbsp;                    runInJavaFXThread(() -&gt; stateManager.addBackgroundTask(task, javafxTask));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.info(&quot;Background task visible without GUI&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        return execute(javafxTask);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Runs the given task and returns a Future representing that task. Usually, you want to use the other method {@link
+&nbsp;     * #execute(BackgroundTask)}.
+&nbsp;     *
+&nbsp;     * @param &lt;V&gt;  type of return value of the task
+&nbsp;     * @param task the task to run
+&nbsp;     */
+&nbsp;    public &lt;V&gt; Future&lt;V&gt; execute(Task&lt;V&gt; task) {
+<b class="nc">&nbsp;        executor.submit(task);</b>
+<b class="nc">&nbsp;        return task;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;V&gt; Future&lt;?&gt; schedule(BackgroundTask&lt;V&gt; task, long delay, TimeUnit unit) {
+<b class="nc">&nbsp;        return scheduledExecutor.schedule(getJavaFXTask(task), delay, unit);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shuts everything down. After termination, this method returns.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void shutdown() {
+<b class="fc">&nbsp;        StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);</b>
+<b class="pc">&nbsp;        if (stateManager != null) {</b>
+<b class="fc">&nbsp;            stateManager.getBackgroundTasks().stream().filter(task -&gt; !task.isDone()).forEach(Task::cancel);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        executor.shutdownNow();</b>
+<b class="fc">&nbsp;        scheduledExecutor.shutdownNow();</b>
+<b class="fc">&nbsp;        throttlers.forEach((throttler, _) -&gt; throttler.shutdown());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public DelayTaskThrottler createThrottler(int delay) {
+<b class="nc">&nbsp;        DelayTaskThrottler throttler = new DelayTaskThrottler(delay);</b>
+<b class="nc">&nbsp;        throttlers.put(throttler, null);</b>
+<b class="nc">&nbsp;        return throttler;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates a wrapper with a JavaFX {@link Task} for our BackgroundTask monitoring the progress based on the data given from the task.
+&nbsp;     * &lt;code&gt;call&lt;/code&gt; is routed to the given task object.
+&nbsp;     *
+&nbsp;     * @param task the BackgroundTask to wrap
+&nbsp;     * @return a new Javafx Task object
+&nbsp;     */
+&nbsp;    public static &lt;V&gt; Task&lt;V&gt; getJavaFXTask(BackgroundTask&lt;V&gt; task) {
+<b class="nc">&nbsp;        Task&lt;V&gt; javaTask = new Task&lt;&gt;() {</b>
+&nbsp;            {
+<b class="nc">&nbsp;                this.updateMessage(task.messageProperty().get());</b>
+<b class="nc">&nbsp;                this.updateTitle(task.titleProperty().get());</b>
+<b class="nc">&nbsp;                BindingsHelper.subscribeFuture(task.progressProperty(), progress -&gt; updateProgress(progress.workDone(), progress.max()));</b>
+<b class="nc">&nbsp;                BindingsHelper.subscribeFuture(task.messageProperty(), this::updateMessage);</b>
+<b class="nc">&nbsp;                BindingsHelper.subscribeFuture(task.titleProperty(), this::updateTitle);</b>
+<b class="nc">&nbsp;                BindingsHelper.subscribeFuture(task.isCancelledProperty(), cancelled -&gt; {</b>
+<b class="nc">&nbsp;                    if (cancelled) {</b>
+<b class="nc">&nbsp;                        cancel();</b>
+&nbsp;                    }
+&nbsp;                });
+<b class="nc">&nbsp;                setOnCancelled(_ -&gt; task.cancel());</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected V call() throws Exception {
+&nbsp;                // this requires that background task call is public as it&#39;s in another package
+<b class="nc">&nbsp;                return task.call();</b>
+&nbsp;            }
+&nbsp;        };
+<b class="nc">&nbsp;        Runnable onRunning = task.getOnRunning();</b>
+<b class="nc">&nbsp;        if (onRunning != null) {</b>
+<b class="nc">&nbsp;            javaTask.setOnRunning(_ -&gt; onRunning.run());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Consumer&lt;V&gt; onSuccess = task.getOnSuccess();</b>
+<b class="nc">&nbsp;        javaTask.setOnSucceeded(_ -&gt; {</b>
+&nbsp;            // Set to 100% completed on completion
+<b class="nc">&nbsp;            task.updateProgress(1, 1);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (onSuccess != null) {</b>
+<b class="nc">&nbsp;                onSuccess.accept(javaTask.getValue());</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        Consumer&lt;Exception&gt; onException = task.getOnException();</b>
+<b class="nc">&nbsp;        if (onException != null) {</b>
+<b class="nc">&nbsp;            javaTask.setOnFailed(_ -&gt; onException.accept(convertToException(javaTask.getException())));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return javaTask;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Exception convertToException(Throwable throwable) {
+&nbsp;        // LOGGER.warn here, because the exception silently disappears otherwise
+<b class="nc">&nbsp;        LOGGER.warn(&quot;Converting throwable to Exception&quot;, throwable);</b>
+<b class="nc">&nbsp;        if (throwable instanceof Exception exception) {</b>
+<b class="nc">&nbsp;            return exception;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return new Exception(throwable);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

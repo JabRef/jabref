@@ -1,0 +1,166 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StandardEntryType</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.types</a>
+</div>
+
+<h1>Coverage Summary for Class: StandardEntryType (org.jabref.model.entry.types)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StandardEntryType</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (4/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.3%
+  </span>
+  <span class="absValue">
+    (36/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.types;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;/**
+&nbsp; * Defines standard entry types as defined by BibTeX and BibLaTeX.
+&nbsp; * At {@link BibtexEntryTypeDefinitions}, the required and optional fields for each type (for BibTeX) is defined.
+&nbsp; * The BibLaTeX entry types are defined at {@link BiblatexEntryTypeDefinitions}.
+&nbsp; * More reading on BibTeX and its fields is collected at &lt;a href=&quot;https://docs.jabref.org/advanced/fields&quot;&gt;JabRef&#39;s documentation&lt;/a&gt;.
+&nbsp; */
+<b class="fc">&nbsp;public enum StandardEntryType implements EntryType {</b>
+&nbsp;    // BibTeX
+<b class="fc">&nbsp;    Article(&quot;Article&quot;),</b>
+<b class="fc">&nbsp;    Book(&quot;Book&quot;),</b>
+<b class="fc">&nbsp;    Booklet(&quot;Booklet&quot;),</b>
+<b class="fc">&nbsp;    Collection(&quot;Collection&quot;),</b>
+<b class="fc">&nbsp;    Conference(&quot;Conference&quot;),</b>
+<b class="fc">&nbsp;    InBook(&quot;InBook&quot;),</b>
+<b class="fc">&nbsp;    InCollection(&quot;InCollection&quot;),</b>
+<b class="fc">&nbsp;    InProceedings(&quot;InProceedings&quot;),</b>
+<b class="fc">&nbsp;    Manual(&quot;Manual&quot;),</b>
+<b class="fc">&nbsp;    MastersThesis(&quot;MastersThesis&quot;),</b>
+<b class="fc">&nbsp;    Misc(&quot;Misc&quot;),</b>
+<b class="fc">&nbsp;    PhdThesis(&quot;PhdThesis&quot;),</b>
+<b class="fc">&nbsp;    Proceedings(&quot;Proceedings&quot;),</b>
+<b class="fc">&nbsp;    TechReport(&quot;TechReport&quot;),</b>
+<b class="fc">&nbsp;    Unpublished(&quot;Unpublished&quot;),</b>
+&nbsp;    // BibLaTeX
+<b class="fc">&nbsp;    BookInBook(&quot;BookInBook&quot;),</b>
+<b class="fc">&nbsp;    InReference(&quot;InReference&quot;),</b>
+<b class="fc">&nbsp;    MvBook(&quot;MvBook&quot;),</b>
+<b class="fc">&nbsp;    MvCollection(&quot;MvCollection&quot;),</b>
+<b class="fc">&nbsp;    MvProceedings(&quot;MvProceedings&quot;),</b>
+<b class="fc">&nbsp;    MvReference(&quot;MvReference&quot;),</b>
+<b class="fc">&nbsp;    Online(&quot;Online&quot;),</b>
+<b class="fc">&nbsp;    Reference(&quot;Reference&quot;),</b>
+<b class="fc">&nbsp;    Report(&quot;Report&quot;),</b>
+<b class="fc">&nbsp;    Set(&quot;Set&quot;),</b>
+<b class="fc">&nbsp;    SuppBook(&quot;SuppBook&quot;),</b>
+<b class="fc">&nbsp;    SuppCollection(&quot;SuppCollection&quot;),</b>
+<b class="fc">&nbsp;    SuppPeriodical(&quot;SuppPeriodical&quot;),</b>
+<b class="fc">&nbsp;    Thesis(&quot;Thesis&quot;),</b>
+<b class="fc">&nbsp;    WWW(&quot;WWW&quot;),</b>
+<b class="fc">&nbsp;    Software(&quot;Software&quot;),</b>
+<b class="fc">&nbsp;    Dataset(&quot;Dataset&quot;);</b>
+&nbsp;
+&nbsp;    private final String displayName;
+&nbsp;
+<b class="fc">&nbsp;    StandardEntryType(String displayName) {</b>
+<b class="fc">&nbsp;        this.displayName = displayName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return displayName.toLowerCase(Locale.ENGLISH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="fc">&nbsp;        return displayName;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

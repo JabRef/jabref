@@ -1,0 +1,296 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ActionFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.actions</a>
+</div>
+
+<h1>Coverage Summary for Class: ActionFactory (org.jabref.gui.actions)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ActionFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.actions;
+&nbsp;
+&nbsp;import java.lang.reflect.InaccessibleObjectException;
+&nbsp;import java.lang.reflect.InvocationTargetException;
+&nbsp;import java.lang.reflect.Method;
+&nbsp;
+&nbsp;import javafx.beans.binding.BooleanExpression;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonBase;
+&nbsp;import javafx.scene.control.CheckMenuItem;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.Menu;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import com.sun.javafx.scene.control.ContextMenuContent;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import de.saxsys.mvvmfx.utils.commands.Command;
+&nbsp;import org.controlsfx.control.action.ActionUtils;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Helper class to create and style controls according to an {@link Action}.
+&nbsp; */
+&nbsp;public class ActionFactory {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ActionFactory.class);</b>
+&nbsp;
+&nbsp;    private final KeyBindingRepository keyBindingRepository;
+&nbsp;
+<b class="nc">&nbsp;    public ActionFactory() {</b>
+<b class="nc">&nbsp;        this.keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * For some reason the graphic is not set correctly by the {@link ActionUtils} class, so we have to fix this by hand
+&nbsp;     */
+&nbsp;    private static void setGraphic(MenuItem node, Action action) {
+<b class="nc">&nbsp;        node.graphicProperty().unbind();</b>
+<b class="nc">&nbsp;        action.getIcon().ifPresent(icon -&gt; node.setGraphic(icon.getGraphicNode()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Returns MenuItemContainer node associated with this menu item
+&nbsp;     * which can contain:
+&nbsp;     *   1. label node of type Label for displaying menu item text,
+&nbsp;     *   2. right node of type Label for displaying accelerator text,
+&nbsp;     *      or an arrow if it&#39;s a Menu,
+&nbsp;     *   3. graphic node for displaying menu item icon, and
+&nbsp;     *   4. left node for displaying either radio button or check box.
+&nbsp;     *
+&nbsp;     * This is basically rewritten impl_styleableGetNode() which
+&nbsp;     * should not be used since it&#39;s marked as deprecated.
+&nbsp;     */
+&nbsp;    private static Label getAssociatedNode(MenuItem menuItem) {
+<b class="nc">&nbsp;        ContextMenuContent.MenuItemContainer container = (ContextMenuContent.MenuItemContainer) menuItem.getStyleableNode();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (container == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        } else {
+&nbsp;            // We have to use reflection to get the associated label
+&nbsp;            try {
+<b class="nc">&nbsp;                Method getLabel = ContextMenuContent.MenuItemContainer.class.getDeclaredMethod(&quot;getLabel&quot;);</b>
+<b class="nc">&nbsp;                getLabel.setAccessible(true);</b>
+<b class="nc">&nbsp;                return (Label) getLabel.invoke(container);</b>
+&nbsp;            } catch (InaccessibleObjectException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Could not get label of menu item&quot;, e);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MenuItem configureMenuItem(Action action, Command command, MenuItem menuItem) {
+<b class="nc">&nbsp;        ActionUtils.configureMenuItem(new JabRefAction(action, command, keyBindingRepository), menuItem);</b>
+<b class="nc">&nbsp;        setGraphic(menuItem, action);</b>
+<b class="nc">&nbsp;        enableTooltips(command, menuItem);</b>
+<b class="nc">&nbsp;        return menuItem;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void enableTooltips(Command command, MenuItem menuItem) {
+<b class="nc">&nbsp;        if (command instanceof SimpleCommand simpleCommand) {</b>
+<b class="nc">&nbsp;            EasyBind.subscribe(</b>
+<b class="nc">&nbsp;                    simpleCommand.statusMessageProperty(),</b>
+&nbsp;                    message -&gt; {
+<b class="nc">&nbsp;                        Label label = getAssociatedNode(menuItem);</b>
+<b class="nc">&nbsp;                        if (label != null) {</b>
+<b class="nc">&nbsp;                            label.setMouseTransparent(false);</b>
+<b class="nc">&nbsp;                            if (StringUtil.isBlank(message)) {</b>
+<b class="nc">&nbsp;                                label.setTooltip(null);</b>
+&nbsp;                            } else {
+<b class="nc">&nbsp;                                label.setTooltip(new Tooltip(message));</b>
+&nbsp;                            }
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public MenuItem createMenuItem(Action action, Command command) {
+<b class="nc">&nbsp;        MenuItem menuItem = new MenuItem();</b>
+<b class="nc">&nbsp;        configureMenuItem(action, command, menuItem);</b>
+<b class="nc">&nbsp;        return menuItem;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MenuItem createCustomMenuItem(Action action, Command command, String text) {
+<b class="nc">&nbsp;        MenuItem menuItem = new MenuItem();</b>
+<b class="nc">&nbsp;        configureMenuItem(action, command, menuItem);</b>
+<b class="nc">&nbsp;        menuItem.textProperty().unbind();</b>
+<b class="nc">&nbsp;        menuItem.setText(text);</b>
+&nbsp;
+<b class="nc">&nbsp;        return menuItem;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public CheckMenuItem createCheckMenuItem(Action action, Command command, boolean selected) {
+<b class="nc">&nbsp;        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository));</b>
+<b class="nc">&nbsp;        checkMenuItem.setSelected(selected);</b>
+<b class="nc">&nbsp;        setGraphic(checkMenuItem, action);</b>
+&nbsp;
+<b class="nc">&nbsp;        return checkMenuItem;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public CheckMenuItem createCheckMenuItem(Action action, Command command, BooleanExpression selectedBinding) {
+<b class="nc">&nbsp;        CheckMenuItem checkMenuItem = ActionUtils.createCheckMenuItem(new JabRefAction(action, command, keyBindingRepository));</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(selectedBinding, checkMenuItem::setSelected);</b>
+<b class="nc">&nbsp;        setGraphic(checkMenuItem, action);</b>
+&nbsp;
+<b class="nc">&nbsp;        return checkMenuItem;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Menu createMenu(Action action) {
+<b class="nc">&nbsp;        Menu menu = ActionUtils.createMenu(new JabRefAction(action, keyBindingRepository));</b>
+&nbsp;
+&nbsp;        // For some reason the graphic is not set correctly, so let&#39;s fix this
+<b class="nc">&nbsp;        setGraphic(menu, action);</b>
+<b class="nc">&nbsp;        return menu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Menu createSubMenu(Action action, MenuItem... children) {
+<b class="nc">&nbsp;        Menu menu = createMenu(action);</b>
+<b class="nc">&nbsp;        menu.getItems().addAll(children);</b>
+<b class="nc">&nbsp;        return menu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Button createIconButton(Action action, Command command) {
+<b class="nc">&nbsp;        Button button = ActionUtils.createButton(new JabRefAction(action, command, keyBindingRepository), ActionUtils.ActionTextBehavior.HIDE);</b>
+&nbsp;
+<b class="nc">&nbsp;        button.getStyleClass().setAll(&quot;icon-button&quot;);</b>
+&nbsp;
+&nbsp;        // For some reason the graphic is not set correctly, so let&#39;s fix this
+<b class="nc">&nbsp;        button.graphicProperty().unbind();</b>
+<b class="nc">&nbsp;        action.getIcon().ifPresent(icon -&gt; button.setGraphic(icon.getGraphicNode()));</b>
+&nbsp;
+&nbsp;        // Prevent the buttons from stealing the focus
+<b class="nc">&nbsp;        button.setFocusTraversable(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        return button;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
+<b class="nc">&nbsp;        ActionUtils.unconfigureButton(button);</b>
+<b class="nc">&nbsp;        ActionUtils.configureButton(</b>
+&nbsp;                new JabRefAction(action, command, keyBindingRepository),
+&nbsp;                button,
+&nbsp;                ActionUtils.ActionTextBehavior.HIDE);
+&nbsp;
+<b class="nc">&nbsp;        button.getStyleClass().add(&quot;icon-button&quot;);</b>
+&nbsp;
+&nbsp;        // For some reason the graphic is not set correctly, so let&#39;s fix this
+&nbsp;        // ToDO: Find a way to reuse JabRefIconView
+<b class="nc">&nbsp;        button.graphicProperty().unbind();</b>
+<b class="nc">&nbsp;        action.getIcon().ifPresent(icon -&gt; button.setGraphic(icon.getGraphicNode()));</b>
+&nbsp;
+<b class="nc">&nbsp;        return button;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

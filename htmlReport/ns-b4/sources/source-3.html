@@ -1,0 +1,336 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationKeyGenerator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.citationkeypattern</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationKeyGenerator (org.jabref.logic.citationkeypattern)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationKeyGenerator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.citationkeypattern;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.regex.PatternSyntaxException;
+&nbsp;
+&nbsp;import org.jabref.model.FieldChange;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This is the utility class of the LabelPattern package.
+&nbsp; */
+&nbsp;public class CitationKeyGenerator extends BracketedPattern {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * All single characters that we can use for extending a key to make it unique.
+&nbsp;     */
+&nbsp;    public static final String APPENDIX_CHARACTERS = &quot;abcdefghijklmnopqrstuvwxyz&quot;;
+&nbsp;
+&nbsp;    /// List of unwanted characters. These will be removed at the end.
+&nbsp;    /// Note that `+` is a wanted character to indicate &quot;et al.&quot; in authorsAlpha.
+&nbsp;    /// Example: `ABC+`. See `org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()` for examples.
+&nbsp;    ///
+&nbsp;    /// See also #DISALLOWED_CHARACTERS
+&nbsp;    public static final String DEFAULT_UNWANTED_CHARACTERS = &quot;?!;^`ʹ&quot;;
+&nbsp;
+&nbsp;    /// Source of disallowed characters: &lt;https://tex.stackexchange.com/a/408548/9075&gt;
+&nbsp;    /// These characters are disallowed in BibTeX keys.
+<b class="nc">&nbsp;    private static final List&lt;Character&gt; DISALLOWED_CHARACTERS = Arrays.asList(&#39;{&#39;, &#39;}&#39;, &#39;(&#39;, &#39;)&#39;, &#39;,&#39;, &#39;=&#39;, &#39;\\&#39;, &#39;&quot;&#39;, &#39;#&#39;, &#39;%&#39;, &#39;~&#39;, &#39;\&#39;&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(CitationKeyGenerator.class);</b>
+&nbsp;
+&nbsp;    private final AbstractCitationKeyPatterns citeKeyPattern;
+&nbsp;    private final BibDatabase database;
+&nbsp;    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+&nbsp;    private final String unwantedCharacters;
+&nbsp;
+&nbsp;    public CitationKeyGenerator(BibDatabaseContext bibDatabaseContext, CitationKeyPatternPreferences citationKeyPatternPreferences) {
+<b class="nc">&nbsp;        this(bibDatabaseContext.getMetaData().getCiteKeyPatterns(citationKeyPatternPreferences.getKeyPatterns()),</b>
+<b class="nc">&nbsp;                bibDatabaseContext.getDatabase(),</b>
+&nbsp;                citationKeyPatternPreferences);
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public CitationKeyGenerator(AbstractCitationKeyPatterns citeKeyPattern, BibDatabase database, CitationKeyPatternPreferences citationKeyPatternPreferences) {</b>
+<b class="nc">&nbsp;        this.citeKeyPattern = Objects.requireNonNull(citeKeyPattern);</b>
+<b class="nc">&nbsp;        this.database = Objects.requireNonNull(database);</b>
+<b class="nc">&nbsp;        this.citationKeyPatternPreferences = Objects.requireNonNull(citationKeyPatternPreferences);</b>
+<b class="nc">&nbsp;        this.unwantedCharacters = citationKeyPatternPreferences.getUnwantedCharacters();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Computes an appendix to a citation key that could make it unique. We use a-z for numbers 0-25, and then aa-az, ba-bz, etc.
+&nbsp;     *
+&nbsp;     * @param number The appendix number.
+&nbsp;     * @return The String to append.
+&nbsp;     */
+&nbsp;    private static String getAppendix(int number) {
+<b class="nc">&nbsp;        if (number &gt;= APPENDIX_CHARACTERS.length()) {</b>
+<b class="nc">&nbsp;            int lastChar = number % APPENDIX_CHARACTERS.length();</b>
+<b class="nc">&nbsp;            return getAppendix((number / APPENDIX_CHARACTERS.length()) - 1) + APPENDIX_CHARACTERS.charAt(lastChar);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return APPENDIX_CHARACTERS.substring(number, number + 1);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String removeDefaultUnwantedCharacters(String key) {
+<b class="nc">&nbsp;        return removeUnwantedCharacters(key, DEFAULT_UNWANTED_CHARACTERS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String removeUnwantedCharacters(String key, String unwantedCharacters) {
+<b class="nc">&nbsp;        String newKey = key.chars()</b>
+<b class="nc">&nbsp;                           .filter(c -&gt; unwantedCharacters.indexOf(c) == -1)</b>
+<b class="nc">&nbsp;                           .filter(c -&gt; !DISALLOWED_CHARACTERS.contains((char) c))</b>
+<b class="nc">&nbsp;                           .collect(StringBuilder::new,</b>
+&nbsp;                                   StringBuilder::appendCodePoint, StringBuilder::append)
+<b class="nc">&nbsp;                           .toString();</b>
+&nbsp;
+&nbsp;        // Replace non-English characters like umlauts etc. with a sensible
+&nbsp;        // letter or letter combination that bibtex can accept.
+<b class="nc">&nbsp;        return StringUtil.replaceSpecialCharacters(newKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String cleanKey(String key, String unwantedCharacters) {
+<b class="nc">&nbsp;        return removeUnwantedCharacters(key, unwantedCharacters).replaceAll(&quot;\\s&quot;, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generate a citation key for the given {@link BibEntry}.
+&nbsp;     *
+&nbsp;     * @param entry a {@link BibEntry}
+&nbsp;     * @return a citation key based on the user&#39;s preferences
+&nbsp;     */
+&nbsp;    public String generateKey(BibEntry entry) {
+<b class="nc">&nbsp;        Objects.requireNonNull(entry);</b>
+<b class="nc">&nbsp;        String currentKey = entry.getCitationKey().orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;        String newKey = createCitationKeyFromPattern(entry);</b>
+<b class="nc">&nbsp;        newKey = replaceWithRegex(newKey);</b>
+<b class="nc">&nbsp;        newKey = appendLettersToKey(newKey, currentKey);</b>
+<b class="nc">&nbsp;        return cleanKey(newKey, unwantedCharacters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A letter will be appended to the key based on the user&#39;s preferences, either always or to prevent duplicated keys.
+&nbsp;     *
+&nbsp;     * @param key    the new key
+&nbsp;     * @param oldKey the old key
+&nbsp;     * @return a key, if needed, with an appended letter
+&nbsp;     */
+&nbsp;    private String appendLettersToKey(String key, String oldKey) {
+<b class="nc">&nbsp;        long occurrences = database.getNumberOfCitationKeyOccurrences(key);</b>
+&nbsp;
+<b class="nc">&nbsp;        if ((occurrences &gt; 0) &amp;&amp; Objects.equals(oldKey, key)) {</b>
+<b class="nc">&nbsp;            occurrences--; // No change, so we can accept one dupe.</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean alwaysAddLetter = citationKeyPatternPreferences.getKeySuffix()</b>
+&nbsp;                == CitationKeyPatternPreferences.KeySuffix.ALWAYS;
+&nbsp;
+<b class="nc">&nbsp;        if (alwaysAddLetter || occurrences != 0) {</b>
+&nbsp;            // The key is already in use, so we must modify it.
+<b class="nc">&nbsp;            boolean firstLetterA = citationKeyPatternPreferences.getKeySuffix()</b>
+&nbsp;                    == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;
+&nbsp;
+<b class="nc">&nbsp;            int number = !alwaysAddLetter &amp;&amp; !firstLetterA ? 1 : 0;</b>
+&nbsp;            String moddedKey;
+&nbsp;
+&nbsp;            // @formatter:off
+&nbsp;            do {
+&nbsp;                // @formatter:on
+<b class="nc">&nbsp;                moddedKey = key + getAppendix(number);</b>
+<b class="nc">&nbsp;                number++;</b>
+&nbsp;
+<b class="nc">&nbsp;                occurrences = database.getNumberOfCitationKeyOccurrences(moddedKey);</b>
+&nbsp;                // only happens if #getAddition() is buggy
+<b class="nc">&nbsp;                if (Objects.equals(oldKey, moddedKey)) {</b>
+<b class="nc">&nbsp;                    occurrences--;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } while (occurrences &gt; 0);</b>
+&nbsp;
+<b class="nc">&nbsp;            key = moddedKey;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return key;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Using preferences, replace matches to the provided regex with a string.
+&nbsp;     *
+&nbsp;     * @param key the citation key
+&nbsp;     * @return the citation key where matches to the regex are replaced
+&nbsp;     */
+&nbsp;    private String replaceWithRegex(String key) {
+&nbsp;        // Remove Regular Expressions while generating Keys
+<b class="nc">&nbsp;        String regex = citationKeyPatternPreferences.getKeyPatternRegex();</b>
+<b class="nc">&nbsp;        if ((regex != null) &amp;&amp; !regex.trim().isEmpty()) {</b>
+<b class="nc">&nbsp;            String replacement = citationKeyPatternPreferences.getKeyPatternReplacement();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                key = key.replaceAll(regex, replacement);</b>
+&nbsp;            } catch (PatternSyntaxException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;There is a syntax error in the regular expression \&quot;{}\&quot; used to generate a citation key&quot;, regex, e);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return key;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String createCitationKeyFromPattern(BibEntry entry) {
+&nbsp;        // get the type of entry
+<b class="nc">&nbsp;        EntryType entryType = entry.getType();</b>
+<b class="nc">&nbsp;        CitationKeyPattern citationKeyPattern = citeKeyPattern.getValue(entryType);</b>
+<b class="nc">&nbsp;        if (citationKeyPattern == null || CitationKeyPattern.NULL_CITATION_KEY_PATTERN.equals(citationKeyPattern)) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return expandBrackets(citationKeyPattern.stringRepresentation(), expandBracketContent(entry));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A helper method to create a {@link Function} that takes a single bracketed expression, expands it, and cleans the key.
+&nbsp;     *
+&nbsp;     * @param entry the {@link BibEntry} that a citation key is generated for
+&nbsp;     * @return a cleaned citation key for the given {@link BibEntry}
+&nbsp;     */
+&nbsp;    private Function&lt;String, String&gt; expandBracketContent(BibEntry entry) {
+<b class="nc">&nbsp;        Character keywordDelimiter = citationKeyPatternPreferences.getKeywordDelimiter();</b>
+&nbsp;
+<b class="nc">&nbsp;        return (String bracket) -&gt; {</b>
+&nbsp;            String expandedPattern;
+<b class="nc">&nbsp;            List&lt;String&gt; fieldParts = parseFieldAndModifiers(bracket);</b>
+&nbsp;
+<b class="nc">&nbsp;            expandedPattern = removeUnwantedCharacters(getFieldValue(entry, fieldParts.getFirst(), keywordDelimiter, database), unwantedCharacters);</b>
+&nbsp;            // check whether there is a modifier on the end such as
+&nbsp;            // &quot;:lower&quot;:
+<b class="nc">&nbsp;            if (fieldParts.size() &gt; 1) {</b>
+&nbsp;                // apply modifiers:
+<b class="nc">&nbsp;                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1, expandBracketContent(entry));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return cleanKey(expandedPattern, unwantedCharacters);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates a citation key for the given entry, and sets the key.
+&nbsp;     *
+&nbsp;     * @param entry the entry to generate the key for
+&nbsp;     * @return the change to the key (or an empty optional if the key was not changed)
+&nbsp;     */
+&nbsp;    public Optional&lt;FieldChange&gt; generateAndSetKey(BibEntry entry) {
+<b class="nc">&nbsp;        String newKey = generateKey(entry);</b>
+<b class="nc">&nbsp;        return entry.setCitationKey(newKey);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

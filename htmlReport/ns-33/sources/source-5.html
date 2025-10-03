@@ -1,0 +1,306 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DownloadFullTextAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.externalfiles</a>
+</div>
+
+<h1>Coverage Summary for Class: DownloadFullTextAction (org.jabref.gui.externalfiles)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DownloadFullTextAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DownloadFullTextAction$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.externalfiles;
+&nbsp;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;
+&nbsp;import javafx.concurrent.Task;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.importer.FulltextFetchers;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Try to download fulltext PDF for selected entry(s) by following URL or DOI link.
+&nbsp; */
+&nbsp;public class DownloadFullTextAction extends SimpleCommand {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadFullTextAction.class);</b>
+&nbsp;    // The minimum number of selected entries to ask the user for confirmation
+&nbsp;    private static final int WARNING_LIMIT = 5;
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final UiTaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    public DownloadFullTextAction(DialogService dialogService,
+&nbsp;                                  StateManager stateManager,
+&nbsp;                                  GuiPreferences preferences,
+<b class="nc">&nbsp;                                  UiTaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        if (stateManager.getActiveDatabase().isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = stateManager.getSelectedEntries();</b>
+<b class="nc">&nbsp;        if (entries.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;No entry selected for fulltext download.&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;Looking for full text document...&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entries.size() &gt;= WARNING_LIMIT) {</b>
+<b class="nc">&nbsp;            boolean confirmDownload = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Download full text documents&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(</b>
+&nbsp;                            &quot;You are attempting to download full text documents for %0 entries.\nJabRef will send at least one request per entry to a publisher.&quot;,
+<b class="nc">&nbsp;                            String.valueOf(stateManager.getSelectedEntries().size())),</b>
+&nbsp;                    // [impl-&gt;req~ui.dialogs.confirmation.naming~1]
+<b class="nc">&nbsp;                    Localization.lang(&quot;Download full text documents&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Cancel&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!confirmDownload) {</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Operation canceled.&quot;));</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Task&lt;Map&lt;BibEntry, Optional&lt;URL&gt;&gt;&gt; findFullTextsTask = new Task&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            protected Map&lt;BibEntry, Optional&lt;URL&gt;&gt; call() {
+<b class="nc">&nbsp;                Map&lt;BibEntry, Optional&lt;URL&gt;&gt; downloads = new ConcurrentHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;                int count = 0;</b>
+<b class="nc">&nbsp;                for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;                    FulltextFetchers fetchers = new FulltextFetchers(</b>
+<b class="nc">&nbsp;                            preferences.getImportFormatPreferences(),</b>
+<b class="nc">&nbsp;                            preferences.getImporterPreferences());</b>
+<b class="nc">&nbsp;                    downloads.put(entry, fetchers.findFullTextPDF(entry));</b>
+<b class="nc">&nbsp;                    updateProgress(++count, entries.size());</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return downloads;</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        findFullTextsTask.setOnSucceeded(value -&gt;</b>
+<b class="nc">&nbsp;                downloadFullTexts(findFullTextsTask.getValue(), stateManager.getActiveDatabase().get()));</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showProgressDialog(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Download full text documents&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Looking for full text document...&quot;),</b>
+&nbsp;                findFullTextsTask);
+&nbsp;
+<b class="nc">&nbsp;        taskExecutor.execute(findFullTextsTask);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void downloadFullTexts(Map&lt;BibEntry, Optional&lt;URL&gt;&gt; downloads, BibDatabaseContext databaseContext) {
+<b class="nc">&nbsp;        for (Map.Entry&lt;BibEntry, Optional&lt;URL&gt;&gt; download : downloads.entrySet()) {</b>
+<b class="nc">&nbsp;            BibEntry entry = download.getKey();</b>
+<b class="nc">&nbsp;            Optional&lt;URL&gt; result = download.getValue();</b>
+<b class="nc">&nbsp;            if (result.isPresent()) {</b>
+<b class="nc">&nbsp;                addLinkedFileFromURL(databaseContext, result.get(), entry);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;No full text document found for entry %0.&quot;,</b>
+<b class="nc">&nbsp;                        entry.getCitationKey().orElse(Localization.lang(&quot;undefined&quot;))));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method attaches a linked file from a URL (if not already linked) to an entry using the key and value pair
+&nbsp;     * from the findFullTexts map and then downloads the file into the given targetDirectory
+&nbsp;     *
+&nbsp;     * @param databaseContext the active database
+&nbsp;     * @param url             the url &quot;key&quot;
+&nbsp;     * @param entry           the entry &quot;value&quot;
+&nbsp;     */
+&nbsp;    private void addLinkedFileFromURL(BibDatabaseContext databaseContext, URL url, BibEntry entry) {
+<b class="nc">&nbsp;        LinkedFile newLinkedFile = new LinkedFile(url, &quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!entry.getFiles().contains(newLinkedFile)) {</b>
+<b class="nc">&nbsp;            LinkedFileViewModel onlineFile = new LinkedFileViewModel(</b>
+&nbsp;                    newLinkedFile,
+&nbsp;                    entry,
+&nbsp;                    databaseContext,
+&nbsp;                    taskExecutor,
+&nbsp;                    dialogService,
+&nbsp;                    preferences);
+<b class="nc">&nbsp;            onlineFile.download(true);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Full text document for entry %0 already linked.&quot;,</b>
+<b class="nc">&nbsp;                    entry.getCitationKey().orElse(Localization.lang(&quot;undefined&quot;))));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,430 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImportEntriesViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.importer</a>
+</div>
+
+<h1>Coverage Summary for Class: ImportEntriesViewModel (org.jabref.gui.importer)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImportEntriesViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/113)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.importer;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.IntegerProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleIntegerProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.collections.ObservableSet;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.externalfiles.ImportHandler;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.bibtex.BibEntryWriter;
+&nbsp;import org.jabref.logic.bibtex.FieldWriter;
+&nbsp;import org.jabref.logic.database.DatabaseMerger;
+&nbsp;import org.jabref.logic.database.DuplicateCheck;
+&nbsp;import org.jabref.logic.exporter.BibWriter;
+&nbsp;import org.jabref.logic.importer.PagedSearchBasedFetcher;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.SearchBasedFetcher;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class ImportEntriesViewModel extends AbstractViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ImportEntriesViewModel.class);</b>
+&nbsp;    private static final int PAGE_SIZE = 20;
+&nbsp;
+&nbsp;    private final StringProperty message;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+<b class="nc">&nbsp;    private ParserResult parserResult = null;</b>
+&nbsp;    private final ObservableList&lt;BibEntry&gt; entries;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final ObjectProperty&lt;BibDatabaseContext&gt; selectedDb;
+&nbsp;
+<b class="nc">&nbsp;    private final IntegerProperty currentPageProperty = new SimpleIntegerProperty(0);</b>
+<b class="nc">&nbsp;    private final IntegerProperty totalPagesProperty = new SimpleIntegerProperty(0);</b>
+<b class="nc">&nbsp;    private final BooleanProperty loading = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final BooleanProperty initialLoadComplete = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;BibEntry&gt; pagedEntries = FXCollections.observableArrayList();</b>
+<b class="nc">&nbsp;    private final ObservableSet&lt;BibEntry&gt; checkedEntries = FXCollections.observableSet();</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;BibEntry&gt; allEntries = FXCollections.observableArrayList();</b>
+&nbsp;    private final Optional&lt;SearchBasedFetcher&gt; fetcher;
+&nbsp;    private final Optional&lt;String&gt; query;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param databaseContext the database to import into
+&nbsp;     * @param task            the task executed for parsing the selected files(s).
+&nbsp;     */
+&nbsp;    public ImportEntriesViewModel(BackgroundTask&lt;ParserResult&gt; task,
+&nbsp;                                  TaskExecutor taskExecutor,
+&nbsp;                                  BibDatabaseContext databaseContext,
+&nbsp;                                  DialogService dialogService,
+&nbsp;                                  UndoManager undoManager,
+&nbsp;                                  GuiPreferences preferences,
+&nbsp;                                  StateManager stateManager,
+&nbsp;                                  BibEntryTypesManager entryTypesManager,
+&nbsp;                                  FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                                  Optional&lt;SearchBasedFetcher&gt; fetcher,
+<b class="nc">&nbsp;                                  Optional&lt;String&gt; query) {</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+<b class="nc">&nbsp;        this.entries = FXCollections.observableArrayList();</b>
+<b class="nc">&nbsp;        this.message = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;        this.message.bind(task.messageProperty());</b>
+<b class="nc">&nbsp;        this.selectedDb = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;        this.fetcher = fetcher;</b>
+<b class="nc">&nbsp;        this.query = query;</b>
+&nbsp;
+<b class="nc">&nbsp;        task.onSuccess(parserResult -&gt; {</b>
+&nbsp;            // store the complete parser result (to import groups, ... later on)
+<b class="nc">&nbsp;            this.parserResult = parserResult;</b>
+&nbsp;            // fill in the list for the user, where one can select the entries to import
+<b class="nc">&nbsp;            entries.addAll(parserResult.getDatabase().getEntries());</b>
+<b class="nc">&nbsp;            loadEntries(entries);</b>
+<b class="nc">&nbsp;            updatePagedEntries();</b>
+<b class="nc">&nbsp;            updateTotalPages();</b>
+<b class="nc">&nbsp;            initialLoadComplete.set(true);</b>
+<b class="nc">&nbsp;            if (entries.isEmpty()) {</b>
+<b class="nc">&nbsp;                task.updateMessage(Localization.lang(&quot;No entries corresponding to given query&quot;));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }).onFailure(ex -&gt; {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error importing&quot;, ex);</b>
+<b class="nc">&nbsp;            initialLoadComplete.set(true);</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(ex);</b>
+<b class="nc">&nbsp;        }).executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty initialLoadCompleteProperty() {
+<b class="nc">&nbsp;        return initialLoadComplete;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getMessage() {
+<b class="nc">&nbsp;        return message.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty messageProperty() {
+<b class="nc">&nbsp;        return message;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;BibDatabaseContext&gt; selectedDbProperty() {
+<b class="nc">&nbsp;        return selectedDb;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibDatabaseContext getSelectedDb() {
+<b class="nc">&nbsp;        return selectedDb.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty loadingProperty() {
+<b class="nc">&nbsp;        return loading;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;BibEntry&gt; getEntries() {
+<b class="nc">&nbsp;        return pagedEntries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableSet&lt;BibEntry&gt; getCheckedEntries() {
+<b class="nc">&nbsp;        return checkedEntries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;BibEntry&gt; getAllEntries() {
+<b class="nc">&nbsp;        return allEntries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void loadEntries(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        allEntries.addAll(entries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasDuplicate(BibEntry entry) {
+<b class="nc">&nbsp;        return findInternalDuplicate(entry).isPresent() ||</b>
+&nbsp;                new DuplicateCheck(entryTypesManager)
+<b class="nc">&nbsp;                        .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSourceString(BibEntry entry) {
+<b class="nc">&nbsp;        StringWriter writer = new StringWriter();</b>
+<b class="nc">&nbsp;        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);</b>
+<b class="nc">&nbsp;        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(preferences.getFieldPreferences());</b>
+&nbsp;        try {
+&nbsp;            // Force reformatting so the displayed BibTeX is consistently formatted
+<b class="nc">&nbsp;            new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, selectedDb.getValue().getMode(), true);</b>
+&nbsp;        } catch (IOException ioException) {
+&nbsp;            // In case of error, fall back to the original parsed serialization if available
+<b class="nc">&nbsp;            return entry.getParsedSerialization();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return writer.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called after the user selected the entries to import. Does the real import stuff.
+&nbsp;     *
+&nbsp;     * @param entriesToImport subset of the entries contained in parserResult
+&nbsp;     */
+&nbsp;    public void importEntries(List&lt;BibEntry&gt; entriesToImport, boolean shouldDownloadFiles) {
+&nbsp;        // Remember the selection in the dialog
+<b class="nc">&nbsp;        preferences.getFilePreferences().setDownloadLinkedFiles(shouldDownloadFiles);</b>
+&nbsp;
+<b class="nc">&nbsp;        new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeStrings(</b>
+<b class="nc">&nbsp;                databaseContext.getDatabase(),</b>
+<b class="nc">&nbsp;                parserResult.getDatabase());</b>
+<b class="nc">&nbsp;        new DatabaseMerger(preferences.getBibEntryPreferences().getKeywordSeparator()).mergeMetaData(</b>
+<b class="nc">&nbsp;                databaseContext.getMetaData(),</b>
+<b class="nc">&nbsp;                parserResult.getMetaData(),</b>
+<b class="nc">&nbsp;                parserResult.getPath().map(path -&gt; path.getFileName().toString()).orElse(&quot;unknown&quot;),</b>
+<b class="nc">&nbsp;                parserResult.getDatabase().getEntries());</b>
+<b class="nc">&nbsp;        ImportHandler importHandler = new ImportHandler(</b>
+<b class="nc">&nbsp;                selectedDb.getValue(),</b>
+&nbsp;                preferences,
+&nbsp;                fileUpdateMonitor,
+&nbsp;                undoManager,
+&nbsp;                stateManager,
+&nbsp;                dialogService,
+&nbsp;                taskExecutor);
+<b class="nc">&nbsp;        importHandler.importEntriesWithDuplicateCheck(selectedDb.getValue(), entriesToImport);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if there are duplicates to the given entry in the list of entries to be imported.
+&nbsp;     *
+&nbsp;     * @param entry The entry to search for duplicates of.
+&nbsp;     * @return A possible duplicate, if any, or null if none were found.
+&nbsp;     */
+&nbsp;    private Optional&lt;BibEntry&gt; findInternalDuplicate(BibEntry entry) {
+<b class="nc">&nbsp;        for (BibEntry othEntry : entries) {</b>
+<b class="nc">&nbsp;            if (othEntry.equals(entry)) {</b>
+&nbsp;                continue; // Don&#39;t compare the entry to itself
+&nbsp;            }
+<b class="nc">&nbsp;            if (new DuplicateCheck(entryTypesManager).isDuplicate(entry, othEntry, databaseContext.getMode())) {</b>
+<b class="nc">&nbsp;                return Optional.of(othEntry);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void goToPrevPage() {
+<b class="nc">&nbsp;        if (hasPrevPage()) {</b>
+<b class="nc">&nbsp;            currentPageProperty.set(currentPageProperty.get() - 1);</b>
+<b class="nc">&nbsp;            updatePagedEntries();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void goToNextPage() {
+<b class="nc">&nbsp;        if (hasNextPage()) {</b>
+<b class="nc">&nbsp;            currentPageProperty.set(currentPageProperty.get() + 1);</b>
+<b class="nc">&nbsp;            updatePagedEntries();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasNextPage() {
+<b class="nc">&nbsp;        return (currentPageProperty.get() + 1) * PAGE_SIZE &lt; allEntries.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasPrevPage() {
+<b class="nc">&nbsp;        return currentPageProperty.get() &gt; 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegerProperty currentPageProperty() {
+<b class="nc">&nbsp;        return currentPageProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegerProperty totalPagesProperty() {
+<b class="nc">&nbsp;        return totalPagesProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void updateTotalPages() {
+<b class="nc">&nbsp;        int total = (int) Math.ceil((double) allEntries.size() / PAGE_SIZE);</b>
+<b class="nc">&nbsp;        totalPagesProperty.set(total);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isFromWebSearch() {
+<b class="nc">&nbsp;        return fetcher.isPresent() &amp;&amp; query.isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updatePagedEntries() {
+<b class="nc">&nbsp;        if (!isFromWebSearch()) {</b>
+&nbsp;            // For entries other than web search, show all entries at once
+<b class="nc">&nbsp;            pagedEntries.setAll(allEntries);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int fromIdx = currentPageProperty.get() * PAGE_SIZE;</b>
+<b class="nc">&nbsp;        int toIdx = Math.min(fromIdx + PAGE_SIZE, allEntries.size());</b>
+<b class="nc">&nbsp;        pagedEntries.setAll(allEntries.subList(fromIdx, toIdx));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void fetchMoreEntries() {
+<b class="nc">&nbsp;        if (fetcher.isPresent() &amp;&amp;</b>
+<b class="nc">&nbsp;                fetcher.get() instanceof PagedSearchBasedFetcher pagedFetcher &amp;&amp;</b>
+<b class="nc">&nbsp;                query.isPresent() &amp;&amp; !loading.get()) {</b>
+<b class="nc">&nbsp;            loading.set(true);</b>
+<b class="nc">&nbsp;            BackgroundTask&lt;ArrayList&lt;BibEntry&gt;&gt; fetchTask = BackgroundTask</b>
+<b class="nc">&nbsp;                    .wrap(() -&gt; {</b>
+<b class="nc">&nbsp;                        LOGGER.info(&quot;Fetching entries from {} for page {}&quot;, fetcher.get().getName(), currentPageProperty.get() + 2);</b>
+<b class="nc">&nbsp;                        return new ArrayList&lt;&gt;(pagedFetcher.performSearchPaged(query.get(), currentPageProperty.get() + 1).getContent());</b>
+&nbsp;                    })
+<b class="nc">&nbsp;                    .onSuccess(newEntries -&gt; {</b>
+<b class="nc">&nbsp;                        if (newEntries != null &amp;&amp; !newEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;                            allEntries.addAll(newEntries);</b>
+<b class="nc">&nbsp;                            updateTotalPages();</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            LOGGER.warn(&quot;No new entries fetched from {} for page {}&quot;, fetcher.get().getName(), currentPageProperty.get() + 2);</b>
+<b class="nc">&nbsp;                            dialogService.notify(Localization.lang(&quot;No new entries found from %0&quot;, fetcher.get().getName()));</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        loading.set(false);</b>
+&nbsp;                    })
+<b class="nc">&nbsp;                    .onFailure(exception -&gt; {</b>
+<b class="nc">&nbsp;                        loading.set(false);</b>
+<b class="nc">&nbsp;                        dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                                Localization.lang(&quot;Error fetching entries&quot;),</b>
+<b class="nc">&nbsp;                                Localization.lang(&quot;An error occurred while fetching entries from %0: %1&quot;,</b>
+<b class="nc">&nbsp;                                        fetcher.get().getName(), exception.getMessage())</b>
+&nbsp;                        );
+&nbsp;                    });
+&nbsp;
+<b class="nc">&nbsp;            fetchTask.executeWith(taskExecutor);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RemoveWordEnclosingAndOuterEnclosingBracesFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.formatter.bibtexfields</a>
+</div>
+
+<h1>Coverage Summary for Class: RemoveWordEnclosingAndOuterEnclosingBracesFormatter (org.jabref.logic.formatter.bibtexfields)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemoveWordEnclosingAndOuterEnclosingBracesFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.formatter.bibtexfields;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.StringJoiner;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.Formatter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NullMarked;
+&nbsp;
+&nbsp;/**
+&nbsp; * Removes start and end brace both at the complete string and at beginning/end of a word
+&nbsp; * &lt;p&gt;
+&nbsp; * E.g.,
+&nbsp; * &lt;ul&gt;
+&nbsp; *     &lt;li&gt;{Vall{\&#39;e}e Poussin} -&gt; Vall{\&#39;e}e Poussin&lt;/li&gt;
+&nbsp; *     &lt;li&gt;{Vall{\&#39;e}e} {Poussin} -&gt; Vall{\&#39;e}e Poussin&lt;/li&gt;
+&nbsp; *     &lt;li&gt;Vall{\&#39;e}e Poussin -&gt; Vall{\&#39;e}e Poussin&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; */
+&nbsp;@NullMarked
+<b class="nc">&nbsp;public class RemoveWordEnclosingAndOuterEnclosingBracesFormatter extends Formatter {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final RemoveEnclosingBracesFormatter REMOVE_ENCLOSING_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Remove word enclosing braces&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getKey() {
+<b class="nc">&nbsp;        return &quot;remove_enclosing_and_outer_enclosing_braces&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Removes braces encapsulating a complete word and the complete field content.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getExampleInput() {
+<b class="nc">&nbsp;        return &quot;{In {CDMA}}&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String input) {
+<b class="nc">&nbsp;        Objects.requireNonNull(input);</b>
+<b class="nc">&nbsp;        if (StringUtil.isBlank(input)) {</b>
+<b class="nc">&nbsp;            return input;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!input.contains(&quot;{&quot;)) {</b>
+<b class="nc">&nbsp;            return input;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // We need to first remove the outer braces to have double braces at the last word working (e.g., {In {CDMA}})
+<b class="nc">&nbsp;        input = REMOVE_ENCLOSING_BRACES_FORMATTER.format(input);</b>
+&nbsp;
+<b class="nc">&nbsp;        String[] split = input.split(&quot; &quot;);</b>
+<b class="nc">&nbsp;        StringJoiner result = new StringJoiner(&quot; &quot;);</b>
+<b class="nc">&nbsp;        for (String s : split) {</b>
+<b class="nc">&nbsp;            if ((s.length() &gt; 2) &amp;&amp; s.startsWith(&quot;{&quot;) &amp;&amp; s.endsWith(&quot;}&quot;)) {</b>
+&nbsp;                // quick solution (which we don&#39;t do): just remove first &quot;{&quot; and last &quot;}&quot;
+&nbsp;                // however, it might be that s is like {A}bbb{c}, where braces may not be removed
+&nbsp;
+<b class="nc">&nbsp;                String inner = s.substring(1, s.length() - 1);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (inner.contains(&quot;}&quot;)) {</b>
+<b class="nc">&nbsp;                    if (properBrackets(inner)) {</b>
+<b class="nc">&nbsp;                        s = inner;</b>
+&nbsp;                    }
+&nbsp;                } else {
+&nbsp;                    //  no inner curly brackets found, no check needed, inner can just be used as s
+<b class="nc">&nbsp;                    s = inner;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            result.add(s);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return true iff the brackets in s are properly paired
+&nbsp;     */
+&nbsp;    private boolean properBrackets(String s) {
+&nbsp;        // nested construct is there, check for &quot;proper&quot; nesting
+<b class="nc">&nbsp;        int i = 0;</b>
+<b class="nc">&nbsp;        int level = 0;</b>
+<b class="nc">&nbsp;        while (i &lt; s.length()) {</b>
+<b class="nc">&nbsp;            char c = s.charAt(i);</b>
+<b class="nc">&nbsp;            switch (c) {</b>
+&nbsp;                case &#39;{&#39;:
+<b class="nc">&nbsp;                    level++;</b>
+&nbsp;                    break;
+&nbsp;                case &#39;}&#39;:
+<b class="nc">&nbsp;                    level--;</b>
+<b class="nc">&nbsp;                    if (level == -1) { // improper nesting</b>
+<b class="nc">&nbsp;                        return false;</b>
+&nbsp;                    }
+&nbsp;                    break;
+&nbsp;                default:
+&nbsp;                    break;
+&nbsp;            }
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return level == 0;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

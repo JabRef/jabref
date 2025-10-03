@@ -1,0 +1,310 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DoiResolution</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: DoiResolution (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DoiResolution</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/71)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.FulltextFetcher;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ImporterPreferences;
+&nbsp;import org.jabref.logic.importer.WebFetchers;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.logic.preferences.DOIPreferences;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;
+&nbsp;import org.jsoup.Connection;
+&nbsp;import org.jsoup.Jsoup;
+&nbsp;import org.jsoup.UnsupportedMimeTypeException;
+&nbsp;import org.jsoup.nodes.Document;
+&nbsp;import org.jsoup.nodes.Element;
+&nbsp;import org.jsoup.select.Elements;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
+&nbsp; * &lt;p&gt;
+&nbsp; * Note that we also have custom fetchers in place.
+&nbsp; * See {@link WebFetchers#getFullTextFetchers(ImportFormatPreferences, ImporterPreferences)}.
+&nbsp; */
+&nbsp;public class DoiResolution implements FulltextFetcher {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);</b>
+&nbsp;    private final DOIPreferences doiPreferences;
+&nbsp;
+&nbsp;    public DoiResolution(DOIPreferences doiPreferences) {
+<b class="nc">&nbsp;        super();</b>
+<b class="nc">&nbsp;        this.doiPreferences = doiPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;URL&gt; findFullText(BibEntry entry) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;DOI&gt; doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (doi.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        URL base;
+&nbsp;
+&nbsp;        String doiLink;
+<b class="nc">&nbsp;        if (doiPreferences.isUseCustom()) {</b>
+<b class="nc">&nbsp;            base = URLUtil.create(doiPreferences.getDefaultBaseURI());</b>
+<b class="nc">&nbsp;            doiLink = doi.get()</b>
+<b class="nc">&nbsp;                         .getExternalURIWithCustomBase(base.toString())</b>
+<b class="nc">&nbsp;                         .map(URI::toASCIIString)</b>
+<b class="nc">&nbsp;                         .orElse(&quot;&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            base = DOI.RESOLVER.toURL();</b>
+<b class="nc">&nbsp;            doiLink = doi.get().getURIAsASCIIString();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (doiLink.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // follow all redirects and scan for a single pdf link
+&nbsp;        try {
+<b class="nc">&nbsp;            Connection connection = Jsoup.connect(doiLink);</b>
+&nbsp;            // pretend to be a browser (agent &amp; referrer)
+<b class="nc">&nbsp;            connection.userAgent(URLDownload.USER_AGENT);</b>
+<b class="nc">&nbsp;            connection.referrer(&quot;https://www.google.com&quot;);</b>
+<b class="nc">&nbsp;            connection.followRedirects(true);</b>
+<b class="nc">&nbsp;            connection.ignoreHttpErrors(true);</b>
+&nbsp;            // some publishers are quite slow (default is 3s)
+<b class="nc">&nbsp;            connection.timeout(30_000);</b>
+&nbsp;
+<b class="nc">&nbsp;            Connection.Response response = connection.execute();</b>
+&nbsp;
+<b class="nc">&nbsp;            Document html = response.parse();</b>
+&nbsp;            // citation pdf meta tag
+<b class="nc">&nbsp;            Optional&lt;URL&gt; citationMetaTag = citationMetaTag(html);</b>
+<b class="nc">&nbsp;            if (citationMetaTag.isPresent()) {</b>
+<b class="nc">&nbsp;                return citationMetaTag;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Optional&lt;URL&gt; embeddedLink = findEmbeddedLink(html, base);</b>
+<b class="nc">&nbsp;            if (embeddedLink.isPresent()) {</b>
+<b class="nc">&nbsp;                return embeddedLink;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // scan for PDF
+<b class="nc">&nbsp;            Elements hrefElements = html.body().select(&quot;a[href]&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;URL&gt; links = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (Element element : hrefElements) {</b>
+<b class="nc">&nbsp;                String href = element.attr(&quot;abs:href&quot;).toLowerCase(Locale.ENGLISH);</b>
+<b class="nc">&nbsp;                String hrefText = element.text().toLowerCase(Locale.ENGLISH);</b>
+&nbsp;                // Only check if pdf is included in the link or inside the text
+&nbsp;                // ACM uses tokens without PDF inside the link
+&nbsp;                // See https://github.com/lehner/LocalCopy for more scrape ideas
+&nbsp;                // link with &quot;PDF&quot; in title tag
+<b class="nc">&nbsp;                if (element.attr(&quot;title&quot;).toLowerCase(Locale.ENGLISH).contains(&quot;pdf&quot;) &amp;&amp; new URLDownload(href).isPdf()) {</b>
+<b class="nc">&nbsp;                    return Optional.of(URLUtil.create(href));</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (href.contains(&quot;pdf&quot;) || hrefText.contains(&quot;pdf&quot;) &amp;&amp; new URLDownload(href).isPdf()) {</b>
+<b class="nc">&nbsp;                    links.add(URLUtil.create(href));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            // return if only one link was found (high accuracy)
+<b class="nc">&nbsp;            if (links.size() == 1) {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;Fulltext PDF found @ {}&quot;, doiLink);</b>
+<b class="nc">&nbsp;                return Optional.of(links.getFirst());</b>
+&nbsp;            }
+&nbsp;            // return if links are equal
+<b class="nc">&nbsp;            return findDistinctLinks(links);</b>
+&nbsp;        } catch (UnsupportedMimeTypeException type) {
+&nbsp;            // this might be the PDF already as we follow redirects
+<b class="nc">&nbsp;            if (type.getMimeType().startsWith(&quot;application/pdf&quot;)) {</b>
+<b class="nc">&nbsp;                return Optional.of(URLUtil.create(type.getUrl()));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            LOGGER.warn(&quot;DoiResolution fetcher failed: &quot;, type);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;DoiResolution fetcher failed: &quot;, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Scan for {@code &lt;meta name=&quot;citation_pdf_url&quot;&gt;}.
+&nbsp;     * See https://scholar.google.com/intl/de/scholar/inclusion.html#indexing
+&nbsp;     */
+&nbsp;    private Optional&lt;URL&gt; citationMetaTag(Document html) {
+<b class="nc">&nbsp;        Elements citationPdfUrlElement = html.head().select(&quot;meta[name=&#39;citation_pdf_url&#39;]&quot;);</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; citationPdfUrl = citationPdfUrlElement.stream().map(e -&gt; e.attr(&quot;content&quot;)).findFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (citationPdfUrl.isPresent()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return Optional.of(URLUtil.create(citationPdfUrl.get()));</b>
+&nbsp;            } catch (MalformedURLException _) {
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;URL&gt; findEmbeddedLink(Document html, URL base) {
+<b class="nc">&nbsp;        Elements embedElement = html.body().select(&quot;embed[id=&#39;pdf&#39;]&quot;);</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; pdfUrl = embedElement</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(e -&gt; e.attr(&quot;src&quot;)).findFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (pdfUrl.isPresent()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                URL url = base.toURI().resolve(pdfUrl.get()).toURL();</b>
+<b class="nc">&nbsp;                return Optional.of(url);</b>
+&nbsp;            } catch (MalformedURLException | URISyntaxException _) {
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;URL&gt; findDistinctLinks(List&lt;URL&gt; urls) {
+<b class="nc">&nbsp;        List&lt;URL&gt; distinctLinks = urls.stream().distinct().toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (distinctLinks.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;        // equal
+<b class="nc">&nbsp;        if (distinctLinks.size() == 1) {</b>
+<b class="nc">&nbsp;            return Optional.of(distinctLinks.getFirst());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TrustLevel getTrustLevel() {
+<b class="nc">&nbsp;        return TrustLevel.SOURCE;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

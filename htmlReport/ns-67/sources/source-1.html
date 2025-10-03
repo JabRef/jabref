@@ -1,0 +1,213 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExternalTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.external</a>
+</div>
+
+<h1>Coverage Summary for Class: ExternalTab (org.jabref.gui.preferences.external)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExternalTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.external;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.help.HelpAction;
+&nbsp;import org.jabref.gui.preferences.AbstractPreferenceTabView;
+&nbsp;import org.jabref.gui.preferences.PreferencesTab;
+&nbsp;import org.jabref.gui.push.GuiPushToApplication;
+&nbsp;import org.jabref.gui.util.IconValidationDecorator;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;
+&nbsp;public class ExternalTab extends AbstractPreferenceTabView&lt;ExternalTabViewModel&gt; implements PreferencesTab {
+&nbsp;
+&nbsp;    @FXML private TextField eMailReferenceSubject;
+&nbsp;    @FXML private CheckBox autoOpenAttachedFolders;
+&nbsp;    @FXML private ComboBox&lt;GuiPushToApplication&gt; pushToApplicationCombo;
+&nbsp;    @FXML private TextField citeCommand;
+&nbsp;    @FXML private Button autolinkExternalHelp;
+&nbsp;
+&nbsp;    @FXML private CheckBox useCustomTerminal;
+&nbsp;    @FXML private TextField customTerminalCommand;
+&nbsp;    @FXML private Button customTerminalBrowse;
+&nbsp;    @FXML private CheckBox useCustomFileBrowser;
+&nbsp;    @FXML private TextField customFileBrowserCommand;
+&nbsp;    @FXML private Button customFileBrowserBrowse;
+&nbsp;    @FXML private TextField kindleEmail;
+&nbsp;
+<b class="nc">&nbsp;    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();</b>
+&nbsp;
+<b class="nc">&nbsp;    public ExternalTab() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;External programs&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new ExternalTabViewModel(dialogService, preferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;GuiPushToApplication&gt;()</b>
+<b class="nc">&nbsp;                .withText(GuiPushToApplication::getDisplayName)</b>
+<b class="nc">&nbsp;                .withIcon(GuiPushToApplication::getApplicationIcon)</b>
+<b class="nc">&nbsp;                .install(pushToApplicationCombo);</b>
+&nbsp;
+<b class="nc">&nbsp;        eMailReferenceSubject.textProperty().bindBidirectional(viewModel.eMailReferenceSubjectProperty());</b>
+<b class="nc">&nbsp;        autoOpenAttachedFolders.selectedProperty().bindBidirectional(viewModel.autoOpenAttachedFoldersProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        pushToApplicationCombo.itemsProperty().bind(viewModel.pushToApplicationsListProperty());</b>
+<b class="nc">&nbsp;        pushToApplicationCombo.valueProperty().bindBidirectional(viewModel.selectedPushToApplication());</b>
+<b class="nc">&nbsp;        citeCommand.textProperty().bindBidirectional(viewModel.citeCommandProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        useCustomTerminal.selectedProperty().bindBidirectional(viewModel.useCustomTerminalProperty());</b>
+<b class="nc">&nbsp;        customTerminalCommand.textProperty().bindBidirectional(viewModel.customTerminalCommandProperty());</b>
+<b class="nc">&nbsp;        customTerminalCommand.disableProperty().bind(useCustomTerminal.selectedProperty().not());</b>
+<b class="nc">&nbsp;        customTerminalBrowse.disableProperty().bind(useCustomTerminal.selectedProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        useCustomFileBrowser.selectedProperty().bindBidirectional(viewModel.useCustomFileBrowserProperty());</b>
+<b class="nc">&nbsp;        customFileBrowserCommand.textProperty().bindBidirectional(viewModel.customFileBrowserCommandProperty());</b>
+<b class="nc">&nbsp;        customFileBrowserCommand.disableProperty().bind(useCustomFileBrowser.selectedProperty().not());</b>
+<b class="nc">&nbsp;        customFileBrowserBrowse.disableProperty().bind(useCustomFileBrowser.selectedProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        kindleEmail.textProperty().bindBidirectional(viewModel.kindleEmailProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        validationVisualizer.setDecoration(new IconValidationDecorator());</b>
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;            validationVisualizer.initVisualization(viewModel.terminalCommandValidationStatus(), customTerminalCommand);</b>
+<b class="nc">&nbsp;            validationVisualizer.initVisualization(viewModel.fileBrowserCommandValidationStatus(), customFileBrowserCommand);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        ActionFactory actionFactory = new ActionFactory();</b>
+<b class="nc">&nbsp;        actionFactory.configureIconButton(StandardActions.HELP_PUSH_TO_APPLICATION, new HelpAction(HelpFile.PUSH_TO_APPLICATION, dialogService, preferences.getExternalApplicationsPreferences()), autolinkExternalHelp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void pushToApplicationSettings() {
+<b class="nc">&nbsp;        viewModel.pushToApplicationSettings();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void useTerminalCommandBrowse() {
+<b class="nc">&nbsp;        viewModel.customTerminalBrowse();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void useFileBrowserSpecialCommandBrowse() {
+<b class="nc">&nbsp;        viewModel.customFileBrowserBrowse();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void resetCiteCommandToDefault() {
+<b class="nc">&nbsp;        viewModel.resetCiteCommandToDefault();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

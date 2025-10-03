@@ -1,0 +1,185 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CompositeIdFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer</a>
+</div>
+
+<h1>Coverage Summary for Class: CompositeIdFetcher (org.jabref.logic.importer)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CompositeIdFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.fetcher.ArXivFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.DoiFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.RfcFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.identifier.ArXivIdentifier;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;import org.jabref.model.entry.identifier.ISBN;
+&nbsp;import org.jabref.model.entry.identifier.Identifier;
+&nbsp;import org.jabref.model.entry.identifier.RFC;
+&nbsp;import org.jabref.model.entry.identifier.SSRN;
+&nbsp;
+&nbsp;public class CompositeIdFetcher {
+&nbsp;
+&nbsp;    private final ImportFormatPreferences importFormatPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public CompositeIdFetcher(ImportFormatPreferences importFormatPreferences) {</b>
+<b class="nc">&nbsp;        this.importFormatPreferences = importFormatPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;BibEntry&gt; performSearchById(String identifier) throws FetcherException {
+&nbsp;        // All identifiers listed here should also be appear at {@link org.jabref.gui.mergeentries.FetchAndMergeEntry.SUPPORTED_FIELDS} and vice versa.
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;DOI&gt; doi = DOI.findInText(identifier);</b>
+<b class="nc">&nbsp;        if (doi.isPresent()) {</b>
+<b class="nc">&nbsp;            return new DoiFetcher(importFormatPreferences).performSearchById(doi.get().asString());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Optional&lt;ArXivIdentifier&gt; arXivIdentifier = ArXivIdentifier.parse(identifier);</b>
+<b class="nc">&nbsp;        if (arXivIdentifier.isPresent()) {</b>
+<b class="nc">&nbsp;            return new ArXivFetcher(importFormatPreferences).performSearchById(arXivIdentifier.get().asString());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Optional&lt;ISBN&gt; isbn = ISBN.parse(identifier);</b>
+<b class="nc">&nbsp;        if (isbn.isPresent()) {</b>
+<b class="nc">&nbsp;            return new IsbnFetcher(importFormatPreferences)</b>
+&nbsp;                    // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
+&nbsp;                    // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
+<b class="nc">&nbsp;                    .performSearchById(isbn.get().asString());</b>
+&nbsp;        }
+&nbsp;        /* TODO: IACR is currently disabled, because it needs to be reworked: https://github.com/JabRef/jabref/issues/8876
+&nbsp;        Optional&lt;IacrEprint&gt; iacrEprint = IacrEprint.parse(identifier);
+&nbsp;        if (iacrEprint.isPresent()) {
+&nbsp;            return new IacrEprintFetcher(importFormatPreferences).performSearchById(iacrEprint.get().getNormalized());
+&nbsp;        }*/
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;SSRN&gt; ssrn = SSRN.parse(identifier);</b>
+<b class="nc">&nbsp;        if (ssrn.isPresent()) {</b>
+<b class="nc">&nbsp;            return new DoiFetcher(importFormatPreferences).performSearchById(ssrn.get().toDoi().asString());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;RFC&gt; rfcId = RFC.parse(identifier);</b>
+<b class="nc">&nbsp;        if (rfcId.isPresent()) {</b>
+<b class="nc">&nbsp;            return new RfcFetcher(importFormatPreferences).performSearchById(rfcId.get().asString());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;CompositeIdFetcher&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean containsValidId(String identifier) {
+<b class="nc">&nbsp;        return Identifier.from(identifier).isPresent();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

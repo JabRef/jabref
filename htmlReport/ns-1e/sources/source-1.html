@@ -1,0 +1,143 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibTexStringAdd</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.collab.stringadd</a>
+</div>
+
+<h1>Coverage Summary for Class: BibTexStringAdd (org.jabref.gui.collab.stringadd)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibTexStringAdd</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.collab.stringadd;
+&nbsp;
+&nbsp;import org.jabref.gui.collab.DatabaseChange;
+&nbsp;import org.jabref.gui.collab.DatabaseChangeResolverFactory;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.gui.undo.UndoableInsertString;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.KeyCollisionException;
+&nbsp;import org.jabref.model.entry.BibtexString;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public final class BibTexStringAdd extends DatabaseChange {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BibTexStringAdd.class);</b>
+&nbsp;
+&nbsp;    private final BibtexString addedString;
+&nbsp;
+&nbsp;    public BibTexStringAdd(BibtexString addedString, BibDatabaseContext databaseContext, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+<b class="nc">&nbsp;        super(databaseContext, databaseChangeResolverFactory);</b>
+<b class="nc">&nbsp;        this.addedString = addedString;</b>
+<b class="nc">&nbsp;        setChangeName(Localization.lang(&quot;Added string: &#39;%0&#39;&quot;, addedString.getName()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void applyChange(NamedCompoundEdit undoEdit) {
+&nbsp;        try {
+<b class="nc">&nbsp;            databaseContext.getDatabase().addString(addedString);</b>
+<b class="nc">&nbsp;            undoEdit.addEdit(new UndoableInsertString(databaseContext.getDatabase(), addedString));</b>
+&nbsp;        } catch (KeyCollisionException ex) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error: could not add string &#39;{}&#39;: {}&quot;, addedString.getName(), ex.getMessage(), ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibtexString getAddedString() {
+<b class="nc">&nbsp;        return addedString;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

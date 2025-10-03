@@ -1,0 +1,221 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutosaveManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.autosaveandbackup</a>
+</div>
+
+<h1>Coverage Summary for Class: AutosaveManager (org.jabref.gui.autosaveandbackup)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutosaveManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.autosaveandbackup;
+&nbsp;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.ScheduledThreadPoolExecutor;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;import org.jabref.logic.util.CoarseChangeFilter;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.event.AutosaveEvent;
+&nbsp;import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+&nbsp;
+&nbsp;import com.google.common.eventbus.EventBus;
+&nbsp;import com.google.common.eventbus.Subscribe;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Saves the given {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent} by posting a new {@link AutosaveEvent}.
+&nbsp; * An intelligent {@link ScheduledThreadPoolExecutor} prevents a high load while saving and rejects all redundant save tasks.
+&nbsp; * The scheduled action is stored and canceled if a newer save action is proposed.
+&nbsp; */
+&nbsp;public class AutosaveManager {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveManager.class);</b>
+&nbsp;
+&nbsp;    private static final int DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS = 31;
+&nbsp;
+<b class="nc">&nbsp;    private static Set&lt;AutosaveManager&gt; runningInstances = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final BibDatabaseContext bibDatabaseContext;
+&nbsp;
+&nbsp;    private final EventBus eventBus;
+&nbsp;    private final ScheduledThreadPoolExecutor executor;
+&nbsp;    private final CoarseChangeFilter coarseChangeFilter;
+<b class="nc">&nbsp;    private boolean needsSave = false;</b>
+&nbsp;
+<b class="nc">&nbsp;    private AutosaveManager(BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter) {</b>
+<b class="nc">&nbsp;        this.bibDatabaseContext = bibDatabaseContext;</b>
+<b class="nc">&nbsp;        this.coarseChangeFilter = coarseChangeFilter;</b>
+<b class="nc">&nbsp;        this.eventBus = new EventBus();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executor = new ScheduledThreadPoolExecutor(2);</b>
+<b class="nc">&nbsp;        this.executor.scheduleAtFixedRate(</b>
+&nbsp;                () -&gt; {
+<b class="nc">&nbsp;                    if (needsSave) {</b>
+<b class="nc">&nbsp;                        eventBus.post(new AutosaveEvent());</b>
+<b class="nc">&nbsp;                        needsSave = false;</b>
+&nbsp;                    }
+&nbsp;                },
+&nbsp;                DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS,
+&nbsp;                DELAY_BETWEEN_AUTOSAVE_ATTEMPTS_IN_SECONDS,
+&nbsp;                TimeUnit.SECONDS);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Subscribe
+&nbsp;    public void listen(@SuppressWarnings(&quot;unused&quot;) BibDatabaseContextChangedEvent event) {
+<b class="nc">&nbsp;        if (!event.isFilteredOut()) {</b>
+<b class="nc">&nbsp;            this.needsSave = true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void shutdown() {
+&nbsp;        try {
+<b class="nc">&nbsp;            coarseChangeFilter.unregisterListener(this);</b>
+&nbsp;        } catch (IllegalArgumentException e) {
+&nbsp;            // ignore exception if the listener was not registered before
+&nbsp;        }
+<b class="nc">&nbsp;        runningInstances.remove(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Starts the Autosaver which is associated with the given {@link BibDatabaseContext}.
+&nbsp;     *
+&nbsp;     * @param bibDatabaseContext Associated {@link BibDatabaseContext}
+&nbsp;     */
+&nbsp;    public static AutosaveManager start(BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter) {
+<b class="nc">&nbsp;        AutosaveManager autosaveManager = new AutosaveManager(bibDatabaseContext, coarseChangeFilter);</b>
+<b class="nc">&nbsp;        runningInstances.add(autosaveManager);</b>
+<b class="nc">&nbsp;        return autosaveManager;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shuts down the Autosaver which is associated with the given {@link BibDatabaseContext}.
+&nbsp;     *
+&nbsp;     * @param bibDatabaseContext Associated {@link BibDatabaseContext}
+&nbsp;     */
+&nbsp;    public static void shutdown(BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        runningInstances.stream().filter(instance -&gt; instance.bibDatabaseContext == bibDatabaseContext).findAny()</b>
+<b class="nc">&nbsp;                        .ifPresent(AutosaveManager::shutdown);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void registerListener(Object listener) {
+<b class="nc">&nbsp;        eventBus.register(listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void unregisterListener(Object listener) {
+&nbsp;        try {
+<b class="nc">&nbsp;            eventBus.unregister(listener);</b>
+&nbsp;        } catch (IllegalArgumentException e) {
+&nbsp;            // occurs if the event source has not been registered, should not prevent shutdown
+<b class="nc">&nbsp;            LOGGER.error(&quot;Problem unregistering&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,327 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SummariesService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.summarization</a>
+</div>
+
+<h1>Coverage Summary for Class: SummariesService (org.jabref.logic.ai.summarization)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SummariesService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SummariesService$EntriesChangedListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.summarization;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.TreeMap;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;import org.jabref.logic.ai.processingstatus.ProcessingInfo;
+&nbsp;import org.jabref.logic.ai.processingstatus.ProcessingState;
+&nbsp;import org.jabref.logic.ai.templates.AiTemplatesService;
+&nbsp;import org.jabref.logic.ai.util.CitationKeyCheck;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.event.EntriesAddedEvent;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.event.FieldChangedEvent;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import com.google.common.eventbus.Subscribe;
+&nbsp;import dev.langchain4j.model.chat.ChatModel;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Main class for generating summaries of {@link BibEntry}ies.
+&nbsp; * Use this class in the logic and UI.
+&nbsp; * &lt;p&gt;
+&nbsp; * In order for summary to be stored and loaded, the {@link BibEntry} must satisfy the following requirements:
+&nbsp; * 1. There should exist an associated {@link BibDatabaseContext} for the {@link BibEntry}.
+&nbsp; * 2. The database path of the associated {@link BibDatabaseContext} must be set.
+&nbsp; * 3. The citation key of the {@link BibEntry} must be set and unique.
+&nbsp; */
+&nbsp;public class SummariesService {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SummariesService.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final TreeMap&lt;BibEntry, ProcessingInfo&lt;BibEntry, Summary&gt;&gt; summariesStatusMap = new TreeMap&lt;&gt;(Comparator.comparing(BibEntry::getId));</b>
+&nbsp;
+<b class="nc">&nbsp;    private final List&lt;List&lt;BibEntry&gt;&gt; listsUnderSummarization = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final AiPreferences aiPreferences;
+&nbsp;    private final SummariesStorage summariesStorage;
+&nbsp;    private final ChatModel chatLanguageModel;
+&nbsp;    private final AiTemplatesService aiTemplatesService;
+&nbsp;    private final BooleanProperty shutdownSignal;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    public SummariesService(AiPreferences aiPreferences,
+&nbsp;                            SummariesStorage summariesStorage,
+&nbsp;                            ChatModel chatLanguageModel,
+&nbsp;                            AiTemplatesService aiTemplatesService,
+&nbsp;                            BooleanProperty shutdownSignal,
+&nbsp;                            FilePreferences filePreferences,
+&nbsp;                            TaskExecutor taskExecutor
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        this.aiPreferences = aiPreferences;</b>
+<b class="nc">&nbsp;        this.summariesStorage = summariesStorage;</b>
+<b class="nc">&nbsp;        this.chatLanguageModel = chatLanguageModel;</b>
+<b class="nc">&nbsp;        this.aiTemplatesService = aiTemplatesService;</b>
+<b class="nc">&nbsp;        this.shutdownSignal = shutdownSignal;</b>
+<b class="nc">&nbsp;        this.filePreferences = filePreferences;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setupDatabase(BibDatabaseContext bibDatabaseContext) {
+&nbsp;        // GC was eating the listeners, so we have to fall back to the event bus.
+<b class="nc">&nbsp;        bibDatabaseContext.getDatabase().registerListener(new EntriesChangedListener(bibDatabaseContext));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private class EntriesChangedListener {
+&nbsp;        private final BibDatabaseContext bibDatabaseContext;
+&nbsp;
+<b class="nc">&nbsp;        public EntriesChangedListener(BibDatabaseContext bibDatabaseContext) {</b>
+<b class="nc">&nbsp;            this.bibDatabaseContext = bibDatabaseContext;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        public void listen(EntriesAddedEvent e) {
+<b class="nc">&nbsp;            e.getBibEntries().forEach(entry -&gt; {</b>
+<b class="nc">&nbsp;                if (aiPreferences.getAutoGenerateSummaries()) {</b>
+<b class="nc">&nbsp;                    summarize(entry, bibDatabaseContext);</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        public void listen(FieldChangedEvent e) {
+<b class="nc">&nbsp;            if (e.getField() == StandardField.FILE &amp;&amp; aiPreferences.getAutoGenerateSummaries()) {</b>
+<b class="nc">&nbsp;                summarize(e.getBibEntry(), bibDatabaseContext);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Start generating summary of a {@link BibEntry}, if it was already generated.
+&nbsp;     * This method returns a {@link ProcessingInfo} that can be used for tracking state of the summarization.
+&nbsp;     * Returned {@link ProcessingInfo} is related to the passed {@link BibEntry}, so if you call this method twice
+&nbsp;     * on the same {@link BibEntry}, the method will return the same {@link ProcessingInfo}.
+&nbsp;     */
+&nbsp;    public ProcessingInfo&lt;BibEntry, Summary&gt; summarize(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        ProcessingInfo&lt;BibEntry, Summary&gt; processingInfo = getProcessingInfo(bibEntry);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (processingInfo.getState() == ProcessingState.STOPPED) {</b>
+<b class="nc">&nbsp;            startSummarizationTask(bibEntry, bibDatabaseContext, processingInfo);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return processingInfo;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ProcessingInfo&lt;BibEntry, Summary&gt; getProcessingInfo(BibEntry entry) {
+<b class="nc">&nbsp;        return summariesStatusMap.computeIfAbsent(entry, _ -&gt; new ProcessingInfo&lt;&gt;(entry, ProcessingState.STOPPED));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;ProcessingInfo&lt;BibEntry, Summary&gt;&gt; getProcessingInfo(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        return entries.stream().map(this::getProcessingInfo).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void summarize(StringProperty groupName, List&lt;BibEntry&gt; entries, BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        List&lt;ProcessingInfo&lt;BibEntry, Summary&gt;&gt; result = getProcessingInfo(entries);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (listsUnderSummarization.contains(entries)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        listsUnderSummarization.add(entries);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;ProcessingInfo&lt;BibEntry, Summary&gt;&gt; needToProcess = result.stream().filter(processingInfo -&gt; processingInfo.getState() == ProcessingState.STOPPED).toList();</b>
+<b class="nc">&nbsp;        startSummarizationTask(groupName, needToProcess, bibDatabaseContext);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void startSummarizationTask(BibEntry entry, BibDatabaseContext bibDatabaseContext, ProcessingInfo&lt;BibEntry, Summary&gt; processingInfo) {
+<b class="nc">&nbsp;        processingInfo.setState(ProcessingState.PROCESSING);</b>
+&nbsp;
+<b class="nc">&nbsp;        new GenerateSummaryTask(entry, bibDatabaseContext, summariesStorage, chatLanguageModel, aiTemplatesService, shutdownSignal, aiPreferences, filePreferences)</b>
+<b class="nc">&nbsp;                .onSuccess(processingInfo::setSuccess)</b>
+<b class="nc">&nbsp;                .onFailure(processingInfo::setException)</b>
+<b class="nc">&nbsp;                .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void startSummarizationTask(StringProperty groupName, List&lt;ProcessingInfo&lt;BibEntry, Summary&gt;&gt; entries, BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        entries.forEach(processingInfo -&gt; processingInfo.setState(ProcessingState.PROCESSING));</b>
+&nbsp;
+<b class="nc">&nbsp;        new GenerateSummaryForSeveralTask(groupName, entries, bibDatabaseContext, summariesStorage, chatLanguageModel, aiTemplatesService, shutdownSignal, aiPreferences, filePreferences, taskExecutor)</b>
+<b class="nc">&nbsp;                .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Method, similar to {@link #summarize(BibEntry, BibDatabaseContext)}, but it allows you to regenerate summary.
+&nbsp;     */
+&nbsp;    public void regenerateSummary(BibEntry bibEntry, BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        ProcessingInfo&lt;BibEntry, Summary&gt; processingInfo = summarize(bibEntry, bibDatabaseContext);</b>
+<b class="nc">&nbsp;        processingInfo.setState(ProcessingState.PROCESSING);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (bibDatabaseContext.getDatabasePath().isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;No database path is present. Could not clear stored summary for regeneration&quot;);</b>
+<b class="nc">&nbsp;        } else if (bibEntry.getCitationKey().isEmpty() || CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, bibEntry)) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;No valid citation key is present. Could not clear stored summary for regeneration&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            summariesStorage.clear(bibDatabaseContext.getDatabasePath().get(), bibEntry.getCitationKey().get());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        startSummarizationTask(bibEntry, bibDatabaseContext, processingInfo);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

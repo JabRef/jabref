@@ -1,0 +1,312 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JabRefEmbeddingModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.ingestion.model</a>
+</div>
+
+<h1>Coverage Summary for Class: JabRefEmbeddingModel (org.jabref.logic.ai.ingestion.model)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JabRefEmbeddingModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JabRefEmbeddingModel$EmbeddingModelBuildingErrorEvent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">JabRefEmbeddingModel$EmbeddingModelBuiltEvent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.ingestion.model;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.Executors;
+&nbsp;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.NotificationService;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;
+&nbsp;import com.google.common.eventbus.EventBus;
+&nbsp;import com.google.common.util.concurrent.ThreadFactoryBuilder;
+&nbsp;import dev.langchain4j.data.embedding.Embedding;
+&nbsp;import dev.langchain4j.data.segment.TextSegment;
+&nbsp;import dev.langchain4j.model.embedding.EmbeddingModel;
+&nbsp;import dev.langchain4j.model.output.Response;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Wrapper around langchain4j {@link dev.langchain4j.model.embedding.EmbeddingModel}.
+&nbsp; * &lt;p&gt;
+&nbsp; * This class listens to preferences changes.
+&nbsp; */
+&nbsp;public class JabRefEmbeddingModel implements EmbeddingModel, AutoCloseable {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefEmbeddingModel.class);</b>
+&nbsp;
+&nbsp;    private final AiPreferences aiPreferences;
+&nbsp;    private final NotificationService notificationService;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+<b class="nc">&nbsp;    private final ExecutorService executorService = Executors.newCachedThreadPool(</b>
+<b class="nc">&nbsp;            new ThreadFactoryBuilder().setNameFormat(&quot;ai-embedding-pool-%d&quot;).build()</b>
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Optional&lt;DeepJavaEmbeddingModel&gt;&gt; predictorProperty = new SimpleObjectProperty&lt;&gt;(Optional.empty());</b>
+&nbsp;
+&nbsp;    // Used to update the tab content after the data is available
+<b class="nc">&nbsp;    private final EventBus eventBus = new EventBus();</b>
+&nbsp;
+<b class="nc">&nbsp;    public static class EmbeddingModelBuiltEvent {</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public static class EmbeddingModelBuildingErrorEvent {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Empty if there is no error.
+<b class="nc">&nbsp;    private String errorWhileBuildingModel = &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;    public JabRefEmbeddingModel(AiPreferences aiPreferences, NotificationService notificationService, TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.aiPreferences = aiPreferences;</b>
+<b class="nc">&nbsp;        this.notificationService = notificationService;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        startRebuildingTask();</b>
+&nbsp;
+<b class="nc">&nbsp;        setupListeningToPreferencesChanges();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void registerListener(Object object) {
+<b class="nc">&nbsp;        eventBus.register(object);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void startRebuildingTask() {
+<b class="nc">&nbsp;        if (!aiPreferences.getEnableAi()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        predictorProperty.set(Optional.empty());</b>
+&nbsp;
+<b class="nc">&nbsp;        new UpdateEmbeddingModelTask(aiPreferences, predictorProperty)</b>
+<b class="nc">&nbsp;                .onSuccess(v -&gt; {</b>
+<b class="nc">&nbsp;                    LOGGER.info(&quot;Embedding model was successfully updated&quot;);</b>
+<b class="nc">&nbsp;                    errorWhileBuildingModel = &quot;&quot;;</b>
+<b class="nc">&nbsp;                    eventBus.post(new EmbeddingModelBuiltEvent());</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .onFailure(e -&gt; {</b>
+<b class="nc">&nbsp;                    LOGGER.error(&quot;An error occurred while building the embedding model&quot;, e);</b>
+<b class="nc">&nbsp;                    notificationService.notify(Localization.lang(&quot;An error occurred while building the embedding model&quot;));</b>
+<b class="nc">&nbsp;                    errorWhileBuildingModel = e.getMessage();</b>
+<b class="nc">&nbsp;                    eventBus.post(new EmbeddingModelBuildingErrorEvent());</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isPresent() {
+<b class="nc">&nbsp;        return predictorProperty.get().isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hadErrorWhileBuildingModel() {
+<b class="nc">&nbsp;        return !errorWhileBuildingModel.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getErrorWhileBuildingModel() {
+<b class="nc">&nbsp;        return errorWhileBuildingModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupListeningToPreferencesChanges() {
+<b class="nc">&nbsp;        aiPreferences.enableAiProperty().addListener((obs, oldValue, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            if (newValue &amp;&amp; predictorProperty.get().isEmpty()) {</b>
+<b class="nc">&nbsp;                startRebuildingTask();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        aiPreferences.customizeExpertSettingsProperty().addListener((obs, oldValue, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            if (newValue &amp;&amp; predictorProperty.get().isEmpty()) {</b>
+<b class="nc">&nbsp;                startRebuildingTask();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        aiPreferences.embeddingModelProperty().addListener(obs -&gt; startRebuildingTask());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Response&lt;List&lt;Embedding&gt;&gt; embedAll(List&lt;TextSegment&gt; list) {
+<b class="nc">&nbsp;        if (predictorProperty.get().isEmpty()) {</b>
+&nbsp;            // The rationale for RuntimeException here:
+&nbsp;            // 1. langchain4j error handling is a mess, and it uses RuntimeExceptions
+&nbsp;            //    everywhere. Because this method implements a langchain4j interface,
+&nbsp;            //    we follow the same &quot;practice&quot;.
+&nbsp;            // 2. There is no way to encode error information from type system: nor
+&nbsp;            //    in the result type, nor &quot;throws&quot; in method signature. Actually,
+&nbsp;            //    it&#39;s possible, but langchain4j doesn&#39;t do it.
+&nbsp;
+<b class="nc">&nbsp;            throw new RuntimeException(Localization.lang(&quot;Embedding model is not set up&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return predictorProperty.get().get().embedAll(list);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        executorService.shutdownNow();</b>
+<b class="nc">&nbsp;        if (predictorProperty.get().isPresent()) {</b>
+<b class="nc">&nbsp;            predictorProperty.get().get().close();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

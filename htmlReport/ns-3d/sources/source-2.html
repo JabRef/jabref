@@ -1,0 +1,244 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GroupDescriptions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.groups</a>
+</div>
+
+<h1>Coverage Summary for Class: GroupDescriptions (org.jabref.gui.groups)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GroupDescriptions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GroupDescriptions$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.groups;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.groups.ExplicitGroup;
+&nbsp;import org.jabref.model.groups.KeywordGroup;
+&nbsp;import org.jabref.model.groups.SearchGroup;
+&nbsp;import org.jabref.model.groups.SmartGroup;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;public class GroupDescriptions {
+&nbsp;
+&nbsp;    private GroupDescriptions() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getShortDescriptionKeywordGroup(KeywordGroup keywordGroup, boolean showDynamic) {
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        sb.append(&quot;&lt;b&gt;&quot;);</b>
+<b class="nc">&nbsp;        if (showDynamic) {</b>
+<b class="nc">&nbsp;            sb.append(&quot;&lt;i&gt;&quot;).append(StringUtil.quoteForHTML(keywordGroup.getName())).append(&quot;&lt;/i&gt;&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            sb.append(StringUtil.quoteForHTML(keywordGroup.getName()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        sb.append(&quot;&lt;/b&gt; - &quot;);</b>
+<b class="nc">&nbsp;        sb.append(Localization.lang(&quot;dynamic group&quot;));</b>
+<b class="nc">&nbsp;        sb.append(&quot; &lt;b&gt;&quot;);</b>
+<b class="nc">&nbsp;        sb.append(keywordGroup.getSearchField());</b>
+<b class="nc">&nbsp;        sb.append(&quot;&lt;/b&gt; &quot;);</b>
+<b class="nc">&nbsp;        sb.append(Localization.lang(&quot;contains&quot;));</b>
+<b class="nc">&nbsp;        sb.append(&quot; &lt;b&gt;&quot;);</b>
+<b class="nc">&nbsp;        sb.append(StringUtil.quoteForHTML(keywordGroup.getSearchExpression()));</b>
+<b class="nc">&nbsp;        sb.append(&quot;&lt;/b&gt;)&quot;);</b>
+<b class="nc">&nbsp;        switch (keywordGroup.getHierarchicalContext()) {</b>
+&nbsp;            case INCLUDING:
+<b class="nc">&nbsp;                sb.append(&quot;, &quot;).append(Localization.lang(&quot;includes subgroups&quot;));</b>
+&nbsp;                break;
+&nbsp;            case REFINING:
+<b class="nc">&nbsp;                sb.append(&quot;, &quot;).append(Localization.lang(&quot;refines supergroup&quot;));</b>
+&nbsp;                break;
+&nbsp;            default:
+&nbsp;                break;
+&nbsp;        }
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getShortDescriptionExplicitGroup(ExplicitGroup explicitGroup) {
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        sb.append(&quot;&lt;b&gt;&quot;).append(explicitGroup.getName()).append(&quot;&lt;/b&gt; - &quot;).append(Localization.lang(&quot;static group&quot;));</b>
+<b class="nc">&nbsp;        switch (explicitGroup.getHierarchicalContext()) {</b>
+&nbsp;            case INCLUDING:
+<b class="nc">&nbsp;                sb.append(&quot;, &quot;).append(Localization.lang(&quot;includes subgroups&quot;));</b>
+&nbsp;                break;
+&nbsp;            case REFINING:
+<b class="nc">&nbsp;                sb.append(&quot;, &quot;).append(Localization.lang(&quot;refines supergroup&quot;));</b>
+&nbsp;                break;
+&nbsp;            default:
+&nbsp;                break;
+&nbsp;        }
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getShortDescriptionAllEntriesGroup() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;&lt;b&gt;All Entries&lt;/b&gt; (this group cannot be edited or removed)&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getShortDescriptionSmartGroup(SmartGroup smartGroup) {
+<b class="nc">&nbsp;        return Localization.lang(&quot;&lt;b&gt;Smart Group&lt;/b&gt; (Import Entries)&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getShortDescription(SearchGroup searchGroup, boolean showDynamic) {
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        sb.append(&quot;&lt;b&gt;&quot;);</b>
+<b class="nc">&nbsp;        if (showDynamic) {</b>
+<b class="nc">&nbsp;            sb.append(&quot;&lt;i&gt;&quot;).append(StringUtil.quoteForHTML(searchGroup.getName())).append(&quot;&lt;/i&gt;&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            sb.append(StringUtil.quoteForHTML(searchGroup.getName()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        sb.append(&quot;&lt;/b&gt; - &quot;);</b>
+<b class="nc">&nbsp;        sb.append(Localization.lang(&quot;dynamic group&quot;));</b>
+<b class="nc">&nbsp;        sb.append(&quot; (&quot;);</b>
+<b class="nc">&nbsp;        sb.append(Localization.lang(&quot;search expression&quot;));</b>
+<b class="nc">&nbsp;        sb.append(&quot; &lt;b&gt;&quot;).append(StringUtil.quoteForHTML(searchGroup.getSearchExpression())).append(&quot;&lt;/b&gt;)&quot;);</b>
+<b class="nc">&nbsp;        switch (searchGroup.getHierarchicalContext()) {</b>
+&nbsp;            case INCLUDING:
+<b class="nc">&nbsp;                sb.append(&quot;, &quot;).append(Localization.lang(&quot;includes subgroups&quot;));</b>
+&nbsp;                break;
+&nbsp;            case REFINING:
+<b class="nc">&nbsp;                sb.append(&quot;, &quot;).append(Localization.lang(&quot;refines supergroup&quot;));</b>
+&nbsp;                break;
+&nbsp;            default:
+&nbsp;                break;
+&nbsp;        }
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

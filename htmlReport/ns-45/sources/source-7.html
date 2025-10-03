@@ -1,0 +1,139 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WalkthroughKeyBindings</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.keyboard</a>
+</div>
+
+<h1>Coverage Summary for Class: WalkthroughKeyBindings (org.jabref.gui.keyboard)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WalkthroughKeyBindings</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.keyboard;
+&nbsp;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.walkthrough.Walkthrough;
+&nbsp;
+<b class="nc">&nbsp;public class WalkthroughKeyBindings {</b>
+&nbsp;
+&nbsp;    /// Handles ESC key to quit active walkthrough with confirmation.
+&nbsp;    ///
+&nbsp;    /// @param event                the key event
+&nbsp;    /// @param stateManager         the state manager
+&nbsp;    /// @param keyBindingRepository the key binding repository
+&nbsp;    public static void call(KeyEvent event, StateManager stateManager, KeyBindingRepository keyBindingRepository) {
+<b class="nc">&nbsp;        keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -&gt; {</b>
+<b class="nc">&nbsp;            if (binding == KeyBinding.CLOSE) { // NOTE: CLOSE is using Esc key. Therefore, we didn&#39;t introduce a new key binding entry since this would lead to conflicts with other key bindings.</b>
+<b class="nc">&nbsp;                stateManager.getActiveWalkthrough().ifPresent(Walkthrough::showQuitConfirmationAndQuit);</b>
+<b class="nc">&nbsp;                event.consume();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

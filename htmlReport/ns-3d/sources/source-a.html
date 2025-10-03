@@ -1,0 +1,863 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GroupTreeViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.groups</a>
+</div>
+
+<h1>Coverage Summary for Class: GroupTreeViewModel (org.jabref.gui.groups)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GroupTreeViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/120)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/313)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.groups;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.control.Alert;
+&nbsp;import javafx.scene.control.ButtonBar;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.ai.components.aichat.AiChatWindow;
+&nbsp;import org.jabref.gui.entryeditor.AdaptVisibleTabs;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.CustomLocalDragboard;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.groups.AbstractGroup;
+&nbsp;import org.jabref.model.groups.AutomaticKeywordGroup;
+&nbsp;import org.jabref.model.groups.AutomaticPersonsGroup;
+&nbsp;import org.jabref.model.groups.ExplicitGroup;
+&nbsp;import org.jabref.model.groups.GroupHierarchyType;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;import org.jabref.model.groups.RegexKeywordGroup;
+&nbsp;import org.jabref.model.groups.SearchGroup;
+&nbsp;import org.jabref.model.groups.SmartGroup;
+&nbsp;import org.jabref.model.groups.TexGroup;
+&nbsp;import org.jabref.model.groups.WordKeywordGroup;
+&nbsp;import org.jabref.model.metadata.MetaData;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import dev.langchain4j.data.message.ChatMessage;
+&nbsp;
+<b class="nc">&nbsp;public class GroupTreeViewModel extends AbstractViewModel {</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;GroupNodeViewModel&gt; rootGroup = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;GroupNodeViewModel&gt; selectedGroups = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final AiService aiService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final AdaptVisibleTabs adaptVisibleTabs;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final CustomLocalDragboard localDragboard;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Predicate&lt;GroupNodeViewModel&gt;&gt; filterPredicate = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final StringProperty filterText = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final Comparator&lt;GroupTreeNode&gt; compAlphabetIgnoreCase = (GroupTreeNode v1, GroupTreeNode v2) -&gt; v1</b>
+<b class="nc">&nbsp;            .getName()</b>
+<b class="nc">&nbsp;            .compareToIgnoreCase(v2.getName());</b>
+<b class="nc">&nbsp;    private final Comparator&lt;GroupTreeNode&gt; compAlphabetIgnoreCaseReverse = (GroupTreeNode v1, GroupTreeNode v2) -&gt; v2</b>
+<b class="nc">&nbsp;            .getName()</b>
+<b class="nc">&nbsp;            .compareToIgnoreCase(v1.getName());</b>
+<b class="nc">&nbsp;    private final Comparator&lt;GroupTreeNode&gt; compEntries = (GroupTreeNode v1, GroupTreeNode v2) -&gt; {</b>
+<b class="nc">&nbsp;        int numChildren1 = v1.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();</b>
+<b class="nc">&nbsp;        int numChildren2 = v2.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();</b>
+<b class="nc">&nbsp;        return Integer.compare(numChildren2, numChildren1);</b>
+&nbsp;    };
+<b class="nc">&nbsp;    private final Comparator&lt;GroupTreeNode&gt; compEntriesReverse = (GroupTreeNode v1, GroupTreeNode v2) -&gt; {</b>
+<b class="nc">&nbsp;        int numChildren1 = v1.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();</b>
+<b class="nc">&nbsp;        int numChildren2 = v2.getEntriesInGroup(this.currentDatabase.get().getEntries()).size();</b>
+<b class="nc">&nbsp;        return Integer.compare(numChildren1, numChildren2);</b>
+&nbsp;    };
+<b class="nc">&nbsp;    private Optional&lt;BibDatabaseContext&gt; currentDatabase = Optional.empty();</b>
+&nbsp;
+&nbsp;    public GroupTreeViewModel(StateManager stateManager,
+&nbsp;                              DialogService dialogService,
+&nbsp;                              AiService aiService,
+&nbsp;                              GuiPreferences preferences,
+&nbsp;                              AdaptVisibleTabs adaptVisibleTabs,
+&nbsp;                              TaskExecutor taskExecutor,
+&nbsp;                              CustomLocalDragboard localDragboard
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        this.stateManager = Objects.requireNonNull(stateManager);</b>
+<b class="nc">&nbsp;        this.dialogService = Objects.requireNonNull(dialogService);</b>
+<b class="nc">&nbsp;        this.aiService = Objects.requireNonNull(aiService);</b>
+<b class="nc">&nbsp;        this.preferences = Objects.requireNonNull(preferences);</b>
+<b class="nc">&nbsp;        this.adaptVisibleTabs = adaptVisibleTabs;</b>
+<b class="nc">&nbsp;        this.taskExecutor = Objects.requireNonNull(taskExecutor);</b>
+<b class="nc">&nbsp;        this.localDragboard = Objects.requireNonNull(localDragboard);</b>
+&nbsp;
+&nbsp;        // Register listener
+<b class="nc">&nbsp;        EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);</b>
+&nbsp;
+&nbsp;        // Set-up bindings
+<b class="nc">&nbsp;        filterPredicate.bind(EasyBind.map(filterText, text -&gt; group -&gt; group.isMatchedBy(text)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void refresh() {
+<b class="nc">&nbsp;        onActiveDatabaseChanged(stateManager.activeDatabaseProperty().getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;GroupNodeViewModel&gt; rootGroupProperty() {
+<b class="nc">&nbsp;        return rootGroup;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;GroupNodeViewModel&gt; selectedGroupsProperty() {
+<b class="nc">&nbsp;        return selectedGroups;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Predicate&lt;GroupNodeViewModel&gt;&gt; filterPredicateProperty() {
+<b class="nc">&nbsp;        return filterPredicate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty filterTextProperty() {
+<b class="nc">&nbsp;        return filterText;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets invoked if the user selects a different group.
+&nbsp;     * We need to notify the {@link StateManager} about this change so that the main table gets updated.
+&nbsp;     */
+&nbsp;    private void onSelectedGroupChanged(ObservableList&lt;GroupNodeViewModel&gt; newValue) {
+<b class="nc">&nbsp;        if (!currentDatabase.equals(stateManager.activeDatabaseProperty().getValue())) {</b>
+&nbsp;            // Switch of database occurred -&gt; do nothing
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        currentDatabase.ifPresent(database -&gt; {</b>
+<b class="nc">&nbsp;            if ((newValue == null) || newValue.isEmpty()) {</b>
+<b class="nc">&nbsp;                stateManager.clearSelectedGroups(database);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                stateManager.setSelectedGroups(database, newValue.stream().map(GroupNodeViewModel::getGroupNode).collect(Collectors.toList()));</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Opens &quot;New Group Dialog&quot; and add the resulting group to the root
+&nbsp;     */
+&nbsp;    public void addNewGroupToRoot() {
+<b class="nc">&nbsp;        if (currentDatabase.isPresent()) {</b>
+<b class="nc">&nbsp;            addNewSubgroup(rootGroup.get(), GroupDialogHeader.GROUP);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.showWarningDialogAndWait(Localization.lang(&quot;Cannot create group&quot;), Localization.lang(&quot;Cannot create group. Please create a library first.&quot;));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets invoked if the user changes the active database.
+&nbsp;     * We need to get the new group tree and update the view
+&nbsp;     */
+&nbsp;    private void onActiveDatabaseChanged(Optional&lt;BibDatabaseContext&gt; newDatabase) {
+<b class="nc">&nbsp;        if (newDatabase.isPresent()) {</b>
+<b class="nc">&nbsp;            GroupNodeViewModel newRoot = newDatabase</b>
+<b class="nc">&nbsp;                    .map(BibDatabaseContext::getMetaData)</b>
+<b class="nc">&nbsp;                    .flatMap(MetaData::getGroups)</b>
+<b class="nc">&nbsp;                    .map(root -&gt; new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, root, localDragboard, preferences))</b>
+<b class="nc">&nbsp;                    .orElse(GroupNodeViewModel.getAllEntriesGroup(newDatabase.get(), stateManager, taskExecutor, localDragboard, preferences));</b>
+&nbsp;
+<b class="nc">&nbsp;            rootGroup.setValue(newRoot);</b>
+<b class="nc">&nbsp;            if (stateManager.getSelectedGroups(newDatabase.get()).isEmpty()) {</b>
+<b class="nc">&nbsp;                stateManager.setSelectedGroups(newDatabase.get(), List.of(newRoot.getGroupNode()));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            selectedGroups.setAll(</b>
+<b class="nc">&nbsp;                    stateManager.getSelectedGroups(newDatabase.get()).stream()</b>
+<b class="nc">&nbsp;                                .map(selectedGroup -&gt; new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))</b>
+<b class="nc">&nbsp;                                .collect(Collectors.toList()));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            rootGroup.setValue(null);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        currentDatabase = newDatabase;</b>
+<b class="nc">&nbsp;        newDatabase.ifPresent(db -&gt; addGroupImportEntries(rootGroup.get()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addGroupImportEntries(GroupNodeViewModel parent) {
+<b class="nc">&nbsp;        if (!preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String grpName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();</b>
+<b class="nc">&nbsp;        AbstractGroup importEntriesGroup = new SmartGroup(grpName, GroupHierarchyType.INDEPENDENT, &#39;,&#39;);</b>
+<b class="nc">&nbsp;        boolean isGrpExist = parent.getGroupNode()</b>
+<b class="nc">&nbsp;                                   .getChildren()</b>
+<b class="nc">&nbsp;                                   .stream()</b>
+<b class="nc">&nbsp;                                   .map(GroupTreeNode::getGroup)</b>
+<b class="nc">&nbsp;                                   .anyMatch(grp -&gt; grp instanceof SmartGroup);</b>
+<b class="nc">&nbsp;        if (!isGrpExist) {</b>
+<b class="nc">&nbsp;            currentDatabase.ifPresent(db -&gt; {</b>
+<b class="nc">&nbsp;                GroupTreeNode newSubgroup = parent.addSubgroup(importEntriesGroup);</b>
+<b class="nc">&nbsp;                newSubgroup.moveTo(parent.getGroupNode(), 0);</b>
+<b class="nc">&nbsp;                selectedGroups.setAll(new GroupNodeViewModel(db, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));</b>
+<b class="nc">&nbsp;                writeGroupChangesToMetaData();</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Opens &quot;New Group Dialog&quot; and adds the resulting group as subgroup to the specified group
+&nbsp;     */
+&nbsp;    public void addNewSubgroup(GroupNodeViewModel parent, GroupDialogHeader groupDialogHeader) {
+<b class="nc">&nbsp;        currentDatabase.ifPresent(database -&gt; {</b>
+<b class="nc">&nbsp;            Optional&lt;AbstractGroup&gt; newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(</b>
+&nbsp;                    database,
+<b class="nc">&nbsp;                    parent.getGroupNode(),</b>
+&nbsp;                    null,
+&nbsp;                    groupDialogHeader));
+&nbsp;
+<b class="nc">&nbsp;            newGroup.ifPresent(group -&gt; {</b>
+<b class="nc">&nbsp;                GroupTreeNode newSubgroup = parent.addSubgroup(group);</b>
+<b class="nc">&nbsp;                selectedGroups.setAll(new GroupNodeViewModel(database, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));</b>
+&nbsp;
+&nbsp;                // TODO: Add undo
+&nbsp;                // UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(parent, new GroupTreeNodeViewModel(newGroupNode), UndoableAddOrRemoveGroup.ADD_NODE);
+&nbsp;                // panel.getUndoManager().addEdit(undo);
+&nbsp;
+&nbsp;                // TODO: Expand parent to make new group visible
+&nbsp;                // parent.expand();
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Added group \&quot;%0\&quot;.&quot;, group.getName()));</b>
+<b class="nc">&nbsp;                writeGroupChangesToMetaData();</b>
+&nbsp;            });
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void writeGroupChangesToMetaData() {
+<b class="nc">&nbsp;        currentDatabase.ifPresent(database -&gt; database.getMetaData().setGroups(rootGroup.get().getGroupNode()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isGroupTypeEqual(AbstractGroup oldGroup, AbstractGroup newGroup) {
+<b class="nc">&nbsp;        return oldGroup.getClass().equals(newGroup.getClass());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds JabRef suggested groups under the &quot;All Entries&quot; parent node.
+&nbsp;     * Assumes the parent is already validated as &quot;All Entries&quot; by the caller.
+&nbsp;     *
+&nbsp;     * @param parent The &quot;All Entries&quot; parent node.
+&nbsp;     */
+&nbsp;    public void addSuggestedGroups(GroupNodeViewModel parent) {
+<b class="nc">&nbsp;        currentDatabase.ifPresent(database -&gt; {</b>
+<b class="nc">&nbsp;            GroupTreeNode rootNode = parent.getGroupNode();</b>
+<b class="nc">&nbsp;            List&lt;GroupTreeNode&gt; newSuggestedSubgroups = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;            // 1. Create &quot;Entries without linked files&quot; group if it doesn&#39;t exist
+<b class="nc">&nbsp;            SearchGroup withoutFilesGroup = JabRefSuggestedGroups.createWithoutFilesGroup();</b>
+<b class="nc">&nbsp;            if (!parent.hasSimilarSearchGroup(withoutFilesGroup)) {</b>
+<b class="nc">&nbsp;                GroupTreeNode subGroup = rootNode.addSubgroup(withoutFilesGroup);</b>
+<b class="nc">&nbsp;                newSuggestedSubgroups.add(subGroup);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // 2. Create &quot;Entries without groups&quot; group if it doesn&#39;t exist
+<b class="nc">&nbsp;            SearchGroup withoutGroupsGroup = JabRefSuggestedGroups.createWithoutGroupsGroup();</b>
+<b class="nc">&nbsp;            if (!parent.hasSimilarSearchGroup(withoutGroupsGroup)) {</b>
+<b class="nc">&nbsp;                GroupTreeNode subGroup = rootNode.addSubgroup(withoutGroupsGroup);</b>
+<b class="nc">&nbsp;                newSuggestedSubgroups.add(subGroup);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            selectedGroups.setAll(newSuggestedSubgroups</b>
+<b class="nc">&nbsp;                    .stream()</b>
+<b class="nc">&nbsp;                    .map(newSubGroup -&gt; new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))</b>
+<b class="nc">&nbsp;                    .toList());</b>
+&nbsp;
+<b class="nc">&nbsp;            writeGroupChangesToMetaData();</b>
+&nbsp;
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Created %0 suggested groups.&quot;, String.valueOf(newSuggestedSubgroups.size())));</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check if it is necessary to show a group modified, reassign entry dialog &lt;br&gt;
+&nbsp;     * Group name change is handled separately
+&nbsp;     *
+&nbsp;     * @param oldGroup Original Group
+&nbsp;     * @param newGroup Edited group
+&nbsp;     * @return true if just trivial modifications (e.g. color or description) or the relevant group properties are equal, false otherwise
+&nbsp;     */
+&nbsp;    boolean onlyMinorChanges(AbstractGroup oldGroup, AbstractGroup newGroup) {
+&nbsp;        // we need to use getclass here because we have different subclass inheritance e.g. ExplicitGroup is a subclass of WordKeyWordGroup
+<b class="nc">&nbsp;        if (oldGroup.getClass() == WordKeywordGroup.class) {</b>
+<b class="nc">&nbsp;            WordKeywordGroup oldWordKeywordGroup = (WordKeywordGroup) oldGroup;</b>
+<b class="nc">&nbsp;            WordKeywordGroup newWordKeywordGroup = (WordKeywordGroup) newGroup;</b>
+&nbsp;
+<b class="nc">&nbsp;            return Objects.equals(oldWordKeywordGroup.getSearchField().getName(), newWordKeywordGroup.getSearchField().getName())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(oldWordKeywordGroup.getSearchExpression(), newWordKeywordGroup.getSearchExpression())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(oldWordKeywordGroup.isCaseSensitive(), newWordKeywordGroup.isCaseSensitive());</b>
+<b class="nc">&nbsp;        } else if (oldGroup.getClass() == RegexKeywordGroup.class) {</b>
+<b class="nc">&nbsp;            RegexKeywordGroup oldRegexKeywordGroup = (RegexKeywordGroup) oldGroup;</b>
+<b class="nc">&nbsp;            RegexKeywordGroup newRegexKeywordGroup = (RegexKeywordGroup) newGroup;</b>
+&nbsp;
+<b class="nc">&nbsp;            return Objects.equals(oldRegexKeywordGroup.getSearchField().getName(), newRegexKeywordGroup.getSearchField().getName())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(oldRegexKeywordGroup.getSearchExpression(), newRegexKeywordGroup.getSearchExpression())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(oldRegexKeywordGroup.isCaseSensitive(), newRegexKeywordGroup.isCaseSensitive());</b>
+<b class="nc">&nbsp;        } else if (oldGroup.getClass() == SearchGroup.class) {</b>
+<b class="nc">&nbsp;            SearchGroup oldSearchGroup = (SearchGroup) oldGroup;</b>
+<b class="nc">&nbsp;            SearchGroup newSearchGroup = (SearchGroup) newGroup;</b>
+&nbsp;
+<b class="nc">&nbsp;            return Objects.equals(oldSearchGroup.getSearchExpression(), newSearchGroup.getSearchExpression())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(oldSearchGroup.getSearchFlags(), newSearchGroup.getSearchFlags());</b>
+<b class="nc">&nbsp;        } else if (oldGroup.getClass() == AutomaticKeywordGroup.class) {</b>
+<b class="nc">&nbsp;            AutomaticKeywordGroup oldAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;</b>
+<b class="nc">&nbsp;            AutomaticKeywordGroup newAutomaticKeywordGroup = (AutomaticKeywordGroup) oldGroup;</b>
+&nbsp;
+<b class="nc">&nbsp;            return Objects.equals(oldAutomaticKeywordGroup.getKeywordDelimiter(), newAutomaticKeywordGroup.getKeywordDelimiter())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(oldAutomaticKeywordGroup.getKeywordHierarchicalDelimiter(), newAutomaticKeywordGroup.getKeywordHierarchicalDelimiter())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(oldAutomaticKeywordGroup.getField().getName(), newAutomaticKeywordGroup.getField().getName());</b>
+<b class="nc">&nbsp;        } else if (oldGroup.getClass() == AutomaticPersonsGroup.class) {</b>
+<b class="nc">&nbsp;            AutomaticPersonsGroup oldAutomaticPersonsGroup = (AutomaticPersonsGroup) oldGroup;</b>
+<b class="nc">&nbsp;            AutomaticPersonsGroup newAutomaticPersonsGroup = (AutomaticPersonsGroup) newGroup;</b>
+&nbsp;
+<b class="nc">&nbsp;            return Objects.equals(oldAutomaticPersonsGroup.getField().getName(), newAutomaticPersonsGroup.getField().getName());</b>
+<b class="nc">&nbsp;        } else if (oldGroup.getClass() == TexGroup.class) {</b>
+<b class="nc">&nbsp;            TexGroup oldTexGroup = (TexGroup) oldGroup;</b>
+<b class="nc">&nbsp;            TexGroup newTexGroup = (TexGroup) newGroup;</b>
+<b class="nc">&nbsp;            return Objects.equals(oldTexGroup.getFilePath().toString(), newTexGroup.getFilePath().toString());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Opens &quot;Edit Group Dialog&quot; and changes the given group to the edited one.
+&nbsp;     */
+&nbsp;    public void editGroup(GroupNodeViewModel oldGroup) {
+<b class="nc">&nbsp;        currentDatabase.ifPresent(database -&gt; {</b>
+<b class="nc">&nbsp;            Optional&lt;AbstractGroup&gt; newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(</b>
+&nbsp;                    database,
+<b class="nc">&nbsp;                    oldGroup.getGroupNode().getParent().orElse(null),</b>
+<b class="nc">&nbsp;                    oldGroup.getGroupNode().getGroup(),</b>
+&nbsp;                    GroupDialogHeader.SUBGROUP));
+&nbsp;
+<b class="nc">&nbsp;            newGroup.ifPresent(group -&gt; {</b>
+<b class="nc">&nbsp;                AbstractGroup oldGroupDef = oldGroup.getGroupNode().getGroup();</b>
+<b class="nc">&nbsp;                String oldGroupName = oldGroupDef.getName();</b>
+&nbsp;
+<b class="nc">&nbsp;                boolean groupTypeEqual = isGroupTypeEqual(oldGroupDef, group);</b>
+<b class="nc">&nbsp;                boolean onlyMinorModifications = groupTypeEqual &amp;&amp; onlyMinorChanges(oldGroupDef, group);</b>
+&nbsp;
+&nbsp;                // dialog already warns us about this if the new group is named like another existing group
+&nbsp;                // We need to check if only the name changed as this is relevant for the entry&#39;s group field
+<b class="nc">&nbsp;                if (groupTypeEqual &amp;&amp; !group.getName().equals(oldGroupName) &amp;&amp; onlyMinorModifications) {</b>
+<b class="nc">&nbsp;                    int groupsWithSameName = 0;</b>
+<b class="nc">&nbsp;                    Optional&lt;GroupTreeNode&gt; databaseRootGroup = currentDatabase.get().getMetaData().getGroups();</b>
+<b class="nc">&nbsp;                    if (databaseRootGroup.isPresent()) {</b>
+&nbsp;                        // we need to check the old name for duplicates. If the new group name occurs more than once, it won&#39;t matter
+<b class="nc">&nbsp;                        groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -&gt; g.getName().equals(oldGroupName)).size();</b>
+&nbsp;                    }
+&nbsp;                    // We found more than 2 groups, so we cannot simply remove old assignment
+<b class="nc">&nbsp;                    boolean removePreviousAssignments = groupsWithSameName &lt; 2;</b>
+&nbsp;
+<b class="nc">&nbsp;                    oldGroup.getGroupNode().setGroup(</b>
+&nbsp;                            group,
+&nbsp;                            true,
+&nbsp;                            removePreviousAssignments,
+<b class="nc">&nbsp;                            database.getEntries());</b>
+&nbsp;
+<b class="nc">&nbsp;                    dialogService.notify(Localization.lang(&quot;Modified group \&quot;%0\&quot;.&quot;, group.getName()));</b>
+<b class="nc">&nbsp;                    writeGroupChangesToMetaData();</b>
+&nbsp;                    // This is ugly, but we have no proper update mechanism in place to propagate the changes, so redraw everything
+<b class="nc">&nbsp;                    refresh();</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (groupTypeEqual &amp;&amp; onlyMinorChanges(oldGroup.getGroupNode().getGroup(), group)) {</b>
+<b class="nc">&nbsp;                    oldGroup.getGroupNode().setGroup(</b>
+&nbsp;                            group,
+&nbsp;                            true,
+&nbsp;                            true,
+<b class="nc">&nbsp;                            database.getEntries());</b>
+&nbsp;
+<b class="nc">&nbsp;                    writeGroupChangesToMetaData();</b>
+<b class="nc">&nbsp;                    refresh();</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+&nbsp;                // Major modifications
+&nbsp;
+<b class="nc">&nbsp;                String content = Localization.lang(&quot;Assign the original group&#39;s entries to this group?&quot;);</b>
+<b class="nc">&nbsp;                ButtonType keepAssignments = new ButtonType(Localization.lang(&quot;Assign&quot;), ButtonBar.ButtonData.YES);</b>
+<b class="nc">&nbsp;                ButtonType removeAssignments = new ButtonType(Localization.lang(&quot;Do not assign&quot;), ButtonBar.ButtonData.NO);</b>
+<b class="nc">&nbsp;                ButtonType cancel = new ButtonType(Localization.lang(&quot;Cancel&quot;), ButtonBar.ButtonData.CANCEL_CLOSE);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (newGroup.get().getClass() == WordKeywordGroup.class) {</b>
+<b class="nc">&nbsp;                    content = content + &quot;\n\n&quot; +</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;(Note: If original entries lack keywords to qualify for the new group configuration, confirming here will add them)&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                Optional&lt;ButtonType&gt; previousAssignments = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.WARNING,</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Change of Grouping Method&quot;),</b>
+&nbsp;                        content,
+&nbsp;                        keepAssignments,
+&nbsp;                        removeAssignments,
+&nbsp;                        cancel);
+<b class="nc">&nbsp;                boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)</b>
+&nbsp;                        &amp;&amp; (group instanceof ExplicitGroup);
+&nbsp;
+<b class="nc">&nbsp;                int groupsWithSameName = 0;</b>
+<b class="nc">&nbsp;                Optional&lt;GroupTreeNode&gt; databaseRootGroup = currentDatabase.get().getMetaData().getGroups();</b>
+<b class="nc">&nbsp;                if (databaseRootGroup.isPresent()) {</b>
+<b class="nc">&nbsp;                    String name = oldGroup.getGroupNode().getGroup().getName();</b>
+<b class="nc">&nbsp;                    groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -&gt; g.getName().equals(name)).size();</b>
+&nbsp;                }
+&nbsp;                // okay we found more than 2 groups with the same name
+&nbsp;                // If we only found one we can still do it
+<b class="nc">&nbsp;                if (groupsWithSameName &gt;= 2) {</b>
+<b class="nc">&nbsp;                    removePreviousAssignments = false;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (previousAssignments.isPresent() &amp;&amp; (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.YES)) {</b>
+<b class="nc">&nbsp;                    oldGroup.getGroupNode().setGroup(</b>
+&nbsp;                            group,
+&nbsp;                            true,
+&nbsp;                            removePreviousAssignments,
+<b class="nc">&nbsp;                            database.getEntries());</b>
+<b class="nc">&nbsp;                } else if (previousAssignments.isPresent() &amp;&amp; (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.NO)) {</b>
+<b class="nc">&nbsp;                    oldGroup.getGroupNode().setGroup(</b>
+&nbsp;                            group,
+&nbsp;                            false,
+&nbsp;                            removePreviousAssignments,
+<b class="nc">&nbsp;                            database.getEntries());</b>
+<b class="nc">&nbsp;                } else if (previousAssignments.isPresent() &amp;&amp; (previousAssignments.get().getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE)) {</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+&nbsp;                // stateManager.getEntriesInCurrentDatabase());
+&nbsp;
+&nbsp;                // TODO: Add undo
+&nbsp;                // Store undo information.
+&nbsp;                // AbstractUndoableEdit undoAddPreviousEntries = null;
+&nbsp;                // UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
+&nbsp;                // if (undoAddPreviousEntries == null) {
+&nbsp;                //    panel.getUndoManager().addEdit(undo);
+&nbsp;                // } else {
+&nbsp;                //    NamedCompound nc = new NamedCompound(&quot;Modify Group&quot;);
+&nbsp;                //    nc.addEdit(undo);
+&nbsp;                //    nc.addEdit(undoAddPreviousEntries);
+&nbsp;                //    nc.end();/
+&nbsp;                //      panel.getUndoManager().addEdit(nc);
+&nbsp;                // }
+&nbsp;                // if (!addChange.isEmpty()) {
+&nbsp;                //    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange);
+&nbsp;                // }
+&nbsp;
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Modified group \&quot;%0\&quot;.&quot;, group.getName()));</b>
+<b class="nc">&nbsp;                writeGroupChangesToMetaData();</b>
+&nbsp;                // This is ugly, but we have no proper update mechanism in place to propagate the changes, so redraw everything
+<b class="nc">&nbsp;                refresh();</b>
+&nbsp;            });
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void chatWithGroup(GroupNodeViewModel group) {
+<b class="nc">&nbsp;        assert currentDatabase.isPresent();</b>
+&nbsp;
+<b class="nc">&nbsp;        StringProperty groupNameProperty = group.getGroupNode().getGroup().nameProperty();</b>
+&nbsp;
+&nbsp;        // We localize the name here, because it is used as the title of the window.
+&nbsp;        // See documentation for {@link AiChatGuardedComponent#name}.
+<b class="nc">&nbsp;        StringProperty nameProperty = new SimpleStringProperty(Localization.lang(&quot;Group %0&quot;, groupNameProperty.get()));</b>
+<b class="nc">&nbsp;        groupNameProperty.addListener((obs, oldValue, newValue) -&gt; nameProperty.setValue(Localization.lang(&quot;Group %0&quot;, groupNameProperty.get())));</b>
+&nbsp;
+<b class="nc">&nbsp;        ObservableList&lt;ChatMessage&gt; chatHistory = aiService.getChatHistoryService().getChatHistoryForGroup(currentDatabase.get(), group.getGroupNode());</b>
+<b class="nc">&nbsp;        ObservableList&lt;BibEntry&gt; bibEntries = FXCollections.observableArrayList(group.getGroupNode().findMatches(currentDatabase.get().getDatabase()));</b>
+&nbsp;
+<b class="nc">&nbsp;        openAiChat(nameProperty, chatHistory, currentDatabase.get(), bibEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void openAiChat(StringProperty name, ObservableList&lt;ChatMessage&gt; chatHistory, BibDatabaseContext bibDatabaseContext, ObservableList&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        Optional&lt;AiChatWindow&gt; existingWindow = stateManager.getAiChatWindows().stream().filter(window -&gt; window.getChatName().equals(name.get())).findFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (existingWindow.isPresent()) {</b>
+<b class="nc">&nbsp;            existingWindow.get().requestFocus();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            AiChatWindow aiChatWindow = new AiChatWindow(</b>
+&nbsp;                    aiService,
+&nbsp;                    dialogService,
+<b class="nc">&nbsp;                    preferences.getAiPreferences(),</b>
+<b class="nc">&nbsp;                    preferences.getExternalApplicationsPreferences(),</b>
+&nbsp;                    adaptVisibleTabs,
+&nbsp;                    taskExecutor
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            aiChatWindow.setOnCloseRequest(event -&gt;</b>
+<b class="nc">&nbsp;                    stateManager.getAiChatWindows().remove(aiChatWindow)</b>
+&nbsp;            );
+&nbsp;
+<b class="nc">&nbsp;            stateManager.getAiChatWindows().add(aiChatWindow);</b>
+<b class="nc">&nbsp;            dialogService.showCustomWindow(aiChatWindow);</b>
+<b class="nc">&nbsp;            aiChatWindow.setChat(name, chatHistory, bibDatabaseContext, entries);</b>
+<b class="nc">&nbsp;            aiChatWindow.requestFocus();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void generateEmbeddings(GroupNodeViewModel groupNode) {
+<b class="nc">&nbsp;        assert currentDatabase.isPresent();</b>
+&nbsp;
+<b class="nc">&nbsp;        AbstractGroup group = groupNode.getGroupNode().getGroup();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;LinkedFile&gt; linkedFiles = currentDatabase</b>
+<b class="nc">&nbsp;                .get()</b>
+<b class="nc">&nbsp;                .getDatabase()</b>
+<b class="nc">&nbsp;                .getEntries()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .filter(group::isMatch)</b>
+<b class="nc">&nbsp;                .flatMap(entry -&gt; entry.getFiles().stream())</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        aiService.getIngestionService().ingest(</b>
+<b class="nc">&nbsp;                group.nameProperty(),</b>
+&nbsp;                linkedFiles,
+<b class="nc">&nbsp;                currentDatabase.get()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;Ingestion started for group \&quot;%0\&quot;.&quot;, group.getName()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void generateSummaries(GroupNodeViewModel groupNode) {
+<b class="nc">&nbsp;        assert currentDatabase.isPresent();</b>
+&nbsp;
+<b class="nc">&nbsp;        AbstractGroup group = groupNode.getGroupNode().getGroup();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = currentDatabase</b>
+<b class="nc">&nbsp;                .get()</b>
+<b class="nc">&nbsp;                .getDatabase()</b>
+<b class="nc">&nbsp;                .getEntries()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .filter(group::isMatch)</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        aiService.getSummariesService().summarize(</b>
+<b class="nc">&nbsp;                group.nameProperty(),</b>
+&nbsp;                entries,
+<b class="nc">&nbsp;                currentDatabase.get()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;Summarization started for group \&quot;%0\&quot;.&quot;, group.getName()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeSubgroups(GroupNodeViewModel group) {
+<b class="nc">&nbsp;        boolean confirmation = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Remove subgroups&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Remove all subgroups of \&quot;%0\&quot;?&quot;, group.getDisplayName()));</b>
+<b class="nc">&nbsp;        if (confirmation) {</b>
+&nbsp;            /// TODO: Add undo
+&nbsp;            // final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, &quot;Remove subgroups&quot;);
+&nbsp;            // panel.getUndoManager().addEdit(undo);
+<b class="nc">&nbsp;            for (GroupNodeViewModel child : group.getChildren()) {</b>
+<b class="nc">&nbsp;                removeGroupsAndSubGroupsFromEntries(child);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            group.getGroupNode().removeAllChildren();</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Removed all subgroups of group \&quot;%0\&quot;.&quot;, group.getDisplayName()));</b>
+<b class="nc">&nbsp;            writeGroupChangesToMetaData();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeGroupKeepSubgroups(GroupNodeViewModel group) {
+&nbsp;        boolean confirmed;
+<b class="nc">&nbsp;        if (selectedGroups.size() &lt;= 1) {</b>
+<b class="nc">&nbsp;            confirmed = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove group&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove group \&quot;%0\&quot; and keep its subgroups?&quot;, group.getDisplayName()),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove&quot;));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            confirmed = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove groups&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove all selected groups and keep their subgroups?&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove all&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (confirmed) {</b>
+&nbsp;            // TODO: Add undo
+&nbsp;            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
+&nbsp;            // panel.getUndoManager().addEdit(undo);
+&nbsp;
+<b class="nc">&nbsp;            List&lt;GroupNodeViewModel&gt; selectedGroupNodes = new ArrayList&lt;&gt;(selectedGroups);</b>
+<b class="nc">&nbsp;            selectedGroupNodes.forEach(eachNode -&gt; {</b>
+<b class="nc">&nbsp;                GroupTreeNode groupNode = eachNode.getGroupNode();</b>
+&nbsp;
+<b class="nc">&nbsp;                groupNode.getParent()</b>
+<b class="nc">&nbsp;                         .ifPresent(parent -&gt; groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));</b>
+<b class="nc">&nbsp;                groupNode.removeFromParent();</b>
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            if (selectedGroupNodes.size() &gt; 1) {</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Removed all selected groups.&quot;));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Removed group \&quot;%0\&quot;.&quot;, group.getDisplayName()));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            writeGroupChangesToMetaData();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the specified group and its subgroups (after asking for confirmation).
+&nbsp;     */
+&nbsp;    public void removeGroupAndSubgroups(GroupNodeViewModel group) {
+&nbsp;        boolean confirmed;
+<b class="nc">&nbsp;        if (selectedGroups.size() &lt;= 1) {</b>
+<b class="nc">&nbsp;            confirmed = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove group and subgroups&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove group \&quot;%0\&quot; and its subgroups?&quot;, group.getDisplayName()),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove&quot;));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            confirmed = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove groups and subgroups&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove all selected groups and their subgroups?&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove all&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (confirmed) {</b>
+&nbsp;            // TODO: Add undo
+&nbsp;            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
+&nbsp;            // panel.getUndoManager().addEdit(undo);
+&nbsp;
+<b class="nc">&nbsp;            ArrayList&lt;GroupNodeViewModel&gt; selectedGroupNodes = new ArrayList&lt;&gt;(selectedGroups);</b>
+<b class="nc">&nbsp;            selectedGroupNodes.forEach(eachNode -&gt; {</b>
+<b class="nc">&nbsp;                removeGroupsAndSubGroupsFromEntries(eachNode);</b>
+<b class="nc">&nbsp;                eachNode.getGroupNode().removeFromParent();</b>
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            if (selectedGroupNodes.size() &gt; 1) {</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Removed all selected groups and their subgroups.&quot;));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Removed group \&quot;%0\&quot; and its subgroups.&quot;, group.getDisplayName()));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            writeGroupChangesToMetaData();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the specified group (after asking for confirmation).
+&nbsp;     */
+&nbsp;    public void removeGroupNoSubgroups(GroupNodeViewModel group) {
+&nbsp;        boolean confirmed;
+<b class="nc">&nbsp;        if (selectedGroups.size() &lt;= 1) {</b>
+<b class="nc">&nbsp;            confirmed = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove group&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove group \&quot;%0\&quot;?&quot;, group.getDisplayName()),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove&quot;));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            confirmed = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove groups and subgroups&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove all selected groups and their subgroups?&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Remove all&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (confirmed) {</b>
+&nbsp;            // TODO: Add undo
+&nbsp;            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_WITHOUT_CHILDREN);
+&nbsp;            // panel.getUndoManager().addEdit(undo);
+&nbsp;
+<b class="nc">&nbsp;            ArrayList&lt;GroupNodeViewModel&gt; selectedGroupNodes = new ArrayList&lt;&gt;(selectedGroups);</b>
+<b class="nc">&nbsp;            selectedGroupNodes.forEach(eachNode -&gt; {</b>
+<b class="nc">&nbsp;                removeGroupsAndSubGroupsFromEntries(eachNode);</b>
+<b class="nc">&nbsp;                eachNode.getGroupNode().removeFromParent();</b>
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            if (selectedGroupNodes.size() &gt; 1) {</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Removed all selected groups.&quot;));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Removed group \&quot;%0\&quot;.&quot;, group.getDisplayName()));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            writeGroupChangesToMetaData();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    void removeGroupsAndSubGroupsFromEntries(GroupNodeViewModel group) {
+<b class="nc">&nbsp;        for (GroupNodeViewModel child : group.getChildren()) {</b>
+<b class="nc">&nbsp;            removeGroupsAndSubGroupsFromEntries(child);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // only remove explicit groups from the entries, keyword groups should not be deleted
+<b class="nc">&nbsp;        if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {</b>
+<b class="nc">&nbsp;            int groupsWithSameName = 0;</b>
+<b class="nc">&nbsp;            String name = group.getGroupNode().getGroup().getName();</b>
+<b class="nc">&nbsp;            Optional&lt;GroupTreeNode&gt; rootGroup = currentDatabase.get().getMetaData().getGroups();</b>
+<b class="nc">&nbsp;            if (rootGroup.isPresent()) {</b>
+<b class="nc">&nbsp;                groupsWithSameName = rootGroup.get().findChildrenSatisfying(g -&gt; g.getName().equals(name)).size();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (groupsWithSameName &lt; 2) {</b>
+<b class="nc">&nbsp;                List&lt;BibEntry&gt; entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());</b>
+<b class="nc">&nbsp;                group.getGroupNode().removeEntriesFromGroup(entriesInGroup);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addSelectedEntries(GroupNodeViewModel group) {
+&nbsp;        // TODO: Warn
+&nbsp;        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(node.getNode().getGroup(), panel.frame())) {
+&nbsp;        //    return; // user aborted operation
+&nbsp;
+<b class="nc">&nbsp;        group.getGroupNode().addEntriesToGroup(stateManager.getSelectedEntries());</b>
+&nbsp;
+&nbsp;        // TODO: Add undo
+&nbsp;        // NamedCompound undoAll = new NamedCompound(Localization.lang(&quot;change assignment of entries&quot;));
+&nbsp;        // if (!undoAdd.isEmpty()) { undo.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(node, undoAdd)); }
+&nbsp;        // panel.getUndoManager().addEdit(undoAll);
+&nbsp;
+&nbsp;        // TODO Display massages
+&nbsp;        // if (undo == null) {
+&nbsp;        //    frame.output(Localization.lang(&quot;The group \&quot;%0\&quot; already contains the selection.&quot;,
+&nbsp;        //            node.getGroup().getName()));
+&nbsp;        //    return;
+&nbsp;        // }
+&nbsp;        // panel.getUndoManager().addEdit(undo);
+&nbsp;        // final String groupName = node.getGroup().getName();
+&nbsp;        // if (assignedEntries == 1) {
+&nbsp;        //    frame.output(Localization.lang(&quot;Assigned 1 entry to group \&quot;%0\&quot;.&quot;, groupName));
+&nbsp;        // } else {
+&nbsp;        //    frame.output(Localization.lang(&quot;Assigned %0 entries to group \&quot;%1\&quot;.&quot;, String.valueOf(assignedEntries),
+&nbsp;        //            groupName));
+&nbsp;        // }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeSelectedEntries(GroupNodeViewModel group) {
+&nbsp;        // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
+&nbsp;        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(mNode.getNode().getGroup(), mPanel.frame())) {
+&nbsp;        //    return; // user aborted operation
+&nbsp;
+<b class="nc">&nbsp;        group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries());</b>
+&nbsp;
+&nbsp;        // TODO: Add undo
+&nbsp;        // if (!undo.isEmpty()) {
+&nbsp;        //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
+&nbsp;    }
+&nbsp;
+&nbsp;    public void sortAlphabeticallyRecursive(GroupTreeNode group) {
+<b class="nc">&nbsp;        group.sortChildren(compAlphabetIgnoreCase, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void sortReverseAlphabeticallyRecursive(GroupTreeNode group) {
+<b class="nc">&nbsp;        group.sortChildren(compAlphabetIgnoreCaseReverse, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void sortEntriesRecursive(GroupTreeNode group) {
+<b class="nc">&nbsp;        group.sortChildren(compEntries, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void sortReverseEntriesRecursive(GroupTreeNode group) {
+<b class="nc">&nbsp;        group.sortChildren(compEntriesReverse, true);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

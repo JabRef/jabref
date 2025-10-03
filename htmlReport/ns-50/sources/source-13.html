@@ -1,0 +1,150 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OpenSingleExternalFileAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: OpenSingleExternalFileAction (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OpenSingleExternalFileAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;
+&nbsp;public class OpenSingleExternalFileAction extends SimpleCommand {
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final BibEntry entry;
+&nbsp;    private final LinkedFile linkedFile;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+&nbsp;    public OpenSingleExternalFileAction(@NonNull DialogService dialogService,
+&nbsp;                                        @NonNull GuiPreferences preferences,
+&nbsp;                                        @NonNull BibEntry entry,
+&nbsp;                                        @NonNull LinkedFile linkedFile,
+&nbsp;                                        @NonNull TaskExecutor taskExecutor,
+<b class="nc">&nbsp;                                        @NonNull StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.entry = entry;</b>
+<b class="nc">&nbsp;        this.linkedFile = linkedFile;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.setExecutable(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        stateManager.getActiveDatabase()</b>
+<b class="nc">&nbsp;                    .ifPresent(databaseContext -&gt; new LinkedFileViewModel(</b>
+&nbsp;                            linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences)
+<b class="nc">&nbsp;                            .open());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

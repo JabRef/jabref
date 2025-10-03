@@ -1,0 +1,431 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CopyMoreAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.edit</a>
+</div>
+
+<h1>Coverage Summary for Class: CopyMoreAction (org.jabref.gui.edit)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CopyMoreAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/119)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CopyMoreAction$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/120)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.edit;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Reader;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.JabRefDialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionHelper;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.layout.Layout;
+&nbsp;import org.jabref.logic.layout.LayoutHelper;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.push.CitationCommandString;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.strings.LatexToUnicodeAdapter;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class CopyMoreAction extends SimpleCommand {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(CopyMoreAction.class);</b>
+&nbsp;    private final StandardActions action;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final JournalAbbreviationRepository abbreviationRepository;
+&nbsp;
+&nbsp;    public CopyMoreAction(StandardActions action,
+&nbsp;                          DialogService dialogService,
+&nbsp;                          StateManager stateManager,
+&nbsp;                          ClipBoardManager clipBoardManager,
+&nbsp;                          GuiPreferences preferences,
+<b class="nc">&nbsp;                          JournalAbbreviationRepository abbreviationRepository) {</b>
+<b class="nc">&nbsp;        this.action = action;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.clipBoardManager = clipBoardManager;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        if (stateManager.getActiveDatabase().isEmpty() || stateManager.getSelectedEntries().isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        switch (action) {</b>
+&nbsp;            case COPY_CITATION_KEY -&gt;
+<b class="nc">&nbsp;                    copyKey();</b>
+&nbsp;            case COPY_AS_CITE_COMMAND -&gt;
+<b class="nc">&nbsp;                    copyCiteKey();</b>
+&nbsp;            case COPY_CITATION_KEY_AND_TITLE -&gt;
+<b class="nc">&nbsp;                    copyKeyAndTitle();</b>
+&nbsp;            case COPY_CITATION_KEY_AND_LINK -&gt;
+<b class="nc">&nbsp;                    copyKeyAndLink();</b>
+&nbsp;            case COPY_DOI,
+&nbsp;                 COPY_DOI_URL -&gt;
+<b class="nc">&nbsp;                    copyDoi();</b>
+&nbsp;            case COPY_FIELD_AUTHOR -&gt;
+<b class="nc">&nbsp;                    copyField(StandardField.AUTHOR, Localization.lang(&quot;Author&quot;));</b>
+&nbsp;            case COPY_FIELD_TITLE -&gt;
+<b class="nc">&nbsp;                    copyField(StandardField.TITLE, Localization.lang(&quot;Title&quot;));</b>
+&nbsp;            case COPY_FIELD_JOURNAL -&gt;
+<b class="nc">&nbsp;                    copyField(StandardField.JOURNAL, Localization.lang(&quot;Journal&quot;));</b>
+&nbsp;            case COPY_FIELD_DATE -&gt;
+<b class="nc">&nbsp;                    copyField(StandardField.DATE, Localization.lang(&quot;Date&quot;));</b>
+&nbsp;            case COPY_FIELD_KEYWORDS -&gt;
+<b class="nc">&nbsp;                    copyField(StandardField.KEYWORDS, Localization.lang(&quot;Keywords&quot;));</b>
+&nbsp;            case COPY_FIELD_ABSTRACT -&gt;
+<b class="nc">&nbsp;                    copyField(StandardField.ABSTRACT, Localization.lang(&quot;Abstract&quot;));</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    LOGGER.info(&quot;Unknown copy command.&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void copyDoi() {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = stateManager.getSelectedEntries();</b>
+&nbsp;
+&nbsp;        // Collect all non-null DOI or DOI urls
+<b class="nc">&nbsp;        if (action == StandardActions.COPY_DOI_URL) {</b>
+<b class="nc">&nbsp;            copyDoiList(entries.stream()</b>
+<b class="nc">&nbsp;                               .filter(entry -&gt; entry.getDOI().isPresent())</b>
+<b class="nc">&nbsp;                               .map(entry -&gt; entry.getDOI().get().getURIAsASCIIString())</b>
+<b class="nc">&nbsp;                               .toList(), entries.size());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            copyDoiList(entries.stream()</b>
+<b class="nc">&nbsp;                               .filter(entry -&gt; entry.getDOI().isPresent())</b>
+<b class="nc">&nbsp;                               .map(entry -&gt; entry.getDOI().get().asString())</b>
+<b class="nc">&nbsp;                               .toList(), entries.size());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void copyDoiList(List&lt;String&gt; dois, int size) {
+<b class="nc">&nbsp;        if (dois.isEmpty()) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;None of the selected entries have DOIs.&quot;));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        final String copiedDois = String.join(&quot;,&quot;, dois);</b>
+<b class="nc">&nbsp;        clipBoardManager.setContent(copiedDois);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (dois.size() == size) {</b>
+&nbsp;            // All entries had DOIs.
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Copied &#39;%0&#39; to clipboard.&quot;,</b>
+<b class="nc">&nbsp;                    JabRefDialogService.shortenDialogMessage(copiedDois)));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Warning: %0 out of %1 entries have undefined DOIs.&quot;,</b>
+<b class="nc">&nbsp;                    Integer.toString(size - dois.size()), Integer.toString(size)));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void doCopyKey(Function&lt;List&lt;String&gt;, String&gt; mapKeyList) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = stateManager.getSelectedEntries();</b>
+&nbsp;
+&nbsp;        // Collect all non-null keys.
+<b class="nc">&nbsp;        List&lt;String&gt; keys = entries.stream()</b>
+<b class="nc">&nbsp;                                   .filter(entry -&gt; entry.getCitationKey().isPresent())</b>
+<b class="nc">&nbsp;                                   .map(entry -&gt; entry.getCitationKey().get())</b>
+<b class="nc">&nbsp;                                   .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (keys.isEmpty()) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;None of the selected entries have citation keys.&quot;));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String clipBoardContent = mapKeyList.apply(keys);</b>
+&nbsp;
+<b class="nc">&nbsp;        clipBoardManager.setContent(clipBoardContent);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (keys.size() == entries.size()) {</b>
+&nbsp;            // All entries had keys.
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Copied &#39;%0&#39; to clipboard.&quot;,</b>
+<b class="nc">&nbsp;                    JabRefDialogService.shortenDialogMessage(clipBoardContent)));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Warning: %0 out of %1 entries have undefined citation key.&quot;,</b>
+<b class="nc">&nbsp;                    Integer.toString(entries.size() - keys.size()), Integer.toString(entries.size())));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void copyCiteKey() {
+<b class="nc">&nbsp;        doCopyKey(keys -&gt; {</b>
+<b class="nc">&nbsp;            CitationCommandString citeCommand = preferences.getPushToApplicationPreferences().getCiteCommand();</b>
+<b class="nc">&nbsp;            return citeCommand.prefix() + String.join(citeCommand.delimiter(), keys) + citeCommand.suffix();</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void copyKey() {
+<b class="nc">&nbsp;        doCopyKey(keys -&gt; String.join(preferences.getPushToApplicationPreferences().getCiteCommand().delimiter(), keys));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void copyKeyAndTitle() {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = stateManager.getSelectedEntries();</b>
+&nbsp;
+&nbsp;        // ToDo: this string should be configurable to allow arbitrary exports
+<b class="nc">&nbsp;        Reader layoutString = Reader.of(&quot;\\citationkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n&quot;);</b>
+&nbsp;        Layout layout;
+&nbsp;        try {
+<b class="nc">&nbsp;            layout = new LayoutHelper(layoutString, preferences.getLayoutFormatterPreferences(), abbreviationRepository).getLayoutFromText();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.info(&quot;Could not get layout.&quot;, e);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder keyAndTitle = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        int entriesWithKeys = 0;</b>
+&nbsp;        // Collect all non-null keys.
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            if (entry.hasCitationKey()) {</b>
+<b class="nc">&nbsp;                entriesWithKeys++;</b>
+<b class="nc">&nbsp;                stateManager.getActiveDatabase()</b>
+<b class="nc">&nbsp;                            .map(BibDatabaseContext::getDatabase)</b>
+<b class="nc">&nbsp;                            .ifPresent(bibDatabase -&gt; keyAndTitle.append(layout.doLayout(entry, bibDatabase)));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (entriesWithKeys == 0) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;None of the selected entries have citation keys.&quot;));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        clipBoardManager.setContent(keyAndTitle.toString());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entriesWithKeys == entries.size()) {</b>
+&nbsp;            // All entries had keys.
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Copied &#39;%0&#39; to clipboard.&quot;,</b>
+<b class="nc">&nbsp;                    JabRefDialogService.shortenDialogMessage(keyAndTitle.toString())));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Warning: %0 out of %1 entries have undefined citation key.&quot;,</b>
+<b class="nc">&nbsp;                    Integer.toString(entries.size() - entriesWithKeys), Integer.toString(entries.size())));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method will copy each selected entry&#39;s citation key as a hyperlink to its url to the clipboard. In case an
+&nbsp;     * entry doesn&#39;t have a citation key it will not be copied. In case an entry doesn&#39;t have an url this will only copy
+&nbsp;     * the citation key.
+&nbsp;     */
+&nbsp;    private void copyKeyAndLink() {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = stateManager.getSelectedEntries();</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder keyAndLink = new StringBuilder();</b>
+<b class="nc">&nbsp;        StringBuilder fallbackString = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entriesWithKey = entries.stream()</b>
+<b class="nc">&nbsp;                                               .filter(BibEntry::hasCitationKey)</b>
+<b class="nc">&nbsp;                                               .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entriesWithKey.isEmpty()) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;None of the selected entries have citation keys.&quot;));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry entry : entriesWithKey) {</b>
+<b class="nc">&nbsp;            String key = entry.getCitationKey().orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;            if (LOGGER.isDebugEnabled() &amp;&amp; key.isEmpty()) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;entry {} had no citation key, but it should have had one&quot;, entry);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            String url = entry.getField(StandardField.URL).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;            keyAndLink.append(url.isEmpty() ? key : &quot;&lt;a href=\&quot;%s\&quot;&gt;%s&lt;/a&gt;&quot;.formatted(url, key));</b>
+<b class="nc">&nbsp;            keyAndLink.append(OS.NEWLINE);</b>
+<b class="nc">&nbsp;            fallbackString.append(url.isEmpty() ? key : &quot;%s - %s&quot;.formatted(key, url));</b>
+<b class="nc">&nbsp;            fallbackString.append(OS.NEWLINE);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        clipBoardManager.setHtmlContent(keyAndLink.toString(), fallbackString.toString());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entriesWithKey.size() == entries.size()) {</b>
+&nbsp;            // All entries had keys.
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Copied &#39;%0&#39; to clipboard.&quot;,</b>
+<b class="nc">&nbsp;                    JabRefDialogService.shortenDialogMessage(keyAndLink.toString())));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Warning: %0 out of %1 entries have undefined citation key.&quot;,</b>
+<b class="nc">&nbsp;                    Long.toString(entries.size() - entriesWithKey.size()), Integer.toString(entries.size())));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void copyField(StandardField field, String fieldDisplayName) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; selectedBibEntries = stateManager.getSelectedEntries();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; fieldValues = selectedBibEntries.stream()</b>
+<b class="nc">&nbsp;                                                     .filter(bibEntry -&gt; bibEntry.getFieldOrAlias(field).isPresent())</b>
+<b class="nc">&nbsp;                                                     .map(bibEntry -&gt; LatexToUnicodeAdapter.format(bibEntry.getFieldOrAlias(field).orElse(&quot;&quot;)))</b>
+<b class="nc">&nbsp;                                                     .filter(value -&gt; !value.isEmpty())</b>
+<b class="nc">&nbsp;                                                     .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fieldValues.isEmpty()) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;None of the selected entries have %0.&quot;, fieldDisplayName));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        final String copiedContent = fieldValues.stream().collect(Collectors.joining(&quot;\n&quot;));</b>
+<b class="nc">&nbsp;        clipBoardManager.setContent(copiedContent);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fieldValues.size() == selectedBibEntries.size()) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Copied &#39;%0&#39; to clipboard.&quot;,</b>
+<b class="nc">&nbsp;                    JabRefDialogService.shortenDialogMessage(copiedContent)));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Warning: %0 out of %1 entries have undefined %2.&quot;,</b>
+<b class="nc">&nbsp;                    Integer.toString(selectedBibEntries.size() - fieldValues.size()),</b>
+<b class="nc">&nbsp;                    Integer.toString(selectedBibEntries.size()),</b>
+&nbsp;                    fieldDisplayName));
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

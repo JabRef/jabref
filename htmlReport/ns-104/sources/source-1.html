@@ -1,0 +1,849 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibDatabase</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.database</a>
+</div>
+
+<h1>Coverage Summary for Class: BibDatabase (org.jabref.model.database)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibDatabase</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/84)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/196)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.database;
+&nbsp;
+&nbsp;import java.math.BigInteger;
+&nbsp;import java.security.SecureRandom;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.FieldWriter;
+&nbsp;import org.jabref.model.database.event.EntriesAddedEvent;
+&nbsp;import org.jabref.model.database.event.EntriesRemovedEvent;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibtexString;
+&nbsp;import org.jabref.model.entry.Month;
+&nbsp;import org.jabref.model.entry.ParsedEntryLink;
+&nbsp;import org.jabref.model.entry.event.EntriesEventSource;
+&nbsp;import org.jabref.model.entry.event.EntryChangedEvent;
+&nbsp;import org.jabref.model.entry.event.FieldChangedEvent;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.FieldProperty;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import com.google.common.eventbus.EventBus;
+&nbsp;import com.google.common.eventbus.Subscribe;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A bibliography database. This is the &quot;bib&quot; file (or the library stored in a shared SQL database)
+&nbsp; */
+&nbsp;public class BibDatabase {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);</b>
+<b class="nc">&nbsp;    private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(&quot;.*#[^#]+#.*&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * State attributes
+&nbsp;     */
+<b class="nc">&nbsp;    private final ObservableList&lt;BibEntry&gt; entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));</b>
+&nbsp;
+&nbsp;    // BibEntryId to BibEntry
+<b class="nc">&nbsp;    private final Map&lt;String, BibEntry&gt; entriesId = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private Map&lt;String, BibtexString&gt; bibtexStrings = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    // Not included in equals, because it is not relevant for the content of the database
+<b class="nc">&nbsp;    private final EventBus eventBus = new EventBus();</b>
+&nbsp;
+&nbsp;    // Reverse index for citation links
+<b class="nc">&nbsp;    private final Map&lt;String, Set&lt;BibEntry&gt;&gt; citationIndex = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private String preamble;
+&nbsp;
+&nbsp;    // All file contents below the last entry in the file
+<b class="nc">&nbsp;    private String epilog = &quot;&quot;;</b>
+&nbsp;
+&nbsp;    private String sharedDatabaseID;
+&nbsp;
+<b class="nc">&nbsp;    private String newLineSeparator = System.lineSeparator();</b>
+&nbsp;
+&nbsp;    public BibDatabase(List&lt;BibEntry&gt; entries, String newLineSeparator) {
+<b class="nc">&nbsp;        this(entries);</b>
+<b class="nc">&nbsp;        this.newLineSeparator = newLineSeparator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibDatabase(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        this();</b>
+<b class="nc">&nbsp;        insertEntries(entries);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public BibDatabase() {</b>
+<b class="nc">&nbsp;        this.registerListener(new KeyChangeListener(this));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of entries.
+&nbsp;     */
+&nbsp;    public int getEntryCount() {
+<b class="nc">&nbsp;        return entries.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the database contains entries.
+&nbsp;     */
+&nbsp;    public boolean hasEntries() {
+<b class="nc">&nbsp;        return !entries.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of entries sorted by the given comparator.
+&nbsp;     */
+&nbsp;    public List&lt;BibEntry&gt; getEntriesSorted(Comparator&lt;BibEntry&gt; comparator) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entriesSorted = new ArrayList&lt;&gt;(entries);</b>
+<b class="nc">&nbsp;        entriesSorted.sort(comparator);</b>
+<b class="nc">&nbsp;        return entriesSorted;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns whether an entry with the given ID exists (-&gt; entry_type + hashcode).
+&nbsp;     */
+&nbsp;    public boolean containsEntryWithId(String id) {
+<b class="nc">&nbsp;        return entries.stream().anyMatch(entry -&gt; entry.getId().equals(id));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;BibEntry&gt; getEntries() {
+<b class="nc">&nbsp;        return FXCollections.unmodifiableObservableList(entries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a set of Strings, that contains all field names that are visible. This means that the fields
+&nbsp;     * are not internal fields. Internal fields are fields, that are starting with &quot;_&quot;.
+&nbsp;     *
+&nbsp;     * @return set of fieldnames, that are visible
+&nbsp;     */
+&nbsp;    public Set&lt;Field&gt; getAllVisibleFields() {
+<b class="nc">&nbsp;        Set&lt;Field&gt; allFields = new TreeSet&lt;&gt;(Comparator.comparing(Field::getName));</b>
+<b class="nc">&nbsp;        for (BibEntry e : getEntries()) {</b>
+<b class="nc">&nbsp;            allFields.addAll(e.getFields());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return allFields.stream().filter(field -&gt; !FieldFactory.isInternalField(field))</b>
+<b class="nc">&nbsp;                        .collect(Collectors.toSet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the entry with the given citation key.
+&nbsp;     */
+&nbsp;    public synchronized Optional&lt;BibEntry&gt; getEntryByCitationKey(String key) {
+<b class="nc">&nbsp;        return entries.stream().filter(entry -&gt; Objects.equals(entry.getCitationKey().orElse(null), key)).findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Collects entries having the specified citation key and returns these entries as list.
+&nbsp;     * The order of the entries is the order they appear in the database.
+&nbsp;     *
+&nbsp;     * @return list of entries that contains the given key
+&nbsp;     */
+&nbsp;    public synchronized List&lt;BibEntry&gt; getEntriesByCitationKey(String key) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            entry.getCitationKey().ifPresent(entryKey -&gt; {</b>
+<b class="nc">&nbsp;                if (key.equals(entryKey)) {</b>
+<b class="nc">&nbsp;                    result.add(entry);</b>
+&nbsp;                }
+&nbsp;            });
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void insertEntry(BibEntry entry) {
+<b class="nc">&nbsp;        insertEntry(entry, EntriesEventSource.LOCAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inserts the entry.
+&nbsp;     *
+&nbsp;     * @param entry       entry to insert
+&nbsp;     * @param eventSource source the event is sent from
+&nbsp;     */
+&nbsp;    public synchronized void insertEntry(BibEntry entry, EntriesEventSource eventSource) {
+<b class="nc">&nbsp;        insertEntries(List.of(entry), eventSource);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void insertEntries(BibEntry... entries) {
+<b class="nc">&nbsp;        insertEntries(Arrays.asList(entries), EntriesEventSource.LOCAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void insertEntries(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        insertEntries(entries, EntriesEventSource.LOCAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void insertEntries(@NonNull List&lt;BibEntry&gt; newEntries, EntriesEventSource eventSource) {
+<b class="nc">&nbsp;        if (newEntries.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry entry : newEntries) {</b>
+<b class="nc">&nbsp;            entry.registerListener(this);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        eventBus.post(new EntriesAddedEvent(newEntries, eventSource));</b>
+<b class="nc">&nbsp;        entries.addAll(newEntries);</b>
+<b class="nc">&nbsp;        newEntries.forEach(entry -&gt; {</b>
+<b class="nc">&nbsp;                    entriesId.put(entry.getId(), entry);</b>
+<b class="nc">&nbsp;                    indexEntry(entry);</b>
+&nbsp;                }
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void removeEntry(BibEntry bibEntry) {
+<b class="nc">&nbsp;        removeEntries(List.of(bibEntry));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized void removeEntry(BibEntry bibEntry, EntriesEventSource eventSource) {
+<b class="nc">&nbsp;        removeEntries(List.of(bibEntry), eventSource);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the given entries.
+&nbsp;     * The entries removed based on the id {@link BibEntry#getId()}
+&nbsp;     *
+&nbsp;     * @param toBeDeleted Entries to delete
+&nbsp;     */
+&nbsp;    public synchronized void removeEntries(List&lt;BibEntry&gt; toBeDeleted) {
+<b class="nc">&nbsp;        removeEntries(toBeDeleted, EntriesEventSource.LOCAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the given entries.
+&nbsp;     * The entries are removed based on the id {@link BibEntry#getId()}
+&nbsp;     *
+&nbsp;     * @param toBeDeleted Entry to delete
+&nbsp;     * @param eventSource Source the event is sent from
+&nbsp;     */
+&nbsp;    public synchronized void removeEntries(List&lt;BibEntry&gt; toBeDeleted, EntriesEventSource eventSource) {
+<b class="nc">&nbsp;        Objects.requireNonNull(toBeDeleted);</b>
+&nbsp;
+&nbsp;        Collection&lt;String&gt; idsToBeDeleted;
+<b class="nc">&nbsp;        if (toBeDeleted.size() &gt; 10) {</b>
+<b class="nc">&nbsp;            idsToBeDeleted = new HashSet&lt;&gt;();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            idsToBeDeleted = new ArrayList&lt;&gt;(toBeDeleted.size());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry entry : toBeDeleted) {</b>
+<b class="nc">&nbsp;            idsToBeDeleted.add(entry.getId());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; newEntries = new ArrayList&lt;&gt;(entries);</b>
+<b class="nc">&nbsp;        newEntries.removeIf(entry -&gt; idsToBeDeleted.contains(entry.getId()));</b>
+&nbsp;
+<b class="nc">&nbsp;        toBeDeleted.forEach(entry -&gt; {</b>
+<b class="nc">&nbsp;            entriesId.remove(entry.getId());</b>
+<b class="nc">&nbsp;            removeEntryFromIndex(entry);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        entries.setAll(newEntries);</b>
+<b class="nc">&nbsp;        eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void forEachCitationKey(BibEntry entry, Consumer&lt;String&gt; keyConsumer) {
+<b class="nc">&nbsp;        for (Field field : entry.getFields()) {</b>
+<b class="nc">&nbsp;            if (field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK) || field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {</b>
+<b class="nc">&nbsp;                List&lt;ParsedEntryLink&gt; parsedLinks = entry.getEntryLinkList(field, this);</b>
+&nbsp;
+<b class="nc">&nbsp;                for (ParsedEntryLink link : parsedLinks) {</b>
+<b class="nc">&nbsp;                    String key = link.getKey().trim();</b>
+<b class="nc">&nbsp;                    if (!key.isEmpty()) {</b>
+<b class="nc">&nbsp;                        keyConsumer.accept(key);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Set&lt;BibEntry&gt; getEntriesForCitationKey(@Nullable String citationKey) {
+&nbsp;        // explicit null check because citationIndex is a ConcurrentHashMap and will throw NPE on null
+<b class="nc">&nbsp;        return citationKey != null ? citationIndex.getOrDefault(citationKey, Set.of()) : Set.of();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Set&lt;String&gt; getReferencedCitationKeys(BibEntry entry) {
+<b class="nc">&nbsp;        Set&lt;String&gt; keys = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        forEachCitationKey(entry, keys::add);</b>
+<b class="nc">&nbsp;        return keys;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void indexEntry(BibEntry entry) {
+<b class="nc">&nbsp;        forEachCitationKey(entry, key -&gt;</b>
+<b class="nc">&nbsp;                citationIndex.computeIfAbsent(key, _ -&gt; ConcurrentHashMap.newKeySet()).add(entry)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeEntryFromIndex(BibEntry entry) {
+<b class="nc">&nbsp;        forEachCitationKey(entry, key -&gt; {</b>
+<b class="nc">&nbsp;            Set&lt;BibEntry&gt; entriesForKey = citationIndex.get(key);</b>
+<b class="nc">&nbsp;            if (entriesForKey != null) {</b>
+<b class="nc">&nbsp;                entriesForKey.remove(entry);</b>
+<b class="nc">&nbsp;                if (entriesForKey.isEmpty()) {</b>
+<b class="nc">&nbsp;                    citationIndex.remove(key);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the database&#39;s preamble.
+&nbsp;     * If the preamble text consists only of whitespace, then also an empty optional is returned.
+&nbsp;     */
+&nbsp;    public synchronized Optional&lt;String&gt; getPreamble() {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(preamble)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.of(preamble);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the database&#39;s preamble.
+&nbsp;     */
+&nbsp;    public synchronized void setPreamble(String preamble) {
+<b class="nc">&nbsp;        this.preamble = preamble;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Inserts a Bibtex String.
+&nbsp;     */
+&nbsp;    public synchronized void addString(BibtexString string) throws KeyCollisionException {
+<b class="nc">&nbsp;        String id = string.getId();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (hasStringByName(string.getName())) {</b>
+<b class="nc">&nbsp;            throw new KeyCollisionException(&quot;A string with that label already exists&quot;, id);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (bibtexStrings.containsKey(id)) {</b>
+<b class="nc">&nbsp;            throw new KeyCollisionException(&quot;Duplicate BibTeX string id.&quot;, id);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        bibtexStrings.put(id, string);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Replaces the existing lists of BibTexString with the given one
+&nbsp;     * Duplicates throw KeyCollisionException
+&nbsp;     *
+&nbsp;     * @param stringsToAdd The collection of strings to set
+&nbsp;     */
+&nbsp;    public void setStrings(List&lt;BibtexString&gt; stringsToAdd) {
+<b class="nc">&nbsp;        bibtexStrings = new ConcurrentHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        stringsToAdd.forEach(this::addString);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the string with the given id.
+&nbsp;     */
+&nbsp;    public void removeString(String id) {
+<b class="nc">&nbsp;        bibtexStrings.remove(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a Set of keys to all BibtexString objects in the database.
+&nbsp;     * These are in no sorted order.
+&nbsp;     */
+&nbsp;    public Set&lt;String&gt; getStringKeySet() {
+<b class="nc">&nbsp;        return bibtexStrings.keySet();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a Collection of all BibtexString objects in the database.
+&nbsp;     * These are in no particular order.
+&nbsp;     */
+&nbsp;    public Collection&lt;BibtexString&gt; getStringValues() {
+<b class="nc">&nbsp;        return bibtexStrings.values();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the string with the given id.
+&nbsp;     */
+&nbsp;    public BibtexString getString(String id) {
+<b class="nc">&nbsp;        return bibtexStrings.get(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the string with the given name/label
+&nbsp;     */
+&nbsp;    public Optional&lt;BibtexString&gt; getStringByName(String name) {
+<b class="nc">&nbsp;        return getStringValues().stream().filter(string -&gt; string.getName().equals(name)).findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of strings.
+&nbsp;     */
+&nbsp;    public int getStringCount() {
+<b class="nc">&nbsp;        return bibtexStrings.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check if there are strings.
+&nbsp;     */
+&nbsp;    public boolean hasNoStrings() {
+<b class="nc">&nbsp;        return bibtexStrings.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Copies the preamble of another BibDatabase.
+&nbsp;     *
+&nbsp;     * @param database another BibDatabase
+&nbsp;     */
+&nbsp;    public void copyPreamble(BibDatabase database) {
+<b class="nc">&nbsp;        setPreamble(database.getPreamble().orElse(&quot;&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if a string with the given label already exists.
+&nbsp;     */
+&nbsp;    public synchronized boolean hasStringByName(String label) {
+<b class="nc">&nbsp;        return bibtexStrings.values().stream().anyMatch(value -&gt; value.getName().equals(label));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resolves any references to strings contained in this field content,
+&nbsp;     * if possible.
+&nbsp;     */
+&nbsp;    public String resolveForStrings(@NonNull String content) {
+<b class="nc">&nbsp;        return resolveContent(content, new HashSet&lt;&gt;(), new HashSet&lt;&gt;());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all strings used in the entries.
+&nbsp;     */
+&nbsp;    public List&lt;BibtexString&gt; getUsedStrings(Collection&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        Set&lt;String&gt; allUsedIds = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Preamble
+<b class="nc">&nbsp;        if (preamble != null) {</b>
+<b class="nc">&nbsp;            resolveContent(preamble, new HashSet&lt;&gt;(), allUsedIds);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // All entries
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            for (String fieldContent : entry.getFieldValues()) {</b>
+<b class="nc">&nbsp;                resolveContent(fieldContent, new HashSet&lt;&gt;(), allUsedIds);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return allUsedIds.stream().map(bibtexStrings::get).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Take the given collection of BibEntry and resolve any string
+&nbsp;     * references.
+&nbsp;     *
+&nbsp;     * @param entriesToResolve A collection of BibtexEntries in which all strings of the form
+&nbsp;     *                         #xxx# will be resolved against the hash map of string
+&nbsp;     *                         references stored in the database.
+&nbsp;     * @param inPlace          If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
+&nbsp;     * @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
+&nbsp;     */
+&nbsp;    public List&lt;BibEntry&gt; resolveForStrings(Collection&lt;BibEntry&gt; entriesToResolve, boolean inPlace) {
+<b class="nc">&nbsp;        Objects.requireNonNull(entriesToResolve, &quot;entries must not be null.&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; results = new ArrayList&lt;&gt;(entriesToResolve.size());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry entry : entriesToResolve) {</b>
+<b class="nc">&nbsp;            results.add(this.resolveForStrings(entry, inPlace));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return results;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Take the given BibEntry and resolve any string references.
+&nbsp;     *
+&nbsp;     * @param entry   A BibEntry in which all strings of the form #xxx# will be
+&nbsp;     *                resolved against the hash map of string references stored in
+&nbsp;     *                the database.
+&nbsp;     * @param inPlace If inPlace is true then the given BibEntry will be
+&nbsp;     *                modified, if false then a copy is made using close made before
+&nbsp;     *                resolving the strings.
+&nbsp;     * @return a BibEntry with all string references resolved. It is
+&nbsp;     * dependent on the value of inPlace whether a copy is made or the
+&nbsp;     * given BibtexEntries is modified.
+&nbsp;     */
+&nbsp;    public BibEntry resolveForStrings(BibEntry entry, boolean inPlace) {
+&nbsp;        BibEntry resultingEntry;
+<b class="nc">&nbsp;        if (inPlace) {</b>
+<b class="nc">&nbsp;            resultingEntry = entry;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            resultingEntry = new BibEntry(entry);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (Map.Entry&lt;Field, String&gt; field : resultingEntry.getFieldMap().entrySet()) {</b>
+<b class="nc">&nbsp;            resultingEntry.setField(field.getKey(), this.resolveForStrings(field.getValue()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return resultingEntry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the label represents a string contained in this database, returns
+&nbsp;     * that string&#39;s content. Resolves references to other strings, taking
+&nbsp;     * care not to follow a circular reference pattern.
+&nbsp;     * If the string is undefined, returns null.
+&nbsp;     */
+&nbsp;    private String resolveString(String label, Set&lt;String&gt; usedIds, Set&lt;String&gt; allUsedIds) {
+<b class="nc">&nbsp;        Objects.requireNonNull(label);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(usedIds);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(allUsedIds);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibtexString string : bibtexStrings.values()) {</b>
+<b class="nc">&nbsp;            if (string.getName().equalsIgnoreCase(label)) {</b>
+&nbsp;                // First check if this string label has been resolved
+&nbsp;                // earlier in this recursion. If so, we have a
+&nbsp;                // circular reference, and have to stop to avoid
+&nbsp;                // infinite recursion.
+<b class="nc">&nbsp;                if (usedIds.contains(string.getId())) {</b>
+<b class="nc">&nbsp;                    LOGGER.info(&quot;Stopped due to circular reference in strings: {}&quot;, label);</b>
+<b class="nc">&nbsp;                    return label;</b>
+&nbsp;                }
+&nbsp;                // If not, log this string&#39;s ID now.
+<b class="nc">&nbsp;                usedIds.add(string.getId());</b>
+<b class="nc">&nbsp;                allUsedIds.add(string.getId());</b>
+&nbsp;
+&nbsp;                // Ok, we found the string. Now we must make sure we
+&nbsp;                // resolve any references to other strings in this one.
+<b class="nc">&nbsp;                String result = string.getContent();</b>
+<b class="nc">&nbsp;                result = resolveContent(result, usedIds, allUsedIds);</b>
+&nbsp;
+&nbsp;                // Finished with recursing this branch, so we remove our
+&nbsp;                // ID again:
+<b class="nc">&nbsp;                usedIds.remove(string.getId());</b>
+&nbsp;
+<b class="nc">&nbsp;                return result;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // If we get to this point, the string has obviously not been defined locally.
+&nbsp;        // Check if one of the standard BibTeX month strings has been used:
+<b class="nc">&nbsp;        Optional&lt;Month&gt; month = Month.getMonthByShortName(label);</b>
+<b class="nc">&nbsp;        return month.map(Month::getFullName).orElse(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String resolveContent(String result, Set&lt;String&gt; usedIds, Set&lt;String&gt; allUsedIds) {
+<b class="nc">&nbsp;        String res = result;</b>
+<b class="nc">&nbsp;        if (RESOLVE_CONTENT_PATTERN.matcher(res).matches()) {</b>
+<b class="nc">&nbsp;            StringBuilder newRes = new StringBuilder();</b>
+<b class="nc">&nbsp;            int piv = 0;</b>
+&nbsp;            int next;
+<b class="nc">&nbsp;            while ((next = res.indexOf(FieldWriter.BIBTEX_STRING_START_END_SYMBOL, piv)) &gt;= 0) {</b>
+&nbsp;                // We found the next string ref. Append the text
+&nbsp;                // up to it.
+<b class="nc">&nbsp;                if (next &gt; 0) {</b>
+<b class="nc">&nbsp;                    newRes.append(res, piv, next);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                int stringEnd = res.indexOf(FieldWriter.BIBTEX_STRING_START_END_SYMBOL, next + 1);</b>
+<b class="nc">&nbsp;                if (stringEnd &gt;= 0) {</b>
+&nbsp;                    // We found the boundaries of the string ref,
+&nbsp;                    // now resolve that one.
+<b class="nc">&nbsp;                    String refLabel = res.substring(next + 1, stringEnd);</b>
+<b class="nc">&nbsp;                    String resolved = resolveString(refLabel, usedIds, allUsedIds);</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (resolved == null) {</b>
+&nbsp;                        // Could not resolve string. Display the #
+&nbsp;                        // characters rather than removing them:
+<b class="nc">&nbsp;                        newRes.append(res, next, stringEnd + 1);</b>
+&nbsp;                    } else {
+&nbsp;                        // The string was resolved, so we display its meaning only,
+&nbsp;                        // stripping the # characters signifying the string label:
+<b class="nc">&nbsp;                        newRes.append(resolved);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    piv = stringEnd + 1;</b>
+&nbsp;                } else {
+&nbsp;                    // We did not find the boundaries of the string ref. This
+&nbsp;                    // makes it impossible to interpret it as a string label.
+&nbsp;                    // So we should just append the rest of the text and finish.
+<b class="nc">&nbsp;                    newRes.append(res.substring(next));</b>
+<b class="nc">&nbsp;                    piv = res.length();</b>
+&nbsp;                    break;
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            if (piv &lt; (res.length() - 1)) {</b>
+<b class="nc">&nbsp;                newRes.append(res.substring(piv));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            res = newRes.toString();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return res;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getEpilog() {
+<b class="nc">&nbsp;        return epilog;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEpilog(String epilog) {
+<b class="nc">&nbsp;        this.epilog = epilog;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Registers a listener object (subscriber) to the internal event bus.
+&nbsp;     * The following events are posted:
+&nbsp;     * &lt;p&gt;
+&nbsp;     * - {@link EntriesAddedEvent}
+&nbsp;     * - {@link EntryChangedEvent}
+&nbsp;     * - {@link EntriesRemovedEvent}
+&nbsp;     *
+&nbsp;     * @param listener listener (subscriber) to add
+&nbsp;     */
+&nbsp;    public void registerListener(Object listener) {
+<b class="nc">&nbsp;        this.eventBus.register(listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void postEvent(Object event) {
+<b class="nc">&nbsp;        this.eventBus.post(event);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Unregisters an listener object.
+&nbsp;     *
+&nbsp;     * @param listener listener (subscriber) to remove
+&nbsp;     */
+&nbsp;    public void unregisterListener(Object listener) {
+&nbsp;        try {
+<b class="nc">&nbsp;            this.eventBus.unregister(listener);</b>
+&nbsp;        } catch (IllegalArgumentException e) {
+&nbsp;            // occurs if the event source has not been registered, should not prevent shutdown
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Problem unregistering&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Subscribe
+&nbsp;    private void relayEntryChangeEvent(FieldChangedEvent event) {
+<b class="nc">&nbsp;        eventBus.post(event);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;BibEntry&gt; getReferencedEntry(BibEntry entry) {
+<b class="nc">&nbsp;        return entry.getField(StandardField.CROSSREF).flatMap(this::getEntryByCitationKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getSharedDatabaseID() {
+<b class="nc">&nbsp;        return Optional.ofNullable(this.sharedDatabaseID);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSharedDatabaseID(String sharedDatabaseID) {
+<b class="nc">&nbsp;        this.sharedDatabaseID = sharedDatabaseID;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isShared() {
+<b class="nc">&nbsp;        return getSharedDatabaseID().isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearSharedDatabaseID() {
+<b class="nc">&nbsp;        this.sharedDatabaseID = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates and sets a random ID which is globally unique.
+&nbsp;     *
+&nbsp;     * @return The generated sharedDatabaseID
+&nbsp;     */
+&nbsp;    public String generateSharedDatabaseID() {
+<b class="nc">&nbsp;        this.sharedDatabaseID = new BigInteger(128, new SecureRandom()).toString(32);</b>
+<b class="nc">&nbsp;        return this.sharedDatabaseID;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of occurrences of the given citation key in this database.
+&nbsp;     */
+&nbsp;    public long getNumberOfCitationKeyOccurrences(String key) {
+<b class="nc">&nbsp;        return entries.stream()</b>
+<b class="nc">&nbsp;                      .flatMap(entry -&gt; entry.getCitationKey().stream())</b>
+<b class="nc">&nbsp;                      .filter(key::equals)</b>
+<b class="nc">&nbsp;                      .count();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if there is more than one occurrence of the citation key.
+&nbsp;     */
+&nbsp;    public boolean isDuplicateCitationKeyExisting(String key) {
+<b class="nc">&nbsp;        return getNumberOfCitationKeyOccurrences(key) &gt; 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set the newline separator.
+&nbsp;     */
+&nbsp;    public void setNewLineSeparator(String newLineSeparator) {
+<b class="nc">&nbsp;        this.newLineSeparator = newLineSeparator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the string used to indicate a linebreak
+&nbsp;     */
+&nbsp;    public String getNewLineSeparator() {
+<b class="nc">&nbsp;        return newLineSeparator;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return The index of the given entry in the list of entries, or -1 if the entry is not in the list.
+&nbsp;     * @implNote New entries are always added to the end of the list and always get a higher ID.
+&nbsp;     * See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
+&nbsp;     * {@link org.jabref.model.entry.IdGenerator IdGenerator},
+&nbsp;     * {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
+&nbsp;     * Therefore, using binary search to find the index.
+&nbsp;     * @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
+&nbsp;     */
+&nbsp;    public int indexOf(BibEntry bibEntry) {
+<b class="nc">&nbsp;        int index = Collections.binarySearch(entries, bibEntry, Comparator.comparing(BibEntry::getId));</b>
+<b class="nc">&nbsp;        if (index &gt;= 0) {</b>
+<b class="nc">&nbsp;            return index;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.warn(&quot;Could not find entry with ID {} in the database&quot;, bibEntry.getId());</b>
+<b class="nc">&nbsp;        return -1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry getEntryById(String id) {
+<b class="nc">&nbsp;        return entriesId.get(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!(o instanceof BibDatabase that)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Objects.equals(entries, that.entries)</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(bibtexStrings, that.bibtexStrings)</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(preamble, that.preamble)</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(epilog, that.epilog)</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(sharedDatabaseID, that.sharedDatabaseID)</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(newLineSeparator, that.newLineSeparator);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(entries, bibtexStrings, preamble, epilog, sharedDatabaseID, newLineSeparator);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

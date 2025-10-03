@@ -1,0 +1,211 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SearchGroupsMigrationAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.importer.actions</a>
+</div>
+
+<h1>Coverage Summary for Class: SearchGroupsMigrationAction (org.jabref.gui.importer.actions)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SearchGroupsMigrationAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.importer.actions;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.search.query.SearchQueryConversion;
+&nbsp;import org.jabref.logic.util.Version;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;import org.jabref.model.groups.SearchGroup;
+&nbsp;
+&nbsp;import org.antlr.v4.runtime.misc.ParseCancellationException;
+&nbsp;
+&nbsp;/**
+&nbsp; * This action checks whether the syntax for SearchGroups is the new one.
+&nbsp; * If not we ask the user whether to migrate.
+&nbsp; */
+<b class="nc">&nbsp;public class SearchGroupsMigrationAction implements GUIPostOpenAction {</b>
+&nbsp;
+&nbsp;    // We cannot have this constant in `Version.java` because of recursion errors
+&nbsp;    // Thus, we keep it here, because it is (currently) used only in the context of groups migration.
+<b class="nc">&nbsp;    public static final Version VERSION_6_0_ALPHA = Version.parse(&quot;6.0-alpha&quot;);</b>
+<b class="nc">&nbsp;    public static final Version VERSION_6_0_ALPHA_1 = Version.parse(&quot;6.0-alpha_1&quot;);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActionNecessary(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
+<b class="nc">&nbsp;        Optional&lt;Version&gt; currentVersion = parserResult.getMetaData().getGroupSearchSyntaxVersion();</b>
+<b class="nc">&nbsp;        if (currentVersion.isPresent()) {</b>
+<b class="nc">&nbsp;            if (currentVersion.get().equals(VERSION_6_0_ALPHA)) {</b>
+&nbsp;                // TODO: This text will only be shown after releasing 6.0-alpha and then removed
+<b class="nc">&nbsp;                dialogService.showErrorDialogAndWait(&quot;Search groups migration of &quot; + parserResult.getPath().map(Path::toString).orElse(&quot;&quot;),</b>
+&nbsp;                        &quot;The search groups syntax has been reverted to the old one. Please use the backup you made before using 6.0-alpha.&quot;);
+&nbsp;            }
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;GroupTreeNode&gt; groups = parserResult.getMetaData().getGroups();</b>
+<b class="nc">&nbsp;        return groups.filter(this::groupOrSubgroupIsSearchGroup).isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean groupOrSubgroupIsSearchGroup(GroupTreeNode groupTreeNode) {
+<b class="nc">&nbsp;        if (groupTreeNode.getGroup() instanceof SearchGroup) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (GroupTreeNode child : groupTreeNode.getChildren()) {</b>
+<b class="nc">&nbsp;            if (groupOrSubgroupIsSearchGroup(child)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void performAction(ParserResult parserResult, DialogService dialogService, CliPreferences preferences) {
+<b class="nc">&nbsp;        if (!dialogService.showConfirmationDialogAndWait(Localization.lang(&quot;Search groups migration of %0&quot;, parserResult.getPath().map(Path::toString).orElse(&quot;&quot;)),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;The search groups syntax is outdated. Do you want to migrate to the new syntax?&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Migrate&quot;), Localization.lang(&quot;Keep as is&quot;))) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        parserResult.getMetaData().getGroups().ifPresent(groupTreeNode -&gt; migrateGroups(groupTreeNode, dialogService));</b>
+<b class="nc">&nbsp;        parserResult.getMetaData().setGroupSearchSyntaxVersion(VERSION_6_0_ALPHA_1);</b>
+<b class="nc">&nbsp;        parserResult.setChangedOnMigration(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void migrateGroups(GroupTreeNode node, DialogService dialogService) {
+<b class="nc">&nbsp;        if (node.getGroup() instanceof SearchGroup searchGroup) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                if (searchGroup.getSearchQuery().isValid()) {</b>
+<b class="nc">&nbsp;                    String newSearchExpression = SearchQueryConversion.flagsToSearchExpression(searchGroup.getSearchQuery());</b>
+<b class="nc">&nbsp;                    searchGroup.setSearchExpression(newSearchExpression);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    showAskForNewSearchExpressionDialog(dialogService, searchGroup);</b>
+&nbsp;                }
+&nbsp;            } catch (ParseCancellationException e) {
+<b class="nc">&nbsp;                showAskForNewSearchExpressionDialog(dialogService, searchGroup);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        for (GroupTreeNode child : node.getChildren()) {</b>
+<b class="nc">&nbsp;            migrateGroups(child, dialogService);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showAskForNewSearchExpressionDialog(DialogService dialogService, SearchGroup searchGroup) {
+<b class="nc">&nbsp;        Optional&lt;String&gt; newSearchExpression = dialogService.showInputDialogWithDefaultAndWait(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Search group migration failed&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;The search group &#39;%0&#39; could not be migrated. Please enter the new search expression.&quot;,</b>
+<b class="nc">&nbsp;                        searchGroup.getName()),</b>
+<b class="nc">&nbsp;                searchGroup.getSearchExpression());</b>
+<b class="nc">&nbsp;        newSearchExpression.ifPresent(searchGroup::setSearchExpression);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

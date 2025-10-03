@@ -1,0 +1,397 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TrustStoreManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.net.ssl</a>
+</div>
+
+<h1>Coverage Summary for Class: TrustStoreManager (org.jabref.logic.net.ssl)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TrustStoreManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.1%
+  </span>
+  <span class="absValue">
+    (8/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    34.3%
+  </span>
+  <span class="absValue">
+    (23/67)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TrustStoreManager$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (1/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20%
+  </span>
+  <span class="absValue">
+    (1/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    39.1%
+  </span>
+  <span class="absValue">
+    (9/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (24/72)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.net.ssl;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.security.KeyManagementException;
+&nbsp;import java.security.KeyStore;
+&nbsp;import java.security.KeyStoreException;
+&nbsp;import java.security.NoSuchAlgorithmException;
+&nbsp;import java.security.cert.CertificateException;
+&nbsp;import java.security.cert.CertificateFactory;
+&nbsp;import java.security.cert.X509Certificate;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.net.ssl.HttpsURLConnection;
+&nbsp;import javax.net.ssl.SSLContext;
+&nbsp;import javax.net.ssl.TrustManager;
+&nbsp;import javax.net.ssl.TrustManagerFactory;
+&nbsp;import javax.net.ssl.X509TrustManager;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * @implNote SSL certificates are installed at {@link TrustStoreManager#configureTrustStore(Path)}
+&nbsp; */
+&nbsp;public class TrustStoreManager {
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(TrustStoreManager.class);</b>
+&nbsp;    private static final String STORE_PASSWORD = &quot;changeit&quot;;
+&nbsp;
+&nbsp;    private final Path storePath;
+&nbsp;
+&nbsp;    private KeyStore store;
+&nbsp;
+<b class="nc">&nbsp;    public TrustStoreManager(Path storePath) {</b>
+<b class="nc">&nbsp;        this.storePath = storePath;</b>
+<b class="nc">&nbsp;        createTruststoreFileIfNotExist(storePath);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            store = KeyStore.getInstance(KeyStore.getDefaultType());</b>
+<b class="nc">&nbsp;            store.load(Files.newInputStream(storePath), STORE_PASSWORD.toCharArray());</b>
+&nbsp;        } catch (CertificateException | IOException | NoSuchAlgorithmException | KeyStoreException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error while loading trust store from: {}&quot;, storePath.toAbsolutePath(), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addCertificate(String alias, Path certPath) {
+<b class="nc">&nbsp;        Objects.requireNonNull(alias);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(certPath);</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            CertificateFactory certificateFactory = CertificateFactory.getInstance(&quot;X509&quot;);</b>
+<b class="nc">&nbsp;            store.setCertificateEntry(alias, certificateFactory.generateCertificate(Files.newInputStream(certPath)));</b>
+&nbsp;        } catch (KeyStoreException | CertificateException | IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error while adding a new certificate to the truststore: {}&quot;, alias, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void deleteCertificate(String alias) {
+<b class="nc">&nbsp;        Objects.requireNonNull(alias);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            store.deleteEntry(alias);</b>
+&nbsp;        } catch (KeyStoreException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error while deleting certificate entry with alias: {}&quot;, alias, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean certificateExists(String alias) {
+<b class="nc">&nbsp;        Objects.requireNonNull(alias);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return store.isCertificateEntry(alias);</b>
+&nbsp;        } catch (KeyStoreException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error while checking certificate existence: {}&quot;, alias, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; aliases() {
+&nbsp;        try {
+<b class="nc">&nbsp;            return Collections.list(store.aliases());</b>
+&nbsp;        } catch (KeyStoreException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error while reading aliases&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return List.of();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int certsCount() {
+&nbsp;        try {
+<b class="nc">&nbsp;            return store.size();</b>
+&nbsp;        } catch (KeyStoreException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Can&#39;t count certificates&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void flush() {
+&nbsp;        try {
+<b class="nc">&nbsp;            store.store(Files.newOutputStream(storePath), STORE_PASSWORD.toCharArray());</b>
+&nbsp;        } catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error while flushing trust store&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Custom certificates are certificates with alias that ends with {@code [custom]}
+&nbsp;     */
+&nbsp;    private Boolean isCustomCertificate(String alias) {
+<b class="nc">&nbsp;        return alias.endsWith(&quot;[custom]&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deletes all custom certificates, Custom certificates are certificates with alias that ends with {@code [custom]}
+&nbsp;     */
+&nbsp;    public void clearCustomCertificates() {
+<b class="nc">&nbsp;        aliases().stream().filter(this::isCustomCertificate).forEach(this::deleteCertificate);</b>
+<b class="nc">&nbsp;        flush();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;SSLCertificate&gt; getCustomCertificates() {
+<b class="nc">&nbsp;        return aliases().stream()</b>
+<b class="nc">&nbsp;                        .filter(this::isCustomCertificate)</b>
+<b class="nc">&nbsp;                        .map(this::getCertificate)</b>
+<b class="nc">&nbsp;                        .map(SSLCertificate::fromX509)</b>
+<b class="nc">&nbsp;                        .flatMap(Optional::stream)</b>
+<b class="nc">&nbsp;                        .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public X509Certificate getCertificate(String alias) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return (X509Certificate) store.getCertificate(alias);</b>
+&nbsp;        } catch (KeyStoreException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error while getting certificate of alias: {}&quot;, alias, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method checks to see if the truststore is present in {@code storePath},
+&nbsp;     * and if it isn&#39;t, it copies the default JDK truststore to the specified location.
+&nbsp;     *
+&nbsp;     * @param storePath path of the truststore
+&nbsp;     */
+&nbsp;    public static void createTruststoreFileIfNotExist(Path storePath) {
+&nbsp;        try {
+<b class="fc">&nbsp;            LOGGER.debug(&quot;Trust store path: {}&quot;, storePath.toAbsolutePath());</b>
+<b class="pc">&nbsp;            if (Files.notExists(storePath)) {</b>
+<b class="nc">&nbsp;                Files.createDirectories(storePath.getParent());</b>
+<b class="nc">&nbsp;                try (InputStream inputStream = TrustStoreManager.class.getResourceAsStream(&quot;/ssl/truststore.jks&quot;)) {</b>
+<b class="nc">&nbsp;                    Files.copy(inputStream, storePath);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            try {
+<b class="fc">&nbsp;                configureTrustStore(storePath);</b>
+&nbsp;            } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException | CertificateException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Error configuring trust store {}&quot;, storePath, e);</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Bad truststore path&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @implNote based on https://stackoverflow.com/a/62586564/3450689
+&nbsp;     */
+&nbsp;    private static void configureTrustStore(Path myStorePath) throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException,
+&nbsp;            CertificateException, IOException {
+<b class="fc">&nbsp;        X509TrustManager jreTrustManager = getJreTrustManager();</b>
+<b class="fc">&nbsp;        X509TrustManager myTrustManager = getJabRefTrustManager(myStorePath);</b>
+&nbsp;
+<b class="fc">&nbsp;        X509TrustManager mergedTrustManager = createMergedTrustManager(jreTrustManager, myTrustManager);</b>
+<b class="fc">&nbsp;        setSystemTrustManager(mergedTrustManager);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static X509TrustManager getJreTrustManager() throws NoSuchAlgorithmException, KeyStoreException {
+<b class="fc">&nbsp;        return findDefaultTrustManager(null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static X509TrustManager getJabRefTrustManager(Path myStorePath) throws KeyStoreException, IOException,
+&nbsp;            NoSuchAlgorithmException, CertificateException {
+&nbsp;        // Adapt to load your keystore
+<b class="fc">&nbsp;        try (InputStream myKeys = Files.newInputStream(myStorePath)) {</b>
+<b class="fc">&nbsp;            KeyStore myTrustStore = KeyStore.getInstance(&quot;jks&quot;);</b>
+<b class="fc">&nbsp;            myTrustStore.load(myKeys, STORE_PASSWORD.toCharArray());</b>
+&nbsp;
+<b class="fc">&nbsp;            return findDefaultTrustManager(myTrustStore);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static X509TrustManager findDefaultTrustManager(KeyStore keyStore)
+&nbsp;            throws NoSuchAlgorithmException, KeyStoreException {
+<b class="fc">&nbsp;        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());</b>
+<b class="fc">&nbsp;        tmf.init(keyStore); // If keyStore is null, tmf will be initialized with the default trust store</b>
+&nbsp;
+<b class="pc">&nbsp;        for (TrustManager tm : tmf.getTrustManagers()) {</b>
+<b class="pc">&nbsp;            if (tm instanceof X509TrustManager manager) {</b>
+<b class="fc">&nbsp;                return manager;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static X509TrustManager createMergedTrustManager(X509TrustManager jreTrustManager,
+&nbsp;                                                             X509TrustManager customTrustManager) {
+<b class="fc">&nbsp;        return new X509TrustManager() {</b>
+&nbsp;            @Override
+&nbsp;            public X509Certificate[] getAcceptedIssuers() {
+&nbsp;                // If you&#39;re planning to use client-cert auth,
+&nbsp;                // merge results from &quot;defaultTm&quot; and &quot;myTm&quot;.
+<b class="nc">&nbsp;                return jreTrustManager.getAcceptedIssuers();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+&nbsp;                try {
+<b class="nc">&nbsp;                    customTrustManager.checkServerTrusted(chain, authType);</b>
+&nbsp;                } catch (CertificateException e) {
+&nbsp;                    // This will throw another CertificateException if this fails too.
+<b class="nc">&nbsp;                    jreTrustManager.checkServerTrusted(chain, authType);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+&nbsp;                // If you&#39;re planning to use client-cert auth,
+&nbsp;                // do the same as checking the server.
+<b class="nc">&nbsp;                jreTrustManager.checkClientTrusted(chain, authType);</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void setSystemTrustManager(X509TrustManager mergedTrustManager)
+&nbsp;            throws NoSuchAlgorithmException, KeyManagementException {
+<b class="fc">&nbsp;        SSLContext sslContext = SSLContext.getInstance(&quot;TLS&quot;);</b>
+<b class="fc">&nbsp;        sslContext.init(null, new TrustManager[] {mergedTrustManager}, null);</b>
+&nbsp;
+&nbsp;        // You don&#39;t have to set this as the default context,
+&nbsp;        // it depends on the library you&#39;re using.
+<b class="fc">&nbsp;        SSLContext.setDefault(sslContext);</b>
+<b class="fc">&nbsp;        HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

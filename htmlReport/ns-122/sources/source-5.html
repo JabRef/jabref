@@ -1,0 +1,142 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SearchVisitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.search</a>
+</div>
+
+<h1>Coverage Summary for Class: SearchVisitor (org.jabref.search)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">SearchVisitor</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;// Generated from org/jabref/search/Search.g4 by ANTLR 4.13.2
+&nbsp;
+&nbsp;package org.jabref.search;
+&nbsp;
+&nbsp;import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+&nbsp;
+&nbsp;/**
+&nbsp; * This interface defines a complete generic visitor for a parse tree produced
+&nbsp; * by {@link SearchParser}.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; The return type of the visit operation. Use {@link Void} for
+&nbsp; * operations with no return type.
+&nbsp; */
+&nbsp;public interface SearchVisitor&lt;T&gt; extends ParseTreeVisitor&lt;T&gt; {
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link SearchParser#start}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitStart(SearchParser.StartContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code implicitAndExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#andExpression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code binaryExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#expression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitBinaryExpression(SearchParser.BinaryExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code negatedExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#expression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitNegatedExpression(SearchParser.NegatedExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code comparisonExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#expression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitComparisonExpression(SearchParser.ComparisonExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code parenExpression}
+&nbsp;	 * labeled alternative in {@link SearchParser#expression}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitParenExpression(SearchParser.ParenExpressionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link SearchParser#comparison}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitComparison(SearchParser.ComparisonContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link SearchParser#operator}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitOperator(SearchParser.OperatorContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link SearchParser#searchValue}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitSearchValue(SearchParser.SearchValueContext ctx);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

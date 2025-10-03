@@ -1,0 +1,303 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SciteTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor</a>
+</div>
+
+<h1>Coverage Summary for Class: SciteTabViewModel (org.jabref.gui.entryeditor)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SciteTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SciteTabViewModel$SciteStatus</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.fetcher.CrossRef;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class SciteTabViewModel extends AbstractViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SciteTabViewModel.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    public enum SciteStatus {</b>
+<b class="nc">&nbsp;        IN_PROGRESS,</b>
+<b class="nc">&nbsp;        FOUND,</b>
+<b class="nc">&nbsp;        ERROR,</b>
+<b class="nc">&nbsp;        DOI_MISSING,</b>
+<b class="nc">&nbsp;        DOI_LOOK_UP,</b>
+<b class="nc">&nbsp;        DOI_LOOK_UP_ERROR</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final String BASE_URL = &quot;https://api.scite.ai/&quot;;
+&nbsp;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final ObjectProperty&lt;SciteStatus&gt; status;
+&nbsp;    private final StringProperty searchError;
+<b class="nc">&nbsp;    private Optional&lt;SciteTallyModel&gt; currentResult = Optional.empty();</b>
+&nbsp;    private Future&lt;?&gt; searchTask;
+&nbsp;
+<b class="nc">&nbsp;    public SciteTabViewModel(GuiPreferences preferences, TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.status = new SimpleObjectProperty&lt;&gt;(SciteStatus.IN_PROGRESS);</b>
+<b class="nc">&nbsp;        this.searchError = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShow() {
+<b class="nc">&nbsp;        return preferences.getEntryEditorPreferences().shouldShowSciteTab();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void bindToEntry(BibEntry entry) {
+&nbsp;        // If a search is already running, cancel it
+<b class="nc">&nbsp;        cancelSearch();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entry == null) {</b>
+<b class="nc">&nbsp;            searchError.set(Localization.lang(&quot;No active entry&quot;));</b>
+<b class="nc">&nbsp;            status.set(SciteStatus.ERROR);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // The scite.ai api requires a DOI
+<b class="nc">&nbsp;        if (entry.getDOI().isEmpty()) {</b>
+<b class="nc">&nbsp;            status.set(SciteStatus.DOI_MISSING);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        searchTask = BackgroundTask.wrap(() -&gt; fetchTallies(entry.getDOI().get()))</b>
+<b class="nc">&nbsp;                                   .onRunning(() -&gt; status.set(SciteStatus.IN_PROGRESS))</b>
+<b class="nc">&nbsp;                                   .onSuccess(result -&gt; {</b>
+<b class="nc">&nbsp;                                       currentResult = Optional.of(result);</b>
+<b class="nc">&nbsp;                                       status.set(SciteStatus.FOUND);</b>
+&nbsp;                                   })
+<b class="nc">&nbsp;                                   .onFailure(error -&gt; {</b>
+<b class="nc">&nbsp;                                       searchError.set(error.getMessage());</b>
+<b class="nc">&nbsp;                                       status.set(SciteStatus.ERROR);</b>
+&nbsp;                                   })
+<b class="nc">&nbsp;                                   .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void cancelSearch() {
+<b class="nc">&nbsp;        if (searchTask == null || searchTask.isCancelled() || searchTask.isDone()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        status.set(SciteStatus.IN_PROGRESS);</b>
+<b class="nc">&nbsp;        searchTask.cancel(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SciteTallyModel fetchTallies(DOI doi) throws FetcherException {
+&nbsp;        URL url;
+&nbsp;        try {
+<b class="nc">&nbsp;            url = new URI(BASE_URL + &quot;tallies/&quot; + doi.asString()).toURL();</b>
+&nbsp;        } catch (MalformedURLException | URISyntaxException ex) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Malformed URL for DOI&quot;, ex);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Fetching tallies from {}&quot;, url);</b>
+<b class="nc">&nbsp;        URLDownload download = new URLDownload(url);</b>
+<b class="nc">&nbsp;        String response = download.asString();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Response {}&quot;, response);</b>
+<b class="nc">&nbsp;        JSONObject tallies = new JSONObject(response);</b>
+<b class="nc">&nbsp;        if (tallies.has(&quot;detail&quot;)) {</b>
+<b class="nc">&nbsp;            String message = tallies.getString(&quot;detail&quot;);</b>
+<b class="nc">&nbsp;            throw new FetcherException(message);</b>
+<b class="nc">&nbsp;        } else if (!tallies.has(&quot;total&quot;)) {</b>
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Unexpected result data.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return SciteTallyModel.fromJSONObject(tallies);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void lookUpDoi(BibEntry entry) {
+<b class="nc">&nbsp;        CrossRef doiFetcher = new CrossRef();</b>
+&nbsp;
+<b class="nc">&nbsp;        BackgroundTask.wrap(() -&gt; doiFetcher.findIdentifier(entry))</b>
+<b class="nc">&nbsp;                      .onRunning(() -&gt; {</b>
+<b class="nc">&nbsp;                          status.set(SciteStatus.DOI_LOOK_UP);</b>
+&nbsp;                      })
+<b class="nc">&nbsp;                      .onSuccess(identifier -&gt; {</b>
+<b class="nc">&nbsp;                          if (identifier.isPresent()) {</b>
+<b class="nc">&nbsp;                              entry.setField(StandardField.DOI, identifier.get().asString());</b>
+<b class="nc">&nbsp;                              bindToEntry(entry);</b>
+&nbsp;                          } else {
+<b class="nc">&nbsp;                              status.set(SciteStatus.DOI_MISSING);</b>
+&nbsp;                          }
+<b class="nc">&nbsp;                      }).onFailure(ex -&gt; {</b>
+<b class="nc">&nbsp;                          status.set(SciteStatus.DOI_LOOK_UP_ERROR);</b>
+<b class="nc">&nbsp;                      }).executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;SciteStatus&gt; statusProperty() {
+<b class="nc">&nbsp;        return status;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty searchErrorProperty() {
+<b class="nc">&nbsp;        return searchError;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;SciteTallyModel&gt; getCurrentResult() {
+<b class="nc">&nbsp;        return currentResult;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

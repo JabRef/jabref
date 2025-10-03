@@ -1,0 +1,139 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConsistencySymbol</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.consistency</a>
+</div>
+
+<h1>Coverage Summary for Class: ConsistencySymbol (org.jabref.gui.consistency)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConsistencySymbol</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.consistency;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;
+<b class="nc">&nbsp;public enum ConsistencySymbol {</b>
+<b class="nc">&nbsp;    REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY(&quot;x&quot;, IconTheme.JabRefIcons.CONSISTENCY_REQUIRED_FIELD),</b>
+<b class="nc">&nbsp;    OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY(&quot;o&quot;, IconTheme.JabRefIcons.CONSISTENCY_OPTIONAL_FIELD),</b>
+<b class="nc">&nbsp;    UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY(&quot;?&quot;, IconTheme.JabRefIcons.CONSISTENCY_UNKNOWN_FIELD),</b>
+<b class="nc">&nbsp;    UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY(&quot;-&quot;, IconTheme.JabRefIcons.CONSISTENCY_UNSET_FIELD);</b>
+&nbsp;
+&nbsp;    private final String text;
+&nbsp;    private final IconTheme.JabRefIcons icon;
+&nbsp;
+<b class="nc">&nbsp;    ConsistencySymbol(String text, IconTheme.JabRefIcons icon) {</b>
+<b class="nc">&nbsp;        this.text = text;</b>
+<b class="nc">&nbsp;        this.icon = icon;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getText() {
+<b class="nc">&nbsp;        return text;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IconTheme.JabRefIcons getIcon() {
+<b class="nc">&nbsp;        return icon;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;ConsistencySymbol&gt; fromText(String text) {
+<b class="nc">&nbsp;        return Arrays.stream(ConsistencySymbol.values())</b>
+<b class="nc">&nbsp;                     .filter(symbol -&gt; symbol.getText().equals(text))</b>
+<b class="nc">&nbsp;                     .findFirst();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

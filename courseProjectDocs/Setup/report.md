@@ -16,5 +16,5 @@
    - Branch Coverage: 0% (241/26072)
 
    #### ReadMe Analysis:
-        The tests mainly cover if the main features work, rather than. 
+         Most modules have some form of test, there a few tests that require a db to be set up.,however that shoudl be mocked, rather than a user. Similar there are tests that fail due one varable deing not included in the expected,so somne test might not been updated when changed happed. 
                                                                                                             

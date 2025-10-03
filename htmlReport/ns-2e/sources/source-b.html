@@ -1,0 +1,313 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LatexCitationsTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor</a>
+</div>
+
+<h1>Coverage Summary for Class: LatexCitationsTab (org.jabref.gui.entryeditor)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LatexCitationsTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/69)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LatexCitationsTab$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor;
+&nbsp;
+&nbsp;import javafx.geometry.HPos;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ProgressIndicator;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.layout.ColumnConstraints;
+&nbsp;import javafx.scene.layout.GridPane;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.RowConstraints;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.texparser.CitationsDisplay;
+&nbsp;import org.jabref.gui.util.DirectoryMonitor;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;
+&nbsp;public class LatexCitationsTab extends EntryEditorTab {
+&nbsp;
+&nbsp;    public static final String NAME = &quot;LaTeX citations&quot;;
+&nbsp;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+&nbsp;    private final LatexCitationsTabViewModel viewModel;
+&nbsp;
+&nbsp;    private final GridPane searchPane;
+&nbsp;    private final ProgressIndicator progressIndicator;
+&nbsp;    private final CitationsDisplay citationsDisplay;
+&nbsp;
+&nbsp;    public LatexCitationsTab(GuiPreferences preferences,
+&nbsp;                             DialogService dialogService,
+&nbsp;                             StateManager stateManager,
+<b class="nc">&nbsp;                             DirectoryMonitor directoryMonitor) {</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.viewModel = new LatexCitationsTabViewModel(</b>
+&nbsp;                preferences,
+&nbsp;                dialogService,
+&nbsp;                directoryMonitor);
+&nbsp;
+<b class="nc">&nbsp;        this.searchPane = new GridPane();</b>
+<b class="nc">&nbsp;        this.progressIndicator = new ProgressIndicator();</b>
+<b class="nc">&nbsp;        this.citationsDisplay = new CitationsDisplay();</b>
+&nbsp;
+<b class="nc">&nbsp;        setText(Localization.lang(&quot;LaTeX citations&quot;));</b>
+<b class="nc">&nbsp;        setTooltip(new Tooltip(Localization.lang(&quot;Search citations for this entry in LaTeX files&quot;)));</b>
+<b class="nc">&nbsp;        setGraphic(IconTheme.JabRefIcons.LATEX_CITATIONS.getGraphicNode());</b>
+<b class="nc">&nbsp;        setSearchPane();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setSearchPane() {
+<b class="nc">&nbsp;        progressIndicator.setMaxSize(100, 100);</b>
+&nbsp;
+<b class="nc">&nbsp;        citationsDisplay.basePathProperty().bindBidirectional(viewModel.directoryProperty());</b>
+<b class="nc">&nbsp;        citationsDisplay.setItems(viewModel.getCitationList());</b>
+<b class="nc">&nbsp;        citationsDisplay.setOnMouseClicked(event -&gt; viewModel.handleMouseClick(event, citationsDisplay));</b>
+&nbsp;
+<b class="nc">&nbsp;        RowConstraints mainRow = new RowConstraints();</b>
+<b class="nc">&nbsp;        mainRow.setVgrow(Priority.ALWAYS);</b>
+&nbsp;
+<b class="nc">&nbsp;        RowConstraints bottomRow = new RowConstraints(40);</b>
+<b class="nc">&nbsp;        bottomRow.setVgrow(Priority.NEVER);</b>
+&nbsp;
+<b class="nc">&nbsp;        ColumnConstraints column = new ColumnConstraints();</b>
+<b class="nc">&nbsp;        column.setPercentWidth(100);</b>
+<b class="nc">&nbsp;        column.setHalignment(HPos.CENTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        searchPane.getColumnConstraints().setAll(column);</b>
+<b class="nc">&nbsp;        searchPane.getRowConstraints().setAll(mainRow, bottomRow);</b>
+<b class="nc">&nbsp;        searchPane.setId(&quot;citationsPane&quot;);</b>
+<b class="nc">&nbsp;        setContent(searchPane);</b>
+&nbsp;
+<b class="nc">&nbsp;        HBox latexDirectoryBox = getLatexDirectoryBox();</b>
+<b class="nc">&nbsp;        VBox citationsPane = getCitationsPane();</b>
+<b class="nc">&nbsp;        VBox notFoundPane = getNotFoundPane();</b>
+<b class="nc">&nbsp;        VBox errorPane = getErrorPane();</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.statusProperty(), status -&gt; {</b>
+<b class="nc">&nbsp;            searchPane.getChildren().clear();</b>
+<b class="nc">&nbsp;            switch (status) {</b>
+&nbsp;                case IN_PROGRESS:
+<b class="nc">&nbsp;                    searchPane.add(progressIndicator, 0, 0);</b>
+&nbsp;                    break;
+&nbsp;                case CITATIONS_FOUND:
+<b class="nc">&nbsp;                    searchPane.add(citationsPane, 0, 0);</b>
+&nbsp;                    break;
+&nbsp;                case NO_RESULTS:
+<b class="nc">&nbsp;                    searchPane.add(notFoundPane, 0, 0);</b>
+&nbsp;                    break;
+&nbsp;                case ERROR:
+<b class="nc">&nbsp;                    searchPane.add(errorPane, 0, 0);</b>
+&nbsp;                    break;
+&nbsp;            }
+<b class="nc">&nbsp;            searchPane.add(latexDirectoryBox, 0, 1);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private HBox getLatexDirectoryBox() {
+<b class="nc">&nbsp;        Text latexDirectoryText = new Text(Localization.lang(&quot;Current search directory:&quot;));</b>
+<b class="nc">&nbsp;        Text latexDirectoryPath = new Text();</b>
+<b class="nc">&nbsp;        latexDirectoryPath.textProperty().bind(viewModel.directoryProperty().asString());</b>
+<b class="nc">&nbsp;        latexDirectoryPath.setStyle(&quot;-fx-font-family:monospace;-fx-font-weight: bold;&quot;);</b>
+<b class="nc">&nbsp;        Button latexDirectoryButton = new Button(Localization.lang(&quot;Set LaTeX file directory&quot;));</b>
+<b class="nc">&nbsp;        latexDirectoryButton.setGraphic(IconTheme.JabRefIcons.LATEX_FILE_DIRECTORY.getGraphicNode());</b>
+<b class="nc">&nbsp;        latexDirectoryButton.setOnAction(event -&gt; viewModel.setLatexDirectory());</b>
+<b class="nc">&nbsp;        HBox latexDirectoryBox = new HBox(10, latexDirectoryText, latexDirectoryPath, latexDirectoryButton);</b>
+<b class="nc">&nbsp;        latexDirectoryBox.setAlignment(Pos.CENTER);</b>
+<b class="nc">&nbsp;        return latexDirectoryBox;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox getCitationsPane() {
+<b class="nc">&nbsp;        VBox citationsBox = new VBox(30, citationsDisplay);</b>
+<b class="nc">&nbsp;        VBox.setVgrow(citationsDisplay, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        citationsBox.setStyle(&quot;-fx-padding: 0;&quot;);</b>
+<b class="nc">&nbsp;        return citationsBox;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox getNotFoundPane() {
+<b class="nc">&nbsp;        Label titleLabel = new Label(Localization.lang(&quot;No citations found&quot;));</b>
+<b class="nc">&nbsp;        titleLabel.getStyleClass().add(&quot;heading&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Text notFoundText = new Text(Localization.lang(&quot;No LaTeX files containing this entry were found.&quot;));</b>
+<b class="nc">&nbsp;        notFoundText.getStyleClass().add(&quot;description&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox notFoundBox = new VBox(30, titleLabel, notFoundText);</b>
+<b class="nc">&nbsp;        notFoundBox.setStyle(&quot;-fx-padding: 30 0 0 30;&quot;);</b>
+<b class="nc">&nbsp;        return notFoundBox;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox getErrorPane() {
+<b class="nc">&nbsp;        Label titleLabel = new Label(Localization.lang(&quot;Error&quot;));</b>
+<b class="nc">&nbsp;        titleLabel.setStyle(&quot;-fx-font-size: 1.5em;-fx-font-weight: bold;-fx-text-fill: -fx-accent;&quot;);</b>
+<b class="nc">&nbsp;        Text errorMessageText = new Text();</b>
+<b class="nc">&nbsp;        errorMessageText.textProperty().bind(viewModel.searchErrorProperty());</b>
+<b class="nc">&nbsp;        VBox errorMessageBox = new VBox(30, titleLabel, errorMessageText);</b>
+<b class="nc">&nbsp;        errorMessageBox.setStyle(&quot;-fx-padding: 30 0 0 30;&quot;);</b>
+<b class="nc">&nbsp;        return errorMessageBox;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        if (stateManager.activeTabProperty().get().isPresent()) {</b>
+<b class="nc">&nbsp;            LibraryTab libraryTab = stateManager.activeTabProperty().get().get();</b>
+<b class="nc">&nbsp;            viewModel.bindToEntry(libraryTab, entry);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean shouldShow(BibEntry entry) {
+<b class="nc">&nbsp;        return viewModel.shouldShow();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

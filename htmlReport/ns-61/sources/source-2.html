@@ -1,0 +1,402 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CustomEntryTypesTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.customentrytypes</a>
+</div>
+
+<h1>Coverage Summary for Class: CustomEntryTypesTab (org.jabref.gui.preferences.customentrytypes)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CustomEntryTypesTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/132)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.customentrytypes;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.beans.property.ReadOnlyStringWrapper;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.Group;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;import javafx.scene.control.TableRow;
+&nbsp;import javafx.scene.control.TableView;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;import javafx.scene.control.cell.CheckBoxTableCell;
+&nbsp;import javafx.scene.control.cell.TextFieldTableCell;
+&nbsp;import javafx.scene.input.ClipboardContent;
+&nbsp;import javafx.scene.input.DragEvent;
+&nbsp;import javafx.scene.input.Dragboard;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.scene.input.TransferMode;
+&nbsp;
+&nbsp;import org.jabref.gui.DragAndDropDataFormats;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.AbstractPreferenceTabView;
+&nbsp;import org.jabref.gui.preferences.PreferencesTab;
+&nbsp;import org.jabref.gui.util.ControlHelper;
+&nbsp;import org.jabref.gui.util.CustomLocalDragboard;
+&nbsp;import org.jabref.gui.util.FieldsUtil;
+&nbsp;import org.jabref.gui.util.ValueTableCellFactory;
+&nbsp;import org.jabref.gui.util.ViewModelTableRowFactory;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class CustomEntryTypesTab extends AbstractPreferenceTabView&lt;CustomEntryTypesTabViewModel&gt; implements PreferencesTab {
+&nbsp;
+&nbsp;    @FXML private TableView&lt;EntryTypeViewModel&gt; entryTypesTable;
+&nbsp;    @FXML private TableColumn&lt;EntryTypeViewModel, String&gt; entryTypColumn;
+&nbsp;    @FXML private TableColumn&lt;EntryTypeViewModel, String&gt; entryTypeActionsColumn;
+&nbsp;    @FXML private TextField addNewEntryType;
+&nbsp;    @FXML private TableView&lt;FieldViewModel&gt; fields;
+&nbsp;    @FXML private TableColumn&lt;FieldViewModel, String&gt; fieldNameColumn;
+&nbsp;    @FXML private TableColumn&lt;FieldViewModel, Boolean&gt; fieldTypeColumn;
+&nbsp;    @FXML private TableColumn&lt;FieldViewModel, String&gt; fieldTypeActionColumn;
+&nbsp;    @FXML private TableColumn&lt;FieldViewModel, Boolean&gt; fieldTypeMultilineColumn;
+&nbsp;    @FXML private ComboBox&lt;Field&gt; addNewField;
+&nbsp;    @FXML private Button addNewEntryTypeButton;
+&nbsp;    @FXML private Button addNewFieldButton;
+&nbsp;
+&nbsp;    @Inject private StateManager stateManager;
+&nbsp;
+<b class="nc">&nbsp;    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();</b>
+&nbsp;
+&nbsp;    private CustomLocalDragboard localDragboard;
+&nbsp;
+<b class="nc">&nbsp;    public CustomEntryTypesTab() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Entry types&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)</b>
+<b class="nc">&nbsp;                                           .orElse(preferences.getLibraryPreferences().getDefaultBibDatabaseMode());</b>
+<b class="nc">&nbsp;        BibEntryTypesManager entryTypesRepository = preferences.getCustomEntryTypesRepository();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.viewModel = new CustomEntryTypesTabViewModel(mode, entryTypesRepository, dialogService, preferences);</b>
+&nbsp;
+&nbsp;        // As the state manager gets injected it&#39;s not available in the constructor
+<b class="nc">&nbsp;        this.localDragboard = stateManager.getLocalDragboard();</b>
+&nbsp;
+<b class="nc">&nbsp;        setupEntryTypesTable();</b>
+<b class="nc">&nbsp;        setupFieldsTable();</b>
+&nbsp;
+<b class="nc">&nbsp;        addNewEntryTypeButton.disableProperty().bind(viewModel.entryTypeValidationStatus().validProperty().not());</b>
+<b class="nc">&nbsp;        addNewFieldButton.disableProperty().bind(viewModel.fieldValidationStatus().validProperty().not().or(viewModel.selectedEntryTypeProperty().isNull()));</b>
+&nbsp;
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;            visualizer.initVisualization(viewModel.entryTypeValidationStatus(), addNewEntryType, true);</b>
+<b class="nc">&nbsp;            visualizer.initVisualization(viewModel.fieldValidationStatus(), addNewField, true);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupEntryTypesTable() {
+&nbsp;        // Table View must be editable, otherwise the change of the Radiobuttons does not propagate the commit event
+<b class="nc">&nbsp;        fields.setEditable(true);</b>
+<b class="nc">&nbsp;        entryTypColumn.setCellValueFactory(cellData -&gt; new ReadOnlyStringWrapper(cellData.getValue().entryType().get().getType().getDisplayName()));</b>
+<b class="nc">&nbsp;        entryTypesTable.setItems(viewModel.entryTypes());</b>
+<b class="nc">&nbsp;        entryTypesTable.getSelectionModel().selectFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;        entryTypeActionsColumn.setSortable(false);</b>
+<b class="nc">&nbsp;        entryTypeActionsColumn.setReorderable(false);</b>
+<b class="nc">&nbsp;        entryTypeActionsColumn.setCellValueFactory(cellData -&gt; new ReadOnlyStringWrapper(cellData.getValue().entryType().get().getType().getDisplayName()));</b>
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;EntryTypeViewModel, String&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic((type, _) -&gt; {</b>
+<b class="nc">&nbsp;                    if (type instanceof CustomEntryTypeViewModel) {</b>
+<b class="nc">&nbsp;                        return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        return null;</b>
+&nbsp;                    }
+&nbsp;                })
+<b class="nc">&nbsp;                .withTooltip((type, name) -&gt; {</b>
+<b class="nc">&nbsp;                    if (type instanceof CustomEntryTypeViewModel) {</b>
+<b class="nc">&nbsp;                        return Localization.lang(&quot;Remove entry type&quot;) + &quot; &quot; + name;</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        return null;</b>
+&nbsp;                    }
+&nbsp;                })
+<b class="nc">&nbsp;                .withOnMouseClickedEvent((type, _) -&gt; {</b>
+<b class="nc">&nbsp;                    if (type instanceof CustomEntryTypeViewModel) {</b>
+<b class="nc">&nbsp;                        return _ -&gt; viewModel.removeEntryType(entryTypesTable.getSelectionModel().getSelectedItem());</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        return _ -&gt; {</b>
+<b class="nc">&nbsp;                        };</b>
+&nbsp;                    }
+&nbsp;                })
+<b class="nc">&nbsp;                .install(entryTypeActionsColumn);</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel.selectedEntryTypeProperty().bind(entryTypesTable.getSelectionModel().selectedItemProperty());</b>
+<b class="nc">&nbsp;        viewModel.entryTypeToAddProperty().bindBidirectional(addNewEntryType.textProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -&gt; {</b>
+<b class="nc">&nbsp;            if (type != null) {</b>
+<b class="nc">&nbsp;                ObservableList&lt;FieldViewModel&gt; items = type.fields();</b>
+<b class="nc">&nbsp;                fields.setItems(items);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                fields.setItems(null);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupFieldsTable() {
+<b class="nc">&nbsp;        fieldNameColumn.setCellValueFactory(item -&gt; item.getValue().displayNameProperty());</b>
+<b class="nc">&nbsp;        fieldNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());</b>
+<b class="nc">&nbsp;        fieldNameColumn.setEditable(true);</b>
+<b class="nc">&nbsp;        fieldNameColumn.setOnEditCommit((TableColumn.CellEditEvent&lt;FieldViewModel, String&gt; event) -&gt; {</b>
+<b class="nc">&nbsp;            String newDisplayName = event.getNewValue();</b>
+<b class="nc">&nbsp;            if (newDisplayName.isBlank()) {</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Name cannot be empty&quot;));</b>
+<b class="nc">&nbsp;                event.getTableView().edit(-1, null);</b>
+<b class="nc">&nbsp;                event.getTableView().refresh();</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            FieldViewModel fieldViewModel = event.getRowValue();</b>
+<b class="nc">&nbsp;            String currentDisplayName = fieldViewModel.displayNameProperty().getValue();</b>
+<b class="nc">&nbsp;            EntryTypeViewModel selectedEntryType = viewModel.selectedEntryTypeProperty().get();</b>
+<b class="nc">&nbsp;            ObservableList&lt;FieldViewModel&gt; entryFields = selectedEntryType.fields();</b>
+&nbsp;            // The first predicate will check if the user input the original field name or doesn&#39;t edit anything after double click
+<b class="nc">&nbsp;            boolean fieldExists = !newDisplayName.equals(currentDisplayName) &amp;&amp; viewModel.displayNameExists(newDisplayName);</b>
+<b class="nc">&nbsp;            if (fieldExists) {</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Unable to change field name. \&quot;%0\&quot; already in use.&quot;, newDisplayName));</b>
+<b class="nc">&nbsp;                event.getTableView().edit(-1, null);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                fieldViewModel.displayNameProperty().setValue(newDisplayName);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            event.getTableView().refresh();</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        fieldTypeColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeColumn));</b>
+<b class="nc">&nbsp;        fieldTypeColumn.setCellValueFactory(item -&gt; item.getValue().requiredProperty());</b>
+<b class="nc">&nbsp;        makeRotatedColumnHeader(fieldTypeColumn, Localization.lang(&quot;Required&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        fieldTypeMultilineColumn.setCellFactory(CheckBoxTableCell.forTableColumn(fieldTypeMultilineColumn));</b>
+<b class="nc">&nbsp;        fieldTypeMultilineColumn.setCellValueFactory(item -&gt; item.getValue().multilineProperty());</b>
+<b class="nc">&nbsp;        makeRotatedColumnHeader(fieldTypeMultilineColumn, Localization.lang(&quot;Multiline&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        fieldTypeActionColumn.setSortable(false);</b>
+<b class="nc">&nbsp;        fieldTypeActionColumn.setReorderable(false);</b>
+<b class="nc">&nbsp;        fieldTypeActionColumn.setEditable(false);</b>
+<b class="nc">&nbsp;        fieldTypeActionColumn.setCellValueFactory(cellData -&gt; cellData.getValue().displayNameProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;FieldViewModel, String&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic(_ -&gt; IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())</b>
+<b class="nc">&nbsp;                .withTooltip(name -&gt; Localization.lang(&quot;Remove field %0 from currently selected entry type&quot;, name))</b>
+<b class="nc">&nbsp;                .withOnMouseClickedEvent(_ -&gt; _ -&gt; viewModel.removeField(fields.getSelectionModel().getSelectedItem()))</b>
+<b class="nc">&nbsp;                .install(fieldTypeActionColumn);</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelTableRowFactory&lt;FieldViewModel&gt;()</b>
+<b class="nc">&nbsp;                .setOnDragDetected(this::handleOnDragDetected)</b>
+<b class="nc">&nbsp;                .setOnDragDropped(this::handleOnDragDropped)</b>
+<b class="nc">&nbsp;                .setOnDragOver(this::handleOnDragOver)</b>
+<b class="nc">&nbsp;                .setOnDragExited(this::handleOnDragExited)</b>
+<b class="nc">&nbsp;                .install(fields);</b>
+&nbsp;
+<b class="nc">&nbsp;        addNewField.setItems(viewModel.fieldsForAdding());</b>
+<b class="nc">&nbsp;        addNewField.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel.newFieldToAddProperty().bindBidirectional(addNewField.valueProperty());</b>
+&nbsp;        // The valueProperty() of addNewField ComboBox needs to be updated by typing text in the ComboBox textfield,
+&nbsp;        // since the enabled/disabled state of addNewFieldButton won&#39;t update otherwise
+<b class="nc">&nbsp;        EasyBind.subscribe(addNewField.getEditor().textProperty(), text -&gt; addNewField.setValue(FieldsUtil.FIELD_STRING_CONVERTER.fromString(text)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void makeRotatedColumnHeader(TableColumn&lt;?, ?&gt; column, String text) {
+<b class="nc">&nbsp;        Label label = new Label();</b>
+<b class="nc">&nbsp;        label.setText(text);</b>
+<b class="nc">&nbsp;        label.setRotate(-90);</b>
+<b class="nc">&nbsp;        label.setMinWidth(80);</b>
+<b class="nc">&nbsp;        column.setGraphic(new Group(label));</b>
+<b class="nc">&nbsp;        column.getStyleClass().add(&quot;rotated&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragOver(TableRow&lt;FieldViewModel&gt; row, FieldViewModel originalItem, DragEvent
+&nbsp;            event) {
+<b class="nc">&nbsp;        if ((event.getGestureSource() != originalItem) &amp;&amp; event.getDragboard().hasContent(DragAndDropDataFormats.FIELD)) {</b>
+<b class="nc">&nbsp;            event.acceptTransferModes(TransferMode.MOVE);</b>
+<b class="nc">&nbsp;            ControlHelper.setDroppingPseudoClasses(row, event);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragDetected(TableRow&lt;FieldViewModel&gt; row, FieldViewModel fieldViewModel, MouseEvent
+&nbsp;            event) {
+<b class="nc">&nbsp;        row.startFullDrag();</b>
+<b class="nc">&nbsp;        FieldViewModel field = fields.getSelectionModel().getSelectedItem();</b>
+&nbsp;
+<b class="nc">&nbsp;        ClipboardContent content = new ClipboardContent();</b>
+<b class="nc">&nbsp;        Dragboard dragboard = fields.startDragAndDrop(TransferMode.MOVE);</b>
+<b class="nc">&nbsp;        content.put(DragAndDropDataFormats.FIELD, &quot;&quot;);</b>
+<b class="nc">&nbsp;        localDragboard.putValue(FieldViewModel.class, field);</b>
+<b class="nc">&nbsp;        dragboard.setContent(content);</b>
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragDropped(TableRow&lt;FieldViewModel&gt; row, FieldViewModel originalItem, DragEvent event) {
+<b class="nc">&nbsp;        if (localDragboard.hasType(FieldViewModel.class)) {</b>
+<b class="nc">&nbsp;            FieldViewModel field = localDragboard.getValue(FieldViewModel.class);</b>
+<b class="nc">&nbsp;            fields.getItems().remove(field);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (row.isEmpty()) {</b>
+<b class="nc">&nbsp;                fields.getItems().add(field);</b>
+&nbsp;            } else {
+&nbsp;                // decide based on drop position whether to add the element before or after
+<b class="nc">&nbsp;                int offset = event.getY() &gt; (row.getHeight() / 2) ? 1 : 0;</b>
+<b class="nc">&nbsp;                fields.getItems().add(row.getIndex() + offset, field);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        event.setDropCompleted(true);</b>
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragExited(TableRow&lt;FieldViewModel&gt; row, FieldViewModel fieldViewModel, DragEvent dragEvent) {
+<b class="nc">&nbsp;        ControlHelper.removeDroppingPseudoClasses(row);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void addEntryType() {
+<b class="nc">&nbsp;        EntryTypeViewModel newlyAdded = viewModel.addNewCustomEntryType();</b>
+<b class="nc">&nbsp;        this.entryTypesTable.getSelectionModel().select(newlyAdded);</b>
+<b class="nc">&nbsp;        this.entryTypesTable.scrollTo(newlyAdded);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void addNewField() {
+<b class="nc">&nbsp;        viewModel.addNewField();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void resetEntryTypes() {
+<b class="nc">&nbsp;        boolean reset = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Reset entry types and fields to defaults&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;This will reset all entry types to their default values and remove all custom entry types&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Reset to default&quot;));</b>
+<b class="nc">&nbsp;        if (reset) {</b>
+<b class="nc">&nbsp;            viewModel.resetAllCustomEntryTypes();</b>
+<b class="nc">&nbsp;            fields.getSelectionModel().clearSelection();</b>
+<b class="nc">&nbsp;            entryTypesTable.getSelectionModel().clearSelection();</b>
+<b class="nc">&nbsp;            viewModel.setValues();</b>
+<b class="nc">&nbsp;            entryTypesTable.refresh();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

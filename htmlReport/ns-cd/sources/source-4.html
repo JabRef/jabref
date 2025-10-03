@@ -1,0 +1,292 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PaperDetails</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher.citation.semanticscholar</a>
+</div>
+
+<h1>Coverage Summary for Class: PaperDetails (org.jabref.logic.importer.fetcher.citation.semanticscholar)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PaperDetails</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher.citation.semanticscholar;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;import com.google.gson.annotations.SerializedName;
+&nbsp;
+<b class="nc">&nbsp;public class PaperDetails {</b>
+&nbsp;    private String paperId;
+&nbsp;    private String title;
+&nbsp;    private String year;
+&nbsp;
+&nbsp;    @SerializedName(&quot;abstract&quot;)
+&nbsp;    private String abstr;
+&nbsp;    private String url;
+&nbsp;    private int citationCount;
+&nbsp;    private int referenceCount;
+&nbsp;    private List&lt;AuthorResponse&gt; authors;
+&nbsp;    private List&lt;String&gt; publicationTypes;
+&nbsp;    private Map&lt;String, String&gt; externalIds;
+&nbsp;
+&nbsp;    public String getPaperId() {
+<b class="nc">&nbsp;        return paperId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPaperId(String paperId) {
+<b class="nc">&nbsp;        this.paperId = paperId;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTitle() {
+<b class="nc">&nbsp;        return title;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTitle(String title) {
+<b class="nc">&nbsp;        this.title = title;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getYear() {
+<b class="nc">&nbsp;        return year;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setYear(String year) {
+<b class="nc">&nbsp;        this.year = year;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAbstract() {
+<b class="nc">&nbsp;        return abstr;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAbstract(String abstr) {
+<b class="nc">&nbsp;        this.abstr = abstr;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getURL() {
+<b class="nc">&nbsp;        return url;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setURL(String url) {
+<b class="nc">&nbsp;        this.url = url;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getCitationCount() {
+<b class="nc">&nbsp;        return citationCount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCitationCount(int citationCount) {
+<b class="nc">&nbsp;        this.citationCount = citationCount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getReferenceCount() {
+<b class="nc">&nbsp;        return referenceCount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setReferenceCount(int referenceCount) {
+<b class="nc">&nbsp;        this.referenceCount = referenceCount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;AuthorResponse&gt; getAuthors() {
+<b class="nc">&nbsp;        return authors;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getPublicationType() {
+<b class="nc">&nbsp;        if (publicationTypes == null || publicationTypes.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;Misc&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (publicationTypes.contains(&quot;Conference&quot;)) {</b>
+<b class="nc">&nbsp;            return &quot;InProceedings&quot;;</b>
+<b class="nc">&nbsp;        } else if (publicationTypes.contains(&quot;JournalArticle&quot;)) {</b>
+<b class="nc">&nbsp;            return &quot;Article&quot;;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return switch (publicationTypes.getFirst()) {</b>
+&nbsp;                case &quot;Review&quot; -&gt;
+<b class="nc">&nbsp;                        &quot;Misc&quot;;</b>
+&nbsp;                case &quot;CaseReport&quot; -&gt;
+<b class="nc">&nbsp;                        &quot;Report&quot;;</b>
+&nbsp;                case &quot;ClinicalTrial&quot; -&gt;
+<b class="nc">&nbsp;                        &quot;Report&quot;;</b>
+&nbsp;                case &quot;Dataset&quot; -&gt;
+<b class="nc">&nbsp;                        &quot;Dataset&quot;;</b>
+&nbsp;                case &quot;Editorial&quot; -&gt;
+<b class="nc">&nbsp;                        &quot;Misc&quot;;</b>
+&nbsp;                case &quot;LettersAndComments&quot; -&gt;
+<b class="nc">&nbsp;                        &quot;Misc&quot;;</b>
+&nbsp;                case &quot;MetaAnalysis&quot; -&gt;
+<b class="nc">&nbsp;                        &quot;Article&quot;;</b>
+&nbsp;                case &quot;News&quot; -&gt;
+<b class="nc">&nbsp;                        &quot;Misc&quot;;</b>
+&nbsp;                case &quot;Study&quot; -&gt;
+<b class="nc">&nbsp;                        &quot;Article&quot;;</b>
+&nbsp;                case &quot;Book&quot; -&gt;
+<b class="nc">&nbsp;                        &quot;Book&quot;;</b>
+&nbsp;                case &quot;BookSection&quot; -&gt;
+<b class="nc">&nbsp;                        &quot;InBook&quot;;</b>
+&nbsp;                default -&gt;
+<b class="nc">&nbsp;                        &quot;Misc&quot;;</b>
+&nbsp;            };
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDOI() {
+<b class="nc">&nbsp;        if (externalIds != null) {</b>
+<b class="nc">&nbsp;            if (externalIds.containsKey(&quot;DOI&quot;)) {</b>
+<b class="nc">&nbsp;                return externalIds.get(&quot;DOI&quot;);</b>
+<b class="nc">&nbsp;            } else if (externalIds.containsKey(&quot;ArXiv&quot;)) {</b>
+&nbsp;                // Some ArXiv articles don&#39;t return the DOI, even though it&#39;s easy to obtain from the ArXiv ID
+<b class="nc">&nbsp;                return &quot;10.48550/arXiv.&quot; + externalIds.get(&quot;ArXiv&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry toBibEntry() {
+<b class="nc">&nbsp;        BibEntry bibEntry = new BibEntry();</b>
+<b class="nc">&nbsp;        bibEntry.setField(StandardField.TITLE, getTitle());</b>
+<b class="nc">&nbsp;        if (getYear() != null) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.YEAR, getYear());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String authors = getAuthors().stream()</b>
+<b class="nc">&nbsp;                                     .map(AuthorResponse::getName)</b>
+<b class="nc">&nbsp;                                     .collect(Collectors.joining(&quot; and &quot;));</b>
+<b class="nc">&nbsp;        bibEntry.setField(StandardField.AUTHOR, authors);</b>
+&nbsp;
+<b class="nc">&nbsp;        bibEntry.setType(StandardEntryType.valueOf(getPublicationType()));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (getDOI() != null) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.DOI, getDOI());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (getURL() != null) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.URL, getURL());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (getAbstract() != null) {</b>
+<b class="nc">&nbsp;            bibEntry.setField(StandardField.ABSTRACT, getAbstract());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return bibEntry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;PaperDetails{&quot; +</b>
+&nbsp;                &quot;paperId=&#39;&quot; + paperId + &#39;\&#39;&#39; +
+&nbsp;                &quot;, title=&#39;&quot; + title + &#39;\&#39;&#39; +
+&nbsp;                &quot;, year=&#39;&quot; + year + &#39;\&#39;&#39; +
+&nbsp;                &quot;, citationCount=&quot; + citationCount +
+&nbsp;                &quot;, referenceCount=&quot; + referenceCount +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,422 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ThemeManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.theme</a>
+</div>
+
+<h1>Coverage Summary for Class: ThemeManager (org.jabref.gui.theme)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ThemeManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    44%
+  </span>
+  <span class="absValue">
+    (11/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (6/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    49.6%
+  </span>
+  <span class="absValue">
+    (60/121)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.theme;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.WeakHashMap;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import javafx.application.ColorScheme;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.scene.web.WebEngine;
+&nbsp;import javafx.stage.Stage;
+&nbsp;import javafx.stage.Window;
+&nbsp;
+&nbsp;import org.jabref.gui.WorkspacePreferences;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.util.FileUpdateListener;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import com.pixelduke.window.ThemeWindowManager;
+&nbsp;import com.pixelduke.window.ThemeWindowManagerFactory;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Installs and manages style files and provides live reloading. JabRef provides two
+&nbsp; * inbuilt themes and a user customizable one: Light, Dark and Custom. The Light theme
+&nbsp; * is basically the base.css theme. Every other theme is loaded as an addition to
+&nbsp; * base.css.
+&nbsp; * &lt;p&gt;
+&nbsp; * For type Custom, Theme will protect against removal of the CSS file, degrading as
+&nbsp; * gracefully as possible. If the file becomes unavailable while the application is
+&nbsp; * running, some Scenes that have not yet had the CSS installed may not be themed. The
+&nbsp; * PreviewViewer, which uses WebEngine, supports data URLs and so generally is not
+&nbsp; * affected by removal of the file; however Theme package will not attempt to URL-encode
+&nbsp; * large style sheets so as to protect memory usage (see
+&nbsp; * {@link StyleSheetFile#MAX_IN_MEMORY_CSS_LENGTH}).
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;https://docs.jabref.org/advanced/custom-themes&quot;&gt;Custom themes&lt;/a&gt; in
+&nbsp; * the Jabref documentation.
+&nbsp; */
+&nbsp;public class ThemeManager {
+<b class="fc">&nbsp;    public static Map&lt;String, Node&gt; getDownloadIconTitleMap = Map.of(</b>
+<b class="fc">&nbsp;            Localization.lang(&quot;Downloading&quot;), IconTheme.JabRefIcons.DOWNLOAD.getGraphicNode()</b>
+&nbsp;    );
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);</b>
+&nbsp;
+&nbsp;    private final WorkspacePreferences workspacePreferences;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    private final ThemeWindowManager themeWindowManager;
+&nbsp;    private final StyleSheet baseStyleSheet;
+&nbsp;    private Theme theme;
+&nbsp;    private boolean isDarkMode;
+<b class="fc">&nbsp;    private final Set&lt;WebEngine&gt; webEngines = Collections.newSetFromMap(new WeakHashMap&lt;&gt;());</b>
+&nbsp;
+&nbsp;    public ThemeManager(WorkspacePreferences workspacePreferences,
+<b class="fc">&nbsp;                        FileUpdateMonitor fileUpdateMonitor) {</b>
+<b class="fc">&nbsp;        this.workspacePreferences = Objects.requireNonNull(workspacePreferences);</b>
+<b class="fc">&nbsp;        this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);</b>
+&nbsp;        // Always returns something even if the native library is not available - see https://github.com/dukke/FXThemes/issues/15
+<b class="fc">&nbsp;        this.themeWindowManager = ThemeWindowManagerFactory.create();</b>
+&nbsp;
+<b class="fc">&nbsp;        this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();</b>
+<b class="fc">&nbsp;        this.theme = workspacePreferences.getTheme();</b>
+<b class="fc">&nbsp;        this.isDarkMode = Theme.EMBEDDED_DARK_CSS.equals(this.theme.getName());</b>
+&nbsp;
+<b class="fc">&nbsp;        initializeWindowThemeUpdater();</b>
+&nbsp;
+&nbsp;        // Watching base CSS only works in development and test scenarios, where the build system exposes the CSS as a
+&nbsp;        // file (e.g. for Gradle run task it will be in build/resources/main/org/jabref/gui/Base.css)
+<b class="fc">&nbsp;        addStylesheetToWatchlist(this.baseStyleSheet, this::baseCssLiveUpdate);</b>
+<b class="fc">&nbsp;        baseCssLiveUpdate();</b>
+&nbsp;
+<b class="pc">&nbsp;        if (Platform.isFxApplicationThread()) {</b>
+<b class="fc">&nbsp;            BindingsHelper.subscribeFuture(workspacePreferences.themeProperty(), _ -&gt; updateThemeSettings());</b>
+<b class="fc">&nbsp;            BindingsHelper.subscribeFuture(workspacePreferences.themeSyncOsProperty(), _ -&gt; updateThemeSettings());</b>
+<b class="fc">&nbsp;            BindingsHelper.subscribeFuture(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), _ -&gt; updateFontSettings());</b>
+<b class="fc">&nbsp;            BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), _ -&gt; updateFontSettings());</b>
+<b class="fc">&nbsp;            BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), _ -&gt; updateThemeSettings());</b>
+<b class="fc">&nbsp;            updateThemeSettings();</b>
+&nbsp;        } else {
+&nbsp;            // Normally ThemeManager is only instantiated by JabGui and therefore already on the FX Thread, but when it&#39;s called from a test (e.g. ThemeManagerTest) then it&#39;s not on the fx thread
+<b class="nc">&nbsp;            UiTaskExecutor.runInJavaFXThread(() -&gt; {</b>
+<b class="nc">&nbsp;                BindingsHelper.subscribeFuture(workspacePreferences.themeProperty(), _ -&gt; updateThemeSettings());</b>
+<b class="nc">&nbsp;                BindingsHelper.subscribeFuture(workspacePreferences.themeSyncOsProperty(), _ -&gt; updateThemeSettings());</b>
+<b class="nc">&nbsp;                BindingsHelper.subscribeFuture(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), _ -&gt; updateFontSettings());</b>
+<b class="nc">&nbsp;                BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), _ -&gt; updateFontSettings());</b>
+<b class="nc">&nbsp;                BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), _ -&gt; updateThemeSettings());</b>
+<b class="nc">&nbsp;                updateThemeSettings();</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Installs the base and additional css files as stylesheets in the given scene.
+&nbsp;    public void installCss(@NonNull Scene scene) {
+&nbsp;        // Because of race condition in JavaFX, IndexOutOfBounds will be thrown, despite
+&nbsp;        // all the invocation to this method come directly from the UI thread
+<b class="nc">&nbsp;        UiTaskExecutor.runInJavaFXThread(() -&gt; {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; stylesheets = Stream</b>
+<b class="nc">&nbsp;                    .of(baseStyleSheet.getSceneStylesheet(),</b>
+<b class="nc">&nbsp;                            theme.getAdditionalStylesheet().map(StyleSheet::getSceneStylesheet).orElse(null)</b>
+<b class="nc">&nbsp;                    ).filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;                    .map(URL::toExternalForm)</b>
+<b class="nc">&nbsp;                    .toList();</b>
+<b class="nc">&nbsp;            scene.getStylesheets().setAll(stylesheets);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Installs the css file as a stylesheet in the given web engine. Changes in the
+&nbsp;    /// css file lead to a redraw of the web engine using the new css file.
+&nbsp;    ///
+&nbsp;    /// @param webEngine the web engine to install the css into
+&nbsp;    public void installCss(WebEngine webEngine) {
+<b class="nc">&nbsp;        if (this.webEngines.add(webEngine)) {</b>
+<b class="nc">&nbsp;            webEngine.setUserStyleSheetLocation(this.theme.getAdditionalStylesheet().isPresent() ?</b>
+<b class="nc">&nbsp;                                                this.theme.getAdditionalStylesheet().get().getWebEngineStylesheet() : &quot;&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Updates the font size settings of a scene. Originally, this methods must be
+&nbsp;    /// called by each Dialog, PopOver, or window when it&#39;s created. Now, this is done
+&nbsp;    /// automatically when the scene is created.
+&nbsp;    ///
+&nbsp;    /// @param scene is the scene, the font size should be applied to
+&nbsp;    private void updateFontStyle(@NonNull Scene scene) {
+<b class="nc">&nbsp;        if (workspacePreferences.shouldOverrideDefaultFontSize()) {</b>
+<b class="nc">&nbsp;            scene.getRoot().setStyle(&quot;-fx-font-size: &quot; + workspacePreferences.getMainFontSize() + &quot;pt;&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            scene.getRoot().setStyle(&quot;-fx-font-size: &quot; + workspacePreferences.getDefaultFontSize() + &quot;pt;&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeWindowThemeUpdater() {
+<b class="fc">&nbsp;        ListChangeListener&lt;Window&gt; windowsListener = change -&gt; {</b>
+<b class="nc">&nbsp;            while (change.next()) {</b>
+<b class="nc">&nbsp;                if (!change.wasAdded()) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+<b class="nc">&nbsp;                for (Window window : change.getAddedSubList()) {</b>
+<b class="nc">&nbsp;                    window.sceneProperty().addListener((_, _, newScene) -&gt; {</b>
+<b class="nc">&nbsp;                        if (newScene != null) {</b>
+<b class="nc">&nbsp;                            installCss(newScene);</b>
+<b class="nc">&nbsp;                            updateFontStyle(newScene);</b>
+&nbsp;                        }
+&nbsp;                    });
+<b class="nc">&nbsp;                    Scene scene = window.getScene();</b>
+<b class="nc">&nbsp;                    if (scene != null) {</b>
+<b class="nc">&nbsp;                        installCss(scene);</b>
+<b class="nc">&nbsp;                        updateFontStyle(scene);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (window instanceof Stage stage) {</b>
+<b class="nc">&nbsp;                        stage.showingProperty().addListener(_ -&gt; applyDarkModeToWindow(stage));</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        };
+<b class="fc">&nbsp;        Window.getWindows().addListener(windowsListener);</b>
+&nbsp;
+&nbsp;        // Apply styles to all windows that *already exist*
+<b class="fc">&nbsp;        applyCssAndFontToAllWindows();</b>
+<b class="fc">&nbsp;        applyDarkModeToAllWindows();</b>
+<b class="fc">&nbsp;        LOGGER.debug(&quot;Window theme monitoring initialized&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void applyDarkModeToWindow(Stage stage) {
+<b class="nc">&nbsp;        if (stage == null || !stage.isShowing()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            themeWindowManager.setDarkModeForWindowFrame(stage, isDarkMode);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Applied {} mode to window: {}&quot;, isDarkMode ? &quot;dark&quot; : &quot;light&quot;, stage);</b>
+&nbsp;        } catch (NoClassDefFoundError | UnsatisfiedLinkError e) {
+&nbsp;            // We need to handle these exceptions because the native library may not be available on all platforms (e.g., x86).
+&nbsp;            // See https://github.com/dukke/FXThemes/issues/13 for details.
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Failed to set dark mode for window frame (likely due to native library compatibility issues on intel)&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void applyDarkModeToAllWindows() {
+<b class="fc">&nbsp;        Window.getWindows().stream()</b>
+<b class="fc">&nbsp;              .filter(Window::isShowing)</b>
+<b class="fc">&nbsp;              .filter(window -&gt; window instanceof Stage)</b>
+<b class="fc">&nbsp;              .map(window -&gt; (Stage) window)</b>
+<b class="fc">&nbsp;              .forEach(this::applyDarkModeToWindow);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateThemeSettings() {
+<b class="fc">&nbsp;        Theme theme = Objects.requireNonNull(workspacePreferences.getTheme());</b>
+&nbsp;
+<b class="pc">&nbsp;        if (workspacePreferences.themeSyncOsProperty().getValue()) {</b>
+<b class="nc">&nbsp;            if (Platform.getPreferences().getColorScheme() == ColorScheme.DARK) {</b>
+<b class="nc">&nbsp;                theme = Theme.dark();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                theme = Theme.light();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (theme.equals(this.theme)) {</b>
+<b class="fc">&nbsp;            LOGGER.info(&quot;Not updating theme because it hasn&#39;t changed&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.theme.getAdditionalStylesheet().ifPresent(this::removeStylesheetFromWatchList);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        this.theme = theme;</b>
+<b class="fc">&nbsp;        LOGGER.info(&quot;Theme set to {} with base css {}&quot;, theme, baseStyleSheet);</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean isDarkTheme = Theme.EMBEDDED_DARK_CSS.equals(theme.getName());</b>
+<b class="pc">&nbsp;        if (this.isDarkMode != isDarkTheme) {</b>
+<b class="nc">&nbsp;            this.isDarkMode = isDarkTheme;</b>
+<b class="nc">&nbsp;            applyDarkModeToAllWindows();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        this.theme.getAdditionalStylesheet().ifPresent(</b>
+<b class="nc">&nbsp;                styleSheet -&gt; addStylesheetToWatchlist(styleSheet, this::additionalCssLiveUpdate));</b>
+&nbsp;
+<b class="fc">&nbsp;        additionalCssLiveUpdate();</b>
+<b class="fc">&nbsp;        updateFontSettings();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateFontSettings() {
+<b class="fc">&nbsp;        UiTaskExecutor.runInJavaFXThread(this::applyCssAndFontToAllWindows);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeStylesheetFromWatchList(StyleSheet styleSheet) {
+<b class="nc">&nbsp;        Path oldPath = styleSheet.getWatchPath();</b>
+<b class="nc">&nbsp;        if (oldPath != null) {</b>
+<b class="nc">&nbsp;            fileUpdateMonitor.removeListener(oldPath, this::additionalCssLiveUpdate);</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;No longer watch css {} for live updates&quot;, oldPath);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addStylesheetToWatchlist(StyleSheet styleSheet, FileUpdateListener updateMethod) {
+<b class="fc">&nbsp;        Path watchPath = styleSheet.getWatchPath();</b>
+<b class="pc">&nbsp;        if (watchPath != null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                fileUpdateMonitor.addListenerForFile(watchPath, updateMethod);</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;Watching css {} for live updates&quot;, watchPath);</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Cannot watch css path {} for live updates&quot;, watchPath, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void baseCssLiveUpdate() {
+<b class="fc">&nbsp;        baseStyleSheet.reload();</b>
+<b class="pc">&nbsp;        if (baseStyleSheet.getSceneStylesheet() == null) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Base stylesheet does not exist.&quot;);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            LOGGER.debug(&quot;Updating base CSS for all scenes&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        UiTaskExecutor.runInJavaFXThread(this::applyCssAndFontToAllWindows);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void additionalCssLiveUpdate() {
+<b class="fc">&nbsp;        final String newStyleSheetLocation = this.theme.getAdditionalStylesheet().map(styleSheet -&gt; {</b>
+<b class="nc">&nbsp;            styleSheet.reload();</b>
+<b class="nc">&nbsp;            return styleSheet.getWebEngineStylesheet();</b>
+<b class="fc">&nbsp;        }).orElse(&quot;&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        LOGGER.debug(&quot;Updating additional CSS for all scenes and {} web engines&quot;, webEngines.size());</b>
+&nbsp;
+<b class="fc">&nbsp;        UiTaskExecutor.runInJavaFXThread(() -&gt; {</b>
+<b class="fc">&nbsp;            applyCssAndFontToAllWindows();</b>
+<b class="fc">&nbsp;            webEngines.forEach(webEngine -&gt; {</b>
+&nbsp;                // force refresh by unloading style sheet, if the location hasn&#39;t changed
+<b class="nc">&nbsp;                if (newStyleSheetLocation.equals(webEngine.getUserStyleSheetLocation())) {</b>
+<b class="nc">&nbsp;                    webEngine.setUserStyleSheetLocation(null);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                webEngine.setUserStyleSheetLocation(newStyleSheetLocation);</b>
+&nbsp;            });
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void applyCssAndFontToAllWindows() {
+<b class="fc">&nbsp;        Window.getWindows().stream()</b>
+<b class="fc">&nbsp;              .filter(Window::isShowing)</b>
+<b class="fc">&nbsp;              .map(Window::getScene)</b>
+<b class="fc">&nbsp;              .filter(Objects::nonNull)</b>
+<b class="fc">&nbsp;              .forEach(scene -&gt; {</b>
+<b class="nc">&nbsp;                  installCss(scene);</b>
+<b class="nc">&nbsp;                  updateFontStyle(scene);</b>
+&nbsp;              });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return the currently active theme
+&nbsp;     */
+&nbsp;    @VisibleForTesting
+&nbsp;    Theme getActiveTheme() {
+<b class="nc">&nbsp;        return this.theme;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

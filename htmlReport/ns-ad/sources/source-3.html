@@ -1,0 +1,220 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibtexLogParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.biblog</a>
+</div>
+
+<h1>Coverage Summary for Class: BibtexLogParser (org.jabref.logic.biblog)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibtexLogParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.biblog;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.model.biblog.BibWarning;
+&nbsp;import org.jabref.model.biblog.SeverityType;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;
+&nbsp;/**
+&nbsp; * Parses the contents of a .blg (BibTeX log) file to extract warning messages.
+&nbsp; */
+<b class="nc">&nbsp;public class BibtexLogParser {</b>
+<b class="nc">&nbsp;    private static final Pattern BIBTEX_WARNING_PATTERN = Pattern.compile(&quot;^Warning--(?&lt;message&gt;[a-zA-Z ]+) in (?&lt;entryKey&gt;[^\\s]+)$&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern BIBLATEX_WARNING_PATTERN = Pattern.compile(</b>
+&nbsp;            &quot;(?:(?:\\[\\d+\\] )?Biber\\.pm:\\d+&gt; )?WARN - Datamodel: [a-z]+ entry &#39;(?&lt;entryKey&gt;[^&#39;]+)&#39; \\((?&lt;fileName&gt;[^)]+)\\): (?&lt;message&gt;.+)&quot;);
+&nbsp;
+&nbsp;    private static final String EMPTY_FIELD_PREFIX = &quot;empty&quot;;
+&nbsp;    private static final String INVALID_FIELD_PREFIX = &quot;field &#39;&quot;;
+&nbsp;    private static final String MULTI_INVALID_FIELD_PREFIX = &quot;field - one of &#39;&quot;;
+&nbsp;
+&nbsp;    public List&lt;BibWarning&gt; parseBiblog(@NonNull Path blgFilePath) throws IOException {
+<b class="nc">&nbsp;        return Files.lines(blgFilePath)</b>
+<b class="nc">&nbsp;                    .map(this::parseWarningLine)</b>
+<b class="nc">&nbsp;                    .flatMap(Optional::stream)</b>
+<b class="nc">&nbsp;                    .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Parses a single line from a .blg file to identify a warning.
+&nbsp;    ///
+&nbsp;    /// This method supports two warning formats:
+&nbsp;    ///
+&nbsp;    /// 1.  **BibTeX Warnings:** Simple warnings from the legacy BibTeX backend.
+&nbsp;    ///     `Warning--[message] in [entryKey]`
+&nbsp;    ///     For example: `Warning--empty journal in Scholey_2013`
+&nbsp;    ///
+&nbsp;    /// 2.  **BibLaTeX Datamodel Warnings:** Detailed warnings from the Biber backend, including datamodel validation issues.
+&nbsp;    ///     `[Log line] &gt; WARN - Datamodel: [entry type] entry &#39;[entryKey]&#39; ([fileName]): [message]`
+&nbsp;    ///     For example: `Biber.pm:123&gt; WARN - Datamodel: article entry &#39;Scholey_2013&#39; (file.bib): Invalid field &#39;journal&#39;`
+&nbsp;    ///
+&nbsp;    /// @param line The single line from the .blg file to parse.
+&nbsp;    /// @returns An `Optional` containing a `BibWarning` if a match is found, or an empty `Optional` otherwise.
+&nbsp;    Optional&lt;BibWarning&gt; parseWarningLine(String line) {
+<b class="nc">&nbsp;        Matcher bibtexMatcher = BIBTEX_WARNING_PATTERN.matcher(line);</b>
+<b class="nc">&nbsp;        if (bibtexMatcher.find()) {</b>
+<b class="nc">&nbsp;            String message = bibtexMatcher.group(&quot;message&quot;).trim();</b>
+<b class="nc">&nbsp;            String entryKey = bibtexMatcher.group(&quot;entryKey&quot;);</b>
+&nbsp;            // Extract field name for warnings related to empty fields  (e.g., &quot;empty journal&quot; -&gt; fieldName = &quot;journal&quot;)
+<b class="nc">&nbsp;            String fieldName = null;</b>
+<b class="nc">&nbsp;            if (message.startsWith(EMPTY_FIELD_PREFIX)) {</b>
+<b class="nc">&nbsp;                fieldName = message.substring(EMPTY_FIELD_PREFIX.length()).trim();</b>
+<b class="nc">&nbsp;                fieldName = FieldFactory.parseField(fieldName).getName();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return Optional.of(new BibWarning(</b>
+&nbsp;                    SeverityType.WARNING,
+&nbsp;                    message,
+&nbsp;                    fieldName,
+&nbsp;                    entryKey
+&nbsp;            ));
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Matcher biblatexMatcher = BIBLATEX_WARNING_PATTERN.matcher(line);</b>
+<b class="nc">&nbsp;        if (biblatexMatcher.find()) {</b>
+<b class="nc">&nbsp;            String message = biblatexMatcher.group(&quot;message&quot;).trim();</b>
+<b class="nc">&nbsp;            String entryKey = biblatexMatcher.group(&quot;entryKey&quot;);</b>
+<b class="nc">&nbsp;            String fieldName = null;</b>
+&nbsp;
+&nbsp;            // Extract field name for warnings related to invalid fields (e.g., &quot;Invalid field &#39;publisher&#39; for entrytype &#39;article&#39;&quot; -&gt; fieldName = &quot;publisher&quot;)
+<b class="nc">&nbsp;            String lowerCaseMessage = message.toLowerCase();</b>
+<b class="nc">&nbsp;            if (lowerCaseMessage.contains(INVALID_FIELD_PREFIX)) {</b>
+<b class="nc">&nbsp;                int startIndex = lowerCaseMessage.indexOf(INVALID_FIELD_PREFIX) + INVALID_FIELD_PREFIX.length();</b>
+<b class="nc">&nbsp;                int endIndex = lowerCaseMessage.indexOf(&#39;\&#39;&#39;, startIndex);</b>
+<b class="nc">&nbsp;                if (endIndex != -1) {</b>
+<b class="nc">&nbsp;                    fieldName = lowerCaseMessage.substring(startIndex, endIndex).trim();</b>
+<b class="nc">&nbsp;                    fieldName = FieldFactory.parseField(fieldName).getName();</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (lowerCaseMessage.contains(MULTI_INVALID_FIELD_PREFIX)) {</b>
+<b class="nc">&nbsp;                int startIndex = lowerCaseMessage.indexOf(MULTI_INVALID_FIELD_PREFIX) + MULTI_INVALID_FIELD_PREFIX.length();</b>
+<b class="nc">&nbsp;                int endIndex = lowerCaseMessage.indexOf(&#39;\&#39;&#39;, startIndex);</b>
+<b class="nc">&nbsp;                if (endIndex != -1) {</b>
+<b class="nc">&nbsp;                    fieldName = lowerCaseMessage.substring(startIndex, endIndex).trim().split(&quot;,&quot;)[0].trim();</b>
+<b class="nc">&nbsp;                    fieldName = FieldFactory.parseField(fieldName).getName();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return Optional.of(new BibWarning(</b>
+&nbsp;                    SeverityType.WARNING,
+&nbsp;                    message,
+&nbsp;                    fieldName,
+&nbsp;                    entryKey
+&nbsp;            ));
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

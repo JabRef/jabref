@@ -1,0 +1,182 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PostgreConstants</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.search</a>
+</div>
+
+<h1>Coverage Summary for Class: PostgreConstants (org.jabref.model.search)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PostgreConstants</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (11/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.search;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+<b class="fc">&nbsp;public enum PostgreConstants {</b>
+<b class="fc">&nbsp;    BIB_FIELDS_SCHEME(&quot;bib_fields&quot;),</b>
+<b class="fc">&nbsp;    SPLIT_TABLE_SUFFIX(&quot;_split_values&quot;),</b>
+<b class="fc">&nbsp;    ENTRY_ID(&quot;entryid&quot;),</b>
+<b class="fc">&nbsp;    FIELD_NAME(&quot;field_name&quot;),</b>
+<b class="fc">&nbsp;    FIELD_VALUE_LITERAL(&quot;field_value_literal&quot;), // contains the value as-is</b>
+<b class="fc">&nbsp;    FIELD_VALUE_TRANSFORMED(&quot;field_value_transformed&quot;); // contains the value transformed for better querying</b>
+&nbsp;
+<b class="fc">&nbsp;    public static final List&lt;String&gt; POSTGRES_FUNCTIONS = List.of(</b>
+&nbsp;            // HTML highlighting function
+&nbsp;            &quot;&quot;&quot;
+&nbsp;                        CREATE OR REPLACE FUNCTION regexp_mark(string text, pattern text)
+&nbsp;                            RETURNS text
+&nbsp;                            LANGUAGE plpgsql
+&nbsp;                        AS
+&nbsp;                        $$
+&nbsp;                        BEGIN
+&nbsp;                            RETURN regexp_replace(string, format(&#39;(%s)&#39;, pattern), &#39;&lt;mark style=&quot;background: orange&quot;&gt;\\1&lt;/mark&gt;&#39;, &#39;gi&#39;);
+&nbsp;                        END
+&nbsp;                        $$;
+&nbsp;                    &quot;&quot;&quot;,
+&nbsp;
+&nbsp;            // Extract positions of a pattern in a string
+&nbsp;            // Source: https://www.postgresql.org/message-id/flat/0aabac3c-9049-4c55-a82d-a70c5ba43d4d%40www.fastmail.com
+&nbsp;            &quot;&quot;&quot;
+&nbsp;                        CREATE OR REPLACE FUNCTION regexp_positions(string text, pattern text, OUT start_pos integer, OUT end_pos integer)
+&nbsp;                            RETURNS SETOF RECORD
+&nbsp;                            LANGUAGE plpgsql
+&nbsp;                        AS
+&nbsp;                        $$
+&nbsp;                        DECLARE
+&nbsp;                            match text;
+&nbsp;                            remainder text := string;
+&nbsp;                            len integer;
+&nbsp;                            pos integer;
+&nbsp;                        BEGIN
+&nbsp;                            end_pos := 0;
+&nbsp;                            FOR match IN SELECT (regexp_matches(string, format(&#39;(%s)&#39;, pattern), &#39;gi&#39;))[1] LOOP
+&nbsp;                                    len := length(match);
+&nbsp;                                    pos := position(match in remainder);
+&nbsp;                                    start_pos := pos + end_pos;
+&nbsp;                                    end_pos := start_pos + len - 1;
+&nbsp;                                    RETURN NEXT;
+&nbsp;                                    remainder := right(remainder, 1 - len - pos);
+&nbsp;                                END LOOP;
+&nbsp;                            RETURN;
+&nbsp;                        END
+&nbsp;                        $$;
+&nbsp;                    &quot;&quot;&quot;
+&nbsp;    );
+&nbsp;
+&nbsp;    private final String value;
+&nbsp;
+<b class="fc">&nbsp;    PostgreConstants(String value) {</b>
+<b class="fc">&nbsp;        this.value = value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getMainTableSchemaReference(String mainTable) {
+<b class="nc">&nbsp;        return BIB_FIELDS_SCHEME + &quot;.\&quot;&quot; + mainTable + &quot;\&quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates the schema reference for the split table, which is used to store multi-value fields (e.g., authors, keywords)
+&nbsp;     * in a normalized form to facilitate efficient querying and indexing of the data.
+&nbsp;     */
+&nbsp;    public static String getSplitTableSchemaReference(String mainTable) {
+<b class="nc">&nbsp;        return BIB_FIELDS_SCHEME + &quot;.\&quot;&quot; + mainTable + SPLIT_TABLE_SUFFIX + &quot;\&quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="fc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

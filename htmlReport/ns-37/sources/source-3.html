@@ -1,0 +1,176 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EprintIdentifierEditorViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors.identifier</a>
+</div>
+
+<h1>Coverage Summary for Class: EprintIdentifierEditorViewModel (org.jabref.gui.fieldeditors.identifier)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EprintIdentifierEditorViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors.identifier;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.collections.MapChangeListener;
+&nbsp;import javafx.collections.WeakMapChangeListener;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.integrity.FieldCheckers;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.ARK;
+&nbsp;import org.jabref.model.entry.identifier.ArXivIdentifier;
+&nbsp;import org.jabref.model.entry.identifier.EprintIdentifier;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;
+&nbsp;public class EprintIdentifierEditorViewModel extends BaseIdentifierEditorViewModel&lt;EprintIdentifier&gt; {
+&nbsp;
+&nbsp;    // The following listener will be wrapped in a weak reference change listener, thus it will be garbage collected
+&nbsp;    // automatically once this object is disposed.
+&nbsp;    // https://en.wikipedia.org/wiki/Lapsed_listener_problem
+<b class="nc">&nbsp;    private MapChangeListener&lt;Field, String&gt; eprintTypeFieldListener = change -&gt; {</b>
+<b class="nc">&nbsp;        Field changedField = change.getKey();</b>
+<b class="nc">&nbsp;        if (StandardField.EPRINTTYPE == changedField) {</b>
+<b class="nc">&nbsp;            updateIdentifier();</b>
+&nbsp;        }
+&nbsp;    };
+&nbsp;
+&nbsp;    public EprintIdentifierEditorViewModel(SuggestionProvider&lt;?&gt; suggestionProvider,
+&nbsp;                                           FieldCheckers fieldCheckers,
+&nbsp;                                           DialogService dialogService,
+&nbsp;                                           TaskExecutor taskExecutor,
+&nbsp;                                           GuiPreferences preferences,
+&nbsp;                                           UndoManager undoManager) {
+<b class="nc">&nbsp;        super(StandardField.EPRINT, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);</b>
+<b class="nc">&nbsp;        configure(false, false, false);</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(identifier, newIdentifier -&gt; newIdentifier.ifPresent(id -&gt; {</b>
+&nbsp;            // TODO: We already have a common superclass between ArXivIdentifier and ARK. This could be refactored further.
+<b class="nc">&nbsp;            if (id instanceof ArXivIdentifier) {</b>
+<b class="nc">&nbsp;                configure(true, false, false);</b>
+<b class="nc">&nbsp;            } else if (id instanceof ARK) {</b>
+<b class="nc">&nbsp;                configure(false, false, false);</b>
+&nbsp;            }
+&nbsp;        }));
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        super.bindToEntry(entry);</b>
+&nbsp;        // Unlike other identifiers (they only depend on their own field value), eprint  depends on eprinttype thus
+&nbsp;        // its identity changes whenever the eprinttype field changes .e.g. If eprinttype equals &#39;arxiv&#39; then the eprint identity
+&nbsp;        // will be of type ArXivIdentifier and if it equals &#39;ark&#39; then it switches to type ARK.
+<b class="nc">&nbsp;        entry.getFieldsObservable().addListener(new WeakMapChangeListener&lt;&gt;(eprintTypeFieldListener));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

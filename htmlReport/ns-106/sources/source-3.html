@@ -1,0 +1,1410 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibEntry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry</a>
+</div>
+
+<h1>Coverage Summary for Class: BibEntry (org.jabref.model.entry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/101)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/288)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/394)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.SequencedSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.function.BiFunction;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.Observable;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableMap;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseLogic;
+&nbsp;import org.jabref.logic.bibtex.FileFieldWriter;
+&nbsp;import org.jabref.logic.importer.util.FileFieldParser;
+&nbsp;import org.jabref.model.FieldChange;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.event.EntriesEventSource;
+&nbsp;import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
+&nbsp;import org.jabref.model.entry.event.FieldChangedEvent;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.OrFields;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;import org.jabref.model.entry.identifier.ISBN;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.IEEETranEntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.strings.LatexToUnicodeAdapter;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;import org.jabref.model.util.MultiKeyMap;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import com.google.common.eventbus.EventBus;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import com.tobiasdiez.easybind.optional.OptionalBinding;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/// Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
+&nbsp;///
+&nbsp;/// Example:
+&nbsp;///
+&nbsp;///     Some commment={fieldValue},otherFieldName ={otherFieldValue}
+&nbsp;///
+&nbsp;/// Then,
+&nbsp;///
+&nbsp;/// - &quot;Some comment&quot; is the comment before the entry,
+&nbsp;/// - &quot;misc&quot; is the entry type
+&nbsp;/// - &quot;key&quot; the citation key
+&nbsp;/// - &quot;fieldName&quot; and &quot;otherFieldName&quot; the fields of the BibEntry
+&nbsp;///
+&nbsp;/// A BibTeX entry has following properties:
+&nbsp;///
+&nbsp;/// - comments before entry
+&nbsp;/// - entry type
+&nbsp;/// - citation key
+&nbsp;/// - fields
+&nbsp;///
+&nbsp;/// In JabRef, this is modeled the following way:
+&nbsp;///
+&nbsp;/// - comments before entry --&amp;gt; [#commentsBeforeEntry]
+&nbsp;/// - entry type --&amp;gt; [#type]
+&nbsp;/// - citation key --&amp;gt; contained in [#fields] using they hashmap key `KEY_FIELD`
+&nbsp;/// - fields --&amp;gt; contained in [#fields]
+&nbsp;///
+&nbsp;/// In case you search for a builder as described in Item 2 of the book &quot;Effective Java&quot;, you won&#39;t find one. Please use the methods [#withCitationKey(String)] and [#withField(Field,String)]. All these methods set [#hasChanged()] to &lt;code&gt;false&lt;/code&gt;. In case &lt;code&gt;changed&lt;/code&gt;, use [#withChanged(boolean)].
+&nbsp;///
+&nbsp;@AllowedToUseLogic(&quot;because it needs access to parser and writers&quot;)
+&nbsp;public class BibEntry {
+&nbsp;
+<b class="nc">&nbsp;    public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);</b>
+&nbsp;    private final SharedBibEntryData sharedBibEntryData;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Map to store the words in every field
+&nbsp;     */
+<b class="nc">&nbsp;    private final Map&lt;Field, Set&lt;String&gt;&gt; fieldsAsWords = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cache that stores latex free versions of fields.
+&nbsp;     */
+<b class="nc">&nbsp;    private final Map&lt;Field, String&gt; latexFreeFields = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cache that stores the field as keyword lists (format &amp;lt;Field, Separator, Keyword list&gt;)
+&nbsp;     */
+<b class="nc">&nbsp;    private final MultiKeyMap&lt;StandardField, Character, KeywordList&gt; fieldsAsKeywords = new MultiKeyMap&lt;&gt;(StandardField.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final EventBus eventBus = new EventBus();</b>
+&nbsp;
+&nbsp;    private String id;
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;EntryType&gt; type = new SimpleObjectProperty&lt;&gt;(DEFAULT_TYPE);</b>
+&nbsp;
+<b class="nc">&nbsp;    private ObservableMap&lt;Field, String&gt; fields = FXCollections.observableMap(new ConcurrentHashMap&lt;&gt;());</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The part before the start of the entry
+&nbsp;     */
+<b class="nc">&nbsp;    private String commentsBeforeEntry = &quot;&quot;;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Stores the text &quot;rendering&quot; of the entry as read by the BibTeX reader. Includes comments.
+&nbsp;     */
+<b class="nc">&nbsp;    private String parsedSerialization = &quot;&quot;;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Marks whether the complete serialization, which was read from file, should be used.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Is set to &lt;code&gt;true&lt;/code&gt;, if parts of the entry changed. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
+&nbsp;     */
+&nbsp;    private boolean changed;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
+&nbsp;     */
+&nbsp;    public BibEntry() {
+<b class="nc">&nbsp;        this(DEFAULT_TYPE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry(String citationKey) {
+<b class="nc">&nbsp;        this();</b>
+<b class="nc">&nbsp;        this.setCitationKey(citationKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructs a new BibEntry. The internal ID is set to IdGenerator.next()
+&nbsp;     */
+<b class="nc">&nbsp;    public BibEntry(EntryType type) {</b>
+<b class="nc">&nbsp;        this.id = IdGenerator.next();</b>
+<b class="nc">&nbsp;        setType(type);</b>
+<b class="nc">&nbsp;        this.sharedBibEntryData = new SharedBibEntryData();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry(EntryType type, String citationKey) {
+<b class="nc">&nbsp;        this(type);</b>
+<b class="nc">&nbsp;        this.setCitationKey(citationKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a copy of this entry.
+&nbsp;     * This will set a new ID for the copied entry to be able to distinguish both copies.
+&nbsp;     * Does &lt;em&gt;not&lt;/em&gt; port the listeners.
+&nbsp;     */
+&nbsp;    public BibEntry(BibEntry other) {
+<b class="nc">&nbsp;        this(other.type.getValue());</b>
+<b class="nc">&nbsp;        this.fields = FXCollections.observableMap(new ConcurrentHashMap&lt;&gt;(other.fields));</b>
+<b class="nc">&nbsp;        this.commentsBeforeEntry = other.commentsBeforeEntry;</b>
+<b class="nc">&nbsp;        this.parsedSerialization = other.parsedSerialization;</b>
+<b class="nc">&nbsp;        this.changed = other.changed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FieldChange&gt; setMonth(Month parsedMonth) {
+<b class="nc">&nbsp;        return setField(StandardField.MONTH, parsedMonth.getJabRefFormat());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FieldChange&gt; setLangid(Langid parsedLangid) {
+<b class="nc">&nbsp;        return setField(StandardField.LANGUAGEID, parsedLangid.getJabRefFormat());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getResolvedFieldOrAlias(OrFields fields, BibDatabase database) {
+<b class="nc">&nbsp;        for (Field field : fields.getFields()) {</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; value = getResolvedFieldOrAlias(field, database);</b>
+<b class="nc">&nbsp;            if (value.isPresent()) {</b>
+<b class="nc">&nbsp;                return value;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Map an (empty) field of a BibEntry to a field of a cross-referenced entry.
+&nbsp;     *
+&nbsp;     * @param targetField field name of the BibEntry
+&nbsp;     * @param targetEntry type of the BibEntry
+&nbsp;     * @param sourceEntry type of the cross-referenced BibEntry
+&nbsp;     * @return the mapped field or null if there is no valid mapping available
+&nbsp;     */
+&nbsp;    private Optional&lt;Field&gt; getSourceField(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
+&nbsp;        // 1. Sort out forbidden fields
+<b class="nc">&nbsp;        if ((targetField == StandardField.IDS) ||</b>
+&nbsp;                (targetField == StandardField.CROSSREF) ||
+&nbsp;                (targetField == StandardField.XREF) ||
+&nbsp;                (targetField == StandardField.ENTRYSET) ||
+&nbsp;                (targetField == StandardField.RELATED) ||
+&nbsp;                (targetField == StandardField.SORTKEY)) {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // 2. Handle special field mappings
+<b class="nc">&nbsp;        if (((sourceEntry == StandardEntryType.MvBook) &amp;&amp; (targetEntry == StandardEntryType.InBook)) ||</b>
+&nbsp;                ((sourceEntry == StandardEntryType.MvBook) &amp;&amp; (targetEntry == StandardEntryType.BookInBook)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.MvBook) &amp;&amp; (targetEntry == StandardEntryType.SuppBook)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.Book) &amp;&amp; (targetEntry == StandardEntryType.InBook)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.Book) &amp;&amp; (targetEntry == StandardEntryType.BookInBook)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.Book) &amp;&amp; (targetEntry == StandardEntryType.SuppBook))) {
+<b class="nc">&nbsp;            if (targetField == StandardField.AUTHOR) {</b>
+<b class="nc">&nbsp;                return Optional.of(StandardField.AUTHOR);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (targetField == StandardField.BOOKAUTHOR) {</b>
+<b class="nc">&nbsp;                return Optional.of(StandardField.AUTHOR);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (((sourceEntry == StandardEntryType.MvBook) &amp;&amp; (targetEntry == StandardEntryType.Book)) ||</b>
+&nbsp;                ((sourceEntry == StandardEntryType.MvBook) &amp;&amp; (targetEntry == StandardEntryType.InBook)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.MvBook) &amp;&amp; (targetEntry == StandardEntryType.BookInBook)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.MvBook) &amp;&amp; (targetEntry == StandardEntryType.SuppBook)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.MvCollection) &amp;&amp; (targetEntry == StandardEntryType.Collection)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.MvCollection) &amp;&amp; (targetEntry == StandardEntryType.InCollection)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.MvCollection) &amp;&amp; (targetEntry == StandardEntryType.SuppCollection)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.MvProceedings) &amp;&amp; (targetEntry == StandardEntryType.Proceedings)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.MvProceedings) &amp;&amp; (targetEntry == StandardEntryType.InProceedings)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.MvReference) &amp;&amp; (targetEntry == StandardEntryType.Reference)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.MvReference) &amp;&amp; (targetEntry == StandardEntryType.InReference))) {
+<b class="nc">&nbsp;            if (targetField == StandardField.MAINTITLE) {</b>
+<b class="nc">&nbsp;                return Optional.of(StandardField.TITLE);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (targetField == StandardField.MAINSUBTITLE) {</b>
+<b class="nc">&nbsp;                return Optional.of(StandardField.SUBTITLE);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (targetField == StandardField.MAINTITLEADDON) {</b>
+<b class="nc">&nbsp;                return Optional.of(StandardField.TITLEADDON);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // those fields are no more available for the same-name inheritance strategy
+<b class="nc">&nbsp;            if ((targetField == StandardField.TITLE) ||</b>
+&nbsp;                    (targetField == StandardField.SUBTITLE) ||
+&nbsp;                    (targetField == StandardField.TITLEADDON)) {
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // for these fields, inheritance is not allowed for the specified entry types
+<b class="nc">&nbsp;            if (targetField == StandardField.SHORTTITLE) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (((sourceEntry == StandardEntryType.Book) &amp;&amp; (targetEntry == StandardEntryType.InBook)) ||</b>
+&nbsp;                ((sourceEntry == StandardEntryType.Book) &amp;&amp; (targetEntry == StandardEntryType.BookInBook)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.Book) &amp;&amp; (targetEntry == StandardEntryType.SuppBook)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.Collection) &amp;&amp; (targetEntry == StandardEntryType.InCollection)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.Collection) &amp;&amp; (targetEntry == StandardEntryType.SuppCollection)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.Reference) &amp;&amp; (targetEntry == StandardEntryType.InReference)) ||
+&nbsp;                ((sourceEntry == StandardEntryType.Proceedings) &amp;&amp; (targetEntry == StandardEntryType.InProceedings))) {
+<b class="nc">&nbsp;            if (targetField == StandardField.BOOKTITLE) {</b>
+<b class="nc">&nbsp;                return Optional.of(StandardField.TITLE);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (targetField == StandardField.BOOKSUBTITLE) {</b>
+<b class="nc">&nbsp;                return Optional.of(StandardField.SUBTITLE);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (targetField == StandardField.BOOKTITLEADDON) {</b>
+<b class="nc">&nbsp;                return Optional.of(StandardField.TITLEADDON);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // those fields are no more available for the same-name inheritance strategy
+<b class="nc">&nbsp;            if ((targetField == StandardField.TITLE) ||</b>
+&nbsp;                    (targetField == StandardField.SUBTITLE) ||
+&nbsp;                    (targetField == StandardField.TITLEADDON)) {
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // for these fields, inheritance is not allowed for the specified entry types
+<b class="nc">&nbsp;            if (targetField == StandardField.SHORTTITLE) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (((sourceEntry == IEEETranEntryType.Periodical) &amp;&amp; (targetEntry == StandardEntryType.Article)) ||</b>
+&nbsp;                ((sourceEntry == IEEETranEntryType.Periodical) &amp;&amp; (targetEntry == StandardEntryType.SuppPeriodical))) {
+<b class="nc">&nbsp;            if (targetField == StandardField.JOURNALTITLE) {</b>
+<b class="nc">&nbsp;                return Optional.of(StandardField.TITLE);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (targetField == StandardField.JOURNALSUBTITLE) {</b>
+<b class="nc">&nbsp;                return Optional.of(StandardField.SUBTITLE);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // those fields are no more available for the same-name inheritance strategy
+<b class="nc">&nbsp;            if ((targetField == StandardField.TITLE) ||</b>
+&nbsp;                    (targetField == StandardField.SUBTITLE)) {
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // for these fields, inheritance is not allowed for the specified entry types
+<b class="nc">&nbsp;            if (targetField == StandardField.SHORTTITLE) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // 3. Fallback to inherit the field with the same name.
+<b class="nc">&nbsp;        return Optional.ofNullable(targetField);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the text stored in the given field of the given bibtex entry
+&nbsp;     * which belongs to the given database.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If a database is given, this function will try to resolve any string
+&nbsp;     * references in the field-value.
+&nbsp;     * Also, if a database is given, this function will try to find values for
+&nbsp;     * unset fields in the entry linked by the &quot;crossref&quot; ({@link StandardField#CROSSREF} field, if any.
+&nbsp;     *
+&nbsp;     * @param field    The field to return the value of.
+&nbsp;     * @param database The database of the bibtex entry.
+&nbsp;     * @return The resolved field value or null if not found.
+&nbsp;     */
+&nbsp;    public Optional&lt;String&gt; getResolvedFieldOrAlias(Field field, @Nullable BibDatabase database) {
+<b class="nc">&nbsp;        return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAlias);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getResolvedFieldOrAliasLatexFree(Field field, @Nullable BibDatabase database) {
+<b class="nc">&nbsp;        return genericGetResolvedFieldOrAlias(field, database, BibEntry::getFieldOrAliasLatexFree);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;String&gt; genericGetResolvedFieldOrAlias(Field field, @Nullable BibDatabase database, BiFunction&lt;BibEntry, Field, Optional&lt;String&gt;&gt; getFieldOrAlias) {
+<b class="nc">&nbsp;        if ((InternalField.TYPE_HEADER == field) || (InternalField.OBSOLETE_TYPE_HEADER == field)) {</b>
+<b class="nc">&nbsp;            return Optional.of(type.get().getDisplayName());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (InternalField.KEY_FIELD == field) {</b>
+<b class="nc">&nbsp;            return getCitationKey();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;String&gt; result = getFieldOrAlias.apply(this, field);</b>
+&nbsp;        // If this field is not set, and the entry has a crossref, try to look up the
+&nbsp;        // field in the referred entry, following the biblatex rules
+<b class="nc">&nbsp;        if (result.isEmpty() &amp;&amp; (database != null)) {</b>
+<b class="nc">&nbsp;            Optional&lt;BibEntry&gt; referred = database.getReferencedEntry(this);</b>
+<b class="nc">&nbsp;            if (referred.isPresent()) {</b>
+<b class="nc">&nbsp;                EntryType sourceEntry = referred.get().type.get();</b>
+<b class="nc">&nbsp;                EntryType targetEntry = type.get();</b>
+<b class="nc">&nbsp;                Optional&lt;Field&gt; sourceField = getSourceField(field, targetEntry, sourceEntry);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (sourceField.isPresent()) {</b>
+<b class="nc">&nbsp;                    result = getFieldOrAlias.apply(referred.get(), sourceField.get());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return (database == null) || result.isEmpty() ?</b>
+<b class="nc">&nbsp;               result :</b>
+<b class="nc">&nbsp;               Optional.of(database.resolveForStrings(result.get()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Returns this entry&#39;s ID. It is used internally to distinguish different BibTeX entries.
+&nbsp;    //  It is **not** the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
+&nbsp;
+&nbsp;    ///
+&nbsp;    /// This id changes on each run of JabRef (because it is currently generated as increasing number).
+&nbsp;    ///
+&nbsp;    /// For more stable ids, check {@link org.jabref.model.entry.SharedBibEntryData#getSharedID}
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets this entry&#39;s identifier (ID).
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The entry is also updated in the shared database - provided the database containing it doesn&#39;t veto the change.
+&nbsp;     *
+&nbsp;     * @param id The ID to be used
+&nbsp;     */
+&nbsp;    @VisibleForTesting
+&nbsp;    public void setId(String id) {
+<b class="nc">&nbsp;        Objects.requireNonNull(id, &quot;Every BibEntry must have an ID&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        String oldId = this.id;</b>
+&nbsp;
+<b class="nc">&nbsp;        eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, id, oldId));</b>
+<b class="nc">&nbsp;        this.id = id;</b>
+<b class="nc">&nbsp;        changed = true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the citation key. Note: This is &lt;em&gt;not&lt;/em&gt; the internal Id of this entry.
+&nbsp;     * The internal Id is always present, whereas the citation key might not be present.
+&nbsp;     *
+&nbsp;     * @param newKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
+&nbsp;     */
+&nbsp;    public Optional&lt;FieldChange&gt; setCitationKey(String newKey) {
+<b class="nc">&nbsp;        return setField(InternalField.KEY_FIELD, newKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry withCitationKey(String newKey) {
+<b class="nc">&nbsp;        setCitationKey(newKey);</b>
+<b class="nc">&nbsp;        this.setChanged(false);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If not present, {@link BibEntry#getAuthorTitleYear(int)} can be used
+&nbsp;     */
+&nbsp;    public Optional&lt;String&gt; getCitationKey() {
+<b class="nc">&nbsp;        String key = fields.get(InternalField.KEY_FIELD);</b>
+<b class="nc">&nbsp;        if (StringUtil.isBlank(key)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.of(key);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasCitationKey() {
+<b class="nc">&nbsp;        return getCitationKey().isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns this entry&#39;s type.
+&nbsp;     */
+&nbsp;    public EntryType getType() {
+<b class="nc">&nbsp;        return type.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;EntryType&gt; typeProperty() {
+<b class="nc">&nbsp;        return type;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets this entry&#39;s type.
+&nbsp;     */
+&nbsp;    public Optional&lt;FieldChange&gt; setType(EntryType type) {
+<b class="nc">&nbsp;        return setType(type, EntriesEventSource.LOCAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets this entry&#39;s type and sets the changed flag to true &lt;br&gt;
+&nbsp;     * If the new entry type equals the old entry type no changed flag is set.
+&nbsp;     */
+&nbsp;    public Optional&lt;FieldChange&gt; setType(EntryType newType, EntriesEventSource eventSource) {
+<b class="nc">&nbsp;        Objects.requireNonNull(newType);</b>
+&nbsp;
+<b class="nc">&nbsp;        EntryType oldType = type.get();</b>
+<b class="nc">&nbsp;        if (newType.equals(oldType)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        changed = true;</b>
+<b class="nc">&nbsp;        this.type.setValue(newType);</b>
+&nbsp;
+<b class="nc">&nbsp;        FieldChange change = new FieldChange(this, InternalField.TYPE_HEADER, oldType.getName(), newType.getName());</b>
+<b class="nc">&nbsp;        eventBus.post(new FieldChangedEvent(change, eventSource));</b>
+<b class="nc">&nbsp;        return Optional.of(change);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns an unmodifiable sequence containing the names of all fields that are set for this particular entry.
+&nbsp;     */
+&nbsp;    public SequencedSet&lt;Field&gt; getFields() {
+<b class="nc">&nbsp;        return new LinkedHashSet&lt;&gt;(fields.keySet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns an unmodifiable sequence containing the names of all fields that are a) set for this particular entry and b) matching the given predicate
+&nbsp;     */
+&nbsp;    public SequencedSet&lt;Field&gt; getFields(Predicate&lt;Field&gt; selector) {
+<b class="nc">&nbsp;        return getFields().stream().filter(selector).collect(Collectors.toCollection(LinkedHashSet::new));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the contents of the given field as an Optional.
+&nbsp;     */
+&nbsp;    public Optional&lt;String&gt; getField(Field field) {
+<b class="nc">&nbsp;        return Optional.ofNullable(fields.get(field));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getFieldLatexFree(Field field) {
+<b class="nc">&nbsp;        if (InternalField.KEY_FIELD == field) {</b>
+&nbsp;            // the key field should not be converted
+<b class="nc">&nbsp;            return getCitationKey();</b>
+<b class="nc">&nbsp;        } else if (InternalField.TYPE_HEADER == field) {</b>
+<b class="nc">&nbsp;            return Optional.of(type.get().getDisplayName());</b>
+<b class="nc">&nbsp;        } else if (latexFreeFields.containsKey(field)) {</b>
+<b class="nc">&nbsp;            return Optional.ofNullable(latexFreeFields.get(field));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            Optional&lt;String&gt; fieldValue = getField(field);</b>
+<b class="nc">&nbsp;            if (fieldValue.isPresent()) {</b>
+&nbsp;                // TODO: Do we need FieldFactory.isLaTeXField(field) here to filter?
+<b class="nc">&nbsp;                String latexFreeValue = LatexToUnicodeAdapter.format(fieldValue.get()).intern();</b>
+<b class="nc">&nbsp;                latexFreeFields.put(field, latexFreeValue);</b>
+<b class="nc">&nbsp;                return Optional.of(latexFreeValue);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the entry has the given field, or false if it is not set.
+&nbsp;     */
+&nbsp;    public boolean hasField(Field field) {
+<b class="nc">&nbsp;        return fields.containsKey(field);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Internal method used to get the content of a field (or its alias)
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Used by {@link #getFieldOrAlias(Field)} and {@link #getFieldOrAliasLatexFree(Field)}
+&nbsp;     *
+&nbsp;     * @param field         the field
+&nbsp;     * @param getFieldValue the method to get the value of a given field in a given entry
+&nbsp;     * @return determined field value
+&nbsp;     */
+&nbsp;    private Optional&lt;String&gt; genericGetFieldOrAlias(Field field, BiFunction&lt;BibEntry, Field, Optional&lt;String&gt;&gt; getFieldValue) {
+<b class="nc">&nbsp;        Optional&lt;String&gt; fieldValue = getFieldValue.apply(this, field);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fieldValue.isPresent() &amp;&amp; !fieldValue.get().isEmpty()) {</b>
+<b class="nc">&nbsp;            return fieldValue;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // No value of this field found, so look at the alias
+<b class="nc">&nbsp;        Field aliasForField = EntryConverter.FIELD_ALIASES.get(field);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (aliasForField != null) {</b>
+<b class="nc">&nbsp;            return getFieldValue.apply(this, aliasForField);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Finally, handle dates
+<b class="nc">&nbsp;        if (StandardField.DATE == field) {</b>
+<b class="nc">&nbsp;            Optional&lt;Date&gt; date = Date.parse(</b>
+<b class="nc">&nbsp;                    getFieldValue.apply(this, StandardField.YEAR),</b>
+<b class="nc">&nbsp;                    getFieldValue.apply(this, StandardField.MONTH),</b>
+<b class="nc">&nbsp;                    getFieldValue.apply(this, StandardField.DAY));</b>
+&nbsp;
+<b class="nc">&nbsp;            return date.map(Date::getNormalized);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if ((StandardField.YEAR == field) || (StandardField.MONTH == field) || (StandardField.DAY == field)) {</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; date = getFieldValue.apply(this, StandardField.DATE);</b>
+<b class="nc">&nbsp;            if (date.isEmpty()) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Optional&lt;Date&gt; parsedDate = Date.parse(date.get());</b>
+<b class="nc">&nbsp;            if (parsedDate.isPresent()) {</b>
+<b class="nc">&nbsp;                return switch (field) {</b>
+&nbsp;                    case StandardField.YEAR -&gt;
+<b class="nc">&nbsp;                            parsedDate.get().getYear().map(Object::toString);</b>
+&nbsp;                    case StandardField.MONTH -&gt;
+<b class="nc">&nbsp;                            parsedDate.get().getMonth().map(Month::getJabRefFormat);</b>
+&nbsp;                    case StandardField.DAY -&gt;
+<b class="nc">&nbsp;                            parsedDate.get().getDay().map(Object::toString);</b>
+&nbsp;                    default -&gt;
+<b class="nc">&nbsp;                            throw new IllegalStateException(&quot;Unexpected value&quot;);</b>
+&nbsp;                };
+&nbsp;            } else {
+&nbsp;                // Date field not in valid format
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Could not parse date {}&quot;, date.get());</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Returns the contents of the given field or its alias as an Optional
+&nbsp;    ///
+&nbsp;    /// The following aliases are considered (old bibtex &lt;-&gt; new biblatex) based
+&nbsp;    /// on the biblatex documentation, chapter 2.2.5:
+&nbsp;    ///
+&nbsp;    /// - address        &lt;-&gt; location
+&nbsp;    /// - annote         &lt;-&gt; annotation
+&nbsp;    /// - archiveprefix  &lt;-&gt; eprinttype
+&nbsp;    /// - journal        &lt;-&gt; journaltitle
+&nbsp;    /// - key            &lt;-&gt; sortkey
+&nbsp;    /// - pdf            &lt;-&gt; file
+&nbsp;    /// - primaryclass   &lt;-&gt; eprintclass
+&nbsp;    /// - school         &lt;-&gt; institution
+&nbsp;    ///
+&nbsp;    /// These work bidirectional.
+&nbsp;    ///
+&nbsp;    /// Special attention is paid to dates: (see the biblatex documentation,
+&nbsp;    /// chapter 2.3.8)
+&nbsp;    /// The fields &#39;year&#39; and &#39;month&#39; are used if the &#39;date&#39;
+&nbsp;    /// field is empty. Conversely, getFieldOrAlias(&quot;year&quot;) also tries to
+&nbsp;    /// extract the year from the &#39;date&#39; field (analogously for &#39;month&#39;).
+&nbsp;    ///
+&nbsp;    public Optional&lt;String&gt; getFieldOrAlias(Field field) {
+<b class="nc">&nbsp;        return genericGetFieldOrAlias(field, BibEntry::getField);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return the LaTeX-free contents of the given field or its alias an Optional
+&nbsp;     * &lt;p&gt;
+&nbsp;     * For details see also {@link #getFieldOrAlias(Field)}
+&nbsp;     *
+&nbsp;     * @param name the name of the field
+&nbsp;     * @return the stored latex-free content of the field (or its alias)
+&nbsp;     */
+&nbsp;    public Optional&lt;String&gt; getFieldOrAliasLatexFree(Field name) {
+<b class="nc">&nbsp;        return genericGetFieldOrAlias(name, BibEntry::getFieldLatexFree);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets a number of fields simultaneously. The given HashMap contains field
+&nbsp;     * names as keys, each mapped to the value to set.
+&nbsp;     */
+&nbsp;    public void setField(Map&lt;Field, String&gt; fields) {
+<b class="nc">&nbsp;        Objects.requireNonNull(fields, &quot;fields must not be null&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        fields.forEach(this::setField);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set a field, and notify listeners about the change.
+&nbsp;     *
+&nbsp;     * @param field       The field to set
+&nbsp;     * @param value       The value to set
+&nbsp;     * @param eventSource Source the event is sent from
+&nbsp;     */
+&nbsp;    public Optional&lt;FieldChange&gt; setField(Field field, String value, EntriesEventSource eventSource) {
+<b class="nc">&nbsp;        Objects.requireNonNull(field, &quot;field name must not be null&quot;);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(value, &quot;field value for field &quot; + field.getName() + &quot; must not be null&quot;);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(eventSource, &quot;field eventSource must not be null&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (value.isEmpty()) {</b>
+<b class="nc">&nbsp;            return clearField(field);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String oldValue = getField(field).orElse(null);</b>
+<b class="nc">&nbsp;        if (value.equals(oldValue)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean isNewField = oldValue == null;</b>
+<b class="nc">&nbsp;        changed = true;</b>
+&nbsp;
+<b class="nc">&nbsp;        invalidateFieldCache(field);</b>
+<b class="nc">&nbsp;        fields.put(field, value.intern());</b>
+&nbsp;
+<b class="nc">&nbsp;        FieldChange change = new FieldChange(this, field, oldValue, value);</b>
+<b class="nc">&nbsp;        if (isNewField) {</b>
+<b class="nc">&nbsp;            eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            eventBus.post(new FieldChangedEvent(change, eventSource));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(change);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set a field, and notify listeners about the change.
+&nbsp;     *
+&nbsp;     * @param field The field to set.
+&nbsp;     * @param value The value to set.
+&nbsp;     */
+&nbsp;    public Optional&lt;FieldChange&gt; setField(Field field, String value) {
+<b class="nc">&nbsp;        return setField(field, value, EntriesEventSource.LOCAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Remove the mapping for the field name, and notify listeners about the change.
+&nbsp;     *
+&nbsp;     * @param field The field to clear.
+&nbsp;     */
+&nbsp;    public Optional&lt;FieldChange&gt; clearField(Field field) {
+<b class="nc">&nbsp;        return clearField(field, EntriesEventSource.LOCAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Remove the mapping for the field name, and notify listeners about
+&nbsp;     * the change including the {@link EntriesEventSource}.
+&nbsp;     *
+&nbsp;     * @param field       the field to clear.
+&nbsp;     * @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
+&nbsp;     */
+&nbsp;    public Optional&lt;FieldChange&gt; clearField(Field field, EntriesEventSource eventSource) {
+<b class="nc">&nbsp;        Optional&lt;String&gt; oldValue = getField(field);</b>
+<b class="nc">&nbsp;        if (oldValue.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        changed = true;</b>
+&nbsp;
+<b class="nc">&nbsp;        invalidateFieldCache(field);</b>
+<b class="nc">&nbsp;        fields.remove(field);</b>
+&nbsp;
+<b class="nc">&nbsp;        FieldChange change = new FieldChange(this, field, oldValue.get(), null);</b>
+<b class="nc">&nbsp;        eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));</b>
+<b class="nc">&nbsp;        return Optional.of(change);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines whether this entry has all the given fields present. If a non-null
+&nbsp;     * database argument is given, this method will try to look up missing fields in
+&nbsp;     * entries linked by the &quot;crossref&quot; field, if any.
+&nbsp;     *
+&nbsp;     * @param fields   An array of field names to be checked.
+&nbsp;     * @param database The database in which to look up crossref&#39;d entries, if any. This argument can be null, meaning
+&nbsp;     *                 that no attempt will be made to follow crossrefs.
+&nbsp;     * @return true if all fields are set or could be resolved, false otherwise.
+&nbsp;     */
+&nbsp;    public boolean allFieldsPresent(Collection&lt;OrFields&gt; fields, BibDatabase database) {
+<b class="nc">&nbsp;        return fields.stream().allMatch(field -&gt; this.getResolvedFieldOrAlias(field, database).isPresent());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Serializes all fields, even the JabRef internal ones. Does NOT serialize &quot;KEY_FIELD&quot; as field, but as key.
+&nbsp;    ///
+&nbsp;    /// We do it this way to
+&nbsp;    ///   a) enable debugging the internal representation and
+&nbsp;    ///   b) save time at this method.
+&nbsp;    ///
+&nbsp;    ///
+&nbsp;    /// This returns canonical BibTeX serialization. Special characters such as &quot;{&quot; or &quot;&amp;&quot; are NOT escaped, but written
+&nbsp;    /// as is. In case the JabRef &quot;hack&quot; for distinguishing &quot;field = value&quot; and &quot;field = {value}&quot; (in .bib files) is
+&nbsp;    /// used, it is output as &quot;field = {#value#}&quot;, which may cause headaches in debugging.
+&nbsp;    ///
+&nbsp;    /// Alternative for some more readable output: [#getAuthorTitleYear(int)] or [#getKeyAuthorTitleYear(int)].
+&nbsp;    ///
+&nbsp;    /// @return A user-readable string NOT A VALID BibTeX string
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return CanonicalBibEntry.getCanonicalRepresentation(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAuthorTitleYear() {
+<b class="nc">&nbsp;        return getAuthorTitleYear(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getKeyAuthorTitleYear() {
+<b class="nc">&nbsp;        return getKeyAuthorTitleYear(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a short textual description of the entry in the format: &lt;code&gt;Author1, Author2: Title (Year)&lt;/code&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If &lt;code&gt;0&lt;/code&gt; is passed as &lt;code&gt;maxCharacters&lt;/code&gt;, the description is not truncated.
+&nbsp;     *
+&nbsp;     * @param maxCharacters The maximum number of characters (additional
+&nbsp;     *                      characters are replaced with &quot;...&quot;). Set to 0 to disable truncation.
+&nbsp;     * @return A short textual description of the entry in the format:
+&nbsp;     * Author1, Author2: Title (Year)
+&nbsp;     */
+&nbsp;    public String getAuthorTitleYear(int maxCharacters) {
+<b class="nc">&nbsp;        String authorField = getField(StandardField.AUTHOR).orElse(&quot;N/A&quot;);</b>
+<b class="nc">&nbsp;        String titleField = getField(StandardField.TITLE).orElse(&quot;N/A&quot;);</b>
+<b class="nc">&nbsp;        String yearField = getField(StandardField.YEAR).orElse(&quot;N/A&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        String formattedAuthors = AuthorList.fixAuthorLastNameOnlyCommas(authorField, false);</b>
+<b class="nc">&nbsp;        String formattedTitle = LatexToUnicodeAdapter.format(titleField);</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder textBuilder = new StringBuilder();</b>
+<b class="nc">&nbsp;        textBuilder.append(formattedAuthors)</b>
+<b class="nc">&nbsp;                   .append(&quot;: \&quot;&quot;)</b>
+<b class="nc">&nbsp;                   .append(formattedTitle)</b>
+<b class="nc">&nbsp;                   .append(&quot;\&quot; (&quot;)</b>
+<b class="nc">&nbsp;                   .append(yearField)</b>
+<b class="nc">&nbsp;                   .append(&#39;)&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return StringUtil.limitStringLength(textBuilder.toString(), maxCharacters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getKeyAuthorTitleYear(int maxCharacters) {
+<b class="nc">&nbsp;        String citationKey = getCitationKey().orElse(&quot;N/A&quot;);</b>
+<b class="nc">&nbsp;        String result = citationKey + &quot; - &quot; + getAuthorTitleYear(0);</b>
+<b class="nc">&nbsp;        return StringUtil.limitStringLength(result, maxCharacters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the title of the given BibTeX entry as an Optional.
+&nbsp;     *
+&nbsp;     * @return an Optional containing the title of a BibTeX entry in case it exists, otherwise return an empty Optional.
+&nbsp;     */
+&nbsp;    public Optional&lt;String&gt; getTitle() {
+<b class="nc">&nbsp;        return getField(StandardField.TITLE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;DOI&gt; getDOI() {
+<b class="nc">&nbsp;        return getField(StandardField.DOI).flatMap(DOI::parse);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;ISBN&gt; getISBN() {
+<b class="nc">&nbsp;        return getField(StandardField.ISBN).flatMap(ISBN::parse);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Will return the publication date of the given bibtex entry conforming to ISO 8601, i.e. either YYYY or YYYY-MM.
+&nbsp;     *
+&nbsp;     * @return will return the publication date of the entry or null if no year was found.
+&nbsp;     */
+&nbsp;    public Optional&lt;Date&gt; getPublicationDate() {
+<b class="nc">&nbsp;        return getFieldOrAlias(StandardField.DATE).flatMap(Date::parse);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getParsedSerialization() {
+<b class="nc">&nbsp;        return parsedSerialization;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setParsedSerialization(String parsedSerialization) {
+<b class="nc">&nbsp;        changed = false;</b>
+<b class="nc">&nbsp;        this.parsedSerialization = parsedSerialization;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCommentsBeforeEntry(String parsedComments) {
+<b class="nc">&nbsp;        this.commentsBeforeEntry = parsedComments;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasChanged() {
+<b class="nc">&nbsp;        return changed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setChanged(boolean changed) {
+<b class="nc">&nbsp;        this.changed = changed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Required to trigger new serialization of the entry.
+&nbsp;     * Reason: We don&#39;t have a &lt;code&gt;build()&lt;/code&gt; command, we don&#39;t want to create a new serialization at each call,
+&nbsp;     * we need to construct a BibEntry with &lt;code&gt;changed=false&lt;/code&gt; (which is the default) and thus we need a workaround.
+&nbsp;     */
+&nbsp;    public BibEntry withChanged(boolean changed) {
+<b class="nc">&nbsp;        this.changed = changed;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FieldChange&gt; putKeywords(List&lt;String&gt; keywords, Character delimiter) {
+<b class="nc">&nbsp;        Objects.requireNonNull(delimiter);</b>
+<b class="nc">&nbsp;        return putKeywords(new KeywordList(keywords), delimiter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FieldChange&gt; putKeywords(KeywordList keywords, Character delimiter) {
+<b class="nc">&nbsp;        Objects.requireNonNull(keywords);</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; oldValue = this.getField(StandardField.KEYWORDS);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (keywords.isEmpty()) {</b>
+&nbsp;            // Clear keyword field
+<b class="nc">&nbsp;            if (oldValue.isPresent()) {</b>
+<b class="nc">&nbsp;                return this.clearField(StandardField.KEYWORDS);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Set new keyword field
+<b class="nc">&nbsp;        String newValue = keywords.getAsString(delimiter);</b>
+<b class="nc">&nbsp;        return this.setField(StandardField.KEYWORDS, newValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check if a keyword already exists (case insensitive), if not: add it
+&nbsp;     *
+&nbsp;     * @param keyword Keyword to add
+&nbsp;     */
+&nbsp;    public void addKeyword(String keyword, Character delimiter) {
+<b class="nc">&nbsp;        Objects.requireNonNull(keyword, &quot;keyword must not be null&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (keyword.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        addKeyword(new Keyword(keyword), delimiter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addKeyword(Keyword keyword, Character delimiter) {
+<b class="nc">&nbsp;        KeywordList keywords = this.getKeywords(delimiter);</b>
+<b class="nc">&nbsp;        keywords.add(keyword);</b>
+<b class="nc">&nbsp;        this.putKeywords(keywords, delimiter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Add multiple keywords to entry
+&nbsp;     *
+&nbsp;     * @param keywords Keywords to add
+&nbsp;     */
+&nbsp;    public void addKeywords(Collection&lt;String&gt; keywords, Character delimiter) {
+<b class="nc">&nbsp;        Objects.requireNonNull(keywords);</b>
+<b class="nc">&nbsp;        keywords.forEach(keyword -&gt; addKeyword(keyword, delimiter));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeywordList getKeywords(Character delimiter) {
+<b class="nc">&nbsp;        return getFieldAsKeywords(StandardField.KEYWORDS, delimiter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeywordList getResolvedKeywords(Character delimiter, BibDatabase database) {
+<b class="nc">&nbsp;        Optional&lt;String&gt; keywordsContent = getResolvedFieldOrAlias(StandardField.KEYWORDS, database);</b>
+<b class="nc">&nbsp;        return keywordsContent.map(content -&gt; KeywordList.parse(content, delimiter)).orElse(new KeywordList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FieldChange&gt; removeKeywords(KeywordList keywordsToRemove, Character keywordDelimiter) {
+<b class="nc">&nbsp;        KeywordList keywordList = getKeywords(keywordDelimiter);</b>
+&nbsp;
+&nbsp;        // We need to fix &quot;file has changed on disk&quot; for duplicate keywords
+&nbsp;        // The input of the set may contain duplicate keywords (which are present as single keyword in the set)
+&nbsp;        // Even if no &quot;keywordsToRemove&quot; is contained, the method &quot;putKeywords&quot; will return a change, because the duplicate keywords will have been removed
+<b class="nc">&nbsp;        int oldSize = keywordList.size();</b>
+<b class="nc">&nbsp;        keywordList.removeAll(keywordsToRemove);</b>
+&nbsp;        // claim 1: The size of a set is the same, if no element is removed
+&nbsp;        // claim 2: The size of a set is different if an element was removed
+&nbsp;        // With claim 1, we can assume no change if there is no change on the size
+<b class="nc">&nbsp;        if (oldSize == keywordList.size()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return putKeywords(keywordList, keywordDelimiter);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FieldChange&gt; replaceKeywords(KeywordList keywordsToReplace,
+&nbsp;                                                 Keyword newValue,
+&nbsp;                                                 Character keywordDelimiter) {
+<b class="nc">&nbsp;        KeywordList keywordList = getKeywords(keywordDelimiter);</b>
+<b class="nc">&nbsp;        keywordList.replaceAll(keywordsToReplace, newValue);</b>
+&nbsp;
+<b class="nc">&nbsp;        return putKeywords(keywordList, keywordDelimiter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Collection&lt;String&gt; getFieldValues() {
+<b class="nc">&nbsp;        return fields.values();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;Field, String&gt; getFieldMap() {
+<b class="nc">&nbsp;        return fields;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SharedBibEntryData getSharedBibEntryData() {
+<b class="nc">&nbsp;        return sharedBibEntryData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry withSharedBibEntryData(int sharedId, int version) {
+<b class="nc">&nbsp;        sharedBibEntryData.setSharedID(sharedId);</b>
+<b class="nc">&nbsp;        sharedBibEntryData.setVersion(version);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry withSharedBibEntryData(SharedBibEntryData sharedBibEntryData) {
+<b class="nc">&nbsp;        sharedBibEntryData = sharedBibEntryData;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((o == null) || (getClass() != o.getClass())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        BibEntry entry = (BibEntry) o;</b>
+<b class="nc">&nbsp;        return Objects.equals(type.getValue(), entry.type.getValue())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(fields, entry.fields)</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(commentsBeforeEntry, entry.commentsBeforeEntry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * On purpose, this hashes the &quot;content&quot; of the BibEntry, not the {@link #sharedBibEntryData}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The content is
+&nbsp;     *
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *     &lt;li&gt;comments before entry&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;entry type&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;fields (including the citation key {@link InternalField#KEY_FIELD}&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(type.getValue(), fields, commentsBeforeEntry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void registerListener(Object object) {
+<b class="nc">&nbsp;        this.eventBus.register(object);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void unregisterListener(Object object) {
+&nbsp;        try {
+<b class="nc">&nbsp;            this.eventBus.unregister(object);</b>
+&nbsp;        } catch (IllegalArgumentException e) {
+&nbsp;            // occurs if the event source has not been registered, should not prevent shutdown
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Problem unregistering&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry withField(Field field, String value) {
+<b class="nc">&nbsp;        setField(field, value);</b>
+<b class="nc">&nbsp;        this.setChanged(false);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A copy is made of the parameter
+&nbsp;     */
+&nbsp;    public BibEntry withFields(Map&lt;Field, String&gt; content) {
+<b class="nc">&nbsp;        this.fields = FXCollections.observableMap(new HashMap&lt;&gt;(content));</b>
+<b class="nc">&nbsp;        this.setChanged(false);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry withDate(Date date) {
+<b class="nc">&nbsp;        setDate(date);</b>
+<b class="nc">&nbsp;        this.setChanged(false);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry withMonth(Month parsedMonth) {
+<b class="nc">&nbsp;        setMonth(parsedMonth);</b>
+<b class="nc">&nbsp;        this.setChanged(false);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
+&nbsp;     */
+&nbsp;    public String getUserComments() {
+<b class="nc">&nbsp;        return commentsBeforeEntry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry withUserComments(String commentsBeforeEntry) {
+<b class="nc">&nbsp;        this.commentsBeforeEntry = commentsBeforeEntry;</b>
+<b class="nc">&nbsp;        this.setChanged(false);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;ParsedEntryLink&gt; getEntryLinkList(Field field, BibDatabase database) {
+<b class="nc">&nbsp;        return getField(field).map(fieldValue -&gt; EntryLinkList.parse(fieldValue, database))</b>
+<b class="nc">&nbsp;                              .orElse(List.of());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FieldChange&gt; setEntryLinkList(Field field, List&lt;ParsedEntryLink&gt; list) {
+<b class="nc">&nbsp;        return setField(field, EntryLinkList.serialize(list));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Set&lt;String&gt; getFieldAsWords(Field field) {
+<b class="nc">&nbsp;        Set&lt;String&gt; storedList = fieldsAsWords.get(field);</b>
+<b class="nc">&nbsp;        if (storedList != null) {</b>
+<b class="nc">&nbsp;            return storedList;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            String fieldValue = fields.get(field);</b>
+<b class="nc">&nbsp;            if (fieldValue == null) {</b>
+<b class="nc">&nbsp;                return Set.of();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                HashSet&lt;String&gt; words = new HashSet&lt;&gt;(StringUtil.getStringAsWords(fieldValue));</b>
+<b class="nc">&nbsp;                fieldsAsWords.put(field, words);</b>
+<b class="nc">&nbsp;                return words;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeywordList getFieldAsKeywords(Field field, Character keywordSeparator) {
+<b class="nc">&nbsp;        if (field instanceof StandardField standardField) {</b>
+<b class="nc">&nbsp;            Optional&lt;KeywordList&gt; storedList = fieldsAsKeywords.get(standardField, keywordSeparator);</b>
+<b class="nc">&nbsp;            if (storedList.isPresent()) {</b>
+<b class="nc">&nbsp;                return storedList.get();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        KeywordList keywords = getField(field)</b>
+<b class="nc">&nbsp;                .map(content -&gt; KeywordList.parse(content, keywordSeparator))</b>
+<b class="nc">&nbsp;                .orElse(new KeywordList());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (field instanceof StandardField standardField) {</b>
+<b class="nc">&nbsp;            fieldsAsKeywords.put(standardField, keywordSeparator, keywords);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return keywords;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FieldChange&gt; clearCiteKey() {
+<b class="nc">&nbsp;        return clearField(InternalField.KEY_FIELD);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void invalidateFieldCache(Field field) {
+<b class="nc">&nbsp;        latexFreeFields.remove(field);</b>
+<b class="nc">&nbsp;        fieldsAsWords.remove(field);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (field instanceof StandardField standardField) {</b>
+<b class="nc">&nbsp;            fieldsAsKeywords.remove(standardField);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // region files
+&nbsp;    public Optional&lt;FieldChange&gt; setFiles(List&lt;LinkedFile&gt; files) {
+<b class="nc">&nbsp;        Optional&lt;String&gt; oldValue = this.getField(StandardField.FILE);</b>
+<b class="nc">&nbsp;        String newValue = FileFieldWriter.getStringRepresentation(files);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (oldValue.isPresent() &amp;&amp; oldValue.get().equals(newValue)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return this.setField(StandardField.FILE, newValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry withFiles(List&lt;LinkedFile&gt; files) {
+<b class="nc">&nbsp;        setFiles(files);</b>
+<b class="nc">&nbsp;        this.setChanged(false);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a list of linked files.
+&nbsp;     *
+&nbsp;     * @return the list of linked files, is never null but can be empty.
+&nbsp;     * Changes to the underlying list will have no effect on the entry itself. Use {@link #addFile(LinkedFile)}.
+&nbsp;     */
+&nbsp;    public List&lt;LinkedFile&gt; getFiles() {
+<b class="nc">&nbsp;        Optional&lt;String&gt; oldValue = getField(StandardField.FILE);</b>
+<b class="nc">&nbsp;        if (oldValue.isEmpty()) {</b>
+<b class="nc">&nbsp;            return new ArrayList&lt;&gt;(); // Return new ArrayList because emptyList is immutable</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Extract the path
+<b class="nc">&nbsp;        return FileFieldParser.parse(oldValue.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FieldChange&gt; addFile(LinkedFile file) {
+<b class="nc">&nbsp;        List&lt;LinkedFile&gt; linkedFiles = getFiles();</b>
+<b class="nc">&nbsp;        linkedFiles.add(file);</b>
+<b class="nc">&nbsp;        return setFiles(linkedFiles);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FieldChange&gt; addFile(int index, LinkedFile file) {
+<b class="nc">&nbsp;        List&lt;LinkedFile&gt; linkedFiles = getFiles();</b>
+<b class="nc">&nbsp;        linkedFiles.add(index, file);</b>
+<b class="nc">&nbsp;        return setFiles(linkedFiles);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FieldChange&gt; addFiles(List&lt;LinkedFile&gt; filesToAdd) {
+<b class="nc">&nbsp;        if (filesToAdd.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (this.getField(StandardField.FILE).isEmpty()) {</b>
+<b class="nc">&nbsp;            return setFiles(filesToAdd);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        List&lt;LinkedFile&gt; currentFiles = getFiles();</b>
+<b class="nc">&nbsp;        currentFiles.addAll(filesToAdd);</b>
+<b class="nc">&nbsp;        return setFiles(currentFiles);</b>
+&nbsp;    }
+&nbsp;    // endregion
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks {@link StandardField#CITES} for a list of citation keys and returns them.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Empty citation keys are not returned. There is no consistency check made.
+&nbsp;     *
+&nbsp;     * @return List of citation keys; empty list if field is empty or not available.
+&nbsp;     */
+&nbsp;    public SequencedSet&lt;String&gt; getCites() {
+<b class="nc">&nbsp;        return this.getField(StandardField.CITES)</b>
+<b class="nc">&nbsp;                   .stream()</b>
+<b class="nc">&nbsp;                   .flatMap(content -&gt; Arrays.stream(content.split(&quot;,&quot;)))</b>
+<b class="nc">&nbsp;                   .map(String::trim)</b>
+<b class="nc">&nbsp;                   .filter(key -&gt; !key.isEmpty())</b>
+<b class="nc">&nbsp;                   .collect(Collectors.toCollection(LinkedHashSet::new));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;FieldChange&gt; setCites(SequencedSet&lt;String&gt; keys) {
+<b class="nc">&nbsp;        return this.setField(StandardField.CITES, String.join(&quot;,&quot;, keys));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDate(Date date) {
+<b class="nc">&nbsp;        date.getYear().ifPresent(year -&gt; setField(StandardField.YEAR, year.toString()));</b>
+<b class="nc">&nbsp;        date.getMonth().ifPresent(this::setMonth);</b>
+<b class="nc">&nbsp;        date.getDay().ifPresent(day -&gt; setField(StandardField.DAY, day.toString()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Month&gt; getMonth() {
+<b class="nc">&nbsp;        return getFieldOrAlias(StandardField.MONTH).flatMap(Month::parse);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Season&gt; getYearDivision() {
+<b class="nc">&nbsp;        return getFieldOrAlias(StandardField.YEARDIVISION).flatMap(Season::parse);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OptionalBinding&lt;String&gt; getFieldBinding(Field field) {
+<b class="nc">&nbsp;        if ((field == InternalField.TYPE_HEADER) || (field == InternalField.OBSOLETE_TYPE_HEADER)) {</b>
+<b class="nc">&nbsp;            return EasyBind.wrapNullable(type).mapOpt(EntryType::getDisplayName);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return EasyBind.valueAt(fields, field);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OptionalBinding&lt;String&gt; getCiteKeyBinding() {
+<b class="nc">&nbsp;        return getFieldBinding(InternalField.KEY_FIELD);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableMap&lt;Field, String&gt; getFieldsObservable() {
+<b class="nc">&nbsp;        return fields;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a list of observables that represent the data of the entry.
+&nbsp;     */
+&nbsp;    public Observable[] getObservables() {
+<b class="nc">&nbsp;        return new Observable[] {fields, type};</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Helper method to add a downloaded file to the entry.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Use-case: URL is contained in the file, the file is downloaded and should then replace the url.
+&nbsp;     * This method. adds the given path (as file) to the entry and removes the url.
+&nbsp;     *
+&nbsp;     * @param linkToDownloadedFile the link to the file, which was downloaded
+&nbsp;     * @param downloadedFile       the path to be added to the entry
+&nbsp;     */
+&nbsp;    public void replaceDownloadedFile(String linkToDownloadedFile, LinkedFile downloadedFile) {
+<b class="nc">&nbsp;        List&lt;LinkedFile&gt; linkedFiles = this.getFiles();</b>
+&nbsp;
+<b class="nc">&nbsp;        int oldFileIndex = -1;</b>
+<b class="nc">&nbsp;        int i = 0;</b>
+<b class="nc">&nbsp;        while ((i &lt; linkedFiles.size()) &amp;&amp; (oldFileIndex == -1)) {</b>
+<b class="nc">&nbsp;            LinkedFile file = linkedFiles.get(i);</b>
+&nbsp;            // The file type changes as part of download process (see prepareDownloadTask), thus we only compare by link
+<b class="nc">&nbsp;            if (file.getLink().equalsIgnoreCase(linkToDownloadedFile)) {</b>
+<b class="nc">&nbsp;                oldFileIndex = i;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (oldFileIndex == -1) {</b>
+<b class="nc">&nbsp;            linkedFiles.addFirst(downloadedFile);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            linkedFiles.set(oldFileIndex, downloadedFile);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.setFiles(linkedFiles);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Merge this entry&#39;s fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
+&nbsp;     * intersection, priority is given to THIS entry&#39;s field value.
+&nbsp;     *
+&nbsp;     * @param other another BibEntry from which fields are sourced from
+&nbsp;     */
+&nbsp;    public void mergeWith(BibEntry other) {
+<b class="nc">&nbsp;        mergeWith(other, Set.of());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Merge this entry&#39;s fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
+&nbsp;     * intersection, priority is given to THIS entry&#39;s field value, UNLESS specified otherwise in the arguments.
+&nbsp;     *
+&nbsp;     * @param other                  another BibEntry from which fields are sourced from
+&nbsp;     * @param otherPrioritizedFields collection of Fields in which &#39;other&#39; has a priority into final result
+&nbsp;     */
+&nbsp;    public void mergeWith(BibEntry other, Set&lt;Field&gt; otherPrioritizedFields) {
+<b class="nc">&nbsp;        Set&lt;Field&gt; thisFields = new TreeSet&lt;&gt;(Comparator.comparing(Field::getName));</b>
+<b class="nc">&nbsp;        Set&lt;Field&gt; otherFields = new TreeSet&lt;&gt;(Comparator.comparing(Field::getName));</b>
+&nbsp;
+<b class="nc">&nbsp;        thisFields.addAll(this.getFields());</b>
+<b class="nc">&nbsp;        otherFields.addAll(other.getFields());</b>
+&nbsp;
+&nbsp;        // At the moment, &quot;Field&quot; interface does not provide explicit equality, so using their names instead.
+<b class="nc">&nbsp;        Set&lt;String&gt; thisFieldsNames = thisFields.stream().map(Field::getName).collect(Collectors.toSet());</b>
+<b class="nc">&nbsp;        Set&lt;String&gt; otherPrioritizedFieldsNames = otherPrioritizedFields.stream().map(Field::getName).collect(Collectors.toSet());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Field otherField : otherFields) {</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; otherFieldValue = other.getField(otherField);</b>
+<b class="nc">&nbsp;            if (!thisFieldsNames.contains(otherField.getName()) ||</b>
+<b class="nc">&nbsp;                    otherPrioritizedFieldsNames.contains(otherField.getName())) {</b>
+&nbsp;                // As iterator only goes through non-null fields from OTHER, otherFieldValue can never be empty
+<b class="nc">&nbsp;                otherFieldValue.ifPresent(s -&gt; this.setField(otherField, s));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                switch (otherField) {</b>
+&nbsp;                    case StandardField.FILE -&gt; {
+<b class="nc">&nbsp;                        List&lt;LinkedFile&gt; currentFiles = this.getFiles();</b>
+<b class="nc">&nbsp;                        List&lt;LinkedFile&gt; otherFiles = other.getFiles();</b>
+<b class="nc">&nbsp;                        List&lt;LinkedFile&gt; filesToAdd = otherFiles.stream()</b>
+<b class="nc">&nbsp;                                                                .filter(file -&gt; !currentFiles.contains(file))</b>
+<b class="nc">&nbsp;                                                                .toList();</b>
+<b class="nc">&nbsp;                        if (!filesToAdd.isEmpty()) {</b>
+<b class="nc">&nbsp;                            this.addFiles(filesToAdd);</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    // TODO: Merging of keywords
+&nbsp;                    default -&gt; {
+&nbsp;                        // We keep the data of the current BibEntry
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (this.getType().equals(DEFAULT_TYPE)) {</b>
+<b class="nc">&nbsp;            this.setType(other.getType());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isEmpty() {
+<b class="nc">&nbsp;        if (this.fields.isEmpty()) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return StandardField.AUTOMATIC_FIELDS.containsAll(this.getFields());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

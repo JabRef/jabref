@@ -1,0 +1,201 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > YearFieldValuePlausibilityComparator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bibtex.comparator</a>
+</div>
+
+<h1>Coverage Summary for Class: YearFieldValuePlausibilityComparator (org.jabref.logic.bibtex.comparator)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">YearFieldValuePlausibilityComparator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bibtex.comparator;
+&nbsp;
+&nbsp;import java.time.Year;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.integrity.YearChecker;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+<b class="nc">&nbsp;public class YearFieldValuePlausibilityComparator extends FieldValuePlausibilityComparator {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern YEAR_PATTERN = Pattern.compile(&quot;(\\d{4})&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compares the plausibility of two field values.
+&nbsp;     *
+&nbsp;     * @param leftValue  value from the library (or candidate)
+&nbsp;     * @param rightValue value from the fetcher (or existing record)
+&nbsp;     * @return ComparisonResult indicating which year is more plausible: RIGHT_BETTER, LEFT_BETTER, or UNDETERMINED
+&nbsp;     */
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ComparisonResult compare(String leftValue, String rightValue) {
+<b class="nc">&nbsp;        boolean isLeftBlank = StringUtil.isBlank(leftValue);</b>
+<b class="nc">&nbsp;        boolean isRightBlank = StringUtil.isBlank(rightValue);</b>
+<b class="nc">&nbsp;        if (isLeftBlank &amp;&amp; !isRightBlank) {</b>
+<b class="nc">&nbsp;            return ComparisonResult.RIGHT_BETTER;</b>
+<b class="nc">&nbsp;        } else if (isRightBlank &amp;&amp; !isLeftBlank) {</b>
+<b class="nc">&nbsp;            return ComparisonResult.LEFT_BETTER;</b>
+<b class="nc">&nbsp;        } else if (isLeftBlank &amp;&amp; isRightBlank) {</b>
+<b class="nc">&nbsp;            return ComparisonResult.UNDETERMINED;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // left and right values are not blank.
+&nbsp;
+<b class="nc">&nbsp;        boolean leftValueCorrectlyFormatted = YearChecker.isValueCorrectlyFormatted(leftValue);</b>
+<b class="nc">&nbsp;        boolean rightValueCorrectlyFormatted = YearChecker.isValueCorrectlyFormatted(rightValue);</b>
+<b class="nc">&nbsp;        if (leftValueCorrectlyFormatted &amp;&amp; !rightValueCorrectlyFormatted) {</b>
+<b class="nc">&nbsp;            return ComparisonResult.LEFT_BETTER;</b>
+<b class="nc">&nbsp;        } else if (rightValueCorrectlyFormatted &amp;&amp; !leftValueCorrectlyFormatted) {</b>
+<b class="nc">&nbsp;            return ComparisonResult.RIGHT_BETTER;</b>
+<b class="nc">&nbsp;        } else if (!leftValueCorrectlyFormatted &amp;&amp; !rightValueCorrectlyFormatted) {</b>
+<b class="nc">&nbsp;            return ComparisonResult.UNDETERMINED;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // left and right values are correctly formatted.
+&nbsp;
+<b class="nc">&nbsp;        int leftYear = extractYear(leftValue).get();</b>
+<b class="nc">&nbsp;        int rightYear = extractYear(rightValue).get();</b>
+<b class="nc">&nbsp;        boolean leftYearInRange = (leftYear &gt;= 1800) &amp;&amp; (leftYear &lt;= Year.now().getValue() + 2);</b>
+<b class="nc">&nbsp;        boolean rightYearInRange = (rightYear &gt;= 1800) &amp;&amp; (rightYear &lt;= Year.now().getValue() + 2);</b>
+<b class="nc">&nbsp;        if (leftYearInRange &amp;&amp; !rightYearInRange) {</b>
+<b class="nc">&nbsp;            return ComparisonResult.LEFT_BETTER;</b>
+<b class="nc">&nbsp;        } else if (rightYearInRange &amp;&amp; !leftYearInRange) {</b>
+<b class="nc">&nbsp;            return ComparisonResult.RIGHT_BETTER;</b>
+<b class="nc">&nbsp;        } else if (!leftYearInRange &amp;&amp; !rightYearInRange) {</b>
+<b class="nc">&nbsp;            return ComparisonResult.UNDETERMINED;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int diff = Math.abs(leftYear - rightYear);</b>
+<b class="nc">&nbsp;        if (diff &gt; 10) {</b>
+<b class="nc">&nbsp;            return rightYear &gt; leftYear</b>
+<b class="nc">&nbsp;                   ? ComparisonResult.RIGHT_BETTER</b>
+<b class="nc">&nbsp;                   : ComparisonResult.LEFT_BETTER;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return ComparisonResult.UNDETERMINED; // years are close, undetermined</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Extracts the first 4-digit number found in the string.
+&nbsp;     * Used to identify year-like values such as &quot;About 2000&quot; or &quot;Published in 1999&quot;.
+&nbsp;     *
+&nbsp;     * @param value the input string possibly containing a year
+&nbsp;     * @return Optional containing the 4-digit year if found, otherwise Optional.empty()
+&nbsp;     */
+&nbsp;    private Optional&lt;Integer&gt; extractYear(String value) {
+<b class="nc">&nbsp;        Matcher matcher = YEAR_PATTERN.matcher(value);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            return Optional.of(Integer.parseInt(matcher.group(1)));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

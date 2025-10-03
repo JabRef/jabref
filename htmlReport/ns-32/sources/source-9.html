@@ -1,0 +1,373 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WriteMetadataToLinkedPdfsAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: WriteMetadataToLinkedPdfsAction (org.jabref.gui.exporter)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WriteMetadataToLinkedPdfsAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WriteMetadataToLinkedPdfsAction$WriteMetaDataTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/74)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.exporter;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.xml.parsers.ParserConfigurationException;
+&nbsp;import javax.xml.transform.TransformerException;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.fieldeditors.WriteMetadataToSinglePdfAction;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.bibtex.FieldPreferences;
+&nbsp;import org.jabref.logic.exporter.SaveException;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.logic.xmp.XmpPreferences;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+&nbsp;
+&nbsp;/**
+&nbsp; * Writes XMP Metadata to all the linked pdfs of the selected entries according to the linking entry
+&nbsp; */
+&nbsp;public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(WriteMetadataToLinkedPdfsAction.class);</b>
+&nbsp;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final FieldPreferences fieldPreferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final XmpPreferences xmpPreferences;
+&nbsp;    private final JournalAbbreviationRepository abbreviationRepository;
+&nbsp;
+&nbsp;    public WriteMetadataToLinkedPdfsAction(DialogService dialogService,
+&nbsp;                                           FieldPreferences fieldPreferences,
+&nbsp;                                           FilePreferences filePreferences,
+&nbsp;                                           XmpPreferences xmpPreferences,
+&nbsp;                                           BibEntryTypesManager entryTypesManager,
+&nbsp;                                           JournalAbbreviationRepository abbreviationRepository,
+&nbsp;                                           TaskExecutor taskExecutor,
+<b class="nc">&nbsp;                                           StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.fieldPreferences = fieldPreferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.filePreferences = filePreferences;</b>
+<b class="nc">&nbsp;        this.xmpPreferences = xmpPreferences;</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(needsDatabase(stateManager));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();</b>
+<b class="nc">&nbsp;        if (stateManager.getActiveDatabase().isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = stateManager.getSelectedEntries();</b>
+<b class="nc">&nbsp;        if (entries.isEmpty()) {</b>
+<b class="nc">&nbsp;            entries = databaseContext.getDatabase().getEntries();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (entries.isEmpty()) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;No entry selected for fulltext download.&quot;);</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;This operation requires one or more entries to be selected.&quot;));</b>
+&nbsp;                return;
+&nbsp;            } else {
+<b class="nc">&nbsp;                boolean confirm = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Write metadata to PDF files&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Write metadata for all PDFs in current library?&quot;));</b>
+<b class="nc">&nbsp;                if (!confirm) {</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;Writing metadata...&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        new WriteMetaDataTask(</b>
+&nbsp;                databaseContext,
+&nbsp;                entries,
+&nbsp;                abbreviationRepository,
+&nbsp;                entryTypesManager,
+&nbsp;                fieldPreferences,
+&nbsp;                filePreferences,
+&nbsp;                xmpPreferences,
+&nbsp;                stateManager,
+&nbsp;                dialogService)
+<b class="nc">&nbsp;                .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class WriteMetaDataTask extends BackgroundTask&lt;Void&gt; {
+&nbsp;
+&nbsp;        private final BibDatabaseContext databaseContext;
+&nbsp;        private final List&lt;BibEntry&gt; entries;
+&nbsp;        private final JournalAbbreviationRepository abbreviationRepository;
+&nbsp;        private final BibEntryTypesManager entryTypesManager;
+&nbsp;        private final FieldPreferences fieldPreferences;
+&nbsp;        private final FilePreferences filePreferences;
+&nbsp;        private final XmpPreferences xmpPreferences;
+&nbsp;        private final StateManager stateManager;
+&nbsp;        private final DialogService dialogService;
+&nbsp;
+<b class="nc">&nbsp;        private final List&lt;Path&gt; failedWrittenFiles = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        private int skipped = 0;</b>
+<b class="nc">&nbsp;        private int entriesChanged = 0;</b>
+<b class="nc">&nbsp;        private int errors = 0;</b>
+&nbsp;
+&nbsp;        public WriteMetaDataTask(BibDatabaseContext databaseContext,
+&nbsp;                                 List&lt;BibEntry&gt; entries,
+&nbsp;                                 JournalAbbreviationRepository abbreviationRepository,
+&nbsp;                                 BibEntryTypesManager entryTypesManager,
+&nbsp;                                 FieldPreferences fieldPreferences,
+&nbsp;                                 FilePreferences filePreferences,
+&nbsp;                                 XmpPreferences xmpPreferences,
+&nbsp;                                 StateManager stateManager,
+<b class="nc">&nbsp;                                 DialogService dialogService) {</b>
+<b class="nc">&nbsp;            this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;            this.entries = entries;</b>
+<b class="nc">&nbsp;            this.abbreviationRepository = abbreviationRepository;</b>
+<b class="nc">&nbsp;            this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;            this.fieldPreferences = fieldPreferences;</b>
+<b class="nc">&nbsp;            this.filePreferences = filePreferences;</b>
+<b class="nc">&nbsp;            this.xmpPreferences = xmpPreferences;</b>
+<b class="nc">&nbsp;            this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;            this.dialogService = dialogService;</b>
+&nbsp;
+<b class="nc">&nbsp;            updateMessage(Localization.lang(&quot;Writing metadata...&quot;));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Void call() {
+<b class="nc">&nbsp;            if (stateManager.getActiveDatabase().isEmpty()) {</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            for (int i = 0; i &lt; entries.size(); i++) {</b>
+<b class="nc">&nbsp;                BibEntry entry = entries.get(i);</b>
+<b class="nc">&nbsp;                updateProgress(i, entries.size());</b>
+&nbsp;
+&nbsp;                // Make a list of all PDFs linked from this entry:
+<b class="nc">&nbsp;                List&lt;Path&gt; files = entry.getFiles().stream()</b>
+<b class="nc">&nbsp;                                        .map(file -&gt; file.findIn(stateManager.getActiveDatabase().get(), filePreferences))</b>
+<b class="nc">&nbsp;                                        .filter(Optional::isPresent)</b>
+<b class="nc">&nbsp;                                        .map(Optional::get)</b>
+<b class="nc">&nbsp;                                        .filter(FileUtil::isPDFFile)</b>
+<b class="nc">&nbsp;                                        .toList();</b>
+<b class="nc">&nbsp;                if (files.isEmpty()) {</b>
+<b class="nc">&nbsp;                    LOGGER.debug(&quot;Skipped empty entry &#39;{}&#39;&quot;,</b>
+<b class="nc">&nbsp;                            entry.getCitationKey().orElse(entry.getAuthorTitleYear(16)));</b>
+<b class="nc">&nbsp;                    skipped++;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    for (Path file : files) {</b>
+<b class="nc">&nbsp;                        updateMessage(Localization.lang(&quot;Writing metadata to %0&quot;, file.getFileName()));</b>
+&nbsp;
+<b class="nc">&nbsp;                        if (Files.exists(file)) {</b>
+&nbsp;                            try {
+<b class="nc">&nbsp;                                WriteMetadataToSinglePdfAction.writeMetadataToFile(</b>
+&nbsp;                                        file,
+&nbsp;                                        entry,
+&nbsp;                                        databaseContext,
+&nbsp;                                        abbreviationRepository,
+&nbsp;                                        entryTypesManager,
+&nbsp;                                        fieldPreferences,
+&nbsp;                                        filePreferences,
+&nbsp;                                        xmpPreferences);
+<b class="nc">&nbsp;                                entriesChanged++;</b>
+&nbsp;                            } catch (IOException
+&nbsp;                                     | TransformerException
+&nbsp;                                     | SaveException
+&nbsp;                                     | ParserConfigurationException e) {
+<b class="nc">&nbsp;                                LOGGER.error(&quot;Error while writing XMP data to pdf &#39;{}&#39;&quot;, file, e);</b>
+<b class="nc">&nbsp;                                failedWrittenFiles.add(file);</b>
+<b class="nc">&nbsp;                                errors++;</b>
+&nbsp;                            }
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            LOGGER.debug(&quot;Skipped non existing pdf &#39;{}&#39;&quot;, file);</b>
+<b class="nc">&nbsp;                            skipped++;</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                updateMessage(Localization.lang(&quot;Processing...&quot;));</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            updateMessage(Localization.lang(&quot;Finished&quot;));</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Finished writing metadata for library %0 (%1 succeeded, %2 skipped, %3 errors).&quot;,</b>
+<b class="nc">&nbsp;                    databaseContext.getDatabasePath().map(Path::toString).orElse(&quot;undefined&quot;),</b>
+<b class="nc">&nbsp;                    String.valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!failedWrittenFiles.isEmpty()) {</b>
+<b class="nc">&nbsp;                LOGGER.error(&quot;Failed to write XMP data to PDFs:\n{}&quot;, failedWrittenFiles);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

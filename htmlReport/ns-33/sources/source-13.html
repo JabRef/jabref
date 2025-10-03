@@ -1,0 +1,415 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UnlinkedFilesDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.externalfiles</a>
+</div>
+
+<h1>Coverage Summary for Class: UnlinkedFilesDialogViewModel (org.jabref.gui.externalfiles)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UnlinkedFilesDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/117)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.externalfiles;
+&nbsp;
+&nbsp;import java.io.BufferedWriter;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.DirectoryStream.Filter;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.StandardOpenOption;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.DoubleProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleDoubleProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.control.ProgressIndicator;
+&nbsp;import javafx.scene.control.TreeItem;
+&nbsp;import javafx.scene.input.TransferMode;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.DirectoryDialogConfiguration;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.gui.util.FileNodeViewModel;
+&nbsp;import org.jabref.logic.externalfiles.DateRange;
+&nbsp;import org.jabref.logic.externalfiles.ExternalFileSorter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class UnlinkedFilesDialogViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(UnlinkedFilesDialogViewModel.class);</b>
+&nbsp;
+&nbsp;    private final ImportHandler importHandler;
+<b class="nc">&nbsp;    private final StringProperty directoryPath = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;FileExtensionViewModel&gt; selectedExtension = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;DateRange&gt; selectedDate = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;ExternalFileSorter&gt; selectedSort = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Optional&lt;FileNodeViewModel&gt;&gt; treeRootProperty = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final SimpleListProperty&lt;TreeItem&lt;FileNodeViewModel&gt;&gt; checkedFileListProperty = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty taskActiveProperty = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final DoubleProperty progressValueProperty = new SimpleDoubleProperty(0);</b>
+<b class="nc">&nbsp;    private final StringProperty progressTextProperty = new SimpleStringProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ObservableList&lt;ImportFilesResultItemViewModel&gt; resultList = FXCollections.observableArrayList();</b>
+&nbsp;    private final ObservableList&lt;FileExtensionViewModel&gt; fileFilterList;
+&nbsp;    private final ObservableList&lt;DateRange&gt; dateFilterList;
+&nbsp;    private final ObservableList&lt;ExternalFileSorter&gt; fileSortList;
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;    private BackgroundTask&lt;FileNodeViewModel&gt; findUnlinkedFilesTask;
+&nbsp;    private BackgroundTask&lt;List&lt;ImportFilesResultItemViewModel&gt;&gt; importFilesBackgroundTask;
+&nbsp;
+&nbsp;    private final BibDatabaseContext bibDatabase;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    private final FunctionBasedValidator&lt;String&gt; scanDirectoryValidator;
+&nbsp;
+&nbsp;    public UnlinkedFilesDialogViewModel(DialogService dialogService,
+&nbsp;                                        UndoManager undoManager,
+&nbsp;                                        FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                                        GuiPreferences preferences,
+&nbsp;                                        StateManager stateManager,
+<b class="nc">&nbsp;                                        TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.bibDatabase = stateManager.getActiveDatabase().orElseThrow(() -&gt; new NullPointerException(&quot;Database null&quot;));</b>
+<b class="nc">&nbsp;        importHandler = new ImportHandler(</b>
+&nbsp;                bibDatabase,
+&nbsp;                preferences,
+&nbsp;                fileUpdateMonitor,
+&nbsp;                undoManager,
+&nbsp;                stateManager,
+&nbsp;                dialogService,
+&nbsp;                taskExecutor);
+&nbsp;
+<b class="nc">&nbsp;        this.fileFilterList = FXCollections.observableArrayList(</b>
+<b class="nc">&nbsp;                new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getExternalApplicationsPreferences()),</b>
+<b class="nc">&nbsp;                new FileExtensionViewModel(StandardFileType.HTML, preferences.getExternalApplicationsPreferences()),</b>
+<b class="nc">&nbsp;                new FileExtensionViewModel(StandardFileType.MARKDOWN, preferences.getExternalApplicationsPreferences()),</b>
+<b class="nc">&nbsp;                new FileExtensionViewModel(StandardFileType.PDF, preferences.getExternalApplicationsPreferences()));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.dateFilterList = FXCollections.observableArrayList(DateRange.values());</b>
+&nbsp;
+<b class="nc">&nbsp;        this.fileSortList = FXCollections.observableArrayList(ExternalFileSorter.values());</b>
+&nbsp;
+<b class="nc">&nbsp;        Predicate&lt;String&gt; isDirectory = path -&gt; Files.isDirectory(Path.of(path));</b>
+<b class="nc">&nbsp;        scanDirectoryValidator = new FunctionBasedValidator&lt;&gt;(directoryPath, isDirectory,</b>
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;Please enter a valid file path.&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        treeRootProperty.setValue(Optional.empty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void startSearch() {
+<b class="nc">&nbsp;        Path directory = this.getSearchDirectory();</b>
+<b class="nc">&nbsp;        Filter&lt;Path&gt; selectedFileFilter = selectedExtension.getValue().dirFilter();</b>
+<b class="nc">&nbsp;        DateRange selectedDateFilter = selectedDate.getValue();</b>
+<b class="nc">&nbsp;        ExternalFileSorter selectedSortFilter = selectedSort.getValue();</b>
+<b class="nc">&nbsp;        progressValueProperty.unbind();</b>
+<b class="nc">&nbsp;        progressTextProperty.unbind();</b>
+&nbsp;
+<b class="nc">&nbsp;        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences())</b>
+<b class="nc">&nbsp;                .onRunning(() -&gt; {</b>
+<b class="nc">&nbsp;                    progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);</b>
+<b class="nc">&nbsp;                    progressTextProperty.setValue(Localization.lang(&quot;Searching file system...&quot;));</b>
+<b class="nc">&nbsp;                    progressTextProperty.bind(findUnlinkedFilesTask.messageProperty());</b>
+<b class="nc">&nbsp;                    taskActiveProperty.setValue(true);</b>
+<b class="nc">&nbsp;                    treeRootProperty.setValue(Optional.empty());</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .onFinished(() -&gt; {</b>
+<b class="nc">&nbsp;                    progressValueProperty.set(0);</b>
+<b class="nc">&nbsp;                    taskActiveProperty.setValue(false);</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .onSuccess(treeRoot -&gt; treeRootProperty.setValue(Optional.of(treeRoot)));</b>
+&nbsp;
+<b class="nc">&nbsp;        findUnlinkedFilesTask.executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void startImport() {
+<b class="nc">&nbsp;        List&lt;Path&gt; fileList = checkedFileListProperty</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(TreeItem::getValue)</b>
+<b class="nc">&nbsp;                .map(FileNodeViewModel::getPath)</b>
+<b class="nc">&nbsp;                .filter(Files::isRegularFile)</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fileList.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;There are no valid files checked for import&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        resultList.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        importFilesBackgroundTask = importHandler</b>
+<b class="nc">&nbsp;                .importFilesInBackground(fileList, bibDatabase, preferences.getFilePreferences(), TransferMode.LINK)</b>
+<b class="nc">&nbsp;                .onRunning(() -&gt; {</b>
+<b class="nc">&nbsp;                    progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());</b>
+<b class="nc">&nbsp;                    progressTextProperty.bind(importFilesBackgroundTask.messageProperty());</b>
+<b class="nc">&nbsp;                    taskActiveProperty.setValue(true);</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .onFinished(() -&gt; {</b>
+<b class="nc">&nbsp;                    progressValueProperty.unbind();</b>
+<b class="nc">&nbsp;                    progressTextProperty.unbind();</b>
+<b class="nc">&nbsp;                    taskActiveProperty.setValue(false);</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .onSuccess(resultList::addAll);</b>
+<b class="nc">&nbsp;        importFilesBackgroundTask.executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This starts the export of all files of all selected nodes in the file tree view.
+&nbsp;     */
+&nbsp;    public void startExport() {
+<b class="nc">&nbsp;        List&lt;Path&gt; fileList = checkedFileListProperty</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(item -&gt; item.getValue().getPath())</b>
+<b class="nc">&nbsp;                .filter(Files::isRegularFile)</b>
+<b class="nc">&nbsp;                .toList();</b>
+<b class="nc">&nbsp;        if (fileList.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;There are no valid files checked for export&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())</b>
+<b class="nc">&nbsp;                .addExtensionFilter(StandardFileType.TXT)</b>
+<b class="nc">&nbsp;                .withDefaultExtension(StandardFileType.TXT)</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        Optional&lt;Path&gt; exportPath = dialogService.showFileSaveDialog(fileDialogConfiguration);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (exportPath.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        try (BufferedWriter writer = Files.newBufferedWriter(exportPath.get(), StandardCharsets.UTF_8,</b>
+&nbsp;                StandardOpenOption.CREATE)) {
+<b class="nc">&nbsp;            for (Path file : fileList) {</b>
+<b class="nc">&nbsp;                writer.write(file.toString() + &quot;\n&quot;);</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error exporting&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;FileExtensionViewModel&gt; getFileFilters() {
+<b class="nc">&nbsp;        return this.fileFilterList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;DateRange&gt; getDateFilters() {
+<b class="nc">&nbsp;        return this.dateFilterList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;ExternalFileSorter&gt; getSorters() {
+<b class="nc">&nbsp;        return this.fileSortList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void cancelTasks() {
+<b class="nc">&nbsp;        if (findUnlinkedFilesTask != null) {</b>
+<b class="nc">&nbsp;            findUnlinkedFilesTask.cancel();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (importFilesBackgroundTask != null) {</b>
+<b class="nc">&nbsp;            importFilesBackgroundTask.cancel();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void browseFileDirectory() {
+<b class="nc">&nbsp;        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory()).build();</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)</b>
+<b class="nc">&nbsp;                     .ifPresent(selectedDirectory -&gt; {</b>
+<b class="nc">&nbsp;                         directoryPath.setValue(selectedDirectory.toAbsolutePath().toString());</b>
+<b class="nc">&nbsp;                         preferences.getFilePreferences().setWorkingDirectory(selectedDirectory.toAbsolutePath());</b>
+&nbsp;                     });
+&nbsp;    }
+&nbsp;
+&nbsp;    private Path getSearchDirectory() {
+<b class="nc">&nbsp;        Path directory = Path.of(directoryPath.getValue());</b>
+<b class="nc">&nbsp;        if (Files.notExists(directory)) {</b>
+<b class="nc">&nbsp;            directory = Path.of(System.getProperty(&quot;user.dir&quot;));</b>
+<b class="nc">&nbsp;            directoryPath.setValue(directory.toAbsolutePath().toString());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!Files.isDirectory(directory)) {</b>
+<b class="nc">&nbsp;            directory = directory.getParent();</b>
+<b class="nc">&nbsp;            directoryPath.setValue(directory.toAbsolutePath().toString());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return directory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;ImportFilesResultItemViewModel&gt; resultTableItems() {
+<b class="nc">&nbsp;        return this.resultList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Optional&lt;FileNodeViewModel&gt;&gt; treeRootProperty() {
+<b class="nc">&nbsp;        return this.treeRootProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;FileExtensionViewModel&gt; selectedExtensionProperty() {
+<b class="nc">&nbsp;        return this.selectedExtension;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;DateRange&gt; selectedDateProperty() {
+<b class="nc">&nbsp;        return this.selectedDate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;ExternalFileSorter&gt; selectedSortProperty() {
+<b class="nc">&nbsp;        return this.selectedSort;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty directoryPathProperty() {
+<b class="nc">&nbsp;        return this.directoryPath;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus directoryPathValidationStatus() {
+<b class="nc">&nbsp;        return this.scanDirectoryValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty progressValueProperty() {
+<b class="nc">&nbsp;        return this.progressValueProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty progressTextProperty() {
+<b class="nc">&nbsp;        return this.progressTextProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty taskActiveProperty() {
+<b class="nc">&nbsp;        return this.taskActiveProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SimpleListProperty&lt;TreeItem&lt;FileNodeViewModel&gt;&gt; checkedFileListProperty() {
+<b class="nc">&nbsp;        return checkedFileListProperty;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

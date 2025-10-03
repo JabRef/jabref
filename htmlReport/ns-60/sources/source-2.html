@@ -1,0 +1,283 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationKeyPatternTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.citationkeypattern</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationKeyPatternTabViewModel (org.jabref.gui.preferences.citationkeypattern)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationKeyPatternTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.citationkeypattern;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;
+&nbsp;import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelItemModel;
+&nbsp;import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelViewModel;
+&nbsp;import org.jabref.gui.preferences.PreferenceTabViewModel;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+&nbsp;import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+&nbsp;import org.jabref.logic.importer.ImporterPreferences;
+&nbsp;
+&nbsp;public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty overwriteAllowProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty overwriteWarningProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty generateOnSaveProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty generateKeyOnImportProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty letterStartAProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty letterStartBProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty letterAlwaysAddProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty keyPatternRegexProperty = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty keyPatternReplacementProperty = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty unwantedCharactersProperty = new SimpleStringProperty();</b>
+&nbsp;
+&nbsp;    // The list and the default properties are being overwritten by the bound properties of the tableView, but to
+&nbsp;    // prevent an NPE on storing the preferences before lazy-loading of the setValues, they need to be initialized.
+<b class="nc">&nbsp;    private final ListProperty&lt;CitationKeyPatternsPanelItemModel&gt; patternListProperty = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;CitationKeyPatternsPanelItemModel&gt; defaultKeyPatternProperty = new SimpleObjectProperty&lt;&gt;(</b>
+&nbsp;            new CitationKeyPatternsPanelItemModel(new CitationKeyPatternsPanelViewModel.DefaultEntryType(), &quot;&quot;));
+&nbsp;
+&nbsp;    private final CitationKeyPatternPreferences keyPatternPreferences;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The preference for whether to use the key generator on import is different from how it is configured.
+&nbsp;     * In the UI, there is no better place to put the option than the Citation Key Generator tab.
+&nbsp;     * However, shifting the preference to {@link CitationKeyPatternPreferences} would break the abstraction or hierarchy.
+&nbsp;     * Hence, we keep the preference in {@link ImporterPreferences}, but for the UI, we initialize it here.
+&nbsp;     */
+&nbsp;    private final ImporterPreferences importerPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public CitationKeyPatternTabViewModel(CitationKeyPatternPreferences keyPatternPreferences, ImporterPreferences importerPreferences) {</b>
+<b class="nc">&nbsp;        this.keyPatternPreferences = keyPatternPreferences;</b>
+<b class="nc">&nbsp;        this.importerPreferences = importerPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        overwriteAllowProperty.setValue(!keyPatternPreferences.shouldAvoidOverwriteCiteKey());</b>
+<b class="nc">&nbsp;        overwriteWarningProperty.setValue(keyPatternPreferences.shouldWarnBeforeOverwriteCiteKey());</b>
+<b class="nc">&nbsp;        generateOnSaveProperty.setValue(keyPatternPreferences.shouldGenerateCiteKeysBeforeSaving());</b>
+<b class="nc">&nbsp;        generateKeyOnImportProperty.setValue(importerPreferences.shouldGenerateNewKeyOnImport());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (keyPatternPreferences.getKeySuffix()</b>
+&nbsp;                == CitationKeyPatternPreferences.KeySuffix.ALWAYS) {
+<b class="nc">&nbsp;            letterAlwaysAddProperty.setValue(true);</b>
+<b class="nc">&nbsp;            letterStartAProperty.setValue(false);</b>
+<b class="nc">&nbsp;            letterStartBProperty.setValue(false);</b>
+<b class="nc">&nbsp;        } else if (keyPatternPreferences.getKeySuffix()</b>
+&nbsp;                == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A) {
+<b class="nc">&nbsp;            letterAlwaysAddProperty.setValue(false);</b>
+<b class="nc">&nbsp;            letterStartAProperty.setValue(true);</b>
+<b class="nc">&nbsp;            letterStartBProperty.setValue(false);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            letterAlwaysAddProperty.setValue(false);</b>
+<b class="nc">&nbsp;            letterStartAProperty.setValue(false);</b>
+<b class="nc">&nbsp;            letterStartBProperty.setValue(true);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        keyPatternRegexProperty.setValue(keyPatternPreferences.getKeyPatternRegex());</b>
+<b class="nc">&nbsp;        keyPatternReplacementProperty.setValue(keyPatternPreferences.getKeyPatternReplacement());</b>
+<b class="nc">&nbsp;        unwantedCharactersProperty.setValue(keyPatternPreferences.getUnwantedCharacters());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        GlobalCitationKeyPatterns newKeyPattern =</b>
+<b class="nc">&nbsp;                new GlobalCitationKeyPatterns(keyPatternPreferences.getKeyPatterns().getDefaultValue());</b>
+<b class="nc">&nbsp;        patternListProperty.forEach(item -&gt; {</b>
+<b class="nc">&nbsp;            String patternString = item.getPattern();</b>
+<b class="nc">&nbsp;            if (!&quot;default&quot;.equals(item.getEntryType().getName())) {</b>
+<b class="nc">&nbsp;                if (!patternString.trim().isEmpty()) {</b>
+<b class="nc">&nbsp;                    newKeyPattern.addCitationKeyPattern(item.getEntryType(), patternString);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        if (!defaultKeyPatternProperty.getValue().getPattern().trim().isEmpty()) {</b>
+&nbsp;            // we do not trim the value at the assignment to enable users to have spaces at the beginning and
+&nbsp;            // at the end of the pattern
+<b class="nc">&nbsp;            newKeyPattern.setDefaultValue(defaultKeyPatternProperty.getValue().getPattern());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        CitationKeyPatternPreferences.KeySuffix keySuffix = CitationKeyPatternPreferences.KeySuffix.ALWAYS;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (letterStartAProperty.getValue()) {</b>
+<b class="nc">&nbsp;            keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;</b>
+<b class="nc">&nbsp;        } else if (letterStartBProperty.getValue()) {</b>
+<b class="nc">&nbsp;            keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        keyPatternPreferences.setAvoidOverwriteCiteKey(!overwriteAllowProperty.getValue());</b>
+<b class="nc">&nbsp;        keyPatternPreferences.setWarnBeforeOverwriteCiteKey(overwriteWarningProperty.getValue());</b>
+<b class="nc">&nbsp;        keyPatternPreferences.setGenerateCiteKeysBeforeSaving(generateOnSaveProperty.getValue());</b>
+<b class="nc">&nbsp;        importerPreferences.setGenerateNewKeyOnImport(generateKeyOnImportProperty.getValue());</b>
+<b class="nc">&nbsp;        keyPatternPreferences.setKeySuffix(keySuffix);</b>
+<b class="nc">&nbsp;        keyPatternPreferences.setKeyPatternRegex(keyPatternRegexProperty.getValue());</b>
+<b class="nc">&nbsp;        keyPatternPreferences.setKeyPatternReplacement(keyPatternReplacementProperty.getValue());</b>
+<b class="nc">&nbsp;        keyPatternPreferences.setUnwantedCharacters(unwantedCharactersProperty.getValue());</b>
+<b class="nc">&nbsp;        keyPatternPreferences.setKeyPatterns(newKeyPattern);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty overwriteAllowProperty() {
+<b class="nc">&nbsp;        return overwriteAllowProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty overwriteWarningProperty() {
+<b class="nc">&nbsp;        return overwriteWarningProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty generateOnSaveProperty() {
+<b class="nc">&nbsp;        return generateOnSaveProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty generateKeyOnImportProperty() {
+<b class="nc">&nbsp;        return generateKeyOnImportProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty letterStartAProperty() {
+<b class="nc">&nbsp;        return letterStartAProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty letterStartBProperty() {
+<b class="nc">&nbsp;        return letterStartBProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty letterAlwaysAddProperty() {
+<b class="nc">&nbsp;        return letterAlwaysAddProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty keyPatternRegexProperty() {
+<b class="nc">&nbsp;        return keyPatternRegexProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty keyPatternReplacementProperty() {
+<b class="nc">&nbsp;        return keyPatternReplacementProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;CitationKeyPatternsPanelItemModel&gt; patternListProperty() {
+<b class="nc">&nbsp;        return patternListProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;CitationKeyPatternsPanelItemModel&gt; defaultKeyPatternProperty() {
+<b class="nc">&nbsp;        return defaultKeyPatternProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty unwantedCharactersProperty() {
+<b class="nc">&nbsp;        return unwantedCharactersProperty;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

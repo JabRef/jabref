@@ -1,0 +1,266 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProtectedTermsLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.protectedterms</a>
+</div>
+
+<h1>Coverage Summary for Class: ProtectedTermsLoader (org.jabref.logic.protectedterms)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProtectedTermsLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    52.9%
+  </span>
+  <span class="absValue">
+    (9/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    30%
+  </span>
+  <span class="absValue">
+    (9/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    35.5%
+  </span>
+  <span class="absValue">
+    (22/62)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.protectedterms;
+&nbsp;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class ProtectedTermsLoader {
+&nbsp;
+<b class="fc">&nbsp;    private static final Map&lt;String, Supplier&lt;String&gt;&gt; INTERNAL_LISTS = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsLoader.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    private final List&lt;ProtectedTermsList&gt; mainList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    static {
+<b class="fc">&nbsp;        INTERNAL_LISTS.put(&quot;/protectedterms/months_weekdays.terms&quot;, () -&gt; Localization.lang(&quot;Months and weekdays in English&quot;));</b>
+<b class="fc">&nbsp;        INTERNAL_LISTS.put(&quot;/protectedterms/countries_territories.terms&quot;, () -&gt; Localization.lang(&quot;Countries and territories in English&quot;));</b>
+<b class="fc">&nbsp;        INTERNAL_LISTS.put(&quot;/protectedterms/electrical_engineering.terms&quot;, () -&gt; Localization.lang(&quot;Electrical engineering terms&quot;));</b>
+<b class="fc">&nbsp;        INTERNAL_LISTS.put(&quot;/protectedterms/computer_science.terms&quot;, () -&gt; Localization.lang(&quot;Computer science&quot;));</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public ProtectedTermsLoader(ProtectedTermsPreferences preferences) {</b>
+<b class="fc">&nbsp;        update(preferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;String&gt; getInternalLists() {
+<b class="fc">&nbsp;        return new ArrayList&lt;&gt;(INTERNAL_LISTS.keySet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void update(ProtectedTermsPreferences preferences) {
+<b class="fc">&nbsp;        mainList.clear();</b>
+&nbsp;
+&nbsp;        // Read internal lists
+<b class="fc">&nbsp;        for (String filename : preferences.getEnabledInternalTermLists()) {</b>
+<b class="pc">&nbsp;            if (INTERNAL_LISTS.containsKey(filename)) {</b>
+<b class="fc">&nbsp;                mainList.add(readProtectedTermsListFromResource(filename, INTERNAL_LISTS.get(filename).get(), true));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Protected terms resource &#39;{}&#39; is no longer available.&quot;, filename);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="pc">&nbsp;        for (String filename : preferences.getDisabledInternalTermLists()) {</b>
+<b class="nc">&nbsp;            if (INTERNAL_LISTS.containsKey(filename)) {</b>
+<b class="nc">&nbsp;                if (!preferences.getEnabledInternalTermLists().contains(filename)) {</b>
+<b class="nc">&nbsp;                    mainList.add(readProtectedTermsListFromResource(filename, INTERNAL_LISTS.get(filename).get(), false));</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Protected terms resource &#39;{}&#39; is no longer available.&quot;, filename);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Check if any new internal lists have emerged
+<b class="fc">&nbsp;        for (String filename : INTERNAL_LISTS.keySet()) {</b>
+<b class="pc">&nbsp;            if (!preferences.getEnabledInternalTermLists().contains(filename)</b>
+<b class="nc">&nbsp;                    &amp;&amp; !preferences.getDisabledInternalTermLists().contains(filename)) {</b>
+&nbsp;                // New internal list, add it
+<b class="nc">&nbsp;                mainList.add(readProtectedTermsListFromResource(filename, INTERNAL_LISTS.get(filename).get(), true));</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;New protected terms resource &#39;{}&#39; is available and enabled by default.&quot;, filename);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Read external lists
+<b class="pc">&nbsp;        for (String filename : preferences.getEnabledExternalTermLists()) {</b>
+<b class="nc">&nbsp;            Path filePath = Path.of(filename);</b>
+<b class="nc">&nbsp;            if (Files.exists(filePath)) {</b>
+<b class="nc">&nbsp;                mainList.add(readProtectedTermsListFromFile(filePath, true));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Cannot find protected terms file {} &quot;, filename);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        for (String filename : preferences.getDisabledExternalTermLists()) {</b>
+<b class="nc">&nbsp;            if (!preferences.getEnabledExternalTermLists().contains(filename)) {</b>
+<b class="nc">&nbsp;                mainList.add(readProtectedTermsListFromFile(Path.of(filename), false));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void reloadProtectedTermsList(ProtectedTermsList list) {
+<b class="nc">&nbsp;        ProtectedTermsList newList = readProtectedTermsListFromFile(Path.of(list.getLocation()), list.isEnabled());</b>
+<b class="nc">&nbsp;        int index = mainList.indexOf(list);</b>
+<b class="nc">&nbsp;        if (index &gt;= 0) {</b>
+<b class="nc">&nbsp;            mainList.set(index, newList);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Problem reloading protected terms file&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;ProtectedTermsList&gt; getProtectedTermsLists() {
+<b class="nc">&nbsp;        return mainList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getProtectedTerms() {
+<b class="nc">&nbsp;        Set&lt;String&gt; result = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (ProtectedTermsList list : mainList) {</b>
+<b class="nc">&nbsp;            if (list.isEnabled()) {</b>
+<b class="nc">&nbsp;                result.addAll(list.getTermList());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addProtectedTermsListFromFile(Path path, boolean enabled) {
+<b class="nc">&nbsp;        mainList.add(readProtectedTermsListFromFile(path, enabled));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ProtectedTermsList readProtectedTermsListFromResource(String resource, String description, boolean enabled) {
+<b class="fc">&nbsp;        ProtectedTermsParser parser = new ProtectedTermsParser();</b>
+<b class="fc">&nbsp;        parser.readTermsFromResource(Objects.requireNonNull(resource), Objects.requireNonNull(description));</b>
+<b class="fc">&nbsp;        return parser.getProtectTermsList(enabled, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ProtectedTermsList readProtectedTermsListFromFile(Path path, boolean enabled) {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Reading term list from file {}&quot;, path);</b>
+<b class="nc">&nbsp;        ProtectedTermsParser parser = new ProtectedTermsParser();</b>
+<b class="nc">&nbsp;        parser.readTermsFromFile(Objects.requireNonNull(path));</b>
+<b class="nc">&nbsp;        return parser.getProtectTermsList(enabled, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean removeProtectedTermsList(ProtectedTermsList termList) {
+<b class="nc">&nbsp;        termList.setEnabled(false);</b>
+<b class="nc">&nbsp;        return mainList.remove(termList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ProtectedTermsList addNewProtectedTermsList(String newDescription, String newLocation, boolean enabled) {
+<b class="nc">&nbsp;        Objects.requireNonNull(newDescription);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(newLocation);</b>
+<b class="nc">&nbsp;        ProtectedTermsList resultingList = new ProtectedTermsList(newDescription, new ArrayList&lt;&gt;(), newLocation);</b>
+<b class="nc">&nbsp;        resultingList.setEnabled(enabled);</b>
+<b class="nc">&nbsp;        resultingList.createAndWriteHeading(newDescription);</b>
+<b class="nc">&nbsp;        mainList.add(resultingList);</b>
+<b class="nc">&nbsp;        return resultingList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ProtectedTermsList addNewProtectedTermsList(String newDescription, String newLocation) {
+<b class="nc">&nbsp;        return addNewProtectedTermsList(newDescription, newLocation, true);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

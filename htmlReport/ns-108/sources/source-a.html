@@ -1,0 +1,156 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IEEEField</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.field</a>
+</div>
+
+<h1>Coverage Summary for Class: IEEEField (org.jabref.model.entry.field)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IEEEField</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.9%
+  </span>
+  <span class="absValue">
+    (20/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.field;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * IEEE BSTctl fields
+&nbsp; */
+<b class="fc">&nbsp;public enum IEEEField implements Field {</b>
+<b class="fc">&nbsp;    CTLALT_STRETCH_FACTOR(&quot;ctlalt_stretch_factor&quot;, FieldProperty.NUMERIC),</b>
+<b class="fc">&nbsp;    CTLDASH_REPEATED_NAMES(&quot;ctldash_repeated_names&quot;, FieldProperty.YES_NO),</b>
+<b class="fc">&nbsp;    CTLMAX_NAMES_FORCED_ETAL(&quot;ctlmax_names_forced_etal&quot;, FieldProperty.NUMERIC),</b>
+<b class="fc">&nbsp;    CTLNAME_FORMAT_STRING(&quot;ctlname_format_string&quot;, FieldProperty.VERBATIM),</b>
+<b class="fc">&nbsp;    CTLNAME_LATEX_CMD(&quot;ctlname_latex_cmd&quot;, FieldProperty.VERBATIM),</b>
+<b class="fc">&nbsp;    CTLNAME_URL_PREFIX(&quot;ctlname_url_prefix&quot;, FieldProperty.VERBATIM),</b>
+<b class="fc">&nbsp;    CTLNAMES_SHOW_ETAL(&quot;ctlnames_show_etal&quot;, FieldProperty.NUMERIC),</b>
+<b class="fc">&nbsp;    CTLUSE_ALT_SPACING(&quot;ctluse_alt_spacing&quot;, FieldProperty.YES_NO),</b>
+<b class="fc">&nbsp;    CTLUSE_ARTICLE_NUMBER(&quot;ctluse_article_number&quot;, FieldProperty.YES_NO),</b>
+<b class="fc">&nbsp;    CTLUSE_FORCED_ETAL(&quot;ctluse_forced_etal&quot;, FieldProperty.YES_NO),</b>
+<b class="fc">&nbsp;    CTLUSE_PAPER(&quot;ctluse_paper&quot;, FieldProperty.YES_NO),</b>
+<b class="fc">&nbsp;    CTLUSE_URL(&quot;ctluse_url&quot;, FieldProperty.YES_NO);</b>
+&nbsp;
+&nbsp;    private final String name;
+&nbsp;    private final EnumSet&lt;FieldProperty&gt; properties;
+&nbsp;
+<b class="fc">&nbsp;    IEEEField(String name, FieldProperty first, FieldProperty... rest) {</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.properties = EnumSet.of(first, rest);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;IEEEField&gt; fromName(String name) {
+<b class="fc">&nbsp;        return Arrays.stream(IEEEField.values())</b>
+<b class="fc">&nbsp;                     .filter(field -&gt; field.getName().equalsIgnoreCase(name))</b>
+<b class="fc">&nbsp;                     .findAny();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="fc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isStandardField() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public EnumSet&lt;FieldProperty&gt; getProperties() {
+<b class="nc">&nbsp;        return properties;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

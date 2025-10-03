@@ -1,0 +1,170 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ACMPortalFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: ACMPortalFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ACMPortalFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.net.CookieHandler;
+&nbsp;import java.net.CookieManager;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.SearchBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
+&nbsp;import org.jabref.logic.importer.fileformat.ACMPortalParser;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;
+&nbsp;public class ACMPortalFetcher implements SearchBasedParserFetcher {
+&nbsp;
+&nbsp;    public static final String FETCHER_NAME = &quot;ACM Portal&quot;;
+&nbsp;
+&nbsp;    private static final String SEARCH_URL = &quot;https://dl.acm.org/action/doSearch&quot;;
+&nbsp;
+<b class="nc">&nbsp;    public ACMPortalFetcher() {</b>
+&nbsp;        // website dl.acm.org requires cookies
+<b class="nc">&nbsp;        CookieHandler.setDefault(new CookieManager());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return FETCHER_NAME;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;HelpFile&gt; getHelpPage() {
+<b class="nc">&nbsp;        return Optional.of(HelpFile.FETCHER_ACM);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String createQueryString(BaseQueryNode queryNode) {
+<b class="nc">&nbsp;        return new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructing the url for the searchpage.
+&nbsp;     *
+&nbsp;     * @param queryNode the first query node
+&nbsp;     * @return query URL
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;AllField&quot;, createQueryString(queryNode));</b>
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets an instance of ACMPortalParser.
+&nbsp;     *
+&nbsp;     * @return the parser which can process the results returned from the ACM Portal search page
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return new ACMPortalParser();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

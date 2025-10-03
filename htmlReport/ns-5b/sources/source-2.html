@@ -1,0 +1,239 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NewEntryPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.newentry</a>
+</div>
+
+<h1>Coverage Summary for Class: NewEntryPreferences (org.jabref.gui.newentry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NewEntryPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.newentry;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;
+&nbsp;public class NewEntryPreferences {
+&nbsp;    private final ObjectProperty&lt;NewEntryDialogTab&gt; latestApproach;
+&nbsp;    private final BooleanProperty typesRecommendedExpanded;
+&nbsp;    private final BooleanProperty typesOtherExpanded;
+&nbsp;    private final BooleanProperty typesCustomExpanded;
+&nbsp;    private final ObjectProperty&lt;EntryType&gt; latestImmediateType;
+&nbsp;    private final BooleanProperty idLookupGuessing;
+&nbsp;    private final StringProperty latestIdFetcherName;
+&nbsp;    private final StringProperty latestInterpretParserName;
+&nbsp;
+&nbsp;    public NewEntryPreferences(NewEntryDialogTab approach,
+&nbsp;                               boolean expandRecommended,
+&nbsp;                               boolean expandOther,
+&nbsp;                               boolean expandCustom,
+&nbsp;                               EntryType immediateType,
+&nbsp;                               boolean idLookupGuessing,
+&nbsp;                               String idFetcherName,
+<b class="nc">&nbsp;                               String interpretParserName) {</b>
+<b class="nc">&nbsp;        this.latestApproach = new SimpleObjectProperty&lt;&gt;(approach);</b>
+<b class="nc">&nbsp;        this.typesRecommendedExpanded = new SimpleBooleanProperty(expandRecommended);</b>
+<b class="nc">&nbsp;        this.typesOtherExpanded = new SimpleBooleanProperty(expandOther);</b>
+<b class="nc">&nbsp;        this.typesCustomExpanded = new SimpleBooleanProperty(expandCustom);</b>
+<b class="nc">&nbsp;        this.latestImmediateType = new SimpleObjectProperty&lt;&gt;(immediateType);</b>
+<b class="nc">&nbsp;        this.idLookupGuessing = new SimpleBooleanProperty(idLookupGuessing);</b>
+<b class="nc">&nbsp;        this.latestIdFetcherName = new SimpleStringProperty(idFetcherName);</b>
+<b class="nc">&nbsp;        this.latestInterpretParserName = new SimpleStringProperty(interpretParserName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public NewEntryDialogTab getLatestApproach() {
+<b class="nc">&nbsp;        return latestApproach.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLatestApproach(NewEntryDialogTab approach) {
+<b class="nc">&nbsp;        latestApproach.set(approach);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;NewEntryDialogTab&gt; latestApproachProperty() {
+<b class="nc">&nbsp;        return latestApproach;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getTypesRecommendedExpanded() {
+<b class="nc">&nbsp;        return typesRecommendedExpanded.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void getTypesRecommendedExpanded(boolean expanded) {
+<b class="nc">&nbsp;        typesRecommendedExpanded.set(expanded);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty typesRecommendedExpandedProperty() {
+<b class="nc">&nbsp;        return typesRecommendedExpanded;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getTypesOtherExpanded() {
+<b class="nc">&nbsp;        return typesOtherExpanded.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void getTypesOtherExpanded(boolean expanded) {
+<b class="nc">&nbsp;        typesOtherExpanded.set(expanded);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty typesOtherExpandedProperty() {
+<b class="nc">&nbsp;        return typesOtherExpanded;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getTypesCustomExpanded() {
+<b class="nc">&nbsp;        return typesCustomExpanded.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void getTypesCustomExpanded(boolean expanded) {
+<b class="nc">&nbsp;        typesCustomExpanded.set(expanded);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty typesCustomExpandedProperty() {
+<b class="nc">&nbsp;        return typesCustomExpanded;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public EntryType getLatestImmediateType() {
+<b class="nc">&nbsp;        return latestImmediateType.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLatestImmediateType(EntryType type) {
+<b class="nc">&nbsp;        latestImmediateType.set(type);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;EntryType&gt; latestImmediateTypeProperty() {
+<b class="nc">&nbsp;        return latestImmediateType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getIdLookupGuessing() {
+<b class="nc">&nbsp;        return idLookupGuessing.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setIdLookupGuessing(boolean guessing) {
+<b class="nc">&nbsp;        idLookupGuessing.set(guessing);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty idLookupGuessingProperty() {
+<b class="nc">&nbsp;        return idLookupGuessing;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLatestIdFetcher() {
+<b class="nc">&nbsp;        return latestIdFetcherName.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLatestIdFetcher(String idFetcherName) {
+<b class="nc">&nbsp;        latestIdFetcherName.set(idFetcherName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty latestIdFetcherProperty() {
+<b class="nc">&nbsp;        return latestIdFetcherName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLatestInterpretParser() {
+<b class="nc">&nbsp;        return latestInterpretParserName.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLatestInterpretParser(String interpretParserName) {
+<b class="nc">&nbsp;        latestInterpretParserName.set(interpretParserName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty latestInterpretParserProperty() {
+<b class="nc">&nbsp;        return latestInterpretParserName;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

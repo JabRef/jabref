@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > XmlCharsMap</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util.strings</a>
+</div>
+
+<h1>Coverage Summary for Class: XmlCharsMap (org.jabref.logic.util.strings)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XmlCharsMap</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/108)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util.strings;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;
+&nbsp;public class XmlCharsMap extends HashMap&lt;String, String&gt; {
+<b class="nc">&nbsp;    public XmlCharsMap() {</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;\\{a\\}\\}&quot;, &quot;&amp;#x00E4;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;\\{A\\}\\}&quot;, &quot;&amp;#x00C4;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;\\{e\\}\\}&quot;, &quot;&amp;#x00EB;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;\\{E\\}\\}&quot;, &quot;&amp;#x00CB;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;\\{i\\}\\}&quot;, &quot;&amp;#x00EF;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;\\{I\\}\\}&quot;, &quot;&amp;#x00CF;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;\\{o\\}\\}&quot;, &quot;&amp;#x00F6;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;\\{O\\}\\}&quot;, &quot;&amp;#x00D6;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;\\{u\\}\\}&quot;, &quot;&amp;#x00FC;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;\\{U\\}\\}&quot;, &quot;&amp;#x00DC;&quot;);</b>
+&nbsp;
+&nbsp;        // next 2 rows were missing...
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`\\{a\\}\\}&quot;, &quot;&amp;#x00E0;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`\\{A\\}\\}&quot;, &quot;&amp;#x00C0;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`\\{e\\}\\}&quot;, &quot;&amp;#x00E8;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`\\{E\\}\\}&quot;, &quot;&amp;#x00C8;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`\\{i\\}\\}&quot;, &quot;&amp;#x00EC;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`\\{I\\}\\}&quot;, &quot;&amp;#x00CC;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`\\{o\\}\\}&quot;, &quot;&amp;#x00F2;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`\\{O\\}\\}&quot;, &quot;&amp;#x00D2;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`\\{u\\}\\}&quot;, &quot;&amp;#x00F9;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`\\{U\\}\\}&quot;, &quot;&amp;#x00D9;&quot;);</b>
+&nbsp;
+&nbsp;        // corrected these 10 lines below...
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;\\{a\\}\\}&quot;, &quot;&amp;#x00E1;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;\\{A\\}\\}&quot;, &quot;&amp;#x00C1;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;\\{e\\}\\}&quot;, &quot;&amp;#x00E9;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;\\{E\\}\\}&quot;, &quot;&amp;#x00C9;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;\\{i\\}\\}&quot;, &quot;&amp;#x00ED;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;\\{I\\}\\}&quot;, &quot;&amp;#x00CD;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;\\{o\\}\\}&quot;, &quot;&amp;#x00F3;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;\\{O\\}\\}&quot;, &quot;&amp;#x00D3;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;\\{u\\}\\}&quot;, &quot;&amp;#x00FA;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;\\{U\\}\\}&quot;, &quot;&amp;#x00DA;&quot;);</b>
+&nbsp;        // added next four chars...
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;\\{c\\}\\}&quot;, &quot;&amp;#x0107;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;\\{C\\}\\}&quot;, &quot;&amp;#x0106;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\c\\{c\\}\\}&quot;, &quot;&amp;#x00E7;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\c\\{C\\}\\}&quot;, &quot;&amp;#x00C7;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\uFFFD\\{E\\}\\}&quot;, &quot;&amp;#x00C9;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\uFFFD\\{i\\}\\}&quot;, &quot;&amp;#x00ED;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\uFFFD\\{I\\}\\}&quot;, &quot;&amp;#x00CD;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\uFFFD\\{o\\}\\}&quot;, &quot;&amp;#x00F3;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\uFFFD\\{O\\}\\}&quot;, &quot;&amp;#x00D3;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\uFFFD\\{u\\}\\}&quot;, &quot;&amp;#x00FA;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\uFFFD\\{U\\}\\}&quot;, &quot;&amp;#x00DA;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\uFFFD\\{a\\}\\}&quot;, &quot;&amp;#x00E1;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\uFFFD\\{A\\}\\}&quot;, &quot;&amp;#x00C1;&quot;);</b>
+&nbsp;
+&nbsp;        // next 2 rows were missing...
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^\\{a\\}\\}&quot;, &quot;&amp;#x00E2;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^\\{A\\}\\}&quot;, &quot;&amp;#x00C2;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^\\{o\\}\\}&quot;, &quot;&amp;#x00F4;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^\\{O\\}\\}&quot;, &quot;&amp;#x00D4;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^\\{u\\}\\}&quot;, &quot;&amp;#x00F9;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^\\{U\\}\\}&quot;, &quot;&amp;#x00D9;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^\\{e\\}\\}&quot;, &quot;&amp;#x00EA;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^\\{E\\}\\}&quot;, &quot;&amp;#x00CA;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^\\{i\\}\\}&quot;, &quot;&amp;#x00EE;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^\\{I\\}\\}&quot;, &quot;&amp;#x00CE;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\~\\{o\\}\\}&quot;, &quot;&amp;#x00F5;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\~\\{O\\}\\}&quot;, &quot;&amp;#x00D5;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\~\\{n\\}\\}&quot;, &quot;&amp;#x00F1;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\~\\{N\\}\\}&quot;, &quot;&amp;#x00D1;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\~\\{a\\}\\}&quot;, &quot;&amp;#x00E3;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\~\\{A\\}\\}&quot;, &quot;&amp;#x00C3;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;a\\}&quot;, &quot;&amp;#x00E4;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;A\\}&quot;, &quot;&amp;#x00C4;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;e\\}&quot;, &quot;&amp;#x00EB;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;E\\}&quot;, &quot;&amp;#x00CB;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;i\\}&quot;, &quot;&amp;#x00EF;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;I\\}&quot;, &quot;&amp;#x00CF;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;o\\}&quot;, &quot;&amp;#x00F6;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;O\\}&quot;, &quot;&amp;#x00D6;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;u\\}&quot;, &quot;&amp;#x00FC;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\\&quot;U\\}&quot;, &quot;&amp;#x00DC;&quot;);</b>
+&nbsp;
+&nbsp;        // next 2 rows were missing...
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`a\\}&quot;, &quot;&amp;#x00E0;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`A\\}&quot;, &quot;&amp;#x00C0;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`e\\}&quot;, &quot;&amp;#x00E8;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`E\\}&quot;, &quot;&amp;#x00C8;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`i\\}&quot;, &quot;&amp;#x00EC;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`I\\}&quot;, &quot;&amp;#x00CC;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`o\\}&quot;, &quot;&amp;#x00F2;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`O\\}&quot;, &quot;&amp;#x00D2;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`u\\}&quot;, &quot;&amp;#x00F9;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\`U\\}&quot;, &quot;&amp;#x00D9;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;e\\}&quot;, &quot;&amp;#x00E9;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;E\\}&quot;, &quot;&amp;#x00C9;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;i\\}&quot;, &quot;&amp;#x00ED;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;I\\}&quot;, &quot;&amp;#x00CD;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;o\\}&quot;, &quot;&amp;#x00F3;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;O\\}&quot;, &quot;&amp;#x00D3;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;u\\}&quot;, &quot;&amp;#x00FA;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;U\\}&quot;, &quot;&amp;#x00DA;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;a\\}&quot;, &quot;&amp;#x00E1;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;A\\}&quot;, &quot;&amp;#x00C1;&quot;);</b>
+&nbsp;        // added next two chars...
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;c\\}&quot;, &quot;&amp;#x0107;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\&#39;C\\}&quot;, &quot;&amp;#x0106;&quot;);</b>
+&nbsp;
+&nbsp;        // next two lines were wrong...
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^a\\}&quot;, &quot;&amp;#x00E2;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^A\\}&quot;, &quot;&amp;#x00C2;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^o\\}&quot;, &quot;&amp;#x00F4;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^O\\}&quot;, &quot;&amp;#x00D4;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^u\\}&quot;, &quot;&amp;#x00F9;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^U\\}&quot;, &quot;&amp;#x00D9;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^e\\}&quot;, &quot;&amp;#x00EA;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^E\\}&quot;, &quot;&amp;#x00CA;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^i\\}&quot;, &quot;&amp;#x00EE;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\^I\\}&quot;, &quot;&amp;#x00CE;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\~o\\}&quot;, &quot;&amp;#x00F5;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\~O\\}&quot;, &quot;&amp;#x00D5;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\~n\\}&quot;, &quot;&amp;#x00F1;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\~N\\}&quot;, &quot;&amp;#x00D1;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\~a\\}&quot;, &quot;&amp;#x00E3;&quot;);</b>
+<b class="nc">&nbsp;        put(&quot;\\{\\\\\\~A\\}&quot;, &quot;&amp;#x00C3;&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

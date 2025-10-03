@@ -1,0 +1,542 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Trigger</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough.declarative</a>
+</div>
+
+<h1>Coverage Summary for Class: Trigger (org.jabref.gui.walkthrough.declarative)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Trigger</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Trigger$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/131)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Trigger$Builder$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Trigger$Builder$PredicateGenerator</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/148)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough.declarative;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javafx.beans.value.ChangeListener;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.event.ActionEvent;
+&nbsp;import javafx.event.Event;
+&nbsp;import javafx.event.EventDispatcher;
+&nbsp;import javafx.event.EventHandler;
+&nbsp;import javafx.event.EventType;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.ListView;
+&nbsp;import javafx.scene.control.TextInputControl;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.util.Duration;
+&nbsp;
+&nbsp;import org.jabref.gui.fieldeditors.LinkedFilesEditor;
+&nbsp;import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
+&nbsp;import org.jabref.gui.util.DelayedExecution;
+&nbsp;import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/// Defines a trigger for when navigation should occur on a target node.
+&nbsp;@FunctionalInterface
+&nbsp;public interface Trigger {
+<b class="nc">&nbsp;    Logger LOGGER = LoggerFactory.getLogger(Trigger.class);</b>
+&nbsp;
+&nbsp;    /// Attaches the navigation triggers to the target node. `beforeNavigate` and `onNavigate` are guaranteed to run at
+&nbsp;    /// most once.
+&nbsp;    ///
+&nbsp;    /// @param node           the node to attach the listeners to
+&nbsp;    /// @param beforeNavigate the runnable to execute before navigation
+&nbsp;    /// @param onNavigate     the runnable to execute when navigation occurs
+&nbsp;    /// @return a runnable to clean up the listeners
+&nbsp;    Runnable attach(@NonNull Node node, Runnable beforeNavigate, Runnable onNavigate);
+&nbsp;
+&nbsp;    static Trigger onClick() {
+<b class="nc">&nbsp;        return create().onClick().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static Trigger onHover() {
+<b class="nc">&nbsp;        return create().onHover().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static Trigger onTextInput() {
+<b class="nc">&nbsp;        return create().onTextInput().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static Trigger onDoubleClick() {
+<b class="nc">&nbsp;        return create().onDoubleClick().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static Trigger onFileAddedToListView() {
+<b class="nc">&nbsp;        return create().onFileAddedToListView().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static Trigger onFetchFulltextCompleted() {
+<b class="nc">&nbsp;        return create().onFetchFulltextCompleted().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static Trigger onTextEquals(String expected) {
+<b class="nc">&nbsp;        return create().onTextEquals(expected).build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static Trigger onTextMatchesRegex(String regex) {
+<b class="nc">&nbsp;        return create().onTextMatchesRegex(regex).build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static Builder create() {
+<b class="nc">&nbsp;        return new Builder();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    class Builder {</b>
+<b class="nc">&nbsp;        private static final Duration DEFAULT_TIMEOUT = Duration.millis(1000);</b>
+<b class="nc">&nbsp;        private static final Duration NAVIGATION_DELAY = Duration.millis(50);</b>
+<b class="nc">&nbsp;        private static final Supplier&lt;Void&gt; NOTHING = () -&gt; null;</b>
+&nbsp;
+<b class="nc">&nbsp;        private Duration timeout = DEFAULT_TIMEOUT;</b>
+<b class="nc">&nbsp;        private boolean withWindowChangeListener = false;</b>
+&nbsp;        private PredicateGenerator generator;
+&nbsp;
+&nbsp;        @FunctionalInterface
+&nbsp;        private interface PredicateGenerator {
+&nbsp;            /// Modify the node&#39;s event dispatch chain or register custom logic to trigger [Trigger] when desired
+&nbsp;            /// conditions are met.
+&nbsp;            ///
+&nbsp;            /// @param node       The node to attach the trigger to.
+&nbsp;            /// @param onNavigate A function that wraps the original event handler. It takes a Supplier representing the
+&nbsp;            ///                                     original action and returns the result of that action.
+&nbsp;            /// @return A cleanup runnable that detaches the trigger.
+&nbsp;            Runnable create(Node node, Function&lt;Supplier&lt;?&gt;, ?&gt; onNavigate);
+&nbsp;        }
+&nbsp;
+&nbsp;        private void setGenerator(PredicateGenerator newGenerator) {
+<b class="nc">&nbsp;            if (this.generator != null) {</b>
+<b class="nc">&nbsp;                throw new IllegalStateException(&quot;A navigation trigger (e.g. onClick) has already been set.&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            this.generator = newGenerator;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /// The timeout after which navigation is triggered automatically.
+&nbsp;        ///
+&nbsp;        /// @param timeout The timeout duration. Defaults to 1000ms.
+&nbsp;        /// @return this builder
+&nbsp;        public Builder withTimeout(Duration timeout) {
+<b class="nc">&nbsp;            this.timeout = timeout;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /// If set, navigation will also be triggered when a window is closed.
+&nbsp;        ///
+&nbsp;        /// @return this builder
+&nbsp;        public Builder withWindowChangeListener() {
+<b class="nc">&nbsp;            this.withWindowChangeListener = true;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /// Triggers navigation on a single mouse click (more precisely, press) or when an action is performed (for Menu
+&nbsp;        /// and Button)
+&nbsp;        public Builder onClick() {
+<b class="nc">&nbsp;            setGenerator((node, onNavigate) -&gt; {</b>
+<b class="nc">&nbsp;                final EventDispatcher originalDispatcher = node.getEventDispatcher();</b>
+&nbsp;
+<b class="nc">&nbsp;                final EventDispatcher newDispatcher = (event, tail) -&gt; {</b>
+<b class="nc">&nbsp;                    EventType&lt;? extends Event&gt; eventType = event.getEventType();</b>
+<b class="nc">&nbsp;                    if (eventType == MouseEvent.MOUSE_CLICKED            // Catch all</b>
+&nbsp;                            || eventType == MouseEvent.MOUSE_RELEASED    // MenuItem on ContextWindow hide upon MOUSE_RELEASED, catch ACTION is too late
+&nbsp;                            || eventType == ActionEvent.ACTION) {        // Buttons, especially Buttons on DialogPane
+<b class="nc">&nbsp;                        node.setEventDispatcher(originalDispatcher);</b>
+<b class="nc">&nbsp;                        Supplier&lt;Event&gt; originalAction = () -&gt; originalDispatcher.dispatchEvent(event, tail);</b>
+<b class="nc">&nbsp;                        return (Event) onNavigate.apply(originalAction);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    return originalDispatcher.dispatchEvent(event, tail);</b>
+&nbsp;                };
+&nbsp;
+<b class="nc">&nbsp;                node.setEventDispatcher(newDispatcher);</b>
+&nbsp;
+<b class="nc">&nbsp;                return () -&gt; node.setEventDispatcher(originalDispatcher);</b>
+&nbsp;            });
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder onHover() {
+<b class="nc">&nbsp;            setGenerator((node, onNavigate) -&gt; {</b>
+<b class="nc">&nbsp;                final EventDispatcher originalDispatcher = node.getEventDispatcher();</b>
+<b class="nc">&nbsp;                final EventDispatcher newDispatcher = (event, tail) -&gt; {</b>
+<b class="nc">&nbsp;                    if (event.getEventType() == MouseEvent.MOUSE_ENTERED) {</b>
+<b class="nc">&nbsp;                        if (!node.isDisabled() &amp;&amp; !event.isConsumed()) {</b>
+<b class="nc">&nbsp;                            node.setEventDispatcher(originalDispatcher);</b>
+<b class="nc">&nbsp;                            Supplier&lt;Event&gt; originalAction = () -&gt; originalDispatcher.dispatchEvent(event, tail);</b>
+<b class="nc">&nbsp;                            return (Event) onNavigate.apply(originalAction);</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    return originalDispatcher.dispatchEvent(event, tail);</b>
+&nbsp;                };
+<b class="nc">&nbsp;                node.setEventDispatcher(newDispatcher);</b>
+<b class="nc">&nbsp;                return () -&gt; node.setEventDispatcher(originalDispatcher);</b>
+&nbsp;            });
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder onTextInput() {
+<b class="nc">&nbsp;            setGenerator((node, onNavigate) -&gt; {</b>
+<b class="nc">&nbsp;                if (!(node instanceof TextInputControl textInput)) {</b>
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;onTextInput can only be used with TextInputControl&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                ChangeListener&lt;String&gt; listener = (_, _, newText) -&gt; {</b>
+<b class="nc">&nbsp;                    if (!newText.trim().isEmpty()) {</b>
+&nbsp;                        // A text input change doesn&#39;t have an &quot;original action&quot; to wrap, so we pass NOTHING.
+<b class="nc">&nbsp;                        onNavigate.apply(NOTHING);</b>
+&nbsp;                    }
+&nbsp;                };
+<b class="nc">&nbsp;                textInput.textProperty().addListener(listener);</b>
+<b class="nc">&nbsp;                return () -&gt; textInput.textProperty().removeListener(listener);</b>
+&nbsp;            });
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder onTextEquals(String expected) {
+<b class="nc">&nbsp;            Objects.requireNonNull(expected, &quot;expected must not be null&quot;);</b>
+<b class="nc">&nbsp;            setGenerator((node, onNavigate) -&gt; {</b>
+<b class="nc">&nbsp;                if (!(node instanceof TextInputControl textInput)) {</b>
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;onTextEquals can only be used with TextInputControl&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                ChangeListener&lt;String&gt; listener = (_, _, newText) -&gt; {</b>
+<b class="nc">&nbsp;                    if (expected.equals(newText)) {</b>
+<b class="nc">&nbsp;                        onNavigate.apply(NOTHING);</b>
+&nbsp;                    }
+&nbsp;                };
+<b class="nc">&nbsp;                textInput.textProperty().addListener(listener);</b>
+<b class="nc">&nbsp;                return () -&gt; textInput.textProperty().removeListener(listener);</b>
+&nbsp;            });
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder onTextMatchesRegex(String regex) {
+<b class="nc">&nbsp;            Objects.requireNonNull(regex, &quot;regex must not be null&quot;);</b>
+<b class="nc">&nbsp;            final Pattern compiled = Pattern.compile(regex);</b>
+<b class="nc">&nbsp;            setGenerator((node, onNavigate) -&gt; {</b>
+<b class="nc">&nbsp;                if (!(node instanceof TextInputControl textInput)) {</b>
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;onTextMatchesRegex can only be used with TextInputControl&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                ChangeListener&lt;String&gt; listener = (_, _, newText) -&gt; {</b>
+<b class="nc">&nbsp;                    if (newText != null &amp;&amp; compiled.matcher(newText).matches()) {</b>
+<b class="nc">&nbsp;                        onNavigate.apply(NOTHING);</b>
+&nbsp;                    }
+&nbsp;                };
+<b class="nc">&nbsp;                textInput.textProperty().addListener(listener);</b>
+<b class="nc">&nbsp;                return () -&gt; textInput.textProperty().removeListener(listener);</b>
+&nbsp;            });
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder onDoubleClick() {
+<b class="nc">&nbsp;            setGenerator((node, onNavigate) -&gt; {</b>
+<b class="nc">&nbsp;                EventHandler&lt;MouseEvent&gt; handler = event -&gt; {</b>
+<b class="nc">&nbsp;                    if (event.getClickCount() == 2 &amp;&amp; !event.isConsumed()) {</b>
+<b class="nc">&nbsp;                        onNavigate.apply(NOTHING);</b>
+&nbsp;                    }
+&nbsp;                };
+<b class="nc">&nbsp;                node.addEventFilter(MouseEvent.MOUSE_CLICKED, handler);</b>
+<b class="nc">&nbsp;                return () -&gt; node.removeEventFilter(MouseEvent.MOUSE_CLICKED, handler);</b>
+&nbsp;            });
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder onRightClick() {
+<b class="nc">&nbsp;            setGenerator((node, onNavigate) -&gt; {</b>
+<b class="nc">&nbsp;                final EventDispatcher originalDispatcher = node.getEventDispatcher();</b>
+<b class="nc">&nbsp;                final EventDispatcher newDispatcher = (event, tail) -&gt; {</b>
+<b class="nc">&nbsp;                    if (event.getEventType() == MouseEvent.MOUSE_PRESSED &amp;&amp; ((MouseEvent) event).getButton() == javafx.scene.input.MouseButton.SECONDARY) {</b>
+<b class="nc">&nbsp;                        node.setEventDispatcher(originalDispatcher);</b>
+<b class="nc">&nbsp;                        Supplier&lt;Event&gt; originalAction = () -&gt; originalDispatcher.dispatchEvent(event, tail);</b>
+<b class="nc">&nbsp;                        return (Event) onNavigate.apply(originalAction);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    return originalDispatcher.dispatchEvent(event, tail);</b>
+&nbsp;                };
+<b class="nc">&nbsp;                node.setEventDispatcher(newDispatcher);</b>
+<b class="nc">&nbsp;                return () -&gt; node.setEventDispatcher(originalDispatcher);</b>
+&nbsp;            });
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder onFileAddedToListView() {
+<b class="nc">&nbsp;            setGenerator((node, onNavigate) -&gt; {</b>
+<b class="nc">&nbsp;                ListView&lt;?&gt; listView = (ListView&lt;?&gt;) node.lookup(&quot;#listView&quot;);</b>
+<b class="nc">&nbsp;                if (listView == null) {</b>
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;onFileAddedToListView can only be used with ListView&quot;);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                ListChangeListener&lt;Object&gt; listener = change -&gt; {</b>
+<b class="nc">&nbsp;                    while (change.next()) {</b>
+<b class="nc">&nbsp;                        if (change.wasAdded() &amp;&amp; !change.getAddedSubList().isEmpty()) {</b>
+<b class="nc">&nbsp;                            onNavigate.apply(NOTHING);</b>
+&nbsp;                            break;
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                };
+&nbsp;
+<b class="nc">&nbsp;                @SuppressWarnings(&quot;unchecked&quot;) ObservableList&lt;Object&gt; items = (ObservableList&lt;Object&gt;) listView.getItems();</b>
+<b class="nc">&nbsp;                items.addListener(listener);</b>
+&nbsp;
+<b class="nc">&nbsp;                return () -&gt; items.removeListener(listener);</b>
+&nbsp;            });
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder onFetchFulltextCompleted() {
+<b class="nc">&nbsp;            setGenerator((node, onNavigate) -&gt; {</b>
+<b class="nc">&nbsp;                if (!(node instanceof LinkedFilesEditor linkedFilesEditor)) {</b>
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Node must be an instance of LinkedFilesEditor&quot;);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                LinkedFilesEditorViewModel viewModel = linkedFilesEditor.getViewModel();</b>
+<b class="nc">&nbsp;                ChangeListener&lt;Boolean&gt; fulltextListener = (_, _, inProgress) -&gt; {</b>
+<b class="nc">&nbsp;                    if (!inProgress) {</b>
+<b class="nc">&nbsp;                        onNavigate.apply(NOTHING);</b>
+&nbsp;                    }
+&nbsp;                };
+&nbsp;
+<b class="nc">&nbsp;                viewModel.fulltextLookupInProgressProperty().addListener(fulltextListener);</b>
+<b class="nc">&nbsp;                return () -&gt; viewModel.fulltextLookupInProgressProperty().removeListener(fulltextListener);</b>
+&nbsp;            });
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Trigger build() {
+<b class="nc">&nbsp;            Objects.requireNonNull(generator, &quot;A navigation trigger must be selected (e.g., onClick, onHover).&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            return (node, beforeNavigate, onNavigate) -&gt; {</b>
+<b class="nc">&nbsp;                List&lt;Runnable&gt; triggerListenersCleanups = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;                List&lt;Runnable&gt; navigationRaceCleanups = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;                Runnable raceToNavigate = new Runnable() {</b>
+<b class="nc">&nbsp;                    boolean hasRun = false;</b>
+&nbsp;
+&nbsp;                    @Override
+&nbsp;                    public void run() {
+<b class="nc">&nbsp;                        if (hasRun) {</b>
+&nbsp;                            return;
+&nbsp;                        }
+<b class="nc">&nbsp;                        hasRun = true;</b>
+<b class="nc">&nbsp;                        navigationRaceCleanups.forEach(Runnable::run);</b>
+<b class="nc">&nbsp;                        navigationRaceCleanups.clear();</b>
+&nbsp;
+&nbsp;                         /*
+&nbsp;                            Replace this line with `onNavigate.run` WILL LEAD TO [IndexOutOfBoundsException] when JavaFX performs layout
+&nbsp;                            calculation on the dialog pane opened by [org.jabref.gui.preferences.ShowPreferencesAction].
+&nbsp;                            It seems that directly listening to MOUSE_PRESSED event (which is necessary)
+&nbsp;                            triggers a race condition between [org.jabref.gui.walkthrough.WalkthroughPane] trying to
+&nbsp;                            attach on the new window and JavaFX trying to perform layout. It&#39;s unclear if this
+&nbsp;                            timeout need to change based configuration to prevent error. You cannot catch this exception
+&nbsp;                            because it occurs directly in the `jdk.internals` package.
+&nbsp;                          */
+<b class="nc">&nbsp;                        new DelayedExecution(NAVIGATION_DELAY, onNavigate).start();</b>
+&nbsp;                    }
+&nbsp;                };
+&nbsp;
+<b class="nc">&nbsp;                Function&lt;Supplier&lt;?&gt;, Object&gt; handleUserAction = originalAction -&gt; {</b>
+&nbsp;                    // Immediate clean-up to ensure at most called once.
+<b class="nc">&nbsp;                    triggerListenersCleanups.forEach(Runnable::run);</b>
+<b class="nc">&nbsp;                    triggerListenersCleanups.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;                    beforeNavigate.run();</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (timeout != null) {</b>
+<b class="nc">&nbsp;                        DelayedExecution delayedExecution = new DelayedExecution(timeout, raceToNavigate);</b>
+<b class="nc">&nbsp;                        delayedExecution.start();</b>
+<b class="nc">&nbsp;                        navigationRaceCleanups.add(delayedExecution::cancel);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (withWindowChangeListener) {</b>
+<b class="nc">&nbsp;                        navigationRaceCleanups.add(WalkthroughUtils.onWindowChangedUntil(() -&gt; {</b>
+<b class="nc">&nbsp;                            raceToNavigate.run();</b>
+<b class="nc">&nbsp;                            return true;</b>
+&nbsp;                        }));
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    Object result = originalAction.get();</b>
+<b class="nc">&nbsp;                    raceToNavigate.run();</b>
+<b class="nc">&nbsp;                    return result;</b>
+&nbsp;                };
+&nbsp;
+<b class="nc">&nbsp;                triggerListenersCleanups.add(generator.create(node, handleUserAction));</b>
+&nbsp;
+<b class="nc">&nbsp;                return () -&gt; {</b>
+<b class="nc">&nbsp;                    triggerListenersCleanups.forEach(Runnable::run);</b>
+<b class="nc">&nbsp;                    navigationRaceCleanups.forEach(Runnable::run);</b>
+&nbsp;                };
+&nbsp;            };
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

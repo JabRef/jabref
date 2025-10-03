@@ -1,0 +1,207 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InternalField</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.field</a>
+</div>
+
+<h1>Coverage Summary for Class: InternalField (org.jabref.model.entry.field)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InternalField</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.9%
+  </span>
+  <span class="absValue">
+    (17/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.field;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * JabRef internal fields. These are not normal fields but mostly placeholders with special functions.
+&nbsp; */
+<b class="fc">&nbsp;public enum InternalField implements Field {</b>
+&nbsp;    /**
+&nbsp;     * The BibTeX key (which is used at \cite{key} in LaTeX
+&nbsp;     */
+<b class="fc">&nbsp;    KEY_FIELD(&quot;citationkey&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * field which indicates the entrytype
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Example: &lt;code&gt;@misc{key}&lt;/code&gt;
+&nbsp;     */
+<b class="fc">&nbsp;    TYPE_HEADER(&quot;entrytype&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used in old layout files
+&nbsp;     */
+<b class="fc">&nbsp;    OBSOLETE_TYPE_HEADER(&quot;bibtextype&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * used in old versions of JabRef. Currently used for conversion only
+&nbsp;     */
+<b class="fc">&nbsp;    MARKED_INTERNAL(&quot;__markedentry&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Marker that the content is just a BibTeX string
+&nbsp;     */
+<b class="fc">&nbsp;    BIBTEX_STRING(&quot;__string&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * virtual field to denote &quot;all fields&quot;. Used in the metadata serialization for save actions.
+&nbsp;     */
+<b class="fc">&nbsp;    INTERNAL_ALL_FIELD(&quot;all&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * virtual field to denote &quot;all text fields&quot;. Used in the metadata serialization for save actions.
+&nbsp;     */
+<b class="fc">&nbsp;    INTERNAL_ALL_TEXT_FIELDS_FIELD(&quot;all-text-fields&quot;),</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * all field names starting with &quot;Jabref-internal-&quot; are not appearing in .bib files
+&nbsp;     */
+<b class="fc">&nbsp;    INTERNAL_ID_FIELD(&quot;JabRef-internal-id&quot;);</b>
+&nbsp;
+&nbsp;    private final String name;
+&nbsp;    private final EnumSet&lt;FieldProperty&gt; properties;
+&nbsp;
+<b class="fc">&nbsp;    InternalField(String name) {</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.properties = EnumSet.noneOf(FieldProperty.class);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    InternalField(String name, FieldProperty first, FieldProperty... rest) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.properties = EnumSet.of(first, rest);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;InternalField&gt; fromName(String name) {
+<b class="pc">&nbsp;        if (&quot;bibtexkey&quot;.equalsIgnoreCase(name)) {</b>
+&nbsp;            // For backwards compatibility
+<b class="nc">&nbsp;            return Optional.of(InternalField.KEY_FIELD);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return Arrays.stream(InternalField.values())</b>
+<b class="fc">&nbsp;                     .filter(field -&gt; field.getName().equalsIgnoreCase(name))</b>
+<b class="fc">&nbsp;                     .findAny();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public EnumSet&lt;FieldProperty&gt; getProperties() {
+<b class="nc">&nbsp;        return properties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="fc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isStandardField() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

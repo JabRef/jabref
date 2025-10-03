@@ -1,0 +1,190 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > URLUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors</a>
+</div>
+
+<h1>Coverage Summary for Class: URLUtil (org.jabref.gui.fieldeditors)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">URLUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.gui.externalfiletype.ExternalFileTypes;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;
+&nbsp;/**
+&nbsp; * URL utilities for URLs in the JabRef GUI.
+&nbsp; * &lt;p&gt;
+&nbsp; * For logic-oriented URL utilities see {@link org.jabref.logic.util.URLUtil}.
+&nbsp; */
+&nbsp;public class URLUtil {
+&nbsp;
+&nbsp;    private URLUtil() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Look for the last &#39;.&#39; in the link, and return the following characters.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This gives the extension for most reasonably named links.
+&nbsp;     *
+&nbsp;     * @param link The link
+&nbsp;     * @return The suffix, excluding the dot (e.g. &quot;pdf&quot;)
+&nbsp;     */
+&nbsp;    public static Optional&lt;String&gt; getSuffix(final String link, ExternalApplicationsPreferences externalApplicationsPreferences) {
+<b class="nc">&nbsp;        String strippedLink = link;</b>
+&nbsp;        try {
+&nbsp;            // Try to strip the query string, if any, to get the correct suffix:
+<b class="nc">&nbsp;            URL url = org.jabref.logic.util.URLUtil.create(link);</b>
+<b class="nc">&nbsp;            if ((url.getQuery() != null) &amp;&amp; (url.getQuery().length() &lt; (link.length() - 1))) {</b>
+<b class="nc">&nbsp;                strippedLink = link.substring(0, link.length() - url.getQuery().length() - 1);</b>
+&nbsp;            }
+&nbsp;        } catch (MalformedURLException e) {
+&nbsp;            // Don&#39;t report this error, since this getting the suffix is a non-critical
+&nbsp;            // operation, and this error will be triggered and reported elsewhere.
+&nbsp;        }
+&nbsp;        // First see if the stripped link gives a reasonable suffix:
+&nbsp;        String suffix;
+<b class="nc">&nbsp;        int strippedLinkIndex = strippedLink.lastIndexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;        if ((strippedLinkIndex &lt;= 0) || (strippedLinkIndex == (strippedLink.length() - 1))) {</b>
+<b class="nc">&nbsp;            suffix = null;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            suffix = strippedLink.substring(strippedLinkIndex + 1);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!ExternalFileTypes.isExternalFileTypeByExt(suffix, externalApplicationsPreferences)) {</b>
+&nbsp;            // If the suffix doesn&#39;t seem to give any reasonable file type, try
+&nbsp;            // with the non-stripped link:
+<b class="nc">&nbsp;            int index = link.lastIndexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;            if ((index &lt;= 0) || (index == (link.length() - 1))) {</b>
+&nbsp;                // No occurrence, or at the end
+&nbsp;                // Check if there are path separators in the suffix - if so, it is definitely
+&nbsp;                // not a proper suffix, so we should give up:
+<b class="nc">&nbsp;                if (strippedLink.substring(strippedLinkIndex + 1).indexOf(&#39;/&#39;) &gt;= 1) {</b>
+<b class="nc">&nbsp;                    return Optional.empty();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    return Optional.of(suffix); // return the first one we found, anyway.</b>
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                // Check if there are path separators in the suffix - if so, it is definitely
+&nbsp;                // not a proper suffix, so we should give up:
+<b class="nc">&nbsp;                if (link.substring(index + 1).indexOf(&#39;/&#39;) &gt;= 1) {</b>
+<b class="nc">&nbsp;                    return Optional.empty();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    return Optional.of(link.substring(index + 1));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.ofNullable(suffix);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

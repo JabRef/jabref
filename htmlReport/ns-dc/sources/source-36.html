@@ -1,0 +1,137 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NoSpaceBetweenAbbreviations</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: NoSpaceBetweenAbbreviations (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NoSpaceBetweenAbbreviations</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import org.jabref.logic.layout.LayoutFormatter;
+&nbsp;
+&nbsp;/**
+&nbsp; * &lt;p&gt;
+&nbsp; * LayoutFormatter that removes the space between abbreviated First names
+&nbsp; * &lt;/p&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * What out that this regular expression might also remove other spaces that fit the pattern.
+&nbsp; * &lt;/p&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Example: J. R. R. Tolkien becomes J.R.R. Tolkien.
+&nbsp; * &lt;/p&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * See Testcase for more examples.
+&nbsp; * &lt;p&gt;
+&nbsp; */
+<b class="nc">&nbsp;public class NoSpaceBetweenAbbreviations implements LayoutFormatter {</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Match &#39;.&#39; followed by spaces followed by uppercase char followed by &#39;.&#39;
+&nbsp;     * but don&#39;t include the last dot into the capturing group.
+&nbsp;     *
+&nbsp;     * Replace the match by removing the spaces.
+&nbsp;     *
+&nbsp;     * @see org.jabref.export.layout.LayoutFormatter#format(java.lang.String)
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String format(String fieldText) {
+<b class="nc">&nbsp;        return fieldText.replaceAll(&quot;\\.\\s+(\\p{Lu})(?=\\.)&quot;, &quot;\\.$1&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

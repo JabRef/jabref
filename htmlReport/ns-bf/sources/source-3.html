@@ -1,0 +1,273 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SlrGitHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.git</a>
+</div>
+
+<h1>Coverage Summary for Class: SlrGitHandler (org.jabref.logic.git)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SlrGitHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.git;
+&nbsp;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.StringJoiner;
+&nbsp;
+&nbsp;import org.jabref.logic.crawler.StudyRepository;
+&nbsp;
+&nbsp;import org.eclipse.jgit.api.Git;
+&nbsp;import org.eclipse.jgit.api.errors.GitAPIException;
+&nbsp;import org.eclipse.jgit.diff.DiffEntry;
+&nbsp;import org.eclipse.jgit.diff.DiffFormatter;
+&nbsp;import org.eclipse.jgit.lib.ObjectId;
+&nbsp;import org.eclipse.jgit.lib.ObjectReader;
+&nbsp;import org.eclipse.jgit.lib.Ref;
+&nbsp;import org.eclipse.jgit.lib.Repository;
+&nbsp;import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+&nbsp;
+&nbsp;public class SlrGitHandler extends GitHandler {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialize the handler for the given repository
+&nbsp;     *
+&nbsp;     * @param repositoryPath The root of the initialized git repository
+&nbsp;     */
+&nbsp;    public SlrGitHandler(Path repositoryPath) {
+<b class="nc">&nbsp;        super(repositoryPath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void appendLatestSearchResultsOntoCurrentBranch(String patchMessage, String searchBranchName) throws IOException, GitAPIException {
+&nbsp;        // Calculate and apply new search results to work branch
+<b class="nc">&nbsp;        String patch = calculatePatchOfNewSearchResults(searchBranchName);</b>
+<b class="nc">&nbsp;        Map&lt;Path, String&gt; result = parsePatchForAddedEntries(patch);</b>
+&nbsp;
+<b class="nc">&nbsp;        applyPatch(result);</b>
+<b class="nc">&nbsp;        this.createCommitOnCurrentBranch(patchMessage, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculates the diff between the HEAD and the previous commit of the sourceBranch.
+&nbsp;     *
+&nbsp;     * @param sourceBranch The name of the branch that is the target of the calculation
+&nbsp;     * @return Returns the patch (diff) between the head of the sourceBranch and its previous commit HEAD^1
+&nbsp;     */
+&nbsp;    String calculatePatchOfNewSearchResults(String sourceBranch) throws IOException, GitAPIException {
+<b class="nc">&nbsp;        try (Git git = Git.open(this.repositoryPathAsFile)) {</b>
+<b class="nc">&nbsp;            Optional&lt;Ref&gt; sourceBranchRef = getRefForBranch(sourceBranch);</b>
+<b class="nc">&nbsp;            if (sourceBranchRef.isEmpty()) {</b>
+<b class="nc">&nbsp;                return &quot;&quot;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Repository repository = git.getRepository();</b>
+<b class="nc">&nbsp;            ObjectId branchHead = sourceBranchRef.get().getObjectId();</b>
+<b class="nc">&nbsp;            ObjectId treeIdHead = repository.resolve(branchHead.getName() + &quot;^{tree}&quot;);</b>
+<b class="nc">&nbsp;            ObjectId treeIdHeadParent = repository.resolve(branchHead.getName() + &quot;~1^{tree}&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            try (ObjectReader reader = repository.newObjectReader()) {</b>
+<b class="nc">&nbsp;                CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();</b>
+<b class="nc">&nbsp;                oldTreeIter.reset(reader, treeIdHeadParent);</b>
+<b class="nc">&nbsp;                CanonicalTreeParser newTreeIter = new CanonicalTreeParser();</b>
+<b class="nc">&nbsp;                newTreeIter.reset(reader, treeIdHead);</b>
+&nbsp;
+<b class="nc">&nbsp;                ByteArrayOutputStream put = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;                try (DiffFormatter formatter = new DiffFormatter(put)) {</b>
+<b class="nc">&nbsp;                    formatter.setRepository(git.getRepository());</b>
+<b class="nc">&nbsp;                    List&lt;DiffEntry&gt; entries = formatter.scan(oldTreeIter, newTreeIter);</b>
+<b class="nc">&nbsp;                    for (DiffEntry entry : entries) {</b>
+<b class="nc">&nbsp;                        if (entry.getChangeType() == DiffEntry.ChangeType.MODIFY) {</b>
+<b class="nc">&nbsp;                            formatter.format(entry);</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    formatter.flush();</b>
+<b class="nc">&nbsp;                    return put.toString();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Applies the provided patch on the current branch
+&nbsp;     * Ignores any changes made to the study definition file.
+&nbsp;     * The reason for this is that the study definition file cannot be patched the same way as the bib files, as the
+&nbsp;     * order of fields in the yml file matters.
+&nbsp;     *
+&nbsp;     * @param patch the patch (diff) as a string
+&nbsp;     * @return Returns a map where each file has its path as a key and the string contains the hunk of new results
+&nbsp;     */
+&nbsp;    Map&lt;Path, String&gt; parsePatchForAddedEntries(String patch) throws IOException, GitAPIException {
+<b class="nc">&nbsp;        String[] tokens = patch.split(&quot;\n&quot;);</b>
+&nbsp;        // Tracks for each file the related diff. Represents each file by its relative path
+<b class="nc">&nbsp;        Map&lt;Path, String&gt; diffsPerFile = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        boolean content = false;</b>
+<b class="nc">&nbsp;        StringJoiner joiner = null;</b>
+<b class="nc">&nbsp;        String relativePath = null;</b>
+<b class="nc">&nbsp;        for (String currentToken : tokens) {</b>
+&nbsp;            // Begin of a new diff
+<b class="nc">&nbsp;            if (currentToken.startsWith(&quot;diff --git a/&quot;)) {</b>
+&nbsp;                // If the diff is related to a different file, save the diff for the previous file
+<b class="nc">&nbsp;                if (!(relativePath == null || joiner == null)) {</b>
+<b class="nc">&nbsp;                    if (!relativePath.contains(StudyRepository.STUDY_DEFINITION_FILE_NAME)) {</b>
+<b class="nc">&nbsp;                        diffsPerFile.put(Path.of(repositoryPath.toString(), relativePath), joiner.toString());</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                // Find the relative path of the file that is related with the current diff
+<b class="nc">&nbsp;                relativePath = currentToken.substring(13, currentToken.indexOf(&quot; b/&quot;));</b>
+<b class="nc">&nbsp;                content = false;</b>
+<b class="nc">&nbsp;                joiner = new StringJoiner(&quot;\n&quot;);</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;            // From here on content follows
+<b class="nc">&nbsp;            if (currentToken.startsWith(&quot;@@ &quot;) &amp;&amp; currentToken.endsWith(&quot; @@&quot;)) {</b>
+<b class="nc">&nbsp;                content = true;</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;            // Only add &quot;new&quot; lines to diff (no context lines)
+<b class="nc">&nbsp;            if (content &amp;&amp; currentToken.startsWith(&quot;+&quot;)) {</b>
+&nbsp;                // Do not include + sign
+<b class="nc">&nbsp;                if (joiner != null) {</b>
+<b class="nc">&nbsp;                    joiner.add(currentToken.substring(1));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (!(relativePath == null || joiner == null)) {</b>
+&nbsp;            // For the last file this has to be done at the end
+<b class="nc">&nbsp;            diffsPerFile.put(Path.of(repositoryPath.toString(), relativePath), joiner.toString());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return diffsPerFile;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Applies for each file (specified as keys), the calculated patch (specified as the value)
+&nbsp;     * The patch is inserted between the encoding and the contents of the bib files.
+&nbsp;     */
+&nbsp;    void applyPatch(Map&lt;Path, String&gt; patch) {
+<b class="nc">&nbsp;        patch.keySet().forEach(path -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                String currentContent = Files.readString(path);</b>
+<b class="nc">&nbsp;                String prefix = &quot;&quot;;</b>
+<b class="nc">&nbsp;                if (currentContent.startsWith(&quot;% Encoding:&quot;)) {</b>
+<b class="nc">&nbsp;                    int endOfEncoding = currentContent.indexOf(&quot;\n&quot;);</b>
+&nbsp;                    // Include Encoding and the empty line
+<b class="nc">&nbsp;                    prefix = currentContent.substring(0, endOfEncoding + 1) + &quot;\n&quot;;</b>
+<b class="nc">&nbsp;                    currentContent = currentContent.substring(endOfEncoding + 2);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                Files.writeString(path, prefix + patch.get(path) + currentContent, StandardCharsets.UTF_8);</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Could not apply patch.&quot;);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

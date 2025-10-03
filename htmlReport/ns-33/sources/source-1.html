@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutoLinkFilesAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.externalfiles</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoLinkFilesAction (org.jabref.gui.externalfiles)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoLinkFilesAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AutoLinkFilesAction$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.externalfiles;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.concurrent.Task;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.gui.undo.UndoableFieldChange;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.bibtex.FileFieldWriter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+&nbsp;import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
+&nbsp;
+&nbsp;/**
+&nbsp; * This Action may only be used in a menu or button.
+&nbsp; * Never in the entry editor. FileListEditor and EntryEditor have other ways to update the file links
+&nbsp; */
+&nbsp;public class AutoLinkFilesAction extends SimpleCommand {
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;    private final UiTaskExecutor taskExecutor;
+&nbsp;
+<b class="nc">&nbsp;    public AutoLinkFilesAction(DialogService dialogService, GuiPreferences preferences, StateManager stateManager, UndoManager undoManager, UiTaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(needsDatabase(this.stateManager).and(needsEntriesSelected(stateManager)));</b>
+<b class="nc">&nbsp;        this.statusMessage.bind(BindingsHelper.ifThenElse(executable, &quot;&quot;, Localization.lang(&quot;This operation requires one or more entries to be selected.&quot;)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        final BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -&gt; new NullPointerException(&quot;Database null&quot;));</b>
+<b class="nc">&nbsp;        final List&lt;BibEntry&gt; entries = stateManager.getSelectedEntries();</b>
+&nbsp;
+<b class="nc">&nbsp;        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(</b>
+&nbsp;                database,
+<b class="nc">&nbsp;                preferences.getExternalApplicationsPreferences(),</b>
+<b class="nc">&nbsp;                preferences.getFilePreferences(),</b>
+<b class="nc">&nbsp;                preferences.getAutoLinkPreferences());</b>
+<b class="nc">&nbsp;        final NamedCompoundEdit nc = new NamedCompoundEdit(Localization.lang(&quot;Automatically set file links&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        Task&lt;AutoSetFileLinksUtil.LinkFilesResult&gt; linkFilesTask = new Task&lt;&gt;() {</b>
+<b class="nc">&nbsp;            final BiConsumer&lt;LinkedFile, BibEntry&gt; onLinkedFile = (linkedFile, entry) -&gt; {</b>
+&nbsp;                // lambda for gui actions that are relevant when setting the linked file entry when ui is opened
+<b class="nc">&nbsp;                String newVal = FileFieldWriter.getStringRepresentation(linkedFile);</b>
+<b class="nc">&nbsp;                String oldVal = entry.getField(StandardField.FILE).orElse(null);</b>
+<b class="nc">&nbsp;                UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);</b>
+<b class="nc">&nbsp;                nc.addEdit(fieldChange); // push to undo manager is in succeeded</b>
+<b class="nc">&nbsp;                UiTaskExecutor.runInJavaFXThread(() -&gt; entry.addFile(linkedFile));</b>
+&nbsp;            };
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected AutoSetFileLinksUtil.LinkFilesResult call() {
+<b class="nc">&nbsp;                return util.linkAssociatedFiles(entries, onLinkedFile);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected void succeeded() {
+<b class="nc">&nbsp;                AutoSetFileLinksUtil.LinkFilesResult result = getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (!result.getFileExceptions().isEmpty()) {</b>
+<b class="nc">&nbsp;                    dialogService.showWarningDialogAndWait(</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Automatically set file links&quot;),</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Problem finding files. See error log for details.&quot;));</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (result.getChangedEntries().isEmpty()) {</b>
+<b class="nc">&nbsp;                    dialogService.showWarningDialogAndWait(&quot;Automatically set file links&quot;,</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Finished automatically setting external links.&quot;) + &quot;\n&quot;</b>
+<b class="nc">&nbsp;                                    + Localization.lang(&quot;No files found.&quot;));</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (nc.hasEdits()) {</b>
+<b class="nc">&nbsp;                    nc.end();</b>
+<b class="nc">&nbsp;                    undoManager.addEdit(nc);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Finished automatically setting external links.&quot;) + &quot; &quot;</b>
+<b class="nc">&nbsp;                        + Localization.lang(&quot;Changed %0 entries.&quot;, String.valueOf(result.getChangedEntries().size())));</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showProgressDialog(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Automatically setting file links&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Searching for files&quot;),</b>
+&nbsp;                linkFilesTask);
+<b class="nc">&nbsp;        taskExecutor.execute(linkFilesTask);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

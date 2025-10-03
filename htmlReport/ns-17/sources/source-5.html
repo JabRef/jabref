@@ -1,0 +1,194 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DatabaseChangeList</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.collab</a>
+</div>
+
+<h1>Coverage Summary for Class: DatabaseChangeList (org.jabref.gui.collab)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DatabaseChangeList</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.collab;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.gui.collab.entryadd.EntryAdd;
+&nbsp;import org.jabref.gui.collab.entrychange.EntryChange;
+&nbsp;import org.jabref.gui.collab.entrydelete.EntryDelete;
+&nbsp;import org.jabref.gui.collab.groupchange.GroupChange;
+&nbsp;import org.jabref.gui.collab.metedatachange.MetadataChange;
+&nbsp;import org.jabref.gui.collab.preamblechange.PreambleChange;
+&nbsp;import org.jabref.gui.collab.stringadd.BibTexStringAdd;
+&nbsp;import org.jabref.gui.collab.stringchange.BibTexStringChange;
+&nbsp;import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
+&nbsp;import org.jabref.gui.collab.stringrename.BibTexStringRename;
+&nbsp;import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
+&nbsp;import org.jabref.logic.bibtex.comparator.BibEntryDiff;
+&nbsp;import org.jabref.logic.bibtex.comparator.BibStringDiff;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;
+&nbsp;public class DatabaseChangeList {
+&nbsp;    private DatabaseChangeList() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compares the given two databases, and returns the list of changes required to change the {@code originalDatabase} into the {@code otherDatabase}
+&nbsp;     *
+&nbsp;     * @param originalDatabase This is the original database
+&nbsp;     * @param otherDatabase    This is the other database.
+&nbsp;     * @return an unmodifiable list of {@code DatabaseChange} required to change {@code originalDatabase} into {@code otherDatabase}
+&nbsp;     */
+&nbsp;    public static List&lt;DatabaseChange&gt; compareAndGetChanges(BibDatabaseContext originalDatabase, BibDatabaseContext otherDatabase, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+<b class="nc">&nbsp;        List&lt;DatabaseChange&gt; changes = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        BibDatabaseDiff differences = BibDatabaseDiff.compare(originalDatabase, otherDatabase);</b>
+&nbsp;
+<b class="nc">&nbsp;        differences.getMetaDataDifferences().ifPresent(diff -&gt; {</b>
+<b class="nc">&nbsp;            changes.add(new MetadataChange(diff, originalDatabase, databaseChangeResolverFactory));</b>
+<b class="nc">&nbsp;            diff.getGroupDifferences().ifPresent(groupDiff -&gt; changes.add(new GroupChange(</b>
+&nbsp;                    groupDiff, originalDatabase, databaseChangeResolverFactory
+&nbsp;            )));
+&nbsp;        });
+<b class="nc">&nbsp;        differences.getPreambleDifferences().ifPresent(diff -&gt; changes.add(new PreambleChange(diff, originalDatabase, databaseChangeResolverFactory)));</b>
+<b class="nc">&nbsp;        differences.getBibStringDifferences().forEach(diff -&gt; changes.add(createBibStringDiff(originalDatabase, databaseChangeResolverFactory, diff)));</b>
+<b class="nc">&nbsp;        differences.getEntryDifferences().forEach(diff -&gt; changes.add(createBibEntryDiff(originalDatabase, databaseChangeResolverFactory, diff)));</b>
+&nbsp;
+<b class="nc">&nbsp;        return Collections.unmodifiableList(changes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static DatabaseChange createBibStringDiff(BibDatabaseContext originalDatabase, DatabaseChangeResolverFactory databaseChangeResolverFactory, BibStringDiff diff) {
+<b class="nc">&nbsp;        if (diff.getOriginalString() == null) {</b>
+<b class="nc">&nbsp;            return new BibTexStringAdd(diff.getNewString(), originalDatabase, databaseChangeResolverFactory);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (diff.getNewString() == null) {</b>
+<b class="nc">&nbsp;            return new BibTexStringDelete(diff.getOriginalString(), originalDatabase, databaseChangeResolverFactory);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (diff.getOriginalString().getName().equals(diff.getNewString().getName())) {</b>
+<b class="nc">&nbsp;            return new BibTexStringChange(diff.getOriginalString(), diff.getNewString(), originalDatabase, databaseChangeResolverFactory);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new BibTexStringRename(diff.getOriginalString(), diff.getNewString(), originalDatabase, databaseChangeResolverFactory);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static DatabaseChange createBibEntryDiff(BibDatabaseContext originalDatabase, DatabaseChangeResolverFactory databaseChangeResolverFactory, BibEntryDiff diff) {
+<b class="nc">&nbsp;        if (diff.originalEntry() == null) {</b>
+<b class="nc">&nbsp;            return new EntryAdd(diff.newEntry(), originalDatabase, databaseChangeResolverFactory);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (diff.newEntry() == null) {</b>
+<b class="nc">&nbsp;            return new EntryDelete(diff.originalEntry(), originalDatabase, databaseChangeResolverFactory);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new EntryChange(diff.originalEntry(), diff.newEntry(), originalDatabase, databaseChangeResolverFactory);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

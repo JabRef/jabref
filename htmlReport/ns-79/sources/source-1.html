@@ -1,0 +1,684 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GlobalSearchBar</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.search</a>
+</div>
+
+<h1>Coverage Summary for Class: GlobalSearchBar (org.jabref.gui.search)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GlobalSearchBar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/205)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GlobalSearchBar$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">GlobalSearchBar$SearchPopupSkin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/81)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/232)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.search;
+&nbsp;
+&nbsp;import java.lang.reflect.Field;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.BooleanBinding;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.collections.SetChangeListener;
+&nbsp;import javafx.css.PseudoClass;
+&nbsp;import javafx.event.Event;
+&nbsp;import javafx.geometry.Insets;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.Cursor;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonBase;
+&nbsp;import javafx.scene.control.ContentDisplay;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ListView;
+&nbsp;import javafx.scene.control.Skin;
+&nbsp;import javafx.scene.control.ToggleButton;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.control.cell.TextFieldListCell;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;import javafx.scene.input.MouseButton;
+&nbsp;import javafx.scene.layout.BorderPane;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.StackPane;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;import javafx.scene.text.TextFlow;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseClassGetResource;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
+&nbsp;import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
+&nbsp;import org.jabref.gui.autocompleter.PersonNameStringConverter;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.gui.util.TooltipTextUtil;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
+&nbsp;import org.jabref.logic.search.SearchPreferences;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.search.SearchDisplayMode;
+&nbsp;import org.jabref.model.search.SearchFlags;
+&nbsp;import org.jabref.model.search.query.SearchQuery;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import impl.org.controlsfx.skin.AutoCompletePopup;
+&nbsp;import org.controlsfx.control.textfield.AutoCompletionBinding;
+&nbsp;import org.controlsfx.control.textfield.CustomTextField;
+&nbsp;import org.reactfx.util.FxTimer;
+&nbsp;import org.reactfx.util.Timer;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+&nbsp;
+&nbsp;public class GlobalSearchBar extends HBox {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);</b>
+&nbsp;    private static final int SEARCH_DELAY = 400;
+<b class="nc">&nbsp;    private static final PseudoClass ILLEGAL_SEARCH = PseudoClass.getPseudoClass(&quot;illegal-search&quot;);</b>
+&nbsp;
+&nbsp;    private final CustomTextField searchField;
+&nbsp;    private final Button openGlobalSearchButton;
+&nbsp;    private final ToggleButton fulltextButton;
+&nbsp;    private final ToggleButton keepSearchString;
+&nbsp;    private final ToggleButton filterModeButton;
+&nbsp;    private final ToggleButton regexButton;
+&nbsp;    private final ToggleButton caseSensitiveButton;
+<b class="nc">&nbsp;    private final Tooltip searchFieldTooltip = new Tooltip();</b>
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;    private final LibraryTabContainer tabContainer;
+&nbsp;    private final SearchPreferences searchPreferences;
+&nbsp;    private final DialogService dialogService;
+<b class="nc">&nbsp;    private final BooleanProperty globalSearchActive = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final BooleanProperty illegalSearch = new SimpleBooleanProperty(false);</b>
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private GlobalSearchResultDialog globalSearchResultDialog;
+&nbsp;    private final SearchType searchType;
+&nbsp;
+&nbsp;    public GlobalSearchBar(LibraryTabContainer tabContainer,
+&nbsp;                           StateManager stateManager,
+&nbsp;                           GuiPreferences preferences,
+&nbsp;                           UndoManager undoManager,
+&nbsp;                           DialogService dialogService,
+&nbsp;                           SearchType searchType) {
+<b class="nc">&nbsp;        super();</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.searchPreferences = preferences.getSearchPreferences();</b>
+<b class="nc">&nbsp;        this.filePreferences = preferences.getFilePreferences();</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.tabContainer = tabContainer;</b>
+<b class="nc">&nbsp;        this.searchType = searchType;</b>
+&nbsp;
+<b class="nc">&nbsp;        KeyBindingRepository keyBindingRepository = preferences.getKeyBindingRepository();</b>
+&nbsp;
+<b class="nc">&nbsp;        searchField = SearchTextField.create(keyBindingRepository);</b>
+<b class="nc">&nbsp;        searchField.disableProperty().bind(needsDatabase(stateManager).not());</b>
+<b class="nc">&nbsp;        stateManager.searchQueryProperty().bind(searchField.textProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        Label currentResults = new Label();</b>
+&nbsp;        // fits the standard &quot;found x entries&quot;-message thus hinders the searchbar to jump around while searching if the tabContainer width is too small
+<b class="nc">&nbsp;        currentResults.setPrefWidth(150);</b>
+&nbsp;
+<b class="nc">&nbsp;        currentResults.textProperty().bind(EasyBind.combine(</b>
+<b class="nc">&nbsp;                stateManager.activeSearchQuery(searchType), stateManager.searchResultSize(searchType), illegalSearch,</b>
+&nbsp;                (searchQuery, matched, illegal) -&gt; {
+<b class="nc">&nbsp;                    searchField.pseudoClassStateChanged(ILLEGAL_SEARCH, illegal);</b>
+<b class="nc">&nbsp;                    if (illegal) {</b>
+<b class="nc">&nbsp;                        return Localization.lang(&quot;Illegal search expression&quot;);</b>
+<b class="nc">&nbsp;                    } else if (searchQuery.isEmpty()) {</b>
+<b class="nc">&nbsp;                        return &quot;&quot;;</b>
+<b class="nc">&nbsp;                    } else if (matched.intValue() == 0) {</b>
+<b class="nc">&nbsp;                        return Localization.lang(&quot;No results found.&quot;);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        return Localization.lang(&quot;Found %0 results.&quot;, String.valueOf(matched));</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;        ));
+&nbsp;
+<b class="nc">&nbsp;        searchField.setTooltip(searchFieldTooltip);</b>
+<b class="nc">&nbsp;        searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);</b>
+<b class="nc">&nbsp;        searchFieldTooltip.setMaxHeight(10);</b>
+<b class="nc">&nbsp;        setSearchBarHint();</b>
+&nbsp;
+<b class="nc">&nbsp;        searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -&gt; {</b>
+<b class="nc">&nbsp;            if (keyBindingRepository.matches(event, KeyBinding.CLEAR_SEARCH)) {</b>
+<b class="nc">&nbsp;                searchField.clear();</b>
+<b class="nc">&nbsp;                if (searchType == SearchType.NORMAL_SEARCH) {</b>
+<b class="nc">&nbsp;                    LibraryTab currentLibraryTab = tabContainer.getCurrentLibraryTab();</b>
+<b class="nc">&nbsp;                    if (currentLibraryTab != null) {</b>
+<b class="nc">&nbsp;                        currentLibraryTab.getMainTable().requestFocus();</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                event.consume();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        ClipBoardManager.addX11Support(searchField);</b>
+&nbsp;
+<b class="nc">&nbsp;        searchField.setContextMenu(SearchFieldRightClickMenu.create(stateManager, searchField));</b>
+<b class="nc">&nbsp;        stateManager.getWholeSearchHistory().addListener((ListChangeListener.Change&lt;? extends String&gt; change) -&gt; {</b>
+<b class="nc">&nbsp;            searchField.getContextMenu().getItems().removeLast();</b>
+<b class="nc">&nbsp;            searchField.getContextMenu().getItems().add(SearchFieldRightClickMenu.createSearchFromHistorySubMenu(stateManager, searchField));</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        regexButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();</b>
+<b class="nc">&nbsp;        caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();</b>
+<b class="nc">&nbsp;        fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();</b>
+<b class="nc">&nbsp;        openGlobalSearchButton = IconTheme.JabRefIcons.OPEN_GLOBAL_SEARCH.asButton();</b>
+<b class="nc">&nbsp;        keepSearchString = IconTheme.JabRefIcons.KEEP_SEARCH_STRING.asToggleButton();</b>
+<b class="nc">&nbsp;        filterModeButton = IconTheme.JabRefIcons.FILTER.asToggleButton();</b>
+&nbsp;
+<b class="nc">&nbsp;        initSearchModifierButtons();</b>
+&nbsp;
+<b class="nc">&nbsp;        BooleanBinding focusedOrActive = searchField.focusedProperty()</b>
+<b class="nc">&nbsp;                                                    .or(regexButton.focusedProperty())</b>
+<b class="nc">&nbsp;                                                    .or(caseSensitiveButton.focusedProperty())</b>
+<b class="nc">&nbsp;                                                    .or(fulltextButton.focusedProperty())</b>
+<b class="nc">&nbsp;                                                    .or(keepSearchString.focusedProperty())</b>
+<b class="nc">&nbsp;                                                    .or(filterModeButton.focusedProperty())</b>
+<b class="nc">&nbsp;                                                    .or(searchField.textProperty().isNotEmpty());</b>
+&nbsp;
+<b class="nc">&nbsp;        regexButton.visibleProperty().unbind();</b>
+<b class="nc">&nbsp;        regexButton.visibleProperty().bind(focusedOrActive);</b>
+<b class="nc">&nbsp;        caseSensitiveButton.visibleProperty().unbind();</b>
+<b class="nc">&nbsp;        caseSensitiveButton.visibleProperty().bind(focusedOrActive);</b>
+<b class="nc">&nbsp;        fulltextButton.visibleProperty().unbind();</b>
+<b class="nc">&nbsp;        fulltextButton.visibleProperty().bind(focusedOrActive);</b>
+<b class="nc">&nbsp;        keepSearchString.visibleProperty().unbind();</b>
+<b class="nc">&nbsp;        keepSearchString.visibleProperty().bind(focusedOrActive);</b>
+<b class="nc">&nbsp;        filterModeButton.visibleProperty().unbind();</b>
+<b class="nc">&nbsp;        filterModeButton.visibleProperty().bind(focusedOrActive);</b>
+&nbsp;
+&nbsp;        StackPane modifierButtons;
+<b class="nc">&nbsp;        if (searchType == SearchType.NORMAL_SEARCH) {</b>
+<b class="nc">&nbsp;            modifierButtons = new StackPane(new HBox(regexButton, caseSensitiveButton, fulltextButton, keepSearchString, filterModeButton));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            modifierButtons = new StackPane(new HBox(regexButton, caseSensitiveButton, fulltextButton));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        modifierButtons.setAlignment(Pos.CENTER);</b>
+<b class="nc">&nbsp;        searchField.setRight(new HBox(searchField.getRight(), modifierButtons));</b>
+<b class="nc">&nbsp;        searchField.getStyleClass().add(&quot;global-search-bar&quot;);</b>
+<b class="nc">&nbsp;        searchField.setMinWidth(100);</b>
+<b class="nc">&nbsp;        HBox.setHgrow(searchField, Priority.ALWAYS);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (searchType == SearchType.NORMAL_SEARCH) {</b>
+<b class="nc">&nbsp;            this.getChildren().addAll(searchField, openGlobalSearchButton, currentResults);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.getChildren().addAll(searchField, currentResults);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.setSpacing(4.0);</b>
+<b class="nc">&nbsp;        this.setAlignment(Pos.CENTER_LEFT);</b>
+&nbsp;
+<b class="nc">&nbsp;        Timer searchTask = FxTimer.create(Duration.ofMillis(SEARCH_DELAY), this::updateSearchQuery);</b>
+<b class="nc">&nbsp;        BindingsHelper.bindBidirectional(</b>
+<b class="nc">&nbsp;                stateManager.activeSearchQuery(searchType),</b>
+<b class="nc">&nbsp;                searchField.textProperty(),</b>
+&nbsp;                searchTerm -&gt; {
+&nbsp;                    // Async update
+<b class="nc">&nbsp;                    searchTask.restart();</b>
+&nbsp;                },
+<b class="nc">&nbsp;                query -&gt; setSearchTerm(query.orElseGet(() -&gt; new SearchQuery(&quot;&quot;))));</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;         * The listener tracks a change on the focus property value.
+&nbsp;         * This happens, from active (user types a query) to inactive / focus
+&nbsp;         * lost (e.g., user selects an entry or triggers the search).
+&nbsp;         * The search history should only be filled, if focus is lost.
+&nbsp;         */
+<b class="nc">&nbsp;        searchField.focusedProperty().addListener((obs, oldValue, newValue) -&gt; {</b>
+&nbsp;            // Focus lost can be derived by checking that there is no newValue (or the text is empty)
+<b class="nc">&nbsp;            if (oldValue &amp;&amp; !(newValue || searchField.getText().isBlank())) {</b>
+<b class="nc">&nbsp;                this.stateManager.addSearchHistory(searchField.textProperty().get());</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initSearchModifierButtons() {
+<b class="nc">&nbsp;        fulltextButton.setTooltip(new Tooltip(Localization.lang(&quot;Fulltext search&quot;)));</b>
+<b class="nc">&nbsp;        initSearchModifierButton(fulltextButton);</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(filePreferences.fulltextIndexLinkedFilesProperty(), enabled -&gt; {</b>
+<b class="nc">&nbsp;            if (!enabled) {</b>
+<b class="nc">&nbsp;                fulltextButton.setSelected(false);</b>
+<b class="nc">&nbsp;            } else if (searchPreferences.isFulltext()) {</b>
+<b class="nc">&nbsp;                fulltextButton.setSelected(true);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        fulltextButton.selectedProperty().addListener((obs, oldVal, newVal) -&gt; {</b>
+<b class="nc">&nbsp;            if (!filePreferences.shouldFulltextIndexLinkedFiles() &amp;&amp; newVal) {</b>
+<b class="nc">&nbsp;                boolean enableFulltextSearch = dialogService.showConfirmationDialogAndWait(Localization.lang(&quot;Fulltext search&quot;), Localization.lang(&quot;Fulltext search requires the setting &#39;Automatically index all linked files for fulltext search&#39; to be enabled. Do you want to enable indexing now?&quot;), Localization.lang(&quot;Enable indexing&quot;), Localization.lang(&quot;Keep disabled&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();</b>
+<b class="nc">&nbsp;                if (libraryTab != null &amp;&amp; enableFulltextSearch) {</b>
+<b class="nc">&nbsp;                    filePreferences.setFulltextIndexLinkedFiles(true);</b>
+<b class="nc">&nbsp;                    searchPreferences.setSearchFlag(SearchFlags.FULLTEXT, true);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (!enableFulltextSearch) {</b>
+<b class="nc">&nbsp;                    fulltextButton.setSelected(false);</b>
+<b class="nc">&nbsp;                    searchPreferences.setSearchFlag(SearchFlags.FULLTEXT, false);</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                searchPreferences.setSearchFlag(SearchFlags.FULLTEXT, newVal);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            searchField.requestFocus();</b>
+<b class="nc">&nbsp;            updateSearchQuery();</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        regexButton.setSelected(searchPreferences.isRegularExpression());</b>
+<b class="nc">&nbsp;        regexButton.setTooltip(new Tooltip(Localization.lang(&quot;Regular expression&quot;) + &quot;\n&quot; + Localization.lang(&quot;This only affects unfielded terms. For using RegEx in a fielded term, use =~ operator.&quot;)));</b>
+<b class="nc">&nbsp;        initSearchModifierButton(regexButton);</b>
+<b class="nc">&nbsp;        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener&lt;SearchFlags&gt;) change -&gt; {</b>
+<b class="nc">&nbsp;            if (change.wasAdded() &amp;&amp; change.getElementAdded() == SearchFlags.REGULAR_EXPRESSION) {</b>
+<b class="nc">&nbsp;                regexButton.setSelected(true);</b>
+<b class="nc">&nbsp;            } else if (change.wasRemoved() &amp;&amp; change.getElementRemoved() == SearchFlags.REGULAR_EXPRESSION) {</b>
+<b class="nc">&nbsp;                regexButton.setSelected(false);</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        regexButton.setOnAction(_ -&gt; {</b>
+<b class="nc">&nbsp;            searchPreferences.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, regexButton.isSelected());</b>
+<b class="nc">&nbsp;            searchField.requestFocus();</b>
+<b class="nc">&nbsp;            updateSearchQuery();</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());</b>
+<b class="nc">&nbsp;        caseSensitiveButton.setTooltip(new Tooltip(Localization.lang(&quot;Case sensitive&quot;) + &quot;\n&quot; + Localization.lang(&quot;This only affects unfielded terms. For using case-sensitive in a fielded term, use =! operator.&quot;)));</b>
+<b class="nc">&nbsp;        initSearchModifierButton(caseSensitiveButton);</b>
+<b class="nc">&nbsp;        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener&lt;SearchFlags&gt;) change -&gt; {</b>
+<b class="nc">&nbsp;            if (change.wasAdded() &amp;&amp; change.getElementAdded() == SearchFlags.CASE_SENSITIVE) {</b>
+<b class="nc">&nbsp;                caseSensitiveButton.setSelected(true);</b>
+<b class="nc">&nbsp;            } else if (change.wasRemoved() &amp;&amp; change.getElementRemoved() == SearchFlags.CASE_SENSITIVE) {</b>
+<b class="nc">&nbsp;                caseSensitiveButton.setSelected(false);</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        caseSensitiveButton.setOnAction(_ -&gt; {</b>
+<b class="nc">&nbsp;            searchPreferences.setSearchFlag(SearchFlags.CASE_SENSITIVE, caseSensitiveButton.isSelected());</b>
+<b class="nc">&nbsp;            searchField.requestFocus();</b>
+<b class="nc">&nbsp;            updateSearchQuery();</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        keepSearchString.setSelected(searchPreferences.shouldKeepSearchString());</b>
+<b class="nc">&nbsp;        keepSearchString.setTooltip(new Tooltip(Localization.lang(&quot;Keep search string across libraries&quot;)));</b>
+<b class="nc">&nbsp;        initSearchModifierButton(keepSearchString);</b>
+<b class="nc">&nbsp;        searchPreferences.keepSearchStringProperty().addListener((_, _, newVal) -&gt; keepSearchString.setSelected(newVal));</b>
+<b class="nc">&nbsp;        keepSearchString.selectedProperty().addListener((_, _, newVal) -&gt; {</b>
+<b class="nc">&nbsp;            searchPreferences.setKeepSearchString(newVal);</b>
+<b class="nc">&nbsp;            searchField.requestFocus();</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        filterModeButton.setSelected(searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FILTER);</b>
+<b class="nc">&nbsp;        filterModeButton.setTooltip(new Tooltip(Localization.lang(&quot;Filter search results&quot;)));</b>
+<b class="nc">&nbsp;        initSearchModifierButton(filterModeButton);</b>
+<b class="nc">&nbsp;        searchPreferences.searchDisplayModeProperty().addListener((_, _, newVal) -&gt; filterModeButton.setSelected(newVal == SearchDisplayMode.FILTER));</b>
+<b class="nc">&nbsp;        filterModeButton.setOnAction(_ -&gt; {</b>
+<b class="nc">&nbsp;            searchPreferences.setSearchDisplayMode(filterModeButton.isSelected() ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT);</b>
+<b class="nc">&nbsp;            searchField.requestFocus();</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        openGlobalSearchButton.disableProperty().bind(globalSearchActive.or(needsDatabase(stateManager).not()));</b>
+<b class="nc">&nbsp;        openGlobalSearchButton.setTooltip(new Tooltip(Localization.lang(&quot;Search across libraries in a new window&quot;)));</b>
+<b class="nc">&nbsp;        initSearchModifierButton(openGlobalSearchButton);</b>
+<b class="nc">&nbsp;        openGlobalSearchButton.setOnAction(evt -&gt; openGlobalSearchDialog());</b>
+&nbsp;
+<b class="nc">&nbsp;        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener.Change&lt;? extends SearchFlags&gt; change) -&gt; {</b>
+<b class="nc">&nbsp;            regexButton.setSelected(searchPreferences.isRegularExpression());</b>
+<b class="nc">&nbsp;            caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());</b>
+<b class="nc">&nbsp;            fulltextButton.setSelected(searchPreferences.isFulltext());</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openGlobalSearchDialog() {
+<b class="nc">&nbsp;        if (globalSearchActive.get()) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        globalSearchActive.setValue(true);</b>
+<b class="nc">&nbsp;        if (globalSearchResultDialog == null) {</b>
+<b class="nc">&nbsp;            globalSearchResultDialog = new GlobalSearchResultDialog(undoManager, tabContainer);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(query -&gt;</b>
+<b class="nc">&nbsp;                stateManager.activeSearchQuery(SearchType.GLOBAL_SEARCH).set(Optional.of(query)));</b>
+<b class="nc">&nbsp;        updateSearchQuery();</b>
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(globalSearchResultDialog);</b>
+<b class="nc">&nbsp;        globalSearchActive.setValue(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initSearchModifierButton(ButtonBase searchButton) {
+<b class="nc">&nbsp;        searchButton.setCursor(Cursor.HAND);</b>
+<b class="nc">&nbsp;        searchButton.setMinHeight(28);</b>
+<b class="nc">&nbsp;        searchButton.setMaxHeight(28);</b>
+<b class="nc">&nbsp;        searchButton.setMinWidth(28);</b>
+<b class="nc">&nbsp;        searchButton.setMaxWidth(28);</b>
+<b class="nc">&nbsp;        searchButton.setPadding(new Insets(1.0));</b>
+<b class="nc">&nbsp;        searchButton.managedProperty().bind(searchField.editableProperty());</b>
+<b class="nc">&nbsp;        searchButton.visibleProperty().bind(searchField.editableProperty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Focuses the search field if it is not focused.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void requestFocus() {
+<b class="nc">&nbsp;        if (!searchField.isFocused()) {</b>
+<b class="nc">&nbsp;            searchField.requestFocus();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        searchField.selectAll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void updateSearchQuery() {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Flags: {}&quot;, searchPreferences.getSearchFlags());</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Updated search query: {}&quot;, searchField.getText());</b>
+&nbsp;
+&nbsp;        // An empty search field should cause the search to be cleared.
+<b class="nc">&nbsp;        if (searchField.getText().isEmpty()) {</b>
+<b class="nc">&nbsp;            stateManager.activeSearchQuery(searchType).set(Optional.empty());</b>
+<b class="nc">&nbsp;            illegalSearch.set(false);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.getSearchFlags());</b>
+<b class="nc">&nbsp;        illegalSearch.set(!searchQuery.isValid());</b>
+<b class="nc">&nbsp;        stateManager.activeSearchQuery(searchType).set(Optional.of(searchQuery));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAutoCompleter(SuggestionProvider&lt;Author&gt; searchCompleter) {
+<b class="nc">&nbsp;        if (preferences.getAutoCompletePreferences().shouldAutoComplete()) {</b>
+<b class="nc">&nbsp;            AutoCompletionTextInputBinding&lt;Author&gt; autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,</b>
+<b class="nc">&nbsp;                    searchCompleter::provideSuggestions,</b>
+&nbsp;                    new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
+&nbsp;                    new AppendPersonNamesStrategy());
+<b class="nc">&nbsp;            AutoCompletePopup&lt;Author&gt; popup = getPopup(autoComplete);</b>
+<b class="nc">&nbsp;            popup.setSkin(new SearchPopupSkin&lt;&gt;(popup));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The popup has private access in {@link AutoCompletionBinding}, so we use reflection to access it.
+&nbsp;     */
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    private &lt;T&gt; AutoCompletePopup&lt;T&gt; getPopup(AutoCompletionBinding&lt;T&gt; autoCompletionBinding) {
+&nbsp;        try {
+&nbsp;            // TODO: reflective access, should be removed
+<b class="nc">&nbsp;            Field privatePopup = AutoCompletionBinding.class.getDeclaredField(&quot;autoCompletionPopup&quot;);</b>
+<b class="nc">&nbsp;            privatePopup.setAccessible(true);</b>
+<b class="nc">&nbsp;            return (AutoCompletePopup&lt;T&gt;) privatePopup.get(autoCompletionBinding);</b>
+&nbsp;        } catch (IllegalAccessException | NoSuchFieldException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not get access to auto completion popup&quot;, e);</b>
+<b class="nc">&nbsp;            return new AutoCompletePopup&lt;&gt;();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSearchBarHint() {
+<b class="nc">&nbsp;        if (preferences.getWorkspacePreferences().shouldShowAdvancedHints()) {</b>
+<b class="nc">&nbsp;            String genericDescription = Localization.lang(&quot;Hint:\n\nTo search all fields for &lt;b&gt;Smith&lt;/b&gt;, enter:\n&lt;tt&gt;smith&lt;/tt&gt;\n\nTo search the field &lt;b&gt;author&lt;/b&gt; for &lt;b&gt;Smith&lt;/b&gt; and the field &lt;b&gt;title&lt;/b&gt; for &lt;b&gt;electrical&lt;/b&gt;, enter:\n&lt;tt&gt;author=Smith AND title=electrical&lt;/tt&gt;&quot;);</b>
+<b class="nc">&nbsp;            List&lt;Text&gt; genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);</b>
+&nbsp;
+<b class="nc">&nbsp;            TextFlow emptyHintTooltip = new TextFlow();</b>
+<b class="nc">&nbsp;            emptyHintTooltip.getChildren().setAll(genericDescriptionTexts);</b>
+<b class="nc">&nbsp;            searchFieldTooltip.setGraphic(emptyHintTooltip);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSearchTerm(SearchQuery searchQuery) {
+<b class="nc">&nbsp;        if (searchQuery.toString().equals(searchField.getText())) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        UiTaskExecutor.runInJavaFXThread(() -&gt; searchField.setText(searchQuery.toString()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @AllowedToUseClassGetResource(&quot;JavaFX internally handles the passed URLs properly.&quot;)
+&nbsp;    private static class SearchPopupSkin&lt;T&gt; implements Skin&lt;AutoCompletePopup&lt;T&gt;&gt; {
+&nbsp;
+&nbsp;        private final AutoCompletePopup&lt;T&gt; control;
+&nbsp;        private final ListView&lt;T&gt; suggestionList;
+&nbsp;        private final BorderPane container;
+&nbsp;
+<b class="nc">&nbsp;        public SearchPopupSkin(AutoCompletePopup&lt;T&gt; control) {</b>
+<b class="nc">&nbsp;            this.control = control;</b>
+<b class="nc">&nbsp;            this.suggestionList = new ListView&lt;&gt;(control.getSuggestions());</b>
+<b class="nc">&nbsp;            this.suggestionList.getStyleClass().add(&quot;auto-complete-popup&quot;);</b>
+<b class="nc">&nbsp;            this.suggestionList.getStylesheets().add(Objects.requireNonNull(AutoCompletionBinding.class.getResource(&quot;autocompletion.css&quot;)).toExternalForm());</b>
+<b class="nc">&nbsp;            this.suggestionList.prefHeightProperty().bind(Bindings.min(control.visibleRowCountProperty(), Bindings.size(this.suggestionList.getItems())).multiply(24).add(18));</b>
+<b class="nc">&nbsp;            this.suggestionList.setCellFactory(TextFieldListCell.forListView(control.getConverter()));</b>
+<b class="nc">&nbsp;            this.suggestionList.prefWidthProperty().bind(control.prefWidthProperty());</b>
+<b class="nc">&nbsp;            this.suggestionList.maxWidthProperty().bind(control.maxWidthProperty());</b>
+<b class="nc">&nbsp;            this.suggestionList.minWidthProperty().bind(control.minWidthProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;            this.container = new BorderPane();</b>
+<b class="nc">&nbsp;            this.container.setCenter(suggestionList);</b>
+&nbsp;
+<b class="nc">&nbsp;            this.registerEventListener();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void registerEventListener() {
+<b class="nc">&nbsp;            this.suggestionList.setOnMouseClicked(me -&gt; {</b>
+<b class="nc">&nbsp;                if (me.getButton() == MouseButton.PRIMARY) {</b>
+<b class="nc">&nbsp;                    this.onSuggestionChosen(this.suggestionList.getSelectionModel().getSelectedItem());</b>
+&nbsp;                }
+&nbsp;            });
+<b class="nc">&nbsp;            this.suggestionList.setOnKeyPressed(ke -&gt; {</b>
+<b class="nc">&nbsp;                switch (ke.getCode()) {</b>
+&nbsp;                    case TAB:
+&nbsp;                    case ENTER:
+<b class="nc">&nbsp;                        this.onSuggestionChosen(this.suggestionList.getSelectionModel().getSelectedItem());</b>
+&nbsp;                        break;
+&nbsp;                    case ESCAPE:
+<b class="nc">&nbsp;                        if (this.control.isHideOnEscape()) {</b>
+<b class="nc">&nbsp;                            this.control.hide();</b>
+&nbsp;                        }
+&nbsp;                        break;
+&nbsp;                    default:
+&nbsp;                        break;
+&nbsp;                }
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+&nbsp;        private void onSuggestionChosen(T suggestion) {
+<b class="nc">&nbsp;            if (suggestion != null) {</b>
+<b class="nc">&nbsp;                Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent&lt;&gt;(suggestion));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Node getNode() {
+<b class="nc">&nbsp;            return this.container;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public AutoCompletePopup&lt;T&gt; getSkinnable() {
+<b class="nc">&nbsp;            return this.control;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void dispose() {
+&nbsp;            // empty
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

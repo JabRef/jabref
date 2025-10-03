@@ -1,0 +1,218 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > XMLChars</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: XMLChars (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XMLChars</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.jabref.logic.layout.LayoutFormatter;
+&nbsp;import org.jabref.logic.util.strings.XmlCharsMap;
+&nbsp;
+&nbsp;/**
+&nbsp; * Changes {\^o} or {\^{o}} to ?
+&nbsp; */
+<b class="nc">&nbsp;public class XMLChars implements LayoutFormatter {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final XmlCharsMap XML_CHARS = new XmlCharsMap();</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Map&lt;String, String&gt; ASCII_TO_XML_CHARS = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private boolean[] forceReplace;
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        ASCII_TO_XML_CHARS.put(&quot;&lt;&quot;, &quot;&amp;lt;&quot;);</b>
+<b class="nc">&nbsp;        ASCII_TO_XML_CHARS.put(&quot;\&quot;&quot;, &quot;&amp;quot;&quot;);</b>
+<b class="nc">&nbsp;        ASCII_TO_XML_CHARS.put(&quot;&gt;&quot;, &quot;&amp;gt;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String fieldText) {
+<b class="nc">&nbsp;        if (fieldText == null) {</b>
+<b class="nc">&nbsp;            return fieldText;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String latexCommandFree = removeLatexCommands(fieldText);</b>
+<b class="nc">&nbsp;        String formattedFieldText = firstFormat(latexCommandFree);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, String&gt; entry : XML_CHARS.entrySet()) {</b>
+<b class="nc">&nbsp;            String s = entry.getKey();</b>
+<b class="nc">&nbsp;            String repl = entry.getValue();</b>
+<b class="nc">&nbsp;            if (repl != null) {</b>
+<b class="nc">&nbsp;                formattedFieldText = formattedFieldText.replaceAll(s, repl);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return restFormat(formattedFieldText);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String removeLatexCommands(String fieldText) {
+<b class="nc">&nbsp;        LatexToUnicodeFormatter latexToUnicode = new LatexToUnicodeFormatter();</b>
+<b class="nc">&nbsp;        return latexToUnicode.format(fieldText);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String firstFormat(String s) {
+<b class="nc">&nbsp;        return s.replaceAll(&quot;&amp;|\\\\&amp;&quot;, &quot;&amp;#x0026;&quot;).replace(&quot;--&quot;, &quot;&amp;#x2013;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String restFormat(String toFormat) {
+<b class="nc">&nbsp;        String fieldText = toFormat.replace(&quot;}&quot;, &quot;&quot;).replace(&quot;{&quot;, &quot;&quot;);</b>
+&nbsp;
+&nbsp;        // now some copy-paste problems most often occuring in abstracts when
+&nbsp;        // copied from PDF
+&nbsp;        // AND: this is accepted in the abstract of bibtex files, so are forced
+&nbsp;        // to catch those cases
+&nbsp;
+<b class="nc">&nbsp;        if (forceReplace == null) {</b>
+<b class="nc">&nbsp;            forceReplace = new boolean[126];</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; 40; i++) {</b>
+<b class="nc">&nbsp;                forceReplace[i] = true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            forceReplace[32] = false;</b>
+<b class="nc">&nbsp;            for (int i : new int[] {44, 45, 63, 64, 94, 95, 96, 124}) {</b>
+<b class="nc">&nbsp;                forceReplace[i] = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder buffer = new StringBuilder(fieldText.length() * 2);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; fieldText.length(); i++) {</b>
+<b class="nc">&nbsp;            int code = fieldText.charAt(i);</b>
+&nbsp;
+&nbsp;            // Checking the case when the character is already escaped
+&nbsp;            // Just push &quot;&amp;#&quot; to the buffer and keep going from the next char
+<b class="nc">&nbsp;            if ((code == 38) &amp;&amp; (fieldText.charAt(i + 1) == 35)) {</b>
+<b class="nc">&nbsp;                i += 2;</b>
+<b class="nc">&nbsp;                buffer.append(&quot;&amp;#&quot;);</b>
+<b class="nc">&nbsp;                code = fieldText.charAt(i);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // TODO: Check whether &gt; 125 is correct here or whether it should rather be &gt;=
+<b class="nc">&nbsp;            if ((code &gt; 125) || forceReplace[code]) {</b>
+<b class="nc">&nbsp;                buffer.append(&quot;&amp;#&quot;).append(code).append(&#39;;&#39;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                buffer.append((char) code);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        fieldText = buffer.toString();</b>
+&nbsp;
+&nbsp;        // use common abbreviations for &lt;, &gt; instead of code
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, String&gt; entry : ASCII_TO_XML_CHARS.entrySet()) {</b>
+<b class="nc">&nbsp;            fieldText = fieldText.replace(entry.getKey(), entry.getValue());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return fieldText;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

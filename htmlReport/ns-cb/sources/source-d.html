@@ -1,0 +1,491 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ComplexSearchQuery</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: ComplexSearchQuery (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ComplexSearchQuery</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ComplexSearchQuery$ComplexSearchQueryBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/106)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/132)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.StringJoiner;
+&nbsp;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.apache.lucene.index.Term;
+&nbsp;
+&nbsp;public class ComplexSearchQuery {
+&nbsp;    // Field for non-fielded search
+&nbsp;    private final List&lt;String&gt; defaultField;
+&nbsp;    private final List&lt;String&gt; authors;
+&nbsp;    private final List&lt;String&gt; titlePhrases;
+&nbsp;    private final List&lt;String&gt; abstractPhrases;
+&nbsp;    private final Integer fromYear;
+&nbsp;    private final Integer toYear;
+&nbsp;    private final Integer singleYear;
+&nbsp;    private final String journal;
+&nbsp;    private final String doi;
+&nbsp;
+<b class="nc">&nbsp;    private ComplexSearchQuery(List&lt;String&gt; defaultField, List&lt;String&gt; authors, List&lt;String&gt; titlePhrases, List&lt;String&gt; abstractPhrases, Integer fromYear, Integer toYear, Integer singleYear, String journal, String doi) {</b>
+<b class="nc">&nbsp;        this.defaultField = defaultField;</b>
+<b class="nc">&nbsp;        this.authors = authors;</b>
+<b class="nc">&nbsp;        this.titlePhrases = titlePhrases;</b>
+<b class="nc">&nbsp;        this.abstractPhrases = abstractPhrases;</b>
+<b class="nc">&nbsp;        this.fromYear = fromYear;</b>
+&nbsp;        // Some APIs do not support, or not fully support, year based search. In these cases, the non applicable parameters are ignored.
+<b class="nc">&nbsp;        this.toYear = toYear;</b>
+<b class="nc">&nbsp;        this.journal = journal;</b>
+<b class="nc">&nbsp;        this.singleYear = singleYear;</b>
+<b class="nc">&nbsp;        this.doi = doi;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ComplexSearchQuery fromTerms(List&lt;Term&gt; terms) {
+<b class="nc">&nbsp;        ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();</b>
+<b class="nc">&nbsp;        terms.forEach(term -&gt; {</b>
+<b class="nc">&nbsp;            String termText = term.text();</b>
+<b class="nc">&nbsp;            switch (term.field().toLowerCase()) {</b>
+&nbsp;                case &quot;author&quot; -&gt;
+<b class="nc">&nbsp;                        builder.author(termText);</b>
+&nbsp;                case &quot;title&quot; -&gt;
+<b class="nc">&nbsp;                        builder.titlePhrase(termText);</b>
+&nbsp;                case &quot;abstract&quot; -&gt;
+<b class="nc">&nbsp;                        builder.abstractPhrase(termText);</b>
+&nbsp;                case &quot;journal&quot; -&gt;
+<b class="nc">&nbsp;                        builder.journal(termText);</b>
+&nbsp;                case &quot;year&quot; -&gt;
+<b class="nc">&nbsp;                        builder.singleYear(Integer.valueOf(termText));</b>
+&nbsp;                case &quot;year-range&quot; -&gt;
+<b class="nc">&nbsp;                        builder.parseYearRange(termText);</b>
+&nbsp;                case &quot;doi&quot; -&gt;
+<b class="nc">&nbsp;                        builder.DOI(termText);</b>
+&nbsp;                case &quot;default&quot; -&gt;
+<b class="nc">&nbsp;                        builder.defaultFieldPhrase(termText);</b>
+&nbsp;                // add unknown field as default field
+&nbsp;                default -&gt;
+<b class="nc">&nbsp;                        builder.defaultFieldPhrase(termText);</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        return builder.build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getDefaultFieldPhrases() {
+<b class="nc">&nbsp;        return defaultField;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getAuthors() {
+<b class="nc">&nbsp;        return authors;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getTitlePhrases() {
+<b class="nc">&nbsp;        return titlePhrases;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getAbstractPhrases() {
+<b class="nc">&nbsp;        return abstractPhrases;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Integer&gt; getFromYear() {
+<b class="nc">&nbsp;        return Optional.ofNullable(fromYear);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Integer&gt; getToYear() {
+<b class="nc">&nbsp;        return Optional.ofNullable(toYear);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Integer&gt; getSingleYear() {
+<b class="nc">&nbsp;        return Optional.ofNullable(singleYear);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getJournal() {
+<b class="nc">&nbsp;        return Optional.ofNullable(journal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getDOI() {
+<b class="nc">&nbsp;        return Optional.ofNullable(doi);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ComplexSearchQueryBuilder builder() {
+<b class="nc">&nbsp;        return new ComplexSearchQueryBuilder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (o == null || getClass() != o.getClass()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ComplexSearchQuery that = (ComplexSearchQuery) o;</b>
+&nbsp;
+&nbsp;        // Just check for set equality, order does not matter
+<b class="nc">&nbsp;        if (!(getDefaultFieldPhrases().containsAll(that.getDefaultFieldPhrases()) &amp;&amp; that.getDefaultFieldPhrases().containsAll(getDefaultFieldPhrases()))) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!(getAuthors().containsAll(that.getAuthors()) &amp;&amp; that.getAuthors().containsAll(getAuthors()))) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!(getTitlePhrases().containsAll(that.getTitlePhrases()) &amp;&amp; that.getTitlePhrases().containsAll(getTitlePhrases()))) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!(getAbstractPhrases().containsAll(that.getAbstractPhrases()) &amp;&amp; that.getAbstractPhrases().containsAll(getAbstractPhrases()))) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (getFromYear().isPresent() ? !getFromYear().equals(that.getFromYear()) : that.getFromYear().isPresent()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (getToYear().isPresent() ? !getToYear().equals(that.getToYear()) : that.getToYear().isPresent()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (getSingleYear().isPresent() ? !getSingleYear().equals(that.getSingleYear()) : that.getSingleYear().isPresent()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (getDOI().isPresent() ? !getDOI().equals(that.getDOI()) : that.getDOI().isPresent()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return getJournal().isPresent() ? getJournal().equals(that.getJournal()) : that.getJournal().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(defaultField, getAuthors(), getSingleYear(), getAbstractPhrases(), getFromYear(), getToYear(), getTitlePhrases(), getJournal(), getDOI());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        StringJoiner stringJoiner = new StringJoiner(&quot; &quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        getSingleYear().ifPresent(singleYear -&gt; stringJoiner.add(singleYear.toString()));</b>
+<b class="nc">&nbsp;        getFromYear().ifPresent(fromYear -&gt; stringJoiner.add(fromYear.toString()));</b>
+<b class="nc">&nbsp;        getToYear().ifPresent(toYear -&gt; stringJoiner.add(toYear.toString()));</b>
+<b class="nc">&nbsp;        getJournal().ifPresent(stringJoiner::add);</b>
+<b class="nc">&nbsp;        getDOI().ifPresent(newElement -&gt; stringJoiner.add(&quot;doi:&quot; + newElement));</b>
+<b class="nc">&nbsp;        stringJoiner.add(String.join(&quot; &quot;, getTitlePhrases()))</b>
+<b class="nc">&nbsp;                    .add(String.join(&quot; &quot;, getDefaultFieldPhrases()))</b>
+<b class="nc">&nbsp;                    .add(String.join(&quot; &quot;, getAuthors()))</b>
+<b class="nc">&nbsp;                    .add(String.join(&quot; &quot;, getAbstractPhrases()));</b>
+&nbsp;
+<b class="nc">&nbsp;        return stringJoiner.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class ComplexSearchQueryBuilder {
+<b class="nc">&nbsp;        private final List&lt;String&gt; defaultFieldPhrases = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        private final List&lt;String&gt; authors = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        private final List&lt;String&gt; titlePhrases = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        private final List&lt;String&gt; abstractPhrases = new ArrayList&lt;&gt;();</b>
+&nbsp;        private String journal;
+&nbsp;        private String doi;
+&nbsp;        private Integer fromYear;
+&nbsp;        private Integer toYear;
+&nbsp;        private Integer singleYear;
+&nbsp;
+<b class="nc">&nbsp;        private ComplexSearchQueryBuilder() {</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ComplexSearchQueryBuilder defaultFieldPhrase(String defaultFieldPhrase) {
+<b class="nc">&nbsp;            if (Objects.requireNonNull(defaultFieldPhrase).isBlank()) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Parameter must not be blank&quot;);</b>
+&nbsp;            }
+&nbsp;            // Strip all quotes before wrapping
+<b class="nc">&nbsp;            this.defaultFieldPhrases.add(&quot;\&quot;%s\&quot;&quot;.formatted(defaultFieldPhrase.replace(&quot;\&quot;&quot;, &quot;&quot;)));</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Adds author and wraps it in quotes
+&nbsp;         */
+&nbsp;        public ComplexSearchQueryBuilder author(String author) {
+<b class="nc">&nbsp;            if (Objects.requireNonNull(author).isBlank()) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Parameter must not be blank&quot;);</b>
+&nbsp;            }
+&nbsp;            // Strip all quotes before wrapping
+<b class="nc">&nbsp;            this.authors.add(&quot;\&quot;%s\&quot;&quot;.formatted(author.replace(&quot;\&quot;&quot;, &quot;&quot;)));</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Adds title phrase and wraps it in quotes
+&nbsp;         */
+&nbsp;        public ComplexSearchQueryBuilder titlePhrase(String titlePhrase) {
+<b class="nc">&nbsp;            if (Objects.requireNonNull(titlePhrase).isBlank()) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Parameter must not be blank&quot;);</b>
+&nbsp;            }
+&nbsp;            // Strip all quotes before wrapping
+<b class="nc">&nbsp;            this.titlePhrases.add(&quot;\&quot;%s\&quot;&quot;.formatted(titlePhrase.replace(&quot;\&quot;&quot;, &quot;&quot;)));</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Adds abstract phrase and wraps it in quotes
+&nbsp;         */
+&nbsp;        public ComplexSearchQueryBuilder abstractPhrase(String abstractPhrase) {
+<b class="nc">&nbsp;            if (Objects.requireNonNull(abstractPhrase).isBlank()) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Parameter must not be blank&quot;);</b>
+&nbsp;            }
+&nbsp;            // Strip all quotes before wrapping
+<b class="nc">&nbsp;            this.titlePhrases.add(&quot;\&quot;%s\&quot;&quot;.formatted(abstractPhrase.replace(&quot;\&quot;&quot;, &quot;&quot;)));</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ComplexSearchQueryBuilder fromYearAndToYear(Integer fromYear, Integer toYear) {
+<b class="nc">&nbsp;            if (singleYear != null) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;You can not use single year and year range search.&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            this.fromYear = Objects.requireNonNull(fromYear);</b>
+<b class="nc">&nbsp;            this.toYear = Objects.requireNonNull(toYear);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ComplexSearchQueryBuilder singleYear(Integer singleYear) {
+<b class="nc">&nbsp;            if (fromYear != null || toYear != null) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;You can not use single year and year range search.&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            this.singleYear = Objects.requireNonNull(singleYear);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ComplexSearchQueryBuilder journal(String journal) {
+<b class="nc">&nbsp;            if (Objects.requireNonNull(journal).isBlank()) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Parameter must not be blank&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            this.journal = &quot;\&quot;%s\&quot;&quot;.formatted(journal.replace(&quot;\&quot;&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ComplexSearchQueryBuilder DOI(String doi) {
+<b class="nc">&nbsp;            if (Objects.requireNonNull(doi).isBlank()) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Parameter must not be blank&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            this.doi = doi.replace(&quot;\&quot;&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public ComplexSearchQueryBuilder terms(Collection&lt;Term&gt; terms) {
+<b class="nc">&nbsp;            terms.forEach(term -&gt; {</b>
+<b class="nc">&nbsp;                String termText = term.text();</b>
+<b class="nc">&nbsp;                switch (term.field().toLowerCase()) {</b>
+&nbsp;                    case &quot;author&quot; -&gt;
+<b class="nc">&nbsp;                            this.author(termText);</b>
+&nbsp;                    case &quot;title&quot; -&gt;
+<b class="nc">&nbsp;                            this.titlePhrase(termText);</b>
+&nbsp;                    case &quot;abstract&quot; -&gt;
+<b class="nc">&nbsp;                            this.abstractPhrase(termText);</b>
+&nbsp;                    case &quot;journal&quot; -&gt;
+<b class="nc">&nbsp;                            this.journal(termText);</b>
+&nbsp;                    case &quot;doi&quot; -&gt;
+<b class="nc">&nbsp;                            this.DOI(termText);</b>
+&nbsp;                    case &quot;year&quot; -&gt;
+<b class="nc">&nbsp;                            this.singleYear(Integer.valueOf(termText));</b>
+&nbsp;                    case &quot;year-range&quot; -&gt;
+<b class="nc">&nbsp;                            this.parseYearRange(termText);</b>
+&nbsp;                    case &quot;default&quot; -&gt;
+<b class="nc">&nbsp;                            this.defaultFieldPhrase(termText);</b>
+&nbsp;                }
+&nbsp;            });
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Instantiates the AdvancesSearchConfig from the provided Builder parameters
+&nbsp;         * If all text fields are empty an empty optional is returned
+&nbsp;         *
+&nbsp;         * @return ComplexSearchQuery instance with the fields set to the values defined in the building instance.
+&nbsp;         * @throws IllegalStateException An IllegalStateException is thrown in case all text search fields are empty.
+&nbsp;         *                               See: https://softwareengineering.stackexchange.com/questions/241309/builder-pattern-when-to-fail/241320#241320
+&nbsp;         */
+&nbsp;        public ComplexSearchQuery build() throws IllegalStateException {
+<b class="nc">&nbsp;            if (textSearchFieldsAndYearFieldsAreEmpty()) {</b>
+<b class="nc">&nbsp;                throw new IllegalStateException(&quot;At least one text field has to be set&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return new ComplexSearchQuery(defaultFieldPhrases, authors, titlePhrases, abstractPhrases, fromYear, toYear, singleYear, journal, doi);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        void parseYearRange(String termText) {
+<b class="nc">&nbsp;            String[] split = termText.split(&quot;-&quot;);</b>
+<b class="nc">&nbsp;            int fromYear = 0;</b>
+<b class="nc">&nbsp;            int toYear = 9999;</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                fromYear = Integer.parseInt(split[0]);</b>
+&nbsp;            } catch (NumberFormatException e) {
+&nbsp;                // default value already set
+&nbsp;            }
+<b class="nc">&nbsp;            if (split.length &gt; 1) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    toYear = Integer.parseInt(split[1]);</b>
+&nbsp;                } catch (NumberFormatException e) {
+&nbsp;                    // default value already set
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            this.fromYearAndToYear(fromYear, toYear);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private boolean textSearchFieldsAndYearFieldsAreEmpty() {
+<b class="nc">&nbsp;            return this.stringListIsBlank(defaultFieldPhrases) &amp;&amp; this.stringListIsBlank(titlePhrases) &amp;&amp;</b>
+<b class="nc">&nbsp;                    this.stringListIsBlank(authors) &amp;&amp; this.stringListIsBlank(abstractPhrases) &amp;&amp; StringUtil.isBlank(journal) &amp;&amp; StringUtil.isBlank(doi) &amp;&amp; yearFieldsAreEmpty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private boolean yearFieldsAreEmpty() {
+<b class="nc">&nbsp;            return singleYear == null &amp;&amp; fromYear == null &amp;&amp; toYear == null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private boolean stringListIsBlank(List&lt;String&gt; stringList) {
+<b class="nc">&nbsp;            return stringList == null || stringList.stream().allMatch(String::isBlank);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

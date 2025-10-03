@@ -1,0 +1,213 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JournalAbbreviationLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.journals</a>
+</div>
+
+<h1>Coverage Summary for Class: JournalAbbreviationLoader (org.jabref.logic.journals)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JournalAbbreviationLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (2/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    30%
+  </span>
+  <span class="absValue">
+    (3/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    21.1%
+  </span>
+  <span class="absValue">
+    (8/38)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.journals;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.journals.ltwa.LtwaRepository;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * &lt;p&gt;
+&nbsp; * This class loads abbreviations from a CSV file and stores them into a MV file ({@link #readAbbreviationsFromCsvFile(Path)}
+&nbsp; * It can also create an {@link JournalAbbreviationRepository} based on an MV file ({@link #loadRepository(JournalAbbreviationPreferences)}.
+&nbsp; * &lt;/p&gt;
+&nbsp; * &lt;p&gt;
+&nbsp; * Abbreviations are available at &lt;a href=&quot;https://github.com/JabRef/abbrv.jabref.org/&quot;&gt;https://github.com/JabRef/abbrv.jabref.org/&lt;/a&gt;.
+&nbsp; * &lt;/p&gt;
+&nbsp; */
+<b class="nc">&nbsp;public class JournalAbbreviationLoader {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);</b>
+&nbsp;
+&nbsp;    public static Collection&lt;Abbreviation&gt; readAbbreviationsFromCsvFile(Path file) throws IOException {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Reading journal list from file {}&quot;, file);</b>
+<b class="nc">&nbsp;        AbbreviationParser parser = new AbbreviationParser();</b>
+<b class="nc">&nbsp;        parser.readJournalListFromFile(file);</b>
+<b class="nc">&nbsp;        return parser.getAbbreviations();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static JournalAbbreviationRepository loadRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {
+&nbsp;        JournalAbbreviationRepository repository;
+&nbsp;
+&nbsp;        // Initialize with built-in list
+<b class="fc">&nbsp;        try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream(&quot;/journals/journal-list.mv&quot;)) {</b>
+<b class="pc">&nbsp;            if (resourceAsStream == null) {</b>
+<b class="fc">&nbsp;                LOGGER.warn(&quot;There is no journal-list.mv. We use a default journal list.&quot;);</b>
+<b class="fc">&nbsp;                repository = new JournalAbbreviationRepository();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                Path tempDir = Files.createTempDirectory(&quot;jabref-journal&quot;);</b>
+<b class="nc">&nbsp;                Path tempJournalList = tempDir.resolve(&quot;journal-list.mv&quot;);</b>
+<b class="nc">&nbsp;                Files.copy(resourceAsStream, tempJournalList);</b>
+<b class="nc">&nbsp;                repository = new JournalAbbreviationRepository(tempJournalList, loadLtwaRepository());</b>
+<b class="nc">&nbsp;                tempDir.toFile().deleteOnExit();</b>
+<b class="nc">&nbsp;                tempJournalList.toFile().deleteOnExit();</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;Loaded journal abbreviations from {}&quot;, tempJournalList.toAbsolutePath());</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error while loading journal abbreviation repository&quot;, e);</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Read external lists
+<b class="fc">&nbsp;        List&lt;String&gt; lists = journalAbbreviationPreferences.getExternalJournalLists();</b>
+&nbsp;        // might produce NPE in tests
+<b class="pc">&nbsp;        if (lists != null &amp;&amp; !lists.isEmpty()) {</b>
+&nbsp;            // reversing ensures that the latest lists overwrites the former one
+<b class="nc">&nbsp;            Collections.reverse(lists);</b>
+<b class="nc">&nbsp;            for (String filename : lists) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    repository.addCustomAbbreviations(readAbbreviationsFromCsvFile(Path.of(filename)));</b>
+&nbsp;                } catch (IOException | InvalidPathException e) {
+&nbsp;                    // invalid path might come from unix/windows mixup of prefs
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Cannot read external journal list file {}&quot;, filename, e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return repository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static LtwaRepository loadLtwaRepository() throws IOException {
+<b class="nc">&nbsp;        try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream(&quot;/journals/ltwa-list.mv&quot;)) {</b>
+<b class="nc">&nbsp;            if (resourceAsStream == null) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;There is no ltwa-list.mv. We cannot load the LTWA repository.&quot;);</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;LTWA repository not found&quot;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                Path tempDir = Files.createTempDirectory(&quot;jabref-ltwa&quot;);</b>
+<b class="nc">&nbsp;                Path tempLtwaList = tempDir.resolve(&quot;ltwa-list.mv&quot;);</b>
+<b class="nc">&nbsp;                Files.copy(resourceAsStream, tempLtwaList);</b>
+<b class="nc">&nbsp;                LtwaRepository ltwaRepository = new LtwaRepository(tempLtwaList);</b>
+<b class="nc">&nbsp;                tempDir.toFile().deleteOnExit();</b>
+<b class="nc">&nbsp;                tempLtwaList.toFile().deleteOnExit();</b>
+<b class="nc">&nbsp;                return ltwaRepository;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static JournalAbbreviationRepository loadBuiltInRepository() {
+<b class="nc">&nbsp;        return loadRepository(new JournalAbbreviationPreferences(List.of(), true));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

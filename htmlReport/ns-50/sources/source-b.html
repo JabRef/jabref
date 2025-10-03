@@ -1,0 +1,150 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MainTablePreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: MainTablePreferences (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MainTablePreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;
+&nbsp;public class MainTablePreferences {
+&nbsp;    private final ColumnPreferences columnPreferences;
+<b class="nc">&nbsp;    private final BooleanProperty resizeColumnsToFit = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty extraFileColumnsEnabled = new SimpleBooleanProperty();</b>
+&nbsp;
+&nbsp;    public MainTablePreferences(ColumnPreferences columnPreferences,
+&nbsp;                                boolean resizeColumnsToFit,
+<b class="nc">&nbsp;                                boolean extraFileColumnsEnabled) {</b>
+<b class="nc">&nbsp;        this.columnPreferences = columnPreferences;</b>
+<b class="nc">&nbsp;        this.resizeColumnsToFit.set(resizeColumnsToFit);</b>
+<b class="nc">&nbsp;        this.extraFileColumnsEnabled.set(extraFileColumnsEnabled);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ColumnPreferences getColumnPreferences() {
+<b class="nc">&nbsp;        return columnPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getResizeColumnsToFit() {
+<b class="nc">&nbsp;        return resizeColumnsToFit.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty resizeColumnsToFitProperty() {
+<b class="nc">&nbsp;        return resizeColumnsToFit;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setResizeColumnsToFit(boolean resizeColumnsToFit) {
+<b class="nc">&nbsp;        this.resizeColumnsToFit.set(resizeColumnsToFit);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getExtraFileColumnsEnabled() {
+<b class="nc">&nbsp;        return extraFileColumnsEnabled.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty extraFileColumnsEnabledProperty() {
+<b class="nc">&nbsp;        return extraFileColumnsEnabled;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setExtraFileColumnsEnabled(boolean extraFileColumnsEnabled) {
+<b class="nc">&nbsp;        this.extraFileColumnsEnabled.set(extraFileColumnsEnabled);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

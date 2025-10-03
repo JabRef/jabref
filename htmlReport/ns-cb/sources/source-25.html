@@ -1,0 +1,230 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Medra</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: Medra (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Medra</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.IntStream;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.DoiCleanup;
+&nbsp;import org.jabref.logic.importer.IdBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.util.JsonReader;
+&nbsp;import org.jabref.logic.importer.util.MediaTypes;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONException;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;
+&nbsp;/**
+&nbsp; * A class for fetching DOIs from Medra
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;https://data.medra.org&quot;&gt;mEDRA Content Negotiation API&lt;/a&gt; for an overview of the API
+&nbsp; * &lt;p&gt;
+&nbsp; * It requires &quot;Accept&quot; request Header attribute to be set to desired content-type.
+&nbsp; */
+<b class="nc">&nbsp;public class Medra implements IdBasedParserFetcher {</b>
+&nbsp;
+&nbsp;    public static final String API_URL = &quot;https://data.medra.org&quot;;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;mEDRA&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return inputStream -&gt; {</b>
+<b class="nc">&nbsp;            JSONObject response = JsonReader.toJsonObject(inputStream);</b>
+<b class="nc">&nbsp;            if (response.isEmpty()) {</b>
+<b class="nc">&nbsp;                return List.of();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return List.of(jsonItemToBibEntry(response));</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
+&nbsp;        try {
+&nbsp;
+<b class="nc">&nbsp;            return new BibEntry(convertType(item.getString(&quot;type&quot;)))</b>
+<b class="nc">&nbsp;                    .withField(StandardField.TITLE, item.getString(&quot;title&quot;))</b>
+<b class="nc">&nbsp;                    .withField(StandardField.AUTHOR, toAuthors(item.optJSONArray(&quot;author&quot;)))</b>
+<b class="nc">&nbsp;                    .withField(StandardField.YEAR,</b>
+<b class="nc">&nbsp;                            Optional.ofNullable(item.optJSONObject(&quot;issued&quot;))</b>
+<b class="nc">&nbsp;                                    .map(array -&gt; array.optJSONArray(&quot;date-parts&quot;))</b>
+<b class="nc">&nbsp;                                    .map(array -&gt; array.optJSONArray(0))</b>
+<b class="nc">&nbsp;                                    .map(array -&gt; array.optInt(0))</b>
+<b class="nc">&nbsp;                                    .map(year -&gt; Integer.toString(year)).orElse(&quot;&quot;))</b>
+<b class="nc">&nbsp;                    .withField(StandardField.DOI, item.getString(&quot;DOI&quot;))</b>
+<b class="nc">&nbsp;                    .withField(StandardField.PAGES, item.optString(&quot;page&quot;))</b>
+<b class="nc">&nbsp;                    .withField(StandardField.ISSN, item.optString(&quot;ISSN&quot;))</b>
+<b class="nc">&nbsp;                    .withField(StandardField.JOURNAL, item.optString(&quot;container-title&quot;))</b>
+<b class="nc">&nbsp;                    .withField(StandardField.PUBLISHER, item.optString(&quot;publisher&quot;))</b>
+<b class="nc">&nbsp;                    .withField(StandardField.URL, item.optString(&quot;URL&quot;))</b>
+<b class="nc">&nbsp;                    .withField(StandardField.VOLUME, item.optString(&quot;volume&quot;));</b>
+&nbsp;        } catch (JSONException exception) {
+<b class="nc">&nbsp;            throw new ParseException(&quot;mEdRA API JSON format has changed&quot;, exception);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private EntryType convertType(String type) {
+<b class="nc">&nbsp;        return &quot;article-journal&quot;.equals(type) ? StandardEntryType.Article : StandardEntryType.Misc;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String toAuthors(JSONArray authors) {
+<b class="nc">&nbsp;        if (authors == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;        // input: list of {&quot;literal&quot;:&quot;A.&quot;}
+<b class="nc">&nbsp;        return IntStream.range(0, authors.length())</b>
+<b class="nc">&nbsp;                        .mapToObj(authors::getJSONObject)</b>
+<b class="nc">&nbsp;                        .map(author -&gt; author.has(&quot;literal&quot;) ? // quickly route through the literal string</b>
+<b class="nc">&nbsp;                                       new Author(author.getString(&quot;literal&quot;), &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;) :</b>
+<b class="nc">&nbsp;                                       new Author(author.optString(&quot;given&quot;, &quot;&quot;), &quot;&quot;, &quot;&quot;, author.optString(&quot;family&quot;, &quot;&quot;), &quot;&quot;))</b>
+<b class="nc">&nbsp;                        .collect(AuthorList.collect())</b>
+<b class="nc">&nbsp;                        .getAsFirstLastNamesWithAnd();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URLDownload getUrlDownload(URL url) {
+<b class="nc">&nbsp;        URLDownload download = new URLDownload(url);</b>
+<b class="nc">&nbsp;        download.addHeader(&quot;Accept&quot;, MediaTypes.CITATIONSTYLES_JSON);</b>
+<b class="nc">&nbsp;        return download;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        return URLUtil.create(API_URL + &quot;/&quot; + identifier);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doPostCleanup(BibEntry entry) {
+<b class="nc">&nbsp;        new DoiCleanup().cleanup(entry);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

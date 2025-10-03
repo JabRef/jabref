@@ -1,0 +1,145 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ThreeWayMergeCell</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.mergeentries.threewaymerge.cell</a>
+</div>
+
+<h1>Coverage Summary for Class: ThreeWayMergeCell (org.jabref.gui.mergeentries.threewaymerge.cell)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ThreeWayMergeCell</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.mergeentries.threewaymerge.cell;
+&nbsp;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.css.PseudoClass;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;
+&nbsp;public abstract class ThreeWayMergeCell extends HBox {
+&nbsp;    public static final String ODD_PSEUDO_CLASS = &quot;odd&quot;;
+&nbsp;    public static final String EVEN_PSEUDO_CLASS = &quot;even&quot;;
+&nbsp;    public static final int HEADER_ROW = -1;
+&nbsp;    private static final String DEFAULT_STYLE_CLASS = &quot;field-cell&quot;;
+&nbsp;
+&nbsp;    private final ThreeWayMergeCellViewModel viewModel;
+&nbsp;
+<b class="nc">&nbsp;    public ThreeWayMergeCell(String text, int rowIndex) {</b>
+<b class="nc">&nbsp;        getStyleClass().add(DEFAULT_STYLE_CLASS);</b>
+<b class="nc">&nbsp;        viewModel = new ThreeWayMergeCellViewModel(text, rowIndex);</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.oddProperty(), isOdd -&gt; pseudoClassStateChanged(PseudoClass.getPseudoClass(ODD_PSEUDO_CLASS), isOdd));</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(viewModel.evenProperty(), isEven -&gt; pseudoClassStateChanged(PseudoClass.getPseudoClass(EVEN_PSEUDO_CLASS), isEven));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getText() {
+<b class="nc">&nbsp;        return viewModel.getText();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty textProperty() {
+<b class="nc">&nbsp;        return viewModel.textProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setText(String text) {
+<b class="nc">&nbsp;        viewModel.setText(text);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;ThreeWayMergeCell [getText()=&quot; + getText() + &quot;]&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

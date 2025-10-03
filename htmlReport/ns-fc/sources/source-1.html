@@ -1,0 +1,561 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BackgroundTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util</a>
+</div>
+
+<h1>Coverage Summary for Class: BackgroundTask (org.jabref.logic.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BackgroundTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BackgroundTask$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BackgroundTask$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BackgroundTask$3</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BackgroundTask$4</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BackgroundTask$5</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BackgroundTask$BackgroundProgress</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/84)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util;
+&nbsp;
+&nbsp;import java.util.concurrent.Callable;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.DoubleProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleDoubleProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/// This class is essentially a wrapper around [javafx.concurrent.Task].
+&nbsp;///
+&nbsp;/// A task created here is to be submitted to `#execute(BackgroundTask)` to submit.
+&nbsp;/// BackgroundTask class is mostly injected by `@Inject TaskExecutor` or provided during class initialization.
+&nbsp;///
+&nbsp;/// We take the opportunity and implement a fluid interface.
+&nbsp;///
+&nbsp;/// Example (for using the fluent interface)
+&nbsp;///
+&nbsp;///     BackgroundTask.wrap(() -&gt; ...).showToUser(true).onRunning(() -&gt; ...).onSuccess(() -&gt; ...).onFailure(() -&gt; ...).executeWith(taskExecutor);
+&nbsp;///
+&nbsp;/// Background: The task executor one takes care to show it in the UI. See `org.jabref.gui.StateManager#addBackgroundTask(BackgroundTask, Task)` for details.
+&nbsp;///
+&nbsp;/// We cannot use [javafx.concurrent.Task] directly since it runs certain update notifications on the JavaFX thread,
+&nbsp;/// and so makes testing harder.
+&nbsp;///
+&nbsp;/// TODO: Think of migrating to &lt;a href=&quot;https://github.com/ReactiveX/RxJava#simple-background-computation&quot;&gt;RxJava&lt;/a&gt;;
+&nbsp;///       &lt;a href=&quot;https://www.baeldung.com/java-completablefuture&quot;&gt;CompletableFuture&lt;/a&gt; do not seem to support everything.
+&nbsp;///       If this is not possible, add an @implNote why.
+&nbsp;///
+&nbsp;/// @param &lt;V&gt; type of the return value of the task
+&nbsp;public abstract class BackgroundTask&lt;V&gt; {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BackgroundTask.class);</b>
+&nbsp;
+&nbsp;    private Runnable onRunning;
+&nbsp;    private Consumer&lt;V&gt; onSuccess;
+&nbsp;    private Consumer&lt;Exception&gt; onException;
+&nbsp;    private Runnable onFinished;
+<b class="nc">&nbsp;    private final BooleanProperty isCancelled = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;BackgroundProgress&gt; progress = new SimpleObjectProperty&lt;&gt;(new BackgroundProgress(0, 0));</b>
+<b class="nc">&nbsp;    private final StringProperty message = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty title = new SimpleStringProperty(this.getClass().getSimpleName());</b>
+<b class="nc">&nbsp;    private final DoubleProperty workDonePercentage = new SimpleDoubleProperty(0);</b>
+<b class="nc">&nbsp;    private final BooleanProperty showToUser = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final BooleanProperty willBeRecoveredAutomatically = new SimpleBooleanProperty(false);</b>
+&nbsp;
+<b class="nc">&nbsp;    public BackgroundTask() {</b>
+<b class="nc">&nbsp;        workDonePercentage.bind(EasyBind.map(progress, BackgroundTask.BackgroundProgress::getWorkDonePercentage));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;V&gt; BackgroundTask&lt;V&gt; wrap(Callable&lt;V&gt; callable) {
+<b class="nc">&nbsp;        return new BackgroundTask&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public V call() throws Exception {
+<b class="nc">&nbsp;                return callable.call();</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public static BackgroundTask&lt;Void&gt; wrap(Runnable runnable) {
+<b class="nc">&nbsp;        return new BackgroundTask&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public Void call() {
+<b class="nc">&nbsp;                runnable.run();</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static &lt;T&gt; Consumer&lt;T&gt; chain(Runnable first, Consumer&lt;T&gt; second) {
+<b class="nc">&nbsp;        if (first != null) {</b>
+<b class="nc">&nbsp;            if (second != null) {</b>
+<b class="nc">&nbsp;                return result -&gt; {</b>
+<b class="nc">&nbsp;                    first.run();</b>
+<b class="nc">&nbsp;                    second.accept(result);</b>
+&nbsp;                };
+&nbsp;            } else {
+<b class="nc">&nbsp;                return result -&gt; first.run();</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            return second;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isCancelled() {
+<b class="nc">&nbsp;        return isCancelled.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void cancel() {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Canceling task&quot;);</b>
+<b class="nc">&nbsp;        this.isCancelled.set(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty isCancelledProperty() {
+<b class="nc">&nbsp;        return isCancelled;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty messageProperty() {
+<b class="nc">&nbsp;        return message;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty titleProperty() {
+<b class="nc">&nbsp;        return title;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BackgroundTask&lt;V&gt; setTitle(String title) {
+<b class="nc">&nbsp;        this.title.set(title);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getWorkDonePercentage() {
+<b class="nc">&nbsp;        return workDonePercentage.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty workDonePercentageProperty() {
+<b class="nc">&nbsp;        return workDonePercentage;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected BackgroundProgress getProgress() {
+<b class="nc">&nbsp;        return progress.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;BackgroundProgress&gt; progressProperty() {
+<b class="nc">&nbsp;        return progress;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean showToUser() {
+<b class="nc">&nbsp;        return showToUser.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty showToUserProperty() {
+<b class="nc">&nbsp;        return showToUser;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BackgroundTask&lt;V&gt; showToUser(boolean show) {
+<b class="nc">&nbsp;        showToUser.set(show);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean willBeRecoveredAutomatically() {
+<b class="nc">&nbsp;        return willBeRecoveredAutomatically.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BackgroundTask&lt;V&gt; willBeRecoveredAutomatically(boolean willBeRecoveredAutomatically) {
+<b class="nc">&nbsp;        this.willBeRecoveredAutomatically.set(willBeRecoveredAutomatically);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the {@link Runnable} that is invoked after the task is started.
+&nbsp;     */
+&nbsp;    public BackgroundTask&lt;V&gt; onRunning(Runnable onRunning) {
+<b class="nc">&nbsp;        this.onRunning = onRunning;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Carry a consumer to a running runnable and invoke it after the task is started.
+&nbsp;     */
+&nbsp;    public @NonNull BackgroundTask&lt;V&gt; consumeOnRunning(@NonNull Consumer&lt;BackgroundTask&lt;V&gt;&gt; onRunningConsumer) {
+<b class="nc">&nbsp;        return this.onRunning(() -&gt; onRunningConsumer.accept(this));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the {@link Consumer} that is invoked after the task is successfully finished.
+&nbsp;     * The consumer always runs on the JavaFX thread.
+&nbsp;     */
+&nbsp;    public BackgroundTask&lt;V&gt; onSuccess(Consumer&lt;V&gt; onSuccess) {
+<b class="nc">&nbsp;        this.onSuccess = onSuccess;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public abstract V call() throws Exception;
+&nbsp;
+&nbsp;    public Runnable getOnRunning() {
+<b class="nc">&nbsp;        return onRunning;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Consumer&lt;V&gt; getOnSuccess() {
+<b class="nc">&nbsp;        return chain(onFinished, onSuccess);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Consumer&lt;Exception&gt; getOnException() {
+<b class="nc">&nbsp;        return chain(onFinished, onException);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the {@link Consumer} that is invoked after the task has failed with an exception.
+&nbsp;     * The consumer always runs on the JavaFX thread.
+&nbsp;     */
+&nbsp;    public BackgroundTask&lt;V&gt; onFailure(Consumer&lt;Exception&gt; onException) {
+<b class="nc">&nbsp;        this.onException = onException;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Future&lt;V&gt; executeWith(TaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        return taskExecutor.execute(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Future&lt;?&gt; scheduleWith(TaskExecutor taskExecutor, long delay, TimeUnit unit) {
+<b class="nc">&nbsp;        return taskExecutor.schedule(this, delay, unit);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the {@link Runnable} that is invoked after the task is finished, irrespectively if it was successful or
+&nbsp;     * failed with an error.
+&nbsp;     */
+&nbsp;    public BackgroundTask&lt;V&gt; onFinished(Runnable onFinished) {
+<b class="nc">&nbsp;        this.onFinished = onFinished;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
+&nbsp;     *
+&nbsp;     * @param nextTaskFactory the function that creates the new task
+&nbsp;     * @param &lt;T&gt;             type of the return value of the second task
+&nbsp;     */
+&nbsp;    public &lt;T&gt; BackgroundTask&lt;T&gt; then(Function&lt;V, BackgroundTask&lt;T&gt;&gt; nextTaskFactory) {
+<b class="nc">&nbsp;        return new BackgroundTask&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public T call() throws Exception {
+<b class="nc">&nbsp;                V result = BackgroundTask.this.call();</b>
+<b class="nc">&nbsp;                BackgroundTask&lt;T&gt; nextTask = nextTaskFactory.apply(result);</b>
+<b class="nc">&nbsp;                EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);</b>
+<b class="nc">&nbsp;                return nextTask.call();</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
+&nbsp;     *
+&nbsp;     * @param nextOperation the function that performs the next operation
+&nbsp;     * @param &lt;T&gt;           type of the return value of the second task
+&nbsp;     */
+&nbsp;    public &lt;T&gt; BackgroundTask&lt;T&gt; thenRun(Function&lt;V, T&gt; nextOperation) {
+<b class="nc">&nbsp;        return new BackgroundTask&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public T call() throws Exception {
+<b class="nc">&nbsp;                V result = BackgroundTask.this.call();</b>
+<b class="nc">&nbsp;                BackgroundTask&lt;T&gt; nextTask = BackgroundTask.wrap(() -&gt; nextOperation.apply(result));</b>
+<b class="nc">&nbsp;                EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);</b>
+<b class="nc">&nbsp;                return nextTask.call();</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a {@link BackgroundTask} that first runs this task and based on the result runs a second task.
+&nbsp;     *
+&nbsp;     * @param nextOperation the function that performs the next operation
+&nbsp;     */
+&nbsp;    public BackgroundTask&lt;Void&gt; thenRun(Consumer&lt;V&gt; nextOperation) {
+<b class="nc">&nbsp;        return new BackgroundTask&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public Void call() throws Exception {
+<b class="nc">&nbsp;                V result = BackgroundTask.this.call();</b>
+<b class="nc">&nbsp;                BackgroundTask&lt;Void&gt; nextTask = BackgroundTask.wrap(() -&gt; nextOperation.accept(result));</b>
+<b class="nc">&nbsp;                EasyBind.subscribe(nextTask.progressProperty(), this::updateProgress);</b>
+<b class="nc">&nbsp;                return nextTask.call();</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void updateProgress(BackgroundProgress newProgress) {
+<b class="nc">&nbsp;        progress.setValue(newProgress);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void updateProgress(double workDone, double max) {
+<b class="nc">&nbsp;        updateProgress(new BackgroundProgress(workDone, max));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void updateMessage(String newMessage) {
+<b class="nc">&nbsp;        message.setValue(newMessage);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BackgroundTask&lt;V&gt; withInitialMessage(String message) {
+<b class="nc">&nbsp;        updateMessage(message);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public record BackgroundProgress(</b>
+&nbsp;            double workDone,
+&nbsp;            double max) {
+&nbsp;
+&nbsp;        public double getWorkDonePercentage() {
+<b class="nc">&nbsp;            if (max == 0) {</b>
+<b class="nc">&nbsp;                return 0;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return workDone / max;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,294 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibtexEntryTypeDefinitions</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.types</a>
+</div>
+
+<h1>Coverage Summary for Class: BibtexEntryTypeDefinitions (org.jabref.model.entry.types)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibtexEntryTypeDefinitions</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (70/70)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.types;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypeBuilder;
+&nbsp;import org.jabref.model.entry.field.OrFields;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class represents all supported BibTeX entry types.
+&nbsp; * It is based on the information of &lt;a href=&quot;https://tug.org/texmf-docs/bibtex/btxdoc.pdf&quot;&gt;BibTeXing&lt;/a&gt;, a manual
+&nbsp; * by the original BibTeX author. Also enriched by new fields not existing back then (e.g., ISSN).
+&nbsp; * &lt;p&gt;
+&nbsp; * The BibLaTeX entry types are defined at {@link BiblatexEntryTypeDefinitions}.
+&nbsp; */
+&nbsp;public class BibtexEntryTypeDefinitions {
+&nbsp;    /**
+&nbsp;     * An article from a journal or magazine.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: author, title, journal, year.
+&nbsp;     * Optional fields: volume, number, pages, month, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType ARTICLE = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Article)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.JOURNAL, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.VOLUME, StandardField.NUMBER, StandardField.PAGES, StandardField.MONTH, StandardField.ISSN, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A book with an explicit publisher.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: author or editor, title, publisher, year.
+&nbsp;     * Optional fields: volume or number, series, address, edition, month, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType BOOK = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Book)</b>
+<b class="fc">&nbsp;            .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.PUBLISHER, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.ADDRESS, StandardField.EDITION, StandardField.MONTH, StandardField.ISBN, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A work that is printed and bound, but without a named publisher or sponsoring institution.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required field: title.
+&nbsp;     * Optional fields: author, howpublished, address, month, year, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType BOOKLET = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Booklet)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.TITLE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.AUTHOR, StandardField.HOWPUBLISHED, StandardField.ADDRESS, StandardField.MONTH, StandardField.YEAR, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * An article in a conference proceedings.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: author, title, booktitle, year.
+&nbsp;     * Optional fields: editor, volume or number, series, pages, address, month, organization, publisher, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType CONFERENCE = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Conference)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.EDITOR, StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.PAGES, StandardField.ADDRESS, StandardField.MONTH, StandardField.ORGANIZATION, StandardField.PUBLISHER, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A part of a book, which may be a chapter (or section or whatever) and/or a range of pages.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: author or editor, title, chapter and/or pages, publisher, year.
+&nbsp;     * Optional fields: volume or number, series, type, address, edition, month, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType INBOOK = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.InBook)</b>
+<b class="fc">&nbsp;            .addRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR))</b>
+<b class="fc">&nbsp;            .addRequiredFields(StandardField.TITLE, StandardField.PUBLISHER, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .addRequiredFields(new OrFields(StandardField.CHAPTER, StandardField.PAGES))</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.TYPE, StandardField.ADDRESS, StandardField.EDITION, StandardField.MONTH, StandardField.ISBN, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A part of a book having its own title.
+&nbsp;     * Required fields: author, title, booktitle, publisher, year.
+&nbsp;     * Optional fields: editor, volume or number, series, type, chapter, pages, address, edition, month, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType INCOLLECTION = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.InCollection)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.PUBLISHER, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.EDITOR, StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.TYPE, StandardField.CHAPTER, StandardField.PAGES, StandardField.ADDRESS, StandardField.EDITION, StandardField.MONTH, StandardField.ISBN, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * An article in a conference proceedings.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: author, title, booktitle, year.
+&nbsp;     * Optional fields: editor, volume or number, series, pages, address, month, organization, publisher, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType INPROCEEDINGS = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.InProceedings)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.BOOKTITLE, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.EDITOR, StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.PAGES, StandardField.ADDRESS, StandardField.MONTH, StandardField.ORGANIZATION, StandardField.PUBLISHER, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Technical documentation.
+&nbsp;     * Required field: title.
+&nbsp;     * Optional fields: author, organization, address, edition, month, year, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType MANUAL = new BibEntryTypeBuilder().withRequiredFields(StandardField.TITLE).withImportantFields(StandardField.AUTHOR, StandardField.ORGANIZATION, StandardField.ADDRESS, StandardField.EDITION, StandardField.MONTH, StandardField.YEAR, StandardField.ISBN, StandardField.NOTE).withType(StandardEntryType.Manual)</b>
+<b class="fc">&nbsp;                                                                        .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A Master&#39;s thesis.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: author, title, school, year.
+&nbsp;     * Optional fields: type, address, month, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType MASTERSTHESIS = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.MastersThesis)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.SCHOOL, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.TYPE, StandardField.ADDRESS, StandardField.MONTH, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Use this type when nothing else fits.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: none.
+&nbsp;     * Optional fields: author, title, howpublished, month, year, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType MISC = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Misc)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.HOWPUBLISHED, StandardField.MONTH, StandardField.YEAR, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A PhD thesis.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: author, title, school, year.
+&nbsp;     * Optional fields: type, address, month, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType PHDTHESIS = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.PhdThesis)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.SCHOOL, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.TYPE, StandardField.ADDRESS, StandardField.MONTH, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The proceedings of a conference.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: title, year.
+&nbsp;     * Optional fields: editor, volume or number, series, address, month, organization, publisher, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType PROCEEDINGS = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Proceedings)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.TITLE, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.EDITOR, StandardField.VOLUME, StandardField.NUMBER, StandardField.SERIES, StandardField.ADDRESS, StandardField.PUBLISHER, StandardField.MONTH, StandardField.ORGANIZATION, StandardField.ISBN, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A report published by a school or other institution, usually numbered within a series.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: author, title, institution, year.
+&nbsp;     * Optional fields: type, number, address, month, note.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType TECHREPORT = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.TechReport)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.INSTITUTION, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.TYPE, StandardField.NUMBER, StandardField.ADDRESS, StandardField.MONTH, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A document having an author and title, but not formally published.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Required fields: author, title, note.
+&nbsp;     * Optional fields: month, year.
+&nbsp;     */
+<b class="fc">&nbsp;    private static final BibEntryType UNPUBLISHED = new BibEntryTypeBuilder()</b>
+<b class="fc">&nbsp;            .withType(StandardEntryType.Unpublished)</b>
+<b class="fc">&nbsp;            .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.NOTE)</b>
+<b class="fc">&nbsp;            .withImportantFields(StandardField.MONTH, StandardField.YEAR)</b>
+<b class="fc">&nbsp;            .build();</b>
+&nbsp;
+<b class="fc">&nbsp;    public static final List&lt;BibEntryType&gt; ALL = Arrays.asList(ARTICLE, INBOOK, BOOK, BOOKLET, INCOLLECTION, CONFERENCE,</b>
+&nbsp;            INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC);
+&nbsp;
+<b class="fc">&nbsp;    public static final List&lt;BibEntryType&gt; RECOMMENDED = Arrays.asList(ARTICLE, BOOK, INPROCEEDINGS, TECHREPORT, MISC);</b>
+&nbsp;
+&nbsp;    private BibtexEntryTypeDefinitions() {
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

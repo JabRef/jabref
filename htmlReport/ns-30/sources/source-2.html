@@ -1,0 +1,232 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileAnnotationTabView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor.fileannotationtab</a>
+</div>
+
+<h1>Coverage Summary for Class: FileAnnotationTabView (org.jabref.gui.entryeditor.fileannotationtab)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileAnnotationTabView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor.fileannotationtab;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.geometry.HPos;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ListView;
+&nbsp;import javafx.scene.control.SelectionMode;
+&nbsp;import javafx.scene.control.TextArea;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.layout.ColumnConstraints;
+&nbsp;import javafx.scene.layout.GridPane;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.scene.text.TextAlignment;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.pdf.FileAnnotationCache;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class FileAnnotationTabView {
+&nbsp;
+&nbsp;    @FXML public ComboBox&lt;Path&gt; files;
+&nbsp;    @FXML public ListView&lt;FileAnnotationViewModel&gt; annotationList;
+&nbsp;    @FXML public Label author;
+&nbsp;    @FXML public Label page;
+&nbsp;    @FXML public Label date;
+&nbsp;    @FXML public TextArea content;
+&nbsp;    @FXML public TextArea marking;
+&nbsp;    @FXML public VBox details;
+&nbsp;    private final BibEntry entry;
+&nbsp;    private final FileAnnotationCache fileAnnotationCache;
+&nbsp;    private FileAnnotationTabViewModel viewModel;
+&nbsp;
+&nbsp;    @Inject private FileUpdateMonitor fileMonitor;
+&nbsp;    @Inject private ClipBoardManager clipBoardManager;
+&nbsp;
+<b class="nc">&nbsp;    public FileAnnotationTabView(BibEntry entry, FileAnnotationCache fileAnnotationCache) {</b>
+<b class="nc">&nbsp;        this.entry = entry;</b>
+<b class="nc">&nbsp;        this.fileAnnotationCache = fileAnnotationCache;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        viewModel = new FileAnnotationTabViewModel(fileAnnotationCache, entry, fileMonitor, clipBoardManager);</b>
+&nbsp;
+&nbsp;        // Set-up files list
+<b class="nc">&nbsp;        files.getItems().setAll(viewModel.filesProperty().get());</b>
+<b class="nc">&nbsp;        files.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -&gt; viewModel.notifyNewSelectedFile(newValue));</b>
+<b class="nc">&nbsp;        files.getSelectionModel().selectFirst();</b>
+&nbsp;
+&nbsp;        // Set-up annotation list
+<b class="nc">&nbsp;        annotationList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);</b>
+<b class="nc">&nbsp;        annotationList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -&gt; viewModel.notifyNewSelectedAnnotation(newValue));</b>
+<b class="nc">&nbsp;        ViewModelListCellFactory&lt;FileAnnotationViewModel&gt; cellFactory = new ViewModelListCellFactory&lt;FileAnnotationViewModel&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic(this::createFileAnnotationNode);</b>
+<b class="nc">&nbsp;        annotationList.setCellFactory(cellFactory);</b>
+<b class="nc">&nbsp;        annotationList.setPlaceholder(new Label(Localization.lang(&quot;File has no attached annotations&quot;)));</b>
+<b class="nc">&nbsp;        Bindings.bindContent(annotationList.itemsProperty().get(), viewModel.annotationsProperty());</b>
+<b class="nc">&nbsp;        annotationList.getSelectionModel().selectFirst();</b>
+<b class="nc">&nbsp;        annotationList.itemsProperty().get().addListener(</b>
+<b class="nc">&nbsp;                (ListChangeListener&lt;? super FileAnnotationViewModel&gt;) c -&gt; annotationList.getSelectionModel().selectFirst());</b>
+&nbsp;
+&nbsp;        // Set-up details pane
+<b class="nc">&nbsp;        content.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::contentProperty));</b>
+<b class="nc">&nbsp;        marking.textProperty().bind(EasyBind.select(viewModel.currentAnnotationProperty()).selectObject(FileAnnotationViewModel::markingProperty));</b>
+<b class="nc">&nbsp;        details.disableProperty().bind(viewModel.isAnnotationsEmpty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node createFileAnnotationNode(FileAnnotationViewModel annotation) {
+<b class="nc">&nbsp;        GridPane node = new GridPane();</b>
+&nbsp;
+<b class="nc">&nbsp;        ColumnConstraints firstColumn = new ColumnConstraints();</b>
+<b class="nc">&nbsp;        ColumnConstraints secondColumn = new ColumnConstraints();</b>
+<b class="nc">&nbsp;        firstColumn.setPercentWidth(70);</b>
+<b class="nc">&nbsp;        secondColumn.setPercentWidth(30);</b>
+<b class="nc">&nbsp;        firstColumn.setHalignment(HPos.LEFT);</b>
+<b class="nc">&nbsp;        secondColumn.setHalignment(HPos.RIGHT);</b>
+<b class="nc">&nbsp;        node.getColumnConstraints().addAll(firstColumn, secondColumn);</b>
+&nbsp;
+<b class="nc">&nbsp;        Label marking = new Label(annotation.getMarking());</b>
+<b class="nc">&nbsp;        Label author = new Label(annotation.getAuthor());</b>
+<b class="nc">&nbsp;        Label date = new Label(annotation.getDate());</b>
+<b class="nc">&nbsp;        Label page = new Label(Localization.lang(&quot;Page&quot;) + &quot;: &quot; + annotation.getPage());</b>
+&nbsp;
+<b class="nc">&nbsp;        marking.setStyle(&quot;-fx-font-size: 0.75em; -fx-font-weight: bold&quot;);</b>
+<b class="nc">&nbsp;        marking.setMaxHeight(30);</b>
+&nbsp;
+<b class="nc">&nbsp;        Tooltip markingTooltip = new Tooltip(annotation.getMarking());</b>
+<b class="nc">&nbsp;        markingTooltip.setMaxWidth(800);</b>
+<b class="nc">&nbsp;        markingTooltip.setWrapText(true);</b>
+<b class="nc">&nbsp;        marking.setTooltip(markingTooltip);</b>
+&nbsp;
+&nbsp;        // add alignment for text in the list
+<b class="nc">&nbsp;        marking.setTextAlignment(TextAlignment.LEFT);</b>
+<b class="nc">&nbsp;        marking.setAlignment(Pos.TOP_LEFT);</b>
+<b class="nc">&nbsp;        marking.setMaxWidth(500);</b>
+<b class="nc">&nbsp;        marking.setWrapText(true);</b>
+<b class="nc">&nbsp;        author.setTextAlignment(TextAlignment.LEFT);</b>
+<b class="nc">&nbsp;        author.setAlignment(Pos.TOP_LEFT);</b>
+<b class="nc">&nbsp;        date.setTextAlignment(TextAlignment.RIGHT);</b>
+<b class="nc">&nbsp;        date.setAlignment(Pos.TOP_RIGHT);</b>
+<b class="nc">&nbsp;        page.setTextAlignment(TextAlignment.RIGHT);</b>
+<b class="nc">&nbsp;        page.setAlignment(Pos.TOP_RIGHT);</b>
+&nbsp;
+<b class="nc">&nbsp;        node.add(marking, 0, 0);</b>
+<b class="nc">&nbsp;        node.add(author, 0, 1);</b>
+<b class="nc">&nbsp;        node.add(date, 1, 0);</b>
+<b class="nc">&nbsp;        node.add(page, 1, 1);</b>
+&nbsp;
+<b class="nc">&nbsp;        return node;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void copy() {
+<b class="nc">&nbsp;        viewModel.copyCurrentAnnotation();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,509 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LayoutHelper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout</a>
+</div>
+
+<h1>Coverage Summary for Class: LayoutHelper (org.jabref.logic.layout)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LayoutHelper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/148)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/141)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PushbackReader;
+&nbsp;import java.io.Reader;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;
+&nbsp;/**
+&nbsp; * Helper class to get a Layout object.
+&nbsp; *
+&nbsp; * &lt;pre&gt;
+&nbsp; * &lt;code&gt;
+&nbsp; * LayoutHelper helper = new LayoutHelper(...a reader...);
+&nbsp; * Layout layout = helper.getLayoutFromText();
+&nbsp; * &lt;/code&gt;
+&nbsp; * &lt;/pre&gt;
+&nbsp; */
+&nbsp;public class LayoutHelper {
+&nbsp;
+&nbsp;    public static final int IS_LAYOUT_TEXT = 1;
+&nbsp;    public static final int IS_SIMPLE_COMMAND = 2;
+&nbsp;    public static final int IS_FIELD_START = 3;
+&nbsp;    public static final int IS_FIELD_END = 4;
+&nbsp;    public static final int IS_OPTION_FIELD = 5;
+&nbsp;    public static final int IS_GROUP_START = 6;
+&nbsp;    public static final int IS_GROUP_END = 7;
+&nbsp;    public static final int IS_ENCODING_NAME = 8;
+&nbsp;    public static final int IS_FILENAME = 9;
+&nbsp;    public static final int IS_FILEPATH = 10;
+&nbsp;
+&nbsp;    private static String currentGroup;
+&nbsp;
+&nbsp;    private final PushbackReader in;
+<b class="nc">&nbsp;    private final List&lt;StringInt&gt; parsedEntries = new ArrayList&lt;&gt;();</b>
+&nbsp;    private final List&lt;Path&gt; fileDirForDatabase;
+&nbsp;    private final LayoutFormatterPreferences preferences;
+&nbsp;    private final JournalAbbreviationRepository abbreviationRepository;
+&nbsp;    private boolean endOfFile;
+&nbsp;
+&nbsp;    public LayoutHelper(Reader in,
+&nbsp;                        List&lt;Path&gt; fileDirForDatabase,
+&nbsp;                        LayoutFormatterPreferences preferences,
+<b class="nc">&nbsp;                        JournalAbbreviationRepository abbreviationRepository) {</b>
+<b class="nc">&nbsp;        this.in = new PushbackReader(Objects.requireNonNull(in), 2);</b>
+<b class="nc">&nbsp;        this.preferences = Objects.requireNonNull(preferences);</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+<b class="nc">&nbsp;        this.fileDirForDatabase = fileDirForDatabase;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LayoutHelper(Reader in,
+&nbsp;                        LayoutFormatterPreferences preferences,
+&nbsp;                        JournalAbbreviationRepository abbreviationRepository) {
+<b class="nc">&nbsp;        this(in, List.of(), preferences, abbreviationRepository);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Layout getLayoutFromText() throws IOException {
+<b class="nc">&nbsp;        parse();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (StringInt parsedEntry : parsedEntries) {</b>
+<b class="nc">&nbsp;            if ((parsedEntry.i == LayoutHelper.IS_SIMPLE_COMMAND) || (parsedEntry.i == LayoutHelper.IS_FIELD_START)</b>
+&nbsp;                    || (parsedEntry.i == LayoutHelper.IS_FIELD_END) || (parsedEntry.i == LayoutHelper.IS_GROUP_START)
+&nbsp;                    || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
+<b class="nc">&nbsp;                parsedEntry.s = parsedEntry.s.trim().toLowerCase(Locale.ROOT);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new Layout(parsedEntries, fileDirForDatabase, preferences, abbreviationRepository);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getCurrentGroup() {
+<b class="nc">&nbsp;        return LayoutHelper.currentGroup;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void setCurrentGroup(String newGroup) {
+<b class="nc">&nbsp;        LayoutHelper.currentGroup = newGroup;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void doBracketedField(final int field) throws IOException {
+<b class="nc">&nbsp;        StringBuilder buffer = null;</b>
+&nbsp;        int currentCharacter;
+<b class="nc">&nbsp;        boolean start = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (!endOfFile) {</b>
+<b class="nc">&nbsp;            currentCharacter = read();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (currentCharacter == -1) {</b>
+<b class="nc">&nbsp;                endOfFile = true;</b>
+<b class="nc">&nbsp;                if (buffer != null) {</b>
+<b class="nc">&nbsp;                    parsedEntries.add(new StringInt(buffer.toString(), field));</b>
+&nbsp;                }
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if ((currentCharacter == &#39;{&#39;) || (currentCharacter == &#39;}&#39;)) {</b>
+<b class="nc">&nbsp;                if (currentCharacter == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                    if (buffer != null) {</b>
+<b class="nc">&nbsp;                        parsedEntries.add(new StringInt(buffer.toString(), field));</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    start = true;</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (buffer == null) {</b>
+<b class="nc">&nbsp;                    buffer = new StringBuilder(100);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (start &amp;&amp; (currentCharacter != &#39;}&#39;)) {</b>
+<b class="nc">&nbsp;                    buffer.append((char) currentCharacter);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void doBracketedOptionField() throws IOException {
+<b class="nc">&nbsp;        StringBuilder buffer = null;</b>
+&nbsp;        int c;
+<b class="nc">&nbsp;        boolean start = false;</b>
+<b class="nc">&nbsp;        boolean inQuotes = false;</b>
+<b class="nc">&nbsp;        boolean doneWithOptions = false;</b>
+<b class="nc">&nbsp;        String option = null;</b>
+&nbsp;        String tmp;
+&nbsp;
+<b class="nc">&nbsp;        while (!endOfFile) {</b>
+<b class="nc">&nbsp;            c = read();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (c == -1) {</b>
+<b class="nc">&nbsp;                endOfFile = true;</b>
+&nbsp;
+<b class="nc">&nbsp;                if (buffer != null) {</b>
+<b class="nc">&nbsp;                    if (option == null) {</b>
+<b class="nc">&nbsp;                        tmp = buffer.toString();</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        tmp = buffer.toString() + &#39;\n&#39; + option;</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            if (!inQuotes &amp;&amp; ((c == &#39;]&#39;) || (c == &#39;[&#39;) || (doneWithOptions &amp;&amp; ((c == &#39;{&#39;) || (c == &#39;}&#39;))))) {</b>
+<b class="nc">&nbsp;                if ((c == &#39;]&#39;) || (doneWithOptions &amp;&amp; (c == &#39;}&#39;))) {</b>
+&nbsp;                    // changed section start - arudert
+&nbsp;                    // buffer may be null for parameters
+<b class="nc">&nbsp;                    if ((c == &#39;]&#39;) &amp;&amp; (buffer != null)) {</b>
+&nbsp;                        // changed section end - arudert
+<b class="nc">&nbsp;                        option = buffer.toString();</b>
+<b class="nc">&nbsp;                        buffer = null;</b>
+<b class="nc">&nbsp;                        start = false;</b>
+<b class="nc">&nbsp;                        doneWithOptions = true;</b>
+<b class="nc">&nbsp;                    } else if (c == &#39;}&#39;) {</b>
+&nbsp;                        // changed section begin - arudert
+&nbsp;                        // bracketed option must be followed by an (optionally empty) parameter
+&nbsp;                        // if empty, the parameter is set to &quot; &quot; (whitespace to avoid that the tokenizer that
+&nbsp;                        // splits the string later on ignores the empty parameter)
+<b class="nc">&nbsp;                        String parameter = buffer == null ? &quot; &quot; : buffer.toString();</b>
+<b class="nc">&nbsp;                        if (option == null) {</b>
+<b class="nc">&nbsp;                            tmp = parameter;</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            tmp = parameter + &#39;\n&#39; + option;</b>
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        parsedEntries.add(new StringInt(tmp, LayoutHelper.IS_OPTION_FIELD));</b>
+&nbsp;
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                    // changed section end - arudert
+&nbsp;                    // changed section start - arudert
+&nbsp;                    // }
+&nbsp;                    // changed section end - arudert
+&nbsp;                } else {
+<b class="nc">&nbsp;                    start = true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (c == &#39;&quot;&#39;) {</b>
+<b class="nc">&nbsp;                inQuotes = !inQuotes;</b>
+&nbsp;
+<b class="nc">&nbsp;                if (buffer == null) {</b>
+<b class="nc">&nbsp;                    buffer = new StringBuilder(100);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                buffer.append(&#39;&quot;&#39;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (buffer == null) {</b>
+<b class="nc">&nbsp;                    buffer = new StringBuilder(100);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (start) {</b>
+&nbsp;                    // changed section begin - arudert
+&nbsp;                    // keep the backslash so we know wether this is a fieldname or an ordinary parameter
+&nbsp;                    // if (c != &#39;\\&#39;) {
+<b class="nc">&nbsp;                    buffer.append((char) c);</b>
+&nbsp;                    // }
+&nbsp;                    // changed section end - arudert
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parse() throws IOException {
+<b class="nc">&nbsp;        skipWhitespace();</b>
+&nbsp;
+&nbsp;        int c;
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder buffer = null;</b>
+<b class="nc">&nbsp;        boolean escaped = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (!endOfFile) {</b>
+<b class="nc">&nbsp;            c = read();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (c == -1) {</b>
+<b class="nc">&nbsp;                endOfFile = true;</b>
+&nbsp;
+&nbsp;                // Check for null, otherwise a Layout that finishes with a curly brace throws a NPE
+<b class="nc">&nbsp;                if (buffer != null) {</b>
+<b class="nc">&nbsp;                    parsedEntries.add(new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT));</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if ((c == &#39;\\&#39;) &amp;&amp; (peek() != &#39;\\&#39;) &amp;&amp; !escaped) {</b>
+<b class="nc">&nbsp;                if (buffer != null) {</b>
+<b class="nc">&nbsp;                    parsedEntries.add(new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT));</b>
+&nbsp;
+<b class="nc">&nbsp;                    buffer = null;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                parseField();</b>
+&nbsp;
+&nbsp;                // To make sure the next character, if it is a backslash,
+&nbsp;                // doesn&#39;t get ignored, since &quot;previous&quot; now holds a backslash:
+<b class="nc">&nbsp;                escaped = false;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (buffer == null) {</b>
+<b class="nc">&nbsp;                    buffer = new StringBuilder(100);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if ((c != &#39;\\&#39;) || escaped) /* (previous == &#39;\\&#39;))) */ {</b>
+<b class="nc">&nbsp;                    buffer.append((char) c);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                escaped = (c == &#39;\\&#39;) &amp;&amp; !escaped;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseField() throws IOException {
+&nbsp;        int c;
+<b class="nc">&nbsp;        StringBuilder buffer = null;</b>
+&nbsp;        String name;
+&nbsp;
+<b class="nc">&nbsp;        while (!endOfFile) {</b>
+<b class="nc">&nbsp;            c = read();</b>
+<b class="nc">&nbsp;            if (c == -1) {</b>
+<b class="nc">&nbsp;                endOfFile = true;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!validChar(c) &amp;&amp; !validAnnotation(c)) {</b>
+<b class="nc">&nbsp;                unread(c);</b>
+&nbsp;
+<b class="nc">&nbsp;                name = buffer == null ? &quot;&quot; : buffer.toString();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (name.isEmpty()) {</b>
+<b class="nc">&nbsp;                    StringBuilder lastFive = new StringBuilder(10);</b>
+<b class="nc">&nbsp;                    if (parsedEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;                        lastFive.append(&quot;unknown&quot;);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        for (StringInt entry : parsedEntries.subList(Math.max(0, parsedEntries.size() - 6),</b>
+<b class="nc">&nbsp;                                parsedEntries.size() - 1)) {</b>
+<b class="nc">&nbsp;                            lastFive.append(entry.s);</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    throw new IOException(</b>
+<b class="nc">&nbsp;                            &quot;Backslash parsing error near \&#39;&quot; + lastFive.toString().replace(&quot;\n&quot;, &quot; &quot;) + &#39;\&#39;&#39;);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (&quot;begin&quot;.equalsIgnoreCase(name)) {</b>
+&nbsp;                    // get field name
+<b class="nc">&nbsp;                    doBracketedField(LayoutHelper.IS_FIELD_START);</b>
+&nbsp;
+&nbsp;                    return;
+<b class="nc">&nbsp;                } else if (&quot;begingroup&quot;.equalsIgnoreCase(name)) {</b>
+&nbsp;                    // get field name
+<b class="nc">&nbsp;                    doBracketedField(LayoutHelper.IS_GROUP_START);</b>
+&nbsp;                    return;
+<b class="nc">&nbsp;                } else if (&quot;format&quot;.equalsIgnoreCase(name)) {</b>
+<b class="nc">&nbsp;                    if (c == &#39;[&#39;) {</b>
+&nbsp;                        // get format parameter
+&nbsp;                        // get field name
+<b class="nc">&nbsp;                        doBracketedOptionField();</b>
+&nbsp;
+&nbsp;                        return;
+&nbsp;                    } else {
+&nbsp;                        // get field name
+<b class="nc">&nbsp;                        doBracketedField(LayoutHelper.IS_OPTION_FIELD);</b>
+&nbsp;
+&nbsp;                        return;
+&nbsp;                    }
+<b class="nc">&nbsp;                } else if (&quot;filename&quot;.equalsIgnoreCase(name)) {</b>
+&nbsp;                    // Print the name of the database BIB file.
+&nbsp;                    // This is only supported in begin/end layouts, not in
+&nbsp;                    // entry layouts.
+<b class="nc">&nbsp;                    parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILENAME));</b>
+&nbsp;                    return;
+<b class="nc">&nbsp;                } else if (&quot;filepath&quot;.equalsIgnoreCase(name)) {</b>
+&nbsp;                    // Print the full path of the database BIB file.
+&nbsp;                    // This is only supported in begin/end layouts, not in
+&nbsp;                    // entry layouts.
+<b class="nc">&nbsp;                    parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILEPATH));</b>
+&nbsp;                    return;
+<b class="nc">&nbsp;                } else if (&quot;end&quot;.equalsIgnoreCase(name)) {</b>
+&nbsp;                    // get field name
+<b class="nc">&nbsp;                    doBracketedField(LayoutHelper.IS_FIELD_END);</b>
+&nbsp;                    return;
+<b class="nc">&nbsp;                } else if (&quot;endgroup&quot;.equalsIgnoreCase(name)) {</b>
+&nbsp;                    // get field name
+<b class="nc">&nbsp;                    doBracketedField(LayoutHelper.IS_GROUP_END);</b>
+&nbsp;                    return;
+<b class="nc">&nbsp;                } else if (&quot;encoding&quot;.equalsIgnoreCase(name)) {</b>
+&nbsp;                    // Print the name of the current encoding used for export.
+&nbsp;                    // This is only supported in begin/end layouts, not in
+&nbsp;                    // entry layouts.
+<b class="nc">&nbsp;                    parsedEntries.add(new StringInt(name, LayoutHelper.IS_ENCODING_NAME));</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+&nbsp;                // for all other cases -&gt; simple command
+<b class="nc">&nbsp;                parsedEntries.add(new StringInt(name, LayoutHelper.IS_SIMPLE_COMMAND));</b>
+&nbsp;
+&nbsp;                return;
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (buffer == null) {</b>
+<b class="nc">&nbsp;                    buffer = new StringBuilder(100);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                buffer.append((char) c);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean validAnnotation(int c) throws IOException {
+&nbsp;        // Only accept annotations that are followed by a valid character
+<b class="nc">&nbsp;        boolean annotation = ((c == &#39;+&#39;) || (c == &#39;:&#39;)) &amp;&amp; validChar(peek());</b>
+&nbsp;
+<b class="nc">&nbsp;        return annotation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean validChar(int c) {
+<b class="nc">&nbsp;        boolean character = Character.isLetter((char) c) || (c == &#39;_&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return character;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int peek() throws IOException {
+<b class="nc">&nbsp;        int c = read();</b>
+<b class="nc">&nbsp;        unread(c);</b>
+&nbsp;
+<b class="nc">&nbsp;        return c;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private int read() throws IOException {
+<b class="nc">&nbsp;        return in.read();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void skipWhitespace() throws IOException {
+&nbsp;        int c;
+&nbsp;
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            c = read();</b>
+&nbsp;
+<b class="nc">&nbsp;            if ((c == -1) || (c == 65535)) {</b>
+<b class="nc">&nbsp;                endOfFile = true;</b>
+&nbsp;
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!Character.isWhitespace((char) c)) {</b>
+<b class="nc">&nbsp;                unread(c);</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void unread(int c) throws IOException {
+<b class="nc">&nbsp;        in.unread(c);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

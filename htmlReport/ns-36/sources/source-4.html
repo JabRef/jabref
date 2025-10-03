@@ -1,0 +1,257 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EditorContextAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors.contextmenu</a>
+</div>
+
+<h1>Coverage Summary for Class: EditorContextAction (org.jabref.gui.fieldeditors.contextmenu)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EditorContextAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EditorContextAction$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors.contextmenu;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.BooleanBinding;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.PasswordField;
+&nbsp;import javafx.scene.control.TextInputControl;
+&nbsp;import javafx.scene.input.Clipboard;
+&nbsp;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;
+&nbsp;import com.sun.javafx.scene.control.Properties;
+&nbsp;
+&nbsp;public class EditorContextAction extends SimpleCommand {
+&nbsp;
+<b class="nc">&nbsp;    private static final boolean SHOW_HANDLES = Properties.IS_TOUCH_SUPPORTED &amp;&amp; !OS.OS_X;</b>
+&nbsp;
+&nbsp;    private final StandardActions command;
+&nbsp;    private final TextInputControl textInputControl;
+&nbsp;
+<b class="nc">&nbsp;    public EditorContextAction(StandardActions command, TextInputControl textInputControl) {</b>
+<b class="nc">&nbsp;        this.command = command;</b>
+<b class="nc">&nbsp;        this.textInputControl = textInputControl;</b>
+&nbsp;
+<b class="nc">&nbsp;        BooleanProperty editableBinding = textInputControl.editableProperty();</b>
+<b class="nc">&nbsp;        BooleanBinding hasTextBinding = Bindings.createBooleanBinding(() -&gt; textInputControl.getLength() &gt; 0, textInputControl.textProperty());</b>
+<b class="nc">&nbsp;        BooleanBinding hasStringInClipboardBinding = (BooleanBinding) BindingsHelper.constantOf(Clipboard.getSystemClipboard().hasString());</b>
+<b class="nc">&nbsp;        BooleanBinding hasSelectionBinding = Bindings.createBooleanBinding(() -&gt; textInputControl.getSelection().getLength() &gt; 0, textInputControl.selectionProperty());</b>
+<b class="nc">&nbsp;        BooleanBinding allSelectedBinding = Bindings.createBooleanBinding(() -&gt; textInputControl.getSelection().getLength() == textInputControl.getLength());</b>
+<b class="nc">&nbsp;        BooleanBinding maskTextBinding = (BooleanBinding) BindingsHelper.constantOf(textInputControl instanceof PasswordField); // (maskText(&quot;A&quot;) != &quot;A&quot;);</b>
+<b class="nc">&nbsp;        BooleanBinding undoableBinding = Bindings.createBooleanBinding(textInputControl::isUndoable, textInputControl.undoableProperty());</b>
+<b class="nc">&nbsp;        BooleanBinding redoableBinding = Bindings.createBooleanBinding(textInputControl::isRedoable, textInputControl.redoableProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(</b>
+<b class="nc">&nbsp;                switch (command) {</b>
+&nbsp;                    case COPY -&gt;
+<b class="nc">&nbsp;                            editableBinding.and(maskTextBinding.not()).and(hasSelectionBinding);</b>
+&nbsp;                    case CUT -&gt;
+<b class="nc">&nbsp;                            maskTextBinding.not().and(hasSelectionBinding);</b>
+&nbsp;                    case PASTE -&gt;
+<b class="nc">&nbsp;                            editableBinding.and(hasStringInClipboardBinding);</b>
+&nbsp;                    case DELETE -&gt;
+<b class="nc">&nbsp;                            editableBinding.and(hasSelectionBinding);</b>
+&nbsp;                    case UNDO -&gt;
+<b class="nc">&nbsp;                            undoableBinding;</b>
+&nbsp;                    case REDO -&gt;
+<b class="nc">&nbsp;                            redoableBinding;</b>
+&nbsp;                    case SELECT_ALL -&gt; {
+<b class="nc">&nbsp;                        if (SHOW_HANDLES) {</b>
+<b class="nc">&nbsp;                            yield hasTextBinding.and(allSelectedBinding.not());</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            yield BindingsHelper.constantOf(true);</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                    default -&gt;
+<b class="nc">&nbsp;                            BindingsHelper.constantOf(true);</b>
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        switch (command) {</b>
+&nbsp;            case COPY -&gt;
+<b class="nc">&nbsp;                    textInputControl.copy();</b>
+&nbsp;            case CUT -&gt;
+<b class="nc">&nbsp;                    textInputControl.cut();</b>
+&nbsp;            case PASTE -&gt;
+<b class="nc">&nbsp;                    textInputControl.paste();</b>
+&nbsp;            case DELETE -&gt;
+<b class="nc">&nbsp;                    textInputControl.deleteText(textInputControl.getSelection());</b>
+&nbsp;            case SELECT_ALL -&gt;
+<b class="nc">&nbsp;                    textInputControl.selectAll();</b>
+&nbsp;            case UNDO -&gt;
+<b class="nc">&nbsp;                    textInputControl.undo();</b>
+&nbsp;            case REDO -&gt;
+<b class="nc">&nbsp;                    textInputControl.redo();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        textInputControl.requestFocus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the default context menu items (except undo/redo)
+&nbsp;     */
+&nbsp;    public static List&lt;MenuItem&gt; getDefaultContextMenuItems(TextInputControl textInputControl) {
+<b class="nc">&nbsp;        ActionFactory factory = new ActionFactory();</b>
+&nbsp;
+<b class="nc">&nbsp;        MenuItem selectAllMenuItem = factory.createMenuItem(StandardActions.SELECT_ALL,</b>
+&nbsp;                new EditorContextAction(StandardActions.SELECT_ALL, textInputControl));
+<b class="nc">&nbsp;        if (SHOW_HANDLES) {</b>
+<b class="nc">&nbsp;            selectAllMenuItem.getProperties().put(&quot;refreshMenu&quot;, Boolean.TRUE);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return List.of(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.CUT, new EditorContextAction(StandardActions.CUT, textInputControl)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY, new EditorContextAction(StandardActions.COPY, textInputControl)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.PASTE, new EditorContextAction(StandardActions.PASTE, textInputControl)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.DELETE, new EditorContextAction(StandardActions.DELETE, textInputControl)),</b>
+&nbsp;                selectAllMenuItem);
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

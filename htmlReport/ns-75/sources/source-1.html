@@ -1,0 +1,227 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > XmpPrivacyTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.xmp</a>
+</div>
+
+<h1>Coverage Summary for Class: XmpPrivacyTab (org.jabref.gui.preferences.xmp)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XmpPrivacyTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.xmp;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;import javafx.scene.control.TableView;
+&nbsp;import javafx.scene.input.KeyCode;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.AbstractPreferenceTabView;
+&nbsp;import org.jabref.gui.preferences.PreferencesTab;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.gui.util.FieldsUtil;
+&nbsp;import org.jabref.gui.util.IconValidationDecorator;
+&nbsp;import org.jabref.gui.util.ValueTableCellFactory;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class XmpPrivacyTab extends AbstractPreferenceTabView&lt;XmpPrivacyTabViewModel&gt; implements PreferencesTab {
+&nbsp;
+&nbsp;    @FXML private CheckBox enableXmpFilter;
+&nbsp;    @FXML private TableView&lt;Field&gt; filterList;
+&nbsp;    @FXML private TableColumn&lt;Field, Field&gt; fieldColumn;
+&nbsp;    @FXML private TableColumn&lt;Field, Field&gt; actionsColumn;
+&nbsp;    @FXML private ComboBox&lt;Field&gt; addFieldName;
+&nbsp;    @FXML private Button addField;
+&nbsp;
+&nbsp;    @Inject private CliPreferences preferences;
+&nbsp;    @Inject private UndoManager undoManager;
+&nbsp;
+<b class="nc">&nbsp;    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();</b>
+&nbsp;
+<b class="nc">&nbsp;    public XmpPrivacyTab() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;XMP metadata&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferences.getXmpPreferences());</b>
+&nbsp;
+<b class="nc">&nbsp;        enableXmpFilter.selectedProperty().bindBidirectional(viewModel.xmpFilterEnabledProperty());</b>
+<b class="nc">&nbsp;        filterList.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());</b>
+<b class="nc">&nbsp;        addFieldName.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());</b>
+<b class="nc">&nbsp;        addField.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        fieldColumn.setSortable(true);</b>
+<b class="nc">&nbsp;        fieldColumn.setReorderable(false);</b>
+<b class="nc">&nbsp;        fieldColumn.setCellValueFactory(cellData -&gt; BindingsHelper.constantOf(cellData.getValue()));</b>
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;Field, Field&gt;()</b>
+<b class="nc">&nbsp;                .withText(item -&gt; FieldsUtil.getNameWithType(item, preferences, undoManager))</b>
+<b class="nc">&nbsp;                .install(fieldColumn);</b>
+&nbsp;
+<b class="nc">&nbsp;        actionsColumn.setSortable(false);</b>
+<b class="nc">&nbsp;        actionsColumn.setReorderable(false);</b>
+<b class="nc">&nbsp;        actionsColumn.setCellValueFactory(cellData -&gt; BindingsHelper.constantOf(cellData.getValue()));</b>
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;Field, Field&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic(item -&gt; IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())</b>
+<b class="nc">&nbsp;                .withTooltip(item -&gt; Localization.lang(&quot;Remove&quot;) + &quot; &quot; + item.getName())</b>
+<b class="nc">&nbsp;                .withOnMouseClickedEvent(</b>
+<b class="nc">&nbsp;                        item -&gt; evt -&gt; viewModel.removeFilter(filterList.getFocusModel().getFocusedItem()))</b>
+<b class="nc">&nbsp;                .install(actionsColumn);</b>
+&nbsp;
+<b class="nc">&nbsp;        filterList.addEventFilter(KeyEvent.KEY_PRESSED, event -&gt; {</b>
+<b class="nc">&nbsp;            if (event.getCode() == KeyCode.DELETE) {</b>
+<b class="nc">&nbsp;                viewModel.removeFilter(filterList.getSelectionModel().getSelectedItem());</b>
+<b class="nc">&nbsp;                event.consume();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        filterList.itemsProperty().bind(viewModel.filterListProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        addFieldName.setEditable(true);</b>
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;Field&gt;()</b>
+<b class="nc">&nbsp;                .withText(item -&gt; FieldsUtil.getNameWithType(item, preferences, undoManager))</b>
+<b class="nc">&nbsp;                .install(addFieldName);</b>
+<b class="nc">&nbsp;        addFieldName.itemsProperty().bind(viewModel.availableFieldsProperty());</b>
+<b class="nc">&nbsp;        addFieldName.valueProperty().bindBidirectional(viewModel.addFieldNameProperty());</b>
+<b class="nc">&nbsp;        addFieldName.setConverter(FieldsUtil.FIELD_STRING_CONVERTER);</b>
+<b class="nc">&nbsp;        addFieldName.addEventFilter(KeyEvent.KEY_PRESSED, event -&gt; {</b>
+<b class="nc">&nbsp;            if (event.getCode() == KeyCode.ENTER) {</b>
+<b class="nc">&nbsp;                viewModel.addField();</b>
+<b class="nc">&nbsp;                event.consume();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        validationVisualizer.setDecoration(new IconValidationDecorator());</b>
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; validationVisualizer.initVisualization(viewModel.xmpFilterListValidationStatus(), filterList));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addField() {
+<b class="nc">&nbsp;        viewModel.addField();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

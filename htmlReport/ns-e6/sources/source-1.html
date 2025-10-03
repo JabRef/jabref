@@ -1,0 +1,248 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OS</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.os</a>
+</div>
+
+<h1>Coverage Summary for Class: OS (org.jabref.logic.os)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OS</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (12/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    51.9%
+  </span>
+  <span class="absValue">
+    (27/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.os;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.InetAddress;
+&nbsp;import java.net.UnknownHostException;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import com.github.javakeyring.BackendNotSupportedException;
+&nbsp;import com.github.javakeyring.Keyring;
+&nbsp;import com.github.javakeyring.PasswordAccessException;
+&nbsp;import mslinks.ShellLink;
+&nbsp;import mslinks.ShellLinkException;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * For GUI-specific things, see `jabref.gui.desktop.os.NativeDesktop`
+&nbsp; */
+<b class="nc">&nbsp;public class OS {</b>
+&nbsp;    // No LOGGER may be initialized directly
+&nbsp;    // Otherwise, org.jabref.Launcher.addLogToDisk will fail, because tinylog&#39;s properties are frozen
+&nbsp;
+&nbsp;    public static final String APP_DIR_APP_NAME = &quot;jabref&quot;;
+&nbsp;    public static final String APP_DIR_APP_AUTHOR = &quot;org.jabref&quot;;
+&nbsp;
+<b class="fc">&nbsp;    public static final String NEWLINE = System.lineSeparator();</b>
+<b class="fc">&nbsp;    public static final List&lt;Charset&gt; ENCODINGS = Charset.availableCharsets().values().stream().distinct().toList();</b>
+&nbsp;
+&nbsp;    // https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/SystemUtils.html
+<b class="fc">&nbsp;    private static final String OS_NAME = System.getProperty(&quot;os.name&quot;, &quot;unknown&quot;).toLowerCase(Locale.ROOT);</b>
+<b class="fc">&nbsp;    public static final boolean LINUX = OS_NAME.startsWith(&quot;linux&quot;);</b>
+<b class="fc">&nbsp;    public static final boolean WINDOWS = OS_NAME.startsWith(&quot;win&quot;);</b>
+<b class="fc">&nbsp;    public static final boolean OS_X = OS_NAME.startsWith(&quot;mac&quot;);</b>
+&nbsp;
+&nbsp;    private static final String DEFAULT_EXECUTABLE_EXTENSION = &quot;.exe&quot;;
+&nbsp;
+&nbsp;    public static String getHostName() {
+&nbsp;        String hostName;
+&nbsp;        // Following code inspired by https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/SystemUtils.html#getHostName--
+&nbsp;        // See also https://stackoverflow.com/a/20793241/873282
+<b class="fc">&nbsp;        hostName = System.getenv(&quot;HOSTNAME&quot;);</b>
+<b class="pc">&nbsp;        if (StringUtil.isBlank(hostName)) {</b>
+<b class="fc">&nbsp;            hostName = System.getenv(&quot;COMPUTERNAME&quot;);</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (StringUtil.isBlank(hostName)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                hostName = InetAddress.getLocalHost().getHostName();</b>
+&nbsp;            } catch (UnknownHostException e) {
+<b class="nc">&nbsp;                LoggerFactory.getLogger(OS.class).info(&quot;Hostname not found. Using \&quot;localhost\&quot; as fallback.&quot;, e);</b>
+<b class="nc">&nbsp;                hostName = &quot;localhost&quot;;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return hostName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isKeyringAvailable() {
+<b class="nc">&nbsp;        try (Keyring keyring = Keyring.create()) {</b>
+<b class="nc">&nbsp;            keyring.setPassword(&quot;JabRef&quot;, &quot;keyringTest&quot;, &quot;keyringTest&quot;);</b>
+<b class="nc">&nbsp;            if (!&quot;keyringTest&quot;.equals(keyring.getPassword(&quot;JabRef&quot;, &quot;keyringTest&quot;))) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            keyring.deletePassword(&quot;JabRef&quot;, &quot;keyringTest&quot;);</b>
+&nbsp;        } catch (BackendNotSupportedException ex) {
+<b class="nc">&nbsp;            LoggerFactory.getLogger(OS.class).warn(&quot;Credential store not supported.&quot;);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        } catch (PasswordAccessException ex) {
+<b class="nc">&nbsp;            LoggerFactory.getLogger(OS.class).warn(&quot;Password storage in credential store failed.&quot;);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        } catch (Exception ex) {
+<b class="nc">&nbsp;            LoggerFactory.getLogger(OS.class).warn(&quot;Connection to credential store failed&quot;);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String detectProgramPath(String programName, String directoryName) {
+<b class="pc">&nbsp;        if (!OS.WINDOWS) {</b>
+<b class="nc">&nbsp;            return programName;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (Objects.equals(programName, &quot;texworks&quot;)) {</b>
+<b class="fc">&nbsp;            Path texworksLinkPath = Path.of(System.getenv(&quot;APPDATA&quot;) + &quot;\\Microsoft\\Windows\\Start Menu\\Programs\\MiKTeX\\TeXworks.lnk&quot;);</b>
+<b class="pc">&nbsp;            if (Files.exists(texworksLinkPath)) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    ShellLink link = new ShellLink(texworksLinkPath);</b>
+<b class="nc">&nbsp;                    return link.resolveTarget();</b>
+&nbsp;                } catch (IOException |
+&nbsp;                         ShellLinkException e) {
+&nbsp;                    // Static logger instance cannot be used. See the class comment.
+<b class="nc">&nbsp;                    Logger logger = LoggerFactory.getLogger(OS.class);</b>
+<b class="nc">&nbsp;                    logger.warn(&quot;Error while reading .lnk file for TeXworks&quot;, e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        String progFiles = System.getenv(&quot;ProgramFiles(x86)&quot;);</b>
+&nbsp;        String programPath;
+<b class="pc">&nbsp;        if (progFiles != null) {</b>
+<b class="fc">&nbsp;            programPath = getProgramPath(programName, directoryName, progFiles);</b>
+<b class="pc">&nbsp;            if (programPath != null) {</b>
+<b class="nc">&nbsp;                return programPath;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        progFiles = System.getenv(&quot;ProgramFiles&quot;);</b>
+<b class="fc">&nbsp;        programPath = getProgramPath(programName, directoryName, progFiles);</b>
+<b class="pc">&nbsp;        if (programPath != null) {</b>
+<b class="nc">&nbsp;            return programPath;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getProgramPath(String programName, String directoryName, String progFiles) {
+&nbsp;        Path programPath;
+<b class="pc">&nbsp;        if ((directoryName != null) &amp;&amp; !directoryName.isEmpty()) {</b>
+<b class="fc">&nbsp;            programPath = Path.of(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            programPath = Path.of(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION);</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (Files.exists(programPath)) {</b>
+<b class="nc">&nbsp;            return programPath.toString();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

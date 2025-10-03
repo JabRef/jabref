@@ -1,0 +1,292 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DonationProvider</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.welcome.components</a>
+</div>
+
+<h1>Coverage Summary for Class: DonationProvider (org.jabref.gui.welcome.components)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DonationProvider</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/83)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.welcome.components;
+&nbsp;
+&nbsp;import java.time.LocalDate;
+&nbsp;
+&nbsp;import javafx.animation.TranslateTransition;
+&nbsp;import javafx.geometry.Insets;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.Region;
+&nbsp;import javafx.scene.layout.StackPane;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.util.Duration;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.edit.OpenBrowserAction;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.DelayedExecution;
+&nbsp;import org.jabref.gui.util.URLs;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;public class DonationProvider {
+&nbsp;    private static final int DONATION_INTERVAL_DAYS = 365;
+&nbsp;    private static final double DONATION_POPUP_ANIM_MS = 200;
+&nbsp;    private static final double DONATION_POPUP_TIMEOUT_SECONDS = 15;
+&nbsp;    private static final String DONATION_URL = URLs.DONATE_URL;
+&nbsp;
+&nbsp;    private final StackPane rootPane;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private HBox donationToast;
+&nbsp;    private DelayedExecution scheduledShow;
+&nbsp;    private DelayedExecution autoHide;
+&nbsp;
+<b class="nc">&nbsp;    public DonationProvider(StackPane rootPane, GuiPreferences preferences, DialogService dialogService) {</b>
+<b class="nc">&nbsp;        this.rootPane = rootPane;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void showIfNeeded() {
+<b class="nc">&nbsp;        if (preferences.getDonationPreferences().isNeverShowAgain()) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        int lastShown = preferences.getDonationPreferences().getLastShownEpochDay();</b>
+<b class="nc">&nbsp;        scheduleAfterDays(calculateDaysUntilNextPopup(lastShown));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int calculateDaysUntilNextPopup(int lastShownEpochDay) {
+<b class="nc">&nbsp;        int today = (int) LocalDate.now().toEpochDay();</b>
+<b class="nc">&nbsp;        if (lastShownEpochDay &lt; 0) {</b>
+<b class="nc">&nbsp;            return 7; // 7 days after first-launch, show the donation popup</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Math.max(0, DONATION_INTERVAL_DAYS - (today - lastShownEpochDay));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void showToast() {
+<b class="nc">&nbsp;        if (donationToast != null &amp;&amp; rootPane.getChildren().contains(donationToast)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        preferences.getDonationPreferences().setLastShownEpochDay((int) LocalDate.now().toEpochDay());</b>
+&nbsp;
+<b class="nc">&nbsp;        Label title = new Label(Localization.lang(&quot;Support JabRef&quot;));</b>
+<b class="nc">&nbsp;        title.getStyleClass().add(&quot;donation-toast-title&quot;);</b>
+<b class="nc">&nbsp;        Label subtitle = new Label(Localization.lang(&quot;Help us improve JabRef by donating.&quot;));</b>
+<b class="nc">&nbsp;        subtitle.getStyleClass().add(&quot;donation-toast-desc&quot;);</b>
+<b class="nc">&nbsp;        VBox textBox = new VBox(title, subtitle);</b>
+<b class="nc">&nbsp;        textBox.getStyleClass().add(&quot;donation-toast-text&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Node iconNode = IconTheme.JabRefIcons.DONATE.getGraphicNode();</b>
+<b class="nc">&nbsp;        HBox leftContent = new HBox(10, iconNode, textBox);</b>
+<b class="nc">&nbsp;        leftContent.setAlignment(Pos.CENTER_LEFT);</b>
+&nbsp;
+<b class="nc">&nbsp;        Button neverButton = new Button(Localization.lang(&quot;Never show again&quot;));</b>
+<b class="nc">&nbsp;        neverButton.getStyleClass().add(&quot;donation-btn-ghost&quot;);</b>
+<b class="nc">&nbsp;        neverButton.setOnAction(_ -&gt; {</b>
+<b class="nc">&nbsp;            preferences.getDonationPreferences().setNeverShowAgain(true);</b>
+<b class="nc">&nbsp;            hideToast();</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        Button cancelButton = new Button(Localization.lang(&quot;Cancel&quot;));</b>
+<b class="nc">&nbsp;        cancelButton.getStyleClass().add(&quot;donation-btn-secondary&quot;);</b>
+<b class="nc">&nbsp;        cancelButton.setOnAction(_ -&gt; hideToast());</b>
+&nbsp;
+<b class="nc">&nbsp;        Button donateButton = new Button(Localization.lang(&quot;Donate&quot;));</b>
+<b class="nc">&nbsp;        donateButton.getStyleClass().add(&quot;donation-btn-primary&quot;);</b>
+<b class="nc">&nbsp;        donateButton.setDefaultButton(true);</b>
+<b class="nc">&nbsp;        donateButton.setOnAction(_ -&gt; {</b>
+<b class="nc">&nbsp;            new OpenBrowserAction(DONATION_URL, dialogService, preferences.getExternalApplicationsPreferences()).execute();</b>
+<b class="nc">&nbsp;            hideToast();</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        HBox rightButtons = new HBox(8, neverButton, cancelButton, donateButton);</b>
+<b class="nc">&nbsp;        rightButtons.setAlignment(Pos.CENTER_RIGHT);</b>
+&nbsp;
+<b class="nc">&nbsp;        Region textSpacer = new Region();</b>
+<b class="nc">&nbsp;        HBox.setHgrow(textSpacer, Priority.ALWAYS);</b>
+&nbsp;
+<b class="nc">&nbsp;        donationToast = new HBox(leftContent, textSpacer, rightButtons);</b>
+<b class="nc">&nbsp;        donationToast.getStyleClass().add(&quot;donation-toast&quot;);</b>
+<b class="nc">&nbsp;        donationToast.setMaxWidth(Region.USE_PREF_SIZE);</b>
+<b class="nc">&nbsp;        donationToast.setMinWidth(Region.USE_PREF_SIZE);</b>
+<b class="nc">&nbsp;        donationToast.setTranslateY(-40);</b>
+&nbsp;
+<b class="nc">&nbsp;        StackPane.setAlignment(donationToast, Pos.TOP_CENTER);</b>
+<b class="nc">&nbsp;        StackPane.setMargin(donationToast, new Insets(16));</b>
+<b class="nc">&nbsp;        rootPane.getChildren().add(donationToast);</b>
+&nbsp;
+<b class="nc">&nbsp;        TranslateTransition slideDown = new TranslateTransition(Duration.millis(DONATION_POPUP_ANIM_MS), donationToast);</b>
+<b class="nc">&nbsp;        slideDown.setFromY(-40);</b>
+<b class="nc">&nbsp;        slideDown.setToY(0);</b>
+<b class="nc">&nbsp;        slideDown.play();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (autoHide != null) {</b>
+<b class="nc">&nbsp;            autoHide.cancel();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        autoHide = new DelayedExecution(Duration.seconds(DONATION_POPUP_TIMEOUT_SECONDS), this::hideToast);</b>
+<b class="nc">&nbsp;        autoHide.start();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void hideToast() {
+<b class="nc">&nbsp;        if (donationToast == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        TranslateTransition slideUp = new TranslateTransition(Duration.millis(DONATION_POPUP_ANIM_MS), donationToast);</b>
+<b class="nc">&nbsp;        slideUp.setFromY(donationToast.getTranslateY());</b>
+<b class="nc">&nbsp;        slideUp.setToY(-40);</b>
+<b class="nc">&nbsp;        slideUp.setOnFinished(_ -&gt; {</b>
+<b class="nc">&nbsp;            rootPane.getChildren().remove(donationToast);</b>
+<b class="nc">&nbsp;            donationToast = null;</b>
+<b class="nc">&nbsp;            if (autoHide != null) {</b>
+<b class="nc">&nbsp;                autoHide.cancel();</b>
+<b class="nc">&nbsp;                autoHide = null;</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        slideUp.play();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Schedules the next donation popup after a specified number of days to take care
+&nbsp;    /// of situation where the user may leave the application open for an extended
+&nbsp;    /// period.
+&nbsp;    private void scheduleAfterDays(int days) {
+<b class="nc">&nbsp;        cancelScheduled();</b>
+<b class="nc">&nbsp;        if (days &lt;= 0) {</b>
+<b class="nc">&nbsp;            showToast();</b>
+<b class="nc">&nbsp;            scheduledShow = new DelayedExecution(Duration.millis(DONATION_INTERVAL_DAYS), this::showIfNeeded);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            scheduledShow = new DelayedExecution(Duration.hours(days * 24), this::showIfNeeded);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        scheduledShow.start();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void cancelScheduled() {
+<b class="nc">&nbsp;        if (scheduledShow != null) {</b>
+<b class="nc">&nbsp;            scheduledShow.cancel();</b>
+<b class="nc">&nbsp;            scheduledShow = null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void cleanUp() {
+<b class="nc">&nbsp;        cancelScheduled();</b>
+<b class="nc">&nbsp;        if (autoHide != null) {</b>
+<b class="nc">&nbsp;            autoHide.cancel();</b>
+<b class="nc">&nbsp;            autoHide = null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (donationToast != null) {</b>
+<b class="nc">&nbsp;            rootPane.getChildren().remove(donationToast);</b>
+<b class="nc">&nbsp;            donationToast = null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,164 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LatexToUnicodeAdapter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.strings</a>
+</div>
+
+<h1>Coverage Summary for Class: LatexToUnicodeAdapter (org.jabref.model.strings)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LatexToUnicodeAdapter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.strings;
+&nbsp;
+&nbsp;import java.text.Normalizer;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import com.github.tomtung.latex2unicode.LaTeX2Unicode;
+&nbsp;import fastparse.Parsed;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;
+&nbsp;/**
+&nbsp; * Adapter class for the latex2unicode lib. This is an alternative to our LatexToUnicode class
+&nbsp; */
+<b class="nc">&nbsp;public class LatexToUnicodeAdapter {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern UNDERSCORE_MATCHER = Pattern.compile(&quot;_(?!\\{)&quot;);</b>
+&nbsp;
+&nbsp;    private static final String REPLACEMENT_CHAR = &quot;\uFFFD&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern UNDERSCORE_PLACEHOLDER_MATCHER = Pattern.compile(REPLACEMENT_CHAR);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Attempts to resolve all LaTeX in the String.
+&nbsp;     *
+&nbsp;     * @param inField a String containing LaTeX
+&nbsp;     * @return a String with LaTeX resolved into Unicode, or the original String if the LaTeX could not be parsed
+&nbsp;     */
+&nbsp;    public static String format(@NonNull String inField) {
+<b class="nc">&nbsp;        return parse(inField).orElse(Normalizer.normalize(inField, Normalizer.Form.NFC));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Attempts to resolve all LaTeX in the String.
+&nbsp;     *
+&nbsp;     * @param inField a String containing LaTeX
+&nbsp;     * @return an {@code Optional&lt;String&gt;} with LaTeX resolved into Unicode or {@code empty} on failure.
+&nbsp;     */
+&nbsp;    public static Optional&lt;String&gt; parse(@NonNull String inField) {
+<b class="nc">&nbsp;        String toFormat = UNDERSCORE_MATCHER.matcher(inField).replaceAll(REPLACEMENT_CHAR);</b>
+<b class="nc">&nbsp;        Parsed&lt;String&gt; parsingResult = LaTeX2Unicode.parse(toFormat);</b>
+<b class="nc">&nbsp;        if (parsingResult instanceof Parsed.Success) {</b>
+<b class="nc">&nbsp;            String text = parsingResult.get().value();</b>
+<b class="nc">&nbsp;            toFormat = Normalizer.normalize(text, Normalizer.Form.NFC);</b>
+<b class="nc">&nbsp;            return Optional.of(UNDERSCORE_PLACEHOLDER_MATCHER.matcher(toFormat).replaceAll(&quot;_&quot;));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

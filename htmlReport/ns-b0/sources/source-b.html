@@ -1,0 +1,432 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BstVMVisitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bst</a>
+</div>
+
+<h1>Coverage Summary for Class: BstVMVisitor (org.jabref.logic.bst)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BstVMVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/130)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BstVMVisitor$Identifier</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/131)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bst;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.ListIterator;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.FieldPreferences;
+&nbsp;import org.jabref.logic.bibtex.FieldWriter;
+&nbsp;import org.jabref.logic.bibtex.InvalidFieldValueException;
+&nbsp;import org.jabref.model.entry.Month;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.antlr.v4.runtime.ParserRuleContext;
+&nbsp;import org.antlr.v4.runtime.tree.ParseTree;
+&nbsp;import org.antlr.v4.runtime.tree.TerminalNode;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;class BstVMVisitor extends BstBaseVisitor&lt;Integer&gt; {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BstVMVisitor.class);</b>
+&nbsp;
+&nbsp;    private final BstVMContext bstVMContext;
+&nbsp;    private final StringBuilder bbl;
+&nbsp;
+<b class="nc">&nbsp;    private BstEntry selectedBstEntry = null;</b>
+&nbsp;
+<b class="nc">&nbsp;    public record Identifier(String name) {</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public BstVMVisitor(BstVMContext bstVMContext, StringBuilder bbl) {</b>
+<b class="nc">&nbsp;        this.bstVMContext = bstVMContext;</b>
+<b class="nc">&nbsp;        this.bbl = bbl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitStringsCommand(BstParser.StringsCommandContext ctx) {
+<b class="nc">&nbsp;        if (ctx.ids.identifier().size() &gt; 20) {</b>
+<b class="nc">&nbsp;            throw new BstVMException(&quot;Strings limit reached&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (BstParser.IdentifierContext identifierContext : ctx.ids.identifier()) {</b>
+<b class="nc">&nbsp;            bstVMContext.strings().put(identifierContext.getText(), null);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitIntegersCommand(BstParser.IntegersCommandContext ctx) {
+<b class="nc">&nbsp;        for (BstParser.IdentifierContext identifierContext : ctx.ids.identifier()) {</b>
+<b class="nc">&nbsp;            bstVMContext.integers().put(identifierContext.getText(), 0);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitFunctionCommand(BstParser.FunctionCommandContext ctx) {
+<b class="nc">&nbsp;        String name = ctx.id.getText();</b>
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Function: {}&quot;, name);</b>
+<b class="nc">&nbsp;        bstVMContext.functions().put(name,</b>
+<b class="nc">&nbsp;                (visitor, functionContext) -&gt; visitor.visit(ctx.function));</b>
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitMacroCommand(BstParser.MacroCommandContext ctx) {
+<b class="nc">&nbsp;        String replacement = ctx.repl.getText().substring(1, ctx.repl.getText().length() - 1);</b>
+<b class="nc">&nbsp;        bstVMContext.functions().put(ctx.id.getText(),</b>
+<b class="nc">&nbsp;                (visitor, functionContext) -&gt; bstVMContext.stack().push(replacement));</b>
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitReadCommand(BstParser.ReadCommandContext ctx) {
+<b class="nc">&nbsp;        FieldWriter fieldWriter = new FieldWriter(new FieldPreferences(true, List.of(StandardField.MONTH), List.of()));</b>
+<b class="nc">&nbsp;        for (BstEntry e : bstVMContext.entries()) {</b>
+<b class="nc">&nbsp;            for (Map.Entry&lt;String, String&gt; mEntry : e.fields.entrySet()) {</b>
+<b class="nc">&nbsp;                Field field = FieldFactory.parseField(mEntry.getKey());</b>
+<b class="nc">&nbsp;                String fieldValue = e.entry.getResolvedFieldOrAlias(field, bstVMContext.bibDatabase())</b>
+<b class="nc">&nbsp;                                           .map(content -&gt; {</b>
+&nbsp;                                               try {
+<b class="nc">&nbsp;                                                   String result = fieldWriter.write(field, content);</b>
+<b class="nc">&nbsp;                                                   if (result.startsWith(&quot;{&quot;)) {</b>
+&nbsp;                                                       // Strip enclosing {} from the output
+<b class="nc">&nbsp;                                                       return result.substring(1, result.length() - 1);</b>
+&nbsp;                                                   }
+<b class="nc">&nbsp;                                                   if (field == StandardField.MONTH) {</b>
+&nbsp;                                                       // We don&#39;t have the internal BibTeX strings at hand.
+&nbsp;                                                       // Thus, we look up the full month name in the generic table.
+<b class="nc">&nbsp;                                                       return Month.parse(result)</b>
+<b class="nc">&nbsp;                                                                   .map(Month::getFullName)</b>
+<b class="nc">&nbsp;                                                                   .orElse(result);</b>
+&nbsp;                                                   }
+<b class="nc">&nbsp;                                                   return result;</b>
+&nbsp;                                               } catch (InvalidFieldValueException invalidFieldValueException) {
+&nbsp;                                                   // in case there is something wrong with the content, just return the content itself
+<b class="nc">&nbsp;                                                   return content;</b>
+&nbsp;                                               }
+&nbsp;                                           })
+<b class="nc">&nbsp;                                           .orElse(null);</b>
+<b class="nc">&nbsp;                mEntry.setValue(fieldValue);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (BstEntry e : bstVMContext.entries()) {</b>
+<b class="nc">&nbsp;            if (!e.fields.containsKey(StandardField.CROSSREF.getName())) {</b>
+<b class="nc">&nbsp;                e.fields.put(StandardField.CROSSREF.getName(), null);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitExecuteCommand(BstParser.ExecuteCommandContext ctx) {
+<b class="nc">&nbsp;        this.selectedBstEntry = null;</b>
+<b class="nc">&nbsp;        BstParser.BstFunctionContext bstFunction = ctx.bstFunction();</b>
+<b class="nc">&nbsp;        String name = bstFunction.getText();</b>
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Executing function {}&quot;, name);</b>
+<b class="nc">&nbsp;        visit(bstFunction);</b>
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Finished executing function {}&quot;, name);</b>
+&nbsp;
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitIterateCommand(BstParser.IterateCommandContext ctx) {
+<b class="nc">&nbsp;        String name = ctx.bstFunction().getText();</b>
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Executing {}&quot;, name);</b>
+<b class="nc">&nbsp;        for (BstEntry entry : bstVMContext.entries()) {</b>
+<b class="nc">&nbsp;            this.selectedBstEntry = entry;</b>
+<b class="nc">&nbsp;            visit(ctx.bstFunction());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Finished executing {}&quot;, name);</b>
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitReverseCommand(BstParser.ReverseCommandContext ctx) {
+<b class="nc">&nbsp;        ListIterator&lt;BstEntry&gt; i = bstVMContext.entries().listIterator(bstVMContext.entries().size());</b>
+<b class="nc">&nbsp;        while (i.hasPrevious()) {</b>
+<b class="nc">&nbsp;            this.selectedBstEntry = i.previous();</b>
+<b class="nc">&nbsp;            visit(ctx.bstFunction());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitEntryCommand(BstParser.EntryCommandContext ctx) {
+&nbsp;        // ENTRY command contains 3 optionally filled identifier lists:
+&nbsp;        // Fields, Integers and Strings
+&nbsp;
+<b class="nc">&nbsp;        BstParser.IdListOptContext entryFields = ctx.idListOpt(0);</b>
+<b class="nc">&nbsp;        for (BstParser.IdentifierContext identifierContext : entryFields.identifier()) {</b>
+<b class="nc">&nbsp;            for (BstEntry entry : bstVMContext.entries()) {</b>
+<b class="nc">&nbsp;                entry.fields.put(identifierContext.getText(), null);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BstParser.IdListOptContext entryIntegers = ctx.idListOpt(1);</b>
+<b class="nc">&nbsp;        for (BstParser.IdentifierContext identifierContext : entryIntegers.identifier()) {</b>
+<b class="nc">&nbsp;            for (BstEntry entry : bstVMContext.entries()) {</b>
+<b class="nc">&nbsp;                entry.localIntegers.put(identifierContext.getText(), 0);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BstParser.IdListOptContext entryStrings = ctx.idListOpt(2);</b>
+<b class="nc">&nbsp;        for (BstParser.IdentifierContext identifierContext : entryStrings.identifier()) {</b>
+<b class="nc">&nbsp;            for (BstEntry entry : bstVMContext.entries()) {</b>
+<b class="nc">&nbsp;                entry.localStrings.put(identifierContext.getText(), null);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (BstEntry entry : bstVMContext.entries()) {</b>
+<b class="nc">&nbsp;            entry.localStrings.put(&quot;sort.key$&quot;, null);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitSortCommand(BstParser.SortCommandContext ctx) {
+<b class="nc">&nbsp;        bstVMContext.entries().sort(Comparator.comparing(o -&gt; (o.localStrings.get(&quot;sort.key$&quot;))));</b>
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitIdentifier(BstParser.IdentifierContext ctx) {
+<b class="nc">&nbsp;        String name = ctx.IDENTIFIER().getText();</b>
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Identifier: {}&quot;, name);</b>
+<b class="nc">&nbsp;        resolveIdentifier(name, ctx);</b>
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void resolveIdentifier(String name, ParserRuleContext ctx) {
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Resolving name {} at resolveIdentifier&quot;, name);</b>
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Stack: {}&quot;, bstVMContext.stack());</b>
+<b class="nc">&nbsp;        if (selectedBstEntry != null) {</b>
+<b class="nc">&nbsp;            LOGGER.trace(&quot;selectedBstEntry is available&quot;);</b>
+<b class="nc">&nbsp;            if (selectedBstEntry.fields.containsKey(name)) {</b>
+<b class="nc">&nbsp;                String value = selectedBstEntry.fields.get(name);</b>
+<b class="nc">&nbsp;                LOGGER.trace(&quot;entry field {}={}&quot;, name, value);</b>
+<b class="nc">&nbsp;                bstVMContext.stack().push(value);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            if (selectedBstEntry.localStrings.containsKey(name)) {</b>
+<b class="nc">&nbsp;                String value = selectedBstEntry.localStrings.get(name);</b>
+<b class="nc">&nbsp;                LOGGER.trace(&quot;entry local string {}={}&quot;, name, value);</b>
+<b class="nc">&nbsp;                bstVMContext.stack().push(value);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            if (selectedBstEntry.localIntegers.containsKey(name)) {</b>
+<b class="nc">&nbsp;                Integer value = selectedBstEntry.localIntegers.get(name);</b>
+<b class="nc">&nbsp;                LOGGER.trace(&quot;entry local integer {}={}&quot;, name, value);</b>
+<b class="nc">&nbsp;                bstVMContext.stack().push(value);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (bstVMContext.strings().containsKey(name)) {</b>
+<b class="nc">&nbsp;            String value = bstVMContext.strings().get(name);</b>
+<b class="nc">&nbsp;            LOGGER.trace(&quot;global string {}={}&quot;, name, value);</b>
+<b class="nc">&nbsp;            bstVMContext.stack().push(value);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (bstVMContext.integers().containsKey(name)) {</b>
+<b class="nc">&nbsp;            Integer value = bstVMContext.integers().get(name);</b>
+<b class="nc">&nbsp;            LOGGER.trace(&quot;global integer {}={}&quot;, name, value);</b>
+<b class="nc">&nbsp;            bstVMContext.stack().push(value);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (bstVMContext.functions().containsKey(name)) {</b>
+<b class="nc">&nbsp;            LOGGER.trace(&quot;function {}&quot;, name);</b>
+<b class="nc">&nbsp;            bstVMContext.functions().get(name).execute(this, ctx, selectedBstEntry);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.warn(&quot;No matching identifier found: {}&quot;, name);</b>
+<b class="nc">&nbsp;        throw new BstVMException(&quot;No matching identifier found: &quot; + name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitBstFunction(BstParser.BstFunctionContext ctx) {
+<b class="nc">&nbsp;        String name = ctx.getChild(0).getText();</b>
+<b class="nc">&nbsp;        LOGGER.trace(&quot;Resolving name {} at visitBstFunction&quot;, name);</b>
+<b class="nc">&nbsp;        resolveIdentifier(name, ctx);</b>
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Integer visitStackitem(BstParser.StackitemContext ctx) {
+<b class="nc">&nbsp;        for (ParseTree childNode : ctx.children) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                if (childNode instanceof TerminalNode token) {</b>
+<b class="nc">&nbsp;                    switch (token.getSymbol().getType()) {</b>
+&nbsp;                        case BstParser.STRING -&gt; {
+<b class="nc">&nbsp;                            String s = token.getText();</b>
+<b class="nc">&nbsp;                            bstVMContext.stack().push(s.substring(1, s.length() - 1));</b>
+&nbsp;                        }
+&nbsp;                        case BstParser.INTEGER -&gt;
+<b class="nc">&nbsp;                                bstVMContext.stack().push(Integer.parseInt(token.getText().substring(1)));</b>
+&nbsp;                        case BstParser.QUOTED -&gt;
+<b class="nc">&nbsp;                                bstVMContext.stack().push(new Identifier(token.getText().substring(1)));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } else if (childNode instanceof BstParser.StackContext) {</b>
+<b class="nc">&nbsp;                    bstVMContext.stack().push(childNode);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    this.visit(childNode);</b>
+&nbsp;                }
+&nbsp;            } catch (BstVMException e) {
+<b class="nc">&nbsp;                bstVMContext.path().ifPresentOrElse(</b>
+<b class="nc">&nbsp;                        path -&gt; LOGGER.error(&quot;{} ({})&quot;, e.getMessage(), path, e),</b>
+<b class="nc">&nbsp;                        () -&gt; LOGGER.error(&quot;&quot;, e));</b>
+&nbsp;                throw e;
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return BstVM.TRUE;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

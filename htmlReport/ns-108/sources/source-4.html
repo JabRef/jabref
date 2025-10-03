@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BiblatexSoftwareField</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.field</a>
+</div>
+
+<h1>Coverage Summary for Class: BiblatexSoftwareField (org.jabref.model.entry.field)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BiblatexSoftwareField</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (5/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    48.5%
+  </span>
+  <span class="absValue">
+    (16/33)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.field;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.model.entry.types.BiblatexSoftwareEntryType;
+&nbsp;
+<b class="fc">&nbsp;public enum BiblatexSoftwareField implements Field {</b>
+&nbsp;
+<b class="fc">&nbsp;    HALID(&quot;hal_id&quot;),</b>
+<b class="fc">&nbsp;    HALVERSION(&quot;hal_version&quot;),</b>
+<b class="fc">&nbsp;    INTRODUCEDIN(&quot;introducedin&quot;),</b>
+<b class="fc">&nbsp;    LICENSE(&quot;license&quot;),</b>
+<b class="fc">&nbsp;    RELATEDTYPE(&quot;relatedtype&quot;),</b>
+<b class="fc">&nbsp;    RELATEDSTRING(&quot;relatedstring&quot;),</b>
+<b class="fc">&nbsp;    REPOSITORY(&quot;repository&quot;),</b>
+<b class="fc">&nbsp;    SWHID(&quot;swhid&quot;);</b>
+&nbsp;
+&nbsp;    private final String name;
+&nbsp;    private final String displayName;
+&nbsp;    private final EnumSet&lt;FieldProperty&gt; properties;
+&nbsp;
+<b class="fc">&nbsp;    BiblatexSoftwareField(String name) {</b>
+<b class="fc">&nbsp;        this.name = name;</b>
+<b class="fc">&nbsp;        this.displayName = null;</b>
+<b class="fc">&nbsp;        this.properties = EnumSet.noneOf(FieldProperty.class);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    BiblatexSoftwareField(String name, String displayName) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.displayName = displayName;</b>
+<b class="nc">&nbsp;        this.properties = EnumSet.noneOf(FieldProperty.class);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    BiblatexSoftwareField(String name, String displayName, FieldProperty first, FieldProperty... rest) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.displayName = displayName;</b>
+<b class="nc">&nbsp;        this.properties = EnumSet.of(first, rest);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    BiblatexSoftwareField(String name, FieldProperty first, FieldProperty... rest) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.displayName = null;</b>
+<b class="nc">&nbsp;        this.properties = EnumSet.of(first, rest);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T&gt; Optional&lt;BiblatexSoftwareField&gt; fromName(T type, String name) {
+<b class="pc">&nbsp;        if (!(type instanceof BiblatexSoftwareEntryType)) {</b>
+<b class="fc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Arrays.stream(BiblatexSoftwareField.values())</b>
+<b class="nc">&nbsp;                     .filter(field -&gt; field.getName().equalsIgnoreCase(name))</b>
+<b class="nc">&nbsp;                     .findAny();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public EnumSet&lt;FieldProperty&gt; getProperties() {
+<b class="nc">&nbsp;        return properties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="fc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isStandardField() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

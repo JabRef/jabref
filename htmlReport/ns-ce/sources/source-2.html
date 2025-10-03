@@ -1,0 +1,157 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EbookDeIsbnFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher.isbntobibtex</a>
+</div>
+
+<h1>Coverage Summary for Class: EbookDeIsbnFetcher (org.jabref.logic.importer.fetcher.isbntobibtex)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EbookDeIsbnFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher.isbntobibtex;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanup;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fetcher for ISBN using &lt;a href=&quot;https://www.ebook.de&quot;&gt;https://www.ebook.de&lt;/a&gt;.
+&nbsp; */
+&nbsp;public class EbookDeIsbnFetcher extends AbstractIsbnFetcher {
+&nbsp;    private static final String BASE_URL = &quot;https://www.ebook.de/de/tools/isbn2bibtex&quot;;
+&nbsp;
+&nbsp;    public EbookDeIsbnFetcher(ImportFormatPreferences importFormatPreferences) {
+<b class="nc">&nbsp;        super(importFormatPreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;ISBN (ebook.de)&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        this.ensureThatIsbnIsValid(identifier);</b>
+<b class="nc">&nbsp;        return new URIBuilder(BASE_URL)</b>
+<b class="nc">&nbsp;                .addParameter(&quot;isbn&quot;, identifier)</b>
+<b class="nc">&nbsp;                .build()</b>
+<b class="nc">&nbsp;                .toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doPostCleanup(BibEntry entry) {
+&nbsp;        // We MUST NOT clean the URL. this is the deal with ebook.de
+&nbsp;        // DO NOT add following code:
+&nbsp;        // new FieldFormatterCleanup(StandardField.URL, new ClearFormatter()).cleanup(entry);
+&nbsp;
+&nbsp;        // Fetcher returns page numbers as &quot;30 Seiten&quot; -&gt; remove every non-digit character in the PAGETOTAL field
+<b class="nc">&nbsp;        entry.getField(StandardField.PAGETOTAL).ifPresent(pages -&gt;</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.PAGETOTAL, pages.replaceAll(&quot;[\\D]&quot;, &quot;&quot;)));</b>
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.PAGETOTAL, new NormalizePagesFormatter()).cleanup(entry);</b>
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

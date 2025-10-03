@@ -1,0 +1,337 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Localization</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.l10n</a>
+</div>
+
+<h1>Coverage Summary for Class: Localization (org.jabref.logic.l10n)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Localization</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    31.2%
+  </span>
+  <span class="absValue">
+    (5/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    67.6%
+  </span>
+  <span class="absValue">
+    (23/34)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Localization$LocalizationBundle</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (9/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    31.2%
+  </span>
+  <span class="absValue">
+    (5/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    69%
+  </span>
+  <span class="absValue">
+    (29/42)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.l10n;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Enumeration;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.MissingResourceException;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.ResourceBundle;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseStandardStreams;
+&nbsp;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/// Provides handling for messages and menu entries in the preferred language of the user.
+&nbsp;///
+&nbsp;/// Notes: All messages and menu-entries in JabRef are stored in escaped form like &quot;This_is_a_message&quot;. This message
+&nbsp;/// serves as key inside the `l10n` properties files that hold the translation for many languages. When a message
+&nbsp;/// is accessed, it needs to be unescaped and possible parameters that can appear in a message need to be filled with
+&nbsp;/// values.
+&nbsp;///
+&nbsp;/// This implementation loads the appropriate language by importing all keys/values from the correct bundle and stores
+&nbsp;/// them in unescaped form inside a [LocalizationBundle] which provides fast access because it caches the key-value
+&nbsp;/// pairs.
+&nbsp;///
+&nbsp;/// The access to this is given by the functions [#lang(String,String...)] and
+&nbsp;/// that developers should use whenever they use strings for the e.g. GUI that need to be translatable.
+&nbsp;@AllowedToUseStandardStreams(&quot;Needs to have acess to System.err because it&#39;s called very early before our loggers&quot;)
+&nbsp;public class Localization {
+&nbsp;    static final String RESOURCE_PREFIX = &quot;l10n/JabRef&quot;;
+&nbsp;    private static Locale locale;
+&nbsp;    private static LocalizationBundle localizedMessages;
+&nbsp;
+&nbsp;    private Localization() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Public access to all messages that are not menu-entries
+&nbsp;     *
+&nbsp;     * @param key    The key of the message in unescaped form like &quot;All fields&quot;
+&nbsp;     * @param params Replacement strings for parameters %0, %1, etc.
+&nbsp;     * @return The message with replaced parameters
+&nbsp;     */
+&nbsp;    public static String lang(String key, Object... params) {
+<b class="pc">&nbsp;        if (localizedMessages == null) {</b>
+<b class="nc">&nbsp;            System.err.println(&quot;Messages are not initialized before accessing key: &quot; + key);</b>
+<b class="nc">&nbsp;            setLanguage(Language.ENGLISH);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        String[] stringParams = Arrays.stream(params).map(Object::toString).toArray(String[]::new);</b>
+<b class="fc">&nbsp;        return lookup(localizedMessages, key, stringParams);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the language and loads the appropriate translations. Note, that this function should be called before any
+&nbsp;     * other function of this class.
+&nbsp;     *
+&nbsp;     * @param language Language identifier like &quot;en&quot;, &quot;de&quot;, etc.
+&nbsp;     */
+&nbsp;    public static void setLanguage(Language language) {
+<b class="fc">&nbsp;        Optional&lt;Locale&gt; knownLanguage = Language.convertToSupportedLocale(language);</b>
+<b class="fc">&nbsp;        final Locale defaultLocale = Locale.getDefault();</b>
+<b class="pc">&nbsp;        if (knownLanguage.isEmpty()) {</b>
+<b class="nc">&nbsp;            LoggerFactory.getLogger(Localization.class).warn(&quot;Language {} is not supported by JabRef (Default: {})&quot;, language, defaultLocale);</b>
+<b class="nc">&nbsp;            setLanguage(Language.ENGLISH);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;        // avoid reinitialization of the language bundles
+<b class="fc">&nbsp;        final Locale langLocale = knownLanguage.get();</b>
+<b class="pc">&nbsp;        if ((locale != null) &amp;&amp; locale.equals(langLocale) &amp;&amp; locale.equals(defaultLocale)) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="fc">&nbsp;        locale = langLocale;</b>
+<b class="fc">&nbsp;        Locale.setDefault(locale);</b>
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            createResourceBundles(locale);</b>
+&nbsp;        } catch (MissingResourceException ex) {
+&nbsp;            // should not happen as we have scripts to enforce this
+<b class="nc">&nbsp;            LoggerFactory.getLogger(Localization.class).warn(&quot;Could not find bundles for language {}, switching to full english language&quot;, locale, ex);</b>
+<b class="nc">&nbsp;            setLanguage(Language.ENGLISH);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the messages bundle, e.g. to load FXML files correctly translated.
+&nbsp;     *
+&nbsp;     * @return The internally cashed bundle.
+&nbsp;     */
+&nbsp;    public static LocalizationBundle getMessages() {
+&nbsp;        // avoid situations where this function is called before any language was set
+<b class="nc">&nbsp;        if (locale == null) {</b>
+<b class="nc">&nbsp;            setLanguage(Language.ENGLISH);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return localizedMessages;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates and caches the language bundles used in JabRef for a particular language. This function first loads
+&nbsp;     * correct version of the &quot;escaped&quot; bundles that are given in {@link l10n}. After that, it stores the unescaped
+&nbsp;     * version in a cached {@link LocalizationBundle} for fast access.
+&nbsp;     *
+&nbsp;     * @param locale Localization to use.
+&nbsp;     */
+&nbsp;    private static void createResourceBundles(Locale locale) {
+<b class="fc">&nbsp;        ResourceBundle messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale);</b>
+<b class="fc">&nbsp;        Objects.requireNonNull(messages, &quot;Could not load &quot; + RESOURCE_PREFIX + &quot; resource.&quot;);</b>
+<b class="fc">&nbsp;        localizedMessages = new LocalizationBundle(createLookupMap(messages));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Helper function to create a Map from the key/value pairs of a bundle.
+&nbsp;     *
+&nbsp;     * @param baseBundle JabRef language bundle with keys and values for translations.
+&nbsp;     * @return Lookup map for the baseBundle.
+&nbsp;     */
+&nbsp;    private static Map&lt;String, String&gt; createLookupMap(ResourceBundle baseBundle) {
+<b class="fc">&nbsp;        final ArrayList&lt;String&gt; baseKeys = Collections.list(baseBundle.getKeys());</b>
+<b class="fc">&nbsp;        return new HashMap&lt;&gt;(baseKeys.stream().collect(</b>
+<b class="fc">&nbsp;                Collectors.toMap(</b>
+&nbsp;                        // not required to unescape content, because that is already done by the ResourceBundle itself
+<b class="fc">&nbsp;                        key -&gt; key,</b>
+<b class="fc">&nbsp;                        baseBundle::getString)</b>
+&nbsp;        ));
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This looks up a key in the bundle and replaces parameters %0, ..., %9 with the respective params given. Note that
+&nbsp;     * the keys are the &quot;unescaped&quot; strings from the bundle property files.
+&nbsp;     *
+&nbsp;     * @param bundle The {@link LocalizationBundle} which is usually {@link Localization#localizedMessages}.
+&nbsp;     * @param key    The lookup key.
+&nbsp;     * @param params The parameters that should be inserted into the message
+&nbsp;     * @return The final message with replaced parameters.
+&nbsp;     */
+&nbsp;    private static String lookup(LocalizationBundle bundle, String key, String... params) {
+<b class="fc">&nbsp;        Objects.requireNonNull(key);</b>
+&nbsp;
+<b class="pc">&nbsp;        String translation = bundle.containsKey(key) ? bundle.getString(key) : &quot;&quot;;</b>
+<b class="pc">&nbsp;        if (translation.isEmpty()) {</b>
+<b class="nc">&nbsp;            LoggerFactory.getLogger(Localization.class).warn(&quot;Warning: could not get translation for \&quot;{}\&quot; for locale {}&quot;, key, Locale.getDefault());</b>
+<b class="nc">&nbsp;            translation = key;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return new LocalizationKeyParams(translation, params).replacePlaceholders();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * A bundle for caching localized strings. Needed to support JavaFX inline binding.
+&nbsp;     */
+&nbsp;    private static class LocalizationBundle extends ResourceBundle {
+&nbsp;
+&nbsp;        private final Map&lt;String, String&gt; lookup;
+&nbsp;
+<b class="fc">&nbsp;        LocalizationBundle(Map&lt;String, String&gt; lookupMap) {</b>
+<b class="fc">&nbsp;            lookup = lookupMap;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public final Object handleGetObject(String key) {
+<b class="fc">&nbsp;            Objects.requireNonNull(key);</b>
+<b class="fc">&nbsp;            return Optional.ofNullable(lookup.get(key))</b>
+<b class="fc">&nbsp;                           .orElse(key);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Enumeration&lt;String&gt; getKeys() {
+<b class="nc">&nbsp;            return Collections.enumeration(lookup.keySet());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        protected Set&lt;String&gt; handleKeySet() {
+<b class="nc">&nbsp;            return lookup.keySet();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean containsKey(String key) {
+&nbsp;            // Pretend we have every key
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

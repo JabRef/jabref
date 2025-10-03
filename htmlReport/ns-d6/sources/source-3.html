@@ -1,0 +1,279 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GrobidService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.util</a>
+</div>
+
+<h1>Coverage Summary for Class: GrobidService (org.jabref.logic.importer.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GrobidService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GrobidService$ConsolidateCitations</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.util;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.jsoup.Connection;
+&nbsp;import org.jsoup.Jsoup;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implements an API to a GROBID server, as described at
+&nbsp; * https://grobid.readthedocs.io/en/latest/Grobid-service/#grobid-web-services
+&nbsp; * &lt;p&gt;
+&nbsp; * Note: Currently a custom GROBID server is used...
+&nbsp; * https://github.com/NikodemKch/grobid
+&nbsp; * &lt;p&gt;
+&nbsp; * The methods are structured to match the GROBID server api.
+&nbsp; * Each method corresponds to a GROBID service request. Only the ones already used are already implemented.
+&nbsp; */
+&nbsp;public class GrobidService {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(GrobidService.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    public enum ConsolidateCitations {</b>
+<b class="nc">&nbsp;        NO(0), WITH_METADATA(1), WITH_DOI_ONLY(2);</b>
+&nbsp;        private final int code;
+&nbsp;
+<b class="nc">&nbsp;        ConsolidateCitations(int code) {</b>
+<b class="nc">&nbsp;            this.code = code;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public int getCode() {
+<b class="nc">&nbsp;            return this.code;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private final GrobidPreferences grobidPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public GrobidService(GrobidPreferences grobidPreferences) {</b>
+<b class="nc">&nbsp;        this.grobidPreferences = grobidPreferences;</b>
+<b class="nc">&nbsp;        if (!grobidPreferences.isGrobidEnabled()) {</b>
+<b class="nc">&nbsp;            throw new UnsupportedOperationException(&quot;Grobid was used but not enabled.&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calls the Grobid server for converting the citation into a BibEntry
+&nbsp;     *
+&nbsp;     * @return A BibEntry for the String
+&nbsp;     * @throws IOException if an I/O exception during the call occurred or no BibTeX entry could be determined
+&nbsp;     */
+&nbsp;    public Optional&lt;BibEntry&gt; processCitation(String rawCitation, ImportFormatPreferences importFormatPreferences, ConsolidateCitations consolidateCitations) throws IOException, ParseException {
+<b class="nc">&nbsp;        Connection.Response response = Jsoup.connect(grobidPreferences.getGrobidURL() + &quot;/api/processCitation&quot;)</b>
+<b class="nc">&nbsp;                                            .header(&quot;Accept&quot;, MediaTypes.APPLICATION_BIBTEX)</b>
+<b class="nc">&nbsp;                                            .data(&quot;citations&quot;, rawCitation)</b>
+<b class="nc">&nbsp;                                            .data(&quot;consolidateCitations&quot;, String.valueOf(consolidateCitations.getCode()))</b>
+<b class="nc">&nbsp;                                            .method(Connection.Method.POST)</b>
+<b class="nc">&nbsp;                                            .ignoreContentType(true)</b>
+<b class="nc">&nbsp;                                            .timeout(100_000)</b>
+<b class="nc">&nbsp;                                            .execute();</b>
+<b class="nc">&nbsp;        String httpResponse = response.body();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;raw citation -&gt; response: {}, {}&quot;, rawCitation, httpResponse);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (httpResponse == null || &quot;@misc{-1,\n  author = {}\n}\n&quot;.equals(httpResponse) || httpResponse.equals(&quot;@misc{-1,\n  author = {&quot; + rawCitation + &quot;}\n}\n&quot;)) { // This filters empty BibTeX entries</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;The GROBID server response does not contain anything.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return BibtexParser.singleFromString(httpResponse, importFormatPreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;BibEntry&gt; processPDF(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
+<b class="nc">&nbsp;        Connection.Response response = Jsoup.connect(grobidPreferences.getGrobidURL() + &quot;/api/processHeaderDocument&quot;)</b>
+<b class="nc">&nbsp;                                            .header(&quot;Accept&quot;, MediaTypes.APPLICATION_BIBTEX)</b>
+<b class="nc">&nbsp;                                            .data(&quot;input&quot;, filePath.toString(), Files.newInputStream(filePath))</b>
+<b class="nc">&nbsp;                                            .method(Connection.Method.POST)</b>
+<b class="nc">&nbsp;                                            .ignoreContentType(true)</b>
+<b class="nc">&nbsp;                                            .timeout(20000)</b>
+<b class="nc">&nbsp;                                            .execute();</b>
+&nbsp;
+<b class="nc">&nbsp;        String httpResponse = response.body();</b>
+&nbsp;
+<b class="nc">&nbsp;        return getBibEntries(importFormatPreferences, httpResponse);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;BibEntry&gt; processReferences(List&lt;Path&gt; pathList, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Path filePath : pathList) {</b>
+<b class="nc">&nbsp;            entries.addAll(processReferences(filePath, importFormatPreferences));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return entries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;BibEntry&gt; processReferences(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
+<b class="nc">&nbsp;        Connection.Response response = Jsoup.connect(grobidPreferences.getGrobidURL() + &quot;/api/processReferences&quot;)</b>
+<b class="nc">&nbsp;                                            .header(&quot;Accept&quot;, MediaTypes.APPLICATION_BIBTEX)</b>
+<b class="nc">&nbsp;                                            .data(&quot;input&quot;, filePath.toString(), Files.newInputStream(filePath))</b>
+<b class="nc">&nbsp;                                            .data(&quot;consolidateCitations&quot;, String.valueOf(ConsolidateCitations.WITH_METADATA))</b>
+<b class="nc">&nbsp;                                            .method(Connection.Method.POST)</b>
+<b class="nc">&nbsp;                                            .ignoreContentType(true)</b>
+<b class="nc">&nbsp;                                            .timeout(20000)</b>
+<b class="nc">&nbsp;                                            .execute();</b>
+&nbsp;
+<b class="nc">&nbsp;        String httpResponse = response.body();</b>
+&nbsp;
+<b class="nc">&nbsp;        return getBibEntries(importFormatPreferences, httpResponse);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;BibEntry&gt; getBibEntries(ImportFormatPreferences importFormatPreferences, String httpResponse) throws IOException, ParseException {
+<b class="nc">&nbsp;        if (httpResponse == null || &quot;@misc{-1,\n  author = {}\n}\n&quot;.equals(httpResponse)) { // This filters empty BibTeX entries</b>
+<b class="nc">&nbsp;            throw new IOException(&quot;The GROBID server response does not contain anything.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BibtexParser parser = new BibtexParser(importFormatPreferences);</b>
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; result = parser.parseEntries(httpResponse);</b>
+<b class="nc">&nbsp;        result.forEach(entry -&gt; entry.setCitationKey(&quot;&quot;));</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

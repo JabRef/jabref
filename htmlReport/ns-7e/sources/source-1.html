@@ -1,0 +1,209 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationsDisplay</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.texparser</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationsDisplay (org.jabref.gui.texparser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationsDisplay</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.texparser;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.ContentDisplay;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ListView;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;import javafx.scene.text.TextFlow;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.model.strings.LatexToUnicodeAdapter;
+&nbsp;import org.jabref.model.texparser.Citation;
+&nbsp;
+&nbsp;public class CitationsDisplay extends ListView&lt;Citation&gt; {
+&nbsp;
+&nbsp;    private final ObjectProperty&lt;Path&gt; basePath;
+&nbsp;
+<b class="nc">&nbsp;    public CitationsDisplay() {</b>
+<b class="nc">&nbsp;        this.basePath = new SimpleObjectProperty&lt;&gt;(null);</b>
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;Citation&gt;().withGraphic(this::getDisplayGraphic)</b>
+<b class="nc">&nbsp;                                                .withTooltip(this::getDisplayTooltip)</b>
+<b class="nc">&nbsp;                                                .install(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.getStyleClass().add(&quot;citationsList&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Path&gt; basePathProperty() {
+<b class="nc">&nbsp;        return basePath;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node getDisplayGraphic(Citation item) {
+<b class="nc">&nbsp;        if (basePath.get() == null) {</b>
+<b class="nc">&nbsp;            basePath.set(item.path().getRoot());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Node citationIcon = IconTheme.JabRefIcons.LATEX_COMMENT.getGraphicNode();</b>
+<b class="nc">&nbsp;        Text contextText = new Text(LatexToUnicodeAdapter.format(item.getContext()));</b>
+<b class="nc">&nbsp;        contextText.wrappingWidthProperty().bind(this.widthProperty().subtract(85));</b>
+<b class="nc">&nbsp;        HBox contextBox = new HBox(8, citationIcon, contextText);</b>
+<b class="nc">&nbsp;        contextBox.getStyleClass().add(&quot;contextBox&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Label fileNameLabel = new Label(&quot;%s&quot;.formatted(basePath.get().relativize(item.path())));</b>
+<b class="nc">&nbsp;        fileNameLabel.setGraphic(IconTheme.JabRefIcons.LATEX_FILE.getGraphicNode());</b>
+<b class="nc">&nbsp;        Label positionLabel = new Label(&quot;(%s:%s-%s)&quot;.formatted(item.line(), item.colStart(), item.colEnd()));</b>
+<b class="nc">&nbsp;        positionLabel.setGraphic(IconTheme.JabRefIcons.LATEX_LINE.getGraphicNode());</b>
+<b class="nc">&nbsp;        HBox dataBox = new HBox(5, fileNameLabel, positionLabel);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new VBox(contextBox, dataBox);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Tooltip getDisplayTooltip(Citation item) {
+<b class="nc">&nbsp;        String line = item.lineText();</b>
+<b class="nc">&nbsp;        int start = item.colStart();</b>
+<b class="nc">&nbsp;        int end = item.colEnd();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Text&gt; texts = new ArrayList&lt;&gt;(3);</b>
+&nbsp;
+&nbsp;        // Text before the citation.
+<b class="nc">&nbsp;        if (start &gt; 0) {</b>
+<b class="nc">&nbsp;            texts.add(new Text(line.substring(0, start)));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Citation text (highlighted).
+<b class="nc">&nbsp;        Text citation = new Text(line.substring(start, end));</b>
+<b class="nc">&nbsp;        citation.getStyleClass().setAll(&quot;tooltip-text-bold&quot;);</b>
+<b class="nc">&nbsp;        texts.add(citation);</b>
+&nbsp;
+&nbsp;        // Text after the citation.
+<b class="nc">&nbsp;        if (end &lt; line.length()) {</b>
+<b class="nc">&nbsp;            texts.add(new Text(line.substring(end)));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Tooltip tooltip = new Tooltip();</b>
+<b class="nc">&nbsp;        tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);</b>
+<b class="nc">&nbsp;        tooltip.setGraphic(new TextFlow(texts.toArray(new Text[0])));</b>
+<b class="nc">&nbsp;        tooltip.setMaxHeight(10);</b>
+<b class="nc">&nbsp;        tooltip.setMinWidth(200);</b>
+<b class="nc">&nbsp;        tooltip.maxWidthProperty().bind(this.widthProperty().subtract(85));</b>
+<b class="nc">&nbsp;        tooltip.setWrapText(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        return tooltip;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

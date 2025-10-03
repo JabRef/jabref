@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CSLAdapter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.citationstyle</a>
+</div>
+
+<h1>Coverage Summary for Class: CSLAdapter (org.jabref.logic.citationstyle)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CSLAdapter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.citationstyle;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import de.undercouch.citeproc.CSL;
+&nbsp;import de.undercouch.citeproc.DefaultAbbreviationProvider;
+&nbsp;import de.undercouch.citeproc.output.Bibliography;
+&nbsp;import de.undercouch.citeproc.output.Citation;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides an adapter class to CSL. It holds a CSL instance under the hood that is only recreated when
+&nbsp; * the style changes.
+&nbsp; * &lt;p&gt;
+&nbsp; * Note on the API: The first call to {@link #makeBibliography} is expensive since the
+&nbsp; * CSL instance will be created. As long as the style stays the same, we can reuse this instance. On style-change, the
+&nbsp; * engine is re-instantiated. Therefore, the use-case of this class is many calls to {@link #makeBibliography} with the
+&nbsp; * same style. Changing the output format is cheap.
+&nbsp; * &lt;p&gt;
+&nbsp; * Note on the implementation:
+&nbsp; * The main function {@link #makeBibliography} will enforce
+&nbsp; * synchronized calling. The main CSL engine under the hood is not thread-safe. Since this class is usually called from
+&nbsp; * a BackgroundTask, the only other option would be to create several CSL instances which is wasting a lot of resources and very slow.
+&nbsp; * In the current scheme, {@link #makeBibliography} can be called as usual
+&nbsp; * background task and to the best of my knowledge, concurrent calls will pile up and processed sequentially.
+&nbsp; */
+<b class="nc">&nbsp;public class CSLAdapter {</b>
+&nbsp;
+<b class="nc">&nbsp;    private final JabRefItemDataProvider dataProvider = new JabRefItemDataProvider();</b>
+&nbsp;    private String style;
+&nbsp;    private CitationStyleOutputFormat format;
+&nbsp;    private CSL cslInstance;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates the bibliography of the provided items. This method needs to run synchronized because the underlying
+&nbsp;     * CSL engine is not thread-safe.
+&nbsp;     *
+&nbsp;     * @param databaseContext {@link BibDatabaseContext} is used to be able to resolve fields and their aliases
+&nbsp;     */
+&nbsp;    public synchronized List&lt;String&gt; makeBibliography(List&lt;BibEntry&gt; bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException, IllegalArgumentException {
+<b class="nc">&nbsp;        dataProvider.setData(bibEntries, databaseContext, entryTypesManager);</b>
+<b class="nc">&nbsp;        initialize(style, outputFormat);</b>
+<b class="nc">&nbsp;        cslInstance.registerCitationItems(dataProvider.getIds());</b>
+<b class="nc">&nbsp;        final Bibliography bibliography = cslInstance.makeBibliography();</b>
+<b class="nc">&nbsp;        return Arrays.asList(bibliography.getEntries());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public synchronized Citation makeCitation(List&lt;BibEntry&gt; bibEntries, String style, CitationStyleOutputFormat outputFormat, BibDatabaseContext databaseContext, BibEntryTypesManager entryTypesManager) throws IOException {
+<b class="nc">&nbsp;        dataProvider.setData(bibEntries, databaseContext, entryTypesManager);</b>
+<b class="nc">&nbsp;        initialize(style, outputFormat);</b>
+<b class="nc">&nbsp;        cslInstance.registerCitationItems(dataProvider.getIds());</b>
+<b class="nc">&nbsp;        return cslInstance.makeCitation(bibEntries.stream().map(entry -&gt; entry.getCitationKey().orElse(&quot;&quot;)).toList()).getFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialized the static CSL instance if needed.
+&nbsp;     *
+&nbsp;     * @param newStyle  journal style of the output
+&nbsp;     * @param newFormat usually HTML or RTF.
+&nbsp;     * @throws IOException An error occurred in the underlying framework
+&nbsp;     */
+&nbsp;    private void initialize(String newStyle, CitationStyleOutputFormat newFormat) throws IOException {
+<b class="nc">&nbsp;        final boolean newCslInstanceNeedsToBeCreated = (cslInstance == null) || !Objects.equals(newStyle, style);</b>
+<b class="nc">&nbsp;        if (newCslInstanceNeedsToBeCreated) {</b>
+&nbsp;            // lang and forceLang are set to the default values of other CSL constructors
+<b class="nc">&nbsp;            cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(),</b>
+&nbsp;                    new DefaultAbbreviationProvider(), newStyle, &quot;en-US&quot;);
+<b class="nc">&nbsp;            style = newStyle;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (newCslInstanceNeedsToBeCreated || (!Objects.equals(newFormat, format))) {</b>
+<b class="nc">&nbsp;            cslInstance.setOutputFormat(newFormat.getFormat());</b>
+<b class="nc">&nbsp;            format = newFormat;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

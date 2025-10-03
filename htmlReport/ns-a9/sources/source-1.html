@@ -1,0 +1,149 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MVStoreSummariesStorage</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.summarization.storages</a>
+</div>
+
+<h1>Coverage Summary for Class: MVStoreSummariesStorage (org.jabref.logic.ai.summarization.storages)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MVStoreSummariesStorage</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.summarization.storages;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.ai.summarization.SummariesStorage;
+&nbsp;import org.jabref.logic.ai.summarization.Summary;
+&nbsp;import org.jabref.logic.ai.util.MVStoreBase;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.NotificationService;
+&nbsp;
+&nbsp;public class MVStoreSummariesStorage extends MVStoreBase implements SummariesStorage {
+&nbsp;    private static final String SUMMARIES_MAP_PREFIX = &quot;summaries&quot;;
+&nbsp;
+&nbsp;    public MVStoreSummariesStorage(Path path, NotificationService dialogService) {
+<b class="fc">&nbsp;        super(path, dialogService);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void set(Path bibDatabasePath, String citationKey, Summary summary) {
+<b class="nc">&nbsp;        getMap(bibDatabasePath).put(citationKey, summary);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Summary&gt; get(Path bibDatabasePath, String citationKey) {
+<b class="nc">&nbsp;        return Optional.ofNullable(getMap(bibDatabasePath).get(citationKey));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clear(Path bibDatabasePath, String citationKey) {
+<b class="nc">&nbsp;        getMap(bibDatabasePath).remove(citationKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, Summary&gt; getMap(Path bibDatabasePath) {
+<b class="nc">&nbsp;        return mvStore.openMap(SUMMARIES_MAP_PREFIX + &quot;-&quot; + bibDatabasePath.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String errorMessageForOpening() {
+<b class="nc">&nbsp;        return &quot;An error occurred while opening summary storage. Summaries of entries will not be stored in the next session.&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String errorMessageForOpeningLocalized() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;An error occurred while opening summary storage. Summaries of entries will not be stored in the next session.&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

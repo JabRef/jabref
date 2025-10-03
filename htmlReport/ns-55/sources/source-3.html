@@ -1,0 +1,480 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FieldRowViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.mergeentries.threewaymerge</a>
+</div>
+
+<h1>Coverage Summary for Class: FieldRowViewModel (org.jabref.gui.mergeentries.threewaymerge)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FieldRowViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/101)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FieldRowViewModel$MergeFieldsUndo</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">FieldRowViewModel$Selection</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/115)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.mergeentries.threewaymerge;
+&nbsp;
+&nbsp;import javax.swing.undo.AbstractUndoableEdit;
+&nbsp;import javax.swing.undo.CannotRedoException;
+&nbsp;import javax.swing.undo.CannotUndoException;
+&nbsp;import javax.swing.undo.CompoundEdit;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.BooleanBinding;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.FieldMerger;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.FieldMergerFactory;
+&nbsp;import org.jabref.logic.bibtex.comparator.ComparisonResult;
+&nbsp;import org.jabref.logic.bibtex.comparator.YearFieldValuePlausibilityComparator;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryTypeFactory;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class FieldRowViewModel {</b>
+<b class="nc">&nbsp;    public enum Selection {</b>
+<b class="nc">&nbsp;        LEFT,</b>
+<b class="nc">&nbsp;        RIGHT,</b>
+&nbsp;        /**
+&nbsp;         * When the user types something into the merged field value and neither the left nor
+&nbsp;         * right values match it, NONE is selected
+&nbsp;         */
+<b class="nc">&nbsp;        NONE</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private final Logger LOGGER = LoggerFactory.getLogger(FieldRowViewModel.class);</b>
+<b class="nc">&nbsp;    private final BooleanProperty isFieldsMerged = new SimpleBooleanProperty(Boolean.FALSE);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Selection&gt; selection = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty leftFieldValue = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty rightFieldValue = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final StringProperty mergedFieldValue = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;
+&nbsp;    private final Field field;
+&nbsp;
+&nbsp;    private final BibEntry leftEntry;
+&nbsp;
+&nbsp;    private final BibEntry rightEntry;
+&nbsp;
+&nbsp;    private final BibEntry mergedEntry;
+&nbsp;
+&nbsp;    private final BooleanBinding hasEqualLeftAndRight;
+&nbsp;
+&nbsp;    private final FieldMergerFactory fieldMergerFactory;
+&nbsp;
+<b class="nc">&nbsp;    private final CompoundEdit fieldsMergedEdit = new CompoundEdit();</b>
+&nbsp;
+<b class="nc">&nbsp;    public FieldRowViewModel(Field field, BibEntry leftEntry, BibEntry rightEntry, BibEntry mergedEntry, FieldMergerFactory fieldMergerFactory) {</b>
+<b class="nc">&nbsp;        this.field = field;</b>
+<b class="nc">&nbsp;        this.leftEntry = leftEntry;</b>
+<b class="nc">&nbsp;        this.rightEntry = rightEntry;</b>
+<b class="nc">&nbsp;        this.mergedEntry = mergedEntry;</b>
+<b class="nc">&nbsp;        this.fieldMergerFactory = fieldMergerFactory;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (field.equals(InternalField.TYPE_HEADER)) {</b>
+<b class="nc">&nbsp;            setLeftFieldValue(leftEntry.getType().getDisplayName());</b>
+<b class="nc">&nbsp;            setRightFieldValue(rightEntry.getType().getDisplayName());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            setLeftFieldValue(leftEntry.getField(field).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;            setRightFieldValue(rightEntry.getField(field).orElse(&quot;&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(leftFieldValueProperty(), (obs, old, leftValue) -&gt; leftEntry.setField(field, leftValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(rightFieldValueProperty(), (obs, old, rightValue) -&gt; rightEntry.setField(field, rightValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(mergedFieldValueProperty(), (obs, old, mergedFieldValue) -&gt; {</b>
+<b class="nc">&nbsp;            if (field.equals(InternalField.TYPE_HEADER)) {</b>
+<b class="nc">&nbsp;                getMergedEntry().setType(EntryTypeFactory.parse(mergedFieldValue));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                getMergedEntry().setField(field, mergedFieldValue);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        hasEqualLeftAndRight = Bindings.createBooleanBinding(this::hasEqualLeftAndRightValues, leftFieldValueProperty(), rightFieldValueProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        selectNonEmptyValue();</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(isFieldsMergedProperty(), (obs, old, areFieldsMerged) -&gt; {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Field are merged: {}&quot;, areFieldsMerged);</b>
+<b class="nc">&nbsp;            if (areFieldsMerged) {</b>
+<b class="nc">&nbsp;                selectLeftValue();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                selectNonEmptyValue();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(selectionProperty(), selection -&gt; {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Selecting {}&#39; value for field {}&quot;, selection, FieldTextMapper.getDisplayName(field));</b>
+<b class="nc">&nbsp;            switch (selection) {</b>
+&nbsp;                case LEFT -&gt;
+<b class="nc">&nbsp;                        EasyBind.subscribe(leftFieldValueProperty(), this::setMergedFieldValue);</b>
+&nbsp;                case RIGHT -&gt;
+<b class="nc">&nbsp;                        EasyBind.subscribe(rightFieldValueProperty(), this::setMergedFieldValue);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(mergedFieldValueProperty(), mergedValue -&gt; {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Merged value is {} for field {}&quot;, mergedValue, FieldTextMapper.getDisplayName(field));</b>
+<b class="nc">&nbsp;            if (mergedValue.equals(getLeftFieldValue())) {</b>
+<b class="nc">&nbsp;                selectLeftValue();</b>
+<b class="nc">&nbsp;            } else if (getMergedFieldValue().equals(getRightFieldValue())) {</b>
+<b class="nc">&nbsp;                selectRightValue();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                selectNone();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(hasEqualLeftAndRightBinding(), this::setIsFieldsMerged);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void autoSelectBetterValue() {
+<b class="nc">&nbsp;        String leftValue = getLeftFieldValue();</b>
+<b class="nc">&nbsp;        String rightValue = getRightFieldValue();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StandardField.YEAR == field) {</b>
+<b class="nc">&nbsp;            YearFieldValuePlausibilityComparator comparator = new YearFieldValuePlausibilityComparator();</b>
+<b class="nc">&nbsp;            ComparisonResult comparison = comparator.compare(leftValue, rightValue);</b>
+<b class="nc">&nbsp;            if (ComparisonResult.RIGHT_BETTER == comparison) {</b>
+<b class="nc">&nbsp;                selectRightValue();</b>
+<b class="nc">&nbsp;            } else if (ComparisonResult.LEFT_BETTER == comparison) {</b>
+<b class="nc">&nbsp;                selectLeftValue();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (InternalField.TYPE_HEADER == field) {</b>
+<b class="nc">&nbsp;            if (leftValue.equalsIgnoreCase(StandardEntryType.Misc.getName())) {</b>
+<b class="nc">&nbsp;                selectRightValue();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectNonEmptyValue() {
+<b class="nc">&nbsp;        if (StringUtil.isNullOrEmpty(leftFieldValue.get())) {</b>
+<b class="nc">&nbsp;            selectRightValue();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            selectLeftValue();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasEqualLeftAndRightValues() {
+<b class="nc">&nbsp;        return leftFieldValue.get().equals(rightFieldValue.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectLeftValue() {
+<b class="nc">&nbsp;        setSelection(Selection.LEFT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectRightValue() {
+<b class="nc">&nbsp;        if (isFieldsMerged()) {</b>
+<b class="nc">&nbsp;            selectLeftValue();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            setSelection(Selection.RIGHT);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectNone() {
+<b class="nc">&nbsp;        setSelection(Selection.NONE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMergedFieldValue(String mergedFieldValue) {
+<b class="nc">&nbsp;        mergedFieldValueProperty().set(mergedFieldValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty mergedFieldValueProperty() {
+<b class="nc">&nbsp;        return mergedFieldValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getMergedFieldValue() {
+<b class="nc">&nbsp;        return mergedFieldValue.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void mergeFields() {
+<b class="nc">&nbsp;        assert !hasEqualLeftAndRightValues();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!FieldMergerFactory.canMerge(field)) {</b>
+<b class="nc">&nbsp;            throw new UnsupportedOperationException();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String oldLeftFieldValue = getLeftFieldValue();</b>
+<b class="nc">&nbsp;        String oldRightFieldValue = getRightFieldValue();</b>
+&nbsp;
+<b class="nc">&nbsp;        FieldMerger fieldMerger = fieldMergerFactory.create(field);</b>
+<b class="nc">&nbsp;        String mergedFields = fieldMerger.merge(getLeftFieldValue(), getRightFieldValue());</b>
+<b class="nc">&nbsp;        setLeftFieldValue(mergedFields);</b>
+<b class="nc">&nbsp;        setRightFieldValue(mergedFields);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fieldsMergedEdit.canRedo()) {</b>
+<b class="nc">&nbsp;            fieldsMergedEdit.redo();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            fieldsMergedEdit.addEdit(new MergeFieldsUndo(oldLeftFieldValue, oldRightFieldValue, mergedFields));</b>
+<b class="nc">&nbsp;            fieldsMergedEdit.end();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void unmergeFields() {
+<b class="nc">&nbsp;        if (fieldsMergedEdit.canUndo()) {</b>
+<b class="nc">&nbsp;            fieldsMergedEdit.undo();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanBinding hasEqualLeftAndRightBinding() {
+<b class="nc">&nbsp;        return hasEqualLeftAndRight;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Selection&gt; selectionProperty() {
+<b class="nc">&nbsp;        return selection;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSelection(Selection select) {
+<b class="nc">&nbsp;        selectionProperty().set(select);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Selection getSelection() {
+<b class="nc">&nbsp;        return selectionProperty().get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isFieldsMerged() {
+<b class="nc">&nbsp;        return isFieldsMerged.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty isFieldsMergedProperty() {
+<b class="nc">&nbsp;        return isFieldsMerged;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setIsFieldsMerged(boolean isFieldsMerged) {
+<b class="nc">&nbsp;        this.isFieldsMerged.set(isFieldsMerged);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLeftFieldValue() {
+<b class="nc">&nbsp;        return leftFieldValue.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty leftFieldValueProperty() {
+<b class="nc">&nbsp;        return leftFieldValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLeftFieldValue(String leftFieldValue) {
+<b class="nc">&nbsp;        this.leftFieldValue.set(leftFieldValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getRightFieldValue() {
+<b class="nc">&nbsp;        return rightFieldValue.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty rightFieldValueProperty() {
+<b class="nc">&nbsp;        return rightFieldValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setRightFieldValue(String rightFieldValue) {
+<b class="nc">&nbsp;        this.rightFieldValue.set(rightFieldValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Field getField() {
+<b class="nc">&nbsp;        return field;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry getLeftEntry() {
+<b class="nc">&nbsp;        return leftEntry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry getRightEntry() {
+<b class="nc">&nbsp;        return rightEntry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry getMergedEntry() {
+<b class="nc">&nbsp;        return mergedEntry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    class MergeFieldsUndo extends AbstractUndoableEdit {
+&nbsp;        private final String oldLeft;
+&nbsp;        private final String oldRight;
+&nbsp;        private final String mergedFields;
+&nbsp;
+<b class="nc">&nbsp;        MergeFieldsUndo(String oldLeft, String oldRight, String mergedFields) {</b>
+<b class="nc">&nbsp;            this.oldLeft = oldLeft;</b>
+<b class="nc">&nbsp;            this.oldRight = oldRight;</b>
+<b class="nc">&nbsp;            this.mergedFields = mergedFields;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void undo() throws CannotUndoException {
+<b class="nc">&nbsp;            super.undo();</b>
+<b class="nc">&nbsp;            setLeftFieldValue(oldLeft);</b>
+<b class="nc">&nbsp;            setRightFieldValue(oldRight);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void redo() throws CannotRedoException {
+<b class="nc">&nbsp;            super.redo();</b>
+<b class="nc">&nbsp;            setLeftFieldValue(mergedFields);</b>
+<b class="nc">&nbsp;            setRightFieldValue(mergedFields);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,212 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EntryChangeDetailsView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.collab.entrychange</a>
+</div>
+
+<h1>Coverage Summary for Class: EntryChangeDetailsView (org.jabref.gui.collab.entrychange)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EntryChangeDetailsView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.collab.entrychange;
+&nbsp;
+&nbsp;import javafx.event.Event;
+&nbsp;import javafx.geometry.Orientation;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.SplitPane;
+&nbsp;import javafx.scene.control.TabPane;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.scene.web.WebView;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.collab.DatabaseChangeDetailsView;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preview.PreviewViewer;
+&nbsp;import org.jabref.gui.theme.ThemeManager;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;
+&nbsp;public final class EntryChangeDetailsView extends DatabaseChangeDetailsView {
+<b class="nc">&nbsp;    private boolean scrolling = false;</b>
+&nbsp;
+&nbsp;    public EntryChangeDetailsView(BibEntry oldEntry,
+&nbsp;                                  BibEntry newEntry,
+&nbsp;                                  BibDatabaseContext databaseContext,
+&nbsp;                                  DialogService dialogService,
+&nbsp;                                  ThemeManager themeManager,
+&nbsp;                                  GuiPreferences preferences,
+&nbsp;                                  BibEntryTypesManager entryTypesManager,
+&nbsp;                                  PreviewViewer previewViewer,
+<b class="nc">&nbsp;                                  TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        Label inJabRef = new Label(Localization.lang(&quot;In JabRef&quot;));</b>
+<b class="nc">&nbsp;        inJabRef.getStyleClass().add(&quot;lib-change-header&quot;);</b>
+<b class="nc">&nbsp;        Label onDisk = new Label(Localization.lang(&quot;On disk&quot;));</b>
+<b class="nc">&nbsp;        onDisk.getStyleClass().add(&quot;lib-change-header&quot;);</b>
+&nbsp;
+&nbsp;        // we need a copy here as we otherwise would set the same entry twice
+<b class="nc">&nbsp;        PreviewViewer previewClone = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);</b>
+<b class="nc">&nbsp;        previewClone.setDatabaseContext(databaseContext);</b>
+&nbsp;
+&nbsp;        // The scroll bar used is not part of ScrollPane, but the attached WebView.
+<b class="nc">&nbsp;        WebView previewCloneView = (WebView) previewClone.getContent();</b>
+<b class="nc">&nbsp;        WebView previewViewerView = (WebView) previewViewer.getContent();</b>
+<b class="nc">&nbsp;        synchronizeScrolling(previewCloneView, previewViewerView);</b>
+<b class="nc">&nbsp;        synchronizeScrolling(previewViewerView, previewCloneView);</b>
+&nbsp;        // TODO: Also sync scrolling for BibTeX view.
+&nbsp;
+<b class="nc">&nbsp;        PreviewWithSourceTab oldPreviewWithSourcesTab = new PreviewWithSourceTab();</b>
+<b class="nc">&nbsp;        TabPane oldEntryTabPane = oldPreviewWithSourcesTab.getPreviewWithSourceTab(oldEntry, databaseContext, preferences, entryTypesManager, previewClone, Localization.lang(&quot;Entry Preview&quot;));</b>
+<b class="nc">&nbsp;        PreviewWithSourceTab newPreviewWithSourcesTab = new PreviewWithSourceTab();</b>
+<b class="nc">&nbsp;        TabPane newEntryTabPane = newPreviewWithSourcesTab.getPreviewWithSourceTab(newEntry, databaseContext, preferences, entryTypesManager, previewViewer, Localization.lang(&quot;Entry Preview&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(</b>
+<b class="nc">&nbsp;                oldEntryTabPane.getSelectionModel().selectedIndexProperty(),</b>
+<b class="nc">&nbsp;                selectedIndex -&gt; newEntryTabPane.getSelectionModel().select(selectedIndex.intValue()));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(newEntryTabPane.getSelectionModel().selectedIndexProperty(), selectedIndex -&gt; {</b>
+<b class="nc">&nbsp;            if (oldEntryTabPane.getSelectionModel().getSelectedIndex() != selectedIndex.intValue()) {</b>
+<b class="nc">&nbsp;                oldEntryTabPane.getSelectionModel().select(selectedIndex.intValue());</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        VBox containerOld = new VBox(inJabRef, oldEntryTabPane);</b>
+<b class="nc">&nbsp;        VBox containerNew = new VBox(onDisk, newEntryTabPane);</b>
+&nbsp;
+<b class="nc">&nbsp;        SplitPane split = new SplitPane(containerOld, containerNew);</b>
+<b class="nc">&nbsp;        split.setOrientation(Orientation.HORIZONTAL);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.setAllAnchorsAndAttachChild(split);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Method adapted from:
+&nbsp;    // https://stackoverflow.com/questions/49509395/synchronize-scrollbars-of-two-javafx-webviews
+&nbsp;    // https://stackoverflow.com/questions/31264847/how-to-set-remember-scrollbar-thumb-position-in-javafx-8-webview
+&nbsp;    private void synchronizeScrolling(WebView webView, WebView otherWebView) {
+<b class="nc">&nbsp;        webView.addEventHandler(Event.ANY, event -&gt; {</b>
+<b class="nc">&nbsp;            if (!scrolling) {</b>
+<b class="nc">&nbsp;                scrolling = true;</b>
+<b class="nc">&nbsp;                if (event instanceof MouseEvent mouseEvent) {</b>
+<b class="nc">&nbsp;                    if (mouseEvent.isPrimaryButtonDown()) {</b>
+<b class="nc">&nbsp;                        int value = (Integer) webView.getEngine().executeScript(&quot;window.scrollY&quot;);</b>
+<b class="nc">&nbsp;                        otherWebView.getEngine().executeScript(&quot;window.scrollTo(0, &quot; + value + &quot;)&quot;);</b>
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    otherWebView.fireEvent(event.copyFor(otherWebView, otherWebView));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                scrolling = false;</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,268 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebSearchTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.websearch</a>
+</div>
+
+<h1>Coverage Summary for Class: WebSearchTab (org.jabref.gui.preferences.websearch)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebSearchTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/64)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.websearch;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.InvalidationListener;
+&nbsp;import javafx.beans.property.ReadOnlyBooleanProperty;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.Region;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.preferences.AbstractPreferenceTabView;
+&nbsp;import org.jabref.gui.preferences.PreferencesTab;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.gui.util.component.HelpButton;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;
+&nbsp;public class WebSearchTab extends AbstractPreferenceTabView&lt;WebSearchTabViewModel&gt; implements PreferencesTab {
+&nbsp;    @FXML private CheckBox enableWebSearch;
+&nbsp;    @FXML private CheckBox warnAboutDuplicatesOnImport;
+&nbsp;    @FXML private CheckBox downloadLinkedOnlineFiles;
+&nbsp;    @FXML private CheckBox keepDownloadUrl;
+&nbsp;    @FXML private CheckBox addImportedEntries;
+&nbsp;    @FXML private TextField addImportedEntriesGroupName;
+&nbsp;    @FXML private ComboBox&lt;PlainCitationParserChoice&gt; defaultPlainCitationParser;
+&nbsp;    @FXML private TextField citationsRelationStoreTTL;
+&nbsp;
+&nbsp;    @FXML private CheckBox useCustomDOI;
+&nbsp;    @FXML private TextField useCustomDOIName;
+&nbsp;
+&nbsp;    @FXML private CheckBox grobidEnabled;
+&nbsp;    @FXML private TextField grobidURL;
+&nbsp;
+&nbsp;    @FXML private VBox fetchersContainer;
+&nbsp;
+&nbsp;    private final ReadOnlyBooleanProperty refAiEnabled;
+&nbsp;
+<b class="nc">&nbsp;    public WebSearchTab(ReadOnlyBooleanProperty refAiEnabled) {</b>
+<b class="nc">&nbsp;        this.refAiEnabled = refAiEnabled;</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Web search&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new WebSearchTabViewModel(preferences, refAiEnabled, taskExecutor);</b>
+&nbsp;
+<b class="nc">&nbsp;        enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());</b>
+<b class="nc">&nbsp;        warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());</b>
+<b class="nc">&nbsp;        downloadLinkedOnlineFiles.selectedProperty().bindBidirectional(viewModel.shouldDownloadLinkedOnlineFiles());</b>
+<b class="nc">&nbsp;        keepDownloadUrl.selectedProperty().bindBidirectional(viewModel.shouldKeepDownloadUrl());</b>
+&nbsp;
+<b class="nc">&nbsp;        addImportedEntries.selectedProperty().bindBidirectional(viewModel.getAddImportedEntries());</b>
+<b class="nc">&nbsp;        addImportedEntriesGroupName.textProperty().bindBidirectional(viewModel.getAddImportedEntriesGroupName());</b>
+<b class="nc">&nbsp;        addImportedEntriesGroupName.disableProperty().bind(addImportedEntries.selectedProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;PlainCitationParserChoice&gt;()</b>
+<b class="nc">&nbsp;                .withText(PlainCitationParserChoice::getLocalizedName)</b>
+<b class="nc">&nbsp;                .install(defaultPlainCitationParser);</b>
+<b class="nc">&nbsp;        defaultPlainCitationParser.itemsProperty().bind(viewModel.plainCitationParsers());</b>
+<b class="nc">&nbsp;        defaultPlainCitationParser.valueProperty().bindBidirectional(viewModel.defaultPlainCitationParserProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel.citationsRelationsStoreTTLProperty()</b>
+<b class="nc">&nbsp;                 .addListener((_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;                     if (newValue != null &amp;&amp; !newValue.toString().equals(citationsRelationStoreTTL.getText())) {</b>
+<b class="nc">&nbsp;                         citationsRelationStoreTTL.setText(newValue.toString());</b>
+&nbsp;                     }
+&nbsp;                 });
+<b class="nc">&nbsp;        citationsRelationStoreTTL</b>
+<b class="nc">&nbsp;                .textProperty()</b>
+<b class="nc">&nbsp;                .addListener((_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;                    if (StringUtil.isBlank(newValue)) {</b>
+&nbsp;                        return;
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (!newValue.matches(&quot;\\d*&quot;)) {</b>
+<b class="nc">&nbsp;                        citationsRelationStoreTTL.setText(newValue.replaceAll(&quot;\\D&quot;, &quot;&quot;));</b>
+&nbsp;                        return;
+&nbsp;                    }
+<b class="nc">&nbsp;                    viewModel.citationsRelationsStoreTTLProperty().set(Integer.parseInt(newValue));</b>
+&nbsp;                });
+&nbsp;
+<b class="nc">&nbsp;        grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());</b>
+<b class="nc">&nbsp;        grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());</b>
+<b class="nc">&nbsp;        grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());</b>
+<b class="nc">&nbsp;        useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());</b>
+<b class="nc">&nbsp;        useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());</b>
+&nbsp;
+<b class="nc">&nbsp;        InvalidationListener listener = _ -&gt; fetchersContainer</b>
+<b class="nc">&nbsp;                .getChildren()</b>
+<b class="nc">&nbsp;                .setAll(viewModel.getFetchers()</b>
+<b class="nc">&nbsp;                                 .stream()</b>
+<b class="nc">&nbsp;                                 .map(this::createFetcherNode).toList());</b>
+<b class="nc">&nbsp;        viewModel.getFetchers().addListener(listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node createFetcherNode(WebSearchTabViewModel.FetcherViewModel item) {
+<b class="nc">&nbsp;        HBox container = new HBox();</b>
+<b class="nc">&nbsp;        container.getStyleClass().add(&quot;fetcher-list-cell&quot;);</b>
+<b class="nc">&nbsp;        container.setAlignment(Pos.CENTER_LEFT);</b>
+&nbsp;
+<b class="nc">&nbsp;        CheckBox enabledCheckBox = new CheckBox();</b>
+<b class="nc">&nbsp;        enabledCheckBox.selectedProperty().bindBidirectional(item.enabledProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        Label nameLabel = new Label(item.getName());</b>
+<b class="nc">&nbsp;        nameLabel.getStyleClass().add(&quot;fetcher-name&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Region spacer = new Region();</b>
+<b class="nc">&nbsp;        HBox.setHgrow(spacer, Priority.ALWAYS);</b>
+&nbsp;
+<b class="nc">&nbsp;        HelpButton helpButton = new HelpButton();</b>
+<b class="nc">&nbsp;        Optional&lt;HelpFile&gt; helpFile = item.getFetcher().getHelpPage();</b>
+<b class="nc">&nbsp;        if (helpFile.isPresent() &amp;&amp; !helpFile.get().getPageName().isEmpty()) {</b>
+<b class="nc">&nbsp;            helpButton.setHelpFile(helpFile.get(), dialogService, preferences.getExternalApplicationsPreferences());</b>
+<b class="nc">&nbsp;            helpButton.setVisible(true);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            helpButton.setVisible(false);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Button configureButton = new Button(Localization.lang(&quot;Configure API key&quot;));</b>
+<b class="nc">&nbsp;        configureButton.getStyleClass().add(&quot;configure-button&quot;);</b>
+<b class="nc">&nbsp;        configureButton.setOnAction(_ -&gt; showApiKeyDialog(item));</b>
+<b class="nc">&nbsp;        configureButton.setVisible(item.isCustomizable());</b>
+&nbsp;
+<b class="nc">&nbsp;        container.getChildren().addAll(enabledCheckBox, nameLabel, spacer, helpButton, configureButton);</b>
+<b class="nc">&nbsp;        return container;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void showApiKeyDialog(WebSearchTabViewModel.FetcherViewModel fetcherViewModel) {
+<b class="nc">&nbsp;        dialogService.showCustomDialogAndWait(new ApiKeyDialog(viewModel, fetcherViewModel));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

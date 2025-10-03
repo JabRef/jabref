@@ -1,0 +1,438 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PreviewViewer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preview</a>
+</div>
+
+<h1>Coverage Summary for Class: PreviewViewer (org.jabref.gui.preview)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PreviewViewer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/108)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preview;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PrintWriter;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import javafx.beans.InvalidationListener;
+&nbsp;import javafx.beans.Observable;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.concurrent.Worker;
+&nbsp;import javafx.print.PrinterJob;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.input.ClipboardContent;
+&nbsp;import javafx.scene.web.WebView;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.exporter.ExportToClipboardAction;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.search.Highlighter;
+&nbsp;import org.jabref.gui.theme.ThemeManager;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.gui.util.WebViewStore;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.layout.format.Number;
+&nbsp;import org.jabref.logic.preview.PreviewLayout;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.search.query.SearchQuery;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.w3c.dom.Node;
+&nbsp;import org.w3c.dom.NodeList;
+&nbsp;import org.w3c.dom.events.EventTarget;
+&nbsp;import org.w3c.dom.html.HTMLAnchorElement;
+&nbsp;
+&nbsp;/**
+&nbsp; * Displays an BibEntry using the given layout format.
+&nbsp; */
+&nbsp;public class PreviewViewer extends ScrollPane implements InvalidationListener {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);</b>
+&nbsp;
+&nbsp;    // https://stackoverflow.com/questions/5669448/get-selected-texts-html-in-div/5670825#5670825
+&nbsp;    private static final String JS_GET_SELECTION_HTML_SCRIPT = &quot;&quot;&quot;
+&nbsp;            function getSelectionHtml() {
+&nbsp;                var html = &quot;&quot;;
+&nbsp;                if (typeof window.getSelection != &quot;undefined&quot;) {
+&nbsp;                    var sel = window.getSelection();
+&nbsp;                    if (sel.rangeCount) {
+&nbsp;                        var container = document.createElement(&quot;div&quot;);
+&nbsp;                        for (var i = 0, len = sel.rangeCount; i &lt; len; ++i) {
+&nbsp;                            container.appendChild(sel.getRangeAt(i).cloneContents());
+&nbsp;                        }
+&nbsp;                        html = container.innerHTML;
+&nbsp;                    }
+&nbsp;                } else if (typeof document.selection != &quot;undefined&quot;) {
+&nbsp;                    if (document.selection.type == &quot;Text&quot;) {
+&nbsp;                        html = document.selection.createRange().htmlText;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                return html;
+&nbsp;            }
+&nbsp;            getSelectionHtml();
+&nbsp;            &quot;&quot;&quot;;
+&nbsp;
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final WebView previewView;
+&nbsp;    private final StringProperty searchQueryProperty;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;
+&nbsp;    private @Nullable BibDatabaseContext databaseContext;
+&nbsp;    private @Nullable BibEntry entry;
+&nbsp;    private PreviewLayout layout;
+&nbsp;    private String layoutText;
+&nbsp;
+&nbsp;    public PreviewViewer(DialogService dialogService,
+&nbsp;                         GuiPreferences preferences,
+&nbsp;                         ThemeManager themeManager,
+&nbsp;                         TaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        this(dialogService, preferences, themeManager, taskExecutor, new SimpleStringProperty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public PreviewViewer(DialogService dialogService,
+&nbsp;                         GuiPreferences preferences,
+&nbsp;                         ThemeManager themeManager,
+&nbsp;                         TaskExecutor taskExecutor,
+<b class="nc">&nbsp;                         StringProperty searchQueryProperty) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.searchQueryProperty = searchQueryProperty;</b>
+<b class="nc">&nbsp;        this.searchQueryProperty.addListener((_, _, _) -&gt; highlightLayoutText());</b>
+&nbsp;
+<b class="nc">&nbsp;        setFitToHeight(true);</b>
+<b class="nc">&nbsp;        setFitToWidth(true);</b>
+<b class="nc">&nbsp;        previewView = WebViewStore.get();</b>
+<b class="nc">&nbsp;        setContent(previewView);</b>
+&nbsp;
+<b class="nc">&nbsp;        configurePreviewView(themeManager);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void configurePreviewView(ThemeManager themeManager) {
+<b class="nc">&nbsp;        previewView.setContextMenuEnabled(false);</b>
+<b class="nc">&nbsp;        previewView.getEngine().setJavaScriptEnabled(true);</b>
+<b class="nc">&nbsp;        themeManager.installCss(previewView.getEngine());</b>
+&nbsp;
+<b class="nc">&nbsp;        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            if (newValue != Worker.State.SUCCEEDED) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+&nbsp;            // https://stackoverflow.com/questions/15555510/javafx-stop-opening-url-in-webview-open-in-browser-instead
+<b class="nc">&nbsp;            NodeList anchorList = previewView.getEngine().getDocument().getElementsByTagName(&quot;a&quot;);</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; anchorList.getLength(); i++) {</b>
+<b class="nc">&nbsp;                Node node = anchorList.item(i);</b>
+<b class="nc">&nbsp;                EventTarget eventTarget = (EventTarget) node;</b>
+<b class="nc">&nbsp;                eventTarget.addEventListener(&quot;click&quot;, evt -&gt; {</b>
+<b class="nc">&nbsp;                    EventTarget target = evt.getCurrentTarget();</b>
+<b class="nc">&nbsp;                    HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;</b>
+<b class="nc">&nbsp;                    String href = anchorElement.getHref();</b>
+<b class="nc">&nbsp;                    if (href != null) {</b>
+&nbsp;                        try {
+<b class="nc">&nbsp;                            NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());</b>
+&nbsp;                        } catch (MalformedURLException exception) {
+<b class="nc">&nbsp;                            LOGGER.error(&quot;Invalid URL&quot;, exception);</b>
+&nbsp;                        } catch (IOException e) {
+<b class="nc">&nbsp;                            LOGGER.error(&quot;Could not open URL: {}&quot;, href, e);</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    evt.preventDefault();</b>
+&nbsp;                }, false);
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLayout(PreviewLayout newLayout) {
+&nbsp;        // Change listeners might set the layout to null while the update method is executing, therefore, we need to prevent this here
+<b class="nc">&nbsp;        if ((newLayout == null) || newLayout.equals(layout)) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        layout = newLayout;</b>
+<b class="nc">&nbsp;        update();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEntry(@Nullable BibEntry newEntry) {
+<b class="nc">&nbsp;        if (Objects.equals(entry, newEntry)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // Remove update listener for old entry
+<b class="nc">&nbsp;        if (entry != null) {</b>
+<b class="nc">&nbsp;            for (Observable observable : entry.getObservables()) {</b>
+<b class="nc">&nbsp;                observable.removeListener(this);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        entry = newEntry;</b>
+&nbsp;
+&nbsp;        // Register listeners for new entry
+<b class="nc">&nbsp;        if (entry != null) {</b>
+<b class="nc">&nbsp;            for (Observable observable : entry.getObservables()) {</b>
+<b class="nc">&nbsp;                observable.addListener(this);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        update();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDatabaseContext(BibDatabaseContext newDatabaseContext) {
+<b class="nc">&nbsp;        if (Objects.equals(databaseContext, newDatabaseContext)) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        setEntry(null);</b>
+<b class="nc">&nbsp;        this.databaseContext = newDatabaseContext;</b>
+<b class="nc">&nbsp;        update();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void update() {
+<b class="nc">&nbsp;        if ((databaseContext == null) || (entry == null) || (layout == null)) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Missing components - Database: {}, Entry: {}, Layout: {}&quot;,</b>
+<b class="nc">&nbsp;                    databaseContext == null ? &quot;null&quot; : databaseContext,</b>
+<b class="nc">&nbsp;                    entry == null ? &quot;null&quot; : entry,</b>
+<b class="nc">&nbsp;                    layout == null ? &quot;null&quot; : layout);</b>
+<b class="nc">&nbsp;            setPreviewText(&quot;&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Number.serialExportNumber = 1;</b>
+<b class="nc">&nbsp;        BibEntry currentEntry = entry;</b>
+&nbsp;
+<b class="nc">&nbsp;        BackgroundTask.wrap(() -&gt; layout.generatePreview(currentEntry, databaseContext))</b>
+<b class="nc">&nbsp;                      .onSuccess(this::setPreviewText)</b>
+<b class="nc">&nbsp;                      .onFailure(e -&gt; setPreviewText(formatError(currentEntry, e)))</b>
+<b class="nc">&nbsp;                      .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String formatError(BibEntry entry, Throwable exception) {
+<b class="nc">&nbsp;        StringWriter sw = new StringWriter();</b>
+<b class="nc">&nbsp;        exception.printStackTrace(new PrintWriter(sw));</b>
+<b class="nc">&nbsp;        return &quot;%s\n\n%s\n\nBibTeX (internal):\n%s\n\nStack Trace:\n%s&quot;.formatted(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Error while generating citation style&quot;),</b>
+<b class="nc">&nbsp;                exception.getLocalizedMessage(),</b>
+&nbsp;                entry,
+&nbsp;                sw);
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setPreviewText(String text) {
+<b class="nc">&nbsp;        layoutText = &quot;&quot;&quot;</b>
+&nbsp;                &lt;html&gt;
+&nbsp;                    &lt;body id=&quot;previewBody&quot;&gt;
+&nbsp;                        &lt;div id=&quot;content&quot;&gt; %s &lt;/div&gt;
+&nbsp;                    &lt;/body&gt;
+&nbsp;                &lt;/html&gt;
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(text);</b>
+<b class="nc">&nbsp;        highlightLayoutText();</b>
+<b class="nc">&nbsp;        setHvalue(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void highlightLayoutText() {
+<b class="nc">&nbsp;        if (layoutText == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String queryText = searchQueryProperty.get();</b>
+<b class="nc">&nbsp;        if (StringUtil.isNotBlank(queryText)) {</b>
+<b class="nc">&nbsp;            SearchQuery searchQuery = new SearchQuery(queryText);</b>
+<b class="nc">&nbsp;            String highlighted = Highlighter.highlightHtml(layoutText, searchQuery);</b>
+<b class="nc">&nbsp;            UiTaskExecutor.runInJavaFXThread(() -&gt; previewView.getEngine().loadContent(highlighted));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            UiTaskExecutor.runInJavaFXThread(() -&gt; previewView.getEngine().loadContent(layoutText));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void print() {
+<b class="nc">&nbsp;        PrinterJob job = PrinterJob.createPrinterJob();</b>
+<b class="nc">&nbsp;        if (job == null) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;PrinterJob.createPrinterJob() returned null; printing not available&quot;);</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(&quot;Could not find an available printer&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if ((entry == null) || !dialogService.showPrintDialog(job)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        BackgroundTask.wrap(() -&gt; {</b>
+<b class="nc">&nbsp;                          job.getJobSettings().setJobName(entry.getCitationKey().orElse(&quot;NO CITATION KEY&quot;));</b>
+<b class="nc">&nbsp;                          previewView.getEngine().print(job);</b>
+<b class="nc">&nbsp;                          job.endJob();</b>
+&nbsp;                      })
+<b class="nc">&nbsp;                      .onFailure(e -&gt; dialogService.showErrorDialogAndWait(Localization.lang(&quot;Could not print preview&quot;), e))</b>
+<b class="nc">&nbsp;                      .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void copyPreviewHtmlToClipBoard() {
+<b class="nc">&nbsp;        if ((entry == null) || (layout == null) || (databaseContext == null)) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Cannot copy preview citation: Missing entry, layout, or database context.&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String citationHtml = layout.generatePreview(entry, databaseContext);</b>
+<b class="nc">&nbsp;        ClipboardContent content = ClipboardContentGenerator.processHtml(List.of(citationHtml));</b>
+<b class="nc">&nbsp;        clipBoardManager.setContent(content);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void copyPreviewPlainTextToClipBoard() {
+<b class="nc">&nbsp;        if ((entry == null) || (layout == null) || (databaseContext == null)) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Cannot copy preview citation: Missing entry, layout, or database context.&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String plainText = (String) previewView.getEngine().executeScript(&quot;document.body.innerText&quot;);</b>
+<b class="nc">&nbsp;        ClipboardContent content = new ClipboardContent();</b>
+<b class="nc">&nbsp;        content.putString(plainText);</b>
+<b class="nc">&nbsp;        clipBoardManager.setContent(content);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void copySelectionToClipBoard() {
+<b class="nc">&nbsp;        if ((entry == null) || (layout == null) || (databaseContext == null)) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Cannot copy preview citation: Missing entry, layout, or database context.&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ClipboardContent content = new ClipboardContent();</b>
+<b class="nc">&nbsp;        content.putString((String) previewView.getEngine().executeScript(&quot;window.getSelection().toString()&quot;));</b>
+<b class="nc">&nbsp;        content.putHtml(getSelectionHtmlContent());</b>
+<b class="nc">&nbsp;        clipBoardManager.setContent(content);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void exportToClipBoard(StateManager stateManager) {
+<b class="nc">&nbsp;        ExportToClipboardAction exportToClipboardAction = new ExportToClipboardAction(</b>
+&nbsp;                dialogService,
+&nbsp;                stateManager,
+&nbsp;                clipBoardManager,
+&nbsp;                taskExecutor,
+&nbsp;                preferences);
+<b class="nc">&nbsp;        exportToClipboardAction.execute();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void invalidated(Observable observable) {
+<b class="nc">&nbsp;        update();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSelectionHtmlContent() {
+<b class="nc">&nbsp;        return (String) previewView.getEngine().executeScript(JS_GET_SELECTION_HTML_SCRIPT);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

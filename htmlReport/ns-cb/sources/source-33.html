@@ -1,0 +1,259 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ZbMATH</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: ZbMATH (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ZbMATH</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanup;
+&nbsp;import org.jabref.logic.cleanup.MoveFieldCleanup;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.EntryBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.IdBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.SearchBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.transformers.ZbMathQueryTransformer;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.AMSField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;
+&nbsp;import kong.unirest.core.HttpResponse;
+&nbsp;import kong.unirest.core.JsonNode;
+&nbsp;import kong.unirest.core.Unirest;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fetches data from the Zentralblatt Math (https://www.zbmath.org/)
+&nbsp; */
+&nbsp;public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, EntryBasedParserFetcher {
+&nbsp;
+&nbsp;    private final ImportFormatPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    public ZbMATH(ImportFormatPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.preferences = Objects.requireNonNull(preferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;zbMATH&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;HelpFile&gt; getHelpPage() {
+<b class="nc">&nbsp;        return Optional.of(HelpFile.FETCHER_ZBMATH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
+<b class="nc">&nbsp;        Optional&lt;String&gt; zblidInEntry = entry.getField(StandardField.ZBL_NUMBER);</b>
+<b class="nc">&nbsp;        if (zblidInEntry.isPresent()) {</b>
+&nbsp;            // zbmath id is already present
+<b class="nc">&nbsp;            return getUrlForIdentifier(zblidInEntry.get());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(&quot;https://zbmath.org/citationmatching/match&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;n&quot;, &quot;1&quot;); // return only the best matching entry</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;m&quot;, &quot;5&quot;); // return only entries with a score of at least 5</b>
+&nbsp;
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.TITLE).ifPresent(title -&gt; uriBuilder.addParameter(&quot;t&quot;, title));</b>
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.JOURNAL).ifPresent(journal -&gt; uriBuilder.addParameter(&quot;j&quot;, journal));</b>
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.YEAR).ifPresent(year -&gt; uriBuilder.addParameter(&quot;y&quot;, year));</b>
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.PAGINATION)</b>
+<b class="nc">&nbsp;             .ifPresent(pagination -&gt; uriBuilder.addParameter(&quot;p&quot;, pagination));</b>
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.VOLUME).ifPresent(volume -&gt; uriBuilder.addParameter(&quot;v&quot;, volume));</b>
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.ISSUE).ifPresent(issue -&gt; uriBuilder.addParameter(&quot;i&quot;, issue));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entry.getFieldOrAlias(StandardField.AUTHOR).isPresent()) {</b>
+&nbsp;            // replace &quot;and&quot; by &quot;;&quot; as citation matching API uses &quot;;&quot; for separation
+<b class="nc">&nbsp;            AuthorList authors = AuthorList.parse(entry.getFieldOrAlias(StandardField.AUTHOR).get());</b>
+<b class="nc">&nbsp;            String authorsWithSemicolon = authors.getAuthors().stream()</b>
+<b class="nc">&nbsp;                                                 .map(author -&gt; author.getFamilyGiven(false))</b>
+<b class="nc">&nbsp;                                                 .collect(Collectors.joining(&quot;;&quot;));</b>
+<b class="nc">&nbsp;            uriBuilder.addParameter(&quot;a&quot;, authorsWithSemicolon);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /*
+&nbsp;        zbmath citation matching API does only return json, thus we use the
+&nbsp;        citation matching API to extract the zbl_id and then use getUrlForIdentifier
+&nbsp;        to get the bibtex data.
+&nbsp;         */
+<b class="nc">&nbsp;        String urlString = uriBuilder.build().toString();</b>
+<b class="nc">&nbsp;        HttpResponse&lt;JsonNode&gt; response = Unirest.get(urlString)</b>
+<b class="nc">&nbsp;                                                 .asJson();</b>
+<b class="nc">&nbsp;        String zblid = null;</b>
+<b class="nc">&nbsp;        if (response.getStatus() == 200) {</b>
+<b class="nc">&nbsp;            JSONArray result = response.getBody()</b>
+<b class="nc">&nbsp;                                       .getObject()</b>
+<b class="nc">&nbsp;                                       .getJSONArray(&quot;results&quot;);</b>
+<b class="nc">&nbsp;            if (!result.isEmpty()) {</b>
+<b class="nc">&nbsp;                zblid = result.getJSONObject(0)</b>
+<b class="nc">&nbsp;                              .get(&quot;zbl_id&quot;)</b>
+<b class="nc">&nbsp;                              .toString();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (zblid == null) {</b>
+&nbsp;            // citation matching API found no matching entry
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return getUrlForIdentifier(zblid);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(&quot;https://zbmath.org/bibtexoutput/&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;q&quot;, new ZbMathQueryTransformer().transformSearchQuery(queryNode).orElse(&quot;&quot;)); // search all fields</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;start&quot;, &quot;0&quot;); // start index</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;count&quot;, &quot;200&quot;); // should return up to 200 items (instead of default 100)</b>
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(&quot;https://zbmath.org/bibtexoutput/&quot;);</b>
+<b class="nc">&nbsp;        String query = &quot;an:&quot;.concat(identifier); // use an: to search for a zbMATH identifier</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;q&quot;, query);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;start&quot;, &quot;0&quot;); // start index</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;count&quot;, &quot;1&quot;); // return exactly one item</b>
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return new BibtexParser(preferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doPostCleanup(BibEntry entry) {
+<b class="nc">&nbsp;        new MoveFieldCleanup(new UnknownField(&quot;msc2010&quot;), StandardField.KEYWORDS).cleanup(entry);</b>
+<b class="nc">&nbsp;        new MoveFieldCleanup(AMSField.FJOURNAL, StandardField.JOURNAL).cleanup(entry);</b>
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.JOURNAL, new RemoveEnclosingBracesFormatter()).cleanup(entry);</b>
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.TITLE, new RemoveEnclosingBracesFormatter()).cleanup(entry);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,203 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProtectedTermsParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.protectedterms</a>
+</div>
+
+<h1>Coverage Summary for Class: ProtectedTermsParser (org.jabref.logic.protectedterms)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProtectedTermsParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (2/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    57.1%
+  </span>
+  <span class="absValue">
+    (16/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.protectedterms;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.
+&nbsp; */
+<b class="fc">&nbsp;public class ProtectedTermsParser {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ProtectedTermsParser.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    private final List&lt;String&gt; terms = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;    private String description = Localization.lang(&quot;The text after the last line starting with # will be used&quot;);</b>
+&nbsp;
+&nbsp;    private String location;
+&nbsp;
+&nbsp;    public void readTermsFromResource(String resourceFileName, String descriptionString) {
+<b class="fc">&nbsp;        description = descriptionString;</b>
+<b class="fc">&nbsp;        location = resourceFileName;</b>
+<b class="fc">&nbsp;        try (InputStream inputStream = ProtectedTermsLoader.class.getResourceAsStream(Objects.requireNonNull(resourceFileName))) {</b>
+<b class="pc">&nbsp;            if (inputStream == null) {</b>
+<b class="nc">&nbsp;                LOGGER.error(&quot;Cannot find resource &#39;{}&#39; ({})&quot;, resourceFileName, descriptionString);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="fc">&nbsp;            readTermsList(inputStream);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Cannot open resource &#39;{}&#39;&quot;, resourceFileName, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void readTermsFromFile(Path path) {
+<b class="nc">&nbsp;        location = path.toString();</b>
+&nbsp;
+<b class="nc">&nbsp;        path = path.toAbsolutePath();</b>
+<b class="nc">&nbsp;        if (!Files.exists(path)) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not read terms from file {}&quot;, path);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        try (InputStream inputStream = Files.newInputStream(path)) {</b>
+<b class="nc">&nbsp;            readTermsList(inputStream);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Cannot open file &#39;{}&#39;&quot;, path, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void readTermsList(InputStream inputStream) {
+<b class="fc">&nbsp;        try (Stream&lt;String&gt; lines = new BufferedReader(new InputStreamReader(inputStream)).lines()) {</b>
+<b class="fc">&nbsp;            this.terms.addAll(lines.map(this::setDescription).filter(Objects::nonNull).toList());</b>
+&nbsp;        } catch (UncheckedIOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not read terms from stream&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse the description that starts after the # but don&#39;t include it in the terms
+&nbsp;     *
+&nbsp;     * @return line or null if the line contains the description
+&nbsp;     */
+&nbsp;    private String setDescription(String line) {
+<b class="pc">&nbsp;        if (line.startsWith(&quot;#&quot;)) {</b>
+<b class="nc">&nbsp;            description = line.substring(1).trim();</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return line;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ProtectedTermsList getProtectTermsList(boolean enabled, boolean internal) {
+<b class="fc">&nbsp;        ProtectedTermsList termList = new ProtectedTermsList(description, terms, location, internal);</b>
+<b class="fc">&nbsp;        termList.setEnabled(enabled);</b>
+<b class="fc">&nbsp;        return termList;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

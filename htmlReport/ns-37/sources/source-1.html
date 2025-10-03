@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BaseIdentifierEditorViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors.identifier</a>
+</div>
+
+<h1>Coverage Summary for Class: BaseIdentifierEditorViewModel (org.jabref.gui.fieldeditors.identifier)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BaseIdentifierEditorViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors.identifier;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.fieldeditors.AbstractEditorViewModel;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.importer.FetcherClientException;
+&nbsp;import org.jabref.logic.importer.FetcherServerException;
+&nbsp;import org.jabref.logic.importer.IdFetcher;
+&nbsp;import org.jabref.logic.importer.util.IdentifierParser;
+&nbsp;import org.jabref.logic.integrity.FieldCheckers;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;import org.jabref.model.entry.identifier.Identifier;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public abstract class BaseIdentifierEditorViewModel&lt;T extends Identifier&gt; extends AbstractEditorViewModel {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BaseIdentifierEditorViewModel.class);</b>
+<b class="nc">&nbsp;    protected BooleanProperty isInvalidIdentifier = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    protected final BooleanProperty canShortenIdentifier = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    protected final BooleanProperty identifierLookupInProgress = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    protected final BooleanProperty canLookupIdentifier = new SimpleBooleanProperty(true);</b>
+<b class="nc">&nbsp;    protected final BooleanProperty canFetchBibliographyInformationById = new SimpleBooleanProperty();</b>
+&nbsp;    protected IdentifierParser identifierParser;
+<b class="nc">&nbsp;    protected final ObjectProperty&lt;Optional&lt;T&gt;&gt; identifier = new SimpleObjectProperty&lt;&gt;(Optional.empty());</b>
+&nbsp;    protected DialogService dialogService;
+&nbsp;    protected TaskExecutor taskExecutor;
+&nbsp;    protected GuiPreferences preferences;
+&nbsp;
+&nbsp;    public BaseIdentifierEditorViewModel(Field field,
+&nbsp;                                         SuggestionProvider&lt;?&gt; suggestionProvider,
+&nbsp;                                         FieldCheckers fieldCheckers,
+&nbsp;                                         DialogService dialogService,
+&nbsp;                                         TaskExecutor taskExecutor,
+&nbsp;                                         GuiPreferences preferences,
+&nbsp;                                         UndoManager undoManager) {
+<b class="nc">&nbsp;        super(field, suggestionProvider, fieldCheckers, undoManager);</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Since it&#39;s not possible to perform the same actions on all identifiers, specific implementations can call the {@code configure}
+&nbsp;     * method to tell the actions they can perform and the actions they can&#39;t. Based on this configuration, the view will enable/disable or
+&nbsp;     * show/hide certain UI elements for certain identifier editors.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;b&gt;NOTE: This method MUST be called by all the implementation view models in their principal constructor&lt;/b&gt;
+&nbsp;     */
+&nbsp;    protected final void configure(boolean canFetchBibliographyInformationById, boolean canLookupIdentifier, boolean canShortenIdentifier) {
+<b class="nc">&nbsp;        this.canLookupIdentifier.set(canLookupIdentifier);</b>
+<b class="nc">&nbsp;        this.canFetchBibliographyInformationById.set(canFetchBibliographyInformationById);</b>
+<b class="nc">&nbsp;        this.canShortenIdentifier.set(canShortenIdentifier);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Optional&lt;T&gt; updateIdentifier() {
+<b class="nc">&nbsp;        if (identifierParser == null) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        identifier.set((Optional&lt;T&gt;) identifierParser.parse(field));</b>
+<b class="nc">&nbsp;        return identifier.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void handleIdentifierFetchingError(Exception exception, IdFetcher&lt;T&gt; fetcher) {
+<b class="nc">&nbsp;        LOGGER.error(&quot;Error while fetching identifier&quot;, exception);</b>
+<b class="nc">&nbsp;        if (exception instanceof FetcherClientException) {</b>
+<b class="nc">&nbsp;            dialogService.showInformationDialogAndWait(Localization.lang(&quot;Look up %0&quot;, fetcher.getName()), Localization.lang(&quot;No data was found for the identifier&quot;));</b>
+<b class="nc">&nbsp;        } else if (exception instanceof FetcherServerException) {</b>
+<b class="nc">&nbsp;            dialogService.showInformationDialogAndWait(Localization.lang(&quot;Look up %0&quot;, fetcher.getName()), Localization.lang(&quot;Server not available&quot;));</b>
+<b class="nc">&nbsp;        } else if (exception.getCause() != null) {</b>
+<b class="nc">&nbsp;            dialogService.showWarningDialogAndWait(Localization.lang(&quot;Look up %0&quot;, fetcher.getName()), Localization.lang(&quot;Error occurred %0&quot;, exception.getCause().getMessage()));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.showWarningDialogAndWait(Localization.lang(&quot;Look up %0&quot;, fetcher.getName()), Localization.lang(&quot;Error occurred %0&quot;, exception.getCause().getMessage()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty canShortenIdentifierProperty() {
+<b class="nc">&nbsp;        return canShortenIdentifier;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getCanShortenIdentifier() {
+<b class="nc">&nbsp;        return canShortenIdentifierProperty().get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty canFetchBibliographyInformationByIdProperty() {
+<b class="nc">&nbsp;        return canFetchBibliographyInformationById;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getCanFetchBibliographyInformationById() {
+<b class="nc">&nbsp;        return canFetchBibliographyInformationById.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty canLookupIdentifierProperty() {
+<b class="nc">&nbsp;        return canLookupIdentifier;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getCanLookupIdentifier() {
+<b class="nc">&nbsp;        return canLookupIdentifier.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty isInvalidIdentifierProperty() {
+<b class="nc">&nbsp;        return isInvalidIdentifier;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getIsInvalidIdentifier() {
+<b class="nc">&nbsp;        return isInvalidIdentifier.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getIdentifierLookupInProgress() {
+<b class="nc">&nbsp;        return identifierLookupInProgress.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty identifierLookupInProgressProperty() {
+<b class="nc">&nbsp;        return identifierLookupInProgress;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void fetchBibliographyInformation(BibEntry bibEntry) {
+<b class="nc">&nbsp;        LOGGER.warn(&quot;Unable to fetch bibliography information using the &#39;{}&#39; identifier&quot;, FieldTextMapper.getDisplayName(field));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void lookupIdentifier(BibEntry bibEntry) {
+<b class="nc">&nbsp;        LOGGER.warn(&quot;Unable to lookup identifier for &#39;{}&#39;&quot;, FieldTextMapper.getDisplayName(field));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openExternalLink() {
+<b class="nc">&nbsp;        identifier.get().flatMap(Identifier::getExternalURI).ifPresent(url -&gt; {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());</b>
+&nbsp;                    } catch (IOException ex) {
+<b class="nc">&nbsp;                        dialogService.showErrorDialogAndWait(Localization.lang(&quot;Unable to open link.&quot;), ex);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    public void shortenID() throws UnsupportedOperationException {
+<b class="nc">&nbsp;        throw new UnsupportedOperationException(&quot;Shortening of identifiers is not supported by this identifier editor.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        super.bindToEntry(entry);</b>
+<b class="nc">&nbsp;        identifierParser = new IdentifierParser(entry);</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(textProperty(), ignored -&gt; updateIdentifier());</b>
+<b class="nc">&nbsp;        EasyBind.subscribe(identifier, newIdentifier -&gt; isInvalidIdentifier.set(newIdentifier.isEmpty()));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

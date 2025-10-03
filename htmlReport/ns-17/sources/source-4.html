@@ -1,0 +1,220 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DatabaseChangeDetailsViewFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.collab</a>
+</div>
+
+<h1>Coverage Summary for Class: DatabaseChangeDetailsViewFactory (org.jabref.gui.collab)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DatabaseChangeDetailsViewFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.collab;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.collab.entryadd.EntryAdd;
+&nbsp;import org.jabref.gui.collab.entrychange.EntryChange;
+&nbsp;import org.jabref.gui.collab.entrychange.EntryChangeDetailsView;
+&nbsp;import org.jabref.gui.collab.entrychange.EntryWithPreviewAndSourceDetailsView;
+&nbsp;import org.jabref.gui.collab.entrydelete.EntryDelete;
+&nbsp;import org.jabref.gui.collab.groupchange.GroupChange;
+&nbsp;import org.jabref.gui.collab.groupchange.GroupChangeDetailsView;
+&nbsp;import org.jabref.gui.collab.metedatachange.MetadataChange;
+&nbsp;import org.jabref.gui.collab.metedatachange.MetadataChangeDetailsView;
+&nbsp;import org.jabref.gui.collab.preamblechange.PreambleChange;
+&nbsp;import org.jabref.gui.collab.preamblechange.PreambleChangeDetailsView;
+&nbsp;import org.jabref.gui.collab.stringadd.BibTexStringAdd;
+&nbsp;import org.jabref.gui.collab.stringadd.BibTexStringAddDetailsView;
+&nbsp;import org.jabref.gui.collab.stringchange.BibTexStringChange;
+&nbsp;import org.jabref.gui.collab.stringchange.BibTexStringChangeDetailsView;
+&nbsp;import org.jabref.gui.collab.stringdelete.BibTexStringDelete;
+&nbsp;import org.jabref.gui.collab.stringdelete.BibTexStringDeleteDetailsView;
+&nbsp;import org.jabref.gui.collab.stringrename.BibTexStringRename;
+&nbsp;import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preview.PreviewViewer;
+&nbsp;import org.jabref.gui.theme.ThemeManager;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;public class DatabaseChangeDetailsViewFactory {
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final ThemeManager themeManager;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final PreviewViewer previewViewer;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    public DatabaseChangeDetailsViewFactory(BibDatabaseContext databaseContext,
+&nbsp;                                            DialogService dialogService,
+&nbsp;                                            ThemeManager themeManager,
+&nbsp;                                            GuiPreferences preferences,
+&nbsp;                                            BibEntryTypesManager entryTypesManager,
+&nbsp;                                            PreviewViewer previewViewer,
+<b class="nc">&nbsp;                                            TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.themeManager = themeManager;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.previewViewer = previewViewer;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DatabaseChangeDetailsView create(DatabaseChange databaseChange) {
+<b class="nc">&nbsp;        return switch (databaseChange) {</b>
+<b class="nc">&nbsp;            case EntryChange entryChange -&gt;</b>
+<b class="nc">&nbsp;                    new EntryChangeDetailsView(</b>
+<b class="nc">&nbsp;                            entryChange.getOldEntry(),</b>
+<b class="nc">&nbsp;                            entryChange.getNewEntry(),</b>
+&nbsp;                            databaseContext,
+&nbsp;                            dialogService,
+&nbsp;                            themeManager,
+&nbsp;                            preferences,
+&nbsp;                            entryTypesManager,
+&nbsp;                            previewViewer,
+&nbsp;                            taskExecutor
+&nbsp;                    );
+<b class="nc">&nbsp;            case EntryAdd entryAdd -&gt;</b>
+<b class="nc">&nbsp;                    new EntryWithPreviewAndSourceDetailsView(</b>
+<b class="nc">&nbsp;                            entryAdd.getAddedEntry(),</b>
+&nbsp;                            databaseContext,
+&nbsp;                            preferences,
+&nbsp;                            entryTypesManager,
+&nbsp;                            previewViewer
+&nbsp;                    );
+<b class="nc">&nbsp;            case EntryDelete entryDelete -&gt;</b>
+<b class="nc">&nbsp;                    new EntryWithPreviewAndSourceDetailsView(</b>
+<b class="nc">&nbsp;                            entryDelete.getDeletedEntry(),</b>
+&nbsp;                            databaseContext,
+&nbsp;                            preferences,
+&nbsp;                            entryTypesManager,
+&nbsp;                            previewViewer
+&nbsp;                    );
+<b class="nc">&nbsp;            case BibTexStringAdd stringAdd -&gt;</b>
+<b class="nc">&nbsp;                    new BibTexStringAddDetailsView(stringAdd);</b>
+<b class="nc">&nbsp;            case BibTexStringDelete stringDelete -&gt;</b>
+<b class="nc">&nbsp;                    new BibTexStringDeleteDetailsView(stringDelete);</b>
+<b class="nc">&nbsp;            case BibTexStringChange stringChange -&gt;</b>
+<b class="nc">&nbsp;                    new BibTexStringChangeDetailsView(stringChange);</b>
+<b class="nc">&nbsp;            case BibTexStringRename stringRename -&gt;</b>
+<b class="nc">&nbsp;                    new BibTexStringRenameDetailsView(stringRename);</b>
+<b class="nc">&nbsp;            case MetadataChange metadataChange -&gt;</b>
+<b class="nc">&nbsp;                    new MetadataChangeDetailsView(</b>
+&nbsp;                            metadataChange,
+<b class="nc">&nbsp;                            preferences.getCitationKeyPatternPreferences().getKeyPatterns()</b>
+&nbsp;                    );
+<b class="nc">&nbsp;            case GroupChange groupChange -&gt;</b>
+<b class="nc">&nbsp;                    new GroupChangeDetailsView(groupChange);</b>
+<b class="nc">&nbsp;            case PreambleChange preambleChange -&gt;</b>
+<b class="nc">&nbsp;                    new PreambleChangeDetailsView(preambleChange);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,307 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WalkthroughRenderer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough</a>
+</div>
+
+<h1>Coverage Summary for Class: WalkthroughRenderer (org.jabref.gui.walkthrough)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WalkthroughRenderer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/104)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough;
+&nbsp;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.Region;
+&nbsp;import javafx.scene.layout.StackPane;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.icon.JabRefIconView;
+&nbsp;import org.jabref.gui.util.MarkdownTextFlow;
+&nbsp;import org.jabref.gui.walkthrough.declarative.richtext.ArbitraryJFXBlock;
+&nbsp;import org.jabref.gui.walkthrough.declarative.richtext.InfoBlock;
+&nbsp;import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.PanelStep;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
+&nbsp;import org.jabref.gui.walkthrough.declarative.step.VisibleComponent;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;/// Renders walkthrough steps and content blocks into JavaFX nodes.
+<b class="nc">&nbsp;public class WalkthroughRenderer {</b>
+&nbsp;    /// Renders a tooltip step into a JavaFX node.
+&nbsp;    ///
+&nbsp;    /// @param step           The tooltip step to render
+&nbsp;    /// @param walkthrough    The walkthrough context for navigation
+&nbsp;    /// @param beforeNavigate Runnable to execute before any navigation action
+&nbsp;    /// @return The rendered tooltip content node
+&nbsp;    public Node render(TooltipStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
+<b class="nc">&nbsp;        VBox tooltip = new VBox();</b>
+<b class="nc">&nbsp;        tooltip.getStyleClass().addAll(&quot;root&quot;, &quot;walkthrough-tooltip-content-container&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        StackPane titleContainer = new StackPane();</b>
+<b class="nc">&nbsp;        titleContainer.getStyleClass().add(&quot;walkthrough-title-container&quot;);</b>
+<b class="nc">&nbsp;        MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);</b>
+<b class="nc">&nbsp;        titleFlow.getStyleClass().add(&quot;walkthrough-tooltip-title&quot;);</b>
+<b class="nc">&nbsp;        titleFlow.setMarkdown(step.title());</b>
+<b class="nc">&nbsp;        titleContainer.getChildren().add(titleFlow);</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox contentContainer = createContent(step, walkthrough, beforeNavigate);</b>
+<b class="nc">&nbsp;        contentContainer.getStyleClass().add(&quot;walkthrough-content&quot;);</b>
+<b class="nc">&nbsp;        VBox.setVgrow(contentContainer, Priority.ALWAYS);</b>
+&nbsp;
+<b class="nc">&nbsp;        HBox actionsContainer = createActions(step, walkthrough, beforeNavigate);</b>
+<b class="nc">&nbsp;        actionsContainer.getStyleClass().add(&quot;walkthrough-actions&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        step.maxHeight().ifPresent(tooltip::setMaxHeight);</b>
+<b class="nc">&nbsp;        step.maxWidth().ifPresent(tooltip::setMaxWidth);</b>
+&nbsp;
+<b class="nc">&nbsp;        tooltip.getChildren().addAll(titleContainer, contentContainer, actionsContainer);</b>
+<b class="nc">&nbsp;        return tooltip;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Renders a panel step into a JavaFX node.
+&nbsp;    ///
+&nbsp;    /// @param step           The panel step to render
+&nbsp;    /// @param walkthrough    The walkthrough context for navigation
+&nbsp;    /// @param beforeNavigate Runnable to execute before any navigation action
+&nbsp;    /// @return The rendered panel node
+&nbsp;    public Node render(PanelStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
+<b class="nc">&nbsp;        VBox panel = makePanel();</b>
+<b class="nc">&nbsp;        configurePanelSize(panel, step);</b>
+&nbsp;
+<b class="nc">&nbsp;        StackPane titleContainer = new StackPane();</b>
+<b class="nc">&nbsp;        titleContainer.getStyleClass().add(&quot;walkthrough-title-container&quot;);</b>
+<b class="nc">&nbsp;        MarkdownTextFlow titleFlow = new MarkdownTextFlow(titleContainer);</b>
+<b class="nc">&nbsp;        titleFlow.getStyleClass().add(&quot;walkthrough-title&quot;);</b>
+<b class="nc">&nbsp;        titleFlow.setMarkdown(step.title());</b>
+<b class="nc">&nbsp;        titleContainer.getChildren().add(titleFlow);</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox contentContainer = createContent(step, walkthrough, beforeNavigate);</b>
+<b class="nc">&nbsp;        HBox actionsContainer = createActions(step, walkthrough, beforeNavigate);</b>
+<b class="nc">&nbsp;        VBox.setVgrow(contentContainer, Priority.ALWAYS);</b>
+&nbsp;
+<b class="nc">&nbsp;        panel.getChildren().addAll(titleContainer, contentContainer, actionsContainer);</b>
+<b class="nc">&nbsp;        return panel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void configurePanelSize(VBox panel, PanelStep step) {
+<b class="nc">&nbsp;        boolean isVertical = step.position() == PanelPosition.LEFT || step.position() == PanelPosition.RIGHT;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isVertical) {</b>
+<b class="nc">&nbsp;            panel.getStyleClass().add(&quot;walkthrough-side-panel-vertical&quot;);</b>
+<b class="nc">&nbsp;            VBox.setVgrow(panel, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;            panel.setMaxHeight(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;            step.maxWidth().ifPresent(panel::setMaxWidth);</b>
+<b class="nc">&nbsp;        } else if (step.position() == PanelPosition.TOP || step.position() == PanelPosition.BOTTOM) {</b>
+<b class="nc">&nbsp;            panel.getStyleClass().add(&quot;walkthrough-side-panel-horizontal&quot;);</b>
+<b class="nc">&nbsp;            HBox.setHgrow(panel, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;            panel.setMaxWidth(Double.MAX_VALUE);</b>
+<b class="nc">&nbsp;            step.maxHeight().ifPresent(panel::setMaxHeight);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node render(ArbitraryJFXBlock block, Walkthrough walkthrough, Runnable beforeNavigate) {
+<b class="nc">&nbsp;        return block.componentFactory().apply(walkthrough, beforeNavigate);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node render(TextBlock textBlock) {
+<b class="nc">&nbsp;        StackPane container = new StackPane();</b>
+<b class="nc">&nbsp;        container.getStyleClass().add(&quot;walkthrough-text-container&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        MarkdownTextFlow textFlow = new MarkdownTextFlow(container);</b>
+<b class="nc">&nbsp;        textFlow.getStyleClass().add(&quot;walkthrough-text-content&quot;);</b>
+<b class="nc">&nbsp;        textFlow.setMarkdown(textBlock.text());</b>
+&nbsp;
+<b class="nc">&nbsp;        container.getChildren().add(textFlow);</b>
+<b class="nc">&nbsp;        return container;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node render(InfoBlock infoBlock) {
+<b class="nc">&nbsp;        HBox infoContainer = new HBox();</b>
+<b class="nc">&nbsp;        infoContainer.getStyleClass().add(&quot;walkthrough-info-container&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        JabRefIconView icon = new JabRefIconView(IconTheme.JabRefIcons.INTEGRITY_INFO);</b>
+&nbsp;
+<b class="nc">&nbsp;        StackPane textContainer = new StackPane();</b>
+<b class="nc">&nbsp;        MarkdownTextFlow infoFlow = new MarkdownTextFlow(textContainer);</b>
+<b class="nc">&nbsp;        infoFlow.getStyleClass().add(&quot;walkthrough-info-text&quot;);</b>
+<b class="nc">&nbsp;        infoFlow.setMarkdown(infoBlock.text());</b>
+<b class="nc">&nbsp;        textContainer.getChildren().add(infoFlow);</b>
+&nbsp;
+<b class="nc">&nbsp;        HBox.setHgrow(textContainer, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        infoContainer.getChildren().addAll(icon, textContainer);</b>
+<b class="nc">&nbsp;        return infoContainer;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox makePanel() {
+<b class="nc">&nbsp;        VBox container = new VBox();</b>
+<b class="nc">&nbsp;        container.getStyleClass().add(&quot;walkthrough-panel&quot;);</b>
+<b class="nc">&nbsp;        return container;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private HBox createActions(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
+<b class="nc">&nbsp;        HBox actions = new HBox();</b>
+<b class="nc">&nbsp;        actions.setAlignment(Pos.CENTER_LEFT);</b>
+<b class="nc">&nbsp;        actions.getStyleClass().add(&quot;walkthrough-actions&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Region spacer = new Region();</b>
+<b class="nc">&nbsp;        HBox.setHgrow(spacer, Priority.ALWAYS);</b>
+&nbsp;
+<b class="nc">&nbsp;        component.backButtonText()</b>
+<b class="nc">&nbsp;                 .ifPresent(text -&gt;</b>
+<b class="nc">&nbsp;                         actions.getChildren()</b>
+<b class="nc">&nbsp;                                .add(makeButton(text, &quot;walkthrough-back-button&quot;, beforeNavigate, walkthrough::previousStep)));</b>
+&nbsp;
+<b class="nc">&nbsp;        HBox rightActions = new HBox();</b>
+<b class="nc">&nbsp;        rightActions.setAlignment(Pos.CENTER_RIGHT);</b>
+<b class="nc">&nbsp;        rightActions.getStyleClass().add(&quot;walkthrough-right-actions&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        component.skipButtonText()</b>
+<b class="nc">&nbsp;                 .ifPresent(text -&gt;</b>
+<b class="nc">&nbsp;                         rightActions.getChildren()</b>
+<b class="nc">&nbsp;                                     .add(makeButton(text, &quot;walkthrough-skip-button&quot;, beforeNavigate, walkthrough::skip)));</b>
+<b class="nc">&nbsp;        component.continueButtonText()</b>
+<b class="nc">&nbsp;                 .ifPresent(text -&gt;</b>
+<b class="nc">&nbsp;                         rightActions.getChildren()</b>
+<b class="nc">&nbsp;                                     .add(makeButton(text, &quot;walkthrough-continue-button&quot;, beforeNavigate, walkthrough::nextStep)));</b>
+<b class="nc">&nbsp;        actions.getChildren().addAll(spacer, rightActions);</b>
+<b class="nc">&nbsp;        return actions;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox createContent(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
+<b class="nc">&nbsp;        VBox contentBox = new VBox();</b>
+<b class="nc">&nbsp;        contentBox.getStyleClass().add(&quot;walkthrough-content&quot;);</b>
+<b class="nc">&nbsp;        contentBox.getChildren().addAll(component.content().stream().map(block -&gt;</b>
+<b class="nc">&nbsp;                switch (block) {</b>
+<b class="nc">&nbsp;                    case TextBlock textBlock -&gt;</b>
+<b class="nc">&nbsp;                            render(textBlock);</b>
+<b class="nc">&nbsp;                    case InfoBlock infoBlock -&gt;</b>
+<b class="nc">&nbsp;                            render(infoBlock);</b>
+<b class="nc">&nbsp;                    case ArbitraryJFXBlock arbitraryBlock -&gt;</b>
+<b class="nc">&nbsp;                            render(arbitraryBlock, walkthrough, beforeNavigate);</b>
+&nbsp;                }
+<b class="nc">&nbsp;        ).toArray(Node[]::new));</b>
+<b class="nc">&nbsp;        return contentBox;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Button makeButton(String text, String styleClass, Runnable beforeNavigate, Runnable navigationAction) {
+<b class="nc">&nbsp;        Button button = new Button(Localization.lang(text));</b>
+<b class="nc">&nbsp;        button.getStyleClass().add(styleClass);</b>
+<b class="nc">&nbsp;        button.setOnAction(_ -&gt; {</b>
+<b class="nc">&nbsp;            beforeNavigate.run();</b>
+<b class="nc">&nbsp;            navigationAction.run();</b>
+&nbsp;        });
+<b class="nc">&nbsp;        return button;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

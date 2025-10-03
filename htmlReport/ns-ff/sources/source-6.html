@@ -1,0 +1,174 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > XmpUtilShared</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.xmp</a>
+</div>
+
+<h1>Coverage Summary for Class: XmpUtilShared (org.jabref.logic.xmp)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XmpUtilShared</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.xmp;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.apache.xmpbox.XMPMetadata;
+&nbsp;import org.apache.xmpbox.xml.DomXmpParser;
+&nbsp;import org.apache.xmpbox.xml.XmpParsingException;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * XMPUtilShared provides support for reading {@link org.jabref.logic.xmp.XmpUtilReader} and writing {@link org.jabref.logic.xmp.XmpUtilWriter} BibTeX data as XMP metadata
+&nbsp; * in PDF-documents.
+&nbsp; */
+&nbsp;public class XmpUtilShared {
+&nbsp;
+&nbsp;    public static final String BIBTEX_DI_FIELD_NAME_PREFIX = &quot;bibtex/&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilShared.class);</b>
+&nbsp;
+&nbsp;    private DomXmpParser DOM_XMP_PARSER;
+&nbsp;
+<b class="nc">&nbsp;    public XmpUtilShared() {</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            DOM_XMP_PARSER = new DomXmpParser();</b>
+&nbsp;        } catch (XmpParsingException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not initialize DomXmpParser&quot;, e);</b>
+<b class="nc">&nbsp;            DOM_XMP_PARSER = null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public XMPMetadata parseXmpMetadata(InputStream is) throws IOException {
+&nbsp;        XMPMetadata meta;
+&nbsp;        try {
+<b class="nc">&nbsp;            meta = DOM_XMP_PARSER.parse(is);</b>
+<b class="nc">&nbsp;            return meta;</b>
+&nbsp;        } catch (XmpParsingException e) {
+&nbsp;            // bad style to catch Exception but as this is called in a loop we do not want to break here when any schema encounters an error
+<b class="nc">&nbsp;            throw new IOException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Will try to read XMP metadata from the given file, returning whether
+&nbsp;     * metadata was found.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Caution: This method is as expensive as it is reading the actual metadata
+&nbsp;     * itself from the PDF.
+&nbsp;     *
+&nbsp;     * @param path the path to the PDF.
+&nbsp;     * @return whether a BibEntry was found in the given PDF.
+&nbsp;     */
+&nbsp;    public static boolean hasMetadata(Path path, XmpPreferences xmpPreferences) {
+&nbsp;        try {
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; bibEntries = new XmpUtilReader().readXmp(path, xmpPreferences);</b>
+<b class="nc">&nbsp;            return !bibEntries.isEmpty();</b>
+&nbsp;        } catch (EncryptedPdfsNotSupportedException ex) {
+<b class="nc">&nbsp;            LOGGER.info(&quot;Encryption not supported by XMPUtil&quot;);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            XmpUtilShared.LOGGER.debug(&quot;No metadata was found. Path: {}&quot;, path.toString());</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

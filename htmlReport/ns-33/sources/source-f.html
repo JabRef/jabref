@@ -1,0 +1,198 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PdfMergeDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.externalfiles</a>
+</div>
+
+<h1>Coverage Summary for Class: PdfMergeDialog (org.jabref.gui.externalfiles)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PdfMergeDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.externalfiles;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+<b class="nc">&nbsp;public class PdfMergeDialog {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructs a merge dialog for a PDF file. This dialog calls various {@link PdfImporter}s, collects the results, and lets the user choose between them.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * {@link PdfImporter}s try to extract a {@link BibEntry} out of a PDF file,
+&nbsp;     * but it does not perform this 100% perfectly, it is only a set of heuristics that in some cases might work, in others not.
+&nbsp;     * Thus, JabRef provides this merge dialog that collects the results of all {@link PdfImporter}s
+&nbsp;     * and gives user a choice between field values.
+&nbsp;     *
+&nbsp;     * @param entry        the entry to merge with
+&nbsp;     * @param filePath     the path to the PDF file. This PDF is used as the source for the {@link PdfImporter}s.
+&nbsp;     * @param preferences  the preferences to use. Full preference object is required, because of current implementation of {@link MultiMergeEntriesView}.
+&nbsp;     * @param taskExecutor the task executor to use when the multi merge dialog executes the importers.
+&nbsp;     */
+&nbsp;    public static MultiMergeEntriesView createMergeDialog(BibEntry entry, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        MultiMergeEntriesView dialog = initDialog(preferences, taskExecutor);</b>
+&nbsp;
+<b class="nc">&nbsp;        dialog.addSource(Localization.lang(&quot;Entry&quot;), entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        finishDialog(dialog, filePath, preferences);</b>
+<b class="nc">&nbsp;        return dialog;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static MultiMergeEntriesView createMergeDialog(Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        MultiMergeEntriesView dialog = initDialog(preferences, taskExecutor);</b>
+&nbsp;
+<b class="nc">&nbsp;        finishDialog(dialog, filePath, preferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        return dialog;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static MultiMergeEntriesView initDialog(GuiPreferences preferences, TaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);</b>
+<b class="nc">&nbsp;        dialog.setTitle(Localization.lang(&quot;Merge PDF metadata&quot;));</b>
+<b class="nc">&nbsp;        return dialog;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void finishDialog(MultiMergeEntriesView dialog, Path filePath, GuiPreferences preferences) {
+<b class="nc">&nbsp;        dialog.addSource(Localization.lang(&quot;Verbatim&quot;), wrapImporterToSupplier(new PdfVerbatimBibtexImporter(preferences.getImportFormatPreferences()), filePath));</b>
+<b class="nc">&nbsp;        dialog.addSource(Localization.lang(&quot;Embedded&quot;), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));</b>
+<b class="nc">&nbsp;        if (preferences.getGrobidPreferences().isGrobidEnabled()) {</b>
+<b class="nc">&nbsp;            dialog.addSource(&quot;Grobid&quot;, wrapImporterToSupplier(new PdfGrobidImporter(preferences.getImportFormatPreferences()), filePath));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        dialog.addSource(Localization.lang(&quot;XMP metadata&quot;), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));</b>
+<b class="nc">&nbsp;        dialog.addSource(Localization.lang(&quot;Content&quot;), wrapImporterToSupplier(new PdfContentImporter(), filePath));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Supplier&lt;BibEntry&gt; wrapImporterToSupplier(Importer importer, Path filePath) {
+<b class="nc">&nbsp;        return () -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                ParserResult parserResult = importer.importDatabase(filePath);</b>
+<b class="nc">&nbsp;                if (parserResult.isInvalid() || parserResult.isEmpty() || !parserResult.getDatabase().hasEntries()) {</b>
+<b class="nc">&nbsp;                    return null;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return parserResult.getDatabase().getEntries().getFirst();</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

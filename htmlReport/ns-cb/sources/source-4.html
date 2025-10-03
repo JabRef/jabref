@@ -1,0 +1,208 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ApsFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: ApsFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ApsFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.FulltextFetcher;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;
+&nbsp;import kong.unirest.core.Unirest;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * FulltextFetcher implementation that attempts to find a PDF URL at APS. Also see the &lt;a
+&nbsp; * href=&quot;https://harvest.aps.org/docs/harvest-api&quot;&gt;API&lt;/a&gt;, although it isn&#39;t currently used.
+&nbsp; */
+<b class="nc">&nbsp;public class ApsFetcher implements FulltextFetcher {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ApsFetcher.class);</b>
+&nbsp;
+&nbsp;    // The actual API needs either an API key or a header. This is a workaround.
+&nbsp;    private static final String DOI_URL = &quot;https://www.doi.org/&quot;;
+&nbsp;    private static final String PDF_URL = &quot;https://journals.aps.org/prl/pdf/&quot;;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;URL&gt; findFullText(BibEntry entry) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;DOI&gt; doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (doi.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;String&gt; id = getId(doi.get().asString());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (id.isPresent()) {</b>
+<b class="nc">&nbsp;            String pdfRequestUrl = PDF_URL + id.get();</b>
+<b class="nc">&nbsp;            int code = Unirest.head(pdfRequestUrl).asJson().getStatus();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (code == 200) {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;Fulltext PDF found @ APS.&quot;);</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    return Optional.of(URLUtil.create(pdfRequestUrl));</b>
+&nbsp;                } catch (MalformedURLException e) {
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;APS returned malformed URL, cannot find PDF.&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TrustLevel getTrustLevel() {
+<b class="nc">&nbsp;        return TrustLevel.PUBLISHER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert a DOI into an appropriate APS id.
+&nbsp;     *
+&nbsp;     * @param doi A case insensitive DOI
+&nbsp;     * @return A DOI cased as APS likes it
+&nbsp;     */
+&nbsp;    private Optional&lt;String&gt; getId(String doi) {
+&nbsp;        // DOI is not case sensitive, but the id for the PDF URL is,
+&nbsp;        // so we follow DOI.org redirects to get the proper id.
+&nbsp;        // https://stackoverflow.com/a/5270162/1729441
+&nbsp;
+<b class="nc">&nbsp;        String doiRequest = DOI_URL + doi;</b>
+&nbsp;
+&nbsp;        URLConnection con;
+&nbsp;        try {
+<b class="nc">&nbsp;            con = URLUtil.create(doiRequest).openConnection();</b>
+<b class="nc">&nbsp;            con.connect();</b>
+<b class="nc">&nbsp;            con.getInputStream();</b>
+<b class="nc">&nbsp;            String[] urlParts = con.getURL().toString().split(&quot;abstract/&quot;);</b>
+<b class="nc">&nbsp;            if (urlParts.length == 2) {</b>
+<b class="nc">&nbsp;                return Optional.of(urlParts[1]);</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error connecting to APS&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

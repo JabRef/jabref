@@ -1,0 +1,260 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CustomImporterTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.customimporter</a>
+</div>
+
+<h1>Coverage Summary for Class: CustomImporterTabViewModel (org.jabref.gui.preferences.customimporter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CustomImporterTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.customimporter;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.importer.ImporterViewModel;
+&nbsp;import org.jabref.gui.preferences.PreferenceTabViewModel;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.logic.importer.ImportException;
+&nbsp;import org.jabref.logic.importer.fileformat.CustomImporter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class CustomImporterTabViewModel implements PreferenceTabViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(CustomImporterTabViewModel.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;ImporterViewModel&gt; importers = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;ImporterViewModel&gt; selectedImporters = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+&nbsp;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;
+<b class="nc">&nbsp;    public CustomImporterTabViewModel(CliPreferences preferences, DialogService dialogService) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        Set&lt;CustomImporter&gt; importersLogic = preferences.getImporterPreferences().getCustomImporters();</b>
+<b class="nc">&nbsp;        importers.clear();</b>
+<b class="nc">&nbsp;        for (CustomImporter importer : importersLogic) {</b>
+<b class="nc">&nbsp;            importers.add(new ImporterViewModel(importer));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        preferences.getImporterPreferences().setCustomImporters(importers.stream()</b>
+<b class="nc">&nbsp;                                                                         .map(ImporterViewModel::getLogic)</b>
+<b class="nc">&nbsp;                                                                         .collect(Collectors.toSet()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts a path relative to a base-path into a class name.
+&nbsp;     *
+&nbsp;     * @param basePath base path
+&nbsp;     * @param path     path that includes base-path as a prefix
+&nbsp;     * @return class name
+&nbsp;     */
+&nbsp;    private static String pathToClass(String basePath, Path path) {
+<b class="nc">&nbsp;        String className = FileUtil.relativize(path, List.of(Path.of(basePath))).toString();</b>
+<b class="nc">&nbsp;        if (className != null) {</b>
+<b class="nc">&nbsp;            int lastDot = className.lastIndexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;            if (lastDot &lt; 0) {</b>
+<b class="nc">&nbsp;                return className;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            className = className.substring(0, lastDot);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return className;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addImporter() {
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .addExtensionFilter(StandardFileType.CLASS, StandardFileType.JAR, StandardFileType.ZIP)</b>
+<b class="nc">&nbsp;                .withDefaultExtension(StandardFileType.CLASS)</b>
+<b class="nc">&nbsp;                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Path&gt; selectedFile = dialogService.showFileOpenDialog(fileDialogConfiguration);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (selectedFile.isPresent() &amp;&amp; (selectedFile.get().getParent() != null)) {</b>
+<b class="nc">&nbsp;            boolean isArchive = FileUtil.getFileExtension(selectedFile.get())</b>
+<b class="nc">&nbsp;                                        .filter(extension -&gt; &quot;jar&quot;.equalsIgnoreCase(extension) || &quot;zip&quot;.equalsIgnoreCase(extension))</b>
+<b class="nc">&nbsp;                                        .isPresent();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (isArchive) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    Optional&lt;Path&gt; selectedFileInArchive = dialogService.showFileOpenFromArchiveDialog(selectedFile.get());</b>
+<b class="nc">&nbsp;                    if (selectedFileInArchive.isPresent()) {</b>
+<b class="nc">&nbsp;                        String className = selectedFileInArchive.get().toString().substring(0, selectedFileInArchive.get().toString().lastIndexOf(&#39;.&#39;)).replace(</b>
+&nbsp;                                &quot;/&quot;, &quot;.&quot;);
+<b class="nc">&nbsp;                        CustomImporter importer = new CustomImporter(selectedFile.get().toAbsolutePath().toString(), className);</b>
+<b class="nc">&nbsp;                        importers.add(new ImporterViewModel(importer));</b>
+&nbsp;                    }
+&nbsp;                } catch (IOException exc) {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Could not open ZIP-archive.&quot;, exc);</b>
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Could not open %0&quot;, selectedFile.get().toString()) + &quot;\n&quot;</b>
+<b class="nc">&nbsp;                                    + Localization.lang(&quot;Have you chosen the correct package path?&quot;),</b>
+&nbsp;                            exc);
+&nbsp;                } catch (ImportException exc) {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Could not instantiate importer&quot;, exc);</b>
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Could not instantiate %0 %1&quot;, &quot;importer&quot;),</b>
+&nbsp;                            exc);
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                try {
+<b class="nc">&nbsp;                    String basePath = selectedFile.get().getParent().toString();</b>
+<b class="nc">&nbsp;                    String className = pathToClass(basePath, selectedFile.get());</b>
+<b class="nc">&nbsp;                    CustomImporter importer = new CustomImporter(basePath, className);</b>
+&nbsp;
+<b class="nc">&nbsp;                    importers.add(new ImporterViewModel(importer));</b>
+&nbsp;                } catch (Exception exc) {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Could not instantiate importer&quot;, exc);</b>
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(Localization.lang(&quot;Could not instantiate %0&quot;, selectedFile.get().toString()), exc);</b>
+&nbsp;                } catch (NoClassDefFoundError exc) {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Could not find class while instantiating importer&quot;, exc);</b>
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Could not instantiate %0. Have you chosen the correct package path?&quot;, selectedFile.get().toString()),</b>
+&nbsp;                            exc);
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeSelectedImporter() {
+<b class="nc">&nbsp;        importers.removeAll(selectedImporters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;ImporterViewModel&gt; selectedImportersProperty() {
+<b class="nc">&nbsp;        return selectedImporters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;ImporterViewModel&gt; importersProperty() {
+<b class="nc">&nbsp;        return importers;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,368 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ViewModelTreeTableRowFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: ViewModelTreeTableRowFactory (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ViewModelTreeTableRowFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ViewModelTreeTableRowFactory$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/81)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.BiConsumer;
+&nbsp;import java.util.function.Consumer;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import javafx.beans.value.ObservableValue;
+&nbsp;import javafx.css.PseudoClass;
+&nbsp;import javafx.event.Event;
+&nbsp;import javafx.event.EventType;
+&nbsp;import javafx.geometry.Bounds;
+&nbsp;import javafx.geometry.Point2D;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.TreeTableRow;
+&nbsp;import javafx.scene.control.TreeTableView;
+&nbsp;import javafx.scene.input.DragEvent;
+&nbsp;import javafx.scene.input.KeyCode;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;import javafx.scene.input.MouseDragEvent;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.util.Callback;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.Subscription;
+&nbsp;import org.reactfx.util.TriConsumer;
+&nbsp;
+<b class="nc">&nbsp;public class ViewModelTreeTableRowFactory&lt;S&gt; implements Callback&lt;TreeTableView&lt;S&gt;, TreeTableRow&lt;S&gt;&gt; {</b>
+&nbsp;    private BiConsumer&lt;S, ? super MouseEvent&gt; onMouseClickedEvent;
+&nbsp;    private BiConsumer&lt;S, ? super MouseEvent&gt; onMousePressedEvent;
+&nbsp;    private Consumer&lt;TreeTableRow&lt;S&gt;&gt; toCustomInitializer;
+&nbsp;    private Function&lt;S, ContextMenu&gt; contextMenuFactory;
+&nbsp;    private TriConsumer&lt;TreeTableRow&lt;S&gt;, S, ? super MouseEvent&gt; toOnDragDetected;
+&nbsp;    private TriConsumer&lt;TreeTableRow&lt;S&gt;, S, ? super DragEvent&gt; toOnDragDropped;
+&nbsp;    private BiConsumer&lt;S, ? super DragEvent&gt; toOnDragEntered;
+&nbsp;    private TriConsumer&lt;TreeTableRow&lt;S&gt;, S, ? super DragEvent&gt; toOnDragExited;
+&nbsp;    private TriConsumer&lt;TreeTableRow&lt;S&gt;, S, ? super DragEvent&gt; toOnDragOver;
+&nbsp;    private TriConsumer&lt;TreeTableRow&lt;S&gt;, S, ? super MouseDragEvent&gt; toOnMouseDragEntered;
+<b class="nc">&nbsp;    private final Map&lt;EventType&lt;? extends Event&gt;, BiConsumer&lt;S, ? super Event&gt;&gt; eventFilters = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;PseudoClass, Callback&lt;TreeTableRow&lt;S&gt;, ObservableValue&lt;Boolean&gt;&gt;&gt; pseudoClasses = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; withOnMouseClickedEvent(BiConsumer&lt;S, ? super MouseEvent&gt; event) {
+<b class="nc">&nbsp;        this.onMouseClickedEvent = event;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; withOnMousePressedEvent(BiConsumer&lt;S, ? super MouseEvent&gt; event) {
+<b class="nc">&nbsp;        this.onMousePressedEvent = event;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; withCustomInitializer(Consumer&lt;TreeTableRow&lt;S&gt;&gt; customInitializer) {
+<b class="nc">&nbsp;        this.toCustomInitializer = customInitializer;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; withContextMenu(Function&lt;S, ContextMenu&gt; contextMenuFactory) {
+<b class="nc">&nbsp;        this.contextMenuFactory = contextMenuFactory;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; setOnDragDetected(TriConsumer&lt;TreeTableRow&lt;S&gt;, S, ? super MouseEvent&gt; toOnDragDetected) {
+<b class="nc">&nbsp;        this.toOnDragDetected = toOnDragDetected;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; setOnDragDetected(BiConsumer&lt;S, ? super MouseEvent&gt; toOnDragDetected) {
+<b class="nc">&nbsp;        this.toOnDragDetected = (row, viewModel, event) -&gt; toOnDragDetected.accept(viewModel, event);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; setOnDragDropped(TriConsumer&lt;TreeTableRow&lt;S&gt;, S, ? super DragEvent&gt; toOnDragDropped) {
+<b class="nc">&nbsp;        this.toOnDragDropped = toOnDragDropped;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; setOnDragDropped(BiConsumer&lt;S, ? super DragEvent&gt; toOnDragDropped) {
+<b class="nc">&nbsp;        return setOnDragDropped((row, viewModel, event) -&gt; toOnDragDropped.accept(viewModel, event));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; setOnDragEntered(BiConsumer&lt;S, ? super DragEvent&gt; toOnDragEntered) {
+<b class="nc">&nbsp;        this.toOnDragEntered = toOnDragEntered;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; setOnMouseDragEntered(TriConsumer&lt;TreeTableRow&lt;S&gt;, S, ? super MouseDragEvent&gt; toOnDragEntered) {
+<b class="nc">&nbsp;        this.toOnMouseDragEntered = toOnDragEntered;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; setOnMouseDragEntered(BiConsumer&lt;S, ? super MouseDragEvent&gt; toOnDragEntered) {
+<b class="nc">&nbsp;        return setOnMouseDragEntered((row, viewModel, event) -&gt; toOnDragEntered.accept(viewModel, event));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; setOnDragExited(TriConsumer&lt;TreeTableRow&lt;S&gt;, S, ? super DragEvent&gt; toOnDragExited) {
+<b class="nc">&nbsp;        this.toOnDragExited = toOnDragExited;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; setOnDragExited(BiConsumer&lt;S, ? super DragEvent&gt; toOnDragExited) {
+<b class="nc">&nbsp;        return setOnDragExited((row, viewModel, event) -&gt; toOnDragExited.accept(viewModel, event));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; setOnDragOver(TriConsumer&lt;TreeTableRow&lt;S&gt;, S, ? super DragEvent&gt; toOnDragOver) {
+<b class="nc">&nbsp;        this.toOnDragOver = toOnDragOver;</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; setOnDragOver(BiConsumer&lt;S, ? super DragEvent&gt; toOnDragOver) {
+<b class="nc">&nbsp;        return setOnDragOver((row, viewModel, event) -&gt; toOnDragOver.accept(viewModel, event));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; withPseudoClass(PseudoClass pseudoClass, Callback&lt;TreeTableRow&lt;S&gt;, ObservableValue&lt;Boolean&gt;&gt; toCondition) {
+<b class="nc">&nbsp;        this.pseudoClasses.putIfAbsent(pseudoClass, toCondition);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ViewModelTreeTableRowFactory&lt;S&gt; withEventFilter(EventType&lt;? extends Event&gt; event, BiConsumer&lt;S, ? super Event&gt; toCondition) {
+<b class="nc">&nbsp;        this.eventFilters.putIfAbsent(event, toCondition);</b>
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void install(TreeTableView&lt;S&gt; table) {
+<b class="nc">&nbsp;        table.setRowFactory(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TreeTableRow&lt;S&gt; call(TreeTableView&lt;S&gt; treeTableView) {
+<b class="nc">&nbsp;        return new TreeTableRow&lt;&gt;() {</b>
+<b class="nc">&nbsp;            final List&lt;Subscription&gt; subscriptions = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;            @Override
+&nbsp;            protected void updateItem(S row, boolean empty) {
+<b class="nc">&nbsp;                super.updateItem(row, empty);</b>
+&nbsp;
+&nbsp;                // Remove previous subscriptions
+<b class="nc">&nbsp;                subscriptions.forEach(Subscription::unsubscribe);</b>
+<b class="nc">&nbsp;                subscriptions.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (contextMenuFactory != null) {</b>
+&nbsp;                    // We only create the context menu when really necessary
+<b class="nc">&nbsp;                    setOnContextMenuRequested(event -&gt; {</b>
+<b class="nc">&nbsp;                        if (!isEmpty()) {</b>
+<b class="nc">&nbsp;                            setContextMenu(contextMenuFactory.apply(row));</b>
+<b class="nc">&nbsp;                            getContextMenu().show(this, event.getScreenX(), event.getScreenY());</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    });
+&nbsp;
+&nbsp;                    // Activate context menu if user presses the &quot;context menu&quot; key
+<b class="nc">&nbsp;                    treeTableView.addEventHandler(KeyEvent.KEY_RELEASED, event -&gt; {</b>
+<b class="nc">&nbsp;                        boolean rowFocused = !isEmpty() &amp;&amp; treeTableView.getFocusModel().getFocusedIndex() == getIndex();</b>
+<b class="nc">&nbsp;                        if (event.getCode() == KeyCode.CONTEXT_MENU &amp;&amp; rowFocused) {</b>
+&nbsp;                            // Get center of focused cell
+<b class="nc">&nbsp;                            Bounds anchorBounds = getBoundsInParent();</b>
+<b class="nc">&nbsp;                            double x = anchorBounds.getMinX() + anchorBounds.getWidth() / 2;</b>
+<b class="nc">&nbsp;                            double y = anchorBounds.getMinY() + anchorBounds.getHeight() / 2;</b>
+<b class="nc">&nbsp;                            Point2D screenPosition = getParent().localToScreen(x, y);</b>
+&nbsp;
+<b class="nc">&nbsp;                            if (getContextMenu() == null) {</b>
+<b class="nc">&nbsp;                                setContextMenu(contextMenuFactory.apply(getItem()));</b>
+&nbsp;                            }
+<b class="nc">&nbsp;                            getContextMenu().show(this, screenPosition.getX(), screenPosition.getY());</b>
+&nbsp;                        }
+&nbsp;                    });
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (!empty &amp;&amp; (row != null)) {</b>
+<b class="nc">&nbsp;                    if (onMouseClickedEvent != null) {</b>
+<b class="nc">&nbsp;                        setOnMouseClicked(event -&gt; onMouseClickedEvent.accept(getItem(), event));</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    if (onMousePressedEvent != null) {</b>
+<b class="nc">&nbsp;                        setOnMousePressed(event -&gt; onMousePressedEvent.accept(getItem(), event));</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    if (toCustomInitializer != null) {</b>
+<b class="nc">&nbsp;                        toCustomInitializer.accept(this);</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    if (toOnDragDetected != null) {</b>
+<b class="nc">&nbsp;                        setOnDragDetected(event -&gt; toOnDragDetected.accept(this, getItem(), event));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (toOnDragDropped != null) {</b>
+<b class="nc">&nbsp;                        setOnDragDropped(event -&gt; toOnDragDropped.accept(this, getItem(), event));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (toOnDragEntered != null) {</b>
+<b class="nc">&nbsp;                        setOnDragEntered(event -&gt; toOnDragEntered.accept(getItem(), event));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (toOnDragExited != null) {</b>
+<b class="nc">&nbsp;                        setOnDragExited(event -&gt; toOnDragExited.accept(this, getItem(), event));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (toOnDragOver != null) {</b>
+<b class="nc">&nbsp;                        setOnDragOver(event -&gt; toOnDragOver.accept(this, getItem(), event));</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    if (toOnMouseDragEntered != null) {</b>
+<b class="nc">&nbsp;                        setOnMouseDragEntered(event -&gt; toOnMouseDragEntered.accept(this, getItem(), event));</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    for (Map.Entry&lt;EventType&lt;?&gt;, BiConsumer&lt;S, ? super Event&gt;&gt; eventFilter : eventFilters.entrySet()) {</b>
+<b class="nc">&nbsp;                        addEventFilter(eventFilter.getKey(), event -&gt; eventFilter.getValue().accept(getItem(), event));</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    for (Map.Entry&lt;PseudoClass, Callback&lt;TreeTableRow&lt;S&gt;, ObservableValue&lt;Boolean&gt;&gt;&gt; pseudoClassWithCondition : pseudoClasses.entrySet()) {</b>
+<b class="nc">&nbsp;                        ObservableValue&lt;Boolean&gt; condition = pseudoClassWithCondition.getValue().call(this);</b>
+<b class="nc">&nbsp;                        subscriptions.add(BindingsHelper.includePseudoClassWhen(</b>
+&nbsp;                                this,
+<b class="nc">&nbsp;                                pseudoClassWithCondition.getKey(),</b>
+&nbsp;                                condition));
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

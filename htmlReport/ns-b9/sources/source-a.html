@@ -1,0 +1,261 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Exporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: Exporter (org.jabref.logic.exporter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Exporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.exporter;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.xml.parsers.ParserConfigurationException;
+&nbsp;import javax.xml.transform.TransformerException;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.util.FileType;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;public abstract class Exporter {
+&nbsp;
+&nbsp;    private final String id;
+&nbsp;    private final String displayName;
+&nbsp;    private final FileType fileType;
+&nbsp;
+<b class="nc">&nbsp;    public Exporter(String id, String displayName, FileType extension) {</b>
+<b class="nc">&nbsp;        this.id = id;</b>
+<b class="nc">&nbsp;        this.displayName = displayName;</b>
+<b class="nc">&nbsp;        this.fileType = extension;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a one-word ID (used, for example, to identify the exporter in the console).
+&nbsp;     */
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the name of the exporter (to display to the user).
+&nbsp;     */
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return displayName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the type of files this exporter creates.
+&nbsp;     */
+&nbsp;    public FileType getFileType() {
+<b class="nc">&nbsp;        return fileType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return displayName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Performs the export.
+&nbsp;     *
+&nbsp;     * @param databaseContext the database to export from
+&nbsp;     * @param file            the file to write to
+&nbsp;     * @param entries         a list containing all entries that should be exported
+&nbsp;     */
+&nbsp;    public abstract void export(BibDatabaseContext databaseContext,
+&nbsp;                                Path file,
+&nbsp;                                List&lt;BibEntry&gt; entries)
+&nbsp;            throws IOException, TransformerException, ParserConfigurationException, SaveException;
+&nbsp;
+&nbsp;    public void export(BibDatabaseContext databaseContext,
+&nbsp;                       Path file,
+&nbsp;                       List&lt;BibEntry&gt; entries,
+&nbsp;                       List&lt;Path&gt; fileDirForDatabase,
+&nbsp;                       JournalAbbreviationRepository abbreviationRepository)
+&nbsp;            throws IOException, SaveException, ParserConfigurationException, TransformerException {
+<b class="nc">&nbsp;        export(databaseContext, file, entries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exports to all files linked to a given entry
+&nbsp;     *
+&nbsp;     * @param databaseContext        the database to export from
+&nbsp;     * @param filePreferences        the filePreferences to use for resolving paths
+&nbsp;     * @param entryToWriteOn         the entry for which we want to write on all linked pdfs
+&nbsp;     * @param entriesToWrite         the content that we want to export to the pdfs
+&nbsp;     * @param abbreviationRepository the opened repository of journal abbreviations
+&nbsp;     * @return whether any file was written on
+&nbsp;     * @throws IOException if the writing fails
+&nbsp;     */
+&nbsp;    public boolean exportToAllFilesOfEntry(BibDatabaseContext databaseContext,
+&nbsp;                                           FilePreferences filePreferences,
+&nbsp;                                           BibEntry entryToWriteOn,
+&nbsp;                                           List&lt;BibEntry&gt; entriesToWrite,
+&nbsp;                                           JournalAbbreviationRepository abbreviationRepository)
+&nbsp;            throws IOException, SaveException, ParserConfigurationException, TransformerException {
+<b class="nc">&nbsp;        boolean writtenToAFile = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (LinkedFile file : entryToWriteOn.getFiles()) {</b>
+<b class="nc">&nbsp;            if (file.getFileType().equals(fileType.getName())) {</b>
+<b class="nc">&nbsp;                Optional&lt;Path&gt; filePath = file.findIn(databaseContext, filePreferences);</b>
+<b class="nc">&nbsp;                if (filePath.isPresent()) {</b>
+<b class="nc">&nbsp;                    export(databaseContext, filePath.get(), entriesToWrite, List.of(), abbreviationRepository);</b>
+<b class="nc">&nbsp;                    writtenToAFile = true;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return writtenToAFile;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exports bib-entries a file is linked to
+&nbsp;     * Behaviour in case the file is linked to different bib-entries depends on the implementation of {@link #export}.
+&nbsp;     * If it overwrites any existing information, only the last found bib-entry will be exported (as the previous exports are overwritten).
+&nbsp;     * If it extends existing information, all found bib-entries will be exported.
+&nbsp;     *
+&nbsp;     * @param databaseContext        the database-context to export from
+&nbsp;     * @param filePreferences        the filePreferences to use for resolving paths
+&nbsp;     * @param filePath               the path to the file we want to write on
+&nbsp;     * @param abbreviationRepository the opened repository of journal abbreviations
+&nbsp;     * @return whether the file was written on at least once
+&nbsp;     * @throws IOException if the writing fails
+&nbsp;     */
+&nbsp;    public boolean exportToFileByPath(BibDatabaseContext databaseContext,
+&nbsp;                                      FilePreferences filePreferences,
+&nbsp;                                      Path filePath,
+&nbsp;                                      JournalAbbreviationRepository abbreviationRepository)
+&nbsp;            throws IOException, SaveException, ParserConfigurationException, TransformerException {
+<b class="nc">&nbsp;        if (!Files.exists(filePath)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        boolean writtenABibEntry = false;</b>
+<b class="nc">&nbsp;        for (BibEntry entry : databaseContext.getEntries()) {</b>
+<b class="nc">&nbsp;            for (LinkedFile linkedFile : entry.getFiles()) {</b>
+<b class="nc">&nbsp;                if (linkedFile.getFileType().equals(fileType.getName())) {</b>
+<b class="nc">&nbsp;                    Optional&lt;Path&gt; linkedFilePath = linkedFile.findIn(databaseContext.getFileDirectories(filePreferences));</b>
+<b class="nc">&nbsp;                    if (linkedFilePath.isPresent() &amp;&amp; Files.exists(linkedFilePath.get()) &amp;&amp; Files.isSameFile(linkedFilePath.get(), filePath)) {</b>
+<b class="nc">&nbsp;                        export(databaseContext, filePath, List.of(entry), List.of(), abbreviationRepository);</b>
+<b class="nc">&nbsp;                        writtenABibEntry = true;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return writtenABibEntry;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

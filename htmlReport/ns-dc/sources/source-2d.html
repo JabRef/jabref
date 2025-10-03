@@ -1,0 +1,161 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IfPlural</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: IfPlural (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IfPlural</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.layout.AbstractParamLayoutFormatter;
+&nbsp;
+&nbsp;/**
+&nbsp; * This formatter takes two arguments and examines the field text.
+&nbsp; * If the field text represents multiple individuals, that is it contains the string &quot;and&quot;
+&nbsp; * then the field text is replaced with the first argument, otherwise it is replaced with the second.
+&nbsp; * For example:
+&nbsp; *
+&nbsp; * &lt;p&gt;
+&nbsp; * \format[IfPlural(Eds.,Ed.)]{\editor}
+&nbsp; * &lt;p&gt;
+&nbsp; * Should expand to &#39;Eds.&#39; if the document has more than one editor and &#39;Ed.&#39; if it only has one.
+&nbsp; */
+<b class="nc">&nbsp;public class IfPlural extends AbstractParamLayoutFormatter {</b>
+&nbsp;
+&nbsp;    private String pluralText;
+&nbsp;    private String singularText;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setArgument(String arg) {
+<b class="nc">&nbsp;        List&lt;String&gt; parts = AbstractParamLayoutFormatter.parseArgument(arg);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (parts.size() &lt; 2) {</b>
+&nbsp;            return; // TODO: too few arguments. Print an error message here?
+&nbsp;        }
+<b class="nc">&nbsp;        pluralText = parts.getFirst();</b>
+<b class="nc">&nbsp;        singularText = parts.get(1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String fieldText) {
+<b class="nc">&nbsp;        if ((fieldText == null) || fieldText.isEmpty() || (pluralText == null)) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;; // TODO: argument missing or invalid. Print an error message here?</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (fieldText.matches(&quot;.*\\sand\\s.*&quot;)) {</b>
+<b class="nc">&nbsp;            return pluralText;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return singularText;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,255 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitationKeyPattern</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.citationkeypattern</a>
+</div>
+
+<h1>Coverage Summary for Class: CitationKeyPattern (org.jabref.logic.citationkeypattern)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitationKeyPattern</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.9%
+  </span>
+  <span class="absValue">
+    (3/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    79.7%
+  </span>
+  <span class="absValue">
+    (51/64)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CitationKeyPattern$Category</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    55.6%
+  </span>
+  <span class="absValue">
+    (5/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80.3%
+  </span>
+  <span class="absValue">
+    (53/66)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.citationkeypattern;
+&nbsp;
+&nbsp;import java.lang.reflect.Modifier;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+<b class="fc">&nbsp;public record CitationKeyPattern(String stringRepresentation, Category category) {</b>
+<b class="fc">&nbsp;    public enum Category {</b>
+<b class="fc">&nbsp;        AUTHOR_RELATED, EDITOR_RELATED, TITLE_RELATED, OTHER_FIELDS, BIBENTRY_FIELDS</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public static final CitationKeyPattern NULL_CITATION_KEY_PATTERN = new CitationKeyPattern(&quot;&quot;, Category.OTHER_FIELDS);</b>
+&nbsp;
+&nbsp;    // region - Author-related field markers
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHOR_YEAR = new CitationKeyPattern(&quot;[auth_year]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHOR_FIRST_FULL = new CitationKeyPattern(&quot;[authFirstFull]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHOR_FORE_INI = new CitationKeyPattern(&quot;[authForeIni]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHOR_ETAL = new CitationKeyPattern(&quot;[auth.etal]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHOR_ET_AL = new CitationKeyPattern(&quot;[authEtAl]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHOR_AUTH_EA = new CitationKeyPattern(&quot;[auth.auth.ea]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHORS = new CitationKeyPattern(&quot;[authors]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHORS_N = new CitationKeyPattern(&quot;[authorsN]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTH_INI_N = new CitationKeyPattern(&quot;[authIniN]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTH_N = new CitationKeyPattern(&quot;[authN]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTH_N_M = new CitationKeyPattern(&quot;[authN_M]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHOR_INI = new CitationKeyPattern(&quot;[authorIni]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTH_SHORT = new CitationKeyPattern(&quot;[authshort]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHORS_ALPHA = new CitationKeyPattern(&quot;[authorsAlpha]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHORS_ALPHA_LNI = new CitationKeyPattern(&quot;[authorsAlphaLNI]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHORS_LAST = new CitationKeyPattern(&quot;[authorsLast]&quot;, Category.AUTHOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHORS_LAST_FORE_INI = new CitationKeyPattern(&quot;[authorsLastForeIni]&quot;, Category.AUTHOR_RELATED);</b>
+&nbsp;    // endregion
+&nbsp;
+&nbsp;    // region - Editor-related field markers
+<b class="fc">&nbsp;    public static final CitationKeyPattern EDTR = new CitationKeyPattern(&quot;[edtr]&quot;, Category.EDITOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern EDTR_INI_N = new CitationKeyPattern(&quot;[edtrIniN]&quot;, Category.EDITOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern EDITORS = new CitationKeyPattern(&quot;[editors]&quot;, Category.EDITOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern EDITOR_LAST = new CitationKeyPattern(&quot;[editorLast]&quot;, Category.EDITOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern EDITOR_INI = new CitationKeyPattern(&quot;[editorIni]&quot;, Category.EDITOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern EDTR_N = new CitationKeyPattern(&quot;[edtrN]&quot;, Category.EDITOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern EDTR_N_M = new CitationKeyPattern(&quot;[edtrN_M]&quot;, Category.EDITOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern EDTR_EDTR_EA = new CitationKeyPattern(&quot;[edtr.edtr.ea]&quot;, Category.EDITOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern EDTRSHORT = new CitationKeyPattern(&quot;[edtrshort]&quot;, Category.EDITOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern EDTR_FORE_INI = new CitationKeyPattern(&quot;[edtrForeIni]&quot;, Category.EDITOR_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern EDITOR_LAST_FORE_INI = new CitationKeyPattern(&quot;[editorLastForeIni]&quot;, Category.EDITOR_RELATED);</b>
+&nbsp;    // endregion
+&nbsp;
+&nbsp;    // region - Title-related field markers
+<b class="fc">&nbsp;    public static final CitationKeyPattern SHORTTITLE = new CitationKeyPattern(&quot;[shorttitle]&quot;, Category.TITLE_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern SHORTTITLE_INI = new CitationKeyPattern(&quot;[shorttitleINI]&quot;, Category.TITLE_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern VERYSHORTTITLE = new CitationKeyPattern(&quot;[veryshorttitle]&quot;, Category.TITLE_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern CAMEL = new CitationKeyPattern(&quot;[camel]&quot;, Category.TITLE_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern CAMEL_N = new CitationKeyPattern(&quot;[camelN]&quot;, Category.TITLE_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern TITLE = new CitationKeyPattern(&quot;[title]&quot;, Category.TITLE_RELATED);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern FULLTITLE = new CitationKeyPattern(&quot;[fulltitle]&quot;, Category.TITLE_RELATED);</b>
+&nbsp;    // endregion
+&nbsp;
+&nbsp;    // region - Other field markers
+<b class="fc">&nbsp;    public static final CitationKeyPattern ENTRYTYPE = new CitationKeyPattern(&quot;[entrytype]&quot;, Category.OTHER_FIELDS);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern FIRSTPAGE = new CitationKeyPattern(&quot;[firstpage]&quot;, Category.OTHER_FIELDS);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern PAGEPREFIX = new CitationKeyPattern(&quot;[pageprefix]&quot;, Category.OTHER_FIELDS);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern KEYWORD_N = new CitationKeyPattern(&quot;[keywordN]&quot;, Category.OTHER_FIELDS);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern KEYWORDS_N = new CitationKeyPattern(&quot;[keywordsN]&quot;, Category.OTHER_FIELDS);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern LASTPAGE = new CitationKeyPattern(&quot;[lastpage]&quot;, Category.OTHER_FIELDS);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern SHORTYEAR = new CitationKeyPattern(&quot;[shortyear]&quot;, Category.OTHER_FIELDS);</b>
+&nbsp;    // endregion
+&nbsp;
+&nbsp;    // region - Bibentry fields
+<b class="fc">&nbsp;    public static final CitationKeyPattern AUTHOR = new CitationKeyPattern(&quot;[AUTHOR]&quot;, Category.BIBENTRY_FIELDS);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern DATE = new CitationKeyPattern(&quot;[DATE]&quot;, Category.BIBENTRY_FIELDS);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern DAY = new CitationKeyPattern(&quot;[DAY]&quot;, Category.BIBENTRY_FIELDS);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern GROUPS = new CitationKeyPattern(&quot;[GROUPS]&quot;, Category.BIBENTRY_FIELDS);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern MONTH = new CitationKeyPattern(&quot;[MONTH]&quot;, Category.BIBENTRY_FIELDS);</b>
+<b class="fc">&nbsp;    public static final CitationKeyPattern YEAR = new CitationKeyPattern(&quot;[YEAR]&quot;, Category.BIBENTRY_FIELDS);</b>
+&nbsp;    // endregion
+&nbsp;
+&nbsp;    public CitationKeyPattern(String stringRepresentation) {
+<b class="fc">&nbsp;        this(stringRepresentation, Category.OTHER_FIELDS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;CitationKeyPattern&gt; getAllPatterns() {
+<b class="nc">&nbsp;        return Arrays.stream(CitationKeyPattern.class.getDeclaredFields())</b>
+<b class="nc">&nbsp;                     .filter(field -&gt; {</b>
+<b class="nc">&nbsp;                         int modifiers = field.getModifiers();</b>
+<b class="nc">&nbsp;                         return Modifier.isPublic(modifiers) &amp;&amp;</b>
+<b class="nc">&nbsp;                                 Modifier.isStatic(modifiers) &amp;&amp;</b>
+<b class="nc">&nbsp;                                 Modifier.isFinal(modifiers) &amp;&amp;</b>
+<b class="nc">&nbsp;                                 field.getType() == CitationKeyPattern.class &amp;&amp;</b>
+<b class="nc">&nbsp;                                 !field.equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN);</b>
+&nbsp;                     })
+<b class="nc">&nbsp;                     .map(field -&gt; {</b>
+&nbsp;                         try {
+<b class="nc">&nbsp;                             return (CitationKeyPattern) field.get(null);</b>
+&nbsp;                         } catch (IllegalAccessException e) {
+<b class="nc">&nbsp;                             throw new RuntimeException(&quot;Could not access field&quot;, e);</b>
+&nbsp;                         }
+&nbsp;                     })
+<b class="nc">&nbsp;                     .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Category getCategory() {
+<b class="nc">&nbsp;        return this.category;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

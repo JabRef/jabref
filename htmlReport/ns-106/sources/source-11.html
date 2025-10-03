@@ -1,0 +1,375 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LinkedFile</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry</a>
+</div>
+
+<h1>Coverage Summary for Class: LinkedFile (org.jabref.model.entry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LinkedFile</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/73)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.ObjectInputStream;
+&nbsp;import java.io.ObjectOutputStream;
+&nbsp;import java.io.Serial;
+&nbsp;import java.io.Serializable;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javafx.beans.Observable;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseLogic;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.util.FileType;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NullMarked;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents the link to an external file (e.g. associated PDF file).
+&nbsp; * This class is {@link Serializable} which is needed for drag and drop in gui
+&nbsp; */
+&nbsp;@AllowedToUseLogic(&quot;Uses FileUtil from logic&quot;)
+&nbsp;@NullMarked
+&nbsp;public class LinkedFile implements Serializable {
+&nbsp;
+&nbsp;    private static final String REGEX_URL = &quot;^((?:https?\\:\\/\\/|www\\.)(?:[-a-z0-9]+\\.)*[-a-z0-9]+.*)&quot;;
+<b class="nc">&nbsp;    private static final Pattern URL_PATTERN = Pattern.compile(REGEX_URL);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final LinkedFile NULL_OBJECT = new LinkedFile(&quot;&quot;, Path.of(&quot;&quot;), &quot;&quot;);</b>
+&nbsp;
+&nbsp;    // We have to mark these properties as transient because they can&#39;t be serialized directly
+<b class="nc">&nbsp;    private transient StringProperty description = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private transient StringProperty link = new SimpleStringProperty();</b>
+&nbsp;    // This field is a {@link StringProperty}, and not an {@link ObjectProperty&lt;FileType&gt;}, as {@link LinkedFile} might
+&nbsp;    // be a URI, where a file type might not be present.
+<b class="nc">&nbsp;    private transient StringProperty fileType = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private transient StringProperty sourceURL = new SimpleStringProperty();</b>
+&nbsp;
+&nbsp;    public LinkedFile(String description, Path link, String fileType) {
+<b class="nc">&nbsp;        this(Objects.requireNonNull(description), Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LinkedFile(String description, Path link, String fileType, String sourceUrl) {
+<b class="nc">&nbsp;        this(Objects.requireNonNull(description), Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType), Objects.requireNonNull(sourceUrl));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LinkedFile(String description, String link, FileType fileType) {
+<b class="nc">&nbsp;        this(description, link, fileType.getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructor can also be used for non-valid paths. We need to parse them, because the GUI needs to render it.
+&nbsp;     */
+<b class="nc">&nbsp;    public LinkedFile(String description, String link, String fileType, String sourceUrl) {</b>
+<b class="nc">&nbsp;        this.description.setValue(Objects.requireNonNull(description));</b>
+<b class="nc">&nbsp;        setLink(link);</b>
+<b class="nc">&nbsp;        this.fileType.setValue(Objects.requireNonNull(fileType));</b>
+<b class="nc">&nbsp;        this.sourceURL.setValue(sourceUrl);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LinkedFile(String description, String link, String fileType) {
+<b class="nc">&nbsp;        this(description, link, fileType, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LinkedFile(URL link, String fileType) {
+<b class="nc">&nbsp;        this(&quot;&quot;, Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LinkedFile(String description, URL link, String fileType) {
+<b class="nc">&nbsp;        this(description, Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public LinkedFile(String description, URL link, String fileType, String sourceUrl) {
+<b class="nc">&nbsp;        this(description, Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType), Objects.requireNonNull(sourceUrl));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructs a new LinkedFile with an empty file type and an empty description
+&nbsp;     */
+&nbsp;    public LinkedFile(Path link) {
+<b class="nc">&nbsp;        this(&quot;&quot;, Objects.requireNonNull(link), &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty descriptionProperty() {
+<b class="nc">&nbsp;        return description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty linkProperty() {
+<b class="nc">&nbsp;        return link;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty fileTypeProperty() {
+<b class="nc">&nbsp;        return fileType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty sourceUrlProperty() {
+<b class="nc">&nbsp;        return sourceURL;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFileType() {
+<b class="nc">&nbsp;        return fileType.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFileType(String fileType) {
+<b class="nc">&nbsp;        this.fileType.setValue(fileType);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFileType(FileType fileType) {
+<b class="nc">&nbsp;        this.setFileType(fileType.getName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return description.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDescription(String description) {
+<b class="nc">&nbsp;        this.description.setValue(description);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLink() {
+<b class="nc">&nbsp;        return link.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLink(String link) {
+<b class="nc">&nbsp;        if (!isOnlineLink(link)) {</b>
+<b class="nc">&nbsp;            this.link.setValue(link.replace(&quot;\\&quot;, &quot;/&quot;));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.link.setValue(link);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSourceUrl() {
+<b class="nc">&nbsp;        return sourceURL.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSourceURL(String url) {
+<b class="nc">&nbsp;        this.sourceURL.setValue(url);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Observable[] getObservables() {
+<b class="nc">&nbsp;        return new Observable[] {this.link, this.description, this.fileType, this.sourceURL};</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(@Nullable Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (o instanceof LinkedFile that) {</b>
+<b class="nc">&nbsp;            return Objects.equals(description.get(), that.description.get())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(link.get(), that.link.get())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(fileType.get(), that.fileType.get())</b>
+<b class="nc">&nbsp;                    &amp;&amp; Objects.equals(sourceURL.get(), that.sourceURL.get());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Writes serialized object to ObjectOutputStream, automatically called
+&nbsp;     */
+&nbsp;    @Serial
+&nbsp;    private void writeObject(ObjectOutputStream out) throws IOException {
+<b class="nc">&nbsp;        out.writeUTF(getFileType());</b>
+<b class="nc">&nbsp;        out.writeUTF(getLink());</b>
+<b class="nc">&nbsp;        out.writeUTF(getDescription());</b>
+<b class="nc">&nbsp;        out.writeUTF(getSourceUrl());</b>
+<b class="nc">&nbsp;        out.flush();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads serialized object from {@link ObjectInputStream}, automatically called
+&nbsp;     */
+&nbsp;    @Serial
+&nbsp;    private void readObject(ObjectInputStream in) throws IOException {
+<b class="nc">&nbsp;        fileType = new SimpleStringProperty(in.readUTF());</b>
+<b class="nc">&nbsp;        link = new SimpleStringProperty(in.readUTF());</b>
+<b class="nc">&nbsp;        description = new SimpleStringProperty(in.readUTF());</b>
+<b class="nc">&nbsp;        sourceURL = new SimpleStringProperty(in.readUTF());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the given String is an online link
+&nbsp;     *
+&nbsp;     * @param toCheck The String to check
+&nbsp;     * @return &lt;code&gt;true&lt;/code&gt;, if it starts with &quot;http://&quot;, &quot;https://&quot; or contains &quot;www.&quot;; &lt;code&gt;false&lt;/code&gt; otherwise
+&nbsp;     */
+&nbsp;    public static boolean isOnlineLink(String toCheck) {
+<b class="nc">&nbsp;        String normalizedFilePath = toCheck.trim().toLowerCase();</b>
+<b class="nc">&nbsp;        return URL_PATTERN.matcher(normalizedFilePath).matches();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(description.get(), link.get(), fileType.get(), sourceURL.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;ParsedFileField{&quot; +</b>
+<b class="nc">&nbsp;                &quot;description=&#39;&quot; + description.get() + &#39;\&#39;&#39; +</b>
+<b class="nc">&nbsp;                &quot;, link=&#39;&quot; + link.get() + &#39;\&#39;&#39; +</b>
+<b class="nc">&nbsp;                &quot;, fileType=&#39;&quot; + fileType.get() + &#39;\&#39;&#39; +</b>
+<b class="nc">&nbsp;                (StringUtil.isNullOrEmpty(sourceURL.get()) ? &quot;&quot; : (&quot;, sourceUrl=&#39;&quot; + sourceURL.get() + &#39;\&#39;&#39;)) +</b>
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isEmpty() {
+<b class="nc">&nbsp;        return NULL_OBJECT.equals(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isOnlineLink() {
+<b class="nc">&nbsp;        return isOnlineLink(link.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Path&gt; findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+<b class="nc">&nbsp;        List&lt;Path&gt; dirs = databaseContext.getFileDirectories(filePreferences);</b>
+<b class="nc">&nbsp;        return findIn(dirs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Tries to locate the file.
+&nbsp;    /// In case the path is absolute, the path is checked.
+&nbsp;    /// In case the path is relative, the given directories are used as base directories.
+&nbsp;    ///
+&nbsp;    /// @return absolute path if found.
+&nbsp;    public Optional&lt;Path&gt; findIn(List&lt;Path&gt; directories) {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (link.get().isEmpty()) {</b>
+&nbsp;                // We do not want to match empty paths (which could be any file or none ?!)
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Path file = Path.of(link.get());</b>
+<b class="nc">&nbsp;            if (file.isAbsolute() || directories.isEmpty()) {</b>
+<b class="nc">&nbsp;                if (Files.exists(file)) {</b>
+<b class="nc">&nbsp;                    return Optional.of(file);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    return Optional.empty();</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                return FileUtil.find(link.get(), directories);</b>
+&nbsp;            }
+&nbsp;        } catch (InvalidPathException ex) {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,239 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibEntryTypeBuilder</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry</a>
+</div>
+
+<h1>Coverage Summary for Class: BibEntryTypeBuilder (org.jabref.model.entry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibEntryTypeBuilder</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.2%
+  </span>
+  <span class="absValue">
+    (15/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.7%
+  </span>
+  <span class="absValue">
+    (41/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.SequencedCollection;
+&nbsp;import java.util.SequencedSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.model.entry.field.BibField;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldPriority;
+&nbsp;import org.jabref.model.entry.field.OrFields;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;import com.google.common.collect.Streams;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="fc">&nbsp;public class BibEntryTypeBuilder {</b>
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BibEntryTypeBuilder.class);</b>
+<b class="fc">&nbsp;    private final SequencedSet&lt;OrFields&gt; requiredFields = new LinkedHashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final Set&lt;Field&gt; seenFields = new HashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;    private SequencedSet&lt;BibField&gt; optionalFields = new LinkedHashSet&lt;&gt;();</b>
+<b class="fc">&nbsp;    private EntryType type = StandardEntryType.Misc;</b>
+<b class="fc">&nbsp;    private boolean hasWarnings = false;</b>
+&nbsp;
+&nbsp;    public BibEntryTypeBuilder withType(EntryType type) {
+<b class="fc">&nbsp;        this.type = type;</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntryTypeBuilder withImportantFields(SequencedSet&lt;Field&gt; newFields) {
+<b class="fc">&nbsp;        List&lt;Field&gt; containedFields = containedInSeenFields(newFields);</b>
+<b class="pc">&nbsp;        if (!containedFields.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Fields {} already added to type {}.&quot;, containedFields, type.getDisplayName());</b>
+<b class="nc">&nbsp;            hasWarnings = true;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.seenFields.addAll(newFields);</b>
+<b class="fc">&nbsp;        this.optionalFields = Streams.concat(optionalFields.stream(), newFields.stream().map(field -&gt; new BibField(field, FieldPriority.IMPORTANT)))</b>
+<b class="fc">&nbsp;                                     .collect(Collectors.toCollection(LinkedHashSet::new));</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntryTypeBuilder withImportantFields(Field... newFields) {
+<b class="fc">&nbsp;        return withImportantFields(Arrays.stream(newFields).collect(Collectors.toCollection(LinkedHashSet::new)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntryTypeBuilder withDetailFields(SequencedCollection&lt;Field&gt; newFields) {
+<b class="fc">&nbsp;        List&lt;Field&gt; containedFields = containedInSeenFields(newFields);</b>
+<b class="pc">&nbsp;        if (!containedFields.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Fields {} already added to type {}.&quot;, containedFields, type.getDisplayName());</b>
+<b class="nc">&nbsp;            hasWarnings = true;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.seenFields.addAll(newFields);</b>
+<b class="fc">&nbsp;        this.optionalFields = Streams.concat(optionalFields.stream(), newFields.stream().map(field -&gt; new BibField(field, FieldPriority.DETAIL)))</b>
+<b class="fc">&nbsp;                                     .collect(Collectors.toCollection(LinkedHashSet::new));</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntryTypeBuilder withDetailFields(Field... fields) {
+<b class="fc">&nbsp;        return withDetailFields(Arrays.asList(fields));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntryTypeBuilder withRequiredFields(SequencedSet&lt;OrFields&gt; requiredFields) {
+<b class="fc">&nbsp;        return addRequiredFields(requiredFields);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntryTypeBuilder addRequiredFields(SequencedSet&lt;OrFields&gt; requiredFields) {
+<b class="fc">&nbsp;        Set&lt;Field&gt; fieldsToAdd = requiredFields.stream().map(OrFields::getFields).flatMap(Set::stream).collect(Collectors.toSet());</b>
+<b class="fc">&nbsp;        List&lt;Field&gt; containedFields = containedInSeenFields(fieldsToAdd);</b>
+<b class="pc">&nbsp;        if (!containedFields.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Fields {} already added to type {}.&quot;, containedFields, type.getDisplayName());</b>
+<b class="nc">&nbsp;            hasWarnings = true;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        this.seenFields.addAll(fieldsToAdd);</b>
+<b class="fc">&nbsp;        this.requiredFields.addAll(requiredFields);</b>
+<b class="fc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntryTypeBuilder addRequiredFields(OrFields... requiredFields) {
+<b class="fc">&nbsp;        return addRequiredFields(new LinkedHashSet&lt;&gt;(List.of(requiredFields)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntryTypeBuilder addRequiredFields(Field... requiredFields) {
+<b class="fc">&nbsp;        return addRequiredFields(Arrays.stream(requiredFields).map(OrFields::new).collect(Collectors.toCollection(LinkedHashSet::new)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntryTypeBuilder withRequiredFields(Field... requiredFields) {
+<b class="fc">&nbsp;        return addRequiredFields(requiredFields);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntryTypeBuilder withRequiredFields(OrFields first, Field... requiredFields) {
+<b class="fc">&nbsp;        return addRequiredFields(Stream.concat(Stream.of(first), Arrays.stream(requiredFields).map(OrFields::new)).collect(Collectors.toCollection(LinkedHashSet::new)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntryTypeBuilder withRequiredFields(SequencedSet&lt;OrFields&gt; first, Field... requiredFields) {
+<b class="nc">&nbsp;        return addRequiredFields(Stream.concat(first.stream(), Arrays.stream(requiredFields).map(OrFields::new)).collect(Collectors.toCollection(LinkedHashSet::new)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntryType build() {
+&nbsp;        // Treat required fields as important ones
+<b class="fc">&nbsp;        Stream&lt;BibField&gt; requiredAsImportant = requiredFields.stream()</b>
+<b class="fc">&nbsp;                                                             .map(OrFields::getFields)</b>
+<b class="fc">&nbsp;                                                             .flatMap(Set::stream)</b>
+<b class="fc">&nbsp;                                                             .map(field -&gt; new BibField(field, FieldPriority.IMPORTANT));</b>
+<b class="fc">&nbsp;        SequencedSet&lt;BibField&gt; allFields = Stream.concat(optionalFields.stream(), requiredAsImportant).collect(Collectors.toCollection(LinkedHashSet::new));</b>
+<b class="fc">&nbsp;        return new BibEntryType(type, allFields, requiredFields);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasWarnings() {
+<b class="nc">&nbsp;        return hasWarnings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Field&gt; containedInSeenFields(Collection&lt;Field&gt; fields) {
+<b class="fc">&nbsp;        return fields.stream().filter(seenFields::contains).toList();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

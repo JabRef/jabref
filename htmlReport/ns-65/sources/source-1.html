@@ -1,0 +1,181 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EntryEditorTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.entryeditor</a>
+</div>
+
+<h1>Coverage Summary for Class: EntryEditorTab (org.jabref.gui.preferences.entryeditor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EntryEditorTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.entryeditor;
+&nbsp;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.TextArea;
+&nbsp;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.help.HelpAction;
+&nbsp;import org.jabref.gui.preferences.AbstractPreferenceTabView;
+&nbsp;import org.jabref.gui.preferences.PreferencesTab;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;
+&nbsp;public class EntryEditorTab extends AbstractPreferenceTabView&lt;EntryEditorTabViewModel&gt; implements PreferencesTab {
+&nbsp;
+&nbsp;    @FXML private CheckBox openOnNewEntry;
+&nbsp;    @FXML private CheckBox defaultSource;
+&nbsp;    @FXML private CheckBox enableRelatedArticlesTab;
+&nbsp;    @FXML private CheckBox enableAiSummaryTab;
+&nbsp;    @FXML private CheckBox enableAiChatTab;
+&nbsp;    @FXML private CheckBox acceptRecommendations;
+&nbsp;    @FXML private CheckBox enableLatexCitationsTab;
+&nbsp;    @FXML private CheckBox smartFileAnnotationsTab;
+&nbsp;    @FXML private CheckBox enableValidation;
+&nbsp;    @FXML private CheckBox allowIntegerEdition;
+&nbsp;    @FXML private CheckBox journalPopupEnabled;
+&nbsp;    @FXML private CheckBox autoLinkFilesEnabled;
+&nbsp;    @FXML private CheckBox enableSciteTab;
+&nbsp;    @FXML private CheckBox showUserCommentsField;
+&nbsp;
+&nbsp;    @FXML private Button generalFieldsHelp;
+&nbsp;    @FXML private TextArea fieldsTextArea;
+&nbsp;
+<b class="nc">&nbsp;    public EntryEditorTab() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Entry editor&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new EntryEditorTabViewModel(dialogService, preferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());</b>
+<b class="nc">&nbsp;        defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());</b>
+<b class="nc">&nbsp;        enableRelatedArticlesTab.selectedProperty().bindBidirectional(viewModel.enableRelatedArticlesTabProperty());</b>
+<b class="nc">&nbsp;        enableAiSummaryTab.selectedProperty().bindBidirectional(viewModel.enableAiSummaryTabProperty());</b>
+<b class="nc">&nbsp;        enableAiChatTab.selectedProperty().bindBidirectional(viewModel.enableAiChatTabProperty());</b>
+<b class="nc">&nbsp;        acceptRecommendations.selectedProperty().bindBidirectional(viewModel.acceptRecommendationsProperty());</b>
+<b class="nc">&nbsp;        enableLatexCitationsTab.selectedProperty().bindBidirectional(viewModel.enableLatexCitationsTabProperty());</b>
+<b class="nc">&nbsp;        smartFileAnnotationsTab.selectedProperty().bindBidirectional(viewModel.smartFileAnnotationsTabProperty());</b>
+<b class="nc">&nbsp;        enableValidation.selectedProperty().bindBidirectional(viewModel.enableValidationProperty());</b>
+<b class="nc">&nbsp;        allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());</b>
+<b class="nc">&nbsp;        journalPopupEnabled.selectedProperty().bindBidirectional(viewModel.journalPopupProperty());</b>
+<b class="nc">&nbsp;        autoLinkFilesEnabled.selectedProperty().bindBidirectional(viewModel.autoLinkFilesEnabledProperty());</b>
+<b class="nc">&nbsp;        enableSciteTab.selectedProperty().bindBidirectional(viewModel.enableSciteTabProperty());</b>
+<b class="nc">&nbsp;        showUserCommentsField.selectedProperty().bindBidirectional(viewModel.showUserCommentsProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        ActionFactory actionFactory = new ActionFactory();</b>
+<b class="nc">&nbsp;        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS, dialogService, preferences.getExternalApplicationsPreferences()), generalFieldsHelp);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void resetToDefaults() {
+<b class="nc">&nbsp;        viewModel.resetToDefaults();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,231 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > XmpPrivacyTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.xmp</a>
+</div>
+
+<h1>Coverage Summary for Class: XmpPrivacyTabViewModel (org.jabref.gui.preferences.xmp)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XmpPrivacyTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.xmp;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.preferences.PreferenceTabViewModel;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.xmp.XmpPreferences;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;
+&nbsp;public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty xmpFilterEnabledProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;Field&gt; xmpFilterListProperty = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;Field&gt; availableFieldsProperty = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Field&gt; addFieldProperty = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final XmpPreferences xmpPreferences;
+&nbsp;
+&nbsp;    private final Validator xmpFilterListValidator;
+&nbsp;
+<b class="nc">&nbsp;    XmpPrivacyTabViewModel(DialogService dialogService, XmpPreferences xmpPreferences) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.xmpPreferences = xmpPreferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        xmpFilterListValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                xmpFilterListProperty,
+<b class="nc">&nbsp;                input -&gt; !input.isEmpty(),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(&quot;%s &gt; %s %n %n %s&quot;.formatted(</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;XMP metadata&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Filter List&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;List must not be empty.&quot;))));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        xmpFilterEnabledProperty.setValue(xmpPreferences.shouldUseXmpPrivacyFilter());</b>
+&nbsp;
+<b class="nc">&nbsp;        xmpFilterListProperty.clear();</b>
+<b class="nc">&nbsp;        xmpFilterListProperty.addAll(xmpPreferences.getXmpPrivacyFilter());</b>
+&nbsp;
+<b class="nc">&nbsp;        availableFieldsProperty.clear();</b>
+<b class="nc">&nbsp;        availableFieldsProperty.addAll(FieldFactory.getCommonFields());</b>
+<b class="nc">&nbsp;        availableFieldsProperty.sort(Comparator.comparing(FieldTextMapper::getDisplayName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        xmpPreferences.setUseXmpPrivacyFilter(xmpFilterEnabledProperty.getValue());</b>
+<b class="nc">&nbsp;        xmpPreferences.getXmpPrivacyFilter().clear();</b>
+<b class="nc">&nbsp;        xmpPreferences.getXmpPrivacyFilter().addAll(xmpFilterListProperty.getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addField() {
+<b class="nc">&nbsp;        if (addFieldProperty.getValue() == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (xmpFilterListProperty.getValue().stream().filter(item -&gt; item.equals(addFieldProperty.getValue())).findAny().isEmpty()) {</b>
+<b class="nc">&nbsp;            xmpFilterListProperty.add(addFieldProperty.getValue());</b>
+<b class="nc">&nbsp;            addFieldProperty.setValue(null);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeFilter(Field filter) {
+<b class="nc">&nbsp;        xmpFilterListProperty.remove(filter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus xmpFilterListValidationStatus() {
+<b class="nc">&nbsp;        return xmpFilterListValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean validateSettings() {
+<b class="nc">&nbsp;        ValidationStatus validationStatus = xmpFilterListValidationStatus();</b>
+<b class="nc">&nbsp;        if (xmpFilterEnabledProperty.getValue() &amp;&amp; !validationStatus.isValid()) {</b>
+<b class="nc">&nbsp;            validationStatus.getHighestMessage().ifPresent(message -&gt;</b>
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(message.getMessage()));</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty xmpFilterEnabledProperty() {
+<b class="nc">&nbsp;        return xmpFilterEnabledProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;Field&gt; filterListProperty() {
+<b class="nc">&nbsp;        return xmpFilterListProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;Field&gt; availableFieldsProperty() {
+<b class="nc">&nbsp;        return availableFieldsProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Field&gt; addFieldNameProperty() {
+<b class="nc">&nbsp;        return addFieldProperty;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

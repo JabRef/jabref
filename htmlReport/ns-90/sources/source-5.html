@@ -1,0 +1,276 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PushApplicationDialogViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.welcome.quicksettings.viewmodel</a>
+</div>
+
+<h1>Coverage Summary for Class: PushApplicationDialogViewModel (org.jabref.gui.welcome.quicksettings.viewmodel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PushApplicationDialogViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/66)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.welcome.quicksettings.viewmodel;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableSet;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.push.GuiPushToApplication;
+&nbsp;import org.jabref.gui.push.GuiPushToApplications;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.logic.push.PushToApplication;
+&nbsp;import org.jabref.logic.push.PushToApplicationDetector;
+&nbsp;import org.jabref.logic.push.PushToApplicationPreferences;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class PushApplicationDialogViewModel extends AbstractViewModel {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PushApplicationDialogViewModel.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;GuiPushToApplication&gt; applicationsProperty =</b>
+<b class="nc">&nbsp;            new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;GuiPushToApplication&gt; selectedApplicationProperty = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final StringProperty pathProperty = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final ObservableSet&lt;GuiPushToApplication&gt; detectedApplications = FXCollections.observableSet();</b>
+&nbsp;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final PushToApplicationPreferences pushToApplicationPreferences;
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;PushToApplication, String&gt; detectedApplicationPaths = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;    private Future&lt;?&gt; detectionFuture;
+&nbsp;
+<b class="nc">&nbsp;    public PushApplicationDialogViewModel(GuiPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.pushToApplicationPreferences = preferences.getPushToApplicationPreferences();</b>
+&nbsp;
+<b class="nc">&nbsp;        initializeApplications();</b>
+<b class="nc">&nbsp;        detectApplications();</b>
+<b class="nc">&nbsp;        setupPathUpdates();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeApplications() {
+<b class="nc">&nbsp;        List&lt;GuiPushToApplication&gt; allApplications = GuiPushToApplications.getAllGUIApplications(dialogService, pushToApplicationPreferences);</b>
+<b class="nc">&nbsp;        applicationsProperty.setAll(allApplications);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!pushToApplicationPreferences.getActiveApplicationName().isEmpty()) {</b>
+<b class="nc">&nbsp;            allApplications.stream()</b>
+<b class="nc">&nbsp;                           .filter(app -&gt; app.getDisplayName().equals(pushToApplicationPreferences.getActiveApplicationName()))</b>
+<b class="nc">&nbsp;                           .findFirst()</b>
+<b class="nc">&nbsp;                           .ifPresent(selectedApplicationProperty::set);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void detectApplications() {
+<b class="nc">&nbsp;        detectionFuture = BackgroundTask</b>
+<b class="nc">&nbsp;                .wrap(() -&gt; PushToApplicationDetector.detectApplicationPaths(applicationsProperty))</b>
+<b class="nc">&nbsp;                .onSuccess(detectedPaths -&gt; {</b>
+<b class="nc">&nbsp;                    detectedApplicationPaths.putAll(detectedPaths);</b>
+<b class="nc">&nbsp;                    List&lt;GuiPushToApplication&gt; sortedApplications = new ArrayList&lt;&gt;(detectedPaths.keySet());</b>
+<b class="nc">&nbsp;                    applicationsProperty.stream()</b>
+<b class="nc">&nbsp;                                        .filter(app -&gt; !detectedPaths.containsKey(app))</b>
+<b class="nc">&nbsp;                                        .forEach(sortedApplications::add);</b>
+<b class="nc">&nbsp;                    applicationsProperty.setAll(sortedApplications);</b>
+<b class="nc">&nbsp;                    detectedApplications.clear();</b>
+<b class="nc">&nbsp;                    detectedApplications.addAll(detectedPaths.keySet());</b>
+<b class="nc">&nbsp;                    LOGGER.info(&quot;Application detection completed. Found {} applications&quot;, detectedPaths.size());</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .onFailure(throwable -&gt; LOGGER.warn(&quot;Application detection failed&quot;, throwable))</b>
+<b class="nc">&nbsp;                .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupPathUpdates() {
+<b class="nc">&nbsp;        selectedApplicationProperty.addListener((_, _, selectedApp) -&gt; {</b>
+<b class="nc">&nbsp;            if (selectedApp == null) {</b>
+<b class="nc">&nbsp;                pathProperty.set(&quot;&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            String existingPath = pushToApplicationPreferences.getCommandPaths().get(selectedApp.getDisplayName());</b>
+<b class="nc">&nbsp;            pathProperty.set(PushToApplicationDetector.isValidAbsolutePath(existingPath) ?</b>
+<b class="nc">&nbsp;                             existingPath :</b>
+<b class="nc">&nbsp;                             Objects.requireNonNullElse(detectedApplicationPaths.get(selectedApp), &quot;&quot;));</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;GuiPushToApplication&gt; applicationsProperty() {
+<b class="nc">&nbsp;        return applicationsProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty pathProperty() {
+<b class="nc">&nbsp;        return pathProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableSet&lt;GuiPushToApplication&gt; detectedApplications() {
+<b class="nc">&nbsp;        return detectedApplications;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPath(String path) {
+<b class="nc">&nbsp;        pathProperty.set(path);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSelectedApplication(GuiPushToApplication application) {
+<b class="nc">&nbsp;        selectedApplicationProperty.set(application);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void browseForApplication() {
+<b class="nc">&nbsp;        FileDialogConfiguration fileConfig = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        dialogService.showFileOpenDialog(fileConfig)</b>
+<b class="nc">&nbsp;                     .ifPresent(selectedFile -&gt; setPath(selectedFile.toString()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isValidConfiguration() {
+<b class="nc">&nbsp;        if (selectedApplicationProperty.get() == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String pathText = pathProperty.get().trim();</b>
+<b class="nc">&nbsp;        Path path = Path.of(pathText);</b>
+<b class="nc">&nbsp;        return !pathText.isEmpty() &amp;&amp; path.isAbsolute() &amp;&amp; path.toFile().exists();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void saveSettings() {
+<b class="nc">&nbsp;        PushToApplication selectedApp = selectedApplicationProperty.get();</b>
+<b class="nc">&nbsp;        if (selectedApp == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        pushToApplicationPreferences.setActiveApplicationName(selectedApp.getDisplayName());</b>
+<b class="nc">&nbsp;        Map&lt;String, String&gt; commandPaths = new HashMap&lt;&gt;(pushToApplicationPreferences.getCommandPaths());</b>
+<b class="nc">&nbsp;        commandPaths.put(selectedApp.getDisplayName(), pathProperty.get().trim());</b>
+<b class="nc">&nbsp;        pushToApplicationPreferences.setCommandPaths(commandPaths);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void cancelDetection() {
+<b class="nc">&nbsp;        if (detectionFuture != null) {</b>
+<b class="nc">&nbsp;            detectionFuture.cancel(true);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

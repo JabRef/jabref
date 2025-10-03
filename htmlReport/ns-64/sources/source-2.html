@@ -1,0 +1,299 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EntryTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.entry</a>
+</div>
+
+<h1>Coverage Summary for Class: EntryTabViewModel (org.jabref.gui.preferences.entry)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EntryTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/49)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EntryTabViewModel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.entry;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.util.StringConverter;
+&nbsp;
+&nbsp;import org.jabref.gui.preferences.PreferenceTabViewModel;
+&nbsp;import org.jabref.logic.bibtex.FieldPreferences;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.preferences.OwnerPreferences;
+&nbsp;import org.jabref.logic.preferences.TimestampPreferences;
+&nbsp;import org.jabref.model.entry.BibEntryPreferences;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;
+&nbsp;public class EntryTabViewModel implements PreferenceTabViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private final StringProperty keywordSeparatorProperty = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty resolveStringsProperty = new SimpleBooleanProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;Field&gt; resolvableTagsFieldProperty = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;Field&gt; nonWrappableTagsFieldProperty = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty markOwnerProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty markOwnerNameProperty = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final BooleanProperty markOwnerOverwriteProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty addCreationDateProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty addModificationDateProperty = new SimpleBooleanProperty();</b>
+&nbsp;
+&nbsp;    private final FieldPreferences fieldPreferences;
+&nbsp;    private final BibEntryPreferences bibEntryPreferences;
+&nbsp;    private final OwnerPreferences ownerPreferences;
+&nbsp;    private final TimestampPreferences timestampPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public EntryTabViewModel(CliPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.bibEntryPreferences = preferences.getBibEntryPreferences();</b>
+<b class="nc">&nbsp;        this.fieldPreferences = preferences.getFieldPreferences();</b>
+<b class="nc">&nbsp;        this.ownerPreferences = preferences.getOwnerPreferences();</b>
+<b class="nc">&nbsp;        this.timestampPreferences = preferences.getTimestampPreferences();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        keywordSeparatorProperty.setValue(bibEntryPreferences.getKeywordSeparator().toString());</b>
+&nbsp;
+<b class="nc">&nbsp;        resolveStringsProperty.setValue(fieldPreferences.shouldResolveStrings());</b>
+<b class="nc">&nbsp;        resolvableTagsFieldProperty.setValue(FXCollections.observableArrayList(fieldPreferences.getResolvableFields()));</b>
+<b class="nc">&nbsp;        nonWrappableTagsFieldProperty.setValue(FXCollections.observableArrayList(fieldPreferences.getNonWrappableFields()));</b>
+&nbsp;
+<b class="nc">&nbsp;        markOwnerProperty.setValue(ownerPreferences.isUseOwner());</b>
+<b class="nc">&nbsp;        markOwnerNameProperty.setValue(ownerPreferences.getDefaultOwner());</b>
+<b class="nc">&nbsp;        markOwnerOverwriteProperty.setValue(ownerPreferences.isOverwriteOwner());</b>
+&nbsp;
+<b class="nc">&nbsp;        addCreationDateProperty.setValue(timestampPreferences.shouldAddCreationDate());</b>
+<b class="nc">&nbsp;        addModificationDateProperty.setValue(timestampPreferences.shouldAddModificationDate());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        bibEntryPreferences.keywordSeparatorProperty().setValue(keywordSeparatorProperty.getValue().charAt(0));</b>
+&nbsp;
+<b class="nc">&nbsp;        fieldPreferences.setResolveStrings(resolveStringsProperty.getValue());</b>
+<b class="nc">&nbsp;        fieldPreferences.setResolvableFields(resolvableTagsFieldProperty.getValue());</b>
+<b class="nc">&nbsp;        fieldPreferences.setNonWrappableFields(resolvableTagsFieldProperty.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;        ownerPreferences.setUseOwner(markOwnerProperty.getValue());</b>
+<b class="nc">&nbsp;        ownerPreferences.setDefaultOwner(markOwnerNameProperty.getValue());</b>
+<b class="nc">&nbsp;        ownerPreferences.setOverwriteOwner(markOwnerOverwriteProperty.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;        timestampPreferences.setAddCreationDate(addCreationDateProperty.getValue());</b>
+<b class="nc">&nbsp;        timestampPreferences.setAddModificationDate(addModificationDateProperty.getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty keywordSeparatorProperty() {
+<b class="nc">&nbsp;        return keywordSeparatorProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty resolveStringsProperty() {
+<b class="nc">&nbsp;        return resolveStringsProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;Field&gt; resolvableTagsFieldProperty() {
+<b class="nc">&nbsp;        return resolvableTagsFieldProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;Field&gt; nonWrappableTagsFieldProperty() {
+<b class="nc">&nbsp;        return nonWrappableTagsFieldProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Entry owner
+&nbsp;    public BooleanProperty markOwnerProperty() {
+<b class="nc">&nbsp;        return this.markOwnerProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty markOwnerNameProperty() {
+<b class="nc">&nbsp;        return this.markOwnerNameProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty markOwnerOverwriteProperty() {
+<b class="nc">&nbsp;        return this.markOwnerOverwriteProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Time stamp
+&nbsp;
+&nbsp;    public BooleanProperty addCreationDateProperty() {
+<b class="nc">&nbsp;        return addCreationDateProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty addModificationDateProperty() {
+<b class="nc">&nbsp;        return addModificationDateProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringConverter&lt;Field&gt; getFieldStringConverter() {
+<b class="nc">&nbsp;        return new StringConverter&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public String toString(Field field) {
+<b class="nc">&nbsp;                return FieldTextMapper.getDisplayName(field);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public Field fromString(String string) {
+<b class="nc">&nbsp;                return FieldFactory.parseField(string);</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Field&gt; getSuggestions(String request) {
+<b class="nc">&nbsp;        List&lt;Field&gt; suggestions = FieldFactory.getAllFieldsWithOutInternal().stream()</b>
+<b class="nc">&nbsp;                                              .filter(field -&gt; FieldTextMapper.getDisplayName(field).toLowerCase().contains(request.toLowerCase()))</b>
+<b class="nc">&nbsp;                                              .collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        Field requestedField = FieldFactory.parseField(request.trim());</b>
+<b class="nc">&nbsp;        if (!suggestions.contains(requestedField)) {</b>
+<b class="nc">&nbsp;            suggestions.addFirst(requestedField);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return suggestions;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,175 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PageNumbers</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.msbib</a>
+</div>
+
+<h1>Coverage Summary for Class: PageNumbers (org.jabref.logic.msbib)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PageNumbers</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.msbib;
+&nbsp;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.w3c.dom.Element;
+&nbsp;import org.w3c.dom.Node;
+&nbsp;
+&nbsp;public class PageNumbers {
+<b class="nc">&nbsp;    private static final Pattern PAGE_PATTERN = Pattern.compile(&quot;\\s*(\\d+)\\s*-{1,2}\\s*(\\d+)\\s*&quot;);</b>
+&nbsp;    private String freeform;
+&nbsp;    private int start;
+&nbsp;
+&nbsp;    private int end;
+&nbsp;
+<b class="nc">&nbsp;    public PageNumbers(String pages) {</b>
+<b class="nc">&nbsp;        parsePageNums(pages);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parsePageNums(String pages) {
+<b class="nc">&nbsp;        Matcher matcher = PAGE_PATTERN.matcher(pages);</b>
+<b class="nc">&nbsp;        if (matcher.matches()) {</b>
+<b class="nc">&nbsp;            start = Integer.parseInt(matcher.group(1));</b>
+<b class="nc">&nbsp;            end = Integer.parseInt(matcher.group(2));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            freeform = pages;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Element getDOMrepresentation(Document document) {
+<b class="nc">&nbsp;        Element result = document.createElement(&quot;extent&quot;);</b>
+<b class="nc">&nbsp;        result.setAttribute(&quot;unit&quot;, &quot;page&quot;);</b>
+<b class="nc">&nbsp;        if (freeform == null) {</b>
+<b class="nc">&nbsp;            Element tmpStart = document.createElement(&quot;start&quot;);</b>
+<b class="nc">&nbsp;            Element tmpEnd = document.createElement(&quot;end&quot;);</b>
+<b class="nc">&nbsp;            tmpStart.appendChild(document.createTextNode(String.valueOf(this.start)));</b>
+<b class="nc">&nbsp;            tmpEnd.appendChild(document.createTextNode(String.valueOf(this.end)));</b>
+<b class="nc">&nbsp;            result.appendChild(tmpStart);</b>
+<b class="nc">&nbsp;            result.appendChild(tmpEnd);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            Node textNode = document.createTextNode(freeform);</b>
+<b class="nc">&nbsp;            result.appendChild(textNode);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String toString(String separator) {
+<b class="nc">&nbsp;        if (freeform != null) {</b>
+<b class="nc">&nbsp;            return freeform;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return start + separator + end;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return toString(&quot;-&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,771 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util.io</a>
+</div>
+
+<h1>Coverage Summary for Class: FileUtil (org.jabref.logic.util.io)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/104)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/197)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util.io;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.file.FileSystems;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.StandardCopyOption;
+&nbsp;import java.util.ArrayDeque;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Deque;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.citationkeypattern.BracketedPattern;
+&nbsp;import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * The idea of this class is to add general functionality that could possibly even in the
+&nbsp; * &lt;a href=&quot;https://en.wikipedia.org/wiki/Non-blocking_I/O_(Java)&quot;&gt;Java NIO package&lt;/a&gt;,
+&nbsp; * such as getting/adding file extension etc.
+&nbsp; */
+&nbsp;public class FileUtil {
+&nbsp;
+<b class="nc">&nbsp;    public static final boolean IS_POSIX_COMPLIANT = FileSystems.getDefault().supportedFileAttributeViews().contains(&quot;posix&quot;);</b>
+&nbsp;    public static final int MAXIMUM_FILE_NAME_LENGTH = 255;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);</b>
+&nbsp;    private static final String ELLIPSIS = &quot;...&quot;;
+<b class="nc">&nbsp;    private static final int ELLIPSIS_LENGTH = ELLIPSIS.length();</b>
+<b class="nc">&nbsp;    private static final RemoveLatexCommandsFormatter REMOVE_LATEX_COMMANDS_FORMATTER = new RemoveLatexCommandsFormatter();</b>
+&nbsp;    private static final String CYGDRIVE_PREFIX = &quot;/cygdrive/&quot;;
+&nbsp;    private static final String MNT_PREFIX = &quot;/mnt/&quot;;
+<b class="nc">&nbsp;    private static final Pattern ROOT_DRIVE_PATTERN = Pattern.compile(&quot;^/[a-zA-Z]/.*&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
+&nbsp;     */
+&nbsp;    // @formatter:off
+<b class="nc">&nbsp;    private static final int[] ILLEGAL_CHARS = {</b>
+&nbsp;            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+&nbsp;            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+&nbsp;            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+&nbsp;            30, 31, 34,
+&nbsp;            42,
+&nbsp;            58, // &quot;:&quot;
+&nbsp;            60, 62, 63,
+&nbsp;            123, 124, 125
+&nbsp;    };
+&nbsp;    // @formatter:on
+&nbsp;
+&nbsp;    private FileUtil() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the extension of a file name or Optional.empty() if the file does not have one (no &quot;.&quot; in name).
+&nbsp;     *
+&nbsp;     * @return the extension (without leading dot), trimmed and in lowercase.
+&nbsp;     */
+&nbsp;    public static Optional&lt;String&gt; getFileExtension(String fileName) {
+<b class="nc">&nbsp;        int dotPosition = fileName.lastIndexOf(&#39;.&#39;);</b>
+<b class="nc">&nbsp;        if ((dotPosition &gt; 0) &amp;&amp; (dotPosition &lt; (fileName.length() - 1))) {</b>
+<b class="nc">&nbsp;            return Optional.of(fileName.substring(dotPosition + 1).trim().toLowerCase(Locale.ROOT));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
+&nbsp;     *
+&nbsp;     * @return the extension (without leading dot), trimmed and in lowercase.
+&nbsp;     */
+&nbsp;    public static Optional&lt;String&gt; getFileExtension(Path file) {
+<b class="nc">&nbsp;        return getFileExtension(file.getFileName().toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the name part of a file name (i.e., everything in front of last &quot;.&quot;).
+&nbsp;     */
+&nbsp;    public static String getBaseName(String fileNameWithExtension) {
+<b class="nc">&nbsp;        return com.google.common.io.Files.getNameWithoutExtension(fileNameWithExtension);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the name part of a file name (i.e., everything in front of last &quot;.&quot;).
+&nbsp;     */
+&nbsp;    public static String getBaseName(Path fileNameWithExtension) {
+<b class="nc">&nbsp;        return getBaseName(fileNameWithExtension.getFileName().toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a valid filename for most operating systems.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * It uses {@link FileNameCleaner#cleanFileName(String)} to remove illegal characters.} and then truncates the length to 255 chars, see {@link #MAXIMUM_FILE_NAME_LENGTH}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * For &quot;real&quot; cleaning, {@link FileNameCleaner#cleanFileName(String)} should be used.
+&nbsp;     */
+&nbsp;    public static String getValidFileName(String fileName) {
+<b class="nc">&nbsp;        String nameWithoutExtension = getBaseName(fileName);</b>
+&nbsp;
+<b class="nc">&nbsp;        nameWithoutExtension = FileNameCleaner.cleanFileName(nameWithoutExtension);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (nameWithoutExtension.length() &gt; MAXIMUM_FILE_NAME_LENGTH) {</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; extension = getFileExtension(fileName);</b>
+<b class="nc">&nbsp;            String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH - extension.map(s -&gt; s.length() + 1).orElse(0));</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;Truncated the too long filename &#39;{}&#39; ({}} characters) to &#39;{}&#39;.&quot;, fileName, fileName.length(), shortName);</b>
+<b class="nc">&nbsp;            return extension.map(s -&gt; shortName + &quot;.&quot; + s).orElse(shortName);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return fileName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds an extension to the given file name. The original extension is not replaced. That means, &quot;demo.bib&quot;, &quot;.sav&quot;
+&nbsp;     * gets &quot;demo.bib.sav&quot; and not &quot;demo.sav&quot;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;em&gt;Warning: If &quot;ext&quot; is passed, this is literally added. Thus {@code addExtension(&quot;tmp.txt&quot;, &quot;ext&quot;)} leads to &quot;tmp.txtext&quot;.&lt;/em&gt;
+&nbsp;     *
+&nbsp;     * @param path      the path to add the extension to
+&nbsp;     * @param extension the extension to add
+&nbsp;     * @return the modified file name
+&nbsp;     */
+&nbsp;    public static Path addExtension(Path path, String extension) {
+<b class="nc">&nbsp;        return path.resolveSibling(path.getFileName() + extension);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Looks for the shortest unique path of the parent directory in the list of paths
+&nbsp;    ///
+&nbsp;    /// @param paths       List of paths as Strings
+&nbsp;    /// @param comparePath The to be tested path
+&nbsp;    /// @return Optional.empty() if the paths are disjoint
+&nbsp;    public static Optional&lt;String&gt; getUniquePathDirectory(List&lt;String&gt; paths, Path comparePath) {
+&nbsp;        // Difference to getUniquePathFragment: We want the parent directory, so we cut off the last path fragment
+<b class="nc">&nbsp;        return getUniquePathFragment(paths, comparePath)</b>
+<b class="nc">&nbsp;                .filter(part -&gt; part.contains(File.separator))</b>
+<b class="nc">&nbsp;                .map(part -&gt; part.substring(0, part.lastIndexOf(File.separator)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Looks for the shortest unique path in the list of paths
+&nbsp;    ///
+&nbsp;    /// @param paths       List of paths as Strings
+&nbsp;    /// @param comparePath The to be shortened path
+&nbsp;    /// @return Shortest unique path fragment (if exists) - Optional.empty() if the paths are disjoint
+&nbsp;    public static Optional&lt;String&gt; getUniquePathFragment(List&lt;String&gt; paths, Path comparePath) {
+<b class="nc">&nbsp;        return uniquePathSubstrings(paths).stream()</b>
+<b class="nc">&nbsp;                                          .filter(part -&gt; comparePath.toString().contains(part))</b>
+<b class="nc">&nbsp;                                          .max(Comparator.comparingInt(String::length));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates the minimal unique path substring for each file among multiple file paths.
+&nbsp;     *
+&nbsp;     * @param paths the file paths
+&nbsp;     * @return the minimal unique path substring for each file path
+&nbsp;     */
+&nbsp;    public static List&lt;String&gt; uniquePathSubstrings(List&lt;String&gt; paths) {
+<b class="nc">&nbsp;        List&lt;Deque&lt;String&gt;&gt; stackList = new ArrayList&lt;&gt;(paths.size());</b>
+&nbsp;        // prepare data structures
+<b class="nc">&nbsp;        for (String path : paths) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; directories = Arrays.asList(path.split(Pattern.quote(File.separator)));</b>
+<b class="nc">&nbsp;            Deque&lt;String&gt; stack = new ArrayDeque&lt;&gt;(directories.reversed());</b>
+<b class="nc">&nbsp;            stackList.add(stack);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; pathSubstrings = new ArrayList&lt;&gt;(Collections.nCopies(paths.size(), &quot;&quot;));</b>
+&nbsp;
+&nbsp;        // compute the shortest folder substrings
+<b class="nc">&nbsp;        while (!stackList.stream().allMatch(Deque::isEmpty)) {</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; stackList.size(); i++) {</b>
+<b class="nc">&nbsp;                String tempPathString = pathSubstrings.get(i);</b>
+&nbsp;
+<b class="nc">&nbsp;                Deque&lt;String&gt; stack = stackList.get(i);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (tempPathString.isEmpty() &amp;&amp; !stack.isEmpty()) {</b>
+<b class="nc">&nbsp;                    String stringFromDeque = stack.pop();</b>
+<b class="nc">&nbsp;                    pathSubstrings.set(i, stringFromDeque);</b>
+<b class="nc">&nbsp;                } else if (!stack.isEmpty()) {</b>
+<b class="nc">&nbsp;                    String stringFromStack = stack.pop();</b>
+<b class="nc">&nbsp;                    pathSubstrings.set(i, stringFromStack + File.separator + tempPathString);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            for (int i = 0; i &lt; stackList.size(); i++) {</b>
+<b class="nc">&nbsp;                String tempString = pathSubstrings.get(i);</b>
+<b class="nc">&nbsp;                if (Collections.frequency(pathSubstrings, tempString) == 1) {</b>
+<b class="nc">&nbsp;                    stackList.get(i).clear();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return pathSubstrings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Copies a file.
+&nbsp;     *
+&nbsp;     * @param pathToSourceFile      Path Source file
+&nbsp;     * @param pathToDestinationFile Path Destination file
+&nbsp;     * @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
+&nbsp;     * @return boolean Whether the copy succeeded or was stopped due to the file already existing.
+&nbsp;     */
+&nbsp;    public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
+&nbsp;        // Check if the file already exists.
+<b class="nc">&nbsp;        if (!Files.exists(pathToSourceFile)) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Path to the source file doesn&#39;t exist.&quot;);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (Files.exists(pathToDestinationFile) &amp;&amp; !replaceExisting) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Path to the destination file exists but the file shouldn&#39;t be replaced.&quot;);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;        try {
+&nbsp;            // This should also preserve Hard Links
+<b class="nc">&nbsp;            Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Copying Files failed.&quot;, e);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts an absolute file to a relative one, if possible. Returns the parameter file itself if no shortening is
+&nbsp;     * possible.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method works correctly only if directories are sorted decent in their length i.e.
+&nbsp;     * /home/user/literature/important before /home/user/literature.
+&nbsp;     *
+&nbsp;     * @param file        the file to be shortened
+&nbsp;     * @param directories directories to check
+&nbsp;     */
+&nbsp;    public static Path relativize(Path file, List&lt;Path&gt; directories) {
+<b class="nc">&nbsp;        if (!file.isAbsolute()) {</b>
+<b class="nc">&nbsp;            return file;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Optional&lt;Path&gt; realFileOpt = toRealPath(file);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Path directory : directories) {</b>
+<b class="nc">&nbsp;            if (file.startsWith(directory)) {</b>
+<b class="nc">&nbsp;                return directory.relativize(file);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (realFileOpt.isPresent()) {</b>
+<b class="nc">&nbsp;                Optional&lt;Path&gt; realDirOpt = toRealPath(directory);</b>
+<b class="nc">&nbsp;                if (realDirOpt.isPresent()) {</b>
+<b class="nc">&nbsp;                    Path realFile = realFileOpt.get();</b>
+<b class="nc">&nbsp;                    Path realDir = realDirOpt.get();</b>
+<b class="nc">&nbsp;                    if (realFile.startsWith(realDir)) {</b>
+<b class="nc">&nbsp;                        return realDir.relativize(realFile);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return file;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Optional&lt;Path&gt; toRealPath(Path path) {
+<b class="nc">&nbsp;        if (Files.exists(path)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return Optional.of(path.toRealPath());</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Could not resolve real path for {}&quot;, path, e);</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.of(path.toAbsolutePath());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts an absolute file to a relative one, if possible. Returns the parameter file itself if no shortening is
+&nbsp;     * possible.
+&nbsp;     *
+&nbsp;     * @param path the file path to be shortened
+&nbsp;     */
+&nbsp;    public static Path relativize(Path path, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+<b class="nc">&nbsp;        List&lt;Path&gt; fileDirectories = databaseContext.getFileDirectories(filePreferences);</b>
+<b class="nc">&nbsp;        return relativize(path, fileDirectories);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Relativizes all BibEntries given to (!) the given database context
+&nbsp;     * &lt;p&gt;
+&nbsp;     * ⚠ Modifies the entries in the list ⚠
+&nbsp;     */
+&nbsp;    public static List&lt;BibEntry&gt; relativize(List&lt;BibEntry&gt; entries, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+<b class="nc">&nbsp;        List&lt;Path&gt; fileDirectories = databaseContext.getFileDirectories(filePreferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        return entries.stream()</b>
+<b class="nc">&nbsp;                      .peek(entry -&gt; {</b>
+<b class="nc">&nbsp;                          if (entry.hasField(StandardField.FILE)) {</b>
+<b class="nc">&nbsp;                              List&lt;LinkedFile&gt; updatedLinkedFiles = entry.getFiles().stream().map(linkedFile -&gt; {</b>
+<b class="nc">&nbsp;                                  if (!linkedFile.isOnlineLink()) {</b>
+<b class="nc">&nbsp;                                      String newPath = FileUtil.relativize(Path.of(linkedFile.getLink()), fileDirectories).toString();</b>
+<b class="nc">&nbsp;                                      linkedFile.setLink(newPath);</b>
+&nbsp;                                  }
+<b class="nc">&nbsp;                                  return linkedFile;</b>
+<b class="nc">&nbsp;                              }).toList();</b>
+<b class="nc">&nbsp;                              entry.setFiles(updatedLinkedFiles);</b>
+&nbsp;                          }
+<b class="nc">&nbsp;                      }).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of linked files. The files have the absolute filename
+&nbsp;     *
+&nbsp;     * @param bes      list of BibTeX entries
+&nbsp;     * @param fileDirs list of directories to try for expansion
+&nbsp;     * @return list of files. May be empty
+&nbsp;     */
+&nbsp;    public static List&lt;Path&gt; getListOfLinkedFiles(List&lt;BibEntry&gt; bes, List&lt;Path&gt; fileDirs) {
+<b class="nc">&nbsp;        Objects.requireNonNull(bes);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(fileDirs);</b>
+&nbsp;
+<b class="nc">&nbsp;        return bes.stream()</b>
+<b class="nc">&nbsp;                  .flatMap(entry -&gt; entry.getFiles().stream())</b>
+<b class="nc">&nbsp;                  .flatMap(file -&gt; file.findIn(fileDirs).stream())</b>
+<b class="nc">&nbsp;                  .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines filename provided by an entry in a database
+&nbsp;     *
+&nbsp;     * @param database        the database, where the entry is located
+&nbsp;     * @param entry           the entry to which the file should be linked to
+&nbsp;     * @param fileNamePattern the filename pattern
+&nbsp;     * @return a suggested fileName
+&nbsp;     */
+&nbsp;    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
+<b class="nc">&nbsp;        String targetName = BracketedPattern.expandBrackets(fileNamePattern, &#39;;&#39;, entry, database);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (targetName.isEmpty()) {</b>
+<b class="nc">&nbsp;            targetName = entry.getCitationKey().orElse(&quot;default&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Remove LaTeX commands (e.g., \mkbibquote{}) from expanded fields before cleaning filename
+&nbsp;        // See: https://github.com/JabRef/jabref/issues/12188
+<b class="nc">&nbsp;        targetName = REMOVE_LATEX_COMMANDS_FORMATTER.format(targetName);</b>
+&nbsp;        // Removes illegal characters from filename
+<b class="nc">&nbsp;        targetName = FileNameCleaner.cleanFileName(targetName);</b>
+&nbsp;
+<b class="nc">&nbsp;        return targetName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines directory name provided by an entry in a database
+&nbsp;     *
+&nbsp;     * @param database             the database, where the entry is located
+&nbsp;     * @param entry                the entry to which the directory should be linked to
+&nbsp;     * @param directoryNamePattern the dirname pattern
+&nbsp;     * @return a suggested dirName
+&nbsp;     */
+&nbsp;    public static String createDirNameFromPattern(BibDatabase database, BibEntry entry, String directoryNamePattern) {
+<b class="nc">&nbsp;        String targetName = BracketedPattern.expandBrackets(directoryNamePattern, &#39;;&#39;, entry, database);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (targetName.isEmpty()) {</b>
+<b class="nc">&nbsp;            return targetName;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Removes illegal characters from directory name
+<b class="nc">&nbsp;        targetName = FileNameCleaner.cleanDirectoryName(targetName);</b>
+&nbsp;
+<b class="nc">&nbsp;        return targetName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a file inside a directory structure. Will also look for the file inside nested directories.
+&nbsp;     *
+&nbsp;     * @param filename      the name of the file that should be found
+&nbsp;     * @param rootDirectory the rootDirectory that will be searched
+&nbsp;     * @return the path to the first file that matches the defined conditions
+&nbsp;     */
+&nbsp;    public static Optional&lt;Path&gt; findSingleFileRecursively(String filename, Path rootDirectory) {
+<b class="nc">&nbsp;        try (Stream&lt;Path&gt; pathStream = Files.walk(rootDirectory)) {</b>
+<b class="nc">&nbsp;            return pathStream</b>
+<b class="nc">&nbsp;                    .filter(Files::isRegularFile)</b>
+<b class="nc">&nbsp;                    .filter(f -&gt; f.getFileName().toString().equals(filename))</b>
+<b class="nc">&nbsp;                    .findFirst();</b>
+&nbsp;        } catch (UncheckedIOException | IOException ex) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error trying to locate the file {} inside the directory {}&quot;, filename, rootDirectory, ex);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;Path&gt; find(final BibDatabaseContext databaseContext, String fileName, FilePreferences filePreferences) {
+<b class="nc">&nbsp;        Objects.requireNonNull(fileName, &quot;fileName&quot;);</b>
+<b class="nc">&nbsp;        return find(fileName, databaseContext.getFileDirectories(filePreferences));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts a relative filename to an absolute one, if necessary. Returns
+&nbsp;     * an empty optional if the file does not exist.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Will look in each of the given directories starting from the beginning and
+&nbsp;     * returning the first found file to match if any.
+&nbsp;     */
+&nbsp;    public static Optional&lt;Path&gt; find(String fileName, List&lt;Path&gt; directories) {
+<b class="nc">&nbsp;        if (directories.isEmpty()) {</b>
+&nbsp;            // Fallback, if no directories to resolve are passed
+<b class="nc">&nbsp;            Path path = Path.of(fileName);</b>
+<b class="nc">&nbsp;            if (path.isAbsolute()) {</b>
+<b class="nc">&nbsp;                return Optional.of(path);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return directories.stream()</b>
+<b class="nc">&nbsp;                          .flatMap(directory -&gt; find(fileName, directory).stream())</b>
+<b class="nc">&nbsp;                          .findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts a relative filename to an absolute one, if necessary.
+&nbsp;     *
+&nbsp;     * @param fileName  the filename (e.g., a .pdf file), may contain path separators
+&nbsp;     * @param directory the directory which should be search starting point
+&nbsp;     * @return an empty optional if the file does not exist, otherwise, the absolute path
+&nbsp;     */
+&nbsp;    public static Optional&lt;Path&gt; find(String fileName, Path directory) {
+<b class="nc">&nbsp;        Objects.requireNonNull(fileName);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(directory);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (detectBadFileName(fileName)) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Invalid characters in path for file {}&quot;, fileName);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Explicitly check for an empty string, as File.exists returns true on that empty path, because it maps to the default jar location.
+&nbsp;        // If we then call toAbsoluteDir, it would always return the jar-location folder. This is not what we want here.
+<b class="nc">&nbsp;        if (fileName.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.of(directory);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Path resolvedFile = directory.resolve(fileName);</b>
+<b class="nc">&nbsp;        if (Files.exists(resolvedFile)) {</b>
+<b class="nc">&nbsp;            return Optional.of(resolvedFile);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // get the furthest path element from root and check if our filename starts with the same name
+&nbsp;        // workaround for old JabRef behavior
+<b class="nc">&nbsp;        String furthestDirFromRoot = directory.getFileName().toString();</b>
+<b class="nc">&nbsp;        if (fileName.startsWith(furthestDirFromRoot)) {</b>
+<b class="nc">&nbsp;            resolvedFile = directory.resolveSibling(fileName);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Files.exists(resolvedFile)) {</b>
+<b class="nc">&nbsp;            return Optional.of(resolvedFile);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a file inside a list of directory structures. Will also look for the file inside nested directories.
+&nbsp;     *
+&nbsp;     * @param filename    the name of the file that should be found
+&nbsp;     * @param directories the directories that will be searched
+&nbsp;     * @return a list including all found paths to files that match the defined conditions
+&nbsp;     */
+&nbsp;    public static List&lt;Path&gt; findListOfFiles(String filename, List&lt;Path&gt; directories) {
+<b class="nc">&nbsp;        List&lt;Path&gt; files = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Path dir : directories) {</b>
+<b class="nc">&nbsp;            FileUtil.find(filename, dir).ifPresent(files::add);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return files;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a string representation of the given path that should work on all systems. This method should be used
+&nbsp;     * when a path needs to be stored in the bib file or preferences.
+&nbsp;     */
+&nbsp;    public static String toPortableString(Path path) {
+<b class="nc">&nbsp;        return path.toString()</b>
+<b class="nc">&nbsp;                   .replace(&#39;\\&#39;, &#39;/&#39;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Test if the file is a bib file by simply checking the extension to be &quot;.bib&quot;
+&nbsp;     *
+&nbsp;     * @param file The file to check
+&nbsp;     * @return True if file extension is &quot;.bib&quot;, false otherwise
+&nbsp;     */
+&nbsp;    public static boolean isBibFile(Path file) {
+<b class="nc">&nbsp;        return getFileExtension(file).filter(&quot;bib&quot;::equals).isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Test if the file is a pdf file by simply checking the extension to be &quot;.pdf&quot;
+&nbsp;     *
+&nbsp;     * @param file The file to check
+&nbsp;     * @return True if file extension is &quot;.pdf&quot;, false otherwise
+&nbsp;     */
+&nbsp;    public static boolean isPDFFile(Path file) {
+<b class="nc">&nbsp;        Optional&lt;String&gt; extension = FileUtil.getFileExtension(file);</b>
+<b class="nc">&nbsp;        return extension.isPresent() &amp;&amp; StandardFileType.PDF.getExtensions().contains(extension.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return Path of current panel database directory or the standard working directory in case the database was not saved yet
+&nbsp;     */
+&nbsp;    public static Path getInitialDirectory(BibDatabaseContext databaseContext, Path workingDirectory) {
+<b class="nc">&nbsp;        return databaseContext.getDatabasePath().map(Path::getParent).orElse(workingDirectory);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Detect illegal characters in given filename.
+&nbsp;     *
+&nbsp;     * @param fileName the fileName to detect
+&nbsp;     * @return Boolean whether there is an illegal name.
+&nbsp;     * @see org.jabref.logic.util.io.FileNameCleaner#cleanFileName
+&nbsp;     */
+&nbsp;    public static boolean detectBadFileName(String fileName) {
+&nbsp;        // fileName could be a path, we want to check the fileName only (and don&#39;t care about the path)
+&nbsp;        // Reason: Handling of &quot;c:\temp.pdf&quot; is difficult, because &quot;:&quot; is an illegal character in the file name,
+&nbsp;        //         but a perfectly legal one in the path at this position
+&nbsp;        try {
+<b class="nc">&nbsp;            fileName = Path.of(fileName).getFileName().toString();</b>
+&nbsp;        } catch (InvalidPathException _) {
+&nbsp;            // in case the internal method cannot parse the path, it is surely illegal
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; fileName.length(); i++) {</b>
+<b class="nc">&nbsp;            char c = fileName.charAt(i);</b>
+<b class="nc">&nbsp;            if (!isCharLegal(c)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Shorten a given file name in the middle of the name using ellipsis. Example: verylongfilenameisthis.pdf
+&nbsp;    /// with maxLength = 20 is shortened into verylo...isthis.pdf
+&nbsp;    ///
+&nbsp;    /// @param fileName  the given file name to be shortened
+&nbsp;    /// @param maxLength the maximum number of characters in the string after shortening (including the extension)
+&nbsp;    /// @return the original fileName if fileName.length() &lt;= maxLength. Otherwise, a shortened fileName
+&nbsp;    public static String shortenFileName(String fileName, Integer maxLength) {
+<b class="nc">&nbsp;        if (fileName == null || maxLength == null || maxLength &lt; ELLIPSIS_LENGTH) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (fileName.length() &lt;= maxLength) {</b>
+<b class="nc">&nbsp;            return fileName;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        String name;
+&nbsp;        String extension;
+&nbsp;
+<b class="nc">&nbsp;        extension = FileUtil.getFileExtension(fileName).map(fileExtension -&gt; &#39;.&#39; + fileExtension).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        if (extension.isEmpty()) {</b>
+<b class="nc">&nbsp;            name = fileName;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            name = fileName.substring(0, fileName.length() - extension.length());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int totalNeededLength = ELLIPSIS_LENGTH + extension.length();</b>
+<b class="nc">&nbsp;        if (maxLength &lt;= totalNeededLength) {</b>
+<b class="nc">&nbsp;            return fileName.substring(0, maxLength - ELLIPSIS_LENGTH) + ELLIPSIS;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int charsForName = maxLength - totalNeededLength;</b>
+<b class="nc">&nbsp;        if (charsForName &lt;= 0) {</b>
+<b class="nc">&nbsp;            return ELLIPSIS + extension;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        int numCharsBeforeEllipsis;
+&nbsp;        int numCharsAfterEllipsis;
+<b class="nc">&nbsp;        if (charsForName == 1) {</b>
+<b class="nc">&nbsp;            numCharsBeforeEllipsis = 1;</b>
+<b class="nc">&nbsp;            numCharsAfterEllipsis = 0;</b>
+&nbsp;        } else {
+&nbsp;            // Allow the front part to have the extra in odd cases
+<b class="nc">&nbsp;            numCharsBeforeEllipsis = (charsForName + 1) / 2;</b>
+<b class="nc">&nbsp;            numCharsAfterEllipsis = charsForName / 2;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        numCharsBeforeEllipsis = Math.min(numCharsBeforeEllipsis, name.length());</b>
+<b class="nc">&nbsp;        numCharsAfterEllipsis = Math.min(numCharsAfterEllipsis, name.length() - numCharsBeforeEllipsis);</b>
+&nbsp;
+<b class="nc">&nbsp;        return name.substring(0, numCharsBeforeEllipsis) +</b>
+&nbsp;                ELLIPSIS +
+<b class="nc">&nbsp;                name.substring(name.length() - numCharsAfterEllipsis) +</b>
+&nbsp;                extension;
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isCharLegal(char c) {
+<b class="nc">&nbsp;        return Arrays.binarySearch(ILLEGAL_CHARS, c) &lt; 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Converts a Cygwin-style file path to a Windows-style path if the operating system is Windows.
+&nbsp;    ///
+&nbsp;    /// Supported formats:
+&nbsp;    /// - /cygdrive/c/Users/... → C:\Users\...
+&nbsp;    /// - /mnt/c/Users/...      → C:\Users\...
+&nbsp;    /// - /c/Users/...          → C:\Users\...
+&nbsp;    ///
+&nbsp;    /// @param filePath the input file path
+&nbsp;    /// @return the converted path if running on Windows and path is in Cygwin format; otherwise, returns the original path
+&nbsp;    public static Path convertCygwinPathToWindows(String filePath) {
+<b class="nc">&nbsp;        if (filePath == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!OS.WINDOWS) {</b>
+<b class="nc">&nbsp;            return Path.of(filePath);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (filePath.startsWith(MNT_PREFIX) &amp;&amp; filePath.length() &gt; 5) {</b>
+<b class="nc">&nbsp;            return buildWindowsPathWithDriveLetterIndex(filePath, 5);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (filePath.startsWith(CYGDRIVE_PREFIX) &amp;&amp; filePath.length() &gt; 10) {</b>
+<b class="nc">&nbsp;            return buildWindowsPathWithDriveLetterIndex(filePath, 10);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (ROOT_DRIVE_PATTERN.matcher(filePath).matches()) {</b>
+<b class="nc">&nbsp;            return buildWindowsPathWithDriveLetterIndex(filePath, 1);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Path.of(filePath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Builds a Windows-style path from a Cygwin-style path using a known prefix index.
+&nbsp;    ///
+&nbsp;    /// @param path        the input file path
+&nbsp;    /// @param letterIndex the index driver letter, zero-based indexing
+&nbsp;    /// @return a windows-style path
+&nbsp;    private static Path buildWindowsPathWithDriveLetterIndex(String path, int letterIndex) {
+<b class="nc">&nbsp;        String driveLetter = path.substring(letterIndex, letterIndex + 1).toUpperCase();</b>
+<b class="nc">&nbsp;        String windowsPath = path.substring(letterIndex + 1).replace(&quot;/&quot;, &quot;\\\\&quot;);</b>
+<b class="nc">&nbsp;        return Path.of(driveLetter + &quot;:&quot; + windowsPath);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

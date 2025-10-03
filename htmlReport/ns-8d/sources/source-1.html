@@ -1,0 +1,554 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WelcomeTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.welcome</a>
+</div>
+
+<h1>Coverage Summary for Class: WelcomeTab (org.jabref.gui.welcome)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WelcomeTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/196)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WelcomeTab$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/197)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.welcome;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.Reader;
+&nbsp;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Hyperlink;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.ScrollPane;
+&nbsp;import javafx.scene.control.Tab;
+&nbsp;import javafx.scene.layout.ColumnConstraints;
+&nbsp;import javafx.scene.layout.FlowPane;
+&nbsp;import javafx.scene.layout.GridPane;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.StackPane;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.stage.Stage;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.WorkspacePreferences;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.edit.OpenBrowserAction;
+&nbsp;import org.jabref.gui.frame.FileHistoryMenu;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.importer.NewDatabaseAction;
+&nbsp;import org.jabref.gui.importer.actions.OpenDatabaseAction;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.undo.CountingUndoManager;
+&nbsp;import org.jabref.gui.util.URLs;
+&nbsp;import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
+&nbsp;import org.jabref.gui.welcome.components.DonationProvider;
+&nbsp;import org.jabref.gui.welcome.components.QuickSettings;
+&nbsp;import org.jabref.gui.welcome.components.Walkthroughs;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BuildInfo;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class WelcomeTab extends Tab {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(WelcomeTab.class);</b>
+&nbsp;
+&nbsp;    private final VBox recentLibrariesBox;
+&nbsp;    private final LibraryTabContainer tabContainer;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final AiService aiService;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final CountingUndoManager undoManager;
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final FileHistoryMenu fileHistoryMenu;
+&nbsp;    private final BuildInfo buildInfo;
+&nbsp;    private final Stage stage;
+&nbsp;    private final WorkspacePreferences workspacePreferences;
+&nbsp;
+&nbsp;    private final VBox main;
+&nbsp;    private Walkthroughs walkthroughs;
+&nbsp;    private QuickSettings quickSettings;
+&nbsp;    private final DonationProvider donationProvider;
+&nbsp;
+&nbsp;    public WelcomeTab(Stage stage,
+&nbsp;                      LibraryTabContainer tabContainer,
+&nbsp;                      GuiPreferences preferences,
+&nbsp;                      AiService aiService,
+&nbsp;                      DialogService dialogService,
+&nbsp;                      StateManager stateManager,
+&nbsp;                      FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                      BibEntryTypesManager entryTypesManager,
+&nbsp;                      CountingUndoManager undoManager,
+&nbsp;                      ClipBoardManager clipBoardManager,
+&nbsp;                      TaskExecutor taskExecutor,
+&nbsp;                      FileHistoryMenu fileHistoryMenu,
+&nbsp;                      BuildInfo buildInfo,
+&nbsp;                      WorkspacePreferences workspacePreferences) {
+<b class="nc">&nbsp;        super(Localization.lang(&quot;Welcome&quot;));</b>
+<b class="nc">&nbsp;        setClosable(true);</b>
+<b class="nc">&nbsp;        this.tabContainer = tabContainer;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.aiService = aiService;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.clipBoardManager = clipBoardManager;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.fileHistoryMenu = fileHistoryMenu;</b>
+<b class="nc">&nbsp;        this.buildInfo = buildInfo;</b>
+<b class="nc">&nbsp;        this.stage = stage;</b>
+<b class="nc">&nbsp;        this.workspacePreferences = workspacePreferences;</b>
+<b class="nc">&nbsp;        this.recentLibrariesBox = new VBox();</b>
+<b class="nc">&nbsp;        recentLibrariesBox.getStyleClass().add(&quot;welcome-recent-libraries&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        main = new VBox(createTopTitles(), new VBox(), createCommunityBox());</b>
+<b class="nc">&nbsp;        main.getStyleClass().add(&quot;welcome-main-container&quot;);</b>
+<b class="nc">&nbsp;        initializeColumns();</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox container = new VBox(main);</b>
+<b class="nc">&nbsp;        container.setAlignment(Pos.CENTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        StackPane rootPane = new StackPane(container);</b>
+<b class="nc">&nbsp;        setContent(rootPane);</b>
+&nbsp;
+<b class="nc">&nbsp;        donationProvider = new DonationProvider(rootPane, preferences, dialogService);</b>
+<b class="nc">&nbsp;        donationProvider.showIfNeeded();</b>
+&nbsp;
+<b class="nc">&nbsp;        setOnClosed(_ -&gt; donationProvider.cleanUp());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox createTopTitles() {
+<b class="nc">&nbsp;        Label welcomeLabel = new Label(Localization.lang(&quot;Welcome to JabRef&quot;));</b>
+<b class="nc">&nbsp;        welcomeLabel.getStyleClass().add(&quot;welcome-label&quot;);</b>
+<b class="nc">&nbsp;        Label descriptionLabel = new Label(Localization.lang(&quot;Stay on top of your literature&quot;));</b>
+<b class="nc">&nbsp;        descriptionLabel.getStyleClass().add(&quot;welcome-description-label&quot;);</b>
+<b class="nc">&nbsp;        VBox topTitles = new VBox(welcomeLabel, descriptionLabel);</b>
+<b class="nc">&nbsp;        topTitles.getStyleClass().add(&quot;welcome-top-titles&quot;);</b>
+<b class="nc">&nbsp;        return topTitles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeColumns() {
+<b class="nc">&nbsp;        GridPane grid = new GridPane();</b>
+<b class="nc">&nbsp;        grid.getStyleClass().add(&quot;welcome-columns-container&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox leftColumn = createLeftColumn();</b>
+<b class="nc">&nbsp;        GridPane.setHgrow(leftColumn, Priority.ALWAYS);</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox rightColumn = createRightColumn();</b>
+<b class="nc">&nbsp;        GridPane.setHgrow(rightColumn, Priority.ALWAYS);</b>
+&nbsp;
+<b class="nc">&nbsp;        WalkthroughUtils.DebouncedRunnable updater = WalkthroughUtils.debounced(() -&gt; updateColumnsLayout(grid, leftColumn, rightColumn, grid.getWidth()));</b>
+&nbsp;
+<b class="nc">&nbsp;        grid.localToSceneTransformProperty().addListener(_ -&gt; updater.run());</b>
+<b class="nc">&nbsp;        grid.layoutBoundsProperty().addListener(_ -&gt; updater.run());</b>
+<b class="nc">&nbsp;        contentProperty().addListener((_, _, newContent) -&gt; {</b>
+<b class="nc">&nbsp;            if (newContent == null) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            newContent.boundsInParentProperty().addListener(_ -&gt; updater.run());</b>
+<b class="nc">&nbsp;            newContent.parentProperty().addListener((_, _, newParent) -&gt; {</b>
+<b class="nc">&nbsp;                if (newParent == null) {</b>
+&nbsp;                    return;
+&nbsp;                }
+<b class="nc">&nbsp;                newParent.boundsInParentProperty().addListener(_ -&gt; updater.run());</b>
+&nbsp;            });
+&nbsp;        });
+<b class="nc">&nbsp;        VBox.setVgrow(grid, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        updater.run();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox createLeftColumn() {
+<b class="nc">&nbsp;        VBox leftColumn = new VBox(</b>
+<b class="nc">&nbsp;                createWelcomeStartBox(),</b>
+<b class="nc">&nbsp;                createWelcomeRecentBox()</b>
+&nbsp;        );
+<b class="nc">&nbsp;        leftColumn.getStyleClass().add(&quot;welcome-content-column&quot;);</b>
+<b class="nc">&nbsp;        return leftColumn;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox createRightColumn() {
+<b class="nc">&nbsp;        this.quickSettings = new QuickSettings(preferences, dialogService, taskExecutor);</b>
+<b class="nc">&nbsp;        this.walkthroughs = new Walkthroughs(stage, tabContainer, stateManager, preferences);</b>
+<b class="nc">&nbsp;        VBox rightColumn = new VBox(quickSettings, walkthroughs);</b>
+<b class="nc">&nbsp;        rightColumn.getStyleClass().add(&quot;welcome-content-column&quot;);</b>
+<b class="nc">&nbsp;        return rightColumn;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateColumnsLayout(@NonNull GridPane grid,
+&nbsp;                                     @NonNull VBox leftColumn,
+&nbsp;                                     @NonNull VBox rightColumn,
+&nbsp;                                     double availableWidth) {
+<b class="nc">&nbsp;        grid.getChildren().clear();</b>
+<b class="nc">&nbsp;        grid.getColumnConstraints().clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean scrollNeeded = false;</b>
+<b class="nc">&nbsp;        double threshold = 48 * workspacePreferences.getMainFontSize();</b>
+<b class="nc">&nbsp;        if (availableWidth &lt; threshold) {</b>
+<b class="nc">&nbsp;            grid.getStyleClass().add(&quot;compact&quot;);</b>
+<b class="nc">&nbsp;            ColumnConstraints single = new ColumnConstraints();</b>
+<b class="nc">&nbsp;            single.setPercentWidth(100);</b>
+<b class="nc">&nbsp;            grid.getColumnConstraints().add(single);</b>
+<b class="nc">&nbsp;            grid.add(leftColumn, 0, 0);</b>
+<b class="nc">&nbsp;            grid.add(rightColumn, 0, 1);</b>
+<b class="nc">&nbsp;            scrollNeeded = true;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            grid.getStyleClass().remove(&quot;compact&quot;);</b>
+<b class="nc">&nbsp;            ColumnConstraints half = new ColumnConstraints();</b>
+<b class="nc">&nbsp;            half.setPercentWidth(50);</b>
+<b class="nc">&nbsp;            grid.getColumnConstraints().addAll(half, half);</b>
+<b class="nc">&nbsp;            grid.add(leftColumn, 0, 0);</b>
+<b class="nc">&nbsp;            grid.add(rightColumn, 1, 0);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!scrollNeeded) {</b>
+<b class="nc">&nbsp;            if (!(main.getChildren().get(1) instanceof GridPane)) {</b>
+<b class="nc">&nbsp;                main.getChildren().set(1, grid);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            quickSettings.enableScroll();</b>
+<b class="nc">&nbsp;            walkthroughs.enableScroll();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ScrollPane scrollPane = new ScrollPane(grid);</b>
+<b class="nc">&nbsp;        scrollPane.setFitToWidth(true);</b>
+<b class="nc">&nbsp;        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);</b>
+<b class="nc">&nbsp;        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);</b>
+<b class="nc">&nbsp;        scrollPane.getStyleClass().add(&quot;welcome-columns-scroll&quot;);</b>
+<b class="nc">&nbsp;        scrollPane.setStyle(&quot;-fx-background-color: transparent;&quot;); // Using class selector is insufficient to prevent background from turning white on click.</b>
+<b class="nc">&nbsp;        if (!(main.getChildren().get(1) instanceof ScrollPane)) {</b>
+<b class="nc">&nbsp;            main.getChildren().set(1, scrollPane);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        quickSettings.disableScroll();</b>
+<b class="nc">&nbsp;        walkthroughs.disableScroll();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox createWelcomeStartBox() {
+<b class="nc">&nbsp;        Label header = new Label(Localization.lang(&quot;Start&quot;));</b>
+<b class="nc">&nbsp;        header.getStyleClass().add(&quot;welcome-header-label&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Hyperlink newLibraryLink = createActionLink(Localization.lang(&quot;New empty library&quot;),</b>
+<b class="nc">&nbsp;                () -&gt; new NewDatabaseAction(tabContainer, preferences).execute());</b>
+&nbsp;
+<b class="nc">&nbsp;        Hyperlink openLibraryLink = createActionLink(Localization.lang(&quot;Open library&quot;),</b>
+<b class="nc">&nbsp;                () -&gt; new OpenDatabaseAction(tabContainer, preferences, aiService, dialogService,</b>
+&nbsp;                        stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
+<b class="nc">&nbsp;                        taskExecutor).execute());</b>
+&nbsp;
+<b class="nc">&nbsp;        Hyperlink openExampleLibraryLink = createActionLink(Localization.lang(&quot;New example library&quot;),</b>
+&nbsp;                this::openExampleLibrary);
+&nbsp;
+<b class="nc">&nbsp;        VBox container = new VBox();</b>
+<b class="nc">&nbsp;        container.getStyleClass().add(&quot;welcome-links-content&quot;);</b>
+<b class="nc">&nbsp;        container.getChildren().addAll(newLibraryLink, openExampleLibraryLink, openLibraryLink);</b>
+&nbsp;
+<b class="nc">&nbsp;        return createVBoxContainer(header, container);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox createWelcomeRecentBox() {
+<b class="nc">&nbsp;        Label header = new Label(Localization.lang(&quot;Recent&quot;));</b>
+<b class="nc">&nbsp;        header.getStyleClass().add(&quot;welcome-header-label&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        updateWelcomeRecentLibraries();</b>
+<b class="nc">&nbsp;        fileHistoryMenu.getItems().addListener((ListChangeListener&lt;MenuItem&gt;) _ -&gt; updateWelcomeRecentLibraries());</b>
+&nbsp;
+<b class="nc">&nbsp;        return createVBoxContainer(header, recentLibrariesBox);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Hyperlink createActionLink(String text, Runnable action) {
+<b class="nc">&nbsp;        Hyperlink link = new Hyperlink(text);</b>
+<b class="nc">&nbsp;        link.getStyleClass().add(&quot;welcome-hyperlink&quot;);</b>
+<b class="nc">&nbsp;        link.setOnAction(_ -&gt; action.run());</b>
+<b class="nc">&nbsp;        return link;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void openExampleLibrary() {
+<b class="nc">&nbsp;        try (InputStream in = WelcomeTab.class.getClassLoader().getResourceAsStream(&quot;Chocolate.bib&quot;)) {</b>
+<b class="nc">&nbsp;            if (in == null) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Example library file not found.&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            Reader reader = Importer.getReader(in);</b>
+<b class="nc">&nbsp;            BibtexParser bibtexParser = new BibtexParser(preferences.getImportFormatPreferences(), fileUpdateMonitor);</b>
+<b class="nc">&nbsp;            ParserResult result = bibtexParser.parse(reader);</b>
+<b class="nc">&nbsp;            BibDatabaseContext databaseContext = result.getDatabaseContext();</b>
+<b class="nc">&nbsp;            LibraryTab libraryTab = LibraryTab.createLibraryTab(databaseContext, tabContainer, dialogService, aiService,</b>
+&nbsp;                    preferences, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor);
+<b class="nc">&nbsp;            tabContainer.addTab(libraryTab, true);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Failed to load example library&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateWelcomeRecentLibraries() {
+<b class="nc">&nbsp;        if (fileHistoryMenu.getItems().isEmpty()) {</b>
+<b class="nc">&nbsp;            displayNoRecentLibrariesMessage();</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        recentLibrariesBox.getChildren().clear();</b>
+<b class="nc">&nbsp;        recentLibrariesBox.getStyleClass().add(&quot;welcome-links-content&quot;);</b>
+<b class="nc">&nbsp;        fileHistoryMenu.disableProperty().unbind();</b>
+<b class="nc">&nbsp;        fileHistoryMenu.setDisable(false);</b>
+<b class="nc">&nbsp;        for (MenuItem item : fileHistoryMenu.getItems()) {</b>
+<b class="nc">&nbsp;            Hyperlink recentLibraryLink = new Hyperlink(item.getText());</b>
+<b class="nc">&nbsp;            recentLibraryLink.getStyleClass().add(&quot;welcome-hyperlink&quot;);</b>
+<b class="nc">&nbsp;            recentLibraryLink.setOnAction(item.getOnAction());</b>
+<b class="nc">&nbsp;            recentLibrariesBox.getChildren().add(recentLibraryLink);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void displayNoRecentLibrariesMessage() {
+<b class="nc">&nbsp;        recentLibrariesBox.getChildren().clear();</b>
+<b class="nc">&nbsp;        Label noRecentLibrariesLabel = new Label(Localization.lang(&quot;No recent libraries&quot;));</b>
+<b class="nc">&nbsp;        noRecentLibrariesLabel.getStyleClass().add(&quot;welcome-no-recent-label&quot;);</b>
+<b class="nc">&nbsp;        recentLibrariesBox.getChildren().add(noRecentLibrariesLabel);</b>
+<b class="nc">&nbsp;        fileHistoryMenu.disableProperty().unbind();</b>
+<b class="nc">&nbsp;        fileHistoryMenu.setDisable(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox createCommunityBox() {
+<b class="nc">&nbsp;        Label header = new Label(Localization.lang(&quot;Community&quot;));</b>
+<b class="nc">&nbsp;        header.getStyleClass().add(&quot;welcome-header-label&quot;);</b>
+<b class="nc">&nbsp;        FlowPane iconLinksContainer = createIconLinksContainer();</b>
+<b class="nc">&nbsp;        HBox textLinksContainer = createTextLinksContainer();</b>
+<b class="nc">&nbsp;        HBox versionContainer = createVersionContainer();</b>
+<b class="nc">&nbsp;        VBox container = new VBox();</b>
+<b class="nc">&nbsp;        container.getStyleClass().add(&quot;welcome-community-content&quot;);</b>
+<b class="nc">&nbsp;        container.getChildren().addAll(iconLinksContainer, textLinksContainer, versionContainer);</b>
+<b class="nc">&nbsp;        return createVBoxContainer(header, container);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private FlowPane createIconLinksContainer() {
+<b class="nc">&nbsp;        FlowPane container = new FlowPane();</b>
+<b class="nc">&nbsp;        container.getStyleClass().add(&quot;welcome-community-icons&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Hyperlink onlineHelpLink = createFooterLink(Localization.lang(&quot;Online help&quot;), StandardActions.HELP, IconTheme.JabRefIcons.HELP);</b>
+<b class="nc">&nbsp;        Hyperlink privacyPolicyLink = createFooterLink(Localization.lang(&quot;Privacy policy&quot;), StandardActions.OPEN_PRIVACY_POLICY, IconTheme.JabRefIcons.BOOK);</b>
+<b class="nc">&nbsp;        Hyperlink forumLink = createFooterLink(Localization.lang(&quot;Community forum&quot;), StandardActions.OPEN_FORUM, IconTheme.JabRefIcons.FORUM);</b>
+<b class="nc">&nbsp;        Hyperlink mastodonLink = createFooterLink(Localization.lang(&quot;Mastodon&quot;), StandardActions.OPEN_MASTODON, IconTheme.JabRefIcons.MASTODON);</b>
+<b class="nc">&nbsp;        Hyperlink linkedInLink = createFooterLink(Localization.lang(&quot;LinkedIn&quot;), StandardActions.OPEN_LINKEDIN, IconTheme.JabRefIcons.LINKEDIN);</b>
+<b class="nc">&nbsp;        Hyperlink donationLink = createFooterLink(Localization.lang(&quot;Donation&quot;), StandardActions.DONATE, IconTheme.JabRefIcons.DONATE);</b>
+&nbsp;
+<b class="nc">&nbsp;        container.getChildren().addAll(onlineHelpLink, privacyPolicyLink, forumLink, mastodonLink, linkedInLink, donationLink);</b>
+<b class="nc">&nbsp;        return container;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private HBox createTextLinksContainer() {
+<b class="nc">&nbsp;        HBox container = new HBox();</b>
+<b class="nc">&nbsp;        container.getStyleClass().add(&quot;welcome-community-links&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Hyperlink devVersionLink = createFooterLink(Localization.lang(&quot;Download development version&quot;), StandardActions.OPEN_DEV_VERSION_LINK, null);</b>
+<b class="nc">&nbsp;        Hyperlink changelogLink = createFooterLink(Localization.lang(&quot;CHANGELOG&quot;), StandardActions.OPEN_CHANGELOG, null);</b>
+&nbsp;
+<b class="nc">&nbsp;        container.getChildren().addAll(devVersionLink, changelogLink);</b>
+<b class="nc">&nbsp;        return container;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Hyperlink createFooterLink(String text, StandardActions action, IconTheme.JabRefIcons icon) {
+<b class="nc">&nbsp;        Hyperlink link = new Hyperlink(text);</b>
+<b class="nc">&nbsp;        link.getStyleClass().add(&quot;welcome-community-link&quot;);</b>
+<b class="nc">&nbsp;        String url = switch (action) {</b>
+&nbsp;            case HELP -&gt;
+<b class="nc">&nbsp;                    URLs.HELP_URL;</b>
+&nbsp;            case OPEN_FORUM -&gt;
+<b class="nc">&nbsp;                    URLs.FORUM_URL;</b>
+&nbsp;            case OPEN_MASTODON -&gt;
+<b class="nc">&nbsp;                    URLs.MASTODON_URL;</b>
+&nbsp;            case OPEN_LINKEDIN -&gt;
+<b class="nc">&nbsp;                    URLs.LINKEDIN_URL;</b>
+&nbsp;            case DONATE -&gt;
+<b class="nc">&nbsp;                    URLs.DONATE_URL;</b>
+&nbsp;            case OPEN_DEV_VERSION_LINK -&gt;
+<b class="nc">&nbsp;                    URLs.DEV_VERSION_LINK_URL;</b>
+&nbsp;            case OPEN_CHANGELOG -&gt;
+<b class="nc">&nbsp;                    URLs.CHANGELOG_URL;</b>
+&nbsp;            case OPEN_PRIVACY_POLICY -&gt;
+<b class="nc">&nbsp;                    URLs.PRIVACY_POLICY_URL;</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    null;</b>
+&nbsp;        };
+<b class="nc">&nbsp;        if (url != null) {</b>
+<b class="nc">&nbsp;            link.setOnAction(_ -&gt; new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (icon != null) {</b>
+<b class="nc">&nbsp;            link.setGraphic(icon.getGraphicNode());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return link;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private HBox createVersionContainer() {
+<b class="nc">&nbsp;        HBox container = new HBox();</b>
+<b class="nc">&nbsp;        container.getStyleClass().add(&quot;welcome-community-version&quot;);</b>
+<b class="nc">&nbsp;        Label versionLabel = new Label(Localization.lang(&quot;Current JabRef version: %0&quot;, buildInfo.version));</b>
+<b class="nc">&nbsp;        versionLabel.getStyleClass().add(&quot;welcome-community-version-text&quot;);</b>
+<b class="nc">&nbsp;        container.getChildren().add(versionLabel);</b>
+<b class="nc">&nbsp;        return container;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private VBox createVBoxContainer(Node... nodes) {
+<b class="nc">&nbsp;        VBox box = new VBox();</b>
+<b class="nc">&nbsp;        box.getStyleClass().add(&quot;welcome-section&quot;);</b>
+<b class="nc">&nbsp;        box.getChildren().addAll(nodes);</b>
+<b class="nc">&nbsp;        return box;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,167 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PushToApplicationCell</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.welcome.components</a>
+</div>
+
+<h1>Coverage Summary for Class: PushToApplicationCell (org.jabref.gui.welcome.components)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PushToApplicationCell</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.welcome.components;
+&nbsp;
+&nbsp;import javafx.beans.InvalidationListener;
+&nbsp;import javafx.collections.ObservableSet;
+&nbsp;import javafx.scene.control.ListCell;
+&nbsp;
+&nbsp;import org.jabref.gui.push.GuiPushToApplication;
+&nbsp;
+&nbsp;public class PushToApplicationCell extends ListCell&lt;GuiPushToApplication&gt; {
+&nbsp;    public static final String DETECTED_APPLICATION_STYLE_CLASS = &quot;detected-application&quot;;
+&nbsp;
+&nbsp;    private final ObservableSet&lt;GuiPushToApplication&gt; detectedApplications;
+&nbsp;
+<b class="nc">&nbsp;    public PushToApplicationCell(ObservableSet&lt;GuiPushToApplication&gt; detectedApplications) {</b>
+<b class="nc">&nbsp;        this.detectedApplications = detectedApplications;</b>
+<b class="nc">&nbsp;        this.getStyleClass().add(&quot;application-item&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        InvalidationListener listener = _ -&gt; updateDetectionStyle();</b>
+<b class="nc">&nbsp;        this.itemProperty().addListener(listener);</b>
+<b class="nc">&nbsp;        this.detectedApplications.addListener(listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void updateItem(GuiPushToApplication application, boolean empty) {
+<b class="nc">&nbsp;        super.updateItem(application, empty);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (empty || application == null) {</b>
+<b class="nc">&nbsp;            setText(null);</b>
+<b class="nc">&nbsp;            setGraphic(null);</b>
+<b class="nc">&nbsp;            getStyleClass().removeAll(DETECTED_APPLICATION_STYLE_CLASS);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        setText(application.getDisplayName());</b>
+<b class="nc">&nbsp;        setGraphic(application.getApplicationIcon().getGraphicNode());</b>
+<b class="nc">&nbsp;        updateDetectionStyle();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateDetectionStyle() {
+<b class="nc">&nbsp;        GuiPushToApplication item = getItem();</b>
+<b class="nc">&nbsp;        boolean isDetected = item != null &amp;&amp; detectedApplications.contains(item);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isDetected) {</b>
+<b class="nc">&nbsp;            if (!getStyleClass().contains(DETECTED_APPLICATION_STYLE_CLASS)) {</b>
+<b class="nc">&nbsp;                getStyleClass().add(DETECTED_APPLICATION_STYLE_CLASS);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            getStyleClass().removeAll(DETECTED_APPLICATION_STYLE_CLASS);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

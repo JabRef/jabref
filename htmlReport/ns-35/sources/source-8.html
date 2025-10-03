@@ -1,0 +1,251 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EditorTextArea</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors</a>
+</div>
+
+<h1>Coverage Summary for Class: EditorTextArea (org.jabref.gui.fieldeditors)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EditorTextArea</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EditorTextArea$FieldTraversalEventHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors;
+&nbsp;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.ResourceBundle;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import javafx.event.EventHandler;
+&nbsp;import javafx.fxml.Initializable;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.TextArea;
+&nbsp;import javafx.scene.input.KeyCode;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;
+&nbsp;public class EditorTextArea extends TextArea implements Initializable, ContextMenuAddable {
+&nbsp;
+<b class="nc">&nbsp;    private final ContextMenu contextMenu = new ContextMenu();</b>
+&nbsp;    /**
+&nbsp;     * Variable that contains user-defined behavior for paste action.
+&nbsp;     */
+<b class="nc">&nbsp;    private Runnable pasteActionHandler = () -&gt; {</b>
+&nbsp;        // Set empty paste behavior by default
+<b class="nc">&nbsp;    };</b>
+&nbsp;
+&nbsp;    public EditorTextArea() {
+<b class="nc">&nbsp;        this(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public EditorTextArea(final String text) {
+<b class="nc">&nbsp;        super(text);</b>
+&nbsp;
+&nbsp;        // Hide horizontal scrollbar and always wrap text
+<b class="nc">&nbsp;        setWrapText(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        ClipBoardManager.addX11Support(this);</b>
+&nbsp;
+&nbsp;        // Add our custom Tab key event handler to traverse focus when empty.
+<b class="nc">&nbsp;        addEventFilter(KeyEvent.KEY_PRESSED, new FieldTraversalEventHandler());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void initContextMenu(final Supplier&lt;List&lt;MenuItem&gt;&gt; items, KeyBindingRepository keyBindingRepository) {
+<b class="nc">&nbsp;        setOnContextMenuRequested(event -&gt; {</b>
+<b class="nc">&nbsp;            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(this));</b>
+<b class="nc">&nbsp;            contextMenu.getItems().addAll(0, items.get());</b>
+<b class="nc">&nbsp;            contextMenu.show(this, event.getScreenX(), event.getScreenY());</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void initialize(URL location, ResourceBundle resources) {
+&nbsp;        // not needed
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set pasteActionHandler variable to passed handler
+&nbsp;     *
+&nbsp;     * @param handler an instance of PasteActionHandler that describes paste behavior
+&nbsp;     */
+&nbsp;    public void setPasteActionHandler(Runnable handler) {
+<b class="nc">&nbsp;        Objects.requireNonNull(handler);</b>
+<b class="nc">&nbsp;        this.pasteActionHandler = handler;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Override javafx TextArea method applying TextArea.paste() and pasteActionHandler after
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void paste() {
+<b class="nc">&nbsp;        super.paste();</b>
+<b class="nc">&nbsp;        pasteActionHandler.run();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Custom event handler for Tab key presses.
+<b class="nc">&nbsp;    private static class FieldTraversalEventHandler implements EventHandler&lt;KeyEvent&gt; {</b>
+&nbsp;        @Override
+&nbsp;        public void handle(KeyEvent event) {
+<b class="nc">&nbsp;            if (event.getCode() == KeyCode.TAB &amp;&amp; !event.isShiftDown() &amp;&amp; !event.isControlDown()) {</b>
+<b class="nc">&nbsp;                event.consume();</b>
+&nbsp;
+&nbsp;                // Get the current text area
+<b class="nc">&nbsp;                Node node = (Node) event.getSource();</b>
+<b class="nc">&nbsp;                KeyEvent newEvent = new KeyEvent(node,</b>
+<b class="nc">&nbsp;                        event.getTarget(), event.getEventType(),</b>
+<b class="nc">&nbsp;                        event.getCharacter(), event.getText(),</b>
+<b class="nc">&nbsp;                        event.getCode(), event.isShiftDown(),</b>
+<b class="nc">&nbsp;                        true, event.isAltDown(),</b>
+<b class="nc">&nbsp;                        event.isMetaDown());</b>
+&nbsp;
+<b class="nc">&nbsp;                node.fireEvent(newEvent);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

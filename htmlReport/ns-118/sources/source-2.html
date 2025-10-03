@@ -1,0 +1,181 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileAnnotationType</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.pdf</a>
+</div>
+
+<h1>Coverage Summary for Class: FileAnnotationType (org.jabref.model.pdf)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileAnnotationType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.pdf;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Our representation of the type of the FileAnnotation. This is needed as some FileAnnotationTypes require special
+&nbsp; * handling (e.g., Highlight or Underline), because of the linked FileAnnotations.
+&nbsp; */
+&nbsp;
+<b class="nc">&nbsp;public enum FileAnnotationType {</b>
+<b class="nc">&nbsp;    TEXT(&quot;Text&quot;, false),</b>
+<b class="nc">&nbsp;    HIGHLIGHT(&quot;Highlight&quot;, true),</b>
+<b class="nc">&nbsp;    SQUIGGLY(&quot;Squiggly&quot;, true),</b>
+<b class="nc">&nbsp;    UNDERLINE(&quot;Underline&quot;, true),</b>
+<b class="nc">&nbsp;    STRIKEOUT(&quot;StrikeOut&quot;, true),</b>
+<b class="nc">&nbsp;    POLYGON(&quot;Polygon&quot;, false),</b>
+<b class="nc">&nbsp;    POPUP(&quot;Popup&quot;, false),</b>
+<b class="nc">&nbsp;    LINE(&quot;Line&quot;, false),</b>
+<b class="nc">&nbsp;    CIRCLE(&quot;Circle&quot;, false),</b>
+<b class="nc">&nbsp;    FREETEXT(&quot;FreeText&quot;, false),</b>
+<b class="nc">&nbsp;    INK(&quot;Ink&quot;, false),</b>
+<b class="nc">&nbsp;    UNKNOWN(&quot;Unknown&quot;, false),</b>
+<b class="nc">&nbsp;    NONE(&quot;None&quot;, false);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotationType.class);</b>
+&nbsp;
+&nbsp;    private final String name;
+&nbsp;    private final boolean linkedFileAnnotationType;
+&nbsp;
+<b class="nc">&nbsp;    FileAnnotationType(String name, boolean linkedFileAnnotationType) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.linkedFileAnnotationType = linkedFileAnnotationType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the FileAnnotationType of a raw PDAnnotation. Returns &#39;UNKNOWN&#39; if the type is currently not in our
+&nbsp;     * list of FileAnnotationTypes.
+&nbsp;     *
+&nbsp;     * @param annotation the raw PDAnnotation
+&nbsp;     * @return The determined FileAnnotationType
+&nbsp;     */
+&nbsp;    public static FileAnnotationType parse(PDAnnotation annotation) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT));</b>
+&nbsp;        } catch (IllegalArgumentException _) {
+<b class="nc">&nbsp;            LOGGER.info(&quot;FileAnnotationType {} is not supported and was converted into &#39;Unknown&#39;!&quot;, annotation.getSubtype());</b>
+<b class="nc">&nbsp;            return UNKNOWN;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines if a String is a supported marked FileAnnotation type.
+&nbsp;     *
+&nbsp;     * @param annotationType a type descriptor
+&nbsp;     * @return true if annotationType is a supported marked FileAnnotation type
+&nbsp;     */
+&nbsp;    public static boolean isMarkedFileAnnotationType(String annotationType) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return FileAnnotationType.valueOf(annotationType.toUpperCase(Locale.ROOT)).linkedFileAnnotationType;</b>
+&nbsp;        } catch (IllegalArgumentException _) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isLinkedFileAnnotationType() {
+<b class="nc">&nbsp;        return linkedFileAnnotationType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return this.name;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

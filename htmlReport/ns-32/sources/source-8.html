@@ -1,0 +1,474 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SaveDatabaseAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: SaveDatabaseAction (org.jabref.gui.exporter)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SaveDatabaseAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/133)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SaveDatabaseAction$SaveDatabaseMode</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/135)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.exporter;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.charset.UnsupportedCharsetException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.scene.control.ButtonBar;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.DialogPane;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.autosaveandbackup.AutosaveManager;
+&nbsp;import org.jabref.gui.autosaveandbackup.BackupManager;
+&nbsp;import org.jabref.gui.maintable.BibEntryTableViewModel;
+&nbsp;import org.jabref.gui.maintable.columns.MainTableColumn;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.logic.exporter.AtomicFileWriter;
+&nbsp;import org.jabref.logic.exporter.BibDatabaseWriter;
+&nbsp;import org.jabref.logic.exporter.BibWriter;
+&nbsp;import org.jabref.logic.exporter.SaveException;
+&nbsp;import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.shared.DatabaseLocation;
+&nbsp;import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.event.ChangePropagation;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.metadata.SaveOrder;
+&nbsp;import org.jabref.model.metadata.SelfContainedSaveOrder;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Action for the &quot;Save&quot; and &quot;Save as&quot; operations called from BasePanel. This class is also used for save operations
+&nbsp; * when closing a database or quitting the applications.
+&nbsp; * &lt;p&gt;
+&nbsp; * The save operation is loaded off of the GUI thread using {@link BackgroundTask}. Callers can query whether the
+&nbsp; * operation was canceled, or whether it was successful.
+&nbsp; */
+&nbsp;public class SaveDatabaseAction {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);</b>
+&nbsp;
+&nbsp;    private final LibraryTab libraryTab;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+<b class="nc">&nbsp;    public enum SaveDatabaseMode {</b>
+<b class="nc">&nbsp;        SILENT, NORMAL</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SaveDatabaseAction(LibraryTab libraryTab,
+&nbsp;                              DialogService dialogService,
+&nbsp;                              GuiPreferences preferences,
+&nbsp;                              BibEntryTypesManager entryTypesManager,
+<b class="nc">&nbsp;                              StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.libraryTab = libraryTab;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean save() {
+<b class="nc">&nbsp;        return save(libraryTab.getBibDatabaseContext(), SaveDatabaseMode.NORMAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean save(SaveDatabaseMode mode) {
+<b class="nc">&nbsp;        return save(libraryTab.getBibDatabaseContext(), mode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Asks the user for the path and saves afterward
+&nbsp;     */
+&nbsp;    public void saveAs() {
+<b class="nc">&nbsp;        askForSavePath().ifPresent(this::saveAs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean saveAs(Path file) {
+<b class="nc">&nbsp;        return this.saveAs(file, SaveDatabaseMode.NORMAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SelfContainedSaveOrder getSaveOrder() {
+<b class="nc">&nbsp;        return libraryTab.getBibDatabaseContext()</b>
+<b class="nc">&nbsp;                         .getMetaData().getSaveOrder()</b>
+<b class="nc">&nbsp;                         .map(so -&gt; {</b>
+<b class="nc">&nbsp;                             if (so.getOrderType() == SaveOrder.OrderType.TABLE) {</b>
+&nbsp;                                 // We need to &quot;flatten out&quot; SaveOrder.OrderType.TABLE as BibWriter does not have access to preferences
+<b class="nc">&nbsp;                                 List&lt;TableColumn&lt;BibEntryTableViewModel, ?&gt;&gt; sortOrder = libraryTab.getMainTable().getSortOrder();</b>
+<b class="nc">&nbsp;                                 return new SelfContainedSaveOrder(</b>
+&nbsp;                                         SaveOrder.OrderType.SPECIFIED,
+<b class="nc">&nbsp;                                         sortOrder.stream()</b>
+<b class="nc">&nbsp;                                                  .filter(col -&gt; col instanceof MainTableColumn&lt;?&gt;)</b>
+<b class="nc">&nbsp;                                                  .map(column -&gt; ((MainTableColumn&lt;?&gt;) column).getModel())</b>
+<b class="nc">&nbsp;                                                  .flatMap(model -&gt; model.getSortCriteria().stream())</b>
+<b class="nc">&nbsp;                                                  .toList());</b>
+&nbsp;                             } else {
+<b class="nc">&nbsp;                                 return SelfContainedSaveOrder.of(so);</b>
+&nbsp;                             }
+&nbsp;                         })
+<b class="nc">&nbsp;                         .orElse(SaveOrder.getDefaultSaveOrder());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void saveSelectedAsPlain() {
+<b class="nc">&nbsp;        askForSavePath().ifPresent(path -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                saveDatabase(path, true, StandardCharsets.UTF_8, BibDatabaseWriter.SaveType.PLAIN_BIBTEX, getSaveOrder());</b>
+<b class="nc">&nbsp;                preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(path);</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Saved selected to &#39;%0&#39;.&quot;, path.toString()));</b>
+&nbsp;            } catch (SaveException ex) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;A problem occurred when trying to save the file&quot;, ex);</b>
+<b class="nc">&nbsp;                dialogService.showErrorDialogAndWait(Localization.lang(&quot;Save library&quot;), Localization.lang(&quot;Could not save file.&quot;), ex);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param file the new file name to save the database to. This is stored in the database context of the panel upon
+&nbsp;     *             successful save.
+&nbsp;     * @return true on successful save
+&nbsp;     */
+&nbsp;    boolean saveAs(Path file, SaveDatabaseMode mode) {
+<b class="nc">&nbsp;        BibDatabaseContext context = libraryTab.getBibDatabaseContext();</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Path&gt; databasePath = context.getDatabasePath();</b>
+<b class="nc">&nbsp;        if (databasePath.isPresent()) {</b>
+&nbsp;            // Close AutosaveManager, BackupManager, and IndexManager for original library
+<b class="nc">&nbsp;            AutosaveManager.shutdown(context);</b>
+<b class="nc">&nbsp;            BackupManager.shutdown(context, this.preferences.getFilePreferences().getBackupDirectory(), preferences.getFilePreferences().shouldCreateBackup());</b>
+<b class="nc">&nbsp;            libraryTab.closeIndexManger();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Set new location
+<b class="nc">&nbsp;        if (context.getLocation() == DatabaseLocation.SHARED) {</b>
+&nbsp;            // Save all properties dependent on the ID. This makes it possible to restore them.
+<b class="nc">&nbsp;            new SharedDatabasePreferences(context.getDatabase().generateSharedDatabaseID())</b>
+<b class="nc">&nbsp;                    .putAllDBMSConnectionProperties(context.getDBMSSynchronizer().getConnectionProperties());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean saveResult = save(file, mode);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (saveResult) {</b>
+&nbsp;            // we managed to successfully save the file
+&nbsp;            // thus, we can store the path into the context
+<b class="nc">&nbsp;            context.setDatabasePath(file);</b>
+<b class="nc">&nbsp;            stateManager.setActiveDatabase(context);</b>
+<b class="nc">&nbsp;            libraryTab.updateTabTitle(false);</b>
+&nbsp;
+&nbsp;            // Reset (here: uninstall and install again) AutosaveManager, BackupManager and IndexManager for the new file name
+<b class="nc">&nbsp;            libraryTab.resetChangeMonitor();</b>
+<b class="nc">&nbsp;            libraryTab.installAutosaveManagerAndBackupManager();</b>
+<b class="nc">&nbsp;            libraryTab.createIndexManager();</b>
+&nbsp;
+<b class="nc">&nbsp;            preferences.getLastFilesOpenedPreferences().getFileHistory().newFile(file);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return saveResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Asks the user for the path to save to. Stores the directory to the preferences, which is used next time when
+&nbsp;     * opening the dialog.
+&nbsp;     *
+&nbsp;     * @return the path set by the user
+&nbsp;     */
+&nbsp;    private Optional&lt;Path&gt; askForSavePath() {
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .addExtensionFilter(StandardFileType.BIBTEX_DB)</b>
+<b class="nc">&nbsp;                .withDefaultExtension(StandardFileType.BIBTEX_DB)</b>
+<b class="nc">&nbsp;                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())</b>
+<b class="nc">&nbsp;                .build();</b>
+<b class="nc">&nbsp;        Optional&lt;Path&gt; selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);</b>
+<b class="nc">&nbsp;        selectedPath.ifPresent(path -&gt; preferences.getFilePreferences().setWorkingDirectory(path.getParent()));</b>
+<b class="nc">&nbsp;        if (selectedPath.isPresent()) {</b>
+<b class="nc">&nbsp;            Path savePath = selectedPath.get();</b>
+&nbsp;            // Workaround for linux systems not adding file extension
+<b class="nc">&nbsp;            if (!savePath.getFileName().toString().toLowerCase().endsWith(&quot;.bib&quot;)) {</b>
+<b class="nc">&nbsp;                savePath = Path.of(savePath + &quot;.bib&quot;);</b>
+<b class="nc">&nbsp;                if (!Files.notExists(savePath) &amp;&amp; !dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Overwrite file&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;&#39;%0&#39; exists. Overwrite file?&quot;, savePath.getFileName()))) {</b>
+<b class="nc">&nbsp;                    return Optional.empty();</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                selectedPath = Optional.of(savePath);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return selectedPath;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean save(BibDatabaseContext bibDatabaseContext, SaveDatabaseMode mode) {
+<b class="nc">&nbsp;        Optional&lt;Path&gt; databasePath = bibDatabaseContext.getDatabasePath();</b>
+<b class="nc">&nbsp;        if (databasePath.isEmpty()) {</b>
+<b class="nc">&nbsp;            Optional&lt;Path&gt; savePath = askForSavePath();</b>
+<b class="nc">&nbsp;            return savePath.filter(path -&gt; saveAs(path, mode)).isPresent();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return save(databasePath.get(), mode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean save(Path targetPath, SaveDatabaseMode mode) {
+<b class="nc">&nbsp;        if (mode == SaveDatabaseMode.NORMAL &amp;&amp; libraryTab.getBibDatabaseContext().getEntries().size() &gt; 2_000) {</b>
+<b class="nc">&nbsp;            dialogService.notify(&quot;%s...&quot;.formatted(Localization.lang(&quot;Saving library&quot;)));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        synchronized (libraryTab) {</b>
+<b class="nc">&nbsp;            if (libraryTab.isSaving()) {</b>
+&nbsp;                // if another thread is saving, we do not need to save
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            libraryTab.setSaving(true);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            Charset encoding = libraryTab.getBibDatabaseContext()</b>
+<b class="nc">&nbsp;                                         .getMetaData()</b>
+<b class="nc">&nbsp;                                         .getEncoding()</b>
+<b class="nc">&nbsp;                                         .orElse(StandardCharsets.UTF_8);</b>
+&nbsp;
+&nbsp;            // Make sure to remember which encoding we used
+<b class="nc">&nbsp;            libraryTab.getBibDatabaseContext().getMetaData().setEncoding(encoding, ChangePropagation.DO_NOT_POST_EVENT);</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean success = saveDatabase(targetPath, false, encoding, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, getSaveOrder());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (success) {</b>
+<b class="nc">&nbsp;                libraryTab.getUndoManager().markUnchanged();</b>
+<b class="nc">&nbsp;                libraryTab.resetChangedProperties();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Library saved&quot;));</b>
+<b class="nc">&nbsp;            return success;</b>
+&nbsp;        } catch (SaveException ex) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;A problem occurred when trying to save the file {}&quot;, targetPath, ex);</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Save library&quot;), Localization.lang(&quot;Could not save file.&quot;), ex);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        } finally {
+&nbsp;            // release panel from save status
+<b class="nc">&nbsp;            libraryTab.setSaving(false);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
+&nbsp;        // if this code is adapted, please also adapt org.jabref.logic.autosaveandbackup.BackupManager.performBackup
+<b class="nc">&nbsp;        SelfContainedSaveConfiguration saveConfiguration</b>
+<b class="nc">&nbsp;                = new SelfContainedSaveConfiguration(saveOrder, false, saveType, preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());</b>
+<b class="nc">&nbsp;        BibDatabaseContext bibDatabaseContext = libraryTab.getBibDatabaseContext();</b>
+<b class="nc">&nbsp;        synchronized (bibDatabaseContext) {</b>
+<b class="nc">&nbsp;            try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {</b>
+<b class="nc">&nbsp;                BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());</b>
+<b class="nc">&nbsp;                BibDatabaseWriter databaseWriter = new BibDatabaseWriter(</b>
+&nbsp;                        bibWriter,
+&nbsp;                        saveConfiguration,
+<b class="nc">&nbsp;                        preferences.getFieldPreferences(),</b>
+<b class="nc">&nbsp;                        preferences.getCitationKeyPatternPreferences(),</b>
+&nbsp;                        entryTypesManager);
+&nbsp;
+<b class="nc">&nbsp;                if (selectedOnly) {</b>
+<b class="nc">&nbsp;                    databaseWriter.savePartOfDatabase(bibDatabaseContext, libraryTab.getSelectedEntries());</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    databaseWriter.saveDatabase(bibDatabaseContext);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());</b>
+&nbsp;
+<b class="nc">&nbsp;                if (fileWriter.hasEncodingProblems()) {</b>
+<b class="nc">&nbsp;                    saveWithDifferentEncoding(file, selectedOnly, encoding, fileWriter.getEncodingProblems(), saveType, saveOrder);</b>
+&nbsp;                }
+&nbsp;            } catch (UnsupportedCharsetException ex) {
+<b class="nc">&nbsp;                throw new SaveException(Localization.lang(&quot;Character encoding &#39;%0&#39; is not supported.&quot;, encoding.displayName()), ex);</b>
+&nbsp;            } catch (IOException ex) {
+<b class="nc">&nbsp;                throw new SaveException(&quot;Problems saving: &quot; + ex, ex);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set&lt;Character&gt; encodingProblems, BibDatabaseWriter.SaveType saveType, SelfContainedSaveOrder saveOrder) throws SaveException {
+<b class="nc">&nbsp;        DialogPane pane = new DialogPane();</b>
+<b class="nc">&nbsp;        VBox vbox = new VBox();</b>
+<b class="nc">&nbsp;        vbox.getChildren().addAll(</b>
+<b class="nc">&nbsp;                new Text(Localization.lang(&quot;The chosen encoding &#39;%0&#39; could not encode the following characters:&quot;, encoding.displayName())),</b>
+<b class="nc">&nbsp;                new Text(encodingProblems.stream().map(Object::toString).collect(Collectors.joining(&quot;.&quot;))),</b>
+<b class="nc">&nbsp;                new Text(Localization.lang(&quot;What do you want to do?&quot;))</b>
+&nbsp;        );
+<b class="nc">&nbsp;        pane.setContent(vbox);</b>
+&nbsp;
+<b class="nc">&nbsp;        ButtonType tryDifferentEncoding = new ButtonType(Localization.lang(&quot;Try different encoding&quot;), ButtonBar.ButtonData.OTHER);</b>
+<b class="nc">&nbsp;        ButtonType ignore = new ButtonType(Localization.lang(&quot;Ignore&quot;), ButtonBar.ButtonData.APPLY);</b>
+<b class="nc">&nbsp;        boolean saveWithDifferentEncoding = dialogService</b>
+<b class="nc">&nbsp;                .showCustomDialogAndWait(Localization.lang(&quot;Save library&quot;), pane, ignore, tryDifferentEncoding)</b>
+<b class="nc">&nbsp;                .filter(buttonType -&gt; buttonType.equals(tryDifferentEncoding))</b>
+<b class="nc">&nbsp;                .isPresent();</b>
+<b class="nc">&nbsp;        if (saveWithDifferentEncoding) {</b>
+<b class="nc">&nbsp;            Optional&lt;Charset&gt; newEncoding = dialogService.showChoiceDialogAndWait(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Save library&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Select new encoding&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Save library&quot;),</b>
+&nbsp;                    encoding,
+&nbsp;                    OS.ENCODINGS);
+<b class="nc">&nbsp;            if (newEncoding.isPresent()) {</b>
+&nbsp;                // Make sure to remember which encoding we used.
+<b class="nc">&nbsp;                libraryTab.getBibDatabaseContext().getMetaData().setEncoding(newEncoding.get(), ChangePropagation.DO_NOT_POST_EVENT);</b>
+&nbsp;
+<b class="nc">&nbsp;                saveDatabase(file, selectedOnly, newEncoding.get(), saveType, saveOrder);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

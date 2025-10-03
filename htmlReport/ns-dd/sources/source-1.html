@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibTeXConverter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.msbib</a>
+</div>
+
+<h1>Coverage Summary for Class: BibTeXConverter (org.jabref.logic.msbib)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibTeXConverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.msbib;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Month;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;
+&nbsp;public class BibTeXConverter {
+&nbsp;
+&nbsp;    private static final String MSBIB_PREFIX = &quot;msbib-&quot;;
+&nbsp;
+&nbsp;    private BibTeXConverter() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts an {@link MSBibEntry} to a {@link BibEntry} for import
+&nbsp;     */
+&nbsp;    public static BibEntry convert(MSBibEntry entry) {
+&nbsp;        BibEntry result;
+<b class="nc">&nbsp;        Map&lt;Field, String&gt; fieldValues = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        EntryType bibTexEntryType = MSBibMapping.getBiblatexEntryType(entry.getType());</b>
+<b class="nc">&nbsp;        result = new BibEntry(bibTexEntryType);</b>
+&nbsp;
+&nbsp;        // add String fields
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, String&gt; field : entry.fields.entrySet()) {</b>
+<b class="nc">&nbsp;            String msField = field.getKey();</b>
+<b class="nc">&nbsp;            String value = field.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            if ((value != null) &amp;&amp; (MSBibMapping.getBibTeXField(msField) != null)) {</b>
+<b class="nc">&nbsp;                fieldValues.put(MSBibMapping.getBibTeXField(msField), value);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Value must be converted
+<b class="nc">&nbsp;        if (fieldValues.containsKey(StandardField.LANGUAGE)) {</b>
+<b class="nc">&nbsp;            int lcid = Integer.parseInt(fieldValues.get(StandardField.LANGUAGE));</b>
+<b class="nc">&nbsp;            fieldValues.put(StandardField.LANGUAGE, MSBibMapping.getLanguage(lcid));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        addAuthor(fieldValues, StandardField.AUTHOR, entry.authors);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, StandardField.BOOKAUTHOR, entry.bookAuthors);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, StandardField.EDITOR, entry.editors);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, StandardField.TRANSLATOR, entry.translators);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + &quot;producername&quot;), entry.producerNames);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + &quot;composer&quot;), entry.composers);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + &quot;conductor&quot;), entry.conductors);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + &quot;performer&quot;), entry.performers);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + &quot;writer&quot;), entry.writers);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + &quot;director&quot;), entry.directors);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + &quot;compiler&quot;), entry.compilers);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + &quot;interviewer&quot;), entry.interviewers);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + &quot;interviewee&quot;), entry.interviewees);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + &quot;inventor&quot;), entry.inventors);</b>
+<b class="nc">&nbsp;        addAuthor(fieldValues, new UnknownField(MSBIB_PREFIX + &quot;counsel&quot;), entry.counsels);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entry.pages != null) {</b>
+<b class="nc">&nbsp;            fieldValues.put(StandardField.PAGES, entry.pages.toString(&quot;--&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        parseStandardNumber(entry.standardNumber, fieldValues);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entry.address != null) {</b>
+<b class="nc">&nbsp;            fieldValues.put(StandardField.LOCATION, entry.address);</b>
+&nbsp;        }
+&nbsp;        // TODO: ConferenceName is saved as booktitle when converting from MSBIB to BibTeX
+<b class="nc">&nbsp;        if (entry.conferenceName != null) {</b>
+<b class="nc">&nbsp;            fieldValues.put(StandardField.ORGANIZATION, entry.conferenceName);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (entry.dateAccessed != null) {</b>
+<b class="nc">&nbsp;            fieldValues.put(new UnknownField(MSBIB_PREFIX + &quot;accessed&quot;), entry.dateAccessed);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (entry.journalName != null) {</b>
+<b class="nc">&nbsp;            fieldValues.put(StandardField.JOURNAL, entry.journalName);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (entry.month != null) {</b>
+<b class="nc">&nbsp;            Optional&lt;Month&gt; month = Month.parse(entry.month);</b>
+<b class="nc">&nbsp;            month.ifPresent(result::setMonth);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (entry.number != null) {</b>
+<b class="nc">&nbsp;            fieldValues.put(StandardField.NUMBER, entry.number);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // set all fields
+<b class="nc">&nbsp;        result.setField(fieldValues);</b>
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addAuthor(Map&lt;Field, String&gt; map, Field field, List&lt;MsBibAuthor&gt; authors) {
+<b class="nc">&nbsp;        if (authors == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        String allAuthors = authors.stream().map(MsBibAuthor::getLastFirst).collect(Collectors.joining(&quot; and &quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        map.put(field, allAuthors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void parseSingleStandardNumber(String type, Field field, String standardNum, Map&lt;Field, String&gt; map) {
+<b class="nc">&nbsp;        Pattern pattern = Pattern.compile(&#39;:&#39; + type + &quot;:(.[^:]+)&quot;);</b>
+<b class="nc">&nbsp;        Matcher matcher = pattern.matcher(standardNum);</b>
+<b class="nc">&nbsp;        if (matcher.matches()) {</b>
+<b class="nc">&nbsp;            map.put(field, matcher.group(1));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void parseStandardNumber(String standardNum, Map&lt;Field, String&gt; map) {
+<b class="nc">&nbsp;        if (standardNum == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        parseSingleStandardNumber(&quot;ISBN&quot;, StandardField.ISBN, standardNum, map);</b>
+<b class="nc">&nbsp;        parseSingleStandardNumber(&quot;ISSN&quot;, StandardField.ISSN, standardNum, map);</b>
+<b class="nc">&nbsp;        parseSingleStandardNumber(&quot;LCCN&quot;, new UnknownField(&quot;lccn&quot;), standardNum, map);</b>
+<b class="nc">&nbsp;        parseSingleStandardNumber(&quot;MRN&quot;, StandardField.MR_NUMBER, standardNum, map);</b>
+<b class="nc">&nbsp;        parseSingleStandardNumber(&quot;DOI&quot;, StandardField.DOI, standardNum, map);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

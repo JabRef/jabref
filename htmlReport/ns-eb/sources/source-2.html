@@ -1,0 +1,162 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PseudonymizationResultCsvWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.pseudonymization</a>
+</div>
+
+<h1>Coverage Summary for Class: PseudonymizationResultCsvWriter (org.jabref.logic.pseudonymization)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PseudonymizationResultCsvWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.pseudonymization;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.apache.commons.csv.CSVFormat;
+&nbsp;import org.apache.commons.csv.CSVPrinter;
+&nbsp;import org.jooq.lambda.Unchecked;
+&nbsp;
+<b class="nc">&nbsp;public class PseudonymizationResultCsvWriter {</b>
+&nbsp;
+&nbsp;    public static void writeValuesMappingAsCsv(Path path, Pseudonymization.Result result) throws IOException {
+&nbsp;        try (
+<b class="nc">&nbsp;                OutputStreamWriter writer = new OutputStreamWriter(Files.newOutputStream(path), StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;                CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)</b>
+&nbsp;        ) {
+<b class="nc">&nbsp;            csvPrinter.printRecord(&quot;pseudonymized&quot;, &quot;original value&quot;);</b>
+&nbsp;            // The valueMapping is a map of pseudonymized value to original value
+&nbsp;            // The pseudonymized value is the key, the original value is the value
+<b class="nc">&nbsp;            result.valueMapping().entrySet().stream()</b>
+&nbsp;                  // We have date-1, date-2, ..., date-10, date-11. That should be sorted accordingly.
+&nbsp;                  // In case a &quot;dumb&quot; string ordering is used, we would get date-1, date-10, date-11, date-2, ...
+<b class="nc">&nbsp;                  .sorted(Comparator.comparing((Map.Entry&lt;String, String&gt; entry) -&gt; getKeyPrefix(entry.getKey())</b>
+<b class="nc">&nbsp;                  ).thenComparingInt(entry -&gt; extractNumber(entry.getKey())))</b>
+<b class="nc">&nbsp;                  .forEach(Unchecked.consumer(entry -&gt; csvPrinter.printRecord(entry.getKey(), entry.getValue())));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getKeyPrefix(String key) {
+<b class="nc">&nbsp;        int dashIndex = key.lastIndexOf(&#39;-&#39;);</b>
+<b class="nc">&nbsp;        return dashIndex != -1 ? key.substring(0, dashIndex) : key;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int extractNumber(String key) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return Integer.parseInt(key.substring(key.lastIndexOf(&#39;-&#39;) + 1));</b>
+&nbsp;        } catch (NumberFormatException e) {
+<b class="nc">&nbsp;            return Integer.MAX_VALUE;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

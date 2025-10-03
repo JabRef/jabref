@@ -1,0 +1,679 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GeneralTabViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.general</a>
+</div>
+
+<h1>Coverage Summary for Class: GeneralTabViewModel (org.jabref.gui.preferences.general)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GeneralTabViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/219)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">GeneralTabViewModel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/51)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/221)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.general;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URI;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.ReadOnlyListProperty;
+&nbsp;import javafx.beans.property.ReadOnlyListWrapper;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.scene.control.SpinnerValueFactory;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.WorkspacePreferences;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.frame.UiMessageHandler;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preferences.PreferenceTabViewModel;
+&nbsp;import org.jabref.gui.remote.CLIMessageHandler;
+&nbsp;import org.jabref.gui.theme.Theme;
+&nbsp;import org.jabref.gui.theme.ThemeTypes;
+&nbsp;import org.jabref.gui.util.DirectoryDialogConfiguration;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.http.manager.HttpServerManager;
+&nbsp;import org.jabref.languageserver.controller.LanguageServerController;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.LibraryPreferences;
+&nbsp;import org.jabref.logic.l10n.Language;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.net.ssl.TrustStoreManager;
+&nbsp;import org.jabref.logic.remote.RemotePreferences;
+&nbsp;import org.jabref.logic.remote.RemoteUtil;
+&nbsp;import org.jabref.logic.remote.server.RemoteListenerServerManager;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.Validator;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class GeneralTabViewModel implements PreferenceTabViewModel {
+&nbsp;
+<b class="nc">&nbsp;    protected static SpinnerValueFactory&lt;Integer&gt; fontSizeValueFactory =</b>
+&nbsp;            new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(GeneralTabViewModel.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ReadOnlyListProperty&lt;Language&gt; languagesListProperty =</b>
+<b class="nc">&nbsp;            new ReadOnlyListWrapper&lt;&gt;(FXCollections.observableArrayList(Language.getSorted()));</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Language&gt; selectedLanguageProperty = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ReadOnlyListProperty&lt;ThemeTypes&gt; themesListProperty =</b>
+<b class="nc">&nbsp;            new ReadOnlyListWrapper&lt;&gt;(FXCollections.observableArrayList(ThemeTypes.values()));</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;ThemeTypes&gt; selectedThemeProperty = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty themeSyncOsProperty = new SimpleBooleanProperty();</b>
+&nbsp;
+&nbsp;    // init with empty string to avoid npe in accessing
+<b class="nc">&nbsp;    private final StringProperty customPathToThemeProperty = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty fontSizeProperty = new SimpleStringProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty openLastStartupProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty inspectionWarningDuplicateProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty confirmDeleteProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty shouldAskForIncludingCrossReferencesProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty hideTabBarProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty donationNeverShowProperty = new SimpleBooleanProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;BibDatabaseMode&gt; bibliographyModeListProperty = new SimpleListProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;BibDatabaseMode&gt; selectedBiblatexModeProperty = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty autosaveLocalLibraries = new SimpleBooleanProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty createBackupProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty backupDirectoryProperty = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final WorkspacePreferences workspacePreferences;
+&nbsp;    private final LibraryPreferences libraryPreferences;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final RemotePreferences remotePreferences;
+&nbsp;
+&nbsp;    private final Validator fontSizeValidator;
+&nbsp;    private final Validator customPathToThemeValidator;
+&nbsp;
+<b class="nc">&nbsp;    private final List&lt;String&gt; restartWarning = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty remotePortProperty = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;    private final Validator remotePortValidator;
+<b class="nc">&nbsp;    private final BooleanProperty enableHttpServerProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty httpPortProperty = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;    private final Validator httpPortValidator;
+&nbsp;    private final Validator languageServerPortValidator;
+<b class="nc">&nbsp;    private final BooleanProperty enableLanguageServerProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final StringProperty languageServerPortProperty = new SimpleStringProperty(&quot;&quot;);</b>
+&nbsp;    private final TrustStoreManager trustStoreManager;
+&nbsp;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;
+<b class="nc">&nbsp;    public GeneralTabViewModel(DialogService dialogService, GuiPreferences preferences, FileUpdateMonitor fileUpdateMonitor) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.workspacePreferences = preferences.getWorkspacePreferences();</b>
+<b class="nc">&nbsp;        this.libraryPreferences = preferences.getLibraryPreferences();</b>
+<b class="nc">&nbsp;        this.filePreferences = preferences.getFilePreferences();</b>
+<b class="nc">&nbsp;        this.remotePreferences = preferences.getRemotePreferences();</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+&nbsp;
+<b class="nc">&nbsp;        fontSizeValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                fontSizeProperty,
+&nbsp;                input -&gt; {
+&nbsp;                    try {
+<b class="nc">&nbsp;                        return Integer.parseInt(fontSizeProperty().getValue()) &gt; 8;</b>
+&nbsp;                    } catch (NumberFormatException ex) {
+<b class="nc">&nbsp;                        return false;</b>
+&nbsp;                    }
+&nbsp;                },
+<b class="nc">&nbsp;                ValidationMessage.error(&quot;%s &gt; %s %n %n %s&quot;.formatted(</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;General&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Font settings&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;You must enter an integer value higher than 8.&quot;))));</b>
+&nbsp;
+<b class="nc">&nbsp;        customPathToThemeValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                customPathToThemeProperty,
+<b class="nc">&nbsp;                input -&gt; !StringUtil.isNullOrEmpty(input),</b>
+<b class="nc">&nbsp;                ValidationMessage.error(&quot;%s &gt; %s %n %n %s&quot;.formatted(</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;General&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Visual theme&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Please specify a css theme file.&quot;))));</b>
+&nbsp;
+<b class="nc">&nbsp;        remotePortValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                remotePortProperty,
+&nbsp;                RemoteUtil::isStringUserPort,
+<b class="nc">&nbsp;                ValidationMessage.error(&quot;%s &gt; %s %n %n %s&quot;.formatted(</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Network&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;Remote operation&quot;),</b>
+<b class="nc">&nbsp;                        Localization.lang(&quot;You must enter an integer value in the interval 1025-65535&quot;))));</b>
+&nbsp;
+<b class="nc">&nbsp;        httpPortValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                httpPortProperty,
+&nbsp;                RemoteUtil::isStringUserPort,
+<b class="nc">&nbsp;                ValidationMessage.error(&quot;%s&quot;.formatted(Localization.lang(&quot;You must enter an integer value in the interval 1025-65535&quot;))));</b>
+&nbsp;
+<b class="nc">&nbsp;        languageServerPortValidator = new FunctionBasedValidator&lt;&gt;(</b>
+&nbsp;                languageServerPortProperty,
+&nbsp;                RemoteUtil::isStringUserPort,
+<b class="nc">&nbsp;                ValidationMessage.error(Localization.lang(&quot;You must enter an integer value in the interval 1025-65535&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.trustStoreManager = new TrustStoreManager(Path.of(preferences.getSSLPreferences().getTruststorePath()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus remotePortValidationStatus() {
+<b class="nc">&nbsp;        return remotePortValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus httpPortValidationStatus() {
+<b class="nc">&nbsp;        return httpPortValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus languageServerPortValidationStatus() {
+<b class="nc">&nbsp;        return languageServerPortValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        selectedLanguageProperty.setValue(workspacePreferences.getLanguage());</b>
+&nbsp;
+&nbsp;        // The light theme is in fact the absence of any theme modifying &#39;base.css&#39;. Another embedded theme like
+&nbsp;        // &#39;dark.css&#39;, stored in the classpath, can be introduced in {@link org.jabref.gui.theme.Theme}.
+<b class="nc">&nbsp;        switch (workspacePreferences.getTheme().getType()) {</b>
+&nbsp;            case DEFAULT -&gt;
+<b class="nc">&nbsp;                    selectedThemeProperty.setValue(ThemeTypes.LIGHT);</b>
+&nbsp;            case EMBEDDED -&gt;
+<b class="nc">&nbsp;                    selectedThemeProperty.setValue(ThemeTypes.DARK);</b>
+&nbsp;            case CUSTOM -&gt; {
+<b class="nc">&nbsp;                selectedThemeProperty.setValue(ThemeTypes.CUSTOM);</b>
+<b class="nc">&nbsp;                customPathToThemeProperty.setValue(workspacePreferences.getTheme().getName());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        themeSyncOsProperty.setValue(workspacePreferences.shouldThemeSyncOs());</b>
+&nbsp;
+<b class="nc">&nbsp;        fontOverrideProperty.setValue(workspacePreferences.shouldOverrideDefaultFontSize());</b>
+<b class="nc">&nbsp;        fontSizeProperty.setValue(String.valueOf(workspacePreferences.getMainFontSize()));</b>
+&nbsp;
+<b class="nc">&nbsp;        openLastStartupProperty.setValue(workspacePreferences.shouldOpenLastEdited());</b>
+<b class="nc">&nbsp;        showAdvancedHintsProperty.setValue(workspacePreferences.shouldShowAdvancedHints());</b>
+<b class="nc">&nbsp;        inspectionWarningDuplicateProperty.setValue(workspacePreferences.shouldWarnAboutDuplicatesInInspection());</b>
+&nbsp;
+<b class="nc">&nbsp;        confirmDeleteProperty.setValue(workspacePreferences.shouldConfirmDelete());</b>
+<b class="nc">&nbsp;        shouldAskForIncludingCrossReferencesProperty.setValue(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences());</b>
+<b class="nc">&nbsp;        hideTabBarProperty.setValue(workspacePreferences.shouldHideTabBar());</b>
+<b class="nc">&nbsp;        donationNeverShowProperty.setValue(preferences.getDonationPreferences().isNeverShowAgain());</b>
+&nbsp;
+<b class="nc">&nbsp;        bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));</b>
+<b class="nc">&nbsp;        selectedBiblatexModeProperty.setValue(libraryPreferences.getDefaultBibDatabaseMode());</b>
+&nbsp;
+<b class="nc">&nbsp;        alwaysReformatBibProperty.setValue(libraryPreferences.shouldAlwaysReformatOnSave());</b>
+<b class="nc">&nbsp;        autosaveLocalLibraries.setValue(libraryPreferences.shouldAutoSave());</b>
+&nbsp;
+<b class="nc">&nbsp;        createBackupProperty.setValue(filePreferences.shouldCreateBackup());</b>
+<b class="nc">&nbsp;        backupDirectoryProperty.setValue(filePreferences.getBackupDirectory().toString());</b>
+&nbsp;
+<b class="nc">&nbsp;        remoteServerProperty.setValue(remotePreferences.useRemoteServer());</b>
+<b class="nc">&nbsp;        remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));</b>
+&nbsp;
+<b class="nc">&nbsp;        enableHttpServerProperty.setValue(remotePreferences.enableHttpServer());</b>
+<b class="nc">&nbsp;        httpPortProperty.setValue(String.valueOf(remotePreferences.getHttpPort()));</b>
+&nbsp;
+<b class="nc">&nbsp;        enableLanguageServerProperty.setValue(remotePreferences.enableLanguageServer());</b>
+<b class="nc">&nbsp;        languageServerPortProperty.setValue(String.valueOf(remotePreferences.getLanguageServerPort()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        Language newLanguage = selectedLanguageProperty.getValue();</b>
+<b class="nc">&nbsp;        if (newLanguage != workspacePreferences.getLanguage()) {</b>
+<b class="nc">&nbsp;            workspacePreferences.setLanguage(newLanguage);</b>
+<b class="nc">&nbsp;            Localization.setLanguage(newLanguage);</b>
+<b class="nc">&nbsp;            restartWarning.add(Localization.lang(&quot;Changed language to %0&quot;, newLanguage.getDisplayName()));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        workspacePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());</b>
+<b class="nc">&nbsp;        workspacePreferences.setMainFontSize(Integer.parseInt(fontSizeProperty.getValue()));</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (selectedThemeProperty.get()) {</b>
+&nbsp;            case LIGHT -&gt;
+<b class="nc">&nbsp;                    workspacePreferences.setTheme(Theme.light());</b>
+&nbsp;            case DARK -&gt;
+<b class="nc">&nbsp;                    workspacePreferences.setTheme(Theme.dark());</b>
+&nbsp;            case CUSTOM -&gt;
+<b class="nc">&nbsp;                    workspacePreferences.setTheme(Theme.custom(customPathToThemeProperty.getValue()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        workspacePreferences.setThemeSyncOs(themeSyncOsProperty.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;        workspacePreferences.setOpenLastEdited(openLastStartupProperty.getValue());</b>
+<b class="nc">&nbsp;        workspacePreferences.setShowAdvancedHints(showAdvancedHintsProperty.getValue());</b>
+<b class="nc">&nbsp;        workspacePreferences.setWarnAboutDuplicatesInInspection(inspectionWarningDuplicateProperty.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;        workspacePreferences.setConfirmDelete(confirmDeleteProperty.getValue());</b>
+<b class="nc">&nbsp;        preferences.getCopyToPreferences().setShouldAskForIncludingCrossReferences(shouldAskForIncludingCrossReferencesProperty.getValue());</b>
+<b class="nc">&nbsp;        workspacePreferences.setHideTabBar(confirmHideTabBarProperty().getValue());</b>
+<b class="nc">&nbsp;        preferences.getDonationPreferences().setNeverShowAgain(donationNeverShowProperty.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;        libraryPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;        libraryPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());</b>
+<b class="nc">&nbsp;        libraryPreferences.setAutoSave(autosaveLocalLibraries.getValue());</b>
+&nbsp;
+<b class="nc">&nbsp;        filePreferences.createBackupProperty().setValue(createBackupProperty.getValue());</b>
+<b class="nc">&nbsp;        filePreferences.backupDirectoryProperty().setValue(Path.of(backupDirectoryProperty.getValue()));</b>
+&nbsp;
+<b class="nc">&nbsp;        getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -&gt; {</b>
+<b class="nc">&nbsp;            if (remotePreferences.isDifferentPort(newPort)) {</b>
+<b class="nc">&nbsp;                remotePreferences.setPort(newPort);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -&gt; {</b>
+<b class="nc">&nbsp;            if (remotePreferences.isDifferentPort(newPort)) {</b>
+<b class="nc">&nbsp;                remotePreferences.setPort(newPort);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        UiMessageHandler uiMessageHandler = Injector.instantiateModelOrService(UiMessageHandler.class);</b>
+<b class="nc">&nbsp;        RemoteListenerServerManager remoteListenerServerManager = Injector.instantiateModelOrService(RemoteListenerServerManager.class);</b>
+&nbsp;        // stop in all cases, because the port might have changed
+<b class="nc">&nbsp;        remoteListenerServerManager.stop();</b>
+<b class="nc">&nbsp;        if (remoteServerProperty.getValue()) {</b>
+<b class="nc">&nbsp;            remotePreferences.setUseRemoteServer(true);</b>
+<b class="nc">&nbsp;            remoteListenerServerManager.openAndStart(</b>
+&nbsp;                    new CLIMessageHandler(uiMessageHandler, preferences),
+<b class="nc">&nbsp;                    remotePreferences.getPort());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            remotePreferences.setUseRemoteServer(false);</b>
+<b class="nc">&nbsp;            remoteListenerServerManager.stop();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        getPortAsInt(httpPortProperty.getValue()).ifPresent(newPort -&gt; {</b>
+<b class="nc">&nbsp;            if (remotePreferences.isDifferentHttpPort(newPort)) {</b>
+<b class="nc">&nbsp;                remotePreferences.setHttpPort(newPort);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        getPortAsInt(languageServerPortProperty.getValue()).ifPresent(newPort -&gt; {</b>
+<b class="nc">&nbsp;            if (remotePreferences.isDifferentLanguageServerPort(newPort)) {</b>
+<b class="nc">&nbsp;                remotePreferences.setLanguageServerPort(newPort);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        HttpServerManager httpServerManager = Injector.instantiateModelOrService(HttpServerManager.class);</b>
+&nbsp;        // stop in all cases, because the port might have changed
+<b class="nc">&nbsp;        httpServerManager.stop();</b>
+<b class="nc">&nbsp;        if (enableHttpServerProperty.getValue()) {</b>
+<b class="nc">&nbsp;            remotePreferences.setEnableHttpServer(true);</b>
+<b class="nc">&nbsp;            URI uri = remotePreferences.getHttpServerUri();</b>
+<b class="nc">&nbsp;            httpServerManager.start(Injector.instantiateModelOrService(StateManager.class), uri);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            remotePreferences.setEnableHttpServer(false);</b>
+<b class="nc">&nbsp;            httpServerManager.stop();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LanguageServerController languageServerController = Injector.instantiateModelOrService(LanguageServerController.class);</b>
+&nbsp;        // stop in all cases, because the port might have changed (or other settings that can&#39;t be easily tracked https://github.com/JabRef/jabref/pull/13697#discussion_r2285997003)
+<b class="nc">&nbsp;        languageServerController.stop();</b>
+<b class="nc">&nbsp;        if (enableLanguageServerProperty.getValue()) {</b>
+<b class="nc">&nbsp;            remotePreferences.setEnableLanguageServer(true);</b>
+<b class="nc">&nbsp;            languageServerController.start(remotePreferences.getLanguageServerPort());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            remotePreferences.setEnableLanguageServer(false);</b>
+<b class="nc">&nbsp;            languageServerController.stop();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        trustStoreManager.flush();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus fontSizeValidationStatus() {
+<b class="nc">&nbsp;        return fontSizeValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ValidationStatus customPathToThemeValidationStatus() {
+<b class="nc">&nbsp;        return customPathToThemeValidator.getValidationStatus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean validateSettings() {
+<b class="nc">&nbsp;        CompositeValidator validator = new CompositeValidator();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (remoteServerProperty.getValue()) {</b>
+<b class="nc">&nbsp;            validator.addValidators(remotePortValidator);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (enableHttpServerProperty.getValue()) {</b>
+<b class="nc">&nbsp;            validator.addValidators(httpPortValidator);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (enableLanguageServerProperty.getValue()) {</b>
+<b class="nc">&nbsp;            validator.addValidators(languageServerPortValidator);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (fontOverrideProperty.getValue()) {</b>
+<b class="nc">&nbsp;            validator.addValidators(fontSizeValidator);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (selectedThemeProperty.getValue() == ThemeTypes.CUSTOM) {</b>
+<b class="nc">&nbsp;            validator.addValidators(customPathToThemeValidator);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ValidationStatus validationStatus = validator.getValidationStatus();</b>
+<b class="nc">&nbsp;        if (!validationStatus.isValid()) {</b>
+<b class="nc">&nbsp;            validationStatus.getHighestMessage().ifPresent(message -&gt;</b>
+<b class="nc">&nbsp;                    dialogService.showErrorDialogAndWait(message.getMessage()));</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; getRestartWarnings() {
+<b class="nc">&nbsp;        return restartWarning;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyListProperty&lt;Language&gt; languagesListProperty() {
+<b class="nc">&nbsp;        return this.languagesListProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Language&gt; selectedLanguageProperty() {
+<b class="nc">&nbsp;        return this.selectedLanguageProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyListProperty&lt;ThemeTypes&gt; themesListProperty() {
+<b class="nc">&nbsp;        return this.themesListProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;ThemeTypes&gt; selectedThemeProperty() {
+<b class="nc">&nbsp;        return this.selectedThemeProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty themeSyncOsProperty() {
+<b class="nc">&nbsp;        return this.themeSyncOsProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty customPathToThemeProperty() {
+<b class="nc">&nbsp;        return customPathToThemeProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void importCSSFile() {
+<b class="nc">&nbsp;        String fileDir = customPathToThemeProperty.getValue().isEmpty() ? preferences.getInternalPreferences().getLastPreferencesExportPath().toString()</b>
+<b class="nc">&nbsp;                                                                        : customPathToThemeProperty.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .addExtensionFilter(StandardFileType.CSS)</b>
+<b class="nc">&nbsp;                .withDefaultExtension(StandardFileType.CSS)</b>
+<b class="nc">&nbsp;                .withInitialDirectory(fileDir).build();</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -&gt;</b>
+<b class="nc">&nbsp;                customPathToThemeProperty.setValue(file.toAbsolutePath().toString()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty fontOverrideProperty() {
+<b class="nc">&nbsp;        return fontOverrideProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty fontSizeProperty() {
+<b class="nc">&nbsp;        return fontSizeProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty openLastStartupProperty() {
+<b class="nc">&nbsp;        return openLastStartupProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty showAdvancedHintsProperty() {
+<b class="nc">&nbsp;        return this.showAdvancedHintsProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty inspectionWarningDuplicateProperty() {
+<b class="nc">&nbsp;        return this.inspectionWarningDuplicateProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty confirmDeleteProperty() {
+<b class="nc">&nbsp;        return this.confirmDeleteProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldAskForIncludingCrossReferences() {
+<b class="nc">&nbsp;        return this.shouldAskForIncludingCrossReferencesProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty confirmHideTabBarProperty() {
+<b class="nc">&nbsp;        return this.hideTabBarProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty donationNeverShowProperty() {
+<b class="nc">&nbsp;        return this.donationNeverShowProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;BibDatabaseMode&gt; biblatexModeListProperty() {
+<b class="nc">&nbsp;        return this.bibliographyModeListProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;BibDatabaseMode&gt; selectedBiblatexModeProperty() {
+<b class="nc">&nbsp;        return this.selectedBiblatexModeProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty alwaysReformatBibProperty() {
+<b class="nc">&nbsp;        return alwaysReformatBibProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty autosaveLocalLibrariesProperty() {
+<b class="nc">&nbsp;        return autosaveLocalLibraries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty createBackupProperty() {
+<b class="nc">&nbsp;        return this.createBackupProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty backupDirectoryProperty() {
+<b class="nc">&nbsp;        return this.backupDirectoryProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void backupFileDirBrowse() {
+<b class="nc">&nbsp;        DirectoryDialogConfiguration dirDialogConfiguration =</b>
+<b class="nc">&nbsp;                new DirectoryDialogConfiguration.Builder().withInitialDirectory(Path.of(backupDirectoryProperty().getValue())).build();</b>
+<b class="nc">&nbsp;        dialogService.showDirectorySelectionDialog(dirDialogConfiguration)</b>
+<b class="nc">&nbsp;                     .ifPresent(dir -&gt; backupDirectoryProperty.setValue(dir.toString()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty remoteServerProperty() {
+<b class="nc">&nbsp;        return remoteServerProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty remotePortProperty() {
+<b class="nc">&nbsp;        return remotePortProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty enableHttpServerProperty() {
+<b class="nc">&nbsp;        return enableHttpServerProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty httpPortProperty() {
+<b class="nc">&nbsp;        return httpPortProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty enableLanguageServerProperty() {
+<b class="nc">&nbsp;        return enableLanguageServerProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty languageServerPortProperty() {
+<b class="nc">&nbsp;        return languageServerPortProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openBrowser() {
+<b class="nc">&nbsp;        String url = &quot;https://themes.jabref.org&quot;;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            NativeDesktop.openBrowser(url, preferences.getExternalApplicationsPreferences());</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Could not open website.&quot;), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;Integer&gt; getPortAsInt(String value) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return Optional.of(Integer.parseInt(value));</b>
+&nbsp;        } catch (NumberFormatException ex) {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,452 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LinkedFileHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.externalfiles</a>
+</div>
+
+<h1>Coverage Summary for Class: LinkedFileHandler (org.jabref.logic.externalfiles)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LinkedFileHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/100)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/141)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LinkedFileHandler$GetTargetPathResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/100)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/142)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.externalfiles;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.StandardCopyOption;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.util.io.FileNameUniqueness;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class LinkedFileHandler {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileHandler.class);</b>
+&nbsp;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final BibEntry entry;
+&nbsp;
+&nbsp;    private final LinkedFile linkedFile;
+&nbsp;
+&nbsp;    public LinkedFileHandler(LinkedFile linkedFile,
+&nbsp;                             BibEntry entry,
+&nbsp;                             BibDatabaseContext databaseContext,
+<b class="nc">&nbsp;                             FilePreferences filePreferences) {</b>
+<b class="nc">&nbsp;        this.linkedFile = linkedFile;</b>
+<b class="nc">&nbsp;        this.entry = entry;</b>
+<b class="nc">&nbsp;        this.databaseContext = Objects.requireNonNull(databaseContext);</b>
+<b class="nc">&nbsp;        this.filePreferences = Objects.requireNonNull(filePreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean moveToDefaultDirectory() throws IOException {
+<b class="nc">&nbsp;        return copyOrMoveToDefaultDirectory(true, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return true if the file was copied/moved or the same file exists in the target directory
+&nbsp;     */
+&nbsp;    public boolean copyOrMoveToDefaultDirectory(boolean shouldMove, boolean shouldRenameToFilenamePattern) throws IOException {
+<b class="nc">&nbsp;        Optional&lt;Path&gt; databaseFileDirectoryOpt = databaseContext.getFirstExistingFileDir(filePreferences);</b>
+<b class="nc">&nbsp;        if (databaseFileDirectoryOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;No existing file directory found&quot;);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Path databaseFileDirectory = databaseFileDirectoryOpt.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Path&gt; sourcePathOpt = linkedFile.findIn(databaseContext, filePreferences);</b>
+<b class="nc">&nbsp;        if (sourcePathOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not find file {}&quot;, linkedFile.getLink());</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Path sourcePath = sourcePathOpt.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        String targetDirectoryName = &quot;&quot;;</b>
+<b class="nc">&nbsp;        if (!filePreferences.getFileDirectoryPattern().isEmpty()) {</b>
+<b class="nc">&nbsp;            targetDirectoryName = FileUtil.createDirNameFromPattern(</b>
+<b class="nc">&nbsp;                    databaseContext.getDatabase(),</b>
+&nbsp;                    entry,
+<b class="nc">&nbsp;                    filePreferences.getFileDirectoryPattern());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Path targetDirectory = databaseFileDirectory.resolve(targetDirectoryName);</b>
+&nbsp;        // Ensure that this directory exists
+<b class="nc">&nbsp;        Files.createDirectories(targetDirectory);</b>
+&nbsp;
+<b class="nc">&nbsp;        GetTargetPathResult getTargetPathResult = null;</b>
+<b class="nc">&nbsp;        if (shouldRenameToFilenamePattern) {</b>
+<b class="nc">&nbsp;            getTargetPathResult = getTargetPath(sourcePath, targetDirectory, true);</b>
+<b class="nc">&nbsp;            if (getTargetPathResult.exists) {</b>
+<b class="nc">&nbsp;                if (shouldMove &amp;&amp; !Files.isSameFile(sourcePath, getTargetPathResult.path)) {</b>
+<b class="nc">&nbsp;                    Files.delete(sourcePath);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                linkedFile.setLink(FileUtil.relativize(getTargetPathResult.path(), databaseContext, filePreferences).toString());</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (!shouldRenameToFilenamePattern || (getTargetPathResult.renamed &amp;&amp; !entry.getFiles().isEmpty())) {</b>
+&nbsp;            // Either we do not rename to pattern - or UX feature:
+&nbsp;            // UX feature: If user adds a file to the entry and JabRef could only add it when renaming to the suggested pattern,
+&nbsp;            //             JabRef should keep the original file name
+<b class="nc">&nbsp;            getTargetPathResult = getTargetPath(sourcePath, targetDirectory, false);</b>
+<b class="nc">&nbsp;            if (getTargetPathResult.exists) {</b>
+<b class="nc">&nbsp;                if (shouldMove &amp;&amp; !Files.isSameFile(sourcePath, getTargetPathResult.path)) {</b>
+<b class="nc">&nbsp;                    Files.delete(sourcePath);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                linkedFile.setLink(FileUtil.relativize(getTargetPathResult.path(), databaseContext, filePreferences).toString());</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        assert !Files.exists(getTargetPathResult.path);</b>
+<b class="nc">&nbsp;        if (shouldMove) {</b>
+<b class="nc">&nbsp;            Files.move(sourcePath, getTargetPathResult.path);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            Files.copy(sourcePath, getTargetPathResult.path);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        assert Files.exists(getTargetPathResult.path);</b>
+&nbsp;
+<b class="nc">&nbsp;        linkedFile.setLink(FileUtil.relativize(getTargetPathResult.path, databaseContext, filePreferences).toString());</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If exists: the path already exists and has the same content as the given sourcePath
+&nbsp;     *
+&nbsp;     * @param renamed The original/suggested filename was adapted to fit it
+&nbsp;     */
+<b class="nc">&nbsp;    private record GetTargetPathResult(boolean exists, boolean renamed, Path path) {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private GetTargetPathResult getTargetPath(Path sourcePath, Path targetDirectory, boolean useSuggestedName) throws IOException {
+&nbsp;        Path suggestedFileName;
+<b class="nc">&nbsp;        if (useSuggestedName) {</b>
+<b class="nc">&nbsp;            suggestedFileName = Path.of(getSuggestedFileName(FileUtil.getFileExtension(sourcePath).orElse(&quot;&quot;)));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            suggestedFileName = sourcePath.getFileName();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Path targetPath = targetDirectory.resolve(suggestedFileName);</b>
+<b class="nc">&nbsp;        boolean renamed = false;</b>
+<b class="nc">&nbsp;        if (Files.exists(targetPath)) {</b>
+<b class="nc">&nbsp;            if (Files.mismatch(sourcePath, targetPath) == -1) {</b>
+&nbsp;                // In case of source == target, we pretend, we have success
+<b class="nc">&nbsp;                LOGGER.debug(&quot;The file {} would have been copied/moved to {}. However, there exists already a file with that name so we do nothing.&quot;, sourcePath, targetPath);</b>
+<b class="nc">&nbsp;                return new GetTargetPathResult(true, false, targetPath);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            Integer count = 1;</b>
+<b class="nc">&nbsp;            boolean exists = false;</b>
+&nbsp;            // @formatter:off
+&nbsp;            do {
+&nbsp;                // @formatter:on
+<b class="nc">&nbsp;                targetPath = targetDirectory.resolve(sourcePath.getFileName() + &quot; (&quot; + count + &quot;)&quot;);</b>
+<b class="nc">&nbsp;                exists = Files.exists(targetPath);</b>
+<b class="nc">&nbsp;                if (exists &amp;&amp; Files.mismatch(sourcePath, targetPath) == -1) {</b>
+&nbsp;                    // In case of source == target, we pretend, we have success
+<b class="nc">&nbsp;                    LOGGER.debug(&quot;The file {} would have been copied/moved to {}. However, there exists already a file with that name so we do nothing.&quot;, sourcePath, targetPath);</b>
+<b class="nc">&nbsp;                    return new GetTargetPathResult(true, true, targetPath);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                count++;</b>
+<b class="nc">&nbsp;            } while (exists);</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;The file {} existed in the target path somehow (but with different content). Chose new name {}.&quot;, sourcePath, targetPath);</b>
+<b class="nc">&nbsp;            renamed = true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return new GetTargetPathResult(false, renamed, targetPath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean renameToSuggestedName() throws IOException {
+<b class="nc">&nbsp;        Optional&lt;Path&gt; oldFilePath = linkedFile.findIn(databaseContext, filePreferences);</b>
+<b class="nc">&nbsp;        if (oldFilePath.isEmpty()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Path targetDirectory = oldFilePath.get().getParent();</b>
+<b class="nc">&nbsp;        String currentFileName = oldFilePath.get().getFileName().toString();</b>
+<b class="nc">&nbsp;        String suggestedFileName = getSuggestedFileName();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (suggestedFileName.equals(currentFileName)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (suggestedFileName.equals(FileNameUniqueness.eraseDuplicateMarks(currentFileName))) {</b>
+&nbsp;            // The current file name ends with something like &quot;(1)&quot;, &quot;(2)&quot;, etc.
+&nbsp;            // and the suggested file name is the same as the current file name without that suffix.
+&nbsp;            // In this case, we do not rename the file, because &quot;only&quot; the suffix number would (maybe) change
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String uniqueFileName = FileNameUniqueness.generateUniqueFileName(targetDirectory, suggestedFileName);</b>
+&nbsp;
+&nbsp;        // If after ensuring uniqueness we got the same name, no need to rename
+<b class="nc">&nbsp;        if (uniqueFileName.equals(currentFileName)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Renaming file {} to {}&quot;, currentFileName, uniqueFileName);</b>
+<b class="nc">&nbsp;        return renameToName(uniqueFileName, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean renameToName(String targetFileName, boolean overwriteExistingFile) throws IOException {
+<b class="nc">&nbsp;        Optional&lt;Path&gt; oldFile = linkedFile.findIn(databaseContext, filePreferences);</b>
+<b class="nc">&nbsp;        if (oldFile.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;No file found for linked file {}&quot;, linkedFile);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        final Path oldPath = oldFile.get();</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; oldExtension = FileUtil.getFileExtension(oldPath);</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; newExtension = FileUtil.getFileExtension(targetFileName);</b>
+&nbsp;
+&nbsp;        Path newPath;
+<b class="nc">&nbsp;        if (newExtension.isPresent() || (oldExtension.isEmpty() &amp;&amp; newExtension.isEmpty())) {</b>
+<b class="nc">&nbsp;            newPath = oldPath.resolveSibling(targetFileName);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            assert oldExtension.isPresent() &amp;&amp; newExtension.isEmpty();</b>
+<b class="nc">&nbsp;            newPath = oldPath.resolveSibling(targetFileName + &quot;.&quot; + oldExtension.get());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String expandedOldFilePath = oldPath.toString();</b>
+<b class="nc">&nbsp;        boolean pathsDifferOnlyByCase = newPath.toString().equalsIgnoreCase(expandedOldFilePath)</b>
+<b class="nc">&nbsp;                &amp;&amp; !newPath.toString().equals(expandedOldFilePath);</b>
+&nbsp;
+&nbsp;        // Since Files.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
+&nbsp;        // nonetheless rename files to a new name which just differs by case.
+<b class="nc">&nbsp;        if (Files.exists(newPath) &amp;&amp; !pathsDifferOnlyByCase &amp;&amp; !overwriteExistingFile) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;The file {} would have been moved to {}. However, there exists already a file with that name so we do nothing.&quot;, oldPath, newPath);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Renaming file {} to {}&quot;, oldPath, newPath);</b>
+<b class="nc">&nbsp;        if (Files.exists(newPath) &amp;&amp; !pathsDifferOnlyByCase &amp;&amp; overwriteExistingFile) {</b>
+<b class="nc">&nbsp;            Files.createDirectories(newPath.getParent());</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Overwriting existing file {}&quot;, newPath);</b>
+<b class="nc">&nbsp;            Files.move(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            Files.createDirectories(newPath.getParent());</b>
+<b class="nc">&nbsp;            Files.move(oldPath, newPath);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Update path
+<b class="nc">&nbsp;        if (newPath.isAbsolute()) {</b>
+<b class="nc">&nbsp;            linkedFile.setLink(FileUtil.relativize(newPath, databaseContext, filePreferences).toString());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            linkedFile.setLink(newPath.toString());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSuggestedFileName() {
+<b class="nc">&nbsp;        String extension = FileUtil.getFileExtension(linkedFile.getLink())</b>
+<b class="nc">&nbsp;                                   .orElse(linkedFile.getFileType());</b>
+<b class="nc">&nbsp;        return getSuggestedFileName(extension);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the file name based on the pattern specified in the preferences and valid for the file system.
+&nbsp;     *
+&nbsp;     * @param extension The extension of the file. If empty, no extension is added.
+&nbsp;     * @return A filename based on the pattern specified in the preferences and valid for the file system.
+&nbsp;     */
+&nbsp;    public String getSuggestedFileName(@NonNull String extension) {
+<b class="nc">&nbsp;        String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).trim();</b>
+<b class="nc">&nbsp;        if ((targetFileName.isEmpty() || &quot;-&quot;.equals(targetFileName)) &amp;&amp; linkedFile.isOnlineLink()) {</b>
+&nbsp;            // &quot;-&quot; is part of the default pattern (org.jabref.logic.FilePreferences.DEFAULT_FILENAME_PATTERNS) and is returned if no fields have been replaced.
+&nbsp;            // All other patterns are not yet handled. See &lt;https://github.com/jabref/jabref/issues/13735&gt; for a sketch of a solution.
+<b class="nc">&nbsp;            String oldFileName = linkedFile.getLink();</b>
+<b class="nc">&nbsp;            int lastSlashIndex = oldFileName.lastIndexOf(&#39;/&#39;);</b>
+<b class="nc">&nbsp;            if (lastSlashIndex &gt;= 0 &amp;&amp; lastSlashIndex &lt; oldFileName.length() - 1) {</b>
+<b class="nc">&nbsp;                String fileNameFromUrl = oldFileName.substring(lastSlashIndex + 1);</b>
+<b class="nc">&nbsp;                int queryIndex = fileNameFromUrl.indexOf(&#39;?&#39;);</b>
+<b class="nc">&nbsp;                if (queryIndex &gt; 0) {</b>
+<b class="nc">&nbsp;                    fileNameFromUrl = fileNameFromUrl.substring(0, queryIndex);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (!extension.isEmpty()) {</b>
+<b class="nc">&nbsp;                    Optional&lt;String&gt; existingExtension = FileUtil.getFileExtension(fileNameFromUrl);</b>
+<b class="nc">&nbsp;                    if (existingExtension.isEmpty() || !existingExtension.get().equalsIgnoreCase(extension)) {</b>
+<b class="nc">&nbsp;                        String baseName = FileUtil.getBaseName(fileNameFromUrl);</b>
+<b class="nc">&nbsp;                        fileNameFromUrl = baseName + &quot;.&quot; + extension;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                return FileUtil.getValidFileName(fileNameFromUrl);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (!extension.isEmpty()) {</b>
+<b class="nc">&nbsp;            targetFileName = targetFileName + &#39;.&#39; + extension;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return FileUtil.getValidFileName(targetFileName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check to see if a file already exists in the target directory.  Search is not case sensitive.
+&nbsp;     *
+&nbsp;     * @return First identified path that matches an existing file.  This name can be used in subsequent calls to
+&nbsp;     * override the existing file.
+&nbsp;     */
+&nbsp;    public Optional&lt;Path&gt; findExistingFile(LinkedFile linkedFile, BibEntry entry, String targetFileName) {
+&nbsp;        // The .get() is legal without check because the method will always return a value.
+<b class="nc">&nbsp;        Path targetFilePath = linkedFile.findIn(databaseContext, filePreferences)</b>
+<b class="nc">&nbsp;                                        .get().getParent().resolve(targetFileName);</b>
+<b class="nc">&nbsp;        Path oldFilePath = linkedFile.findIn(databaseContext, filePreferences).get();</b>
+&nbsp;        // Check if file already exists in directory with different case.
+&nbsp;        // This is necessary because other entries may have such a file.
+<b class="nc">&nbsp;        Optional&lt;Path&gt; matchedByDiffCase = Optional.empty();</b>
+<b class="nc">&nbsp;        try (Stream&lt;Path&gt; stream = Files.list(oldFilePath.getParent())) {</b>
+<b class="nc">&nbsp;            matchedByDiffCase = stream.filter(name -&gt; name.toString().equalsIgnoreCase(targetFilePath.toString()))</b>
+<b class="nc">&nbsp;                                      .findFirst();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not get the list of files in target directory&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return matchedByDiffCase;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

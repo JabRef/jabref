@@ -1,0 +1,232 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > HtmlToLatexFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.formatter.bibtexfields</a>
+</div>
+
+<h1>Coverage Summary for Class: HtmlToLatexFormatter (org.jabref.logic.formatter.bibtexfields)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HtmlToLatexFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    28.6%
+  </span>
+  <span class="absValue">
+    (2/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.9%
+  </span>
+  <span class="absValue">
+    (7/47)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.formatter.bibtexfields;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.Formatter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.layout.LayoutFormatter;
+&nbsp;import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * The inverse operation is &quot;somehow&quot; contained in {@link org.jabref.logic.openoffice.style.OOPreFormatter}
+&nbsp; */
+<b class="fc">&nbsp;public class HtmlToLatexFormatter extends Formatter implements LayoutFormatter {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(HtmlToLatexFormatter.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Pattern REMOVE_TAGS_PATTERN = Pattern.compile(&quot;&lt;[^&gt;]{1,100}&gt;&quot;);</b>
+<b class="fc">&nbsp;    private static final Pattern ESCAPED_PATTERN = Pattern.compile(&quot;&amp;#([x]*)([0]*)(\\p{XDigit}+);&quot;);</b>
+<b class="fc">&nbsp;    private static final Pattern ESCAPED_PATTERN2 = Pattern.compile(&quot;(.)&amp;#([x]*)([0]*)(\\p{XDigit}+);&quot;);</b>
+<b class="fc">&nbsp;    private static final Pattern ESCAPED_PATTERN3 = Pattern.compile(&quot;&amp;#([x]*)([0]*)(\\p{XDigit}+);&quot;);</b>
+<b class="fc">&nbsp;    private static final Pattern ESCAPED_PATTERN4 = Pattern.compile(&quot;&amp;(\\w+);&quot;);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String text) {
+<b class="nc">&nbsp;        String result = Objects.requireNonNull(text);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (result.isEmpty()) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Deal with the form &lt;sup&gt;k&lt;/sup&gt;and &lt;sub&gt;k&lt;/sub&gt;
+<b class="nc">&nbsp;        result = result.replaceAll(&quot;&lt;[ ]?sup&gt;([^&lt;]+)&lt;/sup&gt;&quot;, &quot;\\\\textsuperscript\\{$1\\}&quot;);</b>
+<b class="nc">&nbsp;        result = result.replaceAll(&quot;&lt;[ ]?sub&gt;([^&lt;]+)&lt;/sub&gt;&quot;, &quot;\\\\textsubscript\\{$1\\}&quot;);</b>
+&nbsp;        // Note that (at least) the IEEE Xplore fetcher must be fixed as it relies on the current way to
+&nbsp;        // remove tags for its image alt-tag to equation converter
+<b class="nc">&nbsp;        result = REMOVE_TAGS_PATTERN.matcher(result).replaceAll(&quot;&quot;);</b>
+&nbsp;
+&nbsp;        // Handle text based HTML entities
+<b class="nc">&nbsp;        Set&lt;String&gt; patterns = HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.keySet();</b>
+<b class="nc">&nbsp;        for (String pattern : patterns) {</b>
+<b class="nc">&nbsp;            result = result.replace(pattern, HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.get(pattern));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Handle numerical HTML entities
+<b class="nc">&nbsp;        Matcher m = ESCAPED_PATTERN.matcher(result);</b>
+<b class="nc">&nbsp;        while (m.find()) {</b>
+<b class="nc">&nbsp;            int num = Integer.decode(m.group(1).replace(&quot;x&quot;, &quot;#&quot;) + m.group(3));</b>
+<b class="nc">&nbsp;            if (HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.containsKey(num)) {</b>
+<b class="nc">&nbsp;                result = result.replaceAll(&quot;\\\\?&amp;#&quot; + m.group(1) + m.group(2) + m.group(3) + &quot;;&quot;,</b>
+<b class="nc">&nbsp;                        Matcher.quoteReplacement(HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.get(num)));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Combining accents
+<b class="nc">&nbsp;        m = ESCAPED_PATTERN2.matcher(result);</b>
+<b class="nc">&nbsp;        while (m.find()) {</b>
+<b class="nc">&nbsp;            int num = Integer.decode(m.group(2).replace(&quot;x&quot;, &quot;#&quot;) + m.group(4));</b>
+<b class="nc">&nbsp;            if (HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.containsKey(num)) {</b>
+<b class="nc">&nbsp;                if (&quot;i&quot;.equals(m.group(1))) {</b>
+<b class="nc">&nbsp;                    result = result.replace(m.group(1) + &quot;&amp;#&quot; + m.group(2) + m.group(3) + m.group(4) + &quot;;&quot;,</b>
+<b class="nc">&nbsp;                            &quot;{\\&quot; + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + &quot;{\\i}}&quot;);</b>
+<b class="nc">&nbsp;                } else if (&quot;j&quot;.equals(m.group(1))) {</b>
+<b class="nc">&nbsp;                    result = result.replace(m.group(1) + &quot;&amp;#&quot; + m.group(2) + m.group(3) + m.group(4) + &quot;;&quot;,</b>
+<b class="nc">&nbsp;                            &quot;{\\&quot; + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + &quot;{\\j}}&quot;);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    result = result.replace(m.group(1) + &quot;&amp;#&quot; + m.group(2) + m.group(3) + m.group(4) + &quot;;&quot;,</b>
+<b class="nc">&nbsp;                            &quot;{\\&quot; + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + &quot;{&quot; + m.group(1) + &quot;}}&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Find non-converted numerical characters
+<b class="nc">&nbsp;        m = ESCAPED_PATTERN3.matcher(result);</b>
+<b class="nc">&nbsp;        while (m.find()) {</b>
+<b class="nc">&nbsp;            int num = Integer.decode(m.group(1).replace(&quot;x&quot;, &quot;#&quot;) + m.group(3));</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;HTML escaped char not converted: {}{}{} = {}&quot;, m.group(1), m.group(2), m.group(3), num);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Remove $$ in case of two adjacent conversions
+<b class="nc">&nbsp;        result = result.replace(&quot;$$&quot;, &quot;&quot;);</b>
+&nbsp;
+&nbsp;        // Find non-covered special characters with alphabetic codes
+<b class="nc">&nbsp;        m = ESCAPED_PATTERN4.matcher(result);</b>
+<b class="nc">&nbsp;        while (m.find()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;HTML escaped char not converted: {}&quot;, m.group(1));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result.trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Converts HTML code to LaTeX code.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getExampleInput() {
+<b class="nc">&nbsp;        return &quot;&lt;strong&gt;JabRef&lt;/strong&gt;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;HTML to LaTeX&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getKey() {
+<b class="nc">&nbsp;        return &quot;html_to_latex&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

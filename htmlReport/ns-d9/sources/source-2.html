@@ -1,0 +1,289 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LtwaBaseVisitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.journals.ltwa</a>
+</div>
+
+<h1>Coverage Summary for Class: LtwaBaseVisitor (org.jabref.logic.journals.ltwa)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LtwaBaseVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;// Generated from org/jabref/logic/journals/ltwa/Ltwa.g4 by ANTLR 4.13.2
+&nbsp;
+&nbsp;package org.jabref.logic.journals.ltwa;
+&nbsp;
+&nbsp;import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class provides an empty implementation of {@link LtwaVisitor},
+&nbsp; * which can be extended to create a visitor which only needs to handle a subset
+&nbsp; * of the available methods.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; The return type of the visit operation. Use {@link Void} for
+&nbsp; * operations with no return type.
+&nbsp; */
+&nbsp;@SuppressWarnings(&quot;CheckReturnValue&quot;)
+<b class="nc">&nbsp;public class LtwaBaseVisitor&lt;T&gt; extends AbstractParseTreeVisitor&lt;T&gt; implements LtwaVisitor&lt;T&gt; {</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitSingleWordTitleFull(LtwaParser.SingleWordTitleFullContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitStopwordPlusTitleFull(LtwaParser.StopwordPlusTitleFullContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitAnyPlusSymbolsFull(LtwaParser.AnyPlusSymbolsFullContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitNormalTitleFull(LtwaParser.NormalTitleFullContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitSingleWordTitle(LtwaParser.SingleWordTitleContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitStopwordPlusAny(LtwaParser.StopwordPlusAnyContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitAnyPlusSymbols(LtwaParser.AnyPlusSymbolsContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitNormalTitle(LtwaParser.NormalTitleContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitArticleElement(LtwaParser.ArticleElementContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitStopwordElement(LtwaParser.StopwordElementContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitSymbolsElement(LtwaParser.SymbolsElementContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitOrdinalElement(LtwaParser.OrdinalElementContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitWordElement(LtwaParser.WordElementContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitHyphenElement(LtwaParser.HyphenElementContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitPartElement(LtwaParser.PartElementContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitAbbreviationElement(LtwaParser.AbbreviationElementContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitArticle(LtwaParser.ArticleContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitStopword(LtwaParser.StopwordContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitSymbols(LtwaParser.SymbolsContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitOrdinal(LtwaParser.OrdinalContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitWord(LtwaParser.WordContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitHyphen(LtwaParser.HyphenContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitPart(LtwaParser.PartContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitAbbreviation(LtwaParser.AbbreviationContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

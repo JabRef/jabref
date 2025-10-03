@@ -1,0 +1,131 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GuiPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences</a>
+</div>
+
+<h1>Coverage Summary for Class: GuiPreferences (org.jabref.gui.preferences)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">GuiPreferences</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences;
+&nbsp;
+&nbsp;import org.jabref.gui.CoreGuiPreferences;
+&nbsp;import org.jabref.gui.WorkspacePreferences;
+&nbsp;import org.jabref.gui.autocompleter.AutoCompletePreferences;
+&nbsp;import org.jabref.gui.edit.CopyToPreferences;
+&nbsp;import org.jabref.gui.entryeditor.EntryEditorPreferences;
+&nbsp;import org.jabref.gui.externalfiles.UnlinkedFilesDialogPreferences;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.gui.frame.SidePanePreferences;
+&nbsp;import org.jabref.gui.groups.GroupsPreferences;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.gui.maintable.ColumnPreferences;
+&nbsp;import org.jabref.gui.maintable.MainTablePreferences;
+&nbsp;import org.jabref.gui.maintable.NameDisplayPreferences;
+&nbsp;import org.jabref.gui.mergeentries.MergeDialogPreferences;
+&nbsp;import org.jabref.gui.newentry.NewEntryPreferences;
+&nbsp;import org.jabref.gui.preview.PreviewPreferences;
+&nbsp;import org.jabref.gui.specialfields.SpecialFieldsPreferences;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.push.PushToApplicationPreferences;
+&nbsp;
+&nbsp;public interface GuiPreferences extends CliPreferences {
+&nbsp;    CopyToPreferences getCopyToPreferences();
+&nbsp;
+&nbsp;    EntryEditorPreferences getEntryEditorPreferences();
+&nbsp;
+&nbsp;    MergeDialogPreferences getMergeDialogPreferences();
+&nbsp;
+&nbsp;    AutoCompletePreferences getAutoCompletePreferences();
+&nbsp;
+&nbsp;    CoreGuiPreferences getGuiPreferences();
+&nbsp;
+&nbsp;    WorkspacePreferences getWorkspacePreferences();
+&nbsp;
+&nbsp;    UnlinkedFilesDialogPreferences getUnlinkedFilesDialogPreferences();
+&nbsp;
+&nbsp;    ExternalApplicationsPreferences getExternalApplicationsPreferences();
+&nbsp;
+&nbsp;    SidePanePreferences getSidePanePreferences();
+&nbsp;
+&nbsp;    GroupsPreferences getGroupsPreferences();
+&nbsp;
+&nbsp;    SpecialFieldsPreferences getSpecialFieldsPreferences();
+&nbsp;
+&nbsp;    PreviewPreferences getPreviewPreferences();
+&nbsp;
+&nbsp;    PushToApplicationPreferences getPushToApplicationPreferences();
+&nbsp;
+&nbsp;    NameDisplayPreferences getNameDisplayPreferences();
+&nbsp;
+&nbsp;    MainTablePreferences getMainTablePreferences();
+&nbsp;
+&nbsp;    ColumnPreferences getMainTableColumnPreferences();
+&nbsp;
+&nbsp;    ColumnPreferences getSearchDialogColumnPreferences();
+&nbsp;
+&nbsp;    KeyBindingRepository getKeyBindingRepository();
+&nbsp;
+&nbsp;    NewEntryPreferences getNewEntryPreferences();
+&nbsp;
+&nbsp;    DonationPreferences getDonationPreferences();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

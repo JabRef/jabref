@@ -1,0 +1,733 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AuthorListParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer</a>
+</div>
+
+<h1>Coverage Summary for Class: AuthorListParser (org.jabref.logic.importer)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AuthorListParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/204)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/231)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AuthorListParser$SimpleNormalFormResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AuthorListParser$Token</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/204)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/237)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;
+<b class="nc">&nbsp;public class AuthorListParser {</b>
+&nbsp;
+&nbsp;    // Avoid partition where these values are contained
+<b class="nc">&nbsp;    private final static Set&lt;String&gt; AVOID_TERMS_IN_LOWER_CASE = Set.of(</b>
+&nbsp;            &quot;jr&quot;, &quot;sr&quot;, &quot;jnr&quot;, &quot;snr&quot;, &quot;von&quot;, &quot;zu&quot;, &quot;van&quot;, &quot;der&quot;);
+&nbsp;
+&nbsp;    private static final int TOKEN_GROUP_LENGTH = 4; // number of entries for a token
+&nbsp;
+&nbsp;    // the following are offsets of an entry in a group of entries for one token
+&nbsp;    private static final int OFFSET_TOKEN = 0; // String -- token itself;
+&nbsp;
+&nbsp;    private static final int OFFSET_TOKEN_ABBR = 1; // String -- token abbreviation;
+&nbsp;
+&nbsp;    private static final int OFFSET_TOKEN_TERM = 2; // Character -- token terminator (either &quot; &quot; or
+&nbsp;    // &quot;-&quot;) comma)
+&nbsp;    // Constant HashSet containing names of TeX special characters
+<b class="nc">&nbsp;    private static final Set&lt;String&gt; TEX_NAMES = Set.of(</b>
+&nbsp;            &quot;aa&quot;, &quot;ae&quot;, &quot;l&quot;, &quot;o&quot;, &quot;oe&quot;, &quot;i&quot;, &quot;AA&quot;, &quot;AE&quot;, &quot;L&quot;, &quot;O&quot;, &quot;OE&quot;, &quot;j&quot;);
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern STARTS_WITH_CAPITAL_LETTER_DOT_OR_DASH = Pattern.compile(&quot;^[A-Z](\\.[ -]| ?-)&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern MULTIPLE_SPACE_PATTERN = Pattern.compile(&quot;\\s{2,}&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern NEW_LINE_PATTERN = Pattern.compile(&quot;\\s*\\n\\s*&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * the raw bibtex author/editor field
+&nbsp;     */
+&nbsp;    private String original;
+&nbsp;    /**
+&nbsp;     * index of the start in original, for example to point to &#39;abc&#39; in &#39;abc xyz&#39;, tokenStart=2
+&nbsp;     */
+&nbsp;    private int tokenStart;
+&nbsp;    /**
+&nbsp;     * index of the end in original, for example to point to &#39;abc&#39; in &#39;abc xyz&#39;, tokenEnd=5
+&nbsp;     */
+&nbsp;    private int tokenEnd;
+&nbsp;    /**
+&nbsp;     * end of token abbreviation (always: tokenStart &lt; tokenAbbrEnd &lt;= tokenEnd), only valid if getToken returns
+&nbsp;     * Token.WORD
+&nbsp;     */
+&nbsp;    private int tokenAbbrEnd;
+&nbsp;    /**
+&nbsp;     * either space of dash
+&nbsp;     */
+&nbsp;    private char tokenTerm;
+&nbsp;    /**
+&nbsp;     * true if upper-case token, false if lower-case
+&nbsp;     */
+&nbsp;    private boolean tokenCase;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builds a new array of strings with stringbuilder. Regarding to the name affixes.
+&nbsp;     *
+&nbsp;     * @return New string with correct separation
+&nbsp;     */
+&nbsp;    private static StringBuilder buildWithAffix(Collection&lt;Integer&gt; indexArray, List&lt;String&gt; nameList) {
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+&nbsp;        // avoidedTimes needs to be increased by the count of avoided terms for correct odd/even calculation
+<b class="nc">&nbsp;        int avoidedTimes = 0;</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; nameList.size(); i++) {</b>
+<b class="nc">&nbsp;            if (indexArray.contains(i)) {</b>
+&nbsp;                // We hit a name affix
+<b class="nc">&nbsp;                stringBuilder.append(nameList.get(i));</b>
+<b class="nc">&nbsp;                stringBuilder.append(&#39;,&#39;);</b>
+<b class="nc">&nbsp;                avoidedTimes++;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                stringBuilder.append(nameList.get(i));</b>
+<b class="nc">&nbsp;                if (((i + avoidedTimes) % 2) == 0) {</b>
+&nbsp;                    // Hit separation between last name and firstname --&gt; comma has to be kept
+<b class="nc">&nbsp;                    stringBuilder.append(&#39;,&#39;);</b>
+&nbsp;                } else {
+&nbsp;                    // Hit separation between full names (e.g., Ali Babar, M. and Dingsøyr, T.) --&gt; semicolon has to be used
+&nbsp;                    // Will be treated correctly by AuthorList.parse(authors);
+<b class="nc">&nbsp;                    stringBuilder.append(&#39;;&#39;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return stringBuilder;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record SimpleNormalFormResult(String authors, boolean andOthersPresent) {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static SimpleNormalFormResult getSimpleNormalForm(String listOfNames) {
+<b class="nc">&nbsp;        listOfNames = listOfNames.replace(&quot; -&quot;, &quot;-&quot;).trim();</b>
+<b class="nc">&nbsp;        if (!listOfNames.contains(&quot;,&quot;) &amp;&amp; (MULTIPLE_SPACE_PATTERN.matcher(listOfNames).find() || listOfNames.contains(&quot;\n&quot;))) {</b>
+<b class="nc">&nbsp;            listOfNames = NEW_LINE_PATTERN.matcher(listOfNames).replaceAll(&quot; and &quot;);</b>
+<b class="nc">&nbsp;            listOfNames = MULTIPLE_SPACE_PATTERN.matcher(listOfNames).replaceAll(&quot; and &quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Handling of &quot;and others&quot;
+&nbsp;        // Remove it from the list; it will be added at the very end of this method as special Author.OTHERS
+<b class="nc">&nbsp;        final String andOthersSuffix = &quot; and others&quot;;</b>
+&nbsp;        final boolean andOthersPresent;
+<b class="nc">&nbsp;        if (StringUtil.endsWithIgnoreCase(listOfNames, andOthersSuffix)) {</b>
+<b class="nc">&nbsp;            andOthersPresent = true;</b>
+<b class="nc">&nbsp;            listOfNames = StringUtil.removeStringAtTheEnd(listOfNames, &quot; and others&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            andOthersPresent = false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new SimpleNormalFormResult(checkNamesCommaSeparated(listOfNames), andOthersPresent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Tries to get a simple BibTeX author list of the given string.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is an intermediate step in {@link #parse}. Since parse does not work in all cases,
+&nbsp;     * this method can be used to get more valid BibTeX.
+&nbsp;     *
+&nbsp;     * @return Optional.empty if there was no normalization.
+&nbsp;     */
+&nbsp;    public static Optional&lt;String&gt; normalizeSimply(String listOfNames) {
+<b class="nc">&nbsp;        SimpleNormalFormResult simpleNormalForm = getSimpleNormalForm(listOfNames);</b>
+<b class="nc">&nbsp;        String result = simpleNormalForm.authors;</b>
+<b class="nc">&nbsp;        if (simpleNormalForm.andOthersPresent) {</b>
+<b class="nc">&nbsp;            result += &quot; and others&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (result.equals(listOfNames)) {</b>
+&nbsp;            // No changes were done inside the method
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the String containing person names and returns a list of person information.
+&nbsp;     *
+&nbsp;     * @param listOfNames the String containing the person names to be parsed
+&nbsp;     * @return a parsed list of persons
+&nbsp;     */
+&nbsp;    public AuthorList parse(@NonNull String listOfNames) {
+<b class="nc">&nbsp;        SimpleNormalFormResult simpleNormalForm = getSimpleNormalForm(listOfNames);</b>
+<b class="nc">&nbsp;        listOfNames = simpleNormalForm.authors;</b>
+<b class="nc">&nbsp;        boolean andOthersPresent = simpleNormalForm.andOthersPresent;</b>
+&nbsp;
+&nbsp;        // Handle case names in order lastname, firstname and separated by &quot;,&quot;
+&nbsp;        // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
+<b class="nc">&nbsp;        final boolean authorsContainAND = listOfNames.toUpperCase(Locale.ENGLISH).contains(&quot; AND &quot;);</b>
+<b class="nc">&nbsp;        final boolean authorsContainOpeningBrace = listOfNames.contains(&quot;{&quot;);</b>
+<b class="nc">&nbsp;        final boolean authorsContainSemicolon = listOfNames.contains(&quot;;&quot;);</b>
+<b class="nc">&nbsp;        final boolean authorsContainTwoOrMoreCommas = (listOfNames.length() - listOfNames.replace(&quot;,&quot;, &quot;&quot;).length()) &gt;= 2;</b>
+<b class="nc">&nbsp;        if (!authorsContainAND &amp;&amp; !authorsContainOpeningBrace &amp;&amp; !authorsContainSemicolon &amp;&amp; authorsContainTwoOrMoreCommas) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; arrayNameList = Arrays.asList(listOfNames.split(&quot;,&quot;));</b>
+&nbsp;
+&nbsp;            // Delete spaces for correct case identification
+<b class="nc">&nbsp;            arrayNameList.replaceAll(String::trim);</b>
+&nbsp;
+&nbsp;            // Looking for space between pre- and lastname
+<b class="nc">&nbsp;            boolean spaceInAllParts = arrayNameList.stream().filter(name -&gt; name.contains(&quot; &quot;))</b>
+<b class="nc">&nbsp;                                                   .count() == arrayNameList.size();</b>
+&nbsp;
+&nbsp;            // We hit the comma name separator case
+&nbsp;            // Usually the getAsLastFirstNamesWithAnd method would separate them if pre- and lastname are separated with &quot;and&quot;
+&nbsp;            // If not, we check if spaces separate pre- and lastname
+<b class="nc">&nbsp;            if (spaceInAllParts) {</b>
+<b class="nc">&nbsp;                listOfNames = listOfNames.replace(&quot;,&quot;, &quot; and&quot;);</b>
+&nbsp;            } else {
+&nbsp;                // Looking for name affixes to avoid
+&nbsp;                // arrayNameList needs to reduce by the count off avoiding terms
+&nbsp;                // valuePartsCount holds the count of name parts without the avoided terms
+&nbsp;
+<b class="nc">&nbsp;                int valuePartsCount = arrayNameList.size();</b>
+&nbsp;                // Holds the index of each term which needs to be avoided
+<b class="nc">&nbsp;                Collection&lt;Integer&gt; avoidIndex = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;                for (int i = 0; i &lt; arrayNameList.size(); i++) {</b>
+<b class="nc">&nbsp;                    if (AVOID_TERMS_IN_LOWER_CASE.contains(arrayNameList.get(i).toLowerCase(Locale.ROOT))) {</b>
+<b class="nc">&nbsp;                        avoidIndex.add(i);</b>
+<b class="nc">&nbsp;                        valuePartsCount--;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if ((valuePartsCount % 2) == 0) {</b>
+&nbsp;                    // We hit the described special case with name affix like Jr
+<b class="nc">&nbsp;                    listOfNames = buildWithAffix(avoidIndex, arrayNameList).toString();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // initialization of parser
+<b class="nc">&nbsp;        original = listOfNames;</b>
+<b class="nc">&nbsp;        tokenStart = 0;</b>
+<b class="nc">&nbsp;        tokenEnd = 0;</b>
+&nbsp;
+&nbsp;        // Parse author by author
+<b class="nc">&nbsp;        List&lt;Author&gt; authors = new ArrayList&lt;&gt;(5); // 5 seems to be reasonable initial size</b>
+<b class="nc">&nbsp;        while (tokenStart &lt; original.length()) {</b>
+<b class="nc">&nbsp;            getAuthor().ifPresent(authors::add);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (andOthersPresent) {</b>
+<b class="nc">&nbsp;            authors.add(Author.OTHERS);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return AuthorList.of(authors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Handle cases names in order Firstname Lastname, separated by &lt;code&gt;&quot;,&quot;&lt;/code&gt; and a final &lt;code&gt;&quot;, and &quot;&lt;/code&gt;
+&nbsp;     * E.g, &lt;code&gt;&quot;I. Podadera, J. M. Carmona, A. Ibarra, and J. Molla&quot;&lt;/code&gt;
+&nbsp;     *
+&nbsp;     * @return the original or patched version of listOfNames
+&nbsp;     */
+&nbsp;    private static String checkNamesCommaSeparated(String listOfNames) {
+<b class="nc">&nbsp;        int commandAndPos = listOfNames.lastIndexOf(&quot;, and &quot;);</b>
+<b class="nc">&nbsp;        if (commandAndPos &gt;= 0) {</b>
+<b class="nc">&nbsp;            String lastContainedName = listOfNames.substring(commandAndPos + &quot;, and &quot;.length());</b>
+<b class="nc">&nbsp;            Matcher matcher = STARTS_WITH_CAPITAL_LETTER_DOT_OR_DASH.matcher(lastContainedName);</b>
+<b class="nc">&nbsp;            if (matcher.find()) {</b>
+<b class="nc">&nbsp;                String namesBeforeAndString = listOfNames.substring(0, commandAndPos);</b>
+<b class="nc">&nbsp;                String[] namesBeforeAnd = namesBeforeAndString.split(&quot;, &quot;);</b>
+<b class="nc">&nbsp;                if (Arrays.stream(namesBeforeAnd).allMatch(name -&gt; STARTS_WITH_CAPITAL_LETTER_DOT_OR_DASH.matcher(name).find())) {</b>
+&nbsp;                    // Format found
+<b class="nc">&nbsp;                    listOfNames = Arrays.stream(namesBeforeAnd).collect(Collectors.joining(&quot; and &quot;, &quot;&quot;, &quot; and &quot; + lastContainedName));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return listOfNames;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses one author name and returns preformatted information.
+&nbsp;     *
+&nbsp;     * @return Preformatted author name; &lt;CODE&gt;Optional.empty()&lt;/CODE&gt; if author name is empty.
+&nbsp;     */
+&nbsp;    private Optional&lt;Author&gt; getAuthor() {
+<b class="nc">&nbsp;        List&lt;Object&gt; tokens = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        int vonStart = -1;</b>
+<b class="nc">&nbsp;        int lastStart = -1;</b>
+<b class="nc">&nbsp;        int commaFirst = -1;</b>
+<b class="nc">&nbsp;        int commaSecond = -1;</b>
+&nbsp;
+&nbsp;        // First step: collect tokens in &#39;tokens&#39; Vector and calculate indices
+<b class="nc">&nbsp;        boolean continueLoop = true;</b>
+<b class="nc">&nbsp;        while (continueLoop) {</b>
+<b class="nc">&nbsp;            Token token = getToken();</b>
+<b class="nc">&nbsp;            switch (token) {</b>
+&nbsp;                case EOF:
+&nbsp;                case AND:
+<b class="nc">&nbsp;                    continueLoop = false;</b>
+&nbsp;                    break;
+&nbsp;                case COMMA:
+<b class="nc">&nbsp;                    if (commaFirst &lt; 0) {</b>
+<b class="nc">&nbsp;                        commaFirst = tokens.size();</b>
+<b class="nc">&nbsp;                    } else if (commaSecond &lt; 0) {</b>
+<b class="nc">&nbsp;                        commaSecond = tokens.size();</b>
+&nbsp;                    }
+&nbsp;                    break;
+&nbsp;                case WORD:
+<b class="nc">&nbsp;                    tokens.add(original.substring(tokenStart, tokenEnd));</b>
+<b class="nc">&nbsp;                    tokens.add(original.substring(tokenStart, tokenAbbrEnd));</b>
+<b class="nc">&nbsp;                    tokens.add(tokenTerm);</b>
+<b class="nc">&nbsp;                    tokens.add(tokenCase);</b>
+<b class="nc">&nbsp;                    if (commaFirst &gt;= 0) {</b>
+&nbsp;                        break;
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (lastStart &gt;= 0) {</b>
+&nbsp;                        break;
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (vonStart &lt; 0) {</b>
+<b class="nc">&nbsp;                        if (!tokenCase) {</b>
+<b class="nc">&nbsp;                            int previousTermToken = (tokens.size() - TOKEN_GROUP_LENGTH - TOKEN_GROUP_LENGTH) + OFFSET_TOKEN_TERM;</b>
+<b class="nc">&nbsp;                            if ((previousTermToken &gt;= 0) &amp;&amp; tokens.get(previousTermToken).equals(&#39;-&#39;)) {</b>
+&nbsp;                                // We are in a first name which contained a hyphen
+&nbsp;                                break;
+&nbsp;                            }
+&nbsp;
+<b class="nc">&nbsp;                            int thisTermToken = previousTermToken + TOKEN_GROUP_LENGTH;</b>
+<b class="nc">&nbsp;                            if ((thisTermToken &gt;= 0) &amp;&amp; tokens.get(thisTermToken).equals(&#39;-&#39;)) {</b>
+&nbsp;                                // We are in a name which contained a hyphen
+&nbsp;                                break;
+&nbsp;                            }
+&nbsp;
+<b class="nc">&nbsp;                            vonStart = tokens.size() - TOKEN_GROUP_LENGTH;</b>
+&nbsp;                            break;
+&nbsp;                        }
+<b class="nc">&nbsp;                    } else if (tokenCase) {</b>
+<b class="nc">&nbsp;                        lastStart = tokens.size() - TOKEN_GROUP_LENGTH;</b>
+&nbsp;                        break;
+&nbsp;                    }
+&nbsp;                    break;
+&nbsp;                default:
+&nbsp;                    break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Second step: split name into parts (here: calculate indices of parts in &#39;tokens&#39; Vector)
+<b class="nc">&nbsp;        if (tokens.isEmpty()) {</b>
+&nbsp;            // no author information
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // the following negatives indicate absence of the corresponding part
+<b class="nc">&nbsp;        int firstPartStart = -1;</b>
+<b class="nc">&nbsp;        int vonPartStart = -1;</b>
+<b class="nc">&nbsp;        int lastPartStart = -1;</b>
+<b class="nc">&nbsp;        int jrPartStart = -1;</b>
+&nbsp;        int firstPartEnd;
+<b class="nc">&nbsp;        int vonPartEnd = 0;</b>
+<b class="nc">&nbsp;        int lastPartEnd = 0;</b>
+<b class="nc">&nbsp;        int jrPartEnd = 0;</b>
+<b class="nc">&nbsp;        if (commaFirst &lt; 0) { // no commas</b>
+<b class="nc">&nbsp;            if (vonStart &lt; 0) { // no &#39;von part&#39;</b>
+<b class="nc">&nbsp;                lastPartEnd = tokens.size();</b>
+<b class="nc">&nbsp;                lastPartStart = tokens.size() - TOKEN_GROUP_LENGTH;</b>
+<b class="nc">&nbsp;                int index = (tokens.size() - (2 * TOKEN_GROUP_LENGTH)) + OFFSET_TOKEN_TERM;</b>
+<b class="nc">&nbsp;                if (index &gt; 0) {</b>
+<b class="nc">&nbsp;                    Character ch = (Character) tokens.get(index);</b>
+<b class="nc">&nbsp;                    if (ch == &#39;-&#39;) {</b>
+<b class="nc">&nbsp;                        lastPartStart -= TOKEN_GROUP_LENGTH;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                firstPartEnd = lastPartStart;</b>
+<b class="nc">&nbsp;                if (firstPartEnd &gt; 0) {</b>
+<b class="nc">&nbsp;                    firstPartStart = 0;</b>
+&nbsp;                }
+&nbsp;            } else { // &#39;von part&#39; is present
+<b class="nc">&nbsp;                if (lastStart &gt;= 0) {</b>
+<b class="nc">&nbsp;                    lastPartEnd = tokens.size();</b>
+<b class="nc">&nbsp;                    lastPartStart = lastStart;</b>
+<b class="nc">&nbsp;                    vonPartEnd = lastPartStart;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    vonPartEnd = tokens.size();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                vonPartStart = vonStart;</b>
+<b class="nc">&nbsp;                firstPartEnd = vonPartStart;</b>
+<b class="nc">&nbsp;                if (firstPartEnd &gt; 0) {</b>
+<b class="nc">&nbsp;                    firstPartStart = 0;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } else {
+&nbsp;            // commas are present: it affects only &#39;first part&#39; and &#39;junior part&#39;
+<b class="nc">&nbsp;            firstPartEnd = tokens.size();</b>
+<b class="nc">&nbsp;            if (commaSecond &lt; 0) {</b>
+&nbsp;                // one comma
+<b class="nc">&nbsp;                if (commaFirst &lt; firstPartEnd) {</b>
+<b class="nc">&nbsp;                    firstPartStart = commaFirst;</b>
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                // two or more commas
+<b class="nc">&nbsp;                if (commaSecond &lt; firstPartEnd) {</b>
+<b class="nc">&nbsp;                    firstPartStart = commaSecond;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                jrPartEnd = commaSecond;</b>
+<b class="nc">&nbsp;                if (commaFirst &lt; jrPartEnd) {</b>
+<b class="nc">&nbsp;                    jrPartStart = commaFirst;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            if (vonStart == 0) { // &#39;von part&#39; is present</b>
+<b class="nc">&nbsp;                if (lastStart &lt; 0) {</b>
+<b class="nc">&nbsp;                    vonPartEnd = commaFirst;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    lastPartEnd = commaFirst;</b>
+<b class="nc">&nbsp;                    lastPartStart = lastStart;</b>
+<b class="nc">&nbsp;                    vonPartEnd = lastPartStart;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                vonPartStart = 0;</b>
+&nbsp;            } else { // no &#39;von part&#39;
+<b class="nc">&nbsp;                lastPartEnd = commaFirst;</b>
+<b class="nc">&nbsp;                if (lastPartEnd &gt; 0) {</b>
+<b class="nc">&nbsp;                    lastPartStart = 0;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if ((firstPartStart == -1) &amp;&amp; (lastPartStart == -1) &amp;&amp; (vonPartStart != -1)) {</b>
+&nbsp;            // There is no first or last name, but we have a von part. This is likely
+&nbsp;            // to indicate a single-entry name without an initial capital letter, such
+&nbsp;            // as &quot;unknown&quot;.
+&nbsp;            // We make the von part the last name, to facilitate handling by last-name formatters:
+<b class="nc">&nbsp;            lastPartStart = vonPartStart;</b>
+<b class="nc">&nbsp;            lastPartEnd = vonPartEnd;</b>
+<b class="nc">&nbsp;            vonPartStart = -1;</b>
+<b class="nc">&nbsp;            vonPartEnd = -1;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Third step: do actual splitting, construct Author object
+<b class="nc">&nbsp;        String firstPart = firstPartStart &lt; 0 ? null : concatTokens(tokens, firstPartStart, firstPartEnd, OFFSET_TOKEN, false);</b>
+<b class="nc">&nbsp;        String firstAbbr = firstPartStart &lt; 0 ? null : concatTokens(tokens, firstPartStart, firstPartEnd, OFFSET_TOKEN_ABBR, true);</b>
+<b class="nc">&nbsp;        String vonPart = vonPartStart &lt; 0 ? null : concatTokens(tokens, vonPartStart, vonPartEnd, OFFSET_TOKEN, false);</b>
+<b class="nc">&nbsp;        String lastPart = lastPartStart &lt; 0 ? null : concatTokens(tokens, lastPartStart, lastPartEnd, OFFSET_TOKEN, false);</b>
+<b class="nc">&nbsp;        String jrPart = jrPartStart &lt; 0 ? null : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);</b>
+&nbsp;
+<b class="nc">&nbsp;        if ((commaFirst &lt; 0) &amp;&amp; (firstPart != null) &amp;&amp; (lastPart != null) &amp;&amp; lastPart.equals(lastPart.toUpperCase(Locale.ROOT)) &amp;&amp; (lastPart.length() &lt; 5)</b>
+<b class="nc">&nbsp;                &amp;&amp; (Character.UnicodeScript.of(lastPart.charAt(0)) != Character.UnicodeScript.HAN)) {</b>
+&nbsp;            // In case there is NO comma (e.g., Obama B) AND
+&nbsp;            // the last part is a small string in complete upper case,
+&nbsp;            // we interpret it as initial of the first name
+&nbsp;            // This is the case for example in &quot;Smith SH&quot; which we think of as lastname=Smith and firstname=SH
+&nbsp;            // The length &lt; 5 constraint should allow for &quot;Smith S.H.&quot; as input
+<b class="nc">&nbsp;            return Optional.of(new Author(lastPart, lastPart, vonPart, firstPart, jrPart));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.of(new Author(firstPart, firstAbbr, vonPart, lastPart, jrPart));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Concatenates list of tokens from &#39;tokens&#39; Vector. Tokens are separated by spaces or dashes, depending on stored
+&nbsp;     * in &#39;tokens&#39;. Callers always ensure that start &lt; end; thus, there exists at least one token to be concatenated.
+&nbsp;     *
+&nbsp;     * @param start    index of the first token to be concatenated in &#39;tokens&#39; Vector (always divisible by
+&nbsp;     *                 TOKEN_GROUP_LENGTH).
+&nbsp;     * @param end      index of the first token not to be concatenated in &#39;tokens&#39; Vector (always divisible by
+&nbsp;     *                 TOKEN_GROUP_LENGTH).
+&nbsp;     * @param offset   offset within token group (used to request concatenation of either full tokens or abbreviation).
+&nbsp;     * @param dotAfter &lt;CODE&gt;true&lt;/CODE&gt; -- add period after each token, &lt;CODE&gt;false&lt;/CODE&gt; --
+&nbsp;     *                 do not add.
+&nbsp;     * @return the result of concatenation.
+&nbsp;     */
+&nbsp;    private String concatTokens(List&lt;Object&gt; tokens, int start, int end, int offset, boolean dotAfter) {
+<b class="nc">&nbsp;        StringBuilder result = new StringBuilder();</b>
+&nbsp;        // Here we always have start &lt; end
+<b class="nc">&nbsp;        result.append((String) tokens.get(start + offset));</b>
+<b class="nc">&nbsp;        if (dotAfter) {</b>
+<b class="nc">&nbsp;            result.append(&#39;.&#39;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        int updatedStart = start + TOKEN_GROUP_LENGTH;</b>
+<b class="nc">&nbsp;        while (updatedStart &lt; end) {</b>
+<b class="nc">&nbsp;            result.append(tokens.get((updatedStart - TOKEN_GROUP_LENGTH) + OFFSET_TOKEN_TERM));</b>
+<b class="nc">&nbsp;            result.append((String) tokens.get(updatedStart + offset));</b>
+<b class="nc">&nbsp;            if (dotAfter) {</b>
+<b class="nc">&nbsp;                result.append(&#39;.&#39;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            updatedStart += TOKEN_GROUP_LENGTH;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the next token.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The string being parsed is stored in global variable &lt;CODE&gt;original&lt;/CODE&gt;, and position which parsing has to
+&nbsp;     * start from is stored in global variable
+&nbsp;     * &lt;CODE&gt;token_end&lt;/CODE&gt;; thus, &lt;CODE&gt;token_end&lt;/CODE&gt; has to be set
+&nbsp;     * to 0 before the first invocation. Procedure updates &lt;CODE&gt;token_end&lt;/CODE&gt;; thus, subsequent invocations do not
+&nbsp;     * require any additional variable settings.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The type of the token is returned; if it is &lt;CODE&gt;Token.WORD&lt;/CODE&gt;, additional information is given in global
+&nbsp;     * variables &lt;CODE&gt;token_start&lt;/CODE&gt;,
+&nbsp;     * &lt;CODE&gt;token_end&lt;/CODE&gt;, &lt;CODE&gt;token_abbr&lt;/CODE&gt;, &lt;CODE&gt;token_term&lt;/CODE&gt;,
+&nbsp;     * and &lt;CODE&gt;token_case&lt;/CODE&gt;; namely: &lt;CODE&gt;original.substring(token_start,token_end)&lt;/CODE&gt; is the text of the
+&nbsp;     * token, &lt;CODE&gt;original.substring(token_start,token_abbr)&lt;/CODE&gt; is the token abbreviation, &lt;CODE&gt;token_term&lt;/CODE&gt;
+&nbsp;     * contains token terminator (space or dash), and &lt;CODE&gt;token_case&lt;/CODE&gt; is &lt;CODE&gt;true&lt;/CODE&gt;, if token is
+&nbsp;     * upper-case and &lt;CODE&gt;false&lt;/CODE&gt; if token is lower-case.
+&nbsp;     *
+&nbsp;     * @return &lt;CODE&gt;Token.EOF&lt;/CODE&gt; -- no more tokens, &lt;CODE&gt;Token.COMMA&lt;/CODE&gt; --
+&nbsp;     * token is comma, &lt;CODE&gt;Token.AND&lt;/CODE&gt; -- token is the word &quot;and&quot; (or &quot;And&quot;, or &quot;aND&quot;, etc.) or a semicolon,
+&nbsp;     * &lt;CODE&gt;Token.WORD&lt;/CODE&gt; -- token is a word; additional information is given in global variables
+&nbsp;     * &lt;CODE&gt;token_start&lt;/CODE&gt;, &lt;CODE&gt;token_end&lt;/CODE&gt;,
+&nbsp;     * &lt;CODE&gt;token_abbr&lt;/CODE&gt;, &lt;CODE&gt;token_term&lt;/CODE&gt;, and
+&nbsp;     * &lt;CODE&gt;token_case&lt;/CODE&gt;.
+&nbsp;     */
+&nbsp;    private Token getToken() {
+<b class="nc">&nbsp;        tokenStart = tokenEnd;</b>
+<b class="nc">&nbsp;        while (tokenStart &lt; original.length()) {</b>
+<b class="nc">&nbsp;            char c = original.charAt(tokenStart);</b>
+<b class="nc">&nbsp;            if (!((c == &#39;~&#39;) || (c == &#39;-&#39;) || Character.isWhitespace(c))) {</b>
+&nbsp;                break;
+&nbsp;            }
+<b class="nc">&nbsp;            tokenStart++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        tokenEnd = tokenStart;</b>
+<b class="nc">&nbsp;        if (tokenStart &gt;= original.length()) {</b>
+<b class="nc">&nbsp;            return Token.EOF;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (original.charAt(tokenStart) == &#39;,&#39;) {</b>
+<b class="nc">&nbsp;            tokenEnd++;</b>
+<b class="nc">&nbsp;            return Token.COMMA;</b>
+&nbsp;        }
+&nbsp;        // Semicolon is considered to separate names like &quot;and&quot;
+<b class="nc">&nbsp;        if (original.charAt(tokenStart) == &#39;;&#39;) {</b>
+<b class="nc">&nbsp;            tokenEnd++;</b>
+<b class="nc">&nbsp;            return Token.AND;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        tokenAbbrEnd = -1;</b>
+<b class="nc">&nbsp;        tokenTerm = &#39; &#39;;</b>
+<b class="nc">&nbsp;        tokenCase = true;</b>
+<b class="nc">&nbsp;        int bracesLevel = 0;</b>
+<b class="nc">&nbsp;        int currentBackslash = -1;</b>
+<b class="nc">&nbsp;        boolean firstLetterIsFound = false;</b>
+<b class="nc">&nbsp;        while (tokenEnd &lt; original.length()) {</b>
+<b class="nc">&nbsp;            char c = original.charAt(tokenEnd);</b>
+<b class="nc">&nbsp;            if (c == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                bracesLevel++;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (firstLetterIsFound &amp;&amp; (tokenAbbrEnd &lt; 0) &amp;&amp; ((bracesLevel == 0) || (c == &#39;{&#39;))) {</b>
+<b class="nc">&nbsp;                tokenAbbrEnd = tokenEnd;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c == &#39;}&#39;) &amp;&amp; (bracesLevel &gt; 0)) {</b>
+<b class="nc">&nbsp;                bracesLevel--;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (!firstLetterIsFound &amp;&amp; (currentBackslash &lt; 0) &amp;&amp; Character.isLetter(c)) {</b>
+<b class="nc">&nbsp;                if (bracesLevel == 0) {</b>
+<b class="nc">&nbsp;                    tokenCase = Character.isUpperCase(c) || (Character.UnicodeScript.of(c) == Character.UnicodeScript.HAN);</b>
+&nbsp;                } else {
+&nbsp;                    // If this is a particle in braces, always treat it as if it starts with
+&nbsp;                    // an upper case letter. Otherwise a name such as &quot;{van den Bergen}, Hans&quot;
+&nbsp;                    // will not yield a proper last name:
+<b class="nc">&nbsp;                    tokenCase = true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                firstLetterIsFound = true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((currentBackslash &gt;= 0) &amp;&amp; !Character.isLetter(c)) {</b>
+<b class="nc">&nbsp;                if (!firstLetterIsFound) {</b>
+<b class="nc">&nbsp;                    String texCmdName = original.substring(currentBackslash + 1, tokenEnd);</b>
+<b class="nc">&nbsp;                    if (TEX_NAMES.contains(texCmdName)) {</b>
+<b class="nc">&nbsp;                        tokenCase = Character.isUpperCase(texCmdName.charAt(0));</b>
+<b class="nc">&nbsp;                        firstLetterIsFound = true;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                currentBackslash = -1;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (c == &#39;\\&#39;) {</b>
+<b class="nc">&nbsp;                currentBackslash = tokenEnd;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((bracesLevel == 0) &amp;&amp; ((&quot;,;-&quot;.indexOf(c) != -1) || Character.isWhitespace(c))) {</b>
+&nbsp;                break;
+&nbsp;            }
+<b class="nc">&nbsp;            tokenEnd++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (tokenAbbrEnd &lt; 0) {</b>
+<b class="nc">&nbsp;            tokenAbbrEnd = tokenEnd;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((tokenEnd &lt; original.length()) &amp;&amp; (original.charAt(tokenEnd) == &#39;-&#39;)) {</b>
+<b class="nc">&nbsp;            tokenTerm = &#39;-&#39;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (&quot;and&quot;.equalsIgnoreCase(original.substring(tokenStart, tokenEnd))) {</b>
+<b class="nc">&nbsp;            return Token.AND;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Token.WORD;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Token types (returned by getToken procedure)
+<b class="nc">&nbsp;    private enum Token {</b>
+<b class="nc">&nbsp;        EOF,</b>
+<b class="nc">&nbsp;        AND,</b>
+<b class="nc">&nbsp;        COMMA,</b>
+<b class="nc">&nbsp;        WORD</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,412 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DuplicateSearch</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.duplicationFinder</a>
+</div>
+
+<h1>Coverage Summary for Class: DuplicateSearch (org.jabref.gui.duplicationFinder)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DuplicateSearch</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/90)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DuplicateSearch$DuplicateSearchResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/106)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.duplicationFinder;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.BlockingQueue;
+&nbsp;import java.util.concurrent.LinkedBlockingQueue;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.concurrent.atomic.AtomicBoolean;
+&nbsp;import java.util.concurrent.atomic.AtomicInteger;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.property.SimpleIntegerProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
+&nbsp;import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverType;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.gui.undo.UndoableInsertEntries;
+&nbsp;import org.jabref.gui.undo.UndoableRemoveEntries;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.database.DuplicateCheck;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.HeadlessExecutorService;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+&nbsp;
+&nbsp;public class DuplicateSearch extends SimpleCommand {
+&nbsp;
+&nbsp;    private final Supplier&lt;LibraryTab&gt; tabSupplier;
+<b class="nc">&nbsp;    private final BlockingQueue&lt;List&lt;BibEntry&gt;&gt; duplicates = new LinkedBlockingQueue&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final AtomicBoolean libraryAnalyzed = new AtomicBoolean();</b>
+<b class="nc">&nbsp;    private final AtomicBoolean autoRemoveExactDuplicates = new AtomicBoolean();</b>
+<b class="nc">&nbsp;    private final AtomicInteger duplicateCount = new AtomicInteger();</b>
+<b class="nc">&nbsp;    private final SimpleStringProperty duplicateCountObservable = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final SimpleStringProperty duplicateTotal = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final SimpleIntegerProperty duplicateProgress = new SimpleIntegerProperty(0);</b>
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    public DuplicateSearch(Supplier&lt;LibraryTab&gt; tabSupplier,
+&nbsp;                           DialogService dialogService,
+&nbsp;                           StateManager stateManager,
+&nbsp;                           GuiPreferences preferences,
+&nbsp;                           BibEntryTypesManager entryTypesManager,
+<b class="nc">&nbsp;                           TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.tabSupplier = tabSupplier;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.executable.bind(needsDatabase(stateManager));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -&gt; new NullPointerException(&quot;Database null&quot;));</b>
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;Searching for duplicates...&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = database.getEntries();</b>
+<b class="nc">&nbsp;        duplicates.clear();</b>
+<b class="nc">&nbsp;        libraryAnalyzed.set(false);</b>
+<b class="nc">&nbsp;        autoRemoveExactDuplicates.set(false);</b>
+<b class="nc">&nbsp;        duplicateCount.set(0);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entries.size() &lt; 2) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        duplicateCountObservable.addListener((obj, oldValue, newValue) -&gt; UiTaskExecutor.runAndWaitInJavaFXThread(() -&gt; duplicateTotal.set(newValue)));</b>
+&nbsp;
+<b class="nc">&nbsp;        HeadlessExecutorService.INSTANCE.executeInterruptableTask(() -&gt; searchPossibleDuplicates(entries, database.getMode()), &quot;DuplicateSearcher&quot;);</b>
+<b class="nc">&nbsp;        BackgroundTask.wrap(this::verifyDuplicates)</b>
+<b class="nc">&nbsp;                      .onSuccess(this::handleDuplicates)</b>
+<b class="nc">&nbsp;                      .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void searchPossibleDuplicates(List&lt;BibEntry&gt; entries, BibDatabaseMode databaseMode) {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; (entries.size() - 1); i++) {</b>
+<b class="nc">&nbsp;            for (int j = i + 1; j &lt; entries.size(); j++) {</b>
+<b class="nc">&nbsp;                if (Thread.interrupted()) {</b>
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                BibEntry first = entries.get(i);</b>
+<b class="nc">&nbsp;                BibEntry second = entries.get(j);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (new DuplicateCheck(entryTypesManager).isDuplicate(first, second, databaseMode)) {</b>
+<b class="nc">&nbsp;                    duplicates.add(Arrays.asList(first, second));</b>
+<b class="nc">&nbsp;                    duplicateCountObservable.set(String.valueOf(duplicateCount.incrementAndGet()));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        libraryAnalyzed.set(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private DuplicateSearchResult verifyDuplicates() {
+<b class="nc">&nbsp;        DuplicateSearchResult result = new DuplicateSearchResult();</b>
+&nbsp;
+<b class="nc">&nbsp;        while (!libraryAnalyzed.get() || !duplicates.isEmpty()) {</b>
+<b class="nc">&nbsp;            duplicateProgress.set(duplicateProgress.getValue() + 1);</b>
+&nbsp;
+&nbsp;            List&lt;BibEntry&gt; dups;
+&nbsp;            try {
+&nbsp;                // poll with timeout in case the library is not analyzed completely, but contains no more duplicates
+<b class="nc">&nbsp;                dups = this.duplicates.poll(100, TimeUnit.MILLISECONDS);</b>
+<b class="nc">&nbsp;                if (dups == null) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;            } catch (InterruptedException e) {
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            BibEntry first = dups.getFirst();</b>
+<b class="nc">&nbsp;            BibEntry second = dups.get(1);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!result.isToRemove(first) &amp;&amp; !result.isToRemove(second)) {</b>
+&nbsp;                // Check if they are exact duplicates:
+<b class="nc">&nbsp;                boolean askAboutExact = false;</b>
+<b class="nc">&nbsp;                if (DuplicateCheck.compareEntriesStrictly(first, second) &gt; 1) {</b>
+<b class="nc">&nbsp;                    if (autoRemoveExactDuplicates.get()) {</b>
+<b class="nc">&nbsp;                        result.remove(second);</b>
+&nbsp;                        continue;
+&nbsp;                    }
+<b class="nc">&nbsp;                    askAboutExact = true;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                DuplicateResolverType resolverType = askAboutExact ? DuplicateResolverType.DUPLICATE_SEARCH_WITH_EXACT : DuplicateResolverType.DUPLICATE_SEARCH;</b>
+&nbsp;
+<b class="nc">&nbsp;                UiTaskExecutor.runAndWaitInJavaFXThread(() -&gt; askResolveStrategy(result, first, second, resolverType));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
+<b class="nc">&nbsp;        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, stateManager, dialogService, preferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        dialog.titleProperty().bind(Bindings.concat(dialog.getTitle()).concat(&quot; (&quot;).concat(duplicateProgress.getValue()).concat(&quot;/&quot;).concat(duplicateTotal).concat(&quot;)&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        DuplicateResolverResult resolverResult = dialogService.showCustomDialogAndWait(dialog)</b>
+<b class="nc">&nbsp;                                                              .orElse(DuplicateResolverResult.BREAK);</b>
+&nbsp;
+<b class="nc">&nbsp;        if ((resolverResult == DuplicateResolverResult.KEEP_LEFT)</b>
+&nbsp;                || (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
+<b class="nc">&nbsp;            result.remove(second);</b>
+<b class="nc">&nbsp;            result.replace(first, dialog.getNewLeftEntry());</b>
+<b class="nc">&nbsp;            if (resolverResult == DuplicateResolverResult.AUTOREMOVE_EXACT) {</b>
+<b class="nc">&nbsp;                autoRemoveExactDuplicates.set(true); // Remember choice</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (resolverResult == DuplicateResolverResult.KEEP_RIGHT) {</b>
+<b class="nc">&nbsp;            result.remove(first);</b>
+<b class="nc">&nbsp;            result.replace(second, dialog.getNewRightEntry());</b>
+<b class="nc">&nbsp;        } else if (resolverResult == DuplicateResolverResult.BREAK) {</b>
+<b class="nc">&nbsp;            libraryAnalyzed.set(true);</b>
+<b class="nc">&nbsp;            duplicates.clear();</b>
+<b class="nc">&nbsp;        } else if (resolverResult == DuplicateResolverResult.KEEP_MERGE) {</b>
+<b class="nc">&nbsp;            result.replace(first, second, dialog.getMergedEntry());</b>
+<b class="nc">&nbsp;        } else if (resolverResult == DuplicateResolverResult.KEEP_BOTH) {</b>
+<b class="nc">&nbsp;            result.replace(first, dialog.getNewLeftEntry());</b>
+<b class="nc">&nbsp;            result.replace(second, dialog.getNewRightEntry());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleDuplicates(DuplicateSearchResult result) {
+<b class="nc">&nbsp;        if (result == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LibraryTab libraryTab = tabSupplier.get();</b>
+<b class="nc">&nbsp;        final NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang(&quot;duplicate removal&quot;));</b>
+&nbsp;        // Now, do the actual removal:
+<b class="nc">&nbsp;        if (!result.getToRemove().isEmpty()) {</b>
+<b class="nc">&nbsp;            compoundEdit.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));</b>
+<b class="nc">&nbsp;            libraryTab.getDatabase().removeEntries(result.getToRemove());</b>
+<b class="nc">&nbsp;            libraryTab.markBaseChanged();</b>
+&nbsp;        }
+&nbsp;        // and adding merged entries:
+<b class="nc">&nbsp;        if (!result.getToAdd().isEmpty()) {</b>
+<b class="nc">&nbsp;            compoundEdit.addEdit(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));</b>
+<b class="nc">&nbsp;            libraryTab.getDatabase().insertEntries(result.getToAdd());</b>
+<b class="nc">&nbsp;            libraryTab.markBaseChanged();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        duplicateProgress.set(0);</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;Duplicates found&quot;) + &quot;: &quot; + duplicateCount.get() + &#39; &#39;</b>
+<b class="nc">&nbsp;                + Localization.lang(&quot;pairs processed&quot;) + &quot;: &quot; + result.getDuplicateCount());</b>
+<b class="nc">&nbsp;        compoundEdit.end();</b>
+<b class="nc">&nbsp;        libraryTab.getUndoManager().addEdit(compoundEdit);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Result of a duplicate search.
+&nbsp;     * Uses {@link System#identityHashCode(Object)} for identifying objects for removal, as completely identical
+&nbsp;     * {@link BibEntry BibEntries} are equal to each other.
+&nbsp;     */
+<b class="nc">&nbsp;    static class DuplicateSearchResult {</b>
+&nbsp;
+<b class="nc">&nbsp;        private final Map&lt;String, BibEntry&gt; toRemove = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        private final List&lt;BibEntry&gt; toAdd = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        private int duplicates = 0;</b>
+&nbsp;
+&nbsp;        public synchronized List&lt;BibEntry&gt; getToRemove() {
+<b class="nc">&nbsp;            return new ArrayList&lt;&gt;(toRemove.values());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public synchronized List&lt;BibEntry&gt; getToAdd() {
+<b class="nc">&nbsp;            return toAdd;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public synchronized void remove(BibEntry entry) {
+&nbsp;            // ADR-0038
+<b class="nc">&nbsp;            toRemove.put(entry.getId(), entry);</b>
+<b class="nc">&nbsp;            duplicates++;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public synchronized void replace(BibEntry first, BibEntry second, BibEntry replacement) {
+<b class="nc">&nbsp;            remove(first);</b>
+<b class="nc">&nbsp;            remove(second);</b>
+<b class="nc">&nbsp;            toAdd.add(replacement);</b>
+<b class="nc">&nbsp;            duplicates++;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public synchronized void replace(BibEntry entry, BibEntry replacement) {
+<b class="nc">&nbsp;            remove(entry);</b>
+<b class="nc">&nbsp;            getToAdd().add(replacement);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public synchronized boolean isToRemove(BibEntry entry) {
+&nbsp;            // ADR-0038
+<b class="nc">&nbsp;            return toRemove.containsKey(entry.getId());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public synchronized int getDuplicateCount() {
+<b class="nc">&nbsp;            return duplicates;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,182 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > QuotedStringTokenizer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util.strings</a>
+</div>
+
+<h1>Coverage Summary for Class: QuotedStringTokenizer (org.jabref.logic.util.strings)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">QuotedStringTokenizer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util.strings;
+&nbsp;
+&nbsp;/**
+&nbsp; * A String tokenizer that works just like StringTokenizer, but considers quoted
+&nbsp; * characters (which do not act as delimiters).
+&nbsp; */
+&nbsp;public class QuotedStringTokenizer {
+&nbsp;
+&nbsp;    private final String content;
+&nbsp;    private final int contentLength;
+&nbsp;    private final String delimiters;
+&nbsp;    private final char quoteChar;
+&nbsp;    private int index;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param content        The String to be tokenized.
+&nbsp;     * @param delimiters     The delimiter characters.
+&nbsp;     * @param quoteCharacter The quoting character. Every character (including, but not limited to, delimiters) that is preceded by this character is not treated as a delimiter, but as a token component.
+&nbsp;     */
+<b class="nc">&nbsp;    public QuotedStringTokenizer(String content, String delimiters, char quoteCharacter) {</b>
+<b class="nc">&nbsp;        this.content = content;</b>
+<b class="nc">&nbsp;        this.delimiters = delimiters;</b>
+<b class="nc">&nbsp;        quoteChar = quoteCharacter;</b>
+<b class="nc">&nbsp;        contentLength = this.content.length();</b>
+&nbsp;        // skip leading delimiters
+<b class="nc">&nbsp;        while (isDelimiter(this.content.charAt(index)) &amp;&amp; index &lt; contentLength) {</b>
+<b class="nc">&nbsp;            ++index;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return the next token from the content string, ending at the next
+&nbsp;     * unquoted delimiter. Does not unquote the string itself.
+&nbsp;     */
+&nbsp;    public String nextToken() {
+&nbsp;        char c;
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+<b class="nc">&nbsp;        while (index &lt; contentLength) {</b>
+<b class="nc">&nbsp;            c = content.charAt(index);</b>
+<b class="nc">&nbsp;            if (c == quoteChar) { // next is quoted</b>
+<b class="nc">&nbsp;                ++index;</b>
+<b class="nc">&nbsp;                stringBuilder.append(c);</b>
+<b class="nc">&nbsp;                if (index &lt; contentLength) {</b>
+<b class="nc">&nbsp;                    stringBuilder.append(content.charAt(index));</b>
+&nbsp;                    // ignore for delimiter search!
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (isDelimiter(c)) { // unit finished</b>
+&nbsp;                // advance index until next token or end
+<b class="nc">&nbsp;                ++index;</b>
+<b class="nc">&nbsp;                return stringBuilder.toString();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                stringBuilder.append(c);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            ++index;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return stringBuilder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isDelimiter(char c) {
+<b class="nc">&nbsp;        return delimiters.indexOf(c) &gt;= 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasMoreTokens() {
+<b class="nc">&nbsp;        return index &lt; contentLength;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

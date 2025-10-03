@@ -1,0 +1,459 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EndnoteXmlExporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: EndnoteXmlExporter (org.jabref.logic.exporter)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EndnoteXmlExporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/171)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EndnoteXmlExporter$EndNoteType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/172)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.exporter;
+&nbsp;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.SequencedMap;
+&nbsp;
+&nbsp;import javax.xml.parsers.DocumentBuilder;
+&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+&nbsp;import javax.xml.parsers.ParserConfigurationException;
+&nbsp;import javax.xml.transform.OutputKeys;
+&nbsp;import javax.xml.transform.Transformer;
+&nbsp;import javax.xml.transform.TransformerConfigurationException;
+&nbsp;import javax.xml.transform.TransformerException;
+&nbsp;import javax.xml.transform.TransformerFactory;
+&nbsp;import javax.xml.transform.dom.DOMSource;
+&nbsp;import javax.xml.transform.stream.StreamResult;
+&nbsp;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryPreferences;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.IEEETranEntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.w3c.dom.Element;
+&nbsp;
+&nbsp;public class EndnoteXmlExporter extends Exporter {
+&nbsp;
+<b class="nc">&nbsp;    private static final Map&lt;EntryType, EndNoteType&gt; ENTRY_TYPE_MAPPING = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.Article, new EndNoteType(&quot;Journal Article&quot;, 1));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.Book, new EndNoteType(&quot;Book&quot;, 2));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.InBook, new EndNoteType(&quot;Book Section&quot;, 3));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.InCollection, new EndNoteType(&quot;Book Section&quot;, 4));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.Proceedings, new EndNoteType(&quot;Conference Proceedings&quot;, 5));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.MastersThesis, new EndNoteType(&quot;Thesis&quot;, 6));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.PhdThesis, new EndNoteType(&quot;Thesis&quot;, 7));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.TechReport, new EndNoteType(&quot;Report&quot;, 8));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.Unpublished, new EndNoteType(&quot;Manuscript&quot;, 9));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.InProceedings, new EndNoteType(&quot;Conference Paper&quot;, 10));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.Conference, new EndNoteType(&quot;Conference&quot;, 11));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(IEEETranEntryType.Patent, new EndNoteType(&quot;Patent&quot;, 12));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.Online, new EndNoteType(&quot;Web Page&quot;, 13));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(IEEETranEntryType.Electronic, new EndNoteType(&quot;Electronic Article&quot;, 14));</b>
+<b class="nc">&nbsp;        ENTRY_TYPE_MAPPING.put(StandardEntryType.Misc, new EndNoteType(&quot;Generic&quot;, 15));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Contains the mapping of all fields not explicitly handled by mapX methods.
+&nbsp;     * We need a fixed order here, so we use a SequencedMap
+&nbsp;     */
+<b class="nc">&nbsp;    private static final SequencedMap&lt;Field, String&gt; STANDARD_FIELD_MAPPING = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.PAGES, &quot;pages&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.VOLUME, &quot;volume&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.PUBLISHER, &quot;publisher&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.ISBN, &quot;isbn&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.DOI, &quot;electronic-resource-num&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.ABSTRACT, &quot;abstract&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.BOOKTITLE, &quot;secondary-title&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.EDITION, &quot;edition&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.SERIES, &quot;tertiary-title&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.NUMBER, &quot;number&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.ISSUE, &quot;issue&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.LOCATION, &quot;pub-location&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.CHAPTER, &quot;section&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.HOWPUBLISHED, &quot;work-type&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.ISSN, &quot;issn&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.ADDRESS, &quot;auth-address&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.PAGETOTAL, &quot;page-total&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.NOTE, &quot;notes&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.LABEL, &quot;label&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.LANGUAGE, &quot;language&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(StandardField.KEY, &quot;foreign-keys&quot;);</b>
+<b class="nc">&nbsp;        STANDARD_FIELD_MAPPING.put(new UnknownField(&quot;accession-num&quot;), &quot;accession-num&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final EndNoteType DEFAULT_TYPE = new EndNoteType(&quot;Generic&quot;, 15);</b>
+&nbsp;
+&nbsp;    private final DocumentBuilderFactory documentBuilderFactory;
+&nbsp;
+<b class="nc">&nbsp;    private record EndNoteType(String name, int number) {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final BibEntryPreferences bibEntryPreferences;
+&nbsp;
+&nbsp;    public EndnoteXmlExporter(BibEntryPreferences bibEntryPreferences) {
+<b class="nc">&nbsp;        super(&quot;endnote&quot;, &quot;EndNote XML&quot;, StandardFileType.XML);</b>
+<b class="nc">&nbsp;        this.bibEntryPreferences = bibEntryPreferences;</b>
+<b class="nc">&nbsp;        this.documentBuilderFactory = DocumentBuilderFactory.newInstance();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void export(BibDatabaseContext databaseContext, Path file, List&lt;BibEntry&gt; entries) throws ParserConfigurationException, TransformerException {
+<b class="nc">&nbsp;        Objects.requireNonNull(databaseContext);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(file);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(entries);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entries.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        DocumentBuilder dBuilder = documentBuilderFactory.newDocumentBuilder();</b>
+<b class="nc">&nbsp;        Document document = dBuilder.newDocument();</b>
+&nbsp;
+<b class="nc">&nbsp;        Element rootElement = document.createElement(&quot;xml&quot;);</b>
+<b class="nc">&nbsp;        document.appendChild(rootElement);</b>
+&nbsp;
+<b class="nc">&nbsp;        Element recordsElement = document.createElement(&quot;records&quot;);</b>
+<b class="nc">&nbsp;        rootElement.appendChild(recordsElement);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            Element recordElement = document.createElement(&quot;record&quot;);</b>
+<b class="nc">&nbsp;            recordsElement.appendChild(recordElement);</b>
+&nbsp;
+<b class="nc">&nbsp;            mapEntryType(entry, document, recordElement);</b>
+<b class="nc">&nbsp;            createMetaInformationElements(databaseContext, document, recordElement);</b>
+<b class="nc">&nbsp;            mapAuthorAndEditor(entry, document, recordElement);</b>
+<b class="nc">&nbsp;            mapTitle(entry, document, recordElement);</b>
+<b class="nc">&nbsp;            mapJournalTitle(entry, document, recordElement);</b>
+<b class="nc">&nbsp;            mapKeywords(databaseContext.getDatabase(), entry, document, recordElement);</b>
+<b class="nc">&nbsp;            mapDates(entry, document, recordElement);</b>
+<b class="nc">&nbsp;            mapUrls(entry, document, recordElement);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Map.Entry&lt;Field, String&gt; fieldMapping : STANDARD_FIELD_MAPPING.entrySet()) {</b>
+<b class="nc">&nbsp;                Field field = fieldMapping.getKey();</b>
+<b class="nc">&nbsp;                String xmlElement = fieldMapping.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;                entry.getField(field).ifPresent(value -&gt; {</b>
+<b class="nc">&nbsp;                    Element fieldElement = document.createElement(xmlElement);</b>
+<b class="nc">&nbsp;                    fieldElement.setTextContent(value);</b>
+<b class="nc">&nbsp;                    recordElement.appendChild(fieldElement);</b>
+&nbsp;                });
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Transformer transformer = createTransformer();</b>
+<b class="nc">&nbsp;        DOMSource source = new DOMSource(document);</b>
+<b class="nc">&nbsp;        StreamResult result = new StreamResult(file.toFile());</b>
+<b class="nc">&nbsp;        transformer.transform(source, result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void mapTitle(BibEntry entry, Document document, Element recordElement) {
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.TITLE).ifPresent(title -&gt; {</b>
+<b class="nc">&nbsp;            Element titlesElement = document.createElement(&quot;titles&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            Element titleElement = document.createElement(&quot;title&quot;);</b>
+<b class="nc">&nbsp;            titleElement.setTextContent(title);</b>
+<b class="nc">&nbsp;            titlesElement.appendChild(titleElement);</b>
+&nbsp;
+<b class="nc">&nbsp;            entry.getField(new UnknownField(&quot;alt-title&quot;)).ifPresent(altTitle -&gt; {</b>
+<b class="nc">&nbsp;                Element altTitleElement = document.createElement(&quot;alt-title&quot;);</b>
+<b class="nc">&nbsp;                altTitleElement.setTextContent(altTitle);</b>
+<b class="nc">&nbsp;                titlesElement.appendChild(altTitleElement);</b>
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            entry.getField(StandardField.BOOKTITLE).ifPresent(secondaryTitle -&gt; {</b>
+<b class="nc">&nbsp;                Element secondaryTitleElement = document.createElement(&quot;secondary-title&quot;);</b>
+<b class="nc">&nbsp;                secondaryTitleElement.setTextContent(secondaryTitle);</b>
+<b class="nc">&nbsp;                titlesElement.appendChild(secondaryTitleElement);</b>
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            recordElement.appendChild(titlesElement);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void mapJournalTitle(BibEntry entry, Document document, Element recordElement) {
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.JOURNAL).ifPresent(journalTitle -&gt; {</b>
+<b class="nc">&nbsp;            Element periodicalElement = document.createElement(&quot;periodical&quot;);</b>
+<b class="nc">&nbsp;            Element fullTitleElement = document.createElement(&quot;full-title&quot;);</b>
+<b class="nc">&nbsp;            fullTitleElement.setTextContent(journalTitle);</b>
+<b class="nc">&nbsp;            periodicalElement.appendChild(fullTitleElement);</b>
+<b class="nc">&nbsp;            recordElement.appendChild(periodicalElement);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void mapKeywords(BibDatabase bibDatabase, BibEntry entry, Document document, Element recordElement) {
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.KEYWORDS).ifPresent(_ -&gt; {</b>
+<b class="nc">&nbsp;            Element keywordsElement = document.createElement(&quot;keywords&quot;);</b>
+<b class="nc">&nbsp;            entry.getResolvedKeywords(bibEntryPreferences.getKeywordSeparator(), bibDatabase).forEach(keyword -&gt; {</b>
+<b class="nc">&nbsp;                Element keywordElement = document.createElement(&quot;keyword&quot;);</b>
+&nbsp;                // Hierarchical keywords are separated by the &#39;&gt;&#39; character. See {@link } for details.
+<b class="nc">&nbsp;                keywordElement.setTextContent(keyword.get());</b>
+<b class="nc">&nbsp;                keywordsElement.appendChild(keywordElement);</b>
+&nbsp;            });
+<b class="nc">&nbsp;            recordElement.appendChild(keywordsElement);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void mapUrls(BibEntry entry, Document document, Element recordElement) {
+<b class="nc">&nbsp;        Element urlsElement = document.createElement(&quot;urls&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.FILE).ifPresent(fileField -&gt; {</b>
+<b class="nc">&nbsp;            Element pdfUrlsElement = document.createElement(&quot;pdf-urls&quot;);</b>
+<b class="nc">&nbsp;            Element urlElement = document.createElement(&quot;url&quot;);</b>
+<b class="nc">&nbsp;            urlElement.setTextContent(fileField);</b>
+<b class="nc">&nbsp;            pdfUrlsElement.appendChild(urlElement);</b>
+<b class="nc">&nbsp;            urlsElement.appendChild(pdfUrlsElement);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.URL).ifPresent(url -&gt; {</b>
+<b class="nc">&nbsp;            Element webUrlsElement = document.createElement(&quot;web-urls&quot;);</b>
+<b class="nc">&nbsp;            Element urlElement = document.createElement(&quot;url&quot;);</b>
+<b class="nc">&nbsp;            urlElement.setTextContent(url);</b>
+<b class="nc">&nbsp;            webUrlsElement.appendChild(urlElement);</b>
+<b class="nc">&nbsp;            urlsElement.appendChild(webUrlsElement);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        if (urlsElement.hasChildNodes()) {</b>
+<b class="nc">&nbsp;            recordElement.appendChild(urlsElement);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void mapDates(BibEntry entry, Document document, Element recordElement) {
+<b class="nc">&nbsp;        Element datesElement = document.createElement(&quot;dates&quot;);</b>
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.YEAR).ifPresent(year -&gt; {</b>
+<b class="nc">&nbsp;            Element yearElement = document.createElement(&quot;year&quot;);</b>
+<b class="nc">&nbsp;            yearElement.setTextContent(year);</b>
+<b class="nc">&nbsp;            datesElement.appendChild(yearElement);</b>
+&nbsp;        });
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.MONTH).ifPresent(month -&gt; {</b>
+<b class="nc">&nbsp;            Element yearElement = document.createElement(&quot;month&quot;);</b>
+<b class="nc">&nbsp;            yearElement.setTextContent(month);</b>
+<b class="nc">&nbsp;            datesElement.appendChild(yearElement);</b>
+&nbsp;        });
+<b class="nc">&nbsp;        entry.getFieldOrAlias(StandardField.DAY).ifPresent(day -&gt; {</b>
+<b class="nc">&nbsp;            Element yearElement = document.createElement(&quot;day&quot;);</b>
+<b class="nc">&nbsp;            yearElement.setTextContent(day);</b>
+<b class="nc">&nbsp;            datesElement.appendChild(yearElement);</b>
+&nbsp;        });
+&nbsp;        // We need to use getField here - getFieldOrAlias for Date tries to convert year, month, and day to a date, which we do not want
+<b class="nc">&nbsp;        entry.getField(StandardField.DATE).ifPresent(date -&gt; {</b>
+<b class="nc">&nbsp;            Element pubDatesElement = document.createElement(&quot;pub-dates&quot;);</b>
+<b class="nc">&nbsp;            Element dateElement = document.createElement(&quot;date&quot;);</b>
+<b class="nc">&nbsp;            dateElement.setTextContent(date);</b>
+<b class="nc">&nbsp;            pubDatesElement.appendChild(dateElement);</b>
+<b class="nc">&nbsp;            datesElement.appendChild(pubDatesElement);</b>
+&nbsp;        });
+<b class="nc">&nbsp;        if (datesElement.hasChildNodes()) {</b>
+<b class="nc">&nbsp;            recordElement.appendChild(datesElement);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void mapEntryType(BibEntry entry, Document document, Element recordElement) {
+<b class="nc">&nbsp;        EntryType entryType = entry.getType();</b>
+<b class="nc">&nbsp;        EndNoteType endNoteType = ENTRY_TYPE_MAPPING.getOrDefault(entryType, DEFAULT_TYPE);</b>
+<b class="nc">&nbsp;        Element refTypeElement = document.createElement(&quot;ref-type&quot;);</b>
+<b class="nc">&nbsp;        refTypeElement.setAttribute(&quot;name&quot;, endNoteType.name());</b>
+<b class="nc">&nbsp;        refTypeElement.setTextContent(String.valueOf(endNoteType.number()));</b>
+<b class="nc">&nbsp;        recordElement.appendChild(refTypeElement);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void createMetaInformationElements(BibDatabaseContext databaseContext, Document document, Element recordElement) {
+<b class="nc">&nbsp;        Element databaseElement = document.createElement(&quot;database&quot;);</b>
+<b class="nc">&nbsp;        databaseElement.setAttribute(&quot;name&quot;, &quot;MyLibrary&quot;);</b>
+<b class="nc">&nbsp;        String name = databaseContext.getDatabasePath().map(Path::getFileName).map(Path::toString).orElse(&quot;MyLibrary&quot;);</b>
+<b class="nc">&nbsp;        databaseElement.setTextContent(name);</b>
+<b class="nc">&nbsp;        recordElement.appendChild(databaseElement);</b>
+&nbsp;
+<b class="nc">&nbsp;        Element sourceAppElement = document.createElement(&quot;source-app&quot;);</b>
+<b class="nc">&nbsp;        sourceAppElement.setAttribute(&quot;name&quot;, &quot;JabRef&quot;);</b>
+<b class="nc">&nbsp;        sourceAppElement.setTextContent(&quot;JabRef&quot;);</b>
+<b class="nc">&nbsp;        recordElement.appendChild(sourceAppElement);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void mapAuthorAndEditor(BibEntry entry, Document document, Element recordElement) {
+<b class="nc">&nbsp;        Element contributorsElement = document.createElement(&quot;contributors&quot;);</b>
+<b class="nc">&nbsp;        entry.getField(StandardField.AUTHOR).ifPresent(authors -&gt; addPersons(authors, document, contributorsElement, &quot;authors&quot;));</b>
+<b class="nc">&nbsp;        entry.getField(StandardField.EDITOR).ifPresent(editors -&gt; addPersons(editors, document, contributorsElement, &quot;secondary-authors&quot;));</b>
+<b class="nc">&nbsp;        if (contributorsElement.hasChildNodes()) {</b>
+<b class="nc">&nbsp;            recordElement.appendChild(contributorsElement);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addPersons(String authors, Document document, Element contributorsElement, String wrapTagName) {
+<b class="nc">&nbsp;        Element container = document.createElement(wrapTagName);</b>
+<b class="nc">&nbsp;        AuthorList parsedPersons = AuthorList.parse(authors).latexFree();</b>
+<b class="nc">&nbsp;        for (Author person : parsedPersons) {</b>
+<b class="nc">&nbsp;            Element authorElement = document.createElement(&quot;author&quot;);</b>
+<b class="nc">&nbsp;            authorElement.setTextContent(person.getFamilyGiven(false));</b>
+<b class="nc">&nbsp;            container.appendChild(authorElement);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        contributorsElement.appendChild(container);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Transformer createTransformer() throws TransformerConfigurationException {
+<b class="nc">&nbsp;        TransformerFactory transformerFactory = TransformerFactory.newInstance();</b>
+<b class="nc">&nbsp;        Transformer transformer = transformerFactory.newTransformer();</b>
+<b class="nc">&nbsp;        transformer.setOutputProperty(OutputKeys.ENCODING, StandardCharsets.UTF_8.name());</b>
+<b class="nc">&nbsp;        transformer.setOutputProperty(OutputKeys.INDENT, &quot;yes&quot;);</b>
+<b class="nc">&nbsp;        transformer.setOutputProperty(&quot;{http://xml.apache.org/xslt}indent-amount&quot;, &quot;2&quot;);</b>
+<b class="nc">&nbsp;        return transformer;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

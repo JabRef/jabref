@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitStatusViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.git</a>
+</div>
+
+<h1>Coverage Summary for Class: GitStatusViewModel (org.jabref.gui.git)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitStatusViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.git;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.logic.git.GitHandler;
+&nbsp;import org.jabref.logic.git.status.GitStatusChecker;
+&nbsp;import org.jabref.logic.git.status.GitStatusSnapshot;
+&nbsp;import org.jabref.logic.git.status.SyncStatus;
+&nbsp;import org.jabref.logic.git.util.GitHandlerRegistry;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;
+&nbsp;/// ViewModel that holds current Git sync status for the open .bib database.
+&nbsp;/// It maintains the state of the GitHandler bound to the current file path, including:
+&nbsp;///
+&nbsp;/// &lt;ul&gt;
+&nbsp;///   &lt;li&gt;Whether the current file is inside a Git repository&lt;/li&gt;
+&nbsp;///   &lt;li&gt;Whether the file is tracked by Git&lt;/li&gt;
+&nbsp;///   &lt;li&gt;Whether there are unresolved merge conflicts&lt;/li&gt;
+&nbsp;///   &lt;li&gt;The current sync status (e.g., {@code UP_TO_DATE}, {@code DIVERGED}, etc.)&lt;/li&gt;
+&nbsp;/// &lt;/ul&gt;
+&nbsp;public class GitStatusViewModel extends AbstractViewModel {
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final GitHandlerRegistry handlerRegistry;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;SyncStatus&gt; syncStatus = new SimpleObjectProperty&lt;&gt;(SyncStatus.UNTRACKED);</b>
+<b class="nc">&nbsp;    private final BooleanProperty isTracking = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final BooleanProperty conflictDetected = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final StringProperty lastPulledCommit = new SimpleStringProperty(&quot;&quot;);</b>
+<b class="nc">&nbsp;    private final BooleanProperty hasRemoteConfigured = new SimpleBooleanProperty(false);</b>
+&nbsp;
+<b class="nc">&nbsp;    public GitStatusViewModel(StateManager stateManager, TaskExecutor taskExecutor, GitHandlerRegistry handlerRegistry) {</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.handlerRegistry = handlerRegistry;</b>
+&nbsp;
+<b class="nc">&nbsp;        stateManager.activeDatabaseProperty().addListener((_, _, newDb) -&gt; {</b>
+<b class="nc">&nbsp;            if ((newDb != null) &amp;&amp; newDb.isPresent() &amp;&amp; newDb.get().getDatabasePath().isPresent()) {</b>
+<b class="nc">&nbsp;                Path path = newDb.get().getDatabasePath().get();</b>
+<b class="nc">&nbsp;                refresh(path);</b>
+<b class="nc">&nbsp;                updateRemoteStatus(path);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                reset();</b>
+<b class="nc">&nbsp;                hasRemoteConfigured.set(false);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        stateManager.getActiveDatabase()</b>
+<b class="nc">&nbsp;                    .flatMap(BibDatabaseContext::getDatabasePath)</b>
+<b class="nc">&nbsp;                    .ifPresent(path -&gt; {</b>
+<b class="nc">&nbsp;                        refresh(path);</b>
+<b class="nc">&nbsp;                        updateRemoteStatus(path);</b>
+&nbsp;                    });
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void updateStatusFromContext(BibDatabaseContext context) {
+<b class="nc">&nbsp;        Path path = context.getDatabasePath().orElse(null);</b>
+<b class="nc">&nbsp;        if (path == null) {</b>
+<b class="nc">&nbsp;            reset();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        refresh(path);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void refresh(Path path) {
+<b class="nc">&nbsp;        handlerRegistry.fromAnyPath(path).ifPresentOrElse(handler -&gt; {</b>
+<b class="nc">&nbsp;            GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(handler);</b>
+<b class="nc">&nbsp;            setTracking(snapshot.tracking());</b>
+<b class="nc">&nbsp;            setSyncStatus(snapshot.syncStatus());</b>
+<b class="nc">&nbsp;            setConflictDetected(snapshot.conflict());</b>
+<b class="nc">&nbsp;            snapshot.lastPulledCommit().ifPresent(this::setLastPulledCommit);</b>
+&nbsp;        }, this::reset);
+&nbsp;    }
+&nbsp;
+&nbsp;    public void reset() {
+<b class="nc">&nbsp;        setSyncStatus(SyncStatus.UNTRACKED);</b>
+<b class="nc">&nbsp;        setTracking(false);</b>
+<b class="nc">&nbsp;        setConflictDetected(false);</b>
+<b class="nc">&nbsp;        setLastPulledCommit(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty hasRemoteConfiguredProperty() {
+<b class="nc">&nbsp;        return hasRemoteConfigured;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void updateRemoteStatus(Path databasePath) {
+<b class="nc">&nbsp;        BackgroundTask</b>
+<b class="nc">&nbsp;                .wrap(() -&gt; {</b>
+<b class="nc">&nbsp;                    GitHandler handler = handlerRegistry.get(databasePath.getParent());</b>
+<b class="nc">&nbsp;                    return handler != null &amp;&amp; handler.hasRemote(&quot;origin&quot;);</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .onSuccess(hasRemote -&gt; hasRemoteConfigured.set(hasRemote))</b>
+<b class="nc">&nbsp;                .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Path&gt; currentBibPath() {
+<b class="nc">&nbsp;        return stateManager.getActiveDatabase().flatMap(BibDatabaseContext::getDatabasePath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;SyncStatus&gt; syncStatusProperty() {
+<b class="nc">&nbsp;        return syncStatus;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SyncStatus getSyncStatus() {
+<b class="nc">&nbsp;        return syncStatus.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSyncStatus(SyncStatus status) {
+<b class="nc">&nbsp;        this.syncStatus.set(status);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty isTrackingProperty() {
+<b class="nc">&nbsp;        return isTracking;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isTracking() {
+<b class="nc">&nbsp;        return isTracking.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTracking(boolean tracking) {
+<b class="nc">&nbsp;        this.isTracking.set(tracking);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty conflictDetectedProperty() {
+<b class="nc">&nbsp;        return conflictDetected;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isConflictDetected() {
+<b class="nc">&nbsp;        return conflictDetected.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setConflictDetected(boolean conflict) {
+<b class="nc">&nbsp;        this.conflictDetected.set(conflict);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty lastPulledCommitProperty() {
+<b class="nc">&nbsp;        return lastPulledCommit;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLastPulledCommit() {
+<b class="nc">&nbsp;        return lastPulledCommit.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLastPulledCommit(String commitHash) {
+<b class="nc">&nbsp;        this.lastPulledCommit.set(commitHash);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static GitStatusViewModel fromPathAndContext(StateManager stateManager, TaskExecutor taskExecutor, GitHandlerRegistry handlerRegistry, Path path) {
+<b class="nc">&nbsp;        GitStatusViewModel viewModel = new GitStatusViewModel(stateManager, taskExecutor, handlerRegistry);</b>
+<b class="nc">&nbsp;        viewModel.refresh(path);</b>
+<b class="nc">&nbsp;        return viewModel;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

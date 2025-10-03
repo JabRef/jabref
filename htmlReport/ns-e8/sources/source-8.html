@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CliPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.preferences</a>
+</div>
+
+<h1>Coverage Summary for Class: CliPreferences (org.jabref.logic.preferences)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">CliPreferences</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.preferences;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.prefs.BackingStoreException;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.InternalPreferences;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.LibraryPreferences;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;import org.jabref.logic.bibtex.FieldPreferences;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+&nbsp;import org.jabref.logic.cleanup.CleanupPreferences;
+&nbsp;import org.jabref.logic.exporter.ExportPreferences;
+&nbsp;import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+&nbsp;import org.jabref.logic.git.preferences.GitPreferences;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ImporterPreferences;
+&nbsp;import org.jabref.logic.importer.fetcher.MrDlibPreferences;
+&nbsp;import org.jabref.logic.importer.util.GrobidPreferences;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationPreferences;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.layout.LayoutFormatterPreferences;
+&nbsp;import org.jabref.logic.layout.format.NameFormatterPreferences;
+&nbsp;import org.jabref.logic.net.ProxyPreferences;
+&nbsp;import org.jabref.logic.net.ssl.SSLPreferences;
+&nbsp;import org.jabref.logic.openoffice.OpenOfficePreferences;
+&nbsp;import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
+&nbsp;import org.jabref.logic.push.PushToApplicationPreferences;
+&nbsp;import org.jabref.logic.remote.RemotePreferences;
+&nbsp;import org.jabref.logic.search.SearchPreferences;
+&nbsp;import org.jabref.logic.util.io.AutoLinkPreferences;
+&nbsp;import org.jabref.logic.xmp.XmpPreferences;
+&nbsp;import org.jabref.model.entry.BibEntryPreferences;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;public interface CliPreferences {
+&nbsp;    void clear() throws BackingStoreException;
+&nbsp;
+&nbsp;    void deleteKey(String key) throws IllegalArgumentException;
+&nbsp;
+&nbsp;    void flush();
+&nbsp;
+&nbsp;    void exportPreferences(Path file) throws JabRefException;
+&nbsp;
+&nbsp;    void importPreferences(Path file) throws JabRefException;
+&nbsp;
+&nbsp;    InternalPreferences getInternalPreferences();
+&nbsp;
+&nbsp;    BibEntryPreferences getBibEntryPreferences();
+&nbsp;
+&nbsp;    JournalAbbreviationPreferences getJournalAbbreviationPreferences();
+&nbsp;
+&nbsp;    FilePreferences getFilePreferences();
+&nbsp;
+&nbsp;    FieldPreferences getFieldPreferences();
+&nbsp;
+&nbsp;    Map&lt;String, Object&gt; getPreferences();
+&nbsp;
+&nbsp;    Map&lt;String, Object&gt; getDefaults();
+&nbsp;
+&nbsp;    LayoutFormatterPreferences getLayoutFormatterPreferences();
+&nbsp;
+&nbsp;    ImportFormatPreferences getImportFormatPreferences();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the export configuration. The contained SaveConfiguration is a {@link org.jabref.model.metadata.SelfContainedSaveOrder}
+&nbsp;     */
+&nbsp;    SelfContainedSaveConfiguration getSelfContainedExportConfiguration();
+&nbsp;
+&nbsp;    BibEntryTypesManager getCustomEntryTypesRepository();
+&nbsp;
+&nbsp;    void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager);
+&nbsp;
+&nbsp;    CleanupPreferences getCleanupPreferences();
+&nbsp;
+&nbsp;    CleanupPreferences getDefaultCleanupPreset();
+&nbsp;
+&nbsp;    LibraryPreferences getLibraryPreferences();
+&nbsp;
+&nbsp;    DOIPreferences getDOIPreferences();
+&nbsp;
+&nbsp;    OwnerPreferences getOwnerPreferences();
+&nbsp;
+&nbsp;    TimestampPreferences getTimestampPreferences();
+&nbsp;
+&nbsp;    RemotePreferences getRemotePreferences();
+&nbsp;
+&nbsp;    ProxyPreferences getProxyPreferences();
+&nbsp;
+&nbsp;    SSLPreferences getSSLPreferences();
+&nbsp;
+&nbsp;    CitationKeyPatternPreferences getCitationKeyPatternPreferences();
+&nbsp;
+&nbsp;    AutoLinkPreferences getAutoLinkPreferences();
+&nbsp;
+&nbsp;    ExportPreferences getExportPreferences();
+&nbsp;
+&nbsp;    ImporterPreferences getImporterPreferences();
+&nbsp;
+&nbsp;    GrobidPreferences getGrobidPreferences();
+&nbsp;
+&nbsp;    XmpPreferences getXmpPreferences();
+&nbsp;
+&nbsp;    NameFormatterPreferences getNameFormatterPreferences();
+&nbsp;
+&nbsp;    SearchPreferences getSearchPreferences();
+&nbsp;
+&nbsp;    MrDlibPreferences getMrDlibPreferences();
+&nbsp;
+&nbsp;    ProtectedTermsPreferences getProtectedTermsPreferences();
+&nbsp;
+&nbsp;    AiPreferences getAiPreferences();
+&nbsp;
+&nbsp;    LastFilesOpenedPreferences getLastFilesOpenedPreferences();
+&nbsp;
+&nbsp;    OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository);
+&nbsp;
+&nbsp;    PushToApplicationPreferences getPushToApplicationPreferences();
+&nbsp;
+&nbsp;    GitPreferences getGitPreferences();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

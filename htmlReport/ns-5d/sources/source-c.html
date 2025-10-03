@@ -1,0 +1,118 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PreferencesTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences</a>
+</div>
+
+<h1>Coverage Summary for Class: PreferencesTab (org.jabref.gui.preferences)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">PreferencesTab</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;
+&nbsp;/**
+&nbsp; * A prefsTab is a component displayed in the PreferenceDialog.
+&nbsp; * &lt;p&gt;
+&nbsp; * It needs to extend from Component.
+&nbsp; */
+&nbsp;public interface PreferencesTab {
+&nbsp;
+&nbsp;    Node getBuilder();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Should return the localized identifier to use for the tab.
+&nbsp;     *
+&nbsp;     * @return Identifier for the tab (for instance &quot;General&quot;, &quot;Appearance&quot; or &quot;External Files&quot;).
+&nbsp;     */
+&nbsp;    String getTabName();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is called when the dialog is opened, or if it is made
+&nbsp;     * visible after being hidden. This calls the appropriate method in the
+&nbsp;     * ViewModel.
+&nbsp;     */
+&nbsp;    void setValues();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is called when the user presses OK in the Preferences
+&nbsp;     * dialog. This calls the appropriate method in the ViewModel.
+&nbsp;     */
+&nbsp;    void storeSettings();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is called before the {@link #storeSettings()} method,
+&nbsp;     * to check if there are illegal settings in the tab, or if is ready
+&nbsp;     * to be closed. This calls the appropriate method in the ViewModel.
+&nbsp;     */
+&nbsp;    boolean validateSettings();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method should be called after storing the preferences, This
+&nbsp;     * calls the appropriate method in the ViewModel.
+&nbsp;     *
+&nbsp;     * @return The messages for the changed properties (e.g. &quot;Changed language: English&quot;)
+&nbsp;     */
+&nbsp;    List&lt;String&gt; getRestartWarnings();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

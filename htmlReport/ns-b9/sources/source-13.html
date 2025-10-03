@@ -1,0 +1,234 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OpenOfficeDocumentCreator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: OpenOfficeDocumentCreator (org.jabref.logic.exporter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OpenOfficeDocumentCreator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.exporter;
+&nbsp;
+&nbsp;import java.io.BufferedInputStream;
+&nbsp;import java.io.BufferedOutputStream;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.io.Writer;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;import java.util.zip.ZipOutputStream;
+&nbsp;
+&nbsp;import javax.xml.transform.OutputKeys;
+&nbsp;import javax.xml.transform.Transformer;
+&nbsp;import javax.xml.transform.TransformerException;
+&nbsp;import javax.xml.transform.TransformerFactory;
+&nbsp;import javax.xml.transform.dom.DOMSource;
+&nbsp;import javax.xml.transform.stream.StreamResult;
+&nbsp;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class OpenOfficeDocumentCreator extends Exporter {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeDocumentCreator.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new instance of OpenOfficeDocumentCreator
+&nbsp;     */
+&nbsp;    public OpenOfficeDocumentCreator() {
+<b class="nc">&nbsp;        super(&quot;oocalc&quot;, &quot;Old OpenOffice/LibreOffice Calc format&quot;, StandardFileType.SXC);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void storeOpenOfficeFile(Path file, InputStream source) throws IOException {
+<b class="nc">&nbsp;        try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {</b>
+<b class="nc">&nbsp;            ZipEntry zipEntry = new ZipEntry(&quot;content.xml&quot;);</b>
+<b class="nc">&nbsp;            out.putNextEntry(zipEntry);</b>
+&nbsp;            int c;
+<b class="nc">&nbsp;            while ((c = source.read()) &gt;= 0) {</b>
+<b class="nc">&nbsp;                out.write(c);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            out.closeEntry();</b>
+&nbsp;
+&nbsp;            // Add manifest (required for OOo 2.0), &quot;meta.xml&quot;, &quot;mimetype&quot; files. These are in the
+&nbsp;            // resource/openoffice directory, and are copied verbatim into the zip file.
+<b class="nc">&nbsp;            OpenOfficeDocumentCreator.addResourceFile(&quot;meta.xml&quot;, &quot;/resource/openoffice/meta.xml&quot;, out);</b>
+<b class="nc">&nbsp;            OpenOfficeDocumentCreator.addResourceFile(&quot;mimetype&quot;, &quot;/resource/openoffice/mimetype&quot;, out);</b>
+<b class="nc">&nbsp;            OpenOfficeDocumentCreator.addResourceFile(&quot;META-INF/manifest.xml&quot;, &quot;/resource/openoffice/manifest.xml&quot;,</b>
+&nbsp;                    out);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void exportOpenOfficeCalc(Path file, BibDatabase database, List&lt;BibEntry&gt; entries) throws IOException {
+&nbsp;        // First store the xml formatted content to a temporary file.
+<b class="nc">&nbsp;        File tmpFile = File.createTempFile(&quot;oocalc&quot;, null);</b>
+<b class="nc">&nbsp;        OpenOfficeDocumentCreator.exportOpenOfficeCalcXML(tmpFile, database, entries);</b>
+&nbsp;
+&nbsp;        // Then add the content to the zip file:
+<b class="nc">&nbsp;        try (BufferedInputStream in = new BufferedInputStream(Files.newInputStream(tmpFile.toPath()))) {</b>
+<b class="nc">&nbsp;            OpenOfficeDocumentCreator.storeOpenOfficeFile(file, in);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Delete the temporary file:
+<b class="nc">&nbsp;        if (!tmpFile.delete()) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;Cannot delete temporary export file&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void export(final BibDatabaseContext databaseContext, final Path file,
+&nbsp;                       List&lt;BibEntry&gt; entries) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(databaseContext);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(entries);</b>
+<b class="nc">&nbsp;        if (!entries.isEmpty()) { // Do not export if no entries</b>
+<b class="nc">&nbsp;            OpenOfficeDocumentCreator.exportOpenOfficeCalc(file, databaseContext.getDatabase(), entries);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void exportOpenOfficeCalcXML(File tmpFile, BibDatabase database, List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        OOCalcDatabase od = new OOCalcDatabase(database, entries);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (Writer ps = new OutputStreamWriter(Files.newOutputStream(tmpFile.toPath()), StandardCharsets.UTF_8)) {</b>
+<b class="nc">&nbsp;            DOMSource source = new DOMSource(od.getDOMrepresentation());</b>
+<b class="nc">&nbsp;            StreamResult result = new StreamResult(ps);</b>
+<b class="nc">&nbsp;            Transformer trans = TransformerFactory.newInstance().newTransformer();</b>
+<b class="nc">&nbsp;            trans.setOutputProperty(OutputKeys.INDENT, &quot;yes&quot;);</b>
+<b class="nc">&nbsp;            trans.transform(source, result);</b>
+&nbsp;        } catch (TransformerException | IOException e) {
+<b class="nc">&nbsp;            throw new Error(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addResourceFile(String name, String resource, ZipOutputStream out) throws IOException {
+<b class="nc">&nbsp;        ZipEntry zipEntry = new ZipEntry(name);</b>
+<b class="nc">&nbsp;        out.putNextEntry(zipEntry);</b>
+<b class="nc">&nbsp;        OpenOfficeDocumentCreator.addFromResource(resource, out);</b>
+<b class="nc">&nbsp;        out.closeEntry();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addFromResource(String resource, OutputStream out) {
+<b class="nc">&nbsp;        try (InputStream in = OpenOfficeDocumentCreator.class.getResourceAsStream(resource)) {</b>
+<b class="nc">&nbsp;            in.transferTo(out);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Cannot get resource&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,680 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SearchToSqlVisitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.search.query</a>
+</div>
+
+<h1>Coverage Summary for Class: SearchToSqlVisitor (org.jabref.logic.search.query)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SearchToSqlVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/186)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.search.query;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.search.PostgreConstants;
+&nbsp;import org.jabref.model.search.SearchFlags;
+&nbsp;import org.jabref.model.search.query.SqlQueryNode;
+&nbsp;import org.jabref.search.SearchBaseVisitor;
+&nbsp;import org.jabref.search.SearchParser;
+&nbsp;
+&nbsp;import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
+&nbsp;import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
+&nbsp;import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
+&nbsp;import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
+&nbsp;import static org.jabref.model.search.SearchFlags.CASE_INSENSITIVE;
+&nbsp;import static org.jabref.model.search.SearchFlags.CASE_SENSITIVE;
+&nbsp;import static org.jabref.model.search.SearchFlags.EXACT_MATCH;
+&nbsp;import static org.jabref.model.search.SearchFlags.INEXACT_MATCH;
+&nbsp;import static org.jabref.model.search.SearchFlags.NEGATION;
+&nbsp;import static org.jabref.model.search.SearchFlags.REGULAR_EXPRESSION;
+&nbsp;
+&nbsp;/// Converts to a query processable by the scheme created by [org.jabref.logic.search.indexing.BibFieldsIndexer].
+&nbsp;
+&nbsp;/// Tests are located in `org.jabref.logic.search.query.SearchQuerySQLConversionTest`
+&nbsp;public class SearchToSqlVisitor extends SearchBaseVisitor&lt;SqlQueryNode&gt; {
+&nbsp;
+&nbsp;    private static final String MAIN_TABLE = &quot;main_table&quot;;
+&nbsp;    private static final String SPLIT_TABLE = &quot;split_table&quot;;
+&nbsp;    private static final String INNER_TABLE = &quot;inner_table&quot;;
+<b class="nc">&nbsp;    private static final String GROUPS_FIELD = StandardField.GROUPS.getName();</b>
+&nbsp;
+&nbsp;    private final EnumSet&lt;SearchFlags&gt; searchBarFlags;
+&nbsp;    private final String mainTableName;
+&nbsp;    private final String splitValuesTableName;
+<b class="nc">&nbsp;    private final List&lt;SqlQueryNode&gt; nodes = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    private int cteCounter = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;    public SearchToSqlVisitor(String table, EnumSet&lt;SearchFlags&gt; searchBarFlags) {</b>
+<b class="nc">&nbsp;        this.searchBarFlags = searchBarFlags;</b>
+<b class="nc">&nbsp;        this.mainTableName = PostgreConstants.getMainTableSchemaReference(table);</b>
+<b class="nc">&nbsp;        this.splitValuesTableName = PostgreConstants.getSplitTableSchemaReference(table);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SqlQueryNode visitStart(SearchParser.StartContext ctx) {
+<b class="nc">&nbsp;        SqlQueryNode finalNode = visit(ctx.andExpression());</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder sql = new StringBuilder(&quot;WITH\n&quot;);</b>
+<b class="nc">&nbsp;        List&lt;String&gt; params = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (SqlQueryNode node : nodes) {</b>
+<b class="nc">&nbsp;            sql.append(node.cte()).append(&quot;,\n&quot;);</b>
+<b class="nc">&nbsp;            params.addAll(node.params());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Remove the last comma and newline
+<b class="nc">&nbsp;        if (!nodes.isEmpty()) {</b>
+<b class="nc">&nbsp;            sql.setLength(sql.length() - 2);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sql.append(&quot;SELECT * FROM &quot;).append(finalNode.cte()).append(&quot; GROUP BY &quot;).append(ENTRY_ID);</b>
+<b class="nc">&nbsp;        params.addAll(finalNode.params());</b>
+&nbsp;
+<b class="nc">&nbsp;        return new SqlQueryNode(sql.toString(), params);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SqlQueryNode visitImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx) {
+<b class="nc">&nbsp;        List&lt;SqlQueryNode&gt; children = ctx.expression().stream().map(this::visit).toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (children.size() == 1) {</b>
+<b class="nc">&nbsp;            return children.getFirst();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            String cte = &quot;&quot;&quot;</b>
+&nbsp;                    cte%d AS (
+&nbsp;                    %s
+&nbsp;                    )
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(</b>
+<b class="nc">&nbsp;                    cteCounter,</b>
+<b class="nc">&nbsp;                    children.stream().map(node -&gt; &quot;    SELECT %s FROM %s&quot;.formatted(ENTRY_ID, node.cte())).collect(Collectors.joining(&quot;\n    INTERSECT\n&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;String&gt; params = children.stream().flatMap(node -&gt; node.params().stream()).toList();</b>
+<b class="nc">&nbsp;            SqlQueryNode node = new SqlQueryNode(cte, params);</b>
+<b class="nc">&nbsp;            nodes.add(node);</b>
+<b class="nc">&nbsp;            return new SqlQueryNode(&quot;cte&quot; + cteCounter++);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SqlQueryNode visitParenExpression(SearchParser.ParenExpressionContext ctx) {
+<b class="nc">&nbsp;        return visit(ctx.andExpression());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SqlQueryNode visitNegatedExpression(SearchParser.NegatedExpressionContext ctx) {
+<b class="nc">&nbsp;        SqlQueryNode subNode = visit(ctx.expression());</b>
+<b class="nc">&nbsp;        String cte = &quot;&quot;&quot;</b>
+&nbsp;                cte%d AS (
+&nbsp;                    SELECT %s.%s
+&nbsp;                    FROM %s AS %s
+&nbsp;                    WHERE %s.%s NOT IN (
+&nbsp;                       SELECT %s
+&nbsp;                       FROM %s
+&nbsp;                    )
+&nbsp;                )
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+<b class="nc">&nbsp;                cteCounter,</b>
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, MAIN_TABLE,
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                ENTRY_ID,
+<b class="nc">&nbsp;                subNode.cte());</b>
+&nbsp;
+<b class="nc">&nbsp;        SqlQueryNode node = new SqlQueryNode(cte, subNode.params());</b>
+<b class="nc">&nbsp;        nodes.add(node);</b>
+<b class="nc">&nbsp;        return new SqlQueryNode(&quot;cte&quot; + cteCounter++);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SqlQueryNode visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
+<b class="nc">&nbsp;        SqlQueryNode left = visit(ctx.left);</b>
+<b class="nc">&nbsp;        SqlQueryNode right = visit(ctx.right);</b>
+<b class="nc">&nbsp;        String operator = ctx.bin_op.getType() == SearchParser.AND ? &quot;INTERSECT&quot; : &quot;UNION&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        String cte = &quot;&quot;&quot;</b>
+&nbsp;                cte%d AS (
+&nbsp;                    SELECT %s
+&nbsp;                    FROM %s
+&nbsp;                    %s
+&nbsp;                    SELECT %s
+&nbsp;                    FROM %s
+&nbsp;                )
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+<b class="nc">&nbsp;                cteCounter,</b>
+&nbsp;                ENTRY_ID,
+<b class="nc">&nbsp;                left.cte(),</b>
+&nbsp;                operator,
+&nbsp;                ENTRY_ID,
+<b class="nc">&nbsp;                right.cte());</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; params = new ArrayList&lt;&gt;(left.params());</b>
+<b class="nc">&nbsp;        params.addAll(right.params());</b>
+&nbsp;
+<b class="nc">&nbsp;        SqlQueryNode node = new SqlQueryNode(cte, params);</b>
+<b class="nc">&nbsp;        nodes.add(node);</b>
+<b class="nc">&nbsp;        return new SqlQueryNode(&quot;cte&quot; + cteCounter++);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SqlQueryNode visitComparisonExpression(SearchParser.ComparisonExpressionContext ctx) {
+<b class="nc">&nbsp;        return visit(ctx.comparison());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SqlQueryNode visitComparison(SearchParser.ComparisonContext ctx) {
+<b class="nc">&nbsp;        EnumSet&lt;SearchFlags&gt; searchFlags = EnumSet.noneOf(SearchFlags.class);</b>
+<b class="nc">&nbsp;        String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());</b>
+&nbsp;
+&nbsp;        // unfielded expression
+<b class="nc">&nbsp;        if (ctx.FIELD() == null) {</b>
+&nbsp;            // apply search bar flags to unfielded expressions
+<b class="nc">&nbsp;            boolean isCaseSensitive = searchBarFlags.contains(CASE_SENSITIVE);</b>
+<b class="nc">&nbsp;            if (searchBarFlags.contains(REGULAR_EXPRESSION)) {</b>
+<b class="nc">&nbsp;                setFlags(searchFlags, REGULAR_EXPRESSION, isCaseSensitive, false);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                setFlags(searchFlags, INEXACT_MATCH, isCaseSensitive, false);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return getFieldQueryNode(&quot;any&quot;, term, searchFlags);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // fielded expression
+<b class="nc">&nbsp;        String field = ctx.FIELD().getText();</b>
+<b class="nc">&nbsp;        int operator = ctx.operator().getStart().getType();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (operator == SearchParser.EQUAL || operator == SearchParser.CONTAINS) {</b>
+<b class="nc">&nbsp;            setFlags(searchFlags, INEXACT_MATCH, false, false);</b>
+<b class="nc">&nbsp;        } else if (operator == SearchParser.CEQUAL) {</b>
+<b class="nc">&nbsp;            setFlags(searchFlags, INEXACT_MATCH, true, false);</b>
+<b class="nc">&nbsp;        } else if (operator == SearchParser.EEQUAL || operator == SearchParser.MATCHES) {</b>
+<b class="nc">&nbsp;            setFlags(searchFlags, EXACT_MATCH, false, false);</b>
+<b class="nc">&nbsp;        } else if (operator == SearchParser.CEEQUAL) {</b>
+<b class="nc">&nbsp;            setFlags(searchFlags, EXACT_MATCH, true, false);</b>
+<b class="nc">&nbsp;        } else if (operator == SearchParser.REQUAL) {</b>
+<b class="nc">&nbsp;            setFlags(searchFlags, REGULAR_EXPRESSION, false, false);</b>
+<b class="nc">&nbsp;        } else if (operator == SearchParser.CREEQUAL) {</b>
+<b class="nc">&nbsp;            setFlags(searchFlags, REGULAR_EXPRESSION, true, false);</b>
+<b class="nc">&nbsp;        } else if (operator == SearchParser.NEQUAL) {</b>
+<b class="nc">&nbsp;            setFlags(searchFlags, INEXACT_MATCH, false, true);</b>
+<b class="nc">&nbsp;        } else if (operator == SearchParser.NCEQUAL) {</b>
+<b class="nc">&nbsp;            setFlags(searchFlags, INEXACT_MATCH, true, true);</b>
+<b class="nc">&nbsp;        } else if (operator == SearchParser.NEEQUAL) {</b>
+<b class="nc">&nbsp;            setFlags(searchFlags, EXACT_MATCH, false, true);</b>
+<b class="nc">&nbsp;        } else if (operator == SearchParser.NCEEQUAL) {</b>
+<b class="nc">&nbsp;            setFlags(searchFlags, EXACT_MATCH, true, true);</b>
+<b class="nc">&nbsp;        } else if (operator == SearchParser.NREQUAL) {</b>
+<b class="nc">&nbsp;            setFlags(searchFlags, REGULAR_EXPRESSION, false, true);</b>
+<b class="nc">&nbsp;        } else if (operator == SearchParser.NCREEQUAL) {</b>
+<b class="nc">&nbsp;            setFlags(searchFlags, REGULAR_EXPRESSION, true, true);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // field = &quot;&quot; -&gt; should find entries where the field is empty
+&nbsp;        // field != &quot;&quot; -&gt; should find entries where the field is not empty
+<b class="nc">&nbsp;        if (term.isEmpty()) {</b>
+<b class="nc">&nbsp;            if (searchFlags.contains(NEGATION)) {</b>
+<b class="nc">&nbsp;                searchFlags.remove(NEGATION);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                searchFlags.add(NEGATION);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return getFieldQueryNode(field.toLowerCase(Locale.ROOT), term, searchFlags);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SqlQueryNode getFieldQueryNode(String field, String term, EnumSet&lt;SearchFlags&gt; searchFlags) {
+<b class="nc">&nbsp;        String sqlOperator = getSqlOperator(searchFlags);</b>
+<b class="nc">&nbsp;        String prefixSuffix = searchFlags.contains(INEXACT_MATCH) ? &quot;%&quot; : &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!searchFlags.contains(REGULAR_EXPRESSION)) {</b>
+<b class="nc">&nbsp;            term = escapeTermForSql(term);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Pseudo-fields
+<b class="nc">&nbsp;        field = switch (field) {</b>
+&nbsp;            case &quot;key&quot; -&gt;
+<b class="nc">&nbsp;                    InternalField.KEY_FIELD.getName();</b>
+&nbsp;            case &quot;anykeyword&quot; -&gt;
+<b class="nc">&nbsp;                    StandardField.KEYWORDS.getName();</b>
+&nbsp;            case &quot;anyfield&quot; -&gt;
+<b class="nc">&nbsp;                    &quot;any&quot;;</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    field;</b>
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        if (ENTRY_ID.toString().equals(field)) {</b>
+<b class="nc">&nbsp;            return buildEntryIdQuery(term);</b>
+<b class="nc">&nbsp;        } else if (&quot;any&quot;.equals(field)) {</b>
+<b class="nc">&nbsp;            if (searchFlags.contains(EXACT_MATCH)) {</b>
+<b class="nc">&nbsp;                return searchFlags.contains(NEGATION)</b>
+<b class="nc">&nbsp;                       ? buildExactNegationAnyFieldQuery(sqlOperator, term)</b>
+<b class="nc">&nbsp;                       : buildExactAnyFieldQuery(sqlOperator, term);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return searchFlags.contains(NEGATION)</b>
+<b class="nc">&nbsp;                       ? buildContainsNegationAnyFieldQuery(sqlOperator, prefixSuffix, term)</b>
+<b class="nc">&nbsp;                       : buildContainsAnyFieldQuery(sqlOperator, prefixSuffix, term);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (searchFlags.contains(EXACT_MATCH)) {</b>
+<b class="nc">&nbsp;                return searchFlags.contains(NEGATION)</b>
+<b class="nc">&nbsp;                       ? buildExactNegationFieldQuery(field, sqlOperator, term)</b>
+<b class="nc">&nbsp;                       : buildExactFieldQuery(field, sqlOperator, term);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return searchFlags.contains(NEGATION)</b>
+<b class="nc">&nbsp;                       ? buildContainsNegationFieldQuery(field, sqlOperator, prefixSuffix, term)</b>
+<b class="nc">&nbsp;                       : buildContainsFieldQuery(field, sqlOperator, prefixSuffix, term);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private SqlQueryNode buildEntryIdQuery(String entryId) {
+<b class="nc">&nbsp;        String cte = &quot;&quot;&quot;</b>
+&nbsp;                cte%d AS (
+&nbsp;                    SELECT %s
+&nbsp;                    FROM %s
+&nbsp;                    WHERE %s = ?
+&nbsp;                )
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(cteCounter, ENTRY_ID, mainTableName, ENTRY_ID);</b>
+<b class="nc">&nbsp;        SqlQueryNode node = new SqlQueryNode(cte, List.of(entryId));</b>
+<b class="nc">&nbsp;        nodes.add(node);</b>
+<b class="nc">&nbsp;        return new SqlQueryNode(&quot;cte&quot; + cteCounter++);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SqlQueryNode buildContainsAnyFieldQuery(String operator, String prefixSuffix, String term) {
+<b class="nc">&nbsp;        String cte = &quot;&quot;&quot;</b>
+&nbsp;                cte%d AS (
+&nbsp;                    SELECT %s.%s
+&nbsp;                    FROM %s AS %s
+&nbsp;                    WHERE (
+&nbsp;                        (%s.%s != &#39;%s&#39;) AND ((%s.%s %s ?) OR (%s.%s %s ?))
+&nbsp;                    )
+&nbsp;                )
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+<b class="nc">&nbsp;                cteCounter,</b>
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, MAIN_TABLE,
+&nbsp;                MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+&nbsp;                MAIN_TABLE, FIELD_VALUE_LITERAL,
+&nbsp;                operator,
+&nbsp;                MAIN_TABLE, FIELD_VALUE_TRANSFORMED,
+&nbsp;                operator);
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);</b>
+<b class="nc">&nbsp;        SqlQueryNode node = new SqlQueryNode(cte, params);</b>
+<b class="nc">&nbsp;        nodes.add(node);</b>
+<b class="nc">&nbsp;        return new SqlQueryNode(&quot;cte&quot; + cteCounter++);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SqlQueryNode buildContainsNegationAnyFieldQuery(String operator, String prefixSuffix, String term) {
+<b class="nc">&nbsp;        String cte = &quot;&quot;&quot;</b>
+&nbsp;                cte%d AS (
+&nbsp;                    SELECT %s.%s
+&nbsp;                    FROM %s AS %s
+&nbsp;                    WHERE %s.%s NOT IN (
+&nbsp;                        SELECT %s.%s
+&nbsp;                        FROM %s AS %s
+&nbsp;                        WHERE (
+&nbsp;                            (%s.%s != &#39;%s&#39;) AND ((%s.%s %s ?) OR (%s.%s %s ?))
+&nbsp;                        )
+&nbsp;                    )
+&nbsp;                )
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+<b class="nc">&nbsp;                cteCounter,</b>
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, MAIN_TABLE,
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                INNER_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, INNER_TABLE,
+&nbsp;                INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+&nbsp;                INNER_TABLE, FIELD_VALUE_LITERAL,
+&nbsp;                operator,
+&nbsp;                INNER_TABLE, FIELD_VALUE_TRANSFORMED,
+&nbsp;                operator);
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);</b>
+<b class="nc">&nbsp;        SqlQueryNode node = new SqlQueryNode(cte, params);</b>
+<b class="nc">&nbsp;        nodes.add(node);</b>
+<b class="nc">&nbsp;        return new SqlQueryNode(&quot;cte&quot; + cteCounter++);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SqlQueryNode buildExactAnyFieldQuery(String operator, String term) {
+<b class="nc">&nbsp;        String cte = &quot;&quot;&quot;</b>
+&nbsp;                cte%d AS (
+&nbsp;                    SELECT %s.%s
+&nbsp;                    FROM %s AS %s
+&nbsp;                    LEFT JOIN %s AS %s
+&nbsp;                    ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+&nbsp;                    WHERE (
+&nbsp;                        (%s.%s != &#39;%s&#39;)
+&nbsp;                        AND (
+&nbsp;                            ((%s.%s %s ?) OR (%s.%s %s ?))
+&nbsp;                            OR
+&nbsp;                            ((%s.%s %s ?) OR (%s.%s %s ?))
+&nbsp;                        )
+&nbsp;                    )
+&nbsp;                )
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+<b class="nc">&nbsp;                cteCounter,</b>
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, MAIN_TABLE,
+&nbsp;                splitValuesTableName, SPLIT_TABLE,
+&nbsp;                MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
+&nbsp;                MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
+&nbsp;                MAIN_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+&nbsp;                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
+&nbsp;                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator,
+&nbsp;                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
+&nbsp;                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; params = Collections.nCopies(4, term);</b>
+<b class="nc">&nbsp;        SqlQueryNode node = new SqlQueryNode(cte, params);</b>
+<b class="nc">&nbsp;        nodes.add(node);</b>
+<b class="nc">&nbsp;        return new SqlQueryNode(&quot;cte&quot; + cteCounter++);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SqlQueryNode buildExactNegationAnyFieldQuery(String operator, String term) {
+<b class="nc">&nbsp;        String cte = &quot;&quot;&quot;</b>
+&nbsp;                cte%d AS (
+&nbsp;                    SELECT %s.%s
+&nbsp;                    FROM %s AS %s
+&nbsp;                    WHERE %s.%s NOT IN (
+&nbsp;                        SELECT %s.%s
+&nbsp;                        FROM %s AS %s
+&nbsp;                        LEFT JOIN %s AS %s
+&nbsp;                        ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+&nbsp;                        WHERE (
+&nbsp;                            (%s.%s != &#39;%s&#39;)
+&nbsp;                            AND (
+&nbsp;                                ((%s.%s %s ?) OR (%s.%s %s ?))
+&nbsp;                                OR
+&nbsp;                                ((%s.%s %s ?) OR (%s.%s %s ?))
+&nbsp;                            )
+&nbsp;                        )
+&nbsp;                    )
+&nbsp;                )
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+<b class="nc">&nbsp;                cteCounter,</b>
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, MAIN_TABLE,
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                INNER_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, INNER_TABLE,
+&nbsp;                splitValuesTableName, SPLIT_TABLE,
+&nbsp;                INNER_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
+&nbsp;                INNER_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
+&nbsp;                INNER_TABLE, FIELD_NAME, GROUPS_FIELD, // https://github.com/JabRef/jabref/issues/7996
+&nbsp;                INNER_TABLE, FIELD_VALUE_LITERAL, operator,
+&nbsp;                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator,
+&nbsp;                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
+&nbsp;                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; params = Collections.nCopies(4, term);</b>
+<b class="nc">&nbsp;        SqlQueryNode node = new SqlQueryNode(cte, params);</b>
+<b class="nc">&nbsp;        nodes.add(node);</b>
+<b class="nc">&nbsp;        return new SqlQueryNode(&quot;cte&quot; + cteCounter++);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SqlQueryNode buildContainsFieldQuery(String field, String operator, String prefixSuffix, String term) {
+<b class="nc">&nbsp;        String cte = &quot;&quot;&quot;</b>
+&nbsp;                cte%d AS (
+&nbsp;                    SELECT %s.%s
+&nbsp;                    FROM %s AS %s
+&nbsp;                    WHERE (
+&nbsp;                        (%s.%s = &#39;%s&#39;) AND ((%s.%s %s ?) OR (%s.%s %s ?))
+&nbsp;                    )
+&nbsp;                )
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+<b class="nc">&nbsp;                cteCounter,</b>
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, MAIN_TABLE,
+&nbsp;                MAIN_TABLE, FIELD_NAME, field,
+&nbsp;                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
+&nbsp;                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);</b>
+<b class="nc">&nbsp;        SqlQueryNode node = new SqlQueryNode(cte, params);</b>
+<b class="nc">&nbsp;        nodes.add(node);</b>
+<b class="nc">&nbsp;        return new SqlQueryNode(&quot;cte&quot; + cteCounter++);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SqlQueryNode buildContainsNegationFieldQuery(String field, String operator, String prefixSuffix, String term) {
+<b class="nc">&nbsp;        String cte = &quot;&quot;&quot;</b>
+&nbsp;                cte%d AS (
+&nbsp;                    SELECT %s.%s
+&nbsp;                    FROM %s AS %s
+&nbsp;                    WHERE %s.%s NOT IN (
+&nbsp;                        SELECT %s.%s
+&nbsp;                        FROM %s AS %s
+&nbsp;                        WHERE (
+&nbsp;                            (%s.%s = &#39;%s&#39;) AND ((%s.%s %s ?) OR (%s.%s %s ?))
+&nbsp;                        )
+&nbsp;                    )
+&nbsp;                )
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+<b class="nc">&nbsp;                cteCounter,</b>
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, MAIN_TABLE,
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                INNER_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, INNER_TABLE,
+&nbsp;                INNER_TABLE, FIELD_NAME, field,
+&nbsp;                INNER_TABLE, FIELD_VALUE_LITERAL,
+&nbsp;                operator,
+&nbsp;                INNER_TABLE, FIELD_VALUE_TRANSFORMED,
+&nbsp;                operator);
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; params = Collections.nCopies(2, prefixSuffix + term + prefixSuffix);</b>
+<b class="nc">&nbsp;        SqlQueryNode node = new SqlQueryNode(cte, params);</b>
+<b class="nc">&nbsp;        nodes.add(node);</b>
+<b class="nc">&nbsp;        return new SqlQueryNode(&quot;cte&quot; + cteCounter++);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SqlQueryNode buildExactFieldQuery(String field, String operator, String term) {
+<b class="nc">&nbsp;        String cte = &quot;&quot;&quot;</b>
+&nbsp;                cte%d AS (
+&nbsp;                    SELECT %s.%s
+&nbsp;                    FROM %s AS %s
+&nbsp;                    LEFT JOIN %s AS %s
+&nbsp;                    ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+&nbsp;                    WHERE (
+&nbsp;                        ((%s.%s = &#39;%s&#39;) AND ((%s.%s %s ?) OR (%s.%s %s ?)))
+&nbsp;                        OR
+&nbsp;                        ((%s.%s = &#39;%s&#39;) AND ((%s.%s %s ?) OR (%s.%s %s ?)))
+&nbsp;                    )
+&nbsp;                )
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+<b class="nc">&nbsp;                cteCounter,</b>
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, MAIN_TABLE,
+&nbsp;                splitValuesTableName, SPLIT_TABLE,
+&nbsp;                MAIN_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
+&nbsp;                MAIN_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
+&nbsp;                MAIN_TABLE, FIELD_NAME, field,
+&nbsp;                MAIN_TABLE, FIELD_VALUE_LITERAL, operator,
+&nbsp;                MAIN_TABLE, FIELD_VALUE_TRANSFORMED, operator,
+&nbsp;                SPLIT_TABLE, FIELD_NAME, field,
+&nbsp;                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
+&nbsp;                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; params = Collections.nCopies(4, term);</b>
+<b class="nc">&nbsp;        SqlQueryNode node = new SqlQueryNode(cte, params);</b>
+<b class="nc">&nbsp;        nodes.add(node);</b>
+<b class="nc">&nbsp;        return new SqlQueryNode(&quot;cte&quot; + cteCounter++);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SqlQueryNode buildExactNegationFieldQuery(String field, String operator, String term) {
+<b class="nc">&nbsp;        String cte = &quot;&quot;&quot;</b>
+&nbsp;                cte%d AS (
+&nbsp;                    SELECT %s.%s
+&nbsp;                    FROM %s AS %s
+&nbsp;                    WHERE %s.%s NOT IN (
+&nbsp;                        SELECT %s.%s
+&nbsp;                        FROM %s AS %s
+&nbsp;                        LEFT JOIN %s AS %s
+&nbsp;                        ON (%s.%s = %s.%s AND %s.%s = %s.%s)
+&nbsp;                        WHERE (
+&nbsp;                            ((%s.%s = &#39;%s&#39;) AND ((%s.%s %s ?) OR (%s.%s %s ?)))
+&nbsp;                            OR
+&nbsp;                            ((%s.%s = &#39;%s&#39;) AND ((%s.%s %s ?) OR (%s.%s %s ?)))
+&nbsp;                        )
+&nbsp;                    )
+&nbsp;                )
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+<b class="nc">&nbsp;                cteCounter,</b>
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, MAIN_TABLE,
+&nbsp;                MAIN_TABLE, ENTRY_ID,
+&nbsp;                INNER_TABLE, ENTRY_ID,
+&nbsp;                mainTableName, INNER_TABLE,
+&nbsp;                splitValuesTableName, SPLIT_TABLE,
+&nbsp;                INNER_TABLE, ENTRY_ID, SPLIT_TABLE, ENTRY_ID,
+&nbsp;                INNER_TABLE, FIELD_NAME, SPLIT_TABLE, FIELD_NAME,
+&nbsp;                INNER_TABLE, FIELD_NAME, field,
+&nbsp;                INNER_TABLE, FIELD_VALUE_LITERAL, operator,
+&nbsp;                INNER_TABLE, FIELD_VALUE_TRANSFORMED, operator,
+&nbsp;                SPLIT_TABLE, FIELD_NAME, field,
+&nbsp;                SPLIT_TABLE, FIELD_VALUE_LITERAL, operator,
+&nbsp;                SPLIT_TABLE, FIELD_VALUE_TRANSFORMED, operator);
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; params = Collections.nCopies(4, term);</b>
+<b class="nc">&nbsp;        SqlQueryNode node = new SqlQueryNode(cte, params);</b>
+<b class="nc">&nbsp;        nodes.add(node);</b>
+<b class="nc">&nbsp;        return new SqlQueryNode(&quot;cte&quot; + cteCounter++);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void setFlags(EnumSet&lt;SearchFlags&gt; flags, SearchFlags matchType, boolean caseSensitive, boolean negation) {
+<b class="nc">&nbsp;        flags.add(matchType);</b>
+&nbsp;
+<b class="nc">&nbsp;        flags.add(caseSensitive ? CASE_SENSITIVE : CASE_INSENSITIVE);</b>
+<b class="nc">&nbsp;        if (negation) {</b>
+<b class="nc">&nbsp;            flags.add(NEGATION);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getSqlOperator(EnumSet&lt;SearchFlags&gt; searchFlags) {
+<b class="nc">&nbsp;        return searchFlags.contains(REGULAR_EXPRESSION)</b>
+<b class="nc">&nbsp;               ? (searchFlags.contains(CASE_SENSITIVE) ? &quot;~&quot; : &quot;~*&quot;)</b>
+<b class="nc">&nbsp;               : (searchFlags.contains(CASE_SENSITIVE) ? &quot;LIKE&quot; : &quot;ILIKE&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Escapes wildcard characters in the search term for SQL queries.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * - Escapes {@code \}, {@code _}, and {@code %} for SQL LIKE queries.
+&nbsp;     */
+&nbsp;    private static String escapeTermForSql(String term) {
+<b class="nc">&nbsp;        return term.replaceAll(&quot;[\\\\_%]&quot;, &quot;\\\\$0&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

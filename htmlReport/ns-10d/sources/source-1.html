@@ -1,0 +1,225 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SimpleHttpResponse</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.http</a>
+</div>
+
+<h1>Coverage Summary for Class: SimpleHttpResponse (org.jabref.model.http)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimpleHttpResponse</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.http;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.net.HttpURLConnection;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;
+&nbsp;import org.jsoup.HttpStatusException;
+&nbsp;
+<b class="nc">&nbsp;public record SimpleHttpResponse(int statusCode, String responseMessage, String responseBody) {</b>
+&nbsp;    private static final int MAX_RESPONSE_LENGTH = 1024; // 1 KB
+&nbsp;
+<b class="nc">&nbsp;    public SimpleHttpResponse(int statusCode, String responseMessage, String responseBody) {</b>
+<b class="nc">&nbsp;        this.statusCode = statusCode;</b>
+<b class="nc">&nbsp;        this.responseBody = truncateResponseBody(responseBody);</b>
+<b class="nc">&nbsp;        this.responseMessage = responseMessage;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SimpleHttpResponse(HttpURLConnection connection) {
+<b class="nc">&nbsp;        this(getStatusCode(connection), getResponseMessage(connection), getResponseBodyDefaultEmpty(connection));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SimpleHttpResponse(HttpStatusException e) {
+<b class="nc">&nbsp;        this(e.getStatusCode(), &quot;&quot;, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;SimpleHttpResponse{&quot; +</b>
+&nbsp;                &quot;statusCode=&quot; + statusCode +
+&nbsp;                &quot;, responseMessage=&#39;&quot; + responseMessage + &#39;\&#39;&#39; +
+&nbsp;                &quot;, responseBody=&#39;&quot; + responseBody + &#39;\&#39;&#39; +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int getStatusCode(HttpURLConnection connection) {
+&nbsp;        int statusCode;
+&nbsp;        try {
+<b class="nc">&nbsp;            statusCode = connection.getResponseCode();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            statusCode = -1;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return statusCode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getResponseMessage(HttpURLConnection connection) {
+&nbsp;        String responseMessage;
+&nbsp;        try {
+<b class="nc">&nbsp;            responseMessage = connection.getResponseMessage();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            responseMessage = &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return responseMessage;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getResponseBodyDefaultEmpty(HttpURLConnection connection) {
+&nbsp;        String responseBody;
+&nbsp;        try {
+<b class="nc">&nbsp;            responseBody = getResponseBody(connection);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            responseBody = &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return responseBody;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Truncates the response body to 1 KB if it exceeds that size.
+&nbsp;     * Appends &quot;... (truncated)&quot; to indicate truncation.
+&nbsp;     *
+&nbsp;     * @param responseBody the original response body
+&nbsp;     * @return the truncated response body
+&nbsp;     */
+&nbsp;    private static String truncateResponseBody(String responseBody) {
+<b class="nc">&nbsp;        byte[] bytes = responseBody.getBytes(StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;        if (bytes.length &gt; MAX_RESPONSE_LENGTH) {</b>
+&nbsp;            // Truncate the response body to 1 KB and append &quot;... (truncated)&quot;
+&nbsp;            // Response is in English, thus we append English text - and not localized text
+<b class="nc">&nbsp;            return new String(bytes, 0, MAX_RESPONSE_LENGTH, StandardCharsets.UTF_8) + &quot;... (truncated)&quot;;</b>
+&nbsp;        }
+&nbsp;        // Return the original response body if it&#39;s within the 1 KB limit
+<b class="nc">&nbsp;        return responseBody;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads the response body from the HttpURLConnection and returns it as a string.
+&nbsp;     * This method is used to retrieve the response body from the connection,
+&nbsp;     * which may contain error messages or other information from the server.
+&nbsp;     *
+&nbsp;     * @param connection the HttpURLConnection to read the response body from
+&nbsp;     * @return the response body as a string
+&nbsp;     * @throws IOException if an I/O error occurs while reading the response body
+&nbsp;     */
+&nbsp;    private static String getResponseBody(HttpURLConnection connection) throws IOException {
+<b class="nc">&nbsp;        InputStream errorStream = connection.getErrorStream();</b>
+<b class="nc">&nbsp;        if (errorStream == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        try (BufferedReader in = new BufferedReader(new InputStreamReader(errorStream))) {</b>
+&nbsp;            String inputLine;
+<b class="nc">&nbsp;            StringBuilder content = new StringBuilder();</b>
+<b class="nc">&nbsp;            while ((content.length() &lt; MAX_RESPONSE_LENGTH) &amp;&amp; (inputLine = in.readLine()) != null) {</b>
+<b class="nc">&nbsp;                content.append(inputLine);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return truncateResponseBody(content.toString());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

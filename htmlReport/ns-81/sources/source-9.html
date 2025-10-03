@@ -1,0 +1,233 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultFileUpdateMonitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultFileUpdateMonitor (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultFileUpdateMonitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (4/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (2/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.1%
+  </span>
+  <span class="absValue">
+    (13/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.ClosedWatchServiceException;
+&nbsp;import java.nio.file.FileSystems;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.StandardWatchEventKinds;
+&nbsp;import java.nio.file.WatchEvent;
+&nbsp;import java.nio.file.WatchKey;
+&nbsp;import java.nio.file.WatchService;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.concurrent.atomic.AtomicBoolean;
+&nbsp;import java.util.concurrent.atomic.AtomicReference;
+&nbsp;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.WatchServiceUnavailableException;
+&nbsp;import org.jabref.model.util.FileUpdateListener;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.google.common.collect.ArrayListMultimap;
+&nbsp;import com.google.common.collect.Multimap;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class monitors a set of files for changes. Upon detecting a change it notifies the registered {@link
+&nbsp; * FileUpdateListener}s.
+&nbsp; * &lt;p&gt;
+&nbsp; * Implementation based on &lt;a href=&quot;https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory&quot;&gt;https://stackoverflow.com/questions/16251273/can-i-watch-for-single-file-change-with-watchservice-not-the-whole-directory&lt;/a&gt;.
+&nbsp; */
+<b class="fc">&nbsp;public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    private final Multimap&lt;Path, FileUpdateListener&gt; listeners = ArrayListMultimap.create(20, 4);</b>
+&nbsp;    private volatile WatchService watcher;
+<b class="fc">&nbsp;    private final AtomicBoolean notShutdown = new AtomicBoolean(true);</b>
+<b class="fc">&nbsp;    private final AtomicReference&lt;Optional&lt;JabRefException&gt;&gt; filesystemMonitorFailure = new AtomicReference&lt;&gt;(Optional.empty());</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void run() {
+<b class="fc">&nbsp;        try (WatchService watcher = FileSystems.getDefault().newWatchService()) {</b>
+<b class="fc">&nbsp;            this.watcher = watcher;</b>
+<b class="fc">&nbsp;            filesystemMonitorFailure.set(Optional.empty());</b>
+&nbsp;
+<b class="pc">&nbsp;            while (notShutdown.get()) {</b>
+&nbsp;                WatchKey key;
+&nbsp;                try {
+<b class="fc">&nbsp;                    key = watcher.take();</b>
+&nbsp;                } catch (InterruptedException | ClosedWatchServiceException e) {
+&nbsp;                    return;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                for (WatchEvent&lt;?&gt; event : key.pollEvents()) {</b>
+<b class="nc">&nbsp;                    WatchEvent.Kind&lt;?&gt; kind = event.kind();</b>
+&nbsp;
+<b class="nc">&nbsp;                    if (kind == StandardWatchEventKinds.OVERFLOW) {</b>
+<b class="nc">&nbsp;                        Thread.yield();</b>
+&nbsp;                        continue;
+<b class="nc">&nbsp;                    } else if (kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_MODIFY) {</b>
+&nbsp;                        // We only handle &quot;ENTRY_CREATE&quot; and &quot;ENTRY_MODIFY&quot; here, so the context is always a Path
+&nbsp;                        @SuppressWarnings(&quot;unchecked&quot;)
+<b class="nc">&nbsp;                        WatchEvent&lt;Path&gt; ev = (WatchEvent&lt;Path&gt;) event;</b>
+<b class="nc">&nbsp;                        Path path = ((Path) key.watchable()).resolve(ev.context());</b>
+<b class="nc">&nbsp;                        notifyAboutChange(path);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    key.reset();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                Thread.yield();</b>
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            JabRefException exception = new WatchServiceUnavailableException(</b>
+<b class="nc">&nbsp;                    e.getMessage(), e.getLocalizedMessage(), e.getCause());</b>
+<b class="nc">&nbsp;            filesystemMonitorFailure.set(Optional.of(exception));</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Error during watching&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActive() {
+<b class="nc">&nbsp;        return filesystemMonitorFailure.get().isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void notifyAboutChange(Path path) {
+<b class="nc">&nbsp;        listeners.get(path).forEach(FileUpdateListener::fileUpdated);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
+<b class="nc">&nbsp;        if (isActive()) {</b>
+&nbsp;            // We can&#39;t watch files directly, so monitor their parent directory for updates
+<b class="nc">&nbsp;            Path directory = file.toAbsolutePath().getParent();</b>
+<b class="nc">&nbsp;            directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);</b>
+<b class="nc">&nbsp;            listeners.put(file, listener);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Not adding listener {} to file {} because the file update monitor isn&#39;t active&quot;, listener, file);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void removeListener(Path path, FileUpdateListener listener) {
+<b class="nc">&nbsp;        listeners.remove(path, listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void shutdown() {
+&nbsp;        try {
+<b class="fc">&nbsp;            notShutdown.set(false);</b>
+<b class="fc">&nbsp;            WatchService watcher = this.watcher;</b>
+<b class="pc">&nbsp;            if (watcher != null) {</b>
+&nbsp;                watcher.close();
+&nbsp;            }
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;error closing watcher&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

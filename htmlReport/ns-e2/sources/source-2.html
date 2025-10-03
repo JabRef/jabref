@@ -1,0 +1,313 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Codec52</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.backend</a>
+</div>
+
+<h1>Coverage Summary for Class: Codec52 (org.jabref.logic.openoffice.backend)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Codec52</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Codec52$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">Codec52$ParsedMarkName</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.backend;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.model.openoffice.style.CitationType;
+&nbsp;
+&nbsp;/**
+&nbsp; * How and what is encoded in reference mark names under JabRef 5.2.
+&nbsp; * &lt;p&gt;
+&nbsp; * - pageInfo does not appear here. It is not encoded in the mark name.
+&nbsp; */
+&nbsp;class Codec52 {
+&nbsp;    private static final String BIB_CITATION = &quot;JR_cite&quot;;
+<b class="nc">&nbsp;    private static final Pattern CITE_PATTERN =</b>
+&nbsp;            // Pattern.compile(BIB_CITATION + &quot;(\\d*)_(\\d*)_(.*)&quot;);
+&nbsp;            // citationType is always &quot;1&quot; &quot;2&quot; or &quot;3&quot;
+<b class="nc">&nbsp;            Pattern.compile(BIB_CITATION + &quot;(\\d*)_([123])_(.*)&quot;);</b>
+&nbsp;
+&nbsp;    private Codec52() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is what we get back from parsing a refMarkName.
+&nbsp;     */
+&nbsp;    public static class ParsedMarkName {
+&nbsp;        /**
+&nbsp;         * &quot;&quot;, &quot;0&quot;, &quot;1&quot; ...
+&nbsp;         */
+&nbsp;        public final String index;
+&nbsp;        /**
+&nbsp;         * in-text-citation type
+&nbsp;         */
+&nbsp;        public final CitationType citationType;
+&nbsp;        /**
+&nbsp;         * Citation keys embedded in the reference mark.
+&nbsp;         */
+&nbsp;        public final List&lt;String&gt; citationKeys;
+&nbsp;
+<b class="nc">&nbsp;        ParsedMarkName(String index, CitationType citationType, List&lt;String&gt; citationKeys) {</b>
+<b class="nc">&nbsp;            Objects.requireNonNull(index);</b>
+<b class="nc">&nbsp;            Objects.requireNonNull(citationKeys);</b>
+<b class="nc">&nbsp;            this.index = index;</b>
+<b class="nc">&nbsp;            this.citationType = citationType;</b>
+<b class="nc">&nbsp;            this.citationKeys = citationKeys;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Integer representation was written into the document in JabRef52, keep it for compatibility.
+&nbsp;     */
+&nbsp;    private static CitationType citationTypeFromInt(int code) {
+<b class="nc">&nbsp;        return switch (code) {</b>
+&nbsp;            case 1 -&gt;
+<b class="nc">&nbsp;                    CitationType.AUTHORYEAR_PAR;</b>
+&nbsp;            case 2 -&gt;
+<b class="nc">&nbsp;                    CitationType.AUTHORYEAR_INTEXT;</b>
+&nbsp;            case 3 -&gt;
+<b class="nc">&nbsp;                    CitationType.INVISIBLE_CIT;</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    throw new IllegalArgumentException(&quot;Invalid CitationType code&quot;);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static int citationTypeToInt(CitationType type) {
+<b class="nc">&nbsp;        return switch (type) {</b>
+&nbsp;            case AUTHORYEAR_PAR -&gt;
+<b class="nc">&nbsp;                    1;</b>
+&nbsp;            case AUTHORYEAR_INTEXT -&gt;
+<b class="nc">&nbsp;                    2;</b>
+&nbsp;            case INVISIBLE_CIT -&gt;
+<b class="nc">&nbsp;                    3;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Produce a reference mark name for JabRef for the given citationType and list citation keys that does not yet appear among the reference marks of the document.
+&nbsp;     *
+&nbsp;     * @param usedNames    Reference mark names already in use.
+&nbsp;     * @param citationKeys Identifies the cited sources.
+&nbsp;     * @param citationType Encodes the effect of withText and inParenthesis options.
+&nbsp;     *                     &lt;p&gt;
+&nbsp;     *                     The first occurrence of citationKeys gets no serial number, the second gets 0, the third 1 ...
+&nbsp;     *                     &lt;p&gt;
+&nbsp;     *                     Or the first unused in this series, after removals.
+&nbsp;     */
+&nbsp;    public static String getUniqueMarkName(Set&lt;String&gt; usedNames,
+&nbsp;                                           List&lt;String&gt; citationKeys,
+&nbsp;                                           CitationType citationType) {
+&nbsp;
+<b class="nc">&nbsp;        String citationKeysPart = String.join(&quot;,&quot;, citationKeys);</b>
+&nbsp;
+<b class="nc">&nbsp;        int index = 0;</b>
+<b class="nc">&nbsp;        int citTypeCode = citationTypeToInt(citationType);</b>
+<b class="nc">&nbsp;        String name = BIB_CITATION + &#39;_&#39; + citTypeCode + &#39;_&#39; + citationKeysPart;</b>
+<b class="nc">&nbsp;        while (usedNames.contains(name)) {</b>
+<b class="nc">&nbsp;            name = BIB_CITATION + index + &#39;_&#39; + citTypeCode + &#39;_&#39; + citationKeysPart;</b>
+<b class="nc">&nbsp;            index++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse a JabRef (reference) mark name.
+&nbsp;     *
+&nbsp;     * @return Optional.empty() on failure.
+&nbsp;     */
+&nbsp;    public static Optional&lt;ParsedMarkName&gt; parseMarkName(String refMarkName) {
+<b class="nc">&nbsp;        Matcher citeMatcher = CITE_PATTERN.matcher(refMarkName);</b>
+<b class="nc">&nbsp;        if (!citeMatcher.find()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; keys = Arrays.asList(citeMatcher.group(3).split(&quot;,&quot;));</b>
+<b class="nc">&nbsp;        String index = citeMatcher.group(1);</b>
+<b class="nc">&nbsp;        int citTypeCode = Integer.parseInt(citeMatcher.group(2));</b>
+<b class="nc">&nbsp;        CitationType citationType = citationTypeFromInt(citTypeCode);</b>
+<b class="nc">&nbsp;        return Optional.of(new Codec52.ParsedMarkName(index, citationType, keys));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return true if name matches the pattern used for JabRef reference mark names.
+&nbsp;     */
+&nbsp;    public static boolean isJabRefReferenceMarkName(String name) {
+<b class="nc">&nbsp;        return CITE_PATTERN.matcher(name).find();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Filter a list of reference mark names by `isJabRefReferenceMarkName`
+&nbsp;     *
+&nbsp;     * @param names The list to be filtered.
+&nbsp;     */
+&nbsp;    public static List&lt;String&gt; filterIsJabRefReferenceMarkName(List&lt;String&gt; names) {
+<b class="nc">&nbsp;        return names.stream()</b>
+<b class="nc">&nbsp;                    .filter(Codec52::isJabRefReferenceMarkName)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>
