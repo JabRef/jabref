@@ -56,3 +56,28 @@ BstCaseTest | changeCase_titleCase_wordBoundarie  | Test that the BstCase class 
 Coverage improvement analysis (compare with Baseline)
 
 ##New Test Coverage
+**Rationale**:
+- The Multiple author one entry test was created as the current tests lacked testing of multiple authors in a single entry, only one author per entry (even two authories one entry)
+- The no entry type checks that a field that does not match the result field from the jabref object.
+- testNonASCIICharacters, they test plain text so far, so added a test to check different unicodes.
+- There is no performance tests so far, so added an input one.
+- No one tested if the user simply enters a white space, no need to compute power...
+
+## Test Results
+![image](test_results.png)
+Coverage improvement analysis (compare with Baseline)
+
+
+## StringUtilTests Added
+
+| Test name | Description / rationale |
+|-----------|----------------------------|
+| normalizeAuthorName_trimsAndReorders | Test that author names with “Last, First” normalize correctly |
+| normalizeAuthorName_handlesSingleName | Ensure single-name strings are left intact |
+| normalizeAuthorName_nullOrEmpty_returnsEmpty | Edge / null handling—no NullPointerException |
+| generateSafeFilename_replacesIllegalChars | FileNameUtil must sanitize illegal file system characters |
+| mergeBibEntries_overwritesOrKeepsNonEmpty | Merging logic should override or fill fields correctly |
+| mergeBibEntries_nullOverride_throws | Robustness: null override should cause exception |
+
+## Test Results
+![StringUtil Tests Results](StringUtil_results.png)
