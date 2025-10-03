@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow; // added for a nonASCII
 
 class FormatterTest {
 
@@ -103,6 +104,28 @@ class FormatterTest {
     void getExampleInputAlwaysNonEmpty(Formatter formatter) {
         assertFalse(formatter.getExampleInput().isEmpty());
     }
+    // --+--+--+--+--+--+--+--+--+--+---+--+-SWEN 755---+--+--+--+--+--+--+--+--+--+--+--+
+    @ParameterizedTest
+    @MethodSource("getFormatters") // checks that user does not input white space only ...
+    void getFormatTestWhiteSpace(Formatter formatter) {
+        assertNotEquals(" ", formatter.getExampleInput());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void getHugeInputSize(Formatter formatter) {
+        String hugeInput = "A".repeat(12000);
+        String result = formatter.format(hugeInput);
+        assertNotNull(result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("getFormatters")
+    void testNonASCIICharacters(Formatter formatter) {
+        assertDoesNotThrow(() -> formatter.format("This is a test 🚀äöüé"));
+    }
+
+
 
     public static Stream<Formatter> getFormatters() {
         // all classes implementing {@link net.sf.jabref.model.cleanup.Formatter}
