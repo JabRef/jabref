@@ -44,3 +44,18 @@ JabRefDataItemProvider             | FormatterTest
 ## Test Results
 ![image](test_results.png)
 Coverage improvement analysis (compare with Baseline)
+
+
+## StringUtilTests Added
+
+| Test name | Description / rationale |
+|-----------|----------------------------|
+| normalizeAuthorName_trimsAndReorders | Test that author names with “Last, First” normalize correctly |
+| normalizeAuthorName_handlesSingleName | Ensure single-name strings are left intact |
+| normalizeAuthorName_nullOrEmpty_returnsEmpty | Edge / null handling—no NullPointerException |
+| generateSafeFilename_replacesIllegalChars | FileNameUtil must sanitize illegal file system characters |
+| mergeBibEntries_overwritesOrKeepsNonEmpty | Merging logic should override or fill fields correctly |
+| mergeBibEntries_nullOverride_throws | Robustness: null override should cause exception |
+
+## Test Results
+![StringUtil Tests Results](StringUtil_results.png)
