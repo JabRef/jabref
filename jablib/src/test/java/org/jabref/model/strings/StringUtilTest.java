@@ -434,4 +434,63 @@ class StringUtilTest {
 
         assertEquals(expected, StringUtil.alignStringTable(given));
     }
+
+    @Test
+    void normalizeAuthorName_trimsAndReorders() {
+        String input = "  Doe, John  ";
+        String expected = "John Doe";
+        String actual = StringUtil.normalizeAuthorName(input);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void normalizeAuthorName_handlesSingleName() {
+        String input = "Plato";
+        String expected = "Plato";
+        String actual = StringUtil.normalizeAuthorName(input);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void normalizeAuthorName_nullOrEmpty_returnsEmpty() {
+        String input = null;
+        String actual = StringUtil.normalizeAuthorName(input);
+        assertEquals("", actual);
+        actual = StringUtil.normalizeAuthorName("");
+        assertEquals("", actual);
+    }
+
+    @Test
+    void generateSafeFilename_replacesIllegalChars() {
+        String input = "Title: A / B \\ C?";
+        String safe = FileNameUtil.generateSafeFilename(input);
+        // e.g. expected replaces colon, slash, backslash, question mark with underscore or removed
+        assertFalse(safe.contains(":"));
+        assertFalse(safe.contains("/"));
+        assertFalse(safe.contains("\\"));
+        assertFalse(safe.contains("?"));
+    }
+
+    @Test
+    void mergeBibEntries_overwritesOrKeepsNonEmpty() {
+        BibEntry base = new BibEntry();
+        base.setField("title", "Old Title");
+        base.setField("year", "");
+        BibEntry override = new BibEntry();
+        override.setField("title", "New Title");
+        override.setField("year", "2025");
+
+        BibEntry merged = BibEntryMerger.merge(base, override);
+        assertEquals("New Title", merged.getField("title").orElse(""));
+        assertEquals("2025", merged.getField("year").orElse(""));
+    }
+
+    @Test
+    void mergeBibEntries_nullOverride_throws() {
+        BibEntry base = new BibEntry();
+        assertThrows(IllegalArgumentException.class, () -> {
+            BibEntryMerger.merge(base, null);
+        });
+    }
+
 }
