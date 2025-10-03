@@ -1,0 +1,457 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ThreeWayMergeToolbar</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.mergeentries.threewaymerge.toolbar</a>
+</div>
+
+<h1>Coverage Summary for Class: ThreeWayMergeToolbar (org.jabref.gui.mergeentries.threewaymerge.toolbar)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ThreeWayMergeToolbar</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ThreeWayMergeToolbar$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ThreeWayMergeToolbar$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ThreeWayMergeToolbar$DiffView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ThreeWayMergeToolbar$PlainTextOrDiff</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/69)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.mergeentries.threewaymerge.toolbar;
+&nbsp;
+&nbsp;import javafx.beans.binding.BooleanExpression;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.RadioButton;
+&nbsp;import javafx.scene.control.ToggleGroup;
+&nbsp;import javafx.scene.layout.AnchorPane;
+&nbsp;import javafx.util.StringConverter;
+&nbsp;
+&nbsp;import org.jabref.gui.mergeentries.MergeDialogPreferences;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.DiffMethod;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter.BasicDiffMethod;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.google.common.base.Enums;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import com.tobiasdiez.easybind.EasyBinding;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class ThreeWayMergeToolbar extends AnchorPane {
+&nbsp;    @FXML
+&nbsp;    private RadioButton highlightCharactersRadioButtons;
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private RadioButton highlightWordsRadioButton;
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private ToggleGroup diffHighlightingMethodToggleGroup;
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private ComboBox&lt;DiffView&gt; diffViewComboBox;
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private ComboBox&lt;PlainTextOrDiff&gt; plainTextOrDiffComboBox;
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private Button selectLeftEntryValuesButton;
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private Button selectRightEntryValuesButton;
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private CheckBox onlyShowChangedFieldsCheck;
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private CheckBox applyToAllEntriesCheck;
+&nbsp;
+&nbsp;    @Inject
+&nbsp;    private GuiPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;DiffMethod&gt; diffHighlightingMethod = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final BooleanProperty onlyShowChangedFields = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty applyToAllEntries = new SimpleBooleanProperty();</b>
+&nbsp;    private EasyBinding&lt;Boolean&gt; showDiff;
+&nbsp;
+<b class="nc">&nbsp;    public ThreeWayMergeToolbar() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        showDiff = EasyBind.map(plainTextOrDiffComboBox.valueProperty(), plainTextOrDiff -&gt; plainTextOrDiff == PlainTextOrDiff.Diff);</b>
+<b class="nc">&nbsp;        plainTextOrDiffComboBox.getItems().addAll(PlainTextOrDiff.values());</b>
+&nbsp;
+<b class="nc">&nbsp;        plainTextOrDiffComboBox.setConverter(new StringConverter&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public String toString(PlainTextOrDiff plainTextOrDiff) {
+<b class="nc">&nbsp;                return plainTextOrDiff.getValue();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public PlainTextOrDiff fromString(String string) {
+<b class="nc">&nbsp;                return PlainTextOrDiff.fromString(string);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        diffViewComboBox.disableProperty().bind(notShowDiffProperty());</b>
+<b class="nc">&nbsp;        diffViewComboBox.getItems().addAll(DiffView.values());</b>
+&nbsp;
+<b class="nc">&nbsp;        diffViewComboBox.setConverter(new StringConverter&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public String toString(DiffView diffView) {
+<b class="nc">&nbsp;                return diffView.getValue();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public DiffView fromString(String string) {
+<b class="nc">&nbsp;                return DiffView.fromString(string);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        highlightWordsRadioButton.disableProperty().bind(notShowDiffProperty());</b>
+<b class="nc">&nbsp;        highlightCharactersRadioButtons.disableProperty().bind(notShowDiffProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener(observable -&gt; {</b>
+<b class="nc">&nbsp;            if (diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightCharactersRadioButtons)) {</b>
+<b class="nc">&nbsp;                diffHighlightingMethod.set(BasicDiffMethod.CHARS);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                diffHighlightingMethod.set(BasicDiffMethod.WORDS);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferences.getMergeDialogPreferences().mergeShowChangedFieldOnlyProperty());</b>
+<b class="nc">&nbsp;        onlyShowChangedFields.bind(onlyShowChangedFieldsCheck.selectedProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        applyToAllEntriesCheck.selectedProperty().bindBidirectional(preferences.getMergeDialogPreferences().mergeApplyToAllEntriesProperty());</b>
+<b class="nc">&nbsp;        applyToAllEntries.bind(applyToAllEntriesCheck.selectedProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        loadSavedConfiguration();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void loadSavedConfiguration() {
+<b class="nc">&nbsp;        MergeDialogPreferences mergeDialogPreferences = preferences.getMergeDialogPreferences();</b>
+&nbsp;
+<b class="nc">&nbsp;        PlainTextOrDiff plainTextOrDiffPreference = mergeDialogPreferences.getMergeShouldShowDiff() ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT;</b>
+<b class="nc">&nbsp;        plainTextOrDiffComboBox.getSelectionModel().select(plainTextOrDiffPreference);</b>
+&nbsp;
+<b class="nc">&nbsp;        DiffView diffViewPreference = mergeDialogPreferences.getMergeShouldShowUnifiedDiff() ? DiffView.UNIFIED : DiffView.SPLIT;</b>
+<b class="nc">&nbsp;        diffViewComboBox.getSelectionModel().select(diffViewPreference);</b>
+&nbsp;
+<b class="nc">&nbsp;        diffHighlightingMethodToggleGroup.selectToggle(mergeDialogPreferences.getMergeHighlightWords() ? highlightWordsRadioButton : highlightCharactersRadioButtons);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void saveToolbarConfiguration() {
+<b class="nc">&nbsp;        preferences.getMergeDialogPreferences().setMergeShouldShowDiff(plainTextOrDiffComboBox.getValue() == PlainTextOrDiff.Diff);</b>
+<b class="nc">&nbsp;        preferences.getMergeDialogPreferences().setMergeShouldShowUnifiedDiff(diffViewComboBox.getValue() == DiffView.UNIFIED);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean highlightWordsRadioButtonValue = diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightWordsRadioButton);</b>
+<b class="nc">&nbsp;        preferences.getMergeDialogPreferences().setMergeHighlightWords(highlightWordsRadioButtonValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;DiffView&gt; diffViewProperty() {
+<b class="nc">&nbsp;        return diffViewComboBox.valueProperty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DiffView getDiffView() {
+<b class="nc">&nbsp;        return diffViewProperty().get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDiffView(DiffView diffView) {
+<b class="nc">&nbsp;        diffViewProperty().set(diffView);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public EasyBinding&lt;Boolean&gt; showDiffProperty() {
+<b class="nc">&nbsp;        return showDiff;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShowDiff(boolean showDiff) {
+<b class="nc">&nbsp;        plainTextOrDiffComboBox.valueProperty().set(showDiff ? PlainTextOrDiff.Diff : PlainTextOrDiff.PLAIN_TEXT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty hideEqualFieldsProperty() {
+<b class="nc">&nbsp;        return onlyShowChangedFields;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldHideEqualFields() {
+<b class="nc">&nbsp;        return onlyShowChangedFields.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convenience method used to disable diff related views when diff is not selected.
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This method is required because {@link EasyBinding} class doesn&#39;t have a method to invert a boolean property,
+&nbsp;     * like {@link BooleanExpression#not()}
+&nbsp;     * &lt;/p&gt;
+&nbsp;     */
+&nbsp;    public EasyBinding&lt;Boolean&gt; notShowDiffProperty() {
+<b class="nc">&nbsp;        return showDiffProperty().map(showDiff -&gt; !showDiff);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean shouldShowDiffs() {
+<b class="nc">&nbsp;        return showDiffProperty().get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;DiffMethod&gt; diffHighlightingMethodProperty() {
+<b class="nc">&nbsp;        return diffHighlightingMethod;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DiffMethod getDiffHighlightingMethod() {
+<b class="nc">&nbsp;        return diffHighlightingMethodProperty().get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDiffHighlightingMethod(DiffMethod diffHighlightingMethod) {
+<b class="nc">&nbsp;        diffHighlightingMethodProperty().set(diffHighlightingMethod);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setOnSelectLeftEntryValuesButtonClicked(Runnable onClick) {
+<b class="nc">&nbsp;        selectLeftEntryValuesButton.setOnMouseClicked(e -&gt; onClick.run());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setOnSelectRightEntryValuesButtonClicked(Runnable onClick) {
+<b class="nc">&nbsp;        selectRightEntryValuesButton.setOnMouseClicked(e -&gt; onClick.run());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum PlainTextOrDiff {</b>
+<b class="nc">&nbsp;        PLAIN_TEXT(Localization.lang(&quot;Plain Text&quot;)), Diff(Localization.lang(&quot;Show Diff&quot;));</b>
+&nbsp;
+&nbsp;        private final String value;
+&nbsp;
+<b class="nc">&nbsp;        PlainTextOrDiff(String value) {</b>
+<b class="nc">&nbsp;            this.value = value;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static PlainTextOrDiff parse(String name) {
+<b class="nc">&nbsp;            return Enums.getIfPresent(PlainTextOrDiff.class, name).or(Diff);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getValue() {
+<b class="nc">&nbsp;            return value;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static PlainTextOrDiff fromString(String str) {
+<b class="nc">&nbsp;            return Enum.valueOf(PlainTextOrDiff.class, str);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum DiffView {</b>
+<b class="nc">&nbsp;        UNIFIED(Localization.lang(&quot;Unified View&quot;)),</b>
+<b class="nc">&nbsp;        SPLIT(Localization.lang(&quot;Split View&quot;));</b>
+&nbsp;        private final String value;
+&nbsp;
+<b class="nc">&nbsp;        DiffView(String value) {</b>
+<b class="nc">&nbsp;            this.value = value;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static DiffView parse(String name) {
+<b class="nc">&nbsp;            return Enums.getIfPresent(DiffView.class, name).or(UNIFIED);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getValue() {
+<b class="nc">&nbsp;            return value;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static DiffView fromString(String str) {
+<b class="nc">&nbsp;            return Enum.valueOf(DiffView.class, str);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

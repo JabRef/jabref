@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TextInputKeyBindings</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.keyboard</a>
+</div>
+
+<h1>Coverage Summary for Class: TextInputKeyBindings (org.jabref.gui.keyboard)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TextInputKeyBindings</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TextInputKeyBindings$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.keyboard;
+&nbsp;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.scene.control.TextInputControl;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;
+&nbsp;import org.jabref.logic.util.strings.StringManipulator;
+&nbsp;import org.jabref.model.util.ResultingStringState;
+&nbsp;
+<b class="nc">&nbsp;public class TextInputKeyBindings {</b>
+&nbsp;
+&nbsp;    public static void call(Scene scene, KeyEvent event, KeyBindingRepository keyBindingRepository) {
+<b class="nc">&nbsp;        if (scene.focusOwnerProperty().get() instanceof TextInputControl focusedTextField) {</b>
+<b class="nc">&nbsp;            keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -&gt; {</b>
+<b class="nc">&nbsp;                switch (binding) {</b>
+&nbsp;                    case EDITOR_DELETE -&gt; {
+<b class="nc">&nbsp;                        focusedTextField.deleteNextChar();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    case EDITOR_BACKWARD -&gt; {
+<b class="nc">&nbsp;                        focusedTextField.backward();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    case EDITOR_FORWARD -&gt; {
+<b class="nc">&nbsp;                        focusedTextField.forward();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    case EDITOR_WORD_BACKWARD -&gt; {
+<b class="nc">&nbsp;                        focusedTextField.previousWord();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    case EDITOR_WORD_FORWARD -&gt; {
+<b class="nc">&nbsp;                        focusedTextField.nextWord();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    case EDITOR_BEGINNING,
+&nbsp;                         EDITOR_UP,
+&nbsp;                         EDITOR_BEGINNING_DOC -&gt; {
+<b class="nc">&nbsp;                        focusedTextField.home();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    case EDITOR_END,
+&nbsp;                         EDITOR_DOWN,
+&nbsp;                         EDITOR_END_DOC -&gt; {
+<b class="nc">&nbsp;                        focusedTextField.end();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    case EDITOR_CAPITALIZE -&gt; {
+<b class="nc">&nbsp;                        int pos = focusedTextField.getCaretPosition();</b>
+<b class="nc">&nbsp;                        String text = focusedTextField.getText(0, focusedTextField.getText().length());</b>
+<b class="nc">&nbsp;                        ResultingStringState res = StringManipulator.capitalize(pos, text);</b>
+<b class="nc">&nbsp;                        focusedTextField.setText(res.text);</b>
+<b class="nc">&nbsp;                        focusedTextField.positionCaret(res.caretPosition);</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    case EDITOR_LOWERCASE -&gt; {
+<b class="nc">&nbsp;                        int pos = focusedTextField.getCaretPosition();</b>
+<b class="nc">&nbsp;                        String text = focusedTextField.getText(0, focusedTextField.getText().length());</b>
+<b class="nc">&nbsp;                        ResultingStringState res = StringManipulator.lowercase(pos, text);</b>
+<b class="nc">&nbsp;                        focusedTextField.setText(res.text);</b>
+<b class="nc">&nbsp;                        focusedTextField.positionCaret(res.caretPosition);</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    case EDITOR_UPPERCASE -&gt; {
+<b class="nc">&nbsp;                        int pos = focusedTextField.getCaretPosition();</b>
+<b class="nc">&nbsp;                        String text = focusedTextField.getText(0, focusedTextField.getText().length());</b>
+<b class="nc">&nbsp;                        ResultingStringState res = StringManipulator.uppercase(pos, text);</b>
+<b class="nc">&nbsp;                        focusedTextField.setText(res.text);</b>
+<b class="nc">&nbsp;                        focusedTextField.positionCaret(res.caretPosition);</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    case EDITOR_KILL_LINE -&gt; {
+<b class="nc">&nbsp;                        int pos = focusedTextField.getCaretPosition();</b>
+<b class="nc">&nbsp;                        focusedTextField.setText(focusedTextField.getText(0, pos));</b>
+<b class="nc">&nbsp;                        focusedTextField.positionCaret(pos);</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    case EDITOR_KILL_WORD -&gt; {
+<b class="nc">&nbsp;                        int pos = focusedTextField.getCaretPosition();</b>
+<b class="nc">&nbsp;                        String text = focusedTextField.getText(0, focusedTextField.getText().length());</b>
+<b class="nc">&nbsp;                        ResultingStringState res = StringManipulator.killWord(pos, text);</b>
+<b class="nc">&nbsp;                        focusedTextField.setText(res.text);</b>
+<b class="nc">&nbsp;                        focusedTextField.positionCaret(res.caretPosition);</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    case EDITOR_KILL_WORD_BACKWARD -&gt; {
+<b class="nc">&nbsp;                        int pos = focusedTextField.getCaretPosition();</b>
+<b class="nc">&nbsp;                        String text = focusedTextField.getText(0, focusedTextField.getText().length());</b>
+<b class="nc">&nbsp;                        ResultingStringState res = StringManipulator.backwardKillWord(pos, text);</b>
+<b class="nc">&nbsp;                        focusedTextField.setText(res.text);</b>
+<b class="nc">&nbsp;                        focusedTextField.positionCaret(res.caretPosition);</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                    }
+&nbsp;                    // CLEAR_SEARCH is handled at org.jabref.gui.search.SearchTextField
+&nbsp;                }
+&nbsp;            });
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

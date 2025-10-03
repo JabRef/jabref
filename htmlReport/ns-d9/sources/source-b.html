@@ -1,0 +1,239 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LtwaVisitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.journals.ltwa</a>
+</div>
+
+<h1>Coverage Summary for Class: LtwaVisitor (org.jabref.logic.journals.ltwa)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">LtwaVisitor</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;// Generated from org/jabref/logic/journals/ltwa/Ltwa.g4 by ANTLR 4.13.2
+&nbsp;
+&nbsp;package org.jabref.logic.journals.ltwa;
+&nbsp;
+&nbsp;import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+&nbsp;
+&nbsp;/**
+&nbsp; * This interface defines a complete generic visitor for a parse tree produced
+&nbsp; * by {@link LtwaParser}.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; The return type of the visit operation. Use {@link Void} for
+&nbsp; * operations with no return type.
+&nbsp; */
+&nbsp;public interface LtwaVisitor&lt;T&gt; extends ParseTreeVisitor&lt;T&gt; {
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code SingleWordTitleFull}
+&nbsp;	 * labeled alternative in {@link LtwaParser#title}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitSingleWordTitleFull(LtwaParser.SingleWordTitleFullContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code StopwordPlusTitleFull}
+&nbsp;	 * labeled alternative in {@link LtwaParser#title}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitStopwordPlusTitleFull(LtwaParser.StopwordPlusTitleFullContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code AnyPlusSymbolsFull}
+&nbsp;	 * labeled alternative in {@link LtwaParser#title}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitAnyPlusSymbolsFull(LtwaParser.AnyPlusSymbolsFullContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code NormalTitleFull}
+&nbsp;	 * labeled alternative in {@link LtwaParser#title}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitNormalTitleFull(LtwaParser.NormalTitleFullContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link LtwaParser#singleWordTitle}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitSingleWordTitle(LtwaParser.SingleWordTitleContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link LtwaParser#stopwordPlusAny}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitStopwordPlusAny(LtwaParser.StopwordPlusAnyContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link LtwaParser#anyPlusSymbols}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitAnyPlusSymbols(LtwaParser.AnyPlusSymbolsContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link LtwaParser#normalTitle}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitNormalTitle(LtwaParser.NormalTitleContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code ArticleElement}
+&nbsp;	 * labeled alternative in {@link LtwaParser#titleElement}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitArticleElement(LtwaParser.ArticleElementContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code StopwordElement}
+&nbsp;	 * labeled alternative in {@link LtwaParser#titleElement}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitStopwordElement(LtwaParser.StopwordElementContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code SymbolsElement}
+&nbsp;	 * labeled alternative in {@link LtwaParser#titleElement}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitSymbolsElement(LtwaParser.SymbolsElementContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code OrdinalElement}
+&nbsp;	 * labeled alternative in {@link LtwaParser#titleElement}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitOrdinalElement(LtwaParser.OrdinalElementContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code WordElement}
+&nbsp;	 * labeled alternative in {@link LtwaParser#titleElement}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitWordElement(LtwaParser.WordElementContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code HyphenElement}
+&nbsp;	 * labeled alternative in {@link LtwaParser#titleElement}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitHyphenElement(LtwaParser.HyphenElementContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code PartElement}
+&nbsp;	 * labeled alternative in {@link LtwaParser#titleElement}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitPartElement(LtwaParser.PartElementContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code AbbreviationElement}
+&nbsp;	 * labeled alternative in {@link LtwaParser#titleElement}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitAbbreviationElement(LtwaParser.AbbreviationElementContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link LtwaParser#article}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitArticle(LtwaParser.ArticleContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link LtwaParser#stopword}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitStopword(LtwaParser.StopwordContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link LtwaParser#symbols}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitSymbols(LtwaParser.SymbolsContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link LtwaParser#ordinal}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitOrdinal(LtwaParser.OrdinalContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link LtwaParser#word}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitWord(LtwaParser.WordContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link LtwaParser#hyphen}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitHyphen(LtwaParser.HyphenContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link LtwaParser#part}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitPart(LtwaParser.PartContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link LtwaParser#abbreviation}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitAbbreviation(LtwaParser.AbbreviationContext ctx);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

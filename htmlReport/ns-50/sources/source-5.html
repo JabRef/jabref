@@ -1,0 +1,797 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MainTable</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: MainTable (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MainTable</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/39)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/81)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/273)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MainTable$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/81)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/275)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.css.PseudoClass;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.SelectionMode;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;import javafx.scene.control.TableRow;
+&nbsp;import javafx.scene.control.TableView;
+&nbsp;import javafx.scene.input.ClipboardContent;
+&nbsp;import javafx.scene.input.DragEvent;
+&nbsp;import javafx.scene.input.Dragboard;
+&nbsp;import javafx.scene.input.KeyCode;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;import javafx.scene.input.MouseDragEvent;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.scene.input.TransferMode;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseClassGetResource;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.DragAndDropDataFormats;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.LibraryTabContainer;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.edit.EditAction;
+&nbsp;import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
+&nbsp;import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
+&nbsp;import org.jabref.gui.externalfiles.ImportHandler;
+&nbsp;import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
+&nbsp;import org.jabref.gui.maintable.columns.LibraryColumn;
+&nbsp;import org.jabref.gui.maintable.columns.MainTableColumn;
+&nbsp;import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preview.ClipboardContentGenerator;
+&nbsp;import org.jabref.gui.search.MatchCategory;
+&nbsp;import org.jabref.gui.util.ControlHelper;
+&nbsp;import org.jabref.gui.util.CustomLocalDragboard;
+&nbsp;import org.jabref.gui.util.DragDrop;
+&nbsp;import org.jabref.gui.util.ViewModelTableRowFactory;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+&nbsp;import org.jabref.logic.importer.WebFetchers;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;@AllowedToUseClassGetResource(&quot;JavaFX internally handles the passed URLs properly.&quot;)
+&nbsp;public class MainTable extends TableView&lt;BibEntryTableViewModel&gt; {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);</b>
+<b class="nc">&nbsp;    private static final PseudoClass MATCHING_SEARCH_AND_GROUPS = PseudoClass.getPseudoClass(&quot;matching-search-and-groups&quot;);</b>
+<b class="nc">&nbsp;    private static final PseudoClass MATCHING_SEARCH_NOT_GROUPS = PseudoClass.getPseudoClass(&quot;matching-search-not-groups&quot;);</b>
+<b class="nc">&nbsp;    private static final PseudoClass MATCHING_GROUPS_NOT_SEARCH = PseudoClass.getPseudoClass(&quot;matching-groups-not-search&quot;);</b>
+<b class="nc">&nbsp;    private static final PseudoClass NOT_MATCHING_SEARCH_AND_GROUPS = PseudoClass.getPseudoClass(&quot;not-matching-search-and-groups&quot;);</b>
+&nbsp;
+&nbsp;    private final LibraryTab libraryTab;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final BibDatabaseContext database;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final MainTableDataModel model;
+&nbsp;    private final CustomLocalDragboard localDragboard;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final ImportHandler importHandler;
+&nbsp;    private final ClipboardContentGenerator clipboardContentGenerator;
+&nbsp;
+&nbsp;    private long lastKeyPressTime;
+&nbsp;    private String columnSearchTerm;
+<b class="nc">&nbsp;    private boolean citationMergeMode = false;</b>
+&nbsp;
+&nbsp;    /// There is one maintable instance per library tab
+&nbsp;    public MainTable(MainTableDataModel model,
+&nbsp;                     LibraryTab libraryTab,
+&nbsp;                     LibraryTabContainer tabContainer,
+&nbsp;                     BibDatabaseContext database,
+&nbsp;                     GuiPreferences preferences,
+&nbsp;                     DialogService dialogService,
+&nbsp;                     StateManager stateManager,
+&nbsp;                     KeyBindingRepository keyBindingRepository,
+&nbsp;                     ClipBoardManager clipBoardManager,
+&nbsp;                     BibEntryTypesManager entryTypesManager,
+&nbsp;                     TaskExecutor taskExecutor,
+&nbsp;                     ImportHandler importHandler) {
+<b class="nc">&nbsp;        super();</b>
+<b class="nc">&nbsp;        this.libraryTab = libraryTab;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.database = Objects.requireNonNull(database);</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.model = model;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.undoManager = libraryTab.getUndoManager();</b>
+<b class="nc">&nbsp;        this.filePreferences = preferences.getFilePreferences();</b>
+<b class="nc">&nbsp;        this.importHandler = importHandler;</b>
+<b class="nc">&nbsp;        this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), Injector.instantiateModelOrService(JournalAbbreviationRepository.class));</b>
+&nbsp;
+<b class="nc">&nbsp;        MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();</b>
+&nbsp;
+<b class="nc">&nbsp;        localDragboard = stateManager.getLocalDragboard();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.setOnDragOver(this::handleOnDragOverTableView);</b>
+<b class="nc">&nbsp;        this.setOnDragDropped(this::handleOnDragDroppedTableView);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.getStyleClass().add(&quot;main-table&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        MainTableColumnFactory mainTableColumnFactory = new MainTableColumnFactory(</b>
+&nbsp;                database,
+&nbsp;                preferences,
+<b class="nc">&nbsp;                preferences.getMainTableColumnPreferences(),</b>
+&nbsp;                undoManager,
+&nbsp;                dialogService,
+&nbsp;                stateManager,
+&nbsp;                taskExecutor);
+&nbsp;
+<b class="nc">&nbsp;        this.getColumns().addAll(mainTableColumnFactory.createColumns());</b>
+<b class="nc">&nbsp;        this.getColumns().removeIf(LibraryColumn.class::isInstance);</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelTableRowFactory&lt;BibEntryTableViewModel&gt;()</b>
+<b class="nc">&nbsp;                .withOnMouseClickedEvent((entry, event) -&gt; {</b>
+<b class="nc">&nbsp;                    if (event.getClickCount() == 2) {</b>
+<b class="nc">&nbsp;                        libraryTab.showAndEdit(entry.getEntry());</b>
+&nbsp;                    }
+&nbsp;                })
+<b class="nc">&nbsp;                .withContextMenu(entry -&gt; RightClickMenu.create(entry,</b>
+&nbsp;                        keyBindingRepository,
+&nbsp;                        libraryTab,
+&nbsp;                        dialogService,
+&nbsp;                        stateManager,
+&nbsp;                        preferences,
+&nbsp;                        undoManager,
+&nbsp;                        clipBoardManager,
+&nbsp;                        taskExecutor,
+<b class="nc">&nbsp;                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class),</b>
+&nbsp;                        entryTypesManager,
+&nbsp;                        importHandler))
+<b class="nc">&nbsp;                .withPseudoClass(MATCHING_SEARCH_AND_GROUPS, entry -&gt; entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_AND_GROUPS))</b>
+<b class="nc">&nbsp;                .withPseudoClass(MATCHING_SEARCH_NOT_GROUPS, entry -&gt; entry.matchCategory().isEqualTo(MatchCategory.MATCHING_SEARCH_NOT_GROUPS))</b>
+<b class="nc">&nbsp;                .withPseudoClass(MATCHING_GROUPS_NOT_SEARCH, entry -&gt; entry.matchCategory().isEqualTo(MatchCategory.MATCHING_GROUPS_NOT_SEARCH))</b>
+<b class="nc">&nbsp;                .withPseudoClass(NOT_MATCHING_SEARCH_AND_GROUPS, entry -&gt; entry.matchCategory().isEqualTo(MatchCategory.NOT_MATCHING_SEARCH_AND_GROUPS))</b>
+<b class="nc">&nbsp;                .setOnDragDetected(this::handleOnDragDetected)</b>
+<b class="nc">&nbsp;                .setOnDragDropped(this::handleOnDragDropped)</b>
+<b class="nc">&nbsp;                .setOnDragOver(this::handleOnDragOver)</b>
+<b class="nc">&nbsp;                .setOnDragExited(this::handleOnDragExited)</b>
+<b class="nc">&nbsp;                .setOnMouseDragEntered(this::handleOnDragEntered)</b>
+<b class="nc">&nbsp;                .install(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.getSortOrder().clear();</b>
+&nbsp;
+&nbsp;        // force match category column to be the first sort order, (match_category column is always the first column)
+<b class="nc">&nbsp;        this.getSortOrder().addFirst(getColumns().getFirst());</b>
+<b class="nc">&nbsp;        this.getSortOrder().addListener((ListChangeListener&lt;TableColumn&lt;BibEntryTableViewModel, ?&gt;&gt;) change -&gt; {</b>
+<b class="nc">&nbsp;            if (!this.getSortOrder().getFirst().equals(getColumns().getFirst())) {</b>
+<b class="nc">&nbsp;                this.getSortOrder().addFirst(getColumns().getFirst());</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel -&gt;</b>
+<b class="nc">&nbsp;                this.getColumns().stream()</b>
+<b class="nc">&nbsp;                    .map(column -&gt; (MainTableColumn&lt;?&gt;) column)</b>
+<b class="nc">&nbsp;                    .filter(column -&gt; column.getModel().equals(columnModel))</b>
+<b class="nc">&nbsp;                    .findFirst()</b>
+<b class="nc">&nbsp;                    .ifPresent(column -&gt; {</b>
+<b class="nc">&nbsp;                        LOGGER.trace(&quot;Adding sort order for col {} &quot;, column);</b>
+<b class="nc">&nbsp;                        this.getSortOrder().add(column);</b>
+&nbsp;                    }));
+&nbsp;
+<b class="nc">&nbsp;        if (mainTablePreferences.getResizeColumnsToFit()) {</b>
+<b class="nc">&nbsp;            this.setColumnResizePolicy(new SmartConstrainedResizePolicy());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.setItems(model.getEntriesFilteredAndSorted());</b>
+&nbsp;
+<b class="nc">&nbsp;        Button addExampleButton = new Button(Localization.lang(&quot;Add example entry&quot;));</b>
+<b class="nc">&nbsp;        addExampleButton.getStyleClass().add(&quot;text-button-blue&quot;);</b>
+<b class="nc">&nbsp;        addExampleButton.setOnAction(_ -&gt; {</b>
+<b class="nc">&nbsp;            BibEntry entry = addExampleEntry();</b>
+<b class="nc">&nbsp;            libraryTab.showAndEdit(entry);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        Button importPdfsButton = new Button(Localization.lang(&quot;Import existing PDFs&quot;));</b>
+<b class="nc">&nbsp;        importPdfsButton.getStyleClass().add(&quot;text-button-blue&quot;);</b>
+<b class="nc">&nbsp;        importPdfsButton.setOnAction(_ -&gt; importPdfs());</b>
+&nbsp;
+<b class="nc">&nbsp;        Label noContentLabel = new Label(Localization.lang(&quot;No content in table&quot;));</b>
+<b class="nc">&nbsp;        noContentLabel.getStyleClass().add(&quot;welcome-header-label&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        HBox buttonBox = new HBox(20, addExampleButton, importPdfsButton);</b>
+<b class="nc">&nbsp;        buttonBox.setAlignment(Pos.CENTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        VBox placeholderBox = new VBox(15, noContentLabel, buttonBox);</b>
+<b class="nc">&nbsp;        placeholderBox.setAlignment(Pos.CENTER);</b>
+&nbsp;
+<b class="nc">&nbsp;        updatePlaceholder(placeholderBox);</b>
+&nbsp;
+<b class="nc">&nbsp;        database.getDatabase().getEntries().addListener((ListChangeListener&lt;BibEntry&gt;) change -&gt; updatePlaceholder(placeholderBox));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.getItems().addListener((ListChangeListener&lt;BibEntryTableViewModel&gt;) change -&gt; updatePlaceholder(placeholderBox));</b>
+&nbsp;
+&nbsp;        // Enable sorting
+&nbsp;        // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
+&nbsp;        // The default comparator of the SortedList does not consider the insertion index of entries that are equal according to the comparator.
+&nbsp;        // When two entries are equal based on the comparator, the entry that was inserted first should be considered smaller.
+<b class="nc">&nbsp;        this.setSortPolicy(_ -&gt; true);</b>
+<b class="nc">&nbsp;        model.getEntriesFilteredAndSorted().comparatorProperty().bind(</b>
+<b class="nc">&nbsp;                this.comparatorProperty().map(comparator -&gt; {</b>
+<b class="nc">&nbsp;                    if (comparator == null) {</b>
+<b class="nc">&nbsp;                        return null;</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    return (entry1, entry2) -&gt; {</b>
+<b class="nc">&nbsp;                        int result = comparator.compare(entry1, entry2);</b>
+<b class="nc">&nbsp;                        if (result != 0) {</b>
+<b class="nc">&nbsp;                            return result;</b>
+&nbsp;                        }
+&nbsp;                        // If the entries are equal according to the comparator, compare them by their index in the database.
+&nbsp;                        // The comparison should ideally be based on the database index, but retrieving the index takes log(n). See {@link BibDatabase#indexOf}.
+&nbsp;                        // Using the entry ID is also valid since IDs are monotonically increasing.
+<b class="nc">&nbsp;                        return entry1.getEntry().getId().compareTo(entry2.getEntry().getId());</b>
+&nbsp;                    };
+&nbsp;                })
+&nbsp;        );
+&nbsp;
+&nbsp;        // Store visual state
+<b class="nc">&nbsp;        new PersistenceVisualStateTable(this, mainTablePreferences.getColumnPreferences()).addListeners();</b>
+&nbsp;
+<b class="nc">&nbsp;        setupKeyBindings(keyBindingRepository);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.setOnKeyTyped(key -&gt; {</b>
+<b class="nc">&nbsp;            if (this.getSortOrder().size() &lt;= 1) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;            // skip match category column
+<b class="nc">&nbsp;            this.jumpToSearchKey(getSortOrder().get(1), key);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        database.getDatabase().registerListener(this);</b>
+&nbsp;
+&nbsp;        // Enable the header right-click menu.
+<b class="nc">&nbsp;        new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is called, if a user starts typing some characters into the keyboard with focus on main table. The {@link MainTable} will scroll to the cell with the same starting column value and typed string
+&nbsp;     * If the user presses any other special key as well, e.g. alt or shift we don&#39;t jump
+&nbsp;     *
+&nbsp;     * @param sortedColumn The sorted column in {@link MainTable}
+&nbsp;     * @param keyEvent     The pressed character
+&nbsp;     */
+&nbsp;    private void jumpToSearchKey(TableColumn&lt;BibEntryTableViewModel, ?&gt; sortedColumn, KeyEvent keyEvent) {
+<b class="nc">&nbsp;        if (keyEvent.isAltDown() || keyEvent.isControlDown() || keyEvent.isMetaDown() || keyEvent.isShiftDown()) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if ((keyEvent.getCharacter() == null) || (sortedColumn == null)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if ((System.currentTimeMillis() - lastKeyPressTime) &lt; 700) {</b>
+<b class="nc">&nbsp;            columnSearchTerm += keyEvent.getCharacter().toLowerCase();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            columnSearchTerm = keyEvent.getCharacter().toLowerCase();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        lastKeyPressTime = System.currentTimeMillis();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.getItems().stream()</b>
+<b class="nc">&nbsp;            .filter(item -&gt; Optional.ofNullable(sortedColumn.getCellObservableValue(item).getValue())</b>
+<b class="nc">&nbsp;                                    .map(Object::toString)</b>
+<b class="nc">&nbsp;                                    .orElse(&quot;&quot;)</b>
+<b class="nc">&nbsp;                                    .toLowerCase()</b>
+<b class="nc">&nbsp;                                    .startsWith(columnSearchTerm))</b>
+<b class="nc">&nbsp;            .findFirst()</b>
+<b class="nc">&nbsp;            .ifPresent(item -&gt; {</b>
+<b class="nc">&nbsp;                getSelectionModel().clearSelection();</b>
+<b class="nc">&nbsp;                getSelectionModel().select(item);</b>
+<b class="nc">&nbsp;                scrollTo(item);</b>
+&nbsp;            });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearAndSelect(BibEntry bibEntry) {
+&nbsp;        // check if entries merged from citation relations tab
+<b class="nc">&nbsp;        if (citationMergeMode) {</b>
+&nbsp;            // keep original entry selected and reset citation merge mode
+<b class="nc">&nbsp;            this.citationMergeMode = false;</b>
+&nbsp;        } else {
+&nbsp;            // select new entry
+<b class="nc">&nbsp;            getSelectionModel().clearSelection();</b>
+<b class="nc">&nbsp;            findEntry(bibEntry).ifPresent(entry -&gt; {</b>
+<b class="nc">&nbsp;                getSelectionModel().select(entry);</b>
+<b class="nc">&nbsp;                scrollTo(entry);</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearAndSelect(List&lt;BibEntry&gt; bibEntries) {
+&nbsp;        // check if entries merged from citation relations tab
+<b class="nc">&nbsp;        if (citationMergeMode) {</b>
+&nbsp;            // keep original entry selected and reset citation merge mode
+<b class="nc">&nbsp;            this.citationMergeMode = false;</b>
+&nbsp;        } else {
+&nbsp;            // select new entries
+<b class="nc">&nbsp;            getSelectionModel().clearSelection();</b>
+<b class="nc">&nbsp;            List&lt;BibEntryTableViewModel&gt; entries = bibEntries.stream()</b>
+<b class="nc">&nbsp;                                                             .filter(bibEntry -&gt; bibEntry.getCitationKey().isPresent())</b>
+<b class="nc">&nbsp;                                                             .map(bibEntry -&gt; findEntryByCitationKey(bibEntry.getCitationKey().get()))</b>
+<b class="nc">&nbsp;                                                             .filter(Optional::isPresent)</b>
+<b class="nc">&nbsp;                                                             .map(Optional::get)</b>
+<b class="nc">&nbsp;                                                             .toList();</b>
+<b class="nc">&nbsp;            entries.forEach(entry -&gt; getSelectionModel().select(entry));</b>
+<b class="nc">&nbsp;            if (!entries.isEmpty()) {</b>
+<b class="nc">&nbsp;                scrollTo(entries.getFirst());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void scrollToNextMatchCategory() {
+<b class="nc">&nbsp;        BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();</b>
+<b class="nc">&nbsp;        if (selectedEntry == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MatchCategory currentMatchCategory = selectedEntry.matchCategory().get();</b>
+<b class="nc">&nbsp;        for (int i = getSelectionModel().getSelectedIndex(); i &lt; getItems().size(); i++) {</b>
+<b class="nc">&nbsp;            if (getItems().get(i).matchCategory().get() != currentMatchCategory) {</b>
+<b class="nc">&nbsp;                getSelectionModel().clearSelection();</b>
+<b class="nc">&nbsp;                getSelectionModel().select(i);</b>
+<b class="nc">&nbsp;                scrollTo(i);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void scrollToPreviousMatchCategory() {
+<b class="nc">&nbsp;        BibEntryTableViewModel selectedEntry = getSelectionModel().getSelectedItem();</b>
+<b class="nc">&nbsp;        if (selectedEntry == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MatchCategory currentMatchCategory = selectedEntry.matchCategory().get();</b>
+<b class="nc">&nbsp;        for (int i = getSelectionModel().getSelectedIndex(); i &gt;= 0; i--) {</b>
+<b class="nc">&nbsp;            if (getItems().get(i).matchCategory().get() != currentMatchCategory) {</b>
+<b class="nc">&nbsp;                MatchCategory targetMatchCategory = getItems().get(i).matchCategory().get();</b>
+&nbsp;                // found the previous category, scroll to the first entry of that category
+<b class="nc">&nbsp;                while ((i &gt;= 0) &amp;&amp; getItems().get(i).matchCategory().get() == targetMatchCategory) {</b>
+<b class="nc">&nbsp;                    i--;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                getSelectionModel().clearSelection();</b>
+<b class="nc">&nbsp;                getSelectionModel().select(i + 1);</b>
+<b class="nc">&nbsp;                scrollTo(i + 1);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupKeyBindings(KeyBindingRepository keyBindings) {
+<b class="nc">&nbsp;        EditAction pasteAction = new EditAction(StandardActions.PASTE, () -&gt; libraryTab, stateManager, undoManager);</b>
+<b class="nc">&nbsp;        EditAction copyAction = new EditAction(StandardActions.COPY, () -&gt; libraryTab, stateManager, undoManager);</b>
+<b class="nc">&nbsp;        EditAction cutAction = new EditAction(StandardActions.CUT, () -&gt; libraryTab, stateManager, undoManager);</b>
+<b class="nc">&nbsp;        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -&gt; libraryTab, stateManager, undoManager);</b>
+<b class="nc">&nbsp;        OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);</b>
+<b class="nc">&nbsp;        OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor);</b>
+<b class="nc">&nbsp;        MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager);</b>
+<b class="nc">&nbsp;        LookupIdentifierAction&lt;DOI&gt; lookupIdentifierAction = new LookupIdentifierAction&lt;&gt;(WebFetchers.getIdFetcherForIdentifier(DOI.class), stateManager, undoManager, dialogService, taskExecutor);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.addEventFilter(KeyEvent.KEY_PRESSED, event -&gt; {</b>
+<b class="nc">&nbsp;            if (event.getCode() == KeyCode.ENTER) {</b>
+<b class="nc">&nbsp;                getSelectedEntries().stream()</b>
+<b class="nc">&nbsp;                                    .findFirst()</b>
+<b class="nc">&nbsp;                                    .ifPresent(libraryTab::showAndEdit);</b>
+<b class="nc">&nbsp;                event.consume();</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Optional&lt;KeyBinding&gt; keyBinding = keyBindings.mapToKeyBinding(event);</b>
+<b class="nc">&nbsp;            if (keyBinding.isPresent()) {</b>
+<b class="nc">&nbsp;                switch (keyBinding.get()) {</b>
+&nbsp;                    case SELECT_FIRST_ENTRY:
+<b class="nc">&nbsp;                        clearAndSelectFirst();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    case SELECT_LAST_ENTRY:
+<b class="nc">&nbsp;                        clearAndSelectLast();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    case PASTE:
+<b class="nc">&nbsp;                        pasteAction.execute();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    case COPY:
+<b class="nc">&nbsp;                        copyAction.execute();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    case CUT:
+<b class="nc">&nbsp;                        cutAction.execute();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    case DELETE_ENTRY:
+<b class="nc">&nbsp;                        deleteAction.execute();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    case SCROLL_TO_NEXT_MATCH_CATEGORY:
+<b class="nc">&nbsp;                        scrollToNextMatchCategory();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    case SCROLL_TO_PREVIOUS_MATCH_CATEGORY:
+<b class="nc">&nbsp;                        scrollToPreviousMatchCategory();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    case OPEN_URL_OR_DOI:
+<b class="nc">&nbsp;                        openUrlAction.execute();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    case OPEN_FILE:
+<b class="nc">&nbsp;                        openSelectedEntriesFilesActionFileAction.execute();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    case MERGE_WITH_FETCHED_ENTRY:
+<b class="nc">&nbsp;                        mergeWithFetchedEntryAction.execute();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    case LOOKUP_DOC_IDENTIFIER:
+<b class="nc">&nbsp;                        lookupIdentifierAction.execute();</b>
+<b class="nc">&nbsp;                        event.consume();</b>
+&nbsp;                        break;
+&nbsp;                    default:
+&nbsp;                        // Pass other keys to parent
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearAndSelectFirst() {
+<b class="nc">&nbsp;        getSelectionModel().clearSelection();</b>
+<b class="nc">&nbsp;        getSelectionModel().selectFirst();</b>
+<b class="nc">&nbsp;        scrollTo(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearAndSelectLast() {
+<b class="nc">&nbsp;        getSelectionModel().clearSelection();</b>
+<b class="nc">&nbsp;        getSelectionModel().selectLast();</b>
+<b class="nc">&nbsp;        scrollTo(getItems().size() - 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragOver(TableRow&lt;BibEntryTableViewModel&gt; row, BibEntryTableViewModel item, DragEvent event) {
+<b class="nc">&nbsp;        if (event.getDragboard().hasFiles()) {</b>
+<b class="nc">&nbsp;            event.acceptTransferModes(TransferMode.ANY);</b>
+<b class="nc">&nbsp;            ControlHelper.setDroppingPseudoClasses(row, event);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragOverTableView(DragEvent event) {
+<b class="nc">&nbsp;        if (event.getDragboard().hasFiles()) {</b>
+<b class="nc">&nbsp;            event.acceptTransferModes(TransferMode.ANY);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragEntered(TableRow&lt;BibEntryTableViewModel&gt; row, BibEntryTableViewModel entry, MouseDragEvent event) {
+&nbsp;        // Support the following gesture to select entries: click on one row -&gt; hold mouse button -&gt; move over other rows
+&nbsp;        // We need to select all items between the starting row and the row where the user currently hovers the mouse over
+&nbsp;        // It is not enough to just select the currently hovered row since then sometimes rows are not marked selected if the user moves to fast
+&nbsp;        @SuppressWarnings(&quot;unchecked&quot;)
+<b class="nc">&nbsp;        TableRow&lt;BibEntryTableViewModel&gt; sourceRow = (TableRow&lt;BibEntryTableViewModel&gt;) event.getGestureSource();</b>
+<b class="nc">&nbsp;        getSelectionModel().selectRange(sourceRow.getIndex(), row.getIndex());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragExited(TableRow&lt;BibEntryTableViewModel&gt; row, BibEntryTableViewModel entry, DragEvent dragEvent) {
+<b class="nc">&nbsp;        ControlHelper.removeDroppingPseudoClasses(row);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragDetected(TableRow&lt;BibEntryTableViewModel&gt; row, BibEntryTableViewModel entry, MouseEvent event) {
+&nbsp;        // Start drag&#39;n&#39;drop
+<b class="nc">&nbsp;        row.startFullDrag();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = getSelectionModel().getSelectedItems().stream().map(BibEntryTableViewModel::getEntry).collect(Collectors.toList());</b>
+&nbsp;
+&nbsp;        ClipboardContent content;
+&nbsp;        try {
+<b class="nc">&nbsp;            content = clipboardContentGenerator.generate(entries, CitationStyleOutputFormat.HTML, database);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not generate clipboard content. Falling back to empty clipboard&quot;, e);</b>
+<b class="nc">&nbsp;            content = new ClipboardContent();</b>
+&nbsp;        }
+&nbsp;        // Required to be able to drop the entries inside JabRef
+<b class="nc">&nbsp;        content.put(DragAndDropDataFormats.ENTRIES, &quot;&quot;);</b>
+&nbsp;
+&nbsp;        // Drag&#39;n&#39;drop to other tabs use COPY TransferMode, drop to group sidepane use MOVE
+<b class="nc">&nbsp;        Dragboard dragboard = startDragAndDrop(TransferMode.COPY_OR_MOVE);</b>
+<b class="nc">&nbsp;        dragboard.setContent(content);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!entries.isEmpty()) {</b>
+<b class="nc">&nbsp;            localDragboard.putBibEntries(entries);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragDropped(TableRow&lt;BibEntryTableViewModel&gt; row, BibEntryTableViewModel target, DragEvent event) {
+<b class="nc">&nbsp;        boolean success = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (event.getDragboard().hasFiles()) {</b>
+<b class="nc">&nbsp;            List&lt;Path&gt; files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());</b>
+&nbsp;
+&nbsp;            // Depending on the pressed modifier, move/copy/link files to drop target
+&nbsp;            // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
+<b class="nc">&nbsp;            TransferMode transferMode = event.getTransferMode();</b>
+&nbsp;
+<b class="nc">&nbsp;            switch (ControlHelper.getDroppingMouseLocation(row, event)) {</b>
+&nbsp;                // Different actions depending on where the user releases the drop in the target row
+&nbsp;                // - Bottom + top -&gt; import entries
+&nbsp;                case TOP,
+&nbsp;                     BOTTOM -&gt;
+<b class="nc">&nbsp;                        importHandler.importFilesInBackground(files, database, filePreferences, transferMode).executeWith(taskExecutor);</b>
+&nbsp;                // - Center -&gt; modify entry: link files to entry
+&nbsp;                case CENTER -&gt; {
+<b class="nc">&nbsp;                    BibEntry entry = target.getEntry();</b>
+<b class="nc">&nbsp;                    ExternalFilesEntryLinker fileLinker = importHandler.getFileLinker();</b>
+<b class="nc">&nbsp;                    DragDrop.handleDropOfFiles(files, transferMode, fileLinker, entry);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            success = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        event.setDropCompleted(success);</b>
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleOnDragDroppedTableView(DragEvent event) {
+<b class="nc">&nbsp;        boolean success = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (event.getDragboard().hasFiles()) {</b>
+<b class="nc">&nbsp;            List&lt;Path&gt; files = event.getDragboard().getFiles().stream().map(File::toPath).toList();</b>
+<b class="nc">&nbsp;            importHandler</b>
+<b class="nc">&nbsp;                    .importFilesInBackground(files, this.database, filePreferences, event.getTransferMode())</b>
+<b class="nc">&nbsp;                    .executeWith(taskExecutor);</b>
+<b class="nc">&nbsp;            success = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        event.setDropCompleted(success);</b>
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addSelectionListener(ListChangeListener&lt;? super BibEntryTableViewModel&gt; listener) {
+<b class="nc">&nbsp;        getSelectionModel().getSelectedItems().addListener(listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MainTableDataModel getTableModel() {
+<b class="nc">&nbsp;        return model;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;BibEntry&gt; getSelectedEntries() {
+<b class="nc">&nbsp;        return getSelectionModel()</b>
+<b class="nc">&nbsp;                .getSelectedItems()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(BibEntryTableViewModel::getEntry)</b>
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;BibEntryTableViewModel&gt; findEntry(BibEntry entry) {
+<b class="nc">&nbsp;        return model.getViewModelByIndex(database.getDatabase().indexOf(entry));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;BibEntryTableViewModel&gt; findEntryByCitationKey(String citationKey) {
+<b class="nc">&nbsp;        return model.getViewModelByCitationKey(citationKey);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCitationMergeMode(boolean citationMerge) {
+<b class="nc">&nbsp;        this.citationMergeMode = citationMerge;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updatePlaceholder(VBox placeholderBox) {
+<b class="nc">&nbsp;        if (database.getDatabase().getEntries().isEmpty()) {</b>
+<b class="nc">&nbsp;            this.setPlaceholder(placeholderBox);</b>
+&nbsp;            // [impl-&gt;req~maintable.focus~1]
+<b class="nc">&nbsp;            requestFocus();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.setPlaceholder(null);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibEntry addExampleEntry() {
+<b class="nc">&nbsp;        BibEntry exampleEntry = new BibEntry(StandardEntryType.Article)</b>
+<b class="nc">&nbsp;                .withField(StandardField.AUTHOR, &quot;Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.TITLE, &quot;JabRef: BibTeX-based literature management software&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.JOURNAL, &quot;TUGboat&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.VOLUME, &quot;44&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.NUMBER, &quot;3&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.PAGES, &quot;441--447&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.DOI, &quot;10.47397/tb/44-3/tb138kopp-jabref&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.ISSN, &quot;0896-3207&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.ISSUE, &quot;138&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.YEAR, &quot;2023&quot;)</b>
+<b class="nc">&nbsp;                .withChanged(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        database.getDatabase().insertEntry(exampleEntry);</b>
+<b class="nc">&nbsp;        return exampleEntry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void importPdfs() {
+<b class="nc">&nbsp;        List&lt;Path&gt; fileDirectories = database.getFileDirectories(filePreferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fileDirectories.isEmpty()) {</b>
+<b class="nc">&nbsp;            dialogService.notify(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;File directory is not set or does not exist.&quot;)</b>
+&nbsp;            );
+<b class="nc">&nbsp;            LibraryPropertiesAction libraryPropertiesAction = new LibraryPropertiesAction(stateManager);</b>
+<b class="nc">&nbsp;            libraryPropertiesAction.execute();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        FindUnlinkedFilesAction findUnlinkedFilesAction = new FindUnlinkedFilesAction(dialogService, stateManager);</b>
+<b class="nc">&nbsp;        findUnlinkedFilesAction.execute();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

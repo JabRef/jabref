@@ -1,0 +1,514 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SemanticConflictDetector</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.git.conflicts</a>
+</div>
+
+<h1>Coverage Summary for Class: SemanticConflictDetector (org.jabref.logic.git.conflicts)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SemanticConflictDetector</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/124)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/128)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SemanticConflictDetector$EntryTriples</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/124)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/136)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.git.conflicts;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
+&nbsp;import org.jabref.logic.bibtex.comparator.BibEntryDiff;
+&nbsp;import org.jabref.logic.git.merge.MergePlan;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;import static com.google.common.collect.Sets.union;
+&nbsp;
+&nbsp;/// Detects semantic merge conflicts between base, local, and remote.
+&nbsp;///
+&nbsp;/// Strategy:
+&nbsp;/// Instead of computing full diffs from base to local/remote, we simulate a Git-style merge
+&nbsp;/// by applying the diff between base and remote onto local (`result := local + remoteDiff`).
+&nbsp;///
+&nbsp;/// Caveats:
+&nbsp;/// - Only entries with the same citation key are considered matching.
+&nbsp;/// - Entries without citation keys are currently ignored.
+&nbsp;/// - Changing a citation key is not supported and is treated as deletion + addition.
+<b class="nc">&nbsp;public class SemanticConflictDetector {</b>
+&nbsp;    public static List&lt;ThreeWayEntryConflict&gt; detectConflicts(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
+&nbsp;        // 1. get diffs between base, local and remote
+<b class="nc">&nbsp;        BibDatabaseDiff localDiff = BibDatabaseDiff.compare(base, local);</b>
+<b class="nc">&nbsp;        BibDatabaseDiff remoteDiff = BibDatabaseDiff.compare(base, remote);</b>
+&nbsp;
+&nbsp;        // 2. Union of all citationKeys that were changed (on either side)
+<b class="nc">&nbsp;        EntryTriples triples = EntryTriples.from(base, local, remote);</b>
+&nbsp;
+&nbsp;        // 3. Build a map from citationKey -&gt; BibEntryDiff for both local and remote diffs
+<b class="nc">&nbsp;        Map&lt;String, BibEntryDiff&gt; localDiffMap = indexByCitationKey(localDiff.getEntryDifferences());</b>
+<b class="nc">&nbsp;        Map&lt;String, BibEntryDiff&gt; remoteDiffMap = indexByCitationKey(remoteDiff.getEntryDifferences());</b>
+<b class="nc">&nbsp;        Set&lt;String&gt; allKeys = union(localDiffMap.keySet(), remoteDiffMap.keySet());</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;ThreeWayEntryConflict&gt; conflicts = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // 4. Build full 3-way entry maps (key -&gt; entry) from each database
+<b class="nc">&nbsp;        for (String key : allKeys) {</b>
+<b class="nc">&nbsp;            BibEntry baseEntry = triples.baseMap.get(key);</b>
+<b class="nc">&nbsp;            BibEntry localEntry = resolveEntry(key, localDiffMap.get(key), triples.localMap);</b>
+<b class="nc">&nbsp;            BibEntry remoteEntry = resolveEntry(key, remoteDiffMap.get(key), triples.remoteMap);</b>
+&nbsp;
+&nbsp;            // 5. If this triplet results in a conflict, collect it
+<b class="nc">&nbsp;            detectEntryConflict(baseEntry, localEntry, remoteEntry).ifPresent(conflicts::add);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return conflicts;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Detect entry-level conflicts among base, local, and remote versions of an entry.
+&nbsp;     * &lt;p&gt;
+&nbsp;     *
+&nbsp;     * @param base   the entry in the common ancestor
+&nbsp;     * @param local  the entry in the local version
+&nbsp;     * @param remote the entry in the remote version
+&nbsp;     * @return optional conflict (if detected)
+&nbsp;     */
+&nbsp;    private static Optional&lt;ThreeWayEntryConflict&gt; detectEntryConflict(BibEntry base,
+&nbsp;                                                                       BibEntry local,
+&nbsp;                                                                       BibEntry remote) {
+&nbsp;        // Case 1: Both local and remote added same citation key -&gt; compare their fields
+<b class="nc">&nbsp;        if (base == null &amp;&amp; local != null &amp;&amp; remote != null) {</b>
+<b class="nc">&nbsp;            if (hasConflictingFields(new BibEntry(), local, remote)) {</b>
+<b class="nc">&nbsp;                return Optional.of(new ThreeWayEntryConflict(null, local, remote));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Case 2: base exists, one side deleted, other modified -&gt; conflict
+<b class="nc">&nbsp;        if (base != null) {</b>
+<b class="nc">&nbsp;            boolean localDeleted = local == null;</b>
+<b class="nc">&nbsp;            boolean remoteDeleted = remote == null;</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean localChanged = !localDeleted &amp;&amp; !base.getFieldMap().equals(local.getFieldMap());</b>
+<b class="nc">&nbsp;            boolean remoteChanged = !remoteDeleted &amp;&amp; !base.getFieldMap().equals(remote.getFieldMap());</b>
+&nbsp;
+<b class="nc">&nbsp;            if ((localChanged &amp;&amp; remoteDeleted) || (remoteChanged &amp;&amp; localDeleted)) {</b>
+<b class="nc">&nbsp;                return Optional.of(new ThreeWayEntryConflict(base, local, remote));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Case 3: base exists, both sides modified the entry -&gt; check field-level diff
+<b class="nc">&nbsp;        if (base != null &amp;&amp; local != null &amp;&amp; remote != null) {</b>
+<b class="nc">&nbsp;            boolean localChanged = !base.getFieldMap().equals(local.getFieldMap());</b>
+<b class="nc">&nbsp;            boolean remoteChanged = !base.getFieldMap().equals(remote.getFieldMap());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (localChanged &amp;&amp; remoteChanged &amp;&amp; hasConflictingFields(base, local, remote)) {</b>
+<b class="nc">&nbsp;                return Optional.of(new ThreeWayEntryConflict(base, local, remote));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasConflictingFields(BibEntry base, BibEntry local, BibEntry remote) {
+<b class="nc">&nbsp;        if (entryTypeChangedDifferently(base, local, remote)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;Field&gt; allFields = Stream.of(base, local, remote)</b>
+<b class="nc">&nbsp;                                     .flatMap(entry -&gt; entry.getFields().stream())</b>
+<b class="nc">&nbsp;                                     .collect(Collectors.toSet());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Field field : allFields) {</b>
+<b class="nc">&nbsp;            String baseVal = base.getField(field).orElse(null);</b>
+<b class="nc">&nbsp;            String localVal = local.getField(field).orElse(null);</b>
+<b class="nc">&nbsp;            String remoteVal = remote.getField(field).orElse(null);</b>
+&nbsp;
+&nbsp;            // Case 1: Both local and remote modified the same field from base, and the values differ
+<b class="nc">&nbsp;            if (modifiedOnBothSidesWithDisagreement(baseVal, localVal, remoteVal)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Case 2: One side deleted the field, the other side modified it
+<b class="nc">&nbsp;            if (oneSideDeletedOneSideModified(baseVal, localVal, remoteVal)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Case 3: Both sides added the field with different values
+<b class="nc">&nbsp;            if (addedOnBothSidesWithDisagreement(baseVal, localVal, remoteVal)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean entryTypeChangedDifferently(BibEntry base, BibEntry local, BibEntry remote) {
+<b class="nc">&nbsp;        if (base == null || local == null || remote == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean localChanged = !base.getType().equals(local.getType());</b>
+<b class="nc">&nbsp;        boolean remoteChanged = !base.getType().equals(remote.getType());</b>
+<b class="nc">&nbsp;        boolean changedToDifferentTypes = !local.getType().equals(remote.getType());</b>
+&nbsp;
+<b class="nc">&nbsp;        return localChanged &amp;&amp; remoteChanged &amp;&amp; changedToDifferentTypes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean modifiedOnBothSidesWithDisagreement(String baseVal, String localVal, String remoteVal) {
+<b class="nc">&nbsp;        return notEqual(baseVal, localVal) &amp;&amp; notEqual(baseVal, remoteVal) &amp;&amp; notEqual(localVal, remoteVal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean oneSideDeletedOneSideModified(String baseVal, String localVal, String remoteVal) {
+<b class="nc">&nbsp;        if (localVal == null &amp;&amp; remoteVal == null) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return (baseVal != null)</b>
+<b class="nc">&nbsp;                &amp;&amp; ((localVal == null &amp;&amp; notEqual(baseVal, remoteVal))</b>
+<b class="nc">&nbsp;                || (remoteVal == null &amp;&amp; notEqual(baseVal, localVal)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean addedOnBothSidesWithDisagreement(String baseVal, String localVal, String remoteVal) {
+<b class="nc">&nbsp;        return baseVal == null &amp;&amp; localVal != null &amp;&amp; remoteVal != null &amp;&amp; notEqual(localVal, remoteVal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean notEqual(String a, String b) {
+<b class="nc">&nbsp;        return !Objects.equals(a, b);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compares base and remote, finds all semantic-level changes (new entries, updated fields), and builds a patch plan.
+&nbsp;     * This plan is meant to be applied to local during merge:
+&nbsp;     * result = local + (remote − base)
+&nbsp;     *
+&nbsp;     * @param base   The base version of the database.
+&nbsp;     * @param remote The remote version to be merged.
+&nbsp;     * @return A {@link MergePlan} describing how to update the local copy with remote changes.
+&nbsp;     */
+&nbsp;    public static MergePlan extractMergePlan(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
+<b class="nc">&nbsp;        EntryTriples triples = EntryTriples.from(base, local, remote);</b>
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, Map&lt;Field, String&gt;&gt; fieldPatches = new LinkedHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; newEntries = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, BibEntry&gt; remoteEntryPair : triples.remoteMap.entrySet()) {</b>
+<b class="nc">&nbsp;            String key = remoteEntryPair.getKey();</b>
+<b class="nc">&nbsp;            BibEntry remoteEntry = remoteEntryPair.getValue();</b>
+<b class="nc">&nbsp;            BibEntry baseEntry = triples.baseMap.get(key);</b>
+<b class="nc">&nbsp;            BibEntry localEntry = triples.localMap.get(key);</b>
+&nbsp;
+&nbsp;            // Case 1: Both sides added the same key, if there is no disagreement on overlapping fields -&gt; add as a union
+<b class="nc">&nbsp;            if (baseEntry == null &amp;&amp; localEntry != null) {</b>
+<b class="nc">&nbsp;                if (!hasOverlappingFieldDisagreement(localEntry, remoteEntry)) {</b>
+<b class="nc">&nbsp;                    newEntries.add(unionEntry(localEntry, remoteEntry));</b>
+&nbsp;                }
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+&nbsp;            // Case 2: Added only on the remote side
+<b class="nc">&nbsp;            if (baseEntry == null &amp;&amp; localEntry == null) {</b>
+<b class="nc">&nbsp;                newEntries.add(remoteEntry);</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+&nbsp;            // Case 3: Base exists — generate patches that apply only where local kept the base value
+<b class="nc">&nbsp;            if (baseEntry != null) {</b>
+<b class="nc">&nbsp;                Map&lt;Field, String&gt; patch = computeFieldPatch(baseEntry, localEntry, remoteEntry);</b>
+<b class="nc">&nbsp;                if (!patch.isEmpty()) {</b>
+<b class="nc">&nbsp;                    fieldPatches.put(key, patch);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new MergePlan(fieldPatches, newEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compares base and remote and constructs a patch at the field level. null == the field is deleted.
+&nbsp;     * - Apply remote change when local kept base value (including deletions: null);
+&nbsp;     * - If both sides changed to the same value, no patch needed;
+&nbsp;     * - Fallback: if a divergence is still observed, do not override local; skip this field,
+&nbsp;     *
+&nbsp;     * @param base   base version
+&nbsp;     * @param local  local version
+&nbsp;     * @param remote remote version
+&nbsp;     * @return A map from field to new value
+&nbsp;     */
+&nbsp;    private static Map&lt;Field, String&gt; computeFieldPatch(BibEntry base, BibEntry local, BibEntry remote) {
+<b class="nc">&nbsp;        Map&lt;Field, String&gt; patch = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (remote == null) {</b>
+<b class="nc">&nbsp;            return patch;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Stream.concat(base.getFields().stream(), remote.getFields().stream())</b>
+<b class="nc">&nbsp;              .distinct()</b>
+<b class="nc">&nbsp;              .filter(field -&gt; !isMetaField(field))</b>
+<b class="nc">&nbsp;              .forEach(field -&gt; {</b>
+<b class="nc">&nbsp;                  String baseValue = base.getField(field).orElse(null);</b>
+<b class="nc">&nbsp;                  String remoteValue = remote.getField(field).orElse(null);</b>
+<b class="nc">&nbsp;                  String localValue = local == null ? null : local.getField(field).orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;                  if (Objects.equals(baseValue, remoteValue)) {</b>
+&nbsp;                      return;
+&nbsp;                  }
+<b class="nc">&nbsp;                  if (Objects.equals(localValue, baseValue)) {</b>
+<b class="nc">&nbsp;                      patch.put(field, remoteValue);</b>
+&nbsp;                      return;
+&nbsp;                  }
+<b class="nc">&nbsp;                  if (Objects.equals(localValue, remoteValue)) {</b>
+&nbsp;                      return;
+&nbsp;                  }
+&nbsp;              });
+<b class="nc">&nbsp;        return patch;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts a List of BibEntryDiff into a Map where the key is the citation key,
+&nbsp;     * and the value is the corresponding BibEntryDiff.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Notes:
+&nbsp;     * - Only entries with a citation key are included (entries without a key cannot be uniquely identified during merge).
+&nbsp;     * - Entries that represent additions (base == null) or deletions (new == null) are also included.
+&nbsp;     * - If multiple BibEntryDiffs share the same citation key (rare), the latter one will overwrite the former.
+&nbsp;     * &lt;p&gt;
+&nbsp;     *
+&nbsp;     * @param entryDiffs A list of entry diffs produced by BibDatabaseDiff
+&nbsp;     * @return A map from citation key to corresponding BibEntryDiff
+&nbsp;     */
+&nbsp;    private static Map&lt;String, BibEntryDiff&gt; indexByCitationKey(List&lt;BibEntryDiff&gt; entryDiffs) {
+<b class="nc">&nbsp;        Map&lt;String, BibEntryDiff&gt; result = new LinkedHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntryDiff diff : entryDiffs) {</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; citationKey = Optional.ofNullable(diff.newEntry())</b>
+<b class="nc">&nbsp;                                                   .flatMap(BibEntry::getCitationKey)</b>
+<b class="nc">&nbsp;                                                   .or(() -&gt; Optional.ofNullable(diff.originalEntry())</b>
+<b class="nc">&nbsp;                                                                     .flatMap(BibEntry::getCitationKey));</b>
+<b class="nc">&nbsp;            citationKey.ifPresent(key -&gt; result.put(key, diff));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Map&lt;String, BibEntry&gt; getCitationKeyToEntryMap(BibDatabaseContext context) {
+<b class="nc">&nbsp;        return context.getDatabase().getEntries().stream()</b>
+<b class="nc">&nbsp;                      .filter(entry -&gt; entry.getCitationKey().isPresent())</b>
+<b class="nc">&nbsp;                      .collect(Collectors.toMap(</b>
+<b class="nc">&nbsp;                              entry -&gt; entry.getCitationKey().get(),</b>
+<b class="nc">&nbsp;                              Function.identity(),</b>
+<b class="nc">&nbsp;                              (existing, replacement) -&gt; replacement,</b>
+&nbsp;                              LinkedHashMap::new
+&nbsp;                      ));
+&nbsp;    }
+&nbsp;
+&nbsp;    private static BibEntry resolveEntry(String key, BibEntryDiff diff, Map&lt;String, BibEntry&gt; fullMap) {
+<b class="nc">&nbsp;        if (diff == null) {</b>
+<b class="nc">&nbsp;            return fullMap.get(key);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return diff.newEntry();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasOverlappingFieldDisagreement(BibEntry left, BibEntry right) {
+<b class="nc">&nbsp;        Set&lt;Field&gt; overlap = new LinkedHashSet&lt;&gt;(left.getFields());</b>
+<b class="nc">&nbsp;        overlap.retainAll(right.getFields());</b>
+<b class="nc">&nbsp;        overlap.removeIf(SemanticConflictDetector::isMetaField);</b>
+<b class="nc">&nbsp;        for (Field overlappingField : overlap) {</b>
+<b class="nc">&nbsp;            String leftFieldValue = left.getField(overlappingField).orElse(null);</b>
+<b class="nc">&nbsp;            String rightFieldValue = right.getField(overlappingField).orElse(null);</b>
+<b class="nc">&nbsp;            if (!leftFieldValue.equals(rightFieldValue)) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static BibEntry unionEntry(BibEntry localAdded, BibEntry remoteAdded) {
+<b class="nc">&nbsp;        BibEntry merged = new BibEntry(localAdded);</b>
+<b class="nc">&nbsp;        for (Field field : remoteAdded.getFields()) {</b>
+<b class="nc">&nbsp;            if (isMetaField(field)) {</b>
+&nbsp;                continue;
+&nbsp;            }
+<b class="nc">&nbsp;            if (merged.getField(field).isEmpty()) {</b>
+<b class="nc">&nbsp;                merged.setField(field, remoteAdded.getField(field).get());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return merged;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isMetaField(Field f) {
+<b class="nc">&nbsp;        String name = f.getName();</b>
+<b class="nc">&nbsp;        return name.startsWith(&quot;_&quot;) || &quot;_jabref_shared&quot;.equalsIgnoreCase(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static final class EntryTriples {
+&nbsp;        final Map&lt;String, BibEntry&gt; baseMap;
+&nbsp;        final Map&lt;String, BibEntry&gt; localMap;
+&nbsp;        final Map&lt;String, BibEntry&gt; remoteMap;
+&nbsp;
+&nbsp;        private EntryTriples(Map&lt;String, BibEntry&gt; baseMap,
+&nbsp;                             Map&lt;String, BibEntry&gt; localMap,
+<b class="nc">&nbsp;                             Map&lt;String, BibEntry&gt; remoteMap) {</b>
+<b class="nc">&nbsp;            this.baseMap = baseMap;</b>
+<b class="nc">&nbsp;            this.localMap = localMap;</b>
+<b class="nc">&nbsp;            this.remoteMap = remoteMap;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        static EntryTriples from(BibDatabaseContext base,
+&nbsp;                                 BibDatabaseContext local,
+&nbsp;                                 BibDatabaseContext remote) {
+<b class="nc">&nbsp;            return new EntryTriples(</b>
+<b class="nc">&nbsp;                    getCitationKeyToEntryMap(base),</b>
+<b class="nc">&nbsp;                    getCitationKeyToEntryMap(local),</b>
+<b class="nc">&nbsp;                    getCitationKeyToEntryMap(remote)</b>
+&nbsp;            );
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

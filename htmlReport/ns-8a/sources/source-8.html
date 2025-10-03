@@ -1,0 +1,125 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > VisibleComponent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough.declarative.step</a>
+</div>
+
+<h1>Coverage Summary for Class: VisibleComponent (org.jabref.gui.walkthrough.declarative.step)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">VisibleComponent</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough.declarative.step;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.OptionalDouble;
+&nbsp;
+&nbsp;import org.jabref.gui.walkthrough.declarative.NodeResolver;
+&nbsp;import org.jabref.gui.walkthrough.declarative.Trigger;
+&nbsp;import org.jabref.gui.walkthrough.declarative.WindowResolver;
+&nbsp;import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
+&nbsp;import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
+&nbsp;
+&nbsp;/// Walkthrough steps that display visible UI elements.
+&nbsp;public sealed interface VisibleComponent extends WalkthroughStep permits PanelStep, TooltipStep {
+&nbsp;    /// Content blocks to display
+&nbsp;    List&lt;WalkthroughRichTextBlock&gt; content();
+&nbsp;
+&nbsp;    /// Node resolver for the node to highlight / tooltip to position / etc.
+&nbsp;    Optional&lt;NodeResolver&gt; nodeResolver();
+&nbsp;
+&nbsp;    /// Custom text for the continue button.
+&nbsp;    /// - If [Optional#empty()], no continue button is shown.
+&nbsp;    /// - If present, the button will be shown with the provided text.
+&nbsp;    Optional&lt;String&gt; continueButtonText();
+&nbsp;
+&nbsp;    /// Custom text for the skip button.
+&nbsp;    /// - If [Optional#empty()], no skip button is shown.
+&nbsp;    /// - If present, the button will be shown with the provided text.
+&nbsp;    Optional&lt;String&gt; skipButtonText();
+&nbsp;
+&nbsp;    /// Custom text for the back button.
+&nbsp;    /// - If [Optional#empty()], no back button is shown.
+&nbsp;    /// - If present, the button will be shown with the provided text.
+&nbsp;    Optional&lt;String&gt; backButtonText();
+&nbsp;
+&nbsp;    /// Navigation predicate that determines when to advance by attaching to the UI
+&nbsp;    /// elements that could trigger navigation.
+&nbsp;    Optional&lt;Trigger&gt; trigger();
+&nbsp;
+&nbsp;    /// Maximum width for the display element.
+&nbsp;    OptionalDouble maxWidth();
+&nbsp;
+&nbsp;    /// Maximum height for the display element.
+&nbsp;    OptionalDouble maxHeight();
+&nbsp;
+&nbsp;    /// Highlight effect to apply.
+&nbsp;    Optional&lt;WalkthroughEffect&gt; highlight();
+&nbsp;
+&nbsp;    /// Window resolver for targeting specific windows.
+&nbsp;    Optional&lt;WindowResolver&gt; windowResolver();
+&nbsp;
+&nbsp;    /// Whether to show the quit button.
+&nbsp;    boolean showQuitButton();
+&nbsp;
+&nbsp;    /// Position of the quit button.
+&nbsp;    QuitButtonPosition quitButtonPosition();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

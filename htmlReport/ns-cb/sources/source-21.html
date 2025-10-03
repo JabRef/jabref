@@ -1,0 +1,322 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LOBIDFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: LOBIDFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LOBIDFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/97)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.IntStream;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.IdBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.fetcher.transformers.LOBIDQueryTransformer;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fetches data from the LOBID API
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;https://lobid.org/resources/api&quot;&gt;API documentation&lt;/a&gt; for more details
+&nbsp; */
+<b class="nc">&nbsp;public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParserFetcher {</b>
+&nbsp;
+&nbsp;    public static final String FETCHER_NAME = &quot;LOBID&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LOBIDFetcher.class);</b>
+&nbsp;
+&nbsp;    private static final String API_URL = &quot;https://lobid.org/resources/search&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the query URL
+&nbsp;     *
+&nbsp;     * @param queryNode  the first parsed node
+&nbsp;     * @param pageNumber the number of the page indexed from 0
+&nbsp;     * @return URL
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(API_URL);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;q&quot;, new LOBIDQueryTransformer().transformSearchQuery(queryNode).orElse(&quot;&quot;)); // search query</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;from&quot;, String.valueOf(getPageSize() * pageNumber)); // from entry number, starts indexing at 0</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;size&quot;, String.valueOf(getPageSize()));</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;format&quot;, &quot;json&quot;);</b>
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(API_URL);</b>
+&nbsp;        // We try to search by isbn field
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;q&quot;, &quot;isbn:&quot; + identifier);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;sort&quot;, &quot;newest&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;format&quot;, &quot;json&quot;);</b>
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return inputStream -&gt; {</b>
+<b class="nc">&nbsp;            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));</b>
+<b class="nc">&nbsp;            JSONObject jsonObject = new JSONObject(response);</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; entries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            if (jsonObject.has(&quot;member&quot;)) {</b>
+<b class="nc">&nbsp;                JSONArray results = jsonObject.getJSONArray(&quot;member&quot;);</b>
+<b class="nc">&nbsp;                for (int i = 0; i &lt; results.length(); i++) {</b>
+<b class="nc">&nbsp;                    JSONObject jsonEntry = results.getJSONObject(i);</b>
+<b class="nc">&nbsp;                    BibEntry entry = parseJSONtoBibtex(jsonEntry);</b>
+<b class="nc">&nbsp;                    entries.add(entry);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return entries;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibEntry parseJSONtoBibtex(JSONObject jsonEntry) {
+<b class="nc">&nbsp;        BibEntry entry = new BibEntry();</b>
+<b class="nc">&nbsp;        Field nametype = StandardField.JOURNAL;</b>
+<b class="nc">&nbsp;        EntryType entryType = StandardEntryType.InCollection;</b>
+&nbsp;
+&nbsp;        // publication type
+<b class="nc">&nbsp;        JSONArray typeArray = jsonEntry.optJSONArray(&quot;type&quot;);</b>
+<b class="nc">&nbsp;        String types = &quot;&quot;;</b>
+<b class="nc">&nbsp;        if (typeArray != null) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; typeList = IntStream.range(0, typeArray.length())</b>
+<b class="nc">&nbsp;                                             .mapToObj(typeArray::optString)</b>
+<b class="nc">&nbsp;                                             .filter(type -&gt; !type.isEmpty())</b>
+<b class="nc">&nbsp;                                             .toList();</b>
+<b class="nc">&nbsp;            types = String.join(&quot;, &quot;, typeList);</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.TYPE, types);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (types.toLowerCase().contains(&quot;book&quot;)) {</b>
+<b class="nc">&nbsp;            entryType = StandardEntryType.Book;</b>
+<b class="nc">&nbsp;            nametype = StandardField.BOOKTITLE;</b>
+<b class="nc">&nbsp;        } else if (types.toLowerCase().contains(&quot;article&quot;)) {</b>
+<b class="nc">&nbsp;            entryType = StandardEntryType.Article;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        entry.setType(entryType);</b>
+&nbsp;
+&nbsp;        // isbn
+<b class="nc">&nbsp;        String isbn = getFirstArrayElement(jsonEntry, &quot;isbn&quot;);</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.ISBN, isbn);</b>
+&nbsp;
+&nbsp;        // parent resource
+<b class="nc">&nbsp;        String bibliographicCitation = jsonEntry.optString(&quot;bibliographicCitation&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;        String[] bibSplit = bibliographicCitation.split(&quot;/&quot;);</b>
+<b class="nc">&nbsp;        String parentResource = &quot;&quot;;</b>
+<b class="nc">&nbsp;        if (bibSplit.length &gt; 0) {</b>
+<b class="nc">&nbsp;            parentResource = bibSplit[0].trim();</b>
+<b class="nc">&nbsp;            entry.setField(nametype, parentResource);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        entry.setField(StandardField.ISSN, getFirstArrayElement(jsonEntry, &quot;issn&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.TITLE, jsonEntry.optString(&quot;title&quot;, &quot;&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.ABSTRACT, getFirstArrayElement(jsonEntry, &quot;note&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.TITLEADDON, getFirstArrayElement(jsonEntry, &quot;otherTitleInformation&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.EDITION, getFirstArrayElement(jsonEntry, &quot;edition&quot;));</b>
+&nbsp;
+&nbsp;        // authors
+<b class="nc">&nbsp;        JSONArray authors = jsonEntry.optJSONArray(&quot;contribution&quot;);</b>
+<b class="nc">&nbsp;        if (authors != null) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; authorNames = getAuthorNames(authors);</b>
+<b class="nc">&nbsp;            if (!authors.isEmpty()) {</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.AUTHOR, String.join(&quot; and &quot;, authorNames));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // publication
+<b class="nc">&nbsp;        Optional.ofNullable(jsonEntry.optJSONArray(&quot;publication&quot;))</b>
+<b class="nc">&nbsp;                .map(array -&gt; array.getJSONObject(0))</b>
+<b class="nc">&nbsp;                .ifPresent(publication -&gt; {</b>
+<b class="nc">&nbsp;                    entry.setField(StandardField.PUBLISHER, getFirstArrayElement(publication, &quot;publishedBy&quot;));</b>
+<b class="nc">&nbsp;                    entry.setField(StandardField.LOCATION, getFirstArrayElement(publication, &quot;location&quot;));</b>
+<b class="nc">&nbsp;                    String date = publication.optString(&quot;startDate&quot;);</b>
+<b class="nc">&nbsp;                    entry.setField(StandardField.DATE, date);</b>
+<b class="nc">&nbsp;                    entry.setField(StandardField.YEAR, date);</b>
+&nbsp;                });
+&nbsp;
+&nbsp;        // url
+<b class="nc">&nbsp;        JSONObject describedBy = jsonEntry.optJSONObject(&quot;describedBy&quot;);</b>
+<b class="nc">&nbsp;        if (describedBy != null) {</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.URL, describedBy.optString(&quot;id&quot;));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // language
+<b class="nc">&nbsp;        JSONArray languageArray = jsonEntry.optJSONArray(&quot;language&quot;);</b>
+<b class="nc">&nbsp;        if (languageArray != null) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; languageList = IntStream.range(0, languageArray.length())</b>
+<b class="nc">&nbsp;                                                 .mapToObj(languageArray::getJSONObject)</b>
+<b class="nc">&nbsp;                                                 .filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;                                                 .map(language -&gt; language.optString(&quot;label&quot;))</b>
+<b class="nc">&nbsp;                                                 .toList();</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.LANGUAGE, String.join(&quot; and &quot;, languageList));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // keywords
+<b class="nc">&nbsp;        JSONArray keywordArray = jsonEntry.optJSONArray(&quot;subjectslabels&quot;);</b>
+<b class="nc">&nbsp;        if (keywordArray != null) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; keywordList = IntStream.range(0, keywordArray.length())</b>
+<b class="nc">&nbsp;                                                .mapToObj(keywordArray::optString)</b>
+<b class="nc">&nbsp;                                                .filter(keyword -&gt; !keyword.isEmpty())</b>
+<b class="nc">&nbsp;                                                .toList();</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.KEYWORDS, String.join(&quot;, &quot;, keywordList));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;String&gt; getAuthorNames(JSONArray authors) {
+<b class="nc">&nbsp;        return IntStream.range(0, authors.length())</b>
+<b class="nc">&nbsp;                        .mapToObj(authors::getJSONObject)</b>
+<b class="nc">&nbsp;                        .map(author -&gt; author.optJSONObject(&quot;agent&quot;))</b>
+<b class="nc">&nbsp;                        .filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;                        .map(agent -&gt; agent.optString(&quot;label&quot;))</b>
+<b class="nc">&nbsp;                        .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getFirstArrayElement(JSONObject jsonEntry, String key) {
+<b class="nc">&nbsp;        return Optional.ofNullable(jsonEntry.optJSONArray(key))</b>
+<b class="nc">&nbsp;                       .map(array -&gt; array.getString(0))</b>
+<b class="nc">&nbsp;                       .orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return FETCHER_NAME;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

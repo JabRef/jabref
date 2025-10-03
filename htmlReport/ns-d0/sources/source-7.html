@@ -1,0 +1,980 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CitaviXmlImporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: CitaviXmlImporter (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CitaviXmlImporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/195)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/356)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CitaviXmlImporter$QuotationTypeMapping</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/195)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/369)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.StandardCopyOption;
+&nbsp;import java.nio.file.StandardOpenOption;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.StringJoiner;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.zip.ZipEntry;
+&nbsp;import java.util.zip.ZipInputStream;
+&nbsp;
+&nbsp;import javax.xml.stream.XMLInputFactory;
+&nbsp;import javax.xml.stream.XMLStreamConstants;
+&nbsp;import javax.xml.stream.XMLStreamException;
+&nbsp;import javax.xml.stream.XMLStreamReader;
+&nbsp;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.fileformat.citavi.KnowledgeItem;
+&nbsp;import org.jabref.logic.importer.fileformat.citavi.Reference;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Keyword;
+&nbsp;import org.jabref.model.entry.KeywordList;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.IEEETranEntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.apache.commons.io.ByteOrderMark;
+&nbsp;import org.apache.commons.io.input.BOMInputStream;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class CitaviXmlImporter extends Importer implements Parser {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(CitaviXmlImporter.class);</b>
+&nbsp;    private static final byte UUID_LENGTH = 36;
+&nbsp;    private static final byte UUID_SEMICOLON_OFFSET_INDEX = 37;
+&nbsp;    private static final int END_TAG_CHARACTER_COUNT = 5; // &lt;/os&gt; or &lt;/ps&gt;
+<b class="nc">&nbsp;    private static final EnumSet&lt;QuotationTypeMapping&gt; QUOTATION_TYPES = EnumSet.allOf(QuotationTypeMapping.class);</b>
+<b class="nc">&nbsp;    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();</b>
+<b class="nc">&nbsp;    private final NormalizePagesFormatter pagesFormatter = new NormalizePagesFormatter();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;String, Author&gt; knownPersons = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;String, Keyword&gt; knownKeywords = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;String, String&gt; knownPublishers = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final List&lt;Reference&gt; references = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final List&lt;KnowledgeItem&gt; knowledgeItems = new ArrayList&lt;&gt;();</b>
+&nbsp;    private final XMLInputFactory xmlInputFactory;
+<b class="nc">&nbsp;    private final Map&lt;String, List&lt;String&gt;&gt; refIdWithAuthorIds = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;String, List&lt;String&gt;&gt; refIdWithEditorIds = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;String, List&lt;String&gt;&gt; refIdWithKeywordsIds = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;String, List&lt;String&gt;&gt; refIdWithPublisherIds = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    public CitaviXmlImporter() {</b>
+<b class="nc">&nbsp;        xmlInputFactory = XMLInputFactory.newFactory();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;Citavi XML&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StandardFileType getFileType() {
+<b class="nc">&nbsp;        return StandardFileType.CITAVI;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return &quot;citavi&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Importer for the Citavi XML format.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(reader);</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isRecognizedFormat(Path filePath) throws IOException {
+<b class="nc">&nbsp;        try (BufferedReader reader = getReaderFromZip(filePath)) {</b>
+&nbsp;            String str;
+<b class="nc">&nbsp;            int i = 0;</b>
+<b class="nc">&nbsp;            while (((str = reader.readLine()) != null) &amp;&amp; (i &lt; 50)) {</b>
+<b class="nc">&nbsp;                if (str.toLowerCase(Locale.ROOT).contains(&quot;citaviexchangedata&quot;)) {</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                i++;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(Path filePath) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(filePath);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (BufferedReader reader = getReaderFromZip(filePath)) {</b>
+<b class="nc">&nbsp;            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (xmlStreamReader.hasNext()) {</b>
+<b class="nc">&nbsp;                xmlStreamReader.next();</b>
+<b class="nc">&nbsp;                if (xmlStreamReader.isStartElement()) {</b>
+<b class="nc">&nbsp;                    String elementName = xmlStreamReader.getLocalName();</b>
+<b class="nc">&nbsp;                    if (&quot;CitaviExchangeData&quot;.equals(elementName)) {</b>
+<b class="nc">&nbsp;                        parseCitaviData(xmlStreamReader);</b>
+<b class="nc">&nbsp;                        List&lt;BibEntry&gt; bibItems = buildBibItems();</b>
+<b class="nc">&nbsp;                        return new ParserResult(bibItems);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (XMLStreamException e) {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;could not parse document&quot;, e);</b>
+<b class="nc">&nbsp;            return ParserResult.fromError(e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return ParserResult.fromErrorMessage(&quot;Could not find root element&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseCitaviData(XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            switch (event) {</b>
+&nbsp;                case XMLStreamConstants.START_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    String startElementName = reader.getLocalName();</b>
+<b class="nc">&nbsp;                    switch (startElementName) {</b>
+&nbsp;                        case &quot;Persons&quot; -&gt;
+<b class="nc">&nbsp;                                parsePersons(reader);</b>
+&nbsp;                        case &quot;Keywords&quot; -&gt;
+<b class="nc">&nbsp;                                parseKeywords(reader);</b>
+&nbsp;                        case &quot;Publishers&quot; -&gt;
+<b class="nc">&nbsp;                                parsePublishers(reader);</b>
+&nbsp;                        case &quot;References&quot; -&gt;
+<b class="nc">&nbsp;                                parseReferences(reader);</b>
+&nbsp;                        case &quot;KnowledgeItems&quot; -&gt;
+<b class="nc">&nbsp;                                parseKnowledgeItems(reader);</b>
+&nbsp;                        case &quot;ReferenceAuthors&quot; -&gt;
+<b class="nc">&nbsp;                                parseReferenceIdLink(reader, &quot;ReferenceAuthors&quot;, refIdWithAuthorIds);</b>
+&nbsp;                        case &quot;ReferenceKeywords&quot; -&gt;
+<b class="nc">&nbsp;                                parseReferenceIdLink(reader, &quot;ReferenceKeywords&quot;, refIdWithKeywordsIds);</b>
+&nbsp;                        case &quot;ReferencePublishers&quot; -&gt;
+<b class="nc">&nbsp;                                parseReferenceIdLink(reader, &quot;ReferencePublishers&quot;, refIdWithPublisherIds);</b>
+&nbsp;                        case &quot;ReferenceEditors&quot; -&gt;
+<b class="nc">&nbsp;                                parseReferenceIdLink(reader, &quot;ReferenceEditors&quot;, refIdWithEditorIds);</b>
+&nbsp;                        default -&gt;
+<b class="nc">&nbsp;                                consumeElement(reader);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case XMLStreamConstants.END_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    String endElementName = reader.getLocalName();</b>
+<b class="nc">&nbsp;                    if (&quot;CitaviExchangeData&quot;.equals(endElementName)) {</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parsePersons(XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            switch (event) {</b>
+&nbsp;                case XMLStreamConstants.START_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;Person&quot;.equals(reader.getLocalName())) {</b>
+<b class="nc">&nbsp;                        parsePerson(reader);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case XMLStreamConstants.END_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;Persons&quot;.equals(reader.getLocalName())) {</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parsePerson(XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        String id = reader.getAttributeValue(null, &quot;id&quot;);</b>
+<b class="nc">&nbsp;        String firstName = null;</b>
+<b class="nc">&nbsp;        String lastName = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            switch (event) {</b>
+&nbsp;                case XMLStreamConstants.START_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    String elementName = reader.getLocalName();</b>
+<b class="nc">&nbsp;                    if (&quot;FirstName&quot;.equals(elementName)) {</b>
+<b class="nc">&nbsp;                        firstName = reader.getElementText();</b>
+<b class="nc">&nbsp;                    } else if (&quot;LastName&quot;.equals(elementName)) {</b>
+<b class="nc">&nbsp;                        lastName = reader.getElementText();</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        consumeElement(reader);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case XMLStreamConstants.END_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;Person&quot;.equals(reader.getLocalName())) {</b>
+<b class="nc">&nbsp;                        Author author = new Author(firstName, null, null, lastName, null);</b>
+<b class="nc">&nbsp;                        knownPersons.put(id, author);</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseKeywords(XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            switch (event) {</b>
+&nbsp;                case XMLStreamConstants.START_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;Keyword&quot;.equals(reader.getLocalName())) {</b>
+<b class="nc">&nbsp;                        parseKeyword(reader);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case XMLStreamConstants.END_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;Keywords&quot;.equals(reader.getLocalName())) {</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseKeyword(XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        String id = reader.getAttributeValue(null, &quot;id&quot;);</b>
+<b class="nc">&nbsp;        String keywordName = null;</b>
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            switch (event) {</b>
+&nbsp;                case XMLStreamConstants.START_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    String elementName = reader.getLocalName();</b>
+<b class="nc">&nbsp;                    if (&quot;Name&quot;.equals(elementName)) {</b>
+<b class="nc">&nbsp;                        keywordName = reader.getElementText();</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        consumeElement(reader);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case XMLStreamConstants.END_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;Keyword&quot;.equals(reader.getLocalName())) {</b>
+<b class="nc">&nbsp;                        Keyword keyword = new Keyword(keywordName);</b>
+<b class="nc">&nbsp;                        knownKeywords.put(id, keyword);</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parsePublishers(XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            switch (event) {</b>
+&nbsp;                case XMLStreamConstants.START_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    String elementName = reader.getLocalName();</b>
+<b class="nc">&nbsp;                    if (&quot;Publisher&quot;.equals(elementName)) {</b>
+<b class="nc">&nbsp;                        parsePublisher(reader);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case XMLStreamConstants.END_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;Publishers&quot;.equals(reader.getLocalName())) {</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parsePublisher(XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        String id = reader.getAttributeValue(null, &quot;id&quot;);</b>
+<b class="nc">&nbsp;        String publisherName = null;</b>
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            switch (event) {</b>
+&nbsp;                case XMLStreamConstants.START_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    String elementName = reader.getLocalName();</b>
+<b class="nc">&nbsp;                    if (&quot;Name&quot;.equals(elementName)) {</b>
+<b class="nc">&nbsp;                        publisherName = reader.getElementText();</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        consumeElement(reader);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case XMLStreamConstants.END_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;Publisher&quot;.equals(reader.getLocalName())) {</b>
+<b class="nc">&nbsp;                        knownPublishers.put(id, publisherName);</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseReferences(XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            switch (event) {</b>
+&nbsp;                case XMLStreamConstants.START_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    String elementName = reader.getLocalName();</b>
+<b class="nc">&nbsp;                    if (&quot;Reference&quot;.equals(elementName)) {</b>
+<b class="nc">&nbsp;                        parseReference(reader);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case XMLStreamConstants.END_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;References&quot;.equals(reader.getLocalName())) {</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseReference(XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        String id = reader.getAttributeValue(null, &quot;id&quot;);</b>
+<b class="nc">&nbsp;        String referenceType = null;</b>
+<b class="nc">&nbsp;        String title = null;</b>
+<b class="nc">&nbsp;        String year = null;</b>
+<b class="nc">&nbsp;        String abstractText = null;</b>
+<b class="nc">&nbsp;        String pageRange = null;</b>
+<b class="nc">&nbsp;        String pageCount = null;</b>
+<b class="nc">&nbsp;        String volume = null;</b>
+<b class="nc">&nbsp;        String doi = null;</b>
+<b class="nc">&nbsp;        String isbn = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            switch (event) {</b>
+&nbsp;                case XMLStreamConstants.START_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    String elementName = reader.getLocalName();</b>
+<b class="nc">&nbsp;                    switch (elementName) {</b>
+&nbsp;                        case &quot;ReferenceType&quot; -&gt;
+<b class="nc">&nbsp;                                referenceType = reader.getElementText();</b>
+&nbsp;                        case &quot;Title&quot; -&gt;
+<b class="nc">&nbsp;                                title = reader.getElementText();</b>
+&nbsp;                        case &quot;Year&quot; -&gt;
+<b class="nc">&nbsp;                                year = reader.getElementText();</b>
+&nbsp;                        case &quot;Abstract&quot; -&gt;
+<b class="nc">&nbsp;                                abstractText = reader.getElementText();</b>
+&nbsp;                        case &quot;PageRange&quot; -&gt;
+<b class="nc">&nbsp;                                pageRange = reader.getElementText();</b>
+&nbsp;                        case &quot;PageCount&quot; -&gt;
+<b class="nc">&nbsp;                                pageCount = reader.getElementText();</b>
+&nbsp;                        case &quot;Volume&quot; -&gt;
+<b class="nc">&nbsp;                                volume = reader.getElementText();</b>
+&nbsp;                        case &quot;Doi&quot; -&gt;
+<b class="nc">&nbsp;                                doi = reader.getElementText();</b>
+&nbsp;                        case &quot;Isbn&quot; -&gt;
+<b class="nc">&nbsp;                                isbn = reader.getElementText();</b>
+&nbsp;                        default -&gt;
+<b class="nc">&nbsp;                                consumeElement(reader);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case XMLStreamConstants.END_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;Reference&quot;.equals(reader.getLocalName())) {</b>
+<b class="nc">&nbsp;                        references.add(new Reference(id, referenceType, title, year, abstractText, pageRange, pageCount, volume, doi, isbn));</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseKnowledgeItems(XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            switch (event) {</b>
+&nbsp;                case XMLStreamConstants.START_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;KnowledgeItem&quot;.equals(reader.getLocalName())) {</b>
+<b class="nc">&nbsp;                        parseKnowledgeItem(reader);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        consumeElement(reader);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case XMLStreamConstants.END_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;KnowledgeItems&quot;.equals(reader.getLocalName())) {</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseKnowledgeItem(XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        String referenceId = null;</b>
+<b class="nc">&nbsp;        String coreStatement = null;</b>
+<b class="nc">&nbsp;        String text = null;</b>
+<b class="nc">&nbsp;        String pageRangeNumber = null;</b>
+<b class="nc">&nbsp;        String quotationType = null;</b>
+<b class="nc">&nbsp;        String quotationIndex = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            switch (event) {</b>
+&nbsp;                case XMLStreamConstants.START_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    String elementName = reader.getLocalName();</b>
+<b class="nc">&nbsp;                    switch (elementName) {</b>
+&nbsp;                        case &quot;ReferenceID&quot; -&gt;
+<b class="nc">&nbsp;                                referenceId = reader.getElementText();</b>
+&nbsp;                        case &quot;CoreStatement&quot; -&gt;
+<b class="nc">&nbsp;                                coreStatement = reader.getElementText();</b>
+&nbsp;                        case &quot;Text&quot; -&gt;
+<b class="nc">&nbsp;                                text = reader.getElementText();</b>
+&nbsp;                        case &quot;PageRangeNumber&quot; -&gt;
+<b class="nc">&nbsp;                                pageRangeNumber = reader.getElementText();</b>
+&nbsp;                        case &quot;QuotationType&quot; -&gt;
+<b class="nc">&nbsp;                                quotationType = reader.getElementText();</b>
+&nbsp;                        case &quot;QuotationIndex&quot; -&gt;
+<b class="nc">&nbsp;                                quotationIndex = reader.getElementText();</b>
+&nbsp;                        default -&gt;
+<b class="nc">&nbsp;                                consumeElement(reader);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case XMLStreamConstants.END_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (&quot;KnowledgeItem&quot;.equals(reader.getLocalName())) {</b>
+<b class="nc">&nbsp;                        knowledgeItems.add(new KnowledgeItem(referenceId, coreStatement, text, pageRangeNumber, quotationType, quotationIndex));</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parseReferenceIdLink(XMLStreamReader reader, String startElement, Map&lt;String, List&lt;String&gt;&gt; targetMap) throws XMLStreamException {
+<b class="nc">&nbsp;        while (reader.hasNext()) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            switch (event) {</b>
+&nbsp;                case XMLStreamConstants.START_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    String elementName = reader.getLocalName();</b>
+<b class="nc">&nbsp;                    if (&quot;OnetoN&quot;.equals(elementName)) {</b>
+<b class="nc">&nbsp;                        String rawString = reader.getElementText();</b>
+<b class="nc">&nbsp;                        if (rawString != null &amp;&amp; rawString.length() &gt; UUID_SEMICOLON_OFFSET_INDEX) {</b>
+<b class="nc">&nbsp;                            String referenceId = rawString.substring(0, UUID_LENGTH);</b>
+<b class="nc">&nbsp;                            String attributeIds = rawString.substring(UUID_SEMICOLON_OFFSET_INDEX);</b>
+<b class="nc">&nbsp;                            List&lt;String&gt; attributeIdList = Arrays.asList(attributeIds.split(&quot;;&quot;));</b>
+<b class="nc">&nbsp;                            targetMap.put(referenceId, attributeIdList);</b>
+&nbsp;                        }
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        consumeElement(reader);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case XMLStreamConstants.END_ELEMENT -&gt; {
+<b class="nc">&nbsp;                    if (startElement.equals(reader.getLocalName())) {</b>
+&nbsp;                        return;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntry&gt; buildBibItems() {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; bibItems = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, String&gt; resolvedAuthorMap = resolvePersonMap(refIdWithAuthorIds, knownPersons);</b>
+<b class="nc">&nbsp;        Map&lt;String, String&gt; resolvedEditorMap = resolvePersonMap(refIdWithEditorIds, knownPersons);</b>
+<b class="nc">&nbsp;        Map&lt;String, String&gt; resolvedPublisherMap = resolvePublisherMap(refIdWithPublisherIds, knownPublishers);</b>
+<b class="nc">&nbsp;        Map&lt;String, String&gt; resolvedKeywordMap = resolveKeywordMap(refIdWithKeywordsIds, knownKeywords);</b>
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, List&lt;KnowledgeItem&gt;&gt; knowledgeItemsByRefId = knowledgeItems.stream()</b>
+<b class="nc">&nbsp;                                                                               .filter(item -&gt; item.referenceId() != null &amp;&amp; !item.referenceId().isEmpty())</b>
+<b class="nc">&nbsp;                                                                               .collect(Collectors.groupingBy(KnowledgeItem::referenceId));</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Reference reference : references) {</b>
+<b class="nc">&nbsp;            BibEntry entry = new BibEntry();</b>
+<b class="nc">&nbsp;            setEntryFieldsFromReference(entry, reference);</b>
+&nbsp;
+<b class="nc">&nbsp;            String authors = resolvedAuthorMap.get(reference.id());</b>
+<b class="nc">&nbsp;            String editors = resolvedEditorMap.get(reference.id());</b>
+<b class="nc">&nbsp;            String publishers = resolvedPublisherMap.get(reference.id());</b>
+<b class="nc">&nbsp;            String keywords = resolvedKeywordMap.get(reference.id());</b>
+&nbsp;
+<b class="nc">&nbsp;            Optional.ofNullable(authors)</b>
+<b class="nc">&nbsp;                    .ifPresent(value -&gt; entry.setField(StandardField.AUTHOR, clean(value)));</b>
+<b class="nc">&nbsp;            Optional.ofNullable(editors)</b>
+<b class="nc">&nbsp;                    .ifPresent(value -&gt; entry.setField(StandardField.EDITOR, clean(value)));</b>
+<b class="nc">&nbsp;            Optional.ofNullable(publishers)</b>
+<b class="nc">&nbsp;                    .ifPresent(value -&gt; entry.setField(StandardField.PUBLISHER, clean(value)));</b>
+<b class="nc">&nbsp;            Optional.ofNullable(keywords)</b>
+<b class="nc">&nbsp;                    .ifPresent(value -&gt; entry.setField(StandardField.KEYWORDS, clean(value)));</b>
+&nbsp;
+<b class="nc">&nbsp;            Optional.ofNullable(getKnowledgeItem(knowledgeItemsByRefId, reference))</b>
+<b class="nc">&nbsp;                    .ifPresent(value -&gt; entry.setField(StandardField.COMMENT, StringUtil.unifyLineBreaks(value, &quot;\n&quot;)));</b>
+&nbsp;
+<b class="nc">&nbsp;            bibItems.add(entry);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return bibItems;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setEntryFieldsFromReference(BibEntry entry, Reference reference) {
+<b class="nc">&nbsp;        entry.setType(getType(reference));</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional.ofNullable(reference.title())</b>
+<b class="nc">&nbsp;                .ifPresent(value -&gt; entry.setField(StandardField.TITLE, clean(value)));</b>
+<b class="nc">&nbsp;        Optional.ofNullable(reference.abstractText())</b>
+<b class="nc">&nbsp;                .ifPresent(value -&gt; entry.setField(StandardField.ABSTRACT, clean(value)));</b>
+<b class="nc">&nbsp;        Optional.ofNullable(reference.year())</b>
+<b class="nc">&nbsp;                .ifPresent(value -&gt; entry.setField(StandardField.YEAR, clean(value)));</b>
+<b class="nc">&nbsp;        Optional.ofNullable(reference.doi())</b>
+<b class="nc">&nbsp;                .ifPresent(value -&gt; entry.setField(StandardField.DOI, clean(value)));</b>
+<b class="nc">&nbsp;        Optional.ofNullable(reference.isbn())</b>
+<b class="nc">&nbsp;                .ifPresent(value -&gt; entry.setField(StandardField.ISBN, clean(value)));</b>
+<b class="nc">&nbsp;        Optional.ofNullable(reference.volume())</b>
+<b class="nc">&nbsp;                .ifPresent(value -&gt; entry.setField(StandardField.VOLUME, clean(value)));</b>
+&nbsp;
+<b class="nc">&nbsp;        String pages = clean(getPages(reference.pageRange(), reference.pageCount()));</b>
+<b class="nc">&nbsp;        pages = pagesFormatter.format(pages);</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.PAGES, pages);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, String&gt; resolvePersonMap(Map&lt;String, List&lt;String&gt;&gt; referenceIdMap, Map&lt;String, Author&gt; personMap) {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; resolvedPersonMap = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, List&lt;String&gt;&gt; entry : referenceIdMap.entrySet()) {</b>
+<b class="nc">&nbsp;            String referenceId = entry.getKey();</b>
+<b class="nc">&nbsp;            List&lt;String&gt; personIds = entry.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;Author&gt; authorsForThisReferenceId = personIds.stream()</b>
+<b class="nc">&nbsp;                                                              .map(personMap::get)</b>
+<b class="nc">&nbsp;                                                              .filter(Objects::nonNull)</b>
+<b class="nc">&nbsp;                                                              .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!authorsForThisReferenceId.isEmpty()) {</b>
+<b class="nc">&nbsp;                String stringifiedAuthors = AuthorList.of(authorsForThisReferenceId).getAsLastFirstNamesWithAnd(false);</b>
+<b class="nc">&nbsp;                resolvedPersonMap.put(referenceId, stringifiedAuthors);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return resolvedPersonMap;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, String&gt; resolvePublisherMap(Map&lt;String, List&lt;String&gt;&gt; referenceIdMap, Map&lt;String, String&gt; publisherMap) {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; resolvedPublisherMap = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, List&lt;String&gt;&gt; entry : referenceIdMap.entrySet()) {</b>
+<b class="nc">&nbsp;            String referenceId = entry.getKey();</b>
+<b class="nc">&nbsp;            List&lt;String&gt; publisherIds = entry.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;String&gt; publisherList = publisherIds.stream().</b>
+<b class="nc">&nbsp;                                                     map(publisherMap::get).</b>
+<b class="nc">&nbsp;                                                     filter(Objects::nonNull).</b>
+<b class="nc">&nbsp;                                                     toList();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!publisherList.isEmpty()) {</b>
+<b class="nc">&nbsp;                String stringifiedPublishers = String.join(&quot;,&quot;, publisherList);</b>
+<b class="nc">&nbsp;                resolvedPublisherMap.put(referenceId, stringifiedPublishers);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return resolvedPublisherMap;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, String&gt; resolveKeywordMap(Map&lt;String, List&lt;String&gt;&gt; referenceIdMap, Map&lt;String, Keyword&gt; keywordMap) {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; resolvedKeywordMap = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, List&lt;String&gt;&gt; entry : referenceIdMap.entrySet()) {</b>
+<b class="nc">&nbsp;            String referenceId = entry.getKey();</b>
+<b class="nc">&nbsp;            List&lt;String&gt; keywordIds = entry.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;Keyword&gt; keywordList = keywordIds.stream().</b>
+<b class="nc">&nbsp;                                                  map(keywordMap::get).</b>
+<b class="nc">&nbsp;                                                  filter(Objects::nonNull).</b>
+<b class="nc">&nbsp;                                                  toList();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!keywordList.isEmpty()) {</b>
+<b class="nc">&nbsp;                KeywordList list = new KeywordList(List.copyOf(keywordList));</b>
+<b class="nc">&nbsp;                String stringifiedKeyword = list.toString();</b>
+<b class="nc">&nbsp;                resolvedKeywordMap.put(referenceId, stringifiedKeyword);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return resolvedKeywordMap;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getKnowledgeItem(Map&lt;String, List&lt;KnowledgeItem&gt;&gt; groupedKnowledgeItemMap, Reference reference) {
+<b class="nc">&nbsp;        StringJoiner comment = new StringJoiner(&quot;\n\n&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;KnowledgeItem&gt; relevantKnowledgeItems = groupedKnowledgeItemMap.get(reference.id());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (relevantKnowledgeItems == null || relevantKnowledgeItems.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (KnowledgeItem knowledgeItem : relevantKnowledgeItems) {</b>
+<b class="nc">&nbsp;            Optional.ofNullable(knowledgeItem.coreStatement())</b>
+<b class="nc">&nbsp;                    .filter(Predicate.not(String::isEmpty))</b>
+<b class="nc">&nbsp;                    .ifPresent(t -&gt; comment.add(&quot;# &quot; + cleanUpText(t)));</b>
+&nbsp;
+<b class="nc">&nbsp;            Optional.ofNullable(knowledgeItem.text())</b>
+<b class="nc">&nbsp;                    .filter(Predicate.not(String::isEmpty))</b>
+<b class="nc">&nbsp;                    .ifPresent(t -&gt; comment.add(cleanUpText(t)));</b>
+&nbsp;
+&nbsp;            try {
+<b class="nc">&nbsp;                Optional&lt;Integer&gt; pages = Optional.ofNullable(knowledgeItem.pageRangeNumber())</b>
+<b class="nc">&nbsp;                                                  .map(Integer::parseInt)</b>
+<b class="nc">&nbsp;                                                  .filter(range -&gt; range != -1);</b>
+<b class="nc">&nbsp;                pages.ifPresent(p -&gt; comment.add(&quot;page range: &quot; + p));</b>
+&nbsp;            } catch (NumberFormatException e) {
+&nbsp;                // If the string is not a number, we replicate behaviour by leaving the optional empty
+&nbsp;            }
+&nbsp;
+&nbsp;            try {
+<b class="nc">&nbsp;                Optional&lt;String&gt; quotationTypeDesc = Optional.ofNullable(knowledgeItem.quotationType())</b>
+<b class="nc">&nbsp;                                                             .map(Short::parseShort)</b>
+<b class="nc">&nbsp;                                                             .flatMap(type -&gt; QUOTATION_TYPES.stream()</b>
+<b class="nc">&nbsp;                                                                                             .filter(qt -&gt; type == qt.getCitaviIndexType())</b>
+<b class="nc">&nbsp;                                                                                             .map(QuotationTypeMapping::getName)</b>
+<b class="nc">&nbsp;                                                                                             .findFirst());</b>
+<b class="nc">&nbsp;                quotationTypeDesc.ifPresent(qt -&gt; comment.add(&quot;quotation type: %s&quot;.formatted(qt)));</b>
+&nbsp;            } catch (NumberFormatException e) {
+&nbsp;                // If the string is not a number, we replicate behaviour by leaving the optional empty
+&nbsp;            }
+&nbsp;
+&nbsp;            try {
+<b class="nc">&nbsp;                Optional&lt;Short&gt; quotationIndex = Optional.ofNullable(knowledgeItem.quotationIndex())</b>
+<b class="nc">&nbsp;                                                         .map(Short::parseShort);</b>
+<b class="nc">&nbsp;                quotationIndex.ifPresent(index -&gt; comment.add(&quot;quotation index: %d&quot;.formatted(index)));</b>
+&nbsp;            } catch (NumberFormatException e) {
+&nbsp;                // If the string is not a number, we replicate behaviour by leaving the optional empty
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return comment.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private EntryType getType(Reference reference) {
+<b class="nc">&nbsp;        return Optional.ofNullable(reference.referenceType())</b>
+<b class="nc">&nbsp;                       .map(CitaviXmlImporter::convertRefNameToType)</b>
+<b class="nc">&nbsp;                       .orElse(StandardEntryType.Article);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static EntryType convertRefNameToType(String refName) {
+<b class="nc">&nbsp;        return switch (refName.toLowerCase().trim()) {</b>
+&nbsp;            case &quot;artwork&quot;,
+&nbsp;                 &quot;generic&quot;,
+&nbsp;                 &quot;musicalbum&quot;,
+&nbsp;                 &quot;audioorvideodocument&quot;,
+&nbsp;                 &quot;movie&quot; -&gt;
+<b class="nc">&nbsp;                    StandardEntryType.Misc;</b>
+&nbsp;            case &quot;electronic article&quot; -&gt;
+<b class="nc">&nbsp;                    IEEETranEntryType.Electronic;</b>
+&nbsp;            case &quot;book section&quot; -&gt;
+<b class="nc">&nbsp;                    StandardEntryType.InBook;</b>
+&nbsp;            case &quot;book&quot;,
+&nbsp;                 &quot;bookedited&quot;,
+&nbsp;                 &quot;audiobook&quot; -&gt;
+<b class="nc">&nbsp;                    StandardEntryType.Book;</b>
+&nbsp;            case &quot;report&quot; -&gt;
+<b class="nc">&nbsp;                    StandardEntryType.Report;</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    StandardEntryType.Article;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    String cleanUpText(String text) {
+<b class="nc">&nbsp;        String result = removeSpacesBeforeLineBreak(text);</b>
+<b class="nc">&nbsp;        result = result.replaceAll(&quot;(?&lt;!\\\\)\\{&quot;, &quot;\\\\{&quot;);</b>
+<b class="nc">&nbsp;        result = result.replaceAll(&quot;(?&lt;!\\\\)}&quot;, &quot;\\\\}&quot;);</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String removeSpacesBeforeLineBreak(String string) {
+<b class="nc">&nbsp;        return string.replaceAll(&quot; +\r\n&quot;, &quot;\r\n&quot;)</b>
+<b class="nc">&nbsp;                     .replaceAll(&quot; +\n&quot;, &quot;\n&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(reader);</b>
+<b class="nc">&nbsp;        throw new UnsupportedOperationException(&quot;CitaviXmlImporter does not support importDatabase(BufferedReader reader). &quot;</b>
+&nbsp;                + &quot;Instead use importDatabase(Path filePath, Charset defaultEncoding).&quot;);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BibEntry&gt; parseEntries(InputStream inputStream) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return importDatabase(</b>
+<b class="nc">&nbsp;                    new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(e.getLocalizedMessage(), e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return List.of();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void consumeElement(XMLStreamReader reader) throws XMLStreamException {
+<b class="nc">&nbsp;        int depth = 1;</b>
+<b class="nc">&nbsp;        while (reader.hasNext() &amp;&amp; depth &gt; 0) {</b>
+<b class="nc">&nbsp;            int event = reader.next();</b>
+<b class="nc">&nbsp;            if (event == XMLStreamConstants.START_ELEMENT) {</b>
+<b class="nc">&nbsp;                depth++;</b>
+<b class="nc">&nbsp;            } else if (event == XMLStreamConstants.END_ELEMENT) {</b>
+<b class="nc">&nbsp;                depth--;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * {@code PageRange} and {@code PageCount} tags contain text
+&nbsp;     * with additional markers that need to be discarded.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Example {@code PageCount}:
+&nbsp;     * {@snippet :
+&nbsp;     *   &lt;PageCount&gt;
+&nbsp;     *   &lt;c&gt;113&lt;/c&gt; &lt;in&gt;true&lt;/in&gt; &lt;os&gt;113&lt;/os&gt; &lt;ps&gt;113&lt;/ps&gt;
+&nbsp;     *   &lt;/PageCount&gt;
+&nbsp;     *}
+&nbsp;     * Contents of {@code PageCount} after parsing above example data:
+&nbsp;     * {@snippet :
+&nbsp;     *   &lt;c&gt;113&lt;/c&gt; &lt;in&gt;true&lt;/in&gt; &lt;os&gt;113&lt;/os&gt; &lt;ps&gt;113&lt;/ps&gt;
+&nbsp;     *}
+&nbsp;     * Content of &quot;ps&quot; tag is returned by {@code getPages}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Example {@code PageRange}:
+&nbsp;     * {@snippet :
+&nbsp;     *   &lt;PageRange&gt;
+&nbsp;     *   &lt;![CDATA[
+&nbsp;     *     &lt;sp&gt; &lt;n&gt;34165&lt;/n&gt; &lt;in&gt;true&lt;/in&gt; &lt;os&gt;34165&lt;/os&gt; &lt;ps&gt;34165&lt;/ps&gt; &lt;/sp&gt;
+&nbsp;     *     &lt;ep&gt; &lt;n&gt;34223&lt;/n&gt; &lt;in&gt;true&lt;/in&gt; &lt;os&gt;34223&lt;/os&gt; &lt;ps&gt;34223&lt;/ps&gt; &lt;/ep&gt;
+&nbsp;     *     &lt;os&gt;34165-223&lt;/os&gt;
+&nbsp;     *   ]]&gt;
+&nbsp;     *   &lt;/PageRange&gt;
+&nbsp;     *}
+&nbsp;     * Contents of {@code PageRange} after parsing above example data:
+&nbsp;     * {@snippet :
+&nbsp;     *   &lt;sp&gt; &lt;n&gt;24&lt;/n&gt; &lt;in&gt;true&lt;/in&gt; &lt;os&gt;24&lt;/os&gt; &lt;ps&gt;24&lt;/ps&gt; &lt;/sp&gt;
+&nbsp;     *   &lt;ep&gt; &lt;n&gt;31&lt;/n&gt; &lt;in&gt;true&lt;/in&gt; &lt;os&gt;31&lt;/os&gt; &lt;ps&gt;31&lt;/ps&gt; &lt;/ep&gt;
+&nbsp;     *   &lt;os&gt;24-31&lt;/os&gt;
+&nbsp;     *}
+&nbsp;     * Content of &quot;os&quot; tag is returned by {@code getPages}.
+&nbsp;     */
+&nbsp;    private String getPages(String pageRange, String pageCount) {
+<b class="nc">&nbsp;        String tmpStr = &quot;&quot;;</b>
+<b class="nc">&nbsp;        if ((pageCount != null) &amp;&amp; (pageRange == null)) {</b>
+<b class="nc">&nbsp;            tmpStr = pageCount;</b>
+<b class="nc">&nbsp;        } else if ((pageCount == null) &amp;&amp; (pageRange != null)) {</b>
+<b class="nc">&nbsp;            tmpStr = pageRange;</b>
+<b class="nc">&nbsp;        } else if (pageCount == null) {</b>
+<b class="nc">&nbsp;            return tmpStr;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        int count = 0;</b>
+<b class="nc">&nbsp;        String pages = &quot;&quot;;</b>
+<b class="nc">&nbsp;        for (int i = tmpStr.length() - 1; i &gt;= 0; i--) {</b>
+<b class="nc">&nbsp;            if (count == 2) {</b>
+<b class="nc">&nbsp;                pages = tmpStr.substring(i + 2, tmpStr.length() - END_TAG_CHARACTER_COUNT); // extract tag content, skipping first 2 chars (&quot;s&gt;&quot;) and trimming closing tag</b>
+&nbsp;                break;
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (tmpStr.charAt(i) == &#39;&gt;&#39;) {</b>
+<b class="nc">&nbsp;                    count++;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return pages;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private BufferedReader getReaderFromZip(Path filePath) throws IOException {
+<b class="nc">&nbsp;        Path newFile = Files.createTempFile(&quot;citavicontent&quot;, &quot;.xml&quot;);</b>
+<b class="nc">&nbsp;        newFile.toFile().deleteOnExit();</b>
+&nbsp;
+<b class="nc">&nbsp;        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(filePath))) {</b>
+<b class="nc">&nbsp;            ZipEntry zipEntry = zis.getNextEntry();</b>
+<b class="nc">&nbsp;            while (zipEntry != null) {</b>
+<b class="nc">&nbsp;                Files.copy(zis, newFile, StandardCopyOption.REPLACE_EXISTING);</b>
+<b class="nc">&nbsp;                zipEntry = zis.getNextEntry();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Citavi XML files sometimes contains BOM markers. We just discard them.
+&nbsp;        // Solution inspired by https://stackoverflow.com/a/37445972/873282
+<b class="nc">&nbsp;        return new BufferedReader(</b>
+&nbsp;                new InputStreamReader(
+&nbsp;                        new BOMInputStream.Builder()
+<b class="nc">&nbsp;                                .setInputStream(Files.newInputStream(newFile, StandardOpenOption.READ))</b>
+<b class="nc">&nbsp;                                .setInclude(false)</b>
+<b class="nc">&nbsp;                                .setByteOrderMarks(ByteOrderMark.UTF_8, ByteOrderMark.UTF_16BE, ByteOrderMark.UTF_16LE, ByteOrderMark.UTF_32BE, ByteOrderMark.UTF_32LE)</b>
+<b class="nc">&nbsp;                                .get()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String clean(String input) {
+<b class="nc">&nbsp;        String result = StringUtil.unifyLineBreaks(input, &quot; &quot;)</b>
+<b class="nc">&nbsp;                                  .trim()</b>
+<b class="nc">&nbsp;                                  .replaceAll(&quot; +&quot;, &quot; &quot;);</b>
+<b class="nc">&nbsp;        return htmlToLatexFormatter.format(result);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    enum QuotationTypeMapping {</b>
+<b class="nc">&nbsp;        IMAGE_QUOTATION(0, &quot;Image quotation&quot;),</b>
+<b class="nc">&nbsp;        DIRECT_QUOTATION(1, &quot;Direct quotation&quot;),</b>
+<b class="nc">&nbsp;        INDIRECT_QUOTATION(2, &quot;Indirect quotation&quot;),</b>
+<b class="nc">&nbsp;        SUMMARY(3, &quot;Summary&quot;),</b>
+<b class="nc">&nbsp;        COMMENT(4, &quot;Comment&quot;),</b>
+<b class="nc">&nbsp;        HIGHLIGHT(5, &quot;Highlight&quot;),</b>
+<b class="nc">&nbsp;        HIGHLIGHT_RED(6, &quot;Highlight in red&quot;);</b>
+&nbsp;
+&nbsp;        final int citaviType;
+&nbsp;        final String name;
+&nbsp;
+<b class="nc">&nbsp;        QuotationTypeMapping(int citaviType, String name) {</b>
+<b class="nc">&nbsp;            this.name = name;</b>
+<b class="nc">&nbsp;            this.citaviType = citaviType;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        String getName() {
+<b class="nc">&nbsp;            return name;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        int getCitaviIndexType() {
+<b class="nc">&nbsp;            return citaviType;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

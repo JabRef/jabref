@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IntegrityCheckAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.integrity</a>
+</div>
+
+<h1>Coverage Summary for Class: IntegrityCheckAction (org.jabref.gui.integrity)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IntegrityCheckAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">IntegrityCheckAction$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.integrity;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.concurrent.Task;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.integrity.IntegrityCheck;
+&nbsp;import org.jabref.logic.integrity.IntegrityMessage;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+&nbsp;
+&nbsp;public class IntegrityCheckAction extends SimpleCommand {
+&nbsp;
+&nbsp;    private final UiTaskExecutor taskExecutor;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final Supplier&lt;LibraryTab&gt; tabSupplier;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final JournalAbbreviationRepository abbreviationRepository;
+&nbsp;
+&nbsp;    public IntegrityCheckAction(Supplier&lt;LibraryTab&gt; tabSupplier,
+&nbsp;                                GuiPreferences preferences,
+&nbsp;                                DialogService dialogService,
+&nbsp;                                StateManager stateManager,
+&nbsp;                                UiTaskExecutor taskExecutor,
+<b class="nc">&nbsp;                                JournalAbbreviationRepository abbreviationRepository) {</b>
+<b class="nc">&nbsp;        this.tabSupplier = tabSupplier;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+<b class="nc">&nbsp;        this.executable.bind(needsDatabase(this.stateManager));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -&gt; new NullPointerException(&quot;Database null&quot;));</b>
+<b class="nc">&nbsp;        IntegrityCheck check = new IntegrityCheck(database,</b>
+<b class="nc">&nbsp;                preferences.getFilePreferences(),</b>
+<b class="nc">&nbsp;                preferences.getCitationKeyPatternPreferences(),</b>
+&nbsp;                abbreviationRepository,
+<b class="nc">&nbsp;                preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());</b>
+&nbsp;
+<b class="nc">&nbsp;        Task&lt;List&lt;IntegrityMessage&gt;&gt; task = new Task&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            protected List&lt;IntegrityMessage&gt; call() {
+<b class="nc">&nbsp;                ObservableList&lt;BibEntry&gt; entries = database.getDatabase().getEntries();</b>
+<b class="nc">&nbsp;                List&lt;IntegrityMessage&gt; result = new ArrayList&lt;&gt;(check.checkDatabase(database.getDatabase()));</b>
+<b class="nc">&nbsp;                for (int i = 0; i &lt; entries.size(); i++) {</b>
+<b class="nc">&nbsp;                    if (isCancelled()) {</b>
+&nbsp;                        break;
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    BibEntry entry = entries.get(i);</b>
+<b class="nc">&nbsp;                    result.addAll(check.checkEntry(entry));</b>
+<b class="nc">&nbsp;                    updateProgress(i, entries.size());</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return result;</b>
+&nbsp;            }
+&nbsp;        };
+<b class="nc">&nbsp;        task.setOnSucceeded(value -&gt; {</b>
+<b class="nc">&nbsp;            List&lt;IntegrityMessage&gt; messages = task.getValue();</b>
+<b class="nc">&nbsp;            if (messages.isEmpty()) {</b>
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;No problems found.&quot;));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, tabSupplier.get(), dialogService));</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        task.setOnFailed(event -&gt; dialogService.showErrorDialogAndWait(&quot;Integrity check failed.&quot;, task.getException()));</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showProgressDialog(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Checking integrity...&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Waiting for the check to finish...&quot;),</b>
+&nbsp;                task);
+<b class="nc">&nbsp;        taskExecutor.execute(task);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

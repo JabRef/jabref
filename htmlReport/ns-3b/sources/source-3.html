@@ -1,0 +1,367 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FrameDndHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.frame</a>
+</div>
+
+<h1>Coverage Summary for Class: FrameDndHandler (org.jabref.gui.frame)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FrameDndHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/110)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.frame;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Supplier;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.scene.control.Tab;
+&nbsp;import javafx.scene.control.TabPane;
+&nbsp;import javafx.scene.control.skin.TabPaneSkin;
+&nbsp;import javafx.scene.input.DragEvent;
+&nbsp;import javafx.scene.input.Dragboard;
+&nbsp;import javafx.scene.input.TransferMode;
+&nbsp;
+&nbsp;import org.jabref.gui.DragAndDropDataFormats;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.importer.actions.OpenDatabaseAction;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class FrameDndHandler {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(FrameDndHandler.class);</b>
+&nbsp;
+&nbsp;    private final TabPane tabPane;
+&nbsp;    private final Supplier&lt;Scene&gt; scene;
+&nbsp;    private final Supplier&lt;OpenDatabaseAction&gt; openDatabaseAction;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+&nbsp;    public FrameDndHandler(TabPane tabPane,
+&nbsp;                           Supplier&lt;Scene&gt; scene,
+&nbsp;                           Supplier&lt;OpenDatabaseAction&gt; openDatabaseAction,
+<b class="nc">&nbsp;                           StateManager stateManager) {</b>
+<b class="nc">&nbsp;        this.tabPane = tabPane;</b>
+<b class="nc">&nbsp;        this.scene = scene;</b>
+<b class="nc">&nbsp;        this.openDatabaseAction = openDatabaseAction;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void initDragAndDrop() {
+<b class="nc">&nbsp;        tabPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);</b>
+&nbsp;
+<b class="nc">&nbsp;        Tab dndIndicator = new Tab(Localization.lang(&quot;Open files...&quot;), null);</b>
+<b class="nc">&nbsp;        dndIndicator.getStyleClass().add(&quot;drop&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(tabPane.skinProperty(), skin -&gt; {</b>
+<b class="nc">&nbsp;            if (!(skin instanceof TabPaneSkin)) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;            // Add drag and drop listeners to JabRefFrame
+<b class="nc">&nbsp;            scene.get().setOnDragOver(event -&gt; onSceneDragOver(event, dndIndicator));</b>
+<b class="nc">&nbsp;            scene.get().setOnDragEntered(event -&gt; {</b>
+&nbsp;                // It is necessary to setOnDragOver for newly opened tabs
+&nbsp;                // drag&#39;n&#39;drop on tabs covered dnd on tabbedPane, so dnd on tabs should contain all dnds on tabbedPane
+<b class="nc">&nbsp;                for (Node destinationTabNode : tabPane.lookupAll(&quot;.tab&quot;)) {</b>
+<b class="nc">&nbsp;                    destinationTabNode.setOnDragOver(tabDragEvent -&gt; onTabDragOver(event, tabDragEvent, dndIndicator));</b>
+<b class="nc">&nbsp;                    destinationTabNode.setOnDragExited(tabDragEvent -&gt; tabPane.getTabs().remove(dndIndicator));</b>
+<b class="nc">&nbsp;                    destinationTabNode.setOnDragDropped(tabDragEvent -&gt; onTabDragDropped(destinationTabNode, tabDragEvent, dndIndicator));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                event.consume();</b>
+&nbsp;            });
+<b class="nc">&nbsp;            scene.get().setOnDragExited(event -&gt; tabPane.getTabs().remove(dndIndicator));</b>
+<b class="nc">&nbsp;            scene.get().setOnDragDropped(event -&gt; onSceneDragDropped(event, dndIndicator));</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onTabDragDropped(Node destinationTabNode, DragEvent tabDragEvent, Tab dndIndicator) {
+<b class="nc">&nbsp;        Dragboard dragboard = tabDragEvent.getDragboard();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (hasBibFiles(dragboard)) {</b>
+<b class="nc">&nbsp;            tabPane.getTabs().remove(dndIndicator);</b>
+<b class="nc">&nbsp;            List&lt;Path&gt; bibFiles = getBibFiles(dragboard);</b>
+<b class="nc">&nbsp;            OpenDatabaseAction openDatabaseAction = this.openDatabaseAction.get();</b>
+<b class="nc">&nbsp;            openDatabaseAction.openFiles(bibFiles);</b>
+<b class="nc">&nbsp;            tabDragEvent.setDropCompleted(true);</b>
+<b class="nc">&nbsp;            tabDragEvent.consume();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (stateManager.getActiveDatabase().isEmpty()) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Active library is empty when dropping entries&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            LibraryTab destinationLibraryTab = null;</b>
+<b class="nc">&nbsp;            for (Tab libraryTab : tabPane.getTabs()) {</b>
+<b class="nc">&nbsp;                if (libraryTab.getId().equals(destinationTabNode.getId()) &amp;&amp;</b>
+<b class="nc">&nbsp;                        !tabPane.getSelectionModel().getSelectedItem().equals(libraryTab)) {</b>
+<b class="nc">&nbsp;                    destinationLibraryTab = (LibraryTab) libraryTab;</b>
+&nbsp;                    break;
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (destinationLibraryTab == null) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Failed to find library tab to drop into&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (hasEntries(dragboard)) {</b>
+<b class="nc">&nbsp;                List&lt;BibEntry&gt; entryCopies = stateManager.getLocalDragboard().getBibEntries().stream()</b>
+<b class="nc">&nbsp;                                                         .map(BibEntry::new).toList();</b>
+<b class="nc">&nbsp;                destinationLibraryTab.dropEntry(entryCopies);</b>
+<b class="nc">&nbsp;            } else if (hasGroups(dragboard)) {</b>
+<b class="nc">&nbsp;                dropGroups(dragboard, destinationLibraryTab);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            tabDragEvent.consume();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void dropGroups(Dragboard dragboard, LibraryTab destinationLibraryTab) {
+<b class="nc">&nbsp;        List&lt;String&gt; groupPathToSources = getGroups(dragboard);</b>
+&nbsp;
+<b class="nc">&nbsp;        copyRootNode(destinationLibraryTab);</b>
+&nbsp;
+<b class="nc">&nbsp;        GroupTreeNode destinationLibraryGroupRoot = destinationLibraryTab</b>
+<b class="nc">&nbsp;                .getBibDatabaseContext()</b>
+<b class="nc">&nbsp;                .getMetaData()</b>
+<b class="nc">&nbsp;                .getGroups().get();</b>
+&nbsp;
+<b class="nc">&nbsp;        GroupTreeNode groupsTreeNode = stateManager.getActiveDatabase().get()</b>
+<b class="nc">&nbsp;                                                   .getMetaData()</b>
+<b class="nc">&nbsp;                                                   .getGroups()</b>
+<b class="nc">&nbsp;                                                   .get();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String pathToSource : groupPathToSources) {</b>
+<b class="nc">&nbsp;            GroupTreeNode groupTreeNodeToCopy = groupsTreeNode</b>
+<b class="nc">&nbsp;                    .getChildByPath(pathToSource)</b>
+<b class="nc">&nbsp;                    .get();</b>
+<b class="nc">&nbsp;            copyGroupTreeNode(destinationLibraryTab, destinationLibraryGroupRoot, groupTreeNodeToCopy);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean hasEntries(Dragboard dragboard) {
+<b class="nc">&nbsp;        return dragboard.hasContent(DragAndDropDataFormats.ENTRIES);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onTabDragOver(DragEvent event, DragEvent tabDragEvent, Tab dndIndicator) {
+<b class="nc">&nbsp;        if (hasBibFiles(tabDragEvent.getDragboard()) || hasGroups(tabDragEvent.getDragboard())) {</b>
+<b class="nc">&nbsp;            tabDragEvent.acceptTransferModes(TransferMode.ANY);</b>
+<b class="nc">&nbsp;            if (!tabPane.getTabs().contains(dndIndicator)) {</b>
+<b class="nc">&nbsp;                tabPane.getTabs().add(dndIndicator);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            event.consume();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            tabPane.getTabs().remove(dndIndicator);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (tabDragEvent.getDragboard().hasContent(DragAndDropDataFormats.ENTRIES)) {</b>
+<b class="nc">&nbsp;            tabDragEvent.acceptTransferModes(TransferMode.COPY);</b>
+<b class="nc">&nbsp;            tabDragEvent.consume();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onSceneDragOver(DragEvent event, Tab dndIndicator) {
+<b class="nc">&nbsp;        if (hasBibFiles(event.getDragboard())) {</b>
+<b class="nc">&nbsp;            event.acceptTransferModes(TransferMode.ANY);</b>
+<b class="nc">&nbsp;            if (!tabPane.getTabs().contains(dndIndicator)) {</b>
+<b class="nc">&nbsp;                tabPane.getTabs().add(dndIndicator);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            event.consume();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            tabPane.getTabs().remove(dndIndicator);</b>
+&nbsp;        }
+&nbsp;        // Accept drag entries from MainTable
+<b class="nc">&nbsp;        if (event.getDragboard().hasContent(DragAndDropDataFormats.ENTRIES)) {</b>
+<b class="nc">&nbsp;            event.acceptTransferModes(TransferMode.COPY);</b>
+<b class="nc">&nbsp;            event.consume();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onSceneDragDropped(DragEvent event, Tab dndIndicator) {
+<b class="nc">&nbsp;        tabPane.getTabs().remove(dndIndicator);</b>
+<b class="nc">&nbsp;        List&lt;Path&gt; bibFiles = getBibFiles(event.getDragboard());</b>
+<b class="nc">&nbsp;        OpenDatabaseAction openDatabaseAction = this.openDatabaseAction.get();</b>
+<b class="nc">&nbsp;        openDatabaseAction.openFiles(bibFiles);</b>
+<b class="nc">&nbsp;        event.setDropCompleted(true);</b>
+<b class="nc">&nbsp;        event.consume();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void copyRootNode(LibraryTab destinationLibraryTab) {
+<b class="nc">&nbsp;        if (destinationLibraryTab.getBibDatabaseContext().getMetaData().getGroups().isPresent()</b>
+<b class="nc">&nbsp;                &amp;&amp; stateManager.getActiveDatabase().isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // a root (all entries) GroupTreeNode
+<b class="nc">&nbsp;        GroupTreeNode currentLibraryGroupRoot = stateManager.getActiveDatabase().get()</b>
+<b class="nc">&nbsp;                                                            .getMetaData()</b>
+<b class="nc">&nbsp;                                                            .getGroups()</b>
+<b class="nc">&nbsp;                                                            .get()</b>
+<b class="nc">&nbsp;                                                            .copyNode();</b>
+&nbsp;
+&nbsp;        // add currentLibraryGroupRoot to the Library if it does not have a root.
+<b class="nc">&nbsp;        destinationLibraryTab.getBibDatabaseContext()</b>
+<b class="nc">&nbsp;                             .getMetaData()</b>
+<b class="nc">&nbsp;                             .setGroups(currentLibraryGroupRoot);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void copyGroupTreeNode(LibraryTab destinationLibraryTab, GroupTreeNode parent, GroupTreeNode groupTreeNodeToCopy) {
+<b class="nc">&nbsp;        if (stateManager.getActiveDatabase().isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; allEntries = stateManager.getActiveDatabase().get().getEntries();</b>
+&nbsp;        // add groupTreeNodeToCopy to the parent-- in the first run that will the source/main GroupTreeNode
+<b class="nc">&nbsp;        GroupTreeNode copiedNode = parent.addSubgroup(groupTreeNodeToCopy.copyNode().getGroup());</b>
+&nbsp;        // add all entries of a groupTreeNode to the new library.
+<b class="nc">&nbsp;        destinationLibraryTab.dropEntry(groupTreeNodeToCopy.getEntriesInGroup(allEntries));</b>
+&nbsp;        // List of all children of groupTreeNodeToCopy
+<b class="nc">&nbsp;        List&lt;GroupTreeNode&gt; children = groupTreeNodeToCopy.getChildren();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!children.isEmpty()) {</b>
+&nbsp;            // use recursion to add all subgroups of the original groupTreeNodeToCopy
+<b class="nc">&nbsp;            for (GroupTreeNode child : children) {</b>
+<b class="nc">&nbsp;                copyGroupTreeNode(destinationLibraryTab, copiedNode, child);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean hasBibFiles(Dragboard dragboard) {
+<b class="nc">&nbsp;        return !getBibFiles(dragboard).isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Path&gt; getBibFiles(Dragboard dragboard) {
+<b class="nc">&nbsp;        if (!dragboard.hasFiles()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return dragboard.getFiles().stream().map(File::toPath).filter(FileUtil::isBibFile).collect(Collectors.toList());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean hasGroups(Dragboard dragboard) {
+<b class="nc">&nbsp;        return !getGroups(dragboard).isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;String&gt; getGroups(Dragboard dragboard) {
+<b class="nc">&nbsp;        if (!dragboard.hasContent(DragAndDropDataFormats.GROUP)) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return (List&lt;String&gt;) dragboard.getContent(DragAndDropDataFormats.GROUP);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

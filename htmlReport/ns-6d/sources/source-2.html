@@ -1,0 +1,144 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NewEntryBindingPreset</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.keybindings.presets</a>
+</div>
+
+<h1>Coverage Summary for Class: NewEntryBindingPreset (org.jabref.gui.preferences.keybindings.presets)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NewEntryBindingPreset</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.keybindings.presets;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+<b class="nc">&nbsp;public class NewEntryBindingPreset implements KeyBindingPreset {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;New entry by type&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Map&lt;KeyBinding, String&gt; getKeyBindings() {
+<b class="nc">&nbsp;        final Map&lt;KeyBinding, String&gt; keyBindings = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Clear conflicting default presets
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.PULL_CHANGES_FROM_SHARED_DATABASE, &quot;&quot;);</b>
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.COPY_PREVIEW, &quot;&quot;);</b>
+&nbsp;
+&nbsp;        // Add new entry presets
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.NEW_ARTICLE, &quot;ctrl+shift+A&quot;);</b>
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.NEW_BOOK, &quot;ctrl+shift+B&quot;);</b>
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.ADD_ENTRY, &quot;ctrl+N&quot;);</b>
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.ADD_ENTRY_IDENTIFIER, &quot;ctrl+alt+shift+N&quot;);</b>
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.ADD_ENTRY_PLAINTEXT, &quot;ctrl+shift+N&quot;);</b>
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.NEW_INBOOK, &quot;ctrl+shift+I&quot;);</b>
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.NEW_INPROCEEDINGS, &quot;ctrl+shift+C&quot;);</b>
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.NEW_MASTERSTHESIS, &quot;ctrl+shift+M&quot;);</b>
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.NEW_PHDTHESIS, &quot;ctrl+shift+T&quot;);</b>
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.NEW_PROCEEDINGS, &quot;ctrl+shift+P&quot;);</b>
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.NEW_TECHREPORT, &quot;ctrl+shift+R&quot;);</b>
+<b class="nc">&nbsp;        keyBindings.put(KeyBinding.NEW_UNPUBLISHED, &quot;ctrl+shift+U&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return keyBindings;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

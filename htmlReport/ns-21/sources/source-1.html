@@ -1,0 +1,164 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibTexStringRename</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.collab.stringrename</a>
+</div>
+
+<h1>Coverage Summary for Class: BibTexStringRename (org.jabref.gui.collab.stringrename)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibTexStringRename</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.collab.stringrename;
+&nbsp;
+&nbsp;import org.jabref.gui.collab.DatabaseChange;
+&nbsp;import org.jabref.gui.collab.DatabaseChangeResolverFactory;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.gui.undo.UndoableStringChange;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibtexString;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public final class BibTexStringRename extends DatabaseChange {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BibTexStringRename.class);</b>
+&nbsp;
+&nbsp;    private final BibtexString oldString;
+&nbsp;    private final BibtexString newString;
+&nbsp;
+&nbsp;    public BibTexStringRename(BibtexString oldString, BibtexString newString, BibDatabaseContext databaseContext, DatabaseChangeResolverFactory databaseChangeResolverFactory) {
+<b class="nc">&nbsp;        super(databaseContext, databaseChangeResolverFactory);</b>
+<b class="nc">&nbsp;        this.oldString = oldString;</b>
+<b class="nc">&nbsp;        this.newString = newString;</b>
+&nbsp;
+<b class="nc">&nbsp;        setChangeName(Localization.lang(&quot;Renamed string: &#39;%0&#39;&quot;, oldString.getName()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void applyChange(NamedCompoundEdit undoEdit) {
+<b class="nc">&nbsp;        if (databaseContext.getDatabase().hasStringByName(newString.getName())) {</b>
+&nbsp;            // The name to change to is already in the database, so we can&#39;t comply.
+<b class="nc">&nbsp;            LOGGER.info(&quot;Cannot rename string &#39;{}&#39; to &#39;{}&#39; because the name is already in use&quot;, oldString.getName(), newString.getName());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String currentName = oldString.getName();</b>
+<b class="nc">&nbsp;        String newName = newString.getName();</b>
+<b class="nc">&nbsp;        oldString.setName(newName);</b>
+<b class="nc">&nbsp;        undoEdit.addEdit(new UndoableStringChange(oldString, true, currentName, newName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibtexString getOldString() {
+<b class="nc">&nbsp;        return oldString;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibtexString getNewString() {
+<b class="nc">&nbsp;        return newString;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

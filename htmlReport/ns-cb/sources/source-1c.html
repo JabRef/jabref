@@ -1,0 +1,348 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ISIDOREFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: ISIDOREFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ISIDOREFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/94)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.PushbackInputStream;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.StringJoiner;
+&nbsp;
+&nbsp;import javax.xml.parsers.DocumentBuilder;
+&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+&nbsp;import javax.xml.parsers.ParserConfigurationException;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.fetcher.transformers.ISIDOREQueryTransformer;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;
+&nbsp;import jakarta.ws.rs.core.MediaType;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;import org.jooq.lambda.Unchecked;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.w3c.dom.Element;
+&nbsp;import org.w3c.dom.Node;
+&nbsp;import org.w3c.dom.NodeList;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fetcher for &lt;a href=&quot;https://isidore.science&quot;&gt;ISIDORE&lt;/a&gt;```
+&nbsp; * Will take in the link to the website or the last six digits that identify the reference
+&nbsp; * Uses &lt;a href=&quot;https://isidore.science/api&quot;&gt;ISIDORE&#39;s API&lt;/a&gt;.
+&nbsp; */
+<b class="nc">&nbsp;public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ISIDOREFetcher.class);</b>
+&nbsp;
+&nbsp;    private static final String SOURCE_WEB_SEARCH = &quot;https://api.isidore.science/resource/search&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return xmlData -&gt; {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                PushbackInputStream pushbackInputStream = new PushbackInputStream(xmlData);</b>
+<b class="nc">&nbsp;                int data = pushbackInputStream.read();</b>
+<b class="nc">&nbsp;                if (data == -1) {</b>
+<b class="nc">&nbsp;                    return List.of();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (pushbackInputStream.available() &lt; 5) {</b>
+&nbsp;                    // We guess, it&#39;s an error if less than 5
+<b class="nc">&nbsp;                    pushbackInputStream.unread(data);</b>
+<b class="nc">&nbsp;                    String error = new String(pushbackInputStream.readAllBytes(), StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;                    throw new FetcherException(error);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                pushbackInputStream.unread(data);</b>
+<b class="nc">&nbsp;                DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();</b>
+<b class="nc">&nbsp;                Document document = builder.parse(pushbackInputStream);</b>
+&nbsp;
+&nbsp;                // Assuming the root element represents an entry
+<b class="nc">&nbsp;                Element entryElement = document.getDocumentElement();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (entryElement == null) {</b>
+<b class="nc">&nbsp;                    return List.of();</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                return parseXMl(entryElement);</b>
+&nbsp;            } catch (FetcherException e) {
+<b class="nc">&nbsp;                Unchecked.throwChecked(e);</b>
+&nbsp;            } catch (ParserConfigurationException | IOException | SAXException e) {
+<b class="nc">&nbsp;                Unchecked.throwChecked(new FetcherException(&quot;Issue with parsing link&quot;, e));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URLDownload getUrlDownload(URL url) {
+<b class="nc">&nbsp;        URLDownload download = new URLDownload(url);</b>
+<b class="nc">&nbsp;        download.addHeader(&quot;Accept&quot;, MediaType.APPLICATION_XML);</b>
+<b class="nc">&nbsp;        return download;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        ISIDOREQueryTransformer queryTransformer = new ISIDOREQueryTransformer();</b>
+<b class="nc">&nbsp;        String transformedQuery = queryTransformer.transformSearchQuery(queryNode).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(SOURCE_WEB_SEARCH);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;q&quot;, transformedQuery);</b>
+<b class="nc">&nbsp;        if (pageNumber &gt; 1) {</b>
+<b class="nc">&nbsp;            uriBuilder.addParameter(&quot;page&quot;, String.valueOf(pageNumber));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;replies&quot;, String.valueOf(getPageSize()));</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;lang&quot;, &quot;en&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;output&quot;, &quot;xml&quot;);</b>
+<b class="nc">&nbsp;        queryTransformer.getParameterMap().forEach(uriBuilder::addParameter);</b>
+&nbsp;
+<b class="nc">&nbsp;        URL url = uriBuilder.build().toURL();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;URl for query {}&quot;, url);</b>
+<b class="nc">&nbsp;        return url;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntry&gt; parseXMl(Element element) {
+<b class="nc">&nbsp;        NodeList list = element.getElementsByTagName(&quot;isidore&quot;);</b>
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; bibEntryList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; list.getLength(); i++) {</b>
+<b class="nc">&nbsp;            Element elem = (Element) list.item(i);</b>
+<b class="nc">&nbsp;            BibEntry bibEntry = xmlItemToBibEntry(elem);</b>
+<b class="nc">&nbsp;            bibEntryList.add(bibEntry);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return bibEntryList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibEntry xmlItemToBibEntry(Element itemElement) {
+<b class="nc">&nbsp;        return new BibEntry(getType(itemElement.getElementsByTagName(&quot;types&quot;).item(0).getChildNodes()))</b>
+<b class="nc">&nbsp;                .withField(StandardField.TITLE, itemElement.getElementsByTagName(&quot;title&quot;).item(0).getTextContent().replace(&quot;\&quot;&quot;, &quot;&quot;))</b>
+<b class="nc">&nbsp;                .withField(StandardField.AUTHOR, getAuthor(itemElement.getElementsByTagName(&quot;enrichedCreators&quot;).item(0)))</b>
+<b class="nc">&nbsp;                .withField(StandardField.YEAR, itemElement.getElementsByTagName(&quot;date&quot;).item(0).getChildNodes().item(1).getTextContent().substring(0, 4))</b>
+<b class="nc">&nbsp;                .withField(StandardField.JOURNAL, getJournal(itemElement.getElementsByTagName(&quot;dc:source&quot;)))</b>
+<b class="nc">&nbsp;                .withField(StandardField.PUBLISHER, getPublishers(itemElement.getElementsByTagName(&quot;publishers&quot;).item(0)))</b>
+<b class="nc">&nbsp;                .withField(StandardField.DOI, getDOI(itemElement.getElementsByTagName(&quot;ore&quot;).item(0).getChildNodes()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getDOI(NodeList list) {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; list.getLength(); i++) {</b>
+<b class="nc">&nbsp;            String content = list.item(i).getTextContent();</b>
+<b class="nc">&nbsp;            if (content.contains(&quot;DOI:&quot;)) {</b>
+<b class="nc">&nbsp;                return content.replace(&quot;DOI: &quot;, &quot;&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (list.item(i).getTextContent().contains(&quot;doi:&quot;)) {</b>
+<b class="nc">&nbsp;                return content.replace(&quot;info:doi:&quot;, &quot;&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the type of the document, ISIDORE only seems to have select types, also their types are different to
+&nbsp;     * those used by JabRef.
+&nbsp;     */
+&nbsp;    private EntryType getType(NodeList list) {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; list.getLength(); i++) {</b>
+<b class="nc">&nbsp;            String type = list.item(i).getTextContent();</b>
+<b class="nc">&nbsp;            if (type.contains(&quot;article&quot;) || type.contains(&quot;Article&quot;)) {</b>
+<b class="nc">&nbsp;                return StandardEntryType.Article;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (type.contains(&quot;thesis&quot;) || type.contains(&quot;Thesis&quot;)) {</b>
+<b class="nc">&nbsp;                return StandardEntryType.Thesis;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (type.contains(&quot;book&quot;) || type.contains(&quot;Book&quot;)) {</b>
+<b class="nc">&nbsp;                return StandardEntryType.Book;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return StandardEntryType.Misc;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getAuthor(Node itemElement) {
+&nbsp;        // Gets all the authors, separated with the word &quot;and&quot;
+&nbsp;        // For some reason the author field sometimes has extra numbers and letters.
+<b class="nc">&nbsp;        StringJoiner stringJoiner = new StringJoiner(&quot; and &quot;);</b>
+<b class="nc">&nbsp;        for (int i = 1; i &lt; itemElement.getChildNodes().getLength(); i += 2) {</b>
+<b class="nc">&nbsp;            String next = removeNumbers(itemElement.getChildNodes().item(i).getTextContent()).replaceAll(&quot;\\s+&quot;, &quot; &quot;);</b>
+<b class="nc">&nbsp;            next = next.replace(&quot;\n&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;            if (next.isBlank()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+<b class="nc">&nbsp;            stringJoiner.add(next);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return stringJoiner.toString().substring(0, stringJoiner.length()).trim().replaceAll(&quot;\\s+&quot;, &quot; &quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Remove numbers from a string and everything after the number, (helps with the author field).
+&nbsp;     */
+&nbsp;    private String removeNumbers(String string) {
+<b class="nc">&nbsp;        for (int i = 0; i &lt; string.length(); i++) {</b>
+<b class="nc">&nbsp;            if (Character.isDigit(string.charAt(i))) {</b>
+<b class="nc">&nbsp;                return string.substring(0, i);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return string;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getPublishers(Node itemElement) {
+&nbsp;        // In the XML file the publishers node often lists multiple publisher e.g.
+&nbsp;        // &lt;publisher origin=&quot;HAL CCSD&quot;&gt;HAL CCSD&lt;/publisher&gt;
+&nbsp;        // &lt;publisher origin=&quot;Elsevier&quot;&gt;Elsevier&lt;/publisher&gt;
+&nbsp;        // Therefore this function simply gets all of them.
+<b class="nc">&nbsp;        if (itemElement == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        StringJoiner stringJoiner = new StringJoiner(&quot;, &quot;);</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; itemElement.getChildNodes().getLength(); i++) {</b>
+<b class="nc">&nbsp;            if (itemElement.getChildNodes().item(i).getTextContent().isBlank()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+<b class="nc">&nbsp;            stringJoiner.add(itemElement.getChildNodes().item(i).getTextContent().trim());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return stringJoiner.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getJournal(NodeList list) {
+<b class="nc">&nbsp;        if (list.getLength() == 0) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String reference = list.item(list.getLength() - 1).getTextContent();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; reference.length(); i++) {</b>
+<b class="nc">&nbsp;            if (reference.charAt(i) == &#39;,&#39;) {</b>
+<b class="nc">&nbsp;                return reference.substring(0, i);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;ISIDORE&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

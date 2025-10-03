@@ -1,0 +1,181 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DublinCoreSchemaCustom</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.schema</a>
+</div>
+
+<h1>Coverage Summary for Class: DublinCoreSchemaCustom (org.jabref.model.schema)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DublinCoreSchemaCustom</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.schema;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.reflect.FieldUtils;
+&nbsp;import org.apache.xmpbox.XMPMetadata;
+&nbsp;import org.apache.xmpbox.schema.DublinCoreSchema;
+&nbsp;import org.apache.xmpbox.type.AbstractField;
+&nbsp;import org.apache.xmpbox.type.ArrayProperty;
+&nbsp;import org.apache.xmpbox.type.DateType;
+&nbsp;import org.apache.xmpbox.type.StructuredType;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A DublinCoreSchema extension Class.
+&nbsp; * In case anyone intends to alter standard behaviour.
+&nbsp; */
+&nbsp;@StructuredType(preferedPrefix = &quot;dc&quot;, namespace = &quot;http://purl.org/dc/elements/1.1/&quot;)
+&nbsp;public class DublinCoreSchemaCustom extends DublinCoreSchema {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(DublinCoreSchemaCustom.class);</b>
+&nbsp;
+&nbsp;    public DublinCoreSchemaCustom(XMPMetadata metadata) {
+<b class="nc">&nbsp;        super(metadata);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static DublinCoreSchema copyDublinCoreSchema(DublinCoreSchema dcSchema) {
+<b class="nc">&nbsp;        if (dcSchema == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            DublinCoreSchemaCustom dublinCoreSchemaCustom = new DublinCoreSchemaCustom(dcSchema.getMetadata());</b>
+<b class="nc">&nbsp;            FieldUtils.writeField(dublinCoreSchemaCustom, &quot;container&quot;, dcSchema.getContainer(), true);</b>
+<b class="nc">&nbsp;            FieldUtils.writeField(dublinCoreSchemaCustom, &quot;attributes&quot;,</b>
+<b class="nc">&nbsp;                    FieldUtils.readField(dcSchema, &quot;attributes&quot;, true), true);</b>
+<b class="nc">&nbsp;            return dublinCoreSchemaCustom;</b>
+&nbsp;        } catch (IllegalAccessException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error making custom DC Schema. Using the default&quot;, e);</b>
+<b class="nc">&nbsp;            return dcSchema;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Overloaded XMP Schema method
+&nbsp;     * Behaviour is same except when seqName is &quot;Date&quot;. Will return raw value instead
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; getUnqualifiedSequenceValueList(String seqName) {
+<b class="nc">&nbsp;        AbstractField abstractProperty = getAbstractProperty(seqName);</b>
+<b class="nc">&nbsp;        if (abstractProperty instanceof ArrayProperty property) {</b>
+<b class="nc">&nbsp;            if (&quot;date&quot;.equals(seqName)) {</b>
+<b class="nc">&nbsp;                return property.getContainer()</b>
+<b class="nc">&nbsp;                               .getAllProperties()</b>
+<b class="nc">&nbsp;                               .stream()</b>
+<b class="nc">&nbsp;                               .map(field -&gt; (String) ((DateType) field).getRawValue())</b>
+<b class="nc">&nbsp;                               .collect(Collectors.toList());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return property.getElementsAsString();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

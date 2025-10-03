@@ -1,0 +1,289 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ClipBoardManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui</a>
+</div>
+
+<h1>Coverage Summary for Class: ClipBoardManager (org.jabref.gui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ClipBoardManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (3/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.8%
+  </span>
+  <span class="absValue">
+    (5/51)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui;
+&nbsp;
+&nbsp;import java.awt.Toolkit;
+&nbsp;import java.awt.datatransfer.DataFlavor;
+&nbsp;import java.awt.datatransfer.StringSelection;
+&nbsp;import java.awt.datatransfer.Transferable;
+&nbsp;import java.awt.datatransfer.UnsupportedFlavorException;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.scene.control.TextInputControl;
+&nbsp;import javafx.scene.input.Clipboard;
+&nbsp;import javafx.scene.input.ClipboardContent;
+&nbsp;import javafx.scene.input.MouseButton;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseAwt;
+&nbsp;import org.jabref.logic.bibtex.BibEntryWriter;
+&nbsp;import org.jabref.logic.bibtex.FieldWriter;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.BibtexString;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;@AllowedToUseAwt(&quot;Requires java.awt.datatransfer.Clipboard&quot;)
+&nbsp;public class ClipBoardManager {
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ClipBoardManager.class);</b>
+&nbsp;
+&nbsp;    private static Clipboard clipboard;
+&nbsp;    private static java.awt.datatransfer.Clipboard primary;
+&nbsp;
+&nbsp;    public ClipBoardManager() {
+<b class="fc">&nbsp;        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection());</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public ClipBoardManager(Clipboard clipboard, java.awt.datatransfer.Clipboard primary) {</b>
+<b class="fc">&nbsp;        ClipBoardManager.clipboard = clipboard;</b>
+<b class="fc">&nbsp;        ClipBoardManager.primary = primary;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Add X11 clipboard support to a text input control. It is necessary to call this method in every input where you
+&nbsp;     * want to use it: {@code ClipBoardManager.addX11Support(TextInputControl input);}.
+&nbsp;     *
+&nbsp;     * @param input the TextInputControl (e.g., TextField, TextArea, and children) where adding this functionality.
+&nbsp;     * @see &lt;a href=&quot;https://www.uninformativ.de/blog/postings/2017-04-02/0/POSTING-en.html&quot;&gt;Short summary for X11
+&nbsp;     * clipboards&lt;/a&gt;
+&nbsp;     * @see &lt;a href=&quot;https://unix.stackexchange.com/questions/139191/whats-the-difference-between-primary-selection-and-clipboard-buffer/139193#139193&quot;&gt;Longer
+&nbsp;     * text over clipboards&lt;/a&gt;
+&nbsp;     */
+&nbsp;    public static void addX11Support(TextInputControl input) {
+<b class="nc">&nbsp;        input.selectedTextProperty().addListener(</b>
+&nbsp;                // using InvalidationListener because of https://bugs.openjdk.java.net/browse/JDK-8176270
+<b class="nc">&nbsp;                observable -&gt; Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;                    String newValue = input.getSelectedText();</b>
+<b class="nc">&nbsp;                    if (!newValue.isEmpty() &amp;&amp; (primary != null)) {</b>
+<b class="nc">&nbsp;                        primary.setContents(new StringSelection(newValue), null);</b>
+&nbsp;                    }
+&nbsp;                }));
+<b class="nc">&nbsp;        input.setOnMouseClicked(event -&gt; {</b>
+<b class="nc">&nbsp;            if (event.getButton() == MouseButton.MIDDLE) {</b>
+<b class="nc">&nbsp;                input.insertText(input.getCaretPosition(), getContentsPrimary());</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the String residing on the system clipboard.
+&nbsp;     *
+&nbsp;     * @return any text found on the Clipboard; if none found, return an empty String.
+&nbsp;     */
+&nbsp;    public static String getContents() {
+<b class="nc">&nbsp;        String result = clipboard.getString();</b>
+<b class="nc">&nbsp;        if (result == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getHtmlContents() {
+<b class="nc">&nbsp;        String result = clipboard.getHtml();</b>
+<b class="nc">&nbsp;        if (result == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean hasHtml() {
+<b class="nc">&nbsp;        return clipboard.hasHtml();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the String residing on the primary clipboard (if it exists).
+&nbsp;     *
+&nbsp;     * @return any text found on the primary Clipboard; if none found, try with the system clipboard.
+&nbsp;     */
+&nbsp;    public static String getContentsPrimary() {
+<b class="nc">&nbsp;        if (primary != null) {</b>
+<b class="nc">&nbsp;            Transferable contents = primary.getContents(null);</b>
+<b class="nc">&nbsp;            if ((contents != null) &amp;&amp; contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    return (String) contents.getTransferData(DataFlavor.stringFlavor);</b>
+&nbsp;                } catch (UnsupportedFlavorException | IOException e) {
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;&quot;, e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return getContents();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Puts content onto the system clipboard.
+&nbsp;     *
+&nbsp;     * @param content the ClipboardContent to set as current value of the system clipboard.
+&nbsp;     */
+&nbsp;    public void setContent(ClipboardContent content) {
+<b class="nc">&nbsp;        clipboard.setContent(content);</b>
+<b class="nc">&nbsp;        setPrimaryClipboardContent(content);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Puts content onto the primary clipboard (if it exists).
+&nbsp;     *
+&nbsp;     * @param content the ClipboardContent to set as current value of the primary clipboard.
+&nbsp;     */
+&nbsp;    public void setPrimaryClipboardContent(ClipboardContent content) {
+<b class="nc">&nbsp;        if (primary != null) {</b>
+<b class="nc">&nbsp;            primary.setContents(new StringSelection(content.getString()), null);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setHtmlContent(String html, String fallbackPlain) {
+<b class="nc">&nbsp;        final ClipboardContent content = new ClipboardContent();</b>
+<b class="nc">&nbsp;        content.putHtml(html);</b>
+<b class="nc">&nbsp;        content.putString(fallbackPlain);</b>
+<b class="nc">&nbsp;        clipboard.setContent(content);</b>
+<b class="nc">&nbsp;        setPrimaryClipboardContent(content);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setContent(String string) {
+<b class="nc">&nbsp;        final ClipboardContent content = new ClipboardContent();</b>
+<b class="nc">&nbsp;        content.putString(string);</b>
+<b class="nc">&nbsp;        clipboard.setContent(content);</b>
+<b class="nc">&nbsp;        setPrimaryClipboardContent(content);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setContent(List&lt;BibEntry&gt; entries, BibEntryTypesManager entryTypesManager) throws IOException {
+<b class="nc">&nbsp;        String serializedEntries = serializeEntries(entries, entryTypesManager);</b>
+<b class="nc">&nbsp;        setContent(serializedEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setContent(List&lt;BibEntry&gt; entries, BibEntryTypesManager entryTypesManager, List&lt;BibtexString&gt; stringConstants) throws IOException {
+<b class="nc">&nbsp;        StringBuilder builder = new StringBuilder();</b>
+<b class="nc">&nbsp;        stringConstants.forEach(strConst -&gt; builder.append(strConst.getParsedSerialization() == null ? &quot;&quot; : strConst.getParsedSerialization()));</b>
+<b class="nc">&nbsp;        String serializedEntries = serializeEntries(entries, entryTypesManager);</b>
+<b class="nc">&nbsp;        builder.append(serializedEntries);</b>
+<b class="nc">&nbsp;        setContent(builder.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String serializeEntries(List&lt;BibEntry&gt; entries, BibEntryTypesManager entryTypesManager) throws IOException {
+<b class="nc">&nbsp;        CliPreferences preferences = Injector.instantiateModelOrService(CliPreferences.class);</b>
+&nbsp;        // BibEntry is not Java serializable. Thus, we need to do the serialization manually
+&nbsp;        // At reading of the clipboard in JabRef, we parse the plain string in all cases, so we don&#39;t need to flag we put BibEntries here
+&nbsp;        // Furthermore, storing a string also enables other applications to work with the data
+<b class="nc">&nbsp;        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferences.getFieldPreferences()), entryTypesManager);</b>
+<b class="nc">&nbsp;        return writer.serializeAll(entries, BibDatabaseMode.BIBTEX);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

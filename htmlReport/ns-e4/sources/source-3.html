@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CSLReferenceMark</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.oocsltext</a>
+</div>
+
+<h1>Coverage Summary for Class: CSLReferenceMark (org.jabref.logic.openoffice.oocsltext)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CSLReferenceMark</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.oocsltext;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.openoffice.ReferenceMark;
+&nbsp;
+&nbsp;import com.sun.star.container.XNamed;
+&nbsp;import com.sun.star.lang.XMultiServiceFactory;
+&nbsp;import com.sun.star.text.XTextContent;
+&nbsp;import com.sun.star.uno.Exception;
+&nbsp;import com.sun.star.uno.UnoRuntime;
+&nbsp;import io.github.thibaultmeyer.cuid.CUID;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class to model a reference mark. See {@link CSLReferenceMarkManager} for the usage and management of all reference marks.
+&nbsp; */
+&nbsp;public class CSLReferenceMark {
+&nbsp;    private ReferenceMark referenceMark;
+&nbsp;    private XTextContent textContent;
+&nbsp;    private final List&lt;String&gt; citationKeys;
+&nbsp;    private List&lt;Integer&gt; citationNumbers;
+&nbsp;
+<b class="nc">&nbsp;    public CSLReferenceMark(XNamed named, ReferenceMark referenceMark) {</b>
+<b class="nc">&nbsp;        this.referenceMark = referenceMark;</b>
+<b class="nc">&nbsp;        this.textContent = UnoRuntime.queryInterface(XTextContent.class, named);</b>
+<b class="nc">&nbsp;        this.citationKeys = referenceMark.getCitationKeys();</b>
+<b class="nc">&nbsp;        this.citationNumbers = referenceMark.getCitationNumbers();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static CSLReferenceMark of(List&lt;String&gt; citationKeys, List&lt;Integer&gt; citationNumbers, XMultiServiceFactory factory) throws Exception {
+<b class="nc">&nbsp;        String uniqueId = CUID.randomCUID2(8).toString();</b>
+<b class="nc">&nbsp;        String name = buildReferenceName(citationKeys, citationNumbers, uniqueId);</b>
+<b class="nc">&nbsp;        XNamed named = UnoRuntime.queryInterface(XNamed.class, factory.createInstance(&quot;com.sun.star.text.ReferenceMark&quot;));</b>
+<b class="nc">&nbsp;        named.setName(name);</b>
+<b class="nc">&nbsp;        ReferenceMark referenceMark = new ReferenceMark(name, citationKeys, citationNumbers, uniqueId);</b>
+<b class="nc">&nbsp;        return new CSLReferenceMark(named, referenceMark);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String buildReferenceName(List&lt;String&gt; citationKeys, List&lt;Integer&gt; citationNumbers, String uniqueId) {
+<b class="nc">&nbsp;        StringBuilder nameBuilder = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; citationKeys.size(); i++) {</b>
+<b class="nc">&nbsp;            if (i &gt; 0) {</b>
+<b class="nc">&nbsp;                nameBuilder.append(&quot;, &quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            nameBuilder.append(ReferenceMark.PREFIXES[0]).append(citationKeys.get(i))</b>
+<b class="nc">&nbsp;                       .append(&quot; &quot;).append(ReferenceMark.PREFIXES[1]).append(citationNumbers.get(i));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        nameBuilder.append(&quot; &quot;).append(uniqueId);</b>
+<b class="nc">&nbsp;        return nameBuilder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getCitationKeys() {
+<b class="nc">&nbsp;        return citationKeys;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCitationNumbers(List&lt;Integer&gt; numbers) {
+<b class="nc">&nbsp;        this.citationNumbers = numbers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public XTextContent getTextContent() {
+<b class="nc">&nbsp;        return textContent;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return referenceMark.getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void updateTextContent(XTextContent newTextContent) {
+<b class="nc">&nbsp;        this.textContent = newTextContent;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void updateName(String newName) {
+<b class="nc">&nbsp;        this.referenceMark = new ReferenceMark(newName, this.citationKeys, this.citationNumbers, this.referenceMark.getUniqueId());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

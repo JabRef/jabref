@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SendAsEMailAction</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.frame</a>
+</div>
+
+<h1>Coverage Summary for Class: SendAsEMailAction (org.jabref.gui.frame)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SendAsEMailAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.frame;
+&nbsp;
+&nbsp;import java.awt.Desktop;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseAwt;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Sends the selected entry as email
+&nbsp; * &lt;p&gt;
+&nbsp; * It uses the mailto:-mechanism
+&nbsp; * &lt;p&gt;
+&nbsp; * Microsoft Outlook does not support attachments via mailto
+&nbsp; * Therefore, the folder(s), where the file(s) belonging to the entry are stored,
+&nbsp; * are opened. This feature is disabled by default and can be switched on at
+&nbsp; * preferences/external programs
+&nbsp; */
+&nbsp;@AllowedToUseAwt(&quot;Requires AWT to send an email&quot;)
+&nbsp;public abstract class SendAsEMailAction extends SimpleCommand {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SendAsEMailAction.class);</b>
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    public SendAsEMailAction(DialogService dialogService,
+&nbsp;                             GuiPreferences preferences,
+&nbsp;                             StateManager stateManager,
+<b class="nc">&nbsp;                             TaskExecutor taskExecutor) {</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void execute() {
+<b class="nc">&nbsp;        BackgroundTask.wrap(this::sendEmail)</b>
+<b class="nc">&nbsp;                      .onSuccess(dialogService::notify)</b>
+<b class="nc">&nbsp;                      .onFailure(e -&gt; {</b>
+<b class="nc">&nbsp;                          String message = Localization.lang(&quot;Error creating email&quot;);</b>
+<b class="nc">&nbsp;                          LOGGER.warn(message, e);</b>
+<b class="nc">&nbsp;                          dialogService.notify(message);</b>
+&nbsp;                      })
+<b class="nc">&nbsp;                      .executeWith(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String sendEmail() throws URISyntaxException, IOException {
+<b class="nc">&nbsp;        if (!Desktop.isDesktopSupported() || stateManager.getActiveDatabase().isEmpty()) {</b>
+<b class="nc">&nbsp;            return Localization.lang(&quot;Error creating email&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (stateManager.getSelectedEntries().isEmpty()) {</b>
+<b class="nc">&nbsp;            return Localization.lang(&quot;This operation requires one or more entries to be selected.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = stateManager.getSelectedEntries();</b>
+<b class="nc">&nbsp;        URI uriMailTo = getUriMailTo(entries);</b>
+&nbsp;
+<b class="nc">&nbsp;        Desktop desktop = Desktop.getDesktop();</b>
+<b class="nc">&nbsp;        desktop.mail(uriMailTo);</b>
+&nbsp;
+<b class="nc">&nbsp;        return &quot;%s: %d&quot;.formatted(Localization.lang(&quot;Entries added to an email&quot;), entries.size());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private URI getUriMailTo(List&lt;BibEntry&gt; entries) throws URISyntaxException {
+<b class="nc">&nbsp;        StringBuilder mailTo = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        mailTo.append(getEmailAddress());</b>
+<b class="nc">&nbsp;        mailTo.append(&quot;?Body=&quot;).append(getBody());</b>
+<b class="nc">&nbsp;        mailTo.append(&quot;&amp;Subject=&quot;).append(getSubject());</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; attachments = getAttachments(entries);</b>
+<b class="nc">&nbsp;        for (String path : attachments) {</b>
+<b class="nc">&nbsp;            mailTo.append(&quot;&amp;Attachment=\&quot;&quot;).append(path);</b>
+<b class="nc">&nbsp;            mailTo.append(&quot;\&quot;&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new URI(&quot;mailto&quot;, mailTo.toString(), null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;String&gt; getAttachments(List&lt;BibEntry&gt; entries) {
+&nbsp;        // open folders is needed to indirectly support email programs, which cannot handle
+&nbsp;        //   the unofficial &quot;mailto:attachment&quot; property
+<b class="nc">&nbsp;        boolean openFolders = preferences.getExternalApplicationsPreferences().shouldAutoOpenEmailAttachmentsFolder();</b>
+&nbsp;
+<b class="nc">&nbsp;        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();</b>
+<b class="nc">&nbsp;        List&lt;Path&gt; fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectories(preferences.getFilePreferences()));</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; attachments = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Path path : fileList) {</b>
+<b class="nc">&nbsp;            attachments.add(path.toAbsolutePath().toString());</b>
+<b class="nc">&nbsp;            if (openFolders) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    NativeDesktop.openFolderAndSelectFile(path.toAbsolutePath(), preferences.getExternalApplicationsPreferences(), dialogService);</b>
+&nbsp;                } catch (IOException e) {
+<b class="nc">&nbsp;                    LOGGER.debug(&quot;Cannot open file&quot;, e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return attachments;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected abstract String getEmailAddress();
+&nbsp;
+&nbsp;    protected abstract String getSubject();
+&nbsp;
+&nbsp;    protected abstract String getBody();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

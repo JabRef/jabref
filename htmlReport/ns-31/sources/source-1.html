@@ -1,0 +1,315 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ErrorConsoleView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.errorconsole</a>
+</div>
+
+<h1>Coverage Summary for Class: ErrorConsoleView (org.jabref.gui.errorconsole)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ErrorConsoleView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ErrorConsoleView$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.errorconsole;
+&nbsp;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.ContentDisplay;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ListCell;
+&nbsp;import javafx.scene.control.ListView;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.SelectionMode;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.stage.Modality;
+&nbsp;import javafx.util.Callback;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.ControlHelper;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BuildInfo;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;
+&nbsp;public class ErrorConsoleView extends BaseDialog&lt;Void&gt; {
+&nbsp;
+&nbsp;    private ErrorConsoleViewModel viewModel;
+&nbsp;
+&nbsp;    @FXML private ButtonType copyLogButton;
+&nbsp;    @FXML private ButtonType clearLogButton;
+&nbsp;    @FXML private ButtonType createIssueButton;
+&nbsp;    @FXML private ListView&lt;LogEventViewModel&gt; messagesListView;
+&nbsp;    @FXML private Label descriptionLabel;
+&nbsp;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;    @Inject private GuiPreferences preferences;
+&nbsp;    @Inject private ClipBoardManager clipBoardManager;
+&nbsp;    @Inject private BuildInfo buildInfo;
+&nbsp;    @Inject private KeyBindingRepository keyBindingRepository;
+&nbsp;
+<b class="nc">&nbsp;    public ErrorConsoleView() {</b>
+<b class="nc">&nbsp;        this.setTitle(Localization.lang(&quot;Event log&quot;));</b>
+<b class="nc">&nbsp;        this.initModality(Modality.NONE);</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .load()</b>
+<b class="nc">&nbsp;                  .setAsDialogPane(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        ControlHelper.setAction(copyLogButton, getDialogPane(), event -&gt; copyLog());</b>
+<b class="nc">&nbsp;        ControlHelper.setAction(clearLogButton, getDialogPane(), event -&gt; clearLog());</b>
+<b class="nc">&nbsp;        ControlHelper.setAction(createIssueButton, getDialogPane(), event -&gt; createIssue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        viewModel = new ErrorConsoleViewModel(dialogService, preferences, clipBoardManager, buildInfo);</b>
+<b class="nc">&nbsp;        messagesListView.setCellFactory(createCellFactory());</b>
+<b class="nc">&nbsp;        messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());</b>
+<b class="nc">&nbsp;        messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);</b>
+<b class="nc">&nbsp;        messagesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);</b>
+<b class="nc">&nbsp;        viewModel.allMessagesDataProperty().addListener((ListChangeListener&lt;LogEventViewModel&gt;) (change -&gt; {</b>
+<b class="nc">&nbsp;            int size = viewModel.allMessagesDataProperty().size();</b>
+<b class="nc">&nbsp;            if (size &gt; 0) {</b>
+<b class="nc">&nbsp;                messagesListView.scrollTo(size - 1);</b>
+&nbsp;            }
+&nbsp;        }));
+<b class="nc">&nbsp;        descriptionLabel.setGraphic(IconTheme.JabRefIcons.CONSOLE.getGraphicNode());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Callback&lt;ListView&lt;LogEventViewModel&gt;, ListCell&lt;LogEventViewModel&gt;&gt; createCellFactory() {
+<b class="nc">&nbsp;        return cell -&gt; new ListCell&lt;&gt;() {</b>
+&nbsp;            private final HBox graphic;
+&nbsp;            private final VBox message;
+&nbsp;            private final Label heading;
+&nbsp;            private final Label stacktrace;
+&nbsp;
+&nbsp;            {
+<b class="nc">&nbsp;                graphic = new HBox();</b>
+<b class="nc">&nbsp;                heading = new Label();</b>
+<b class="nc">&nbsp;                stacktrace = new Label();</b>
+<b class="nc">&nbsp;                message = new VBox();</b>
+<b class="nc">&nbsp;                message.setAlignment(Pos.CENTER_LEFT);</b>
+<b class="nc">&nbsp;                message.getChildren().setAll(heading, stacktrace);</b>
+<b class="nc">&nbsp;                message.getStyleClass().add(&quot;message-box&quot;);</b>
+<b class="nc">&nbsp;                setContentDisplay(ContentDisplay.GRAPHIC_ONLY);</b>
+<b class="nc">&nbsp;                getStyleClass().add(&quot;error-console-cell&quot;);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void updateItem(LogEventViewModel event, boolean empty) {
+<b class="nc">&nbsp;                super.updateItem(event, empty);</b>
+&nbsp;
+<b class="nc">&nbsp;                if ((event == null) || empty) {</b>
+<b class="nc">&nbsp;                    setGraphic(null);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    Node icon = event.getIcon().getGraphicNode();</b>
+<b class="nc">&nbsp;                    heading.setText(event.getDisplayText());</b>
+<b class="nc">&nbsp;                    heading.getStyleClass().setAll(event.getStyleClass());</b>
+<b class="nc">&nbsp;                    event.getStackTrace().ifPresentOrElse(text -&gt; {</b>
+<b class="nc">&nbsp;                        stacktrace.setText(text);</b>
+<b class="nc">&nbsp;                        stacktrace.setVisible(true);</b>
+<b class="nc">&nbsp;                        stacktrace.setManaged(true);</b>
+&nbsp;                    }, () -&gt; {
+<b class="nc">&nbsp;                        stacktrace.setVisible(false);</b>
+<b class="nc">&nbsp;                        stacktrace.setManaged(false);</b>
+&nbsp;                    });
+<b class="nc">&nbsp;                    graphic.getStyleClass().setAll(event.getStyleClass());</b>
+<b class="nc">&nbsp;                    graphic.getChildren().setAll(icon, message);</b>
+<b class="nc">&nbsp;                    setGraphic(graphic);</b>
+<b class="nc">&nbsp;                    setContextMenu(createContextMenu(event));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            private ContextMenu createContextMenu(LogEventViewModel selectedLogEntry) {
+<b class="nc">&nbsp;                ContextMenu contextMenu = new ContextMenu();</b>
+<b class="nc">&nbsp;                MenuItem copyItem = new MenuItem(&quot;Copy&quot;);</b>
+<b class="nc">&nbsp;                copyItem.setOnAction(event -&gt; viewModel.copyLogEntry(selectedLogEntry));</b>
+<b class="nc">&nbsp;                contextMenu.getItems().add(copyItem);</b>
+<b class="nc">&nbsp;                return contextMenu;</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void copySelectedLogEntries(KeyEvent event) {
+<b class="nc">&nbsp;        if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.COPY, event)) {</b>
+<b class="nc">&nbsp;            ObservableList&lt;LogEventViewModel&gt; selectedEntries = messagesListView.getSelectionModel().getSelectedItems();</b>
+<b class="nc">&nbsp;            viewModel.copyLog(selectedEntries);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void copyLog() {
+<b class="nc">&nbsp;        viewModel.copyLog();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void clearLog() {
+<b class="nc">&nbsp;        viewModel.clearLog();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void createIssue() {
+<b class="nc">&nbsp;        viewModel.reportIssue();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

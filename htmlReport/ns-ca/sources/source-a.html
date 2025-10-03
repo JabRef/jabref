@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IdBasedParserFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer</a>
+</div>
+
+<h1>Coverage Summary for Class: IdBasedParserFetcher (org.jabref.logic.importer)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IdBasedParserFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides a convenient interface for ID-based fetcher, which follow the usual three-step procedure:
+&nbsp; * 1. Open a URL based on the search query
+&nbsp; * 2. Parse the response to get a list of {@link BibEntry}
+&nbsp; * 3. Post-process fetched entries
+&nbsp; */
+&nbsp;public interface IdBasedParserFetcher extends IdBasedFetcher, ParserFetcher {
+&nbsp;
+<b class="nc">&nbsp;    Logger LOGGER = LoggerFactory.getLogger(IdBasedParserFetcher.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Constructs a URL based on the query.
+&nbsp;     *
+&nbsp;     * @param identifier the ID
+&nbsp;     */
+&nbsp;    URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the parser used to convert the response to a list of {@link BibEntry}.
+&nbsp;     */
+&nbsp;    Parser getParser();
+&nbsp;
+&nbsp;    @Override
+&nbsp;    default Optional&lt;BibEntry&gt; performSearchById(String identifier) throws FetcherException {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(identifier)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;        URL urlForIdentifier;
+&nbsp;        try {
+<b class="nc">&nbsp;            urlForIdentifier = getUrlForIdentifier(identifier);</b>
+&nbsp;        } catch (URISyntaxException | MalformedURLException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Search URI is malformed&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        try (InputStream stream = getUrlDownload(urlForIdentifier).asInputStream()) {</b>
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; fetchedEntries = getParser().parseEntries(stream);</b>
+<b class="nc">&nbsp;            if (fetchedEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (fetchedEntries.size() &gt; 1) {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;Fetcher {} found more than one result for identifier {}. We will use the first entry.&quot;, getName(), identifier);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            BibEntry entry = fetchedEntries.getFirst();</b>
+<b class="nc">&nbsp;            doPostCleanup(entry);</b>
+<b class="nc">&nbsp;            return Optional.of(entry);</b>
+&nbsp;        } catch (IOException e) {
+&nbsp;            // check for the case where we already have a FetcherException from UrlDownload
+<b class="nc">&nbsp;            if (e.getCause() instanceof FetcherException fe) {</b>
+&nbsp;                throw fe;
+&nbsp;            }
+<b class="nc">&nbsp;            throw new FetcherException(urlForIdentifier, &quot;A network error occurred&quot;, e);</b>
+&nbsp;        } catch (ParseException e) {
+<b class="nc">&nbsp;            throw new FetcherException(urlForIdentifier, &quot;An internal parser error occurred&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

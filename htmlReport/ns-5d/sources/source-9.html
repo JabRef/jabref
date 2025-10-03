@@ -1,0 +1,290 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PreferencesSearchHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences</a>
+</div>
+
+<h1>Coverage Summary for Class: PreferencesSearchHandler (org.jabref.gui.preferences)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PreferencesSearchHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.css.PseudoClass;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.Control;
+&nbsp;import javafx.scene.control.Labeled;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;
+&nbsp;import com.google.common.collect.ArrayListMultimap;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class is responsible for filtering and searching inside the preferences view based on a search query.
+&nbsp; */
+&nbsp;class PreferencesSearchHandler {
+&nbsp;
+<b class="nc">&nbsp;    private static final PseudoClass CONTROL_HIGHLIGHT = PseudoClass.getPseudoClass(&quot;search-highlight&quot;);</b>
+&nbsp;
+&nbsp;    private final List&lt;PreferencesTab&gt; preferenceTabs;
+&nbsp;    private final ListProperty&lt;PreferencesTab&gt; filteredPreferenceTabs;
+&nbsp;    private final ArrayListMultimap&lt;PreferencesTab, Control&gt; preferenceTabsControls;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initializes the PreferencesSearchHandler with the given list of preference tabs.
+&nbsp;     *
+&nbsp;     * @param preferenceTabs The list of preference tabs.
+&nbsp;     */
+<b class="nc">&nbsp;    PreferencesSearchHandler(List&lt;PreferencesTab&gt; preferenceTabs) {</b>
+<b class="nc">&nbsp;        this.preferenceTabs = preferenceTabs;</b>
+<b class="nc">&nbsp;        this.preferenceTabsControls = getPreferenceTabsControlsMap(preferenceTabs);</b>
+<b class="nc">&nbsp;        this.filteredPreferenceTabs = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList(preferenceTabs));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Filters the preference tabs based on the provided search query.
+&nbsp;     * Highlights matching controls within tabs.
+&nbsp;     *
+&nbsp;     * @param query The search query to filter tabs.
+&nbsp;     */
+&nbsp;    public void filterTabs(String query) {
+<b class="nc">&nbsp;        clearHighlights();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (query.isBlank()) {</b>
+<b class="nc">&nbsp;            resetSearch();</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String searchQuery = query.toLowerCase(Locale.ROOT);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;PreferencesTab&gt; matchedTabs = preferenceTabs.stream()</b>
+<b class="nc">&nbsp;                                                         .filter(tab -&gt; tabMatchesQuery(tab, searchQuery))</b>
+<b class="nc">&nbsp;                                                         .collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        filteredPreferenceTabs.setAll(matchedTabs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if a tab matches the given search query either by its name or by its controls.
+&nbsp;     *
+&nbsp;     * @param tab   The preferences tab to check.
+&nbsp;     * @param query The search query.
+&nbsp;     * @return True if the tab matches the query.
+&nbsp;     */
+&nbsp;    private boolean tabMatchesQuery(PreferencesTab tab, String query) {
+<b class="nc">&nbsp;        boolean tabNameMatches = tab.getTabName().toLowerCase(Locale.ROOT).contains(query);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean controlMatches = preferenceTabsControls.get(tab).stream()</b>
+<b class="nc">&nbsp;                                                       .filter(control -&gt; controlMatchesQuery(control, query))</b>
+<b class="nc">&nbsp;                                                       .peek(this::highlightControl)</b>
+<b class="nc">&nbsp;                                                       .findAny()</b>
+<b class="nc">&nbsp;                                                       .isPresent();</b>
+&nbsp;
+<b class="nc">&nbsp;        return tabNameMatches || controlMatches;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if a control contains the given query in its content.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Matching criteria based on control type:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *     &lt;li&gt;&lt;b&gt;Labeled&lt;/b&gt; (e.g., Label, Button): Matches if its text contains the query (case-insensitive).&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;&lt;b&gt;ComboBox&lt;/b&gt;: Matches if any item (converted to string) contains the query (case-insensitive).&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;&lt;b&gt;TextField&lt;/b&gt;: Matches if its content contains the query (case-insensitive).&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     *
+&nbsp;     * @param control The control to check.
+&nbsp;     * @param query   The search query.
+&nbsp;     * @return true if the control contains the query, otherwise false.
+&nbsp;     */
+&nbsp;    private boolean controlMatchesQuery(Control control, String query) {
+<b class="nc">&nbsp;        if (control instanceof Labeled labeled &amp;&amp; labeled.getText() != null) {</b>
+<b class="nc">&nbsp;            return labeled.getText().toLowerCase(Locale.ROOT).contains(query);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (control instanceof ComboBox&lt;?&gt; comboBox &amp;&amp; !comboBox.getItems().isEmpty()) {</b>
+<b class="nc">&nbsp;            return comboBox.getItems().stream()</b>
+<b class="nc">&nbsp;                           .map(Object::toString)</b>
+<b class="nc">&nbsp;                           .anyMatch(item -&gt; item.toLowerCase(Locale.ROOT).contains(query));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (control instanceof TextField textField &amp;&amp; textField.getText() != null) {</b>
+<b class="nc">&nbsp;            return textField.getText().toLowerCase(Locale.ROOT).contains(query);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Highlights the given control to indicate a match.
+&nbsp;     *
+&nbsp;     * @param control The control to highlight.
+&nbsp;     */
+&nbsp;    private void highlightControl(Control control) {
+<b class="nc">&nbsp;        control.pseudoClassStateChanged(CONTROL_HIGHLIGHT, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Clears all highlights from controls.
+&nbsp;     */
+&nbsp;    private void clearHighlights() {
+<b class="nc">&nbsp;        preferenceTabsControls.values().forEach(control -&gt; control.pseudoClassStateChanged(CONTROL_HIGHLIGHT, false));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Resets the search, displaying all preference tabs.
+&nbsp;     */
+&nbsp;    private void resetSearch() {
+<b class="nc">&nbsp;        filteredPreferenceTabs.setAll(preferenceTabs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Provides the property representing the filtered list of preferences tabs.
+&nbsp;     *
+&nbsp;     * @return The filtered preference tabs as a ListProperty.
+&nbsp;     */
+&nbsp;    protected ListProperty&lt;PreferencesTab&gt; filteredPreferenceTabsProperty() {
+<b class="nc">&nbsp;        return filteredPreferenceTabs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Builds a map of controls for each preferences tab.
+&nbsp;     *
+&nbsp;     * @param tabs The list of preferences tabs.
+&nbsp;     * @return A map of preferences tabs to their controls.
+&nbsp;     */
+&nbsp;    private ArrayListMultimap&lt;PreferencesTab, Control&gt; getPreferenceTabsControlsMap(List&lt;PreferencesTab&gt; tabs) {
+<b class="nc">&nbsp;        ArrayListMultimap&lt;PreferencesTab, Control&gt; controlMap = ArrayListMultimap.create();</b>
+<b class="nc">&nbsp;        tabs.forEach(tab -&gt; scanControls(tab.getBuilder(), controlMap, tab));</b>
+<b class="nc">&nbsp;        return controlMap;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Recursively scans nodes and collects all controls.
+&nbsp;     *
+&nbsp;     * @param node       The current node being scanned.
+&nbsp;     * @param controlMap Map storing tabs and their corresponding controls.
+&nbsp;     * @param tab        The PreferencesTab associated with the current node.
+&nbsp;     */
+&nbsp;    private void scanControls(Node node, ArrayListMultimap&lt;PreferencesTab, Control&gt; controlMap, PreferencesTab tab) {
+<b class="nc">&nbsp;        if (node instanceof Control control) {</b>
+<b class="nc">&nbsp;            controlMap.put(tab, control);</b>
+<b class="nc">&nbsp;        } else if (node instanceof Parent parent) {</b>
+<b class="nc">&nbsp;            parent.getChildrenUnmodifiable().forEach(child -&gt; scanControls(child, controlMap, tab));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

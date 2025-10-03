@@ -1,0 +1,312 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileFieldParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.util</a>
+</div>
+
+<h1>Coverage Summary for Class: FileFieldParser (org.jabref.logic.importer.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileFieldParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/74)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/74)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.util;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.nio.file.InvalidPathException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class FileFieldParser {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(FileFieldParser.class);</b>
+&nbsp;
+&nbsp;    private final String value;
+&nbsp;
+&nbsp;    private StringBuilder charactersOfCurrentElement;
+&nbsp;
+&nbsp;    private boolean windowsPath;
+&nbsp;
+<b class="nc">&nbsp;    public FileFieldParser(String value) {</b>
+<b class="nc">&nbsp;        if (value == null) {</b>
+<b class="nc">&nbsp;            this.value = null;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.value = value.replace(&quot;$\\backslash$&quot;, &quot;\\&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts the string representation of LinkedFileData to a List of LinkedFile
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The syntax of one element is description:path:type
+&nbsp;     * Multiple elements are concatenated with ;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The main challenges of the implementation are:
+&nbsp;     *
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *     &lt;li&gt;that XML characters might be included (thus one cannot simply split on &quot;;&quot;)&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;some characters might be escaped&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;Windows absolute paths might be included without escaping&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     */
+&nbsp;    public static List&lt;LinkedFile&gt; parse(String value) {
+&nbsp;        // We need state to have a more clean code. Thus, we instantiate the class and then return the result
+<b class="nc">&nbsp;        FileFieldParser fileFieldParser = new FileFieldParser(value);</b>
+<b class="nc">&nbsp;        return fileFieldParser.parse();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;LinkedFile&gt; parse() {
+<b class="nc">&nbsp;        List&lt;LinkedFile&gt; files = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if ((value == null) || value.trim().isEmpty()) {</b>
+<b class="nc">&nbsp;            return files;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (LinkedFile.isOnlineLink(value.trim())) {</b>
+&nbsp;            // needs to be modifiable
+&nbsp;            try {
+<b class="nc">&nbsp;                return List.of(new LinkedFile(URLUtil.create(value), &quot;&quot;));</b>
+&nbsp;            } catch (MalformedURLException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;invalid url&quot;, e);</b>
+<b class="nc">&nbsp;                return files;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // data of each LinkedFile as split string
+<b class="nc">&nbsp;        List&lt;String&gt; linkedFileData = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        resetDataStructuresForNextElement();</b>
+<b class="nc">&nbsp;        boolean inXmlChar = false;</b>
+<b class="nc">&nbsp;        boolean escaped = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; value.length(); i++) {</b>
+<b class="nc">&nbsp;            char c = value.charAt(i);</b>
+<b class="nc">&nbsp;            if (!escaped &amp;&amp; (c == &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;                if (windowsPath) {</b>
+<b class="nc">&nbsp;                    charactersOfCurrentElement.append(c);</b>
+&nbsp;                    continue;
+&nbsp;                } else {
+<b class="nc">&nbsp;                    escaped = true;</b>
+&nbsp;                    continue;
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (!escaped &amp;&amp; (c == &#39;&amp;&#39;) &amp;&amp; !inXmlChar) {</b>
+&nbsp;                // Check if we are entering an XML special character construct such
+&nbsp;                // as &quot;&amp;#44;&quot;, because we need to know in order to ignore the semicolon.
+<b class="nc">&nbsp;                charactersOfCurrentElement.append(c);</b>
+<b class="nc">&nbsp;                if ((value.length() &gt; (i + 1)) &amp;&amp; (value.charAt(i + 1) == &#39;#&#39;)) {</b>
+<b class="nc">&nbsp;                    inXmlChar = true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (!escaped &amp;&amp; inXmlChar &amp;&amp; (c == &#39;;&#39;)) {</b>
+&nbsp;                // Check if we are exiting an XML special character construct:
+<b class="nc">&nbsp;                charactersOfCurrentElement.append(c);</b>
+<b class="nc">&nbsp;                inXmlChar = false;</b>
+<b class="nc">&nbsp;            } else if (!escaped &amp;&amp; (c == &#39;:&#39;)) {</b>
+<b class="nc">&nbsp;                if ((linkedFileData.size() == 1) &amp;&amp; // we already parsed the description</b>
+<b class="nc">&nbsp;                        (charactersOfCurrentElement.length() == 1)) { // we parsed one character</b>
+&nbsp;                    // special case of Windows paths
+&nbsp;                    // Example: &quot;:c:\test.pdf:PDF&quot;
+&nbsp;                    // We are at the second : (position 3 in the example) and &quot;just&quot; add it to the current element
+<b class="nc">&nbsp;                    charactersOfCurrentElement.append(c);</b>
+<b class="nc">&nbsp;                    windowsPath = true;</b>
+&nbsp;                    // special case for zotero absolute path on windows that do not have a colon in front
+&nbsp;                    // e.g. A:\zotero\paper.pdf
+<b class="nc">&nbsp;                } else if (charactersOfCurrentElement.length() == 1 &amp;&amp; value.charAt(i + 1) == &#39;\\&#39;) {</b>
+<b class="nc">&nbsp;                    charactersOfCurrentElement.append(c);</b>
+<b class="nc">&nbsp;                    windowsPath = true;</b>
+&nbsp;                } else {
+&nbsp;                    // We are in the next LinkedFile data element
+<b class="nc">&nbsp;                    linkedFileData.add(charactersOfCurrentElement.toString());</b>
+<b class="nc">&nbsp;                    resetDataStructuresForNextElement();</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (!escaped &amp;&amp; (c == &#39;;&#39;) &amp;&amp; !inXmlChar) {</b>
+<b class="nc">&nbsp;                linkedFileData.add(charactersOfCurrentElement.toString());</b>
+<b class="nc">&nbsp;                files.add(convert(linkedFileData));</b>
+&nbsp;
+&nbsp;                // next iteration
+<b class="nc">&nbsp;                resetDataStructuresForNextElement();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                charactersOfCurrentElement.append(c);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            escaped = false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!charactersOfCurrentElement.isEmpty()) {</b>
+<b class="nc">&nbsp;            linkedFileData.add(charactersOfCurrentElement.toString());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!linkedFileData.isEmpty()) {</b>
+<b class="nc">&nbsp;            files.add(convert(linkedFileData));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return files;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void resetDataStructuresForNextElement() {
+<b class="nc">&nbsp;        charactersOfCurrentElement = new StringBuilder();</b>
+<b class="nc">&nbsp;        windowsPath = false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts the given textual representation of a LinkedFile object
+&nbsp;     * &lt;p&gt;
+&nbsp;     * SIDE EFFECT: The given entry list is cleared upon completion
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Expected format is: description:link:fileType:sourceURL
+&nbsp;     * fileType is an {@link org.jabref.gui.externalfiletype.ExternalFileType}, which contains a name and a mime type
+&nbsp;     *
+&nbsp;     * @param entry the list of elements in the linked file textual representation
+&nbsp;     * @return a LinkedFile object
+&nbsp;     */
+&nbsp;    static LinkedFile convert(List&lt;String&gt; entry) {
+&nbsp;        // ensure list has at least 3 fields
+<b class="nc">&nbsp;        while (entry.size() &lt; 3) {</b>
+<b class="nc">&nbsp;            entry.add(&quot;&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LinkedFile field = null;</b>
+<b class="nc">&nbsp;        if (LinkedFile.isOnlineLink(entry.get(1))) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                field = new LinkedFile(entry.getFirst(), URLUtil.create(entry.get(1)), entry.get(2));</b>
+&nbsp;            } catch (MalformedURLException e) {
+&nbsp;                // in case the URL is malformed, store it nevertheless
+<b class="nc">&nbsp;                field = new LinkedFile(entry.getFirst(), entry.get(1), entry.get(2));</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            String pathStr = entry.get(1);</b>
+<b class="nc">&nbsp;            if (pathStr.contains(&quot;//&quot;)) {</b>
+&nbsp;                // In case the path contains //, we assume it is a malformed URL, not a malformed path.
+&nbsp;                // On linux, the double slash would be converted to a single slash.
+<b class="nc">&nbsp;                field = new LinkedFile(entry.getFirst(), pathStr, entry.get(2));</b>
+&nbsp;            } else {
+&nbsp;                try {
+&nbsp;                    // there is no Path.isValidPath(String) method
+<b class="nc">&nbsp;                    field = new LinkedFile(entry.getFirst(), Path.of(pathStr), entry.get(2));</b>
+&nbsp;                } catch (InvalidPathException e) {
+&nbsp;                    // Ignored
+<b class="nc">&nbsp;                    LOGGER.debug(&quot;Invalid path object, continuing with string&quot;, e);</b>
+<b class="nc">&nbsp;                    field = new LinkedFile(entry.getFirst(), pathStr, entry.get(2));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (entry.size() &gt; 3) {</b>
+<b class="nc">&nbsp;            field.setSourceURL(entry.get(3));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // link is the only mandatory field
+<b class="nc">&nbsp;        if (field.getDescription().isEmpty() &amp;&amp; field.getLink().isEmpty() &amp;&amp; !field.getFileType().isEmpty()) {</b>
+<b class="nc">&nbsp;            field = new LinkedFile(&quot;&quot;, Path.of(field.getFileType()), &quot;&quot;);</b>
+<b class="nc">&nbsp;        } else if (!field.getDescription().isEmpty() &amp;&amp; field.getLink().isEmpty() &amp;&amp; field.getFileType().isEmpty()) {</b>
+<b class="nc">&nbsp;            field = new LinkedFile(&quot;&quot;, Path.of(field.getDescription()), &quot;&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        entry.clear();</b>
+<b class="nc">&nbsp;        return field;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

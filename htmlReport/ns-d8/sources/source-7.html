@@ -1,0 +1,353 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JournalAbbreviationRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.journals</a>
+</div>
+
+<h1>Coverage Summary for Class: JournalAbbreviationRepository (org.jabref.logic.journals)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JournalAbbreviationRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (3/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    15.7%
+  </span>
+  <span class="absValue">
+    (14/89)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.journals;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.journals.ltwa.LtwaRepository;
+&nbsp;import org.jabref.logic.util.strings.StringSimilarity;
+&nbsp;
+&nbsp;import org.h2.mvstore.MVMap;
+&nbsp;import org.h2.mvstore.MVStore;
+&nbsp;
+&nbsp;/**
+&nbsp; * A repository for all journal abbreviations, including add and find methods.
+&nbsp; */
+&nbsp;public class JournalAbbreviationRepository {
+<b class="fc">&nbsp;    static final Pattern QUESTION_MARK = Pattern.compile(&quot;\\?&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;    private final Map&lt;String, Abbreviation&gt; fullToAbbreviationObject = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final Map&lt;String, Abbreviation&gt; abbreviationToAbbreviationObject = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final Map&lt;String, Abbreviation&gt; dotlessToAbbreviationObject = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final Map&lt;String, Abbreviation&gt; shortestUniqueToAbbreviationObject = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final TreeSet&lt;Abbreviation&gt; customAbbreviations = new TreeSet&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final StringSimilarity similarity = new StringSimilarity();</b>
+&nbsp;    private final LtwaRepository ltwaRepository;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initializes the internal data based on the abbreviations found in the given MV file
+&nbsp;     *
+&nbsp;     * @param journalList    The path to the MV file containing the journal abbreviations.
+&nbsp;     * @param ltwaRepository The LTWA repository to use for abbreviations.
+&nbsp;     */
+<b class="nc">&nbsp;    public JournalAbbreviationRepository(Path journalList, LtwaRepository ltwaRepository) {</b>
+&nbsp;        MVMap&lt;String, Abbreviation&gt; mvFullToAbbreviationObject;
+<b class="nc">&nbsp;        try (MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open()) {</b>
+<b class="nc">&nbsp;            mvFullToAbbreviationObject = store.openMap(&quot;FullToAbbreviation&quot;);</b>
+<b class="nc">&nbsp;            mvFullToAbbreviationObject.forEach((name, abbreviation) -&gt; {</b>
+<b class="nc">&nbsp;                String abbrevationString = abbreviation.getAbbreviation();</b>
+<b class="nc">&nbsp;                String shortestUniqueAbbreviation = abbreviation.getShortestUniqueAbbreviation();</b>
+<b class="nc">&nbsp;                Abbreviation newAbbreviation = new Abbreviation(</b>
+&nbsp;                        name,
+&nbsp;                        abbrevationString,
+&nbsp;                        shortestUniqueAbbreviation
+&nbsp;                );
+<b class="nc">&nbsp;                fullToAbbreviationObject.put(name, newAbbreviation);</b>
+<b class="nc">&nbsp;                abbreviationToAbbreviationObject.put(abbrevationString, newAbbreviation);</b>
+<b class="nc">&nbsp;                dotlessToAbbreviationObject.put(newAbbreviation.getDotlessAbbreviation(), newAbbreviation);</b>
+<b class="nc">&nbsp;                shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);</b>
+&nbsp;            });
+&nbsp;        }
+<b class="nc">&nbsp;        this.ltwaRepository = ltwaRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initializes the repository with demonstration data. Used if no abbreviation file is found.
+&nbsp;     */
+<b class="fc">&nbsp;    public JournalAbbreviationRepository() {</b>
+<b class="fc">&nbsp;        Abbreviation newAbbreviation = new Abbreviation(</b>
+&nbsp;                &quot;Demonstration&quot;,
+&nbsp;                &quot;Demo&quot;,
+&nbsp;                &quot;Dem&quot;
+&nbsp;        );
+<b class="fc">&nbsp;        fullToAbbreviationObject.put(&quot;Demonstration&quot;, newAbbreviation);</b>
+<b class="fc">&nbsp;        abbreviationToAbbreviationObject.put(&quot;Demo&quot;, newAbbreviation);</b>
+<b class="fc">&nbsp;        dotlessToAbbreviationObject.put(&quot;Demo&quot;, newAbbreviation);</b>
+<b class="fc">&nbsp;        shortestUniqueToAbbreviationObject.put(&quot;Dem&quot;, newAbbreviation);</b>
+<b class="fc">&nbsp;        ltwaRepository = new LtwaRepository();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isMatched(String name, Abbreviation abbreviation) {
+<b class="nc">&nbsp;        return name.equalsIgnoreCase(abbreviation.getName())</b>
+<b class="nc">&nbsp;                || name.equalsIgnoreCase(abbreviation.getAbbreviation())</b>
+<b class="nc">&nbsp;                || name.equalsIgnoreCase(abbreviation.getDotlessAbbreviation())</b>
+<b class="nc">&nbsp;                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isMatchedAbbreviated(String name, Abbreviation abbreviation) {
+<b class="nc">&nbsp;        boolean isExpanded = name.equalsIgnoreCase(abbreviation.getName());</b>
+<b class="nc">&nbsp;        if (isExpanded) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return name.equalsIgnoreCase(abbreviation.getAbbreviation())</b>
+<b class="nc">&nbsp;                || name.equalsIgnoreCase(abbreviation.getDotlessAbbreviation())</b>
+<b class="nc">&nbsp;                || name.equalsIgnoreCase(abbreviation.getShortestUniqueAbbreviation());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the given journal name is contained in the list either in its full form
+&nbsp;     * (e.g., Physical Review Letters) or its abbreviated form (e.g., Phys. Rev. Lett.).
+&nbsp;     * If the exact match is not found, attempts a fuzzy match to recognize minor input errors.
+&nbsp;     */
+&nbsp;    public boolean isKnownName(String journalName) {
+<b class="nc">&nbsp;        if (QUESTION_MARK.matcher(journalName).find()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return get(journalName).isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the LTWA abbreviation for the given journal name.
+&nbsp;     */
+&nbsp;    public Optional&lt;String&gt; getLtwaAbbreviation(String journalName) {
+<b class="nc">&nbsp;        if (QUESTION_MARK.matcher(journalName).find()) {</b>
+<b class="nc">&nbsp;            return Optional.of(journalName);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return ltwaRepository.abbreviate(journalName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the given journal name is in its abbreviated form (e.g. Phys. Rev. Lett.). The test is strict,
+&nbsp;     * i.e., journals whose abbreviation is the same as the full name are not considered
+&nbsp;     */
+&nbsp;    public boolean isAbbreviatedName(String journalName) {
+<b class="nc">&nbsp;        if (QUESTION_MARK.matcher(journalName).find()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String journal = journalName.trim().replaceAll(Matcher.quoteReplacement(&quot;\\&amp;&quot;), &quot;&amp;&quot;);</b>
+<b class="nc">&nbsp;        return customAbbreviations.stream().anyMatch(abbreviation -&gt; isMatchedAbbreviated(journal, abbreviation))</b>
+<b class="nc">&nbsp;                || abbreviationToAbbreviationObject.containsKey(journal)</b>
+<b class="nc">&nbsp;                || dotlessToAbbreviationObject.containsKey(journal)</b>
+<b class="nc">&nbsp;                || shortestUniqueToAbbreviationObject.containsKey(journal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Attempts to get the abbreviation of the journal given.
+&nbsp;     * if no exact match is found, attempts a fuzzy match on full journal names.
+&nbsp;     *
+&nbsp;     * @param input The journal name (either full name or abbreviated name).
+&nbsp;     */
+&nbsp;    public Optional&lt;Abbreviation&gt; get(String input) {
+&nbsp;        // Clean up input: trim and unescape ampersand
+<b class="nc">&nbsp;        String journal = input.trim().replaceAll(Matcher.quoteReplacement(&quot;\\&amp;&quot;), &quot;&amp;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Abbreviation&gt; customAbbreviation = customAbbreviations.stream()</b>
+<b class="nc">&nbsp;                                                                       .filter(abbreviation -&gt; isMatched(journal, abbreviation))</b>
+<b class="nc">&nbsp;                                                                       .findFirst();</b>
+<b class="nc">&nbsp;        if (customAbbreviation.isPresent()) {</b>
+<b class="nc">&nbsp;            return customAbbreviation;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Abbreviation&gt; abbreviation = Optional.ofNullable(fullToAbbreviationObject.get(journal))</b>
+<b class="nc">&nbsp;                                                      .or(() -&gt; Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))</b>
+<b class="nc">&nbsp;                                                      .or(() -&gt; Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))</b>
+<b class="nc">&nbsp;                                                      .or(() -&gt; Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (abbreviation.isEmpty()) {</b>
+<b class="nc">&nbsp;            abbreviation = findAbbreviationFuzzyMatched(journal);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return abbreviation;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;Abbreviation&gt; findAbbreviationFuzzyMatched(String input) {
+<b class="nc">&nbsp;        Optional&lt;Abbreviation&gt; customMatch = findBestFuzzyMatched(customAbbreviations, input);</b>
+<b class="nc">&nbsp;        if (customMatch.isPresent()) {</b>
+<b class="nc">&nbsp;            return customMatch;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return findBestFuzzyMatched(fullToAbbreviationObject.values(), input);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;Abbreviation&gt; findBestFuzzyMatched(Collection&lt;Abbreviation&gt; abbreviations, String input) {
+&nbsp;        // threshold for edit distance similarity comparison
+<b class="nc">&nbsp;        final double SIMILARITY_THRESHOLD = 1.0;</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Abbreviation&gt; candidates = abbreviations.stream()</b>
+<b class="nc">&nbsp;                                                     .filter(abbreviation -&gt; similarity.isSimilar(input, abbreviation.getName()))</b>
+<b class="nc">&nbsp;                                                     .sorted(Comparator.comparingDouble(abbreviation -&gt; similarity.editDistanceIgnoreCase(input, abbreviation.getName())))</b>
+<b class="nc">&nbsp;                                                     .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (candidates.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (candidates.size() &gt; 1) {</b>
+<b class="nc">&nbsp;            double bestDistance = similarity.editDistanceIgnoreCase(input, candidates.getFirst().getName());</b>
+<b class="nc">&nbsp;            double secondDistance = similarity.editDistanceIgnoreCase(input, candidates.get(1).getName());</b>
+&nbsp;
+&nbsp;            // If there is a very close match of two abbreviations, do not use any of them, because they are too close.
+<b class="nc">&nbsp;            if (Math.abs(bestDistance - secondDistance) &lt; SIMILARITY_THRESHOLD) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.of(candidates.getFirst());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addCustomAbbreviation(Abbreviation abbreviation) {
+<b class="nc">&nbsp;        Objects.requireNonNull(abbreviation);</b>
+&nbsp;
+&nbsp;        // We do NOT want to keep duplicates
+&nbsp;        // The set automatically &quot;removes&quot; duplicates
+&nbsp;        // What is a duplicate? An abbreviation is NOT the same if any field is NOT equal (e.g., if the shortest unique differs, the abbreviation is NOT the same)
+<b class="nc">&nbsp;        customAbbreviations.add(abbreviation);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Collection&lt;Abbreviation&gt; getCustomAbbreviations() {
+<b class="nc">&nbsp;        return customAbbreviations;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addCustomAbbreviations(Collection&lt;Abbreviation&gt; abbreviationsToAdd) {
+<b class="nc">&nbsp;        abbreviationsToAdd.forEach(this::addCustomAbbreviation);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getNextAbbreviation(String text) {
+<b class="nc">&nbsp;        return get(text).map(abbreviation -&gt; abbreviation.getNext(text));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getDefaultAbbreviation(String text) {
+<b class="nc">&nbsp;        return get(text).map(Abbreviation::getAbbreviation);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getDotless(String text) {
+<b class="nc">&nbsp;        return get(text).map(Abbreviation::getDotlessAbbreviation);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getShortestUniqueAbbreviation(String text) {
+<b class="nc">&nbsp;        return get(text).map(Abbreviation::getShortestUniqueAbbreviation);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Set&lt;String&gt; getFullNames() {
+<b class="nc">&nbsp;        return fullToAbbreviationObject.keySet();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Collection&lt;Abbreviation&gt; getAllLoaded() {
+<b class="nc">&nbsp;        return fullToAbbreviationObject.values();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

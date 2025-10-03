@@ -1,0 +1,208 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SearchCitationsRelationsService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.citation</a>
+</div>
+
+<h1>Coverage Summary for Class: SearchCitationsRelationsService (org.jabref.logic.citation)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SearchCitationsRelationsService</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.citation;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.FieldPreferences;
+&nbsp;import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepository;
+&nbsp;import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepositoryShell;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ImporterPreferences;
+&nbsp;import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
+&nbsp;import org.jabref.logic.util.Directories;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class SearchCitationsRelationsService {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SearchCitationsRelationsService.class);</b>
+&nbsp;
+&nbsp;    private final CitationFetcher citationFetcher;
+&nbsp;    private final BibEntryCitationsAndReferencesRepository relationsRepository;
+&nbsp;
+&nbsp;    public SearchCitationsRelationsService(ImporterPreferences importerPreferences,
+&nbsp;                                           ImportFormatPreferences importFormatPreferences,
+&nbsp;                                           FieldPreferences fieldPreferences,
+<b class="nc">&nbsp;                                           BibEntryTypesManager entryTypesManager) {</b>
+<b class="nc">&nbsp;        this.citationFetcher = new SemanticScholarCitationFetcher(importerPreferences);</b>
+<b class="nc">&nbsp;        this.relationsRepository = BibEntryCitationsAndReferencesRepositoryShell.of(</b>
+<b class="nc">&nbsp;                Directories.getCitationsRelationsDirectory(),</b>
+<b class="nc">&nbsp;                importerPreferences.getCitationsRelationsStoreTTL(),</b>
+&nbsp;                importFormatPreferences,
+&nbsp;                fieldPreferences,
+&nbsp;                entryTypesManager
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    @VisibleForTesting
+&nbsp;    SearchCitationsRelationsService(CitationFetcher citationFetcher,
+&nbsp;                                    BibEntryCitationsAndReferencesRepository repository
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        this.citationFetcher = citationFetcher;</b>
+<b class="nc">&nbsp;        this.relationsRepository = repository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;BibEntry&gt; searchCites(BibEntry referencing) throws FetcherException {
+<b class="nc">&nbsp;        boolean isFetchingAllowed =</b>
+<b class="nc">&nbsp;                !relationsRepository.containsReferences(referencing) ||</b>
+<b class="nc">&nbsp;                        relationsRepository.isReferencesUpdatable(referencing);</b>
+<b class="nc">&nbsp;        if (isFetchingAllowed) {</b>
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; referencedBy = citationFetcher.searchCiting(referencing);</b>
+<b class="nc">&nbsp;            relationsRepository.insertReferences(referencing, referencedBy);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return relationsRepository.readReferences(referencing);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If the store was empty and nothing was fetch in any case (empty fetch, or error) then yes =&gt; empty list
+&nbsp;     * If the store was not empty and nothing was fetched after a successful fetch =&gt; the store will be erased and the returned collection will be empty
+&nbsp;     * If the store was not empty and an error occurs while fetching =&gt; will return the content of the store
+&nbsp;     */
+&nbsp;    public List&lt;BibEntry&gt; searchCitedBy(BibEntry cited) throws FetcherException {
+<b class="nc">&nbsp;        boolean isFetchingAllowed =</b>
+<b class="nc">&nbsp;                !relationsRepository.containsCitations(cited) ||</b>
+<b class="nc">&nbsp;                        relationsRepository.isCitationsUpdatable(cited);</b>
+<b class="nc">&nbsp;        if (isFetchingAllowed) {</b>
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; citedBy = citationFetcher.searchCitedBy(cited);</b>
+<b class="nc">&nbsp;            relationsRepository.insertCitations(cited, citedBy);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return relationsRepository.readCitations(cited);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getCitationCount(BibEntry citationCounted, Optional&lt;String&gt; actualFieldValue) throws FetcherException {
+<b class="nc">&nbsp;        boolean isFetchingAllowed = actualFieldValue.isEmpty() ||</b>
+<b class="nc">&nbsp;                relationsRepository.isCitationsUpdatable(citationCounted);</b>
+<b class="nc">&nbsp;        if (isFetchingAllowed) {</b>
+<b class="nc">&nbsp;            Optional&lt;Integer&gt; citationCountResult = citationFetcher.searchCitationCount(citationCounted);</b>
+<b class="nc">&nbsp;            return citationCountResult.orElse(0);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        assert actualFieldValue.isPresent();</b>
+<b class="nc">&nbsp;        return Integer.parseInt(actualFieldValue.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        relationsRepository.close();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,173 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SharedBibEntryData</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry</a>
+</div>
+
+<h1>Coverage Summary for Class: SharedBibEntryData (org.jabref.model.entry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SharedBibEntryData</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry;
+&nbsp;
+&nbsp;import com.google.common.base.MoreObjects;
+&nbsp;
+&nbsp;/**
+&nbsp; * Stores all information needed to manage entries on a shared (SQL) database.
+&nbsp; */
+&nbsp;public class SharedBibEntryData implements Comparable&lt;SharedBibEntryData&gt; {
+&nbsp;
+&nbsp;    // This id is set by the remote database system (DBS).
+&nbsp;    // It has to be unique on remote DBS for all connected JabRef instances.
+&nbsp;    // The old id above does not satisfy this requirement.
+&nbsp;    // This is &quot;ID&quot; in JabDrive sync
+&nbsp;    private int sharedID;
+&nbsp;
+&nbsp;    // Needed for version controlling if used on shared database
+&nbsp;    // This is &quot;Revision&quot; in JabDrive sync
+&nbsp;    private int version;
+&nbsp;
+<b class="nc">&nbsp;    public SharedBibEntryData() {</b>
+<b class="nc">&nbsp;        this.sharedID = -1;</b>
+<b class="nc">&nbsp;        this.version = 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getSharedID() {
+<b class="nc">&nbsp;        return sharedID;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSharedID(int sharedID) {
+<b class="nc">&nbsp;        this.sharedID = sharedID;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getVersion() {
+<b class="nc">&nbsp;        return version;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setVersion(int version) {
+<b class="nc">&nbsp;        this.version = version;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return MoreObjects.toStringHelper(this)</b>
+<b class="nc">&nbsp;                          .add(&quot;sharedID&quot;, sharedID)</b>
+<b class="nc">&nbsp;                          .add(&quot;version&quot;, version)</b>
+<b class="nc">&nbsp;                          .toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int compareTo(SharedBibEntryData o) {
+<b class="nc">&nbsp;        if (this.sharedID == o.sharedID) {</b>
+<b class="nc">&nbsp;            return Integer.compare(this.version, o.version);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Integer.compare(this.sharedID, o.sharedID);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

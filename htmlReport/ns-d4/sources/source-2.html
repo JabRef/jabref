@@ -1,0 +1,241 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PdfEmbeddedBibFileImporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat.pdf</a>
+</div>
+
+<h1>Coverage Summary for Class: PdfEmbeddedBibFileImporter (org.jabref.logic.importer.fileformat.pdf)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PdfEmbeddedBibFileImporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat.pdf;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocument;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocumentNameDictionary;
+&nbsp;import org.apache.pdfbox.pdmodel.PDEmbeddedFilesNameTreeNode;
+&nbsp;import org.apache.pdfbox.pdmodel.PDPage;
+&nbsp;import org.apache.pdfbox.pdmodel.common.PDNameTreeNode;
+&nbsp;import org.apache.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecification;
+&nbsp;import org.apache.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile;
+&nbsp;import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+&nbsp;import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotationFileAttachment;
+&nbsp;
+&nbsp;/**
+&nbsp; * Imports an embedded Bib-File from the PDF.
+&nbsp; */
+&nbsp;public class PdfEmbeddedBibFileImporter extends PdfImporter {
+&nbsp;
+&nbsp;    private final BibtexParser bibtexParser;
+&nbsp;
+<b class="nc">&nbsp;    public PdfEmbeddedBibFileImporter(ImportFormatPreferences importFormatPreferences) {</b>
+<b class="nc">&nbsp;        bibtexParser = new BibtexParser(importFormatPreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Extraction of embedded files in pdfs adapted from:
+&nbsp;     * &lt;a href=&quot;https://svn.apache.org/repos/asf/pdfbox/trunk/examples/src/main/java/org/apache/pdfbox/examples/pdmodel/ExtractEmbeddedFiles.javaj&quot;&gt;...&lt;/a&gt;
+&nbsp;     */
+&nbsp;    public List&lt;BibEntry&gt; importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; allParsedEntries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();</b>
+<b class="nc">&nbsp;        if (nameDictionary != null) {</b>
+<b class="nc">&nbsp;            PDEmbeddedFilesNameTreeNode efTree = nameDictionary.getEmbeddedFiles();</b>
+<b class="nc">&nbsp;            if (efTree != null) {</b>
+<b class="nc">&nbsp;                Map&lt;String, PDComplexFileSpecification&gt; names = efTree.getNames();</b>
+<b class="nc">&nbsp;                if (names != null) {</b>
+<b class="nc">&nbsp;                    allParsedEntries.addAll(extractAndParseFiles(names));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    List&lt;PDNameTreeNode&lt;PDComplexFileSpecification&gt;&gt; kids = efTree.getKids();</b>
+<b class="nc">&nbsp;                    if (kids != null) {</b>
+<b class="nc">&nbsp;                        for (PDNameTreeNode&lt;PDComplexFileSpecification&gt; node : kids) {</b>
+<b class="nc">&nbsp;                            names = node.getNames();</b>
+<b class="nc">&nbsp;                            allParsedEntries.addAll(extractAndParseFiles(names));</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        // extract files from annotations
+<b class="nc">&nbsp;        for (PDPage page : document.getPages()) {</b>
+<b class="nc">&nbsp;            for (PDAnnotation annotation : page.getAnnotations()) {</b>
+<b class="nc">&nbsp;                if (annotation instanceof PDAnnotationFileAttachment annotationFileAttachment) {</b>
+<b class="nc">&nbsp;                    PDComplexFileSpecification fileSpec = (PDComplexFileSpecification) annotationFileAttachment.getFile();</b>
+<b class="nc">&nbsp;                    allParsedEntries.addAll(extractAndParseFile(getEmbeddedFile(fileSpec)));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return allParsedEntries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntry&gt; extractAndParseFiles(Map&lt;String, PDComplexFileSpecification&gt; names) throws IOException, ParseException {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; allParsedEntries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, PDComplexFileSpecification&gt; entry : names.entrySet()) {</b>
+<b class="nc">&nbsp;            String filename = entry.getKey();</b>
+<b class="nc">&nbsp;            FileUtil.getFileExtension(filename);</b>
+<b class="nc">&nbsp;            if (FileUtil.isBibFile(Path.of(filename))) {</b>
+<b class="nc">&nbsp;                PDComplexFileSpecification fileSpec = entry.getValue();</b>
+<b class="nc">&nbsp;                allParsedEntries.addAll(extractAndParseFile(getEmbeddedFile(fileSpec)));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return allParsedEntries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntry&gt; extractAndParseFile(PDEmbeddedFile embeddedFile) throws IOException, ParseException {
+<b class="nc">&nbsp;        return bibtexParser.parseEntries(embeddedFile.createInputStream());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static PDEmbeddedFile getEmbeddedFile(PDComplexFileSpecification fileSpec) {
+&nbsp;        // search for the first available alternative of the embedded file
+<b class="nc">&nbsp;        PDEmbeddedFile embeddedFile = null;</b>
+<b class="nc">&nbsp;        if (fileSpec != null) {</b>
+<b class="nc">&nbsp;            embeddedFile = fileSpec.getEmbeddedFileUnicode();</b>
+<b class="nc">&nbsp;            if (embeddedFile == null) {</b>
+<b class="nc">&nbsp;                embeddedFile = fileSpec.getEmbeddedFileDos();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (embeddedFile == null) {</b>
+<b class="nc">&nbsp;                embeddedFile = fileSpec.getEmbeddedFileMac();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (embeddedFile == null) {</b>
+<b class="nc">&nbsp;                embeddedFile = fileSpec.getEmbeddedFileUnix();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (embeddedFile == null) {</b>
+<b class="nc">&nbsp;                embeddedFile = fileSpec.getEmbeddedFile();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return embeddedFile;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return &quot;pdfEmbeddedBibFile&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Embedded BIB-file in PDF&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Imports a BibTeX file found inside a PDF.&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

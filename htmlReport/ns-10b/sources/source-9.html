@@ -1,0 +1,455 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GroupTreeNode</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.groups</a>
+</div>
+
+<h1>Coverage Summary for Class: GroupTreeNode (org.jabref.model.groups)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GroupTreeNode</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/66)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/103)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.groups;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;
+&nbsp;import org.jabref.model.FieldChange;
+&nbsp;import org.jabref.model.TreeNode;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.search.SearchMatcher;
+&nbsp;import org.jabref.model.search.matchers.MatcherSet;
+&nbsp;import org.jabref.model.search.matchers.MatcherSets;
+&nbsp;
+&nbsp;/**
+&nbsp; * A node in the groups tree that holds exactly one AbstractGroup.
+&nbsp; */
+&nbsp;public class GroupTreeNode extends TreeNode&lt;GroupTreeNode&gt; {
+&nbsp;
+&nbsp;    private static final String PATH_DELIMITER = &quot; &gt; &quot;;
+<b class="nc">&nbsp;    private ObjectProperty&lt;AbstractGroup&gt; groupProperty = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates this node and associates the specified group with it.
+&nbsp;     *
+&nbsp;     * @param group the group underlying this node
+&nbsp;     */
+&nbsp;    public GroupTreeNode(AbstractGroup group) {
+<b class="nc">&nbsp;        super(GroupTreeNode.class);</b>
+<b class="nc">&nbsp;        setGroup(group, false, false, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static GroupTreeNode fromGroup(AbstractGroup group) {
+<b class="nc">&nbsp;        return new GroupTreeNode(group);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the group underlying this node.
+&nbsp;     *
+&nbsp;     * @return the group associated with this node
+&nbsp;     */
+&nbsp;    public AbstractGroup getGroup() {
+<b class="nc">&nbsp;        return groupProperty.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;AbstractGroup&gt; getGroupProperty() {
+<b class="nc">&nbsp;        return groupProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Associates the specified group with this node.
+&nbsp;     *
+&nbsp;     * @param newGroup the new group (has to be non-null)
+&nbsp;     */
+&nbsp;    public void setGroup(AbstractGroup newGroup) {
+<b class="nc">&nbsp;        this.groupProperty.set(Objects.requireNonNull(newGroup));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Associates the specified group with this node while also providing the possibility to modify previous matched entries so that they are now matched by the new group.
+&nbsp;     *
+&nbsp;     * @param newGroup                        the new group (has to be non-null)
+&nbsp;     * @param shouldKeepPreviousAssignments   specifies whether previous matched entries should be added to the new group
+&nbsp;     * @param shouldRemovePreviousAssignments specifies whether previous matched entries should be removed from the old group
+&nbsp;     * @param entriesInDatabase               list of entries in the database
+&nbsp;     */
+&nbsp;    public List&lt;FieldChange&gt; setGroup(AbstractGroup newGroup, boolean shouldKeepPreviousAssignments,
+&nbsp;                                      boolean shouldRemovePreviousAssignments, List&lt;BibEntry&gt; entriesInDatabase) {
+<b class="nc">&nbsp;        AbstractGroup oldGroup = getGroup();</b>
+<b class="nc">&nbsp;        groupProperty.set(Objects.requireNonNull(newGroup));</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;FieldChange&gt; changes = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        boolean shouldRemoveFromOldGroup = shouldRemovePreviousAssignments &amp;&amp; (oldGroup instanceof GroupEntryChanger);</b>
+<b class="nc">&nbsp;        boolean shouldAddToNewGroup = shouldKeepPreviousAssignments &amp;&amp; (newGroup instanceof GroupEntryChanger);</b>
+<b class="nc">&nbsp;        if (shouldAddToNewGroup || shouldRemoveFromOldGroup) {</b>
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; entriesMatchedByOldGroup = entriesInDatabase.stream().filter(oldGroup::isMatch)</b>
+<b class="nc">&nbsp;                                                                       .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;            if (shouldRemoveFromOldGroup) {</b>
+<b class="nc">&nbsp;                GroupEntryChanger entryChanger = (GroupEntryChanger) oldGroup;</b>
+<b class="nc">&nbsp;                changes.addAll(entryChanger.remove(entriesMatchedByOldGroup));</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (shouldAddToNewGroup) {</b>
+<b class="nc">&nbsp;                GroupEntryChanger entryChanger = (GroupEntryChanger) newGroup;</b>
+<b class="nc">&nbsp;                changes.addAll(entryChanger.add(entriesMatchedByOldGroup));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return changes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a {@link SearchMatcher} that matches entries of this group and that takes the hierarchical information into account. I.e., it finds elements contained in this nodes group, or the union of those elements in its own group and its children&#39;s groups (recursively), or the intersection of the elements in its own group and its parent&#39;s group (depending on the hierarchical settings stored in the involved groups)
+&nbsp;     */
+&nbsp;    public SearchMatcher getSearchMatcher() {
+<b class="nc">&nbsp;        return getSearchMatcher(getGroup().getHierarchicalContext());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private SearchMatcher getSearchMatcher(GroupHierarchyType originalContext) {
+<b class="nc">&nbsp;        final GroupHierarchyType context = getGroup().getHierarchicalContext();</b>
+<b class="nc">&nbsp;        if (context == GroupHierarchyType.INDEPENDENT) {</b>
+<b class="nc">&nbsp;            return getGroup();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        MatcherSet searchRule = MatcherSets.build(</b>
+<b class="nc">&nbsp;                context == GroupHierarchyType.REFINING ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);</b>
+<b class="nc">&nbsp;        searchRule.addRule(getGroup());</b>
+<b class="nc">&nbsp;        if ((context == GroupHierarchyType.INCLUDING) &amp;&amp; (originalContext != GroupHierarchyType.REFINING)) {</b>
+<b class="nc">&nbsp;            for (GroupTreeNode child : getChildren()) {</b>
+<b class="nc">&nbsp;                searchRule.addRule(child.getSearchMatcher(originalContext));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if ((context == GroupHierarchyType.REFINING) &amp;&amp; !isRoot() &amp;&amp; (originalContext</b>
+&nbsp;                != GroupHierarchyType.INCLUDING)) {
+&nbsp;            // noinspection OptionalGetWithoutIsPresent
+<b class="nc">&nbsp;            searchRule.addRule(getParent().get().getSearchMatcher(originalContext));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return searchRule;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((o == null) || (getClass() != o.getClass())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        GroupTreeNode that = (GroupTreeNode) o;</b>
+<b class="nc">&nbsp;        return Objects.equals(getGroup(), that.getGroup()) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(getChildren(), that.getChildren());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(getGroup());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get only groups containing all the entries or just groups containing any of the
+&nbsp;     *
+&nbsp;     * @param entries    List of {@link BibEntry} to search for
+&nbsp;     * @param requireAll Whether to return only groups that must contain all entries
+&nbsp;     * @return List of {@link GroupTreeNode} containing the matches. {@link AllEntriesGroup} is always contained}
+&nbsp;     */
+&nbsp;    public List&lt;GroupTreeNode&gt; getContainingGroups(List&lt;BibEntry&gt; entries, boolean requireAll) {
+<b class="nc">&nbsp;        List&lt;GroupTreeNode&gt; groups = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Add myself if I contain the entries
+<b class="nc">&nbsp;        if (requireAll) {</b>
+<b class="nc">&nbsp;            if (this.getGroup().containsAll(entries)) {</b>
+<b class="nc">&nbsp;                groups.add(this);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (this.getGroup().containsAny(entries)) {</b>
+<b class="nc">&nbsp;                groups.add(this);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Traverse children
+<b class="nc">&nbsp;        for (GroupTreeNode child : getChildren()) {</b>
+<b class="nc">&nbsp;            groups.addAll(child.getContainingGroups(entries, requireAll));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return groups;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines all groups in the subtree starting at this node which contain the given entry.
+&nbsp;     */
+&nbsp;    public List&lt;GroupTreeNode&gt; getMatchingGroups(BibEntry entry) {
+<b class="nc">&nbsp;        return getMatchingGroups(List.of(entry));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines all groups in the subtree starting at this node which contain at least one of the given entries.
+&nbsp;     */
+&nbsp;    public List&lt;GroupTreeNode&gt; getMatchingGroups(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        List&lt;GroupTreeNode&gt; groups = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Add myself if I contain the entries
+<b class="nc">&nbsp;        SearchMatcher matcher = getSearchMatcher();</b>
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            if (matcher.isMatch(entry)) {</b>
+<b class="nc">&nbsp;                groups.add(this);</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Traverse children
+<b class="nc">&nbsp;        for (GroupTreeNode child : getChildren()) {</b>
+<b class="nc">&nbsp;            groups.addAll(child.getMatchingGroups(entries));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return groups;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;BibEntry&gt; getEntriesInGroup(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            if (this.getGroup().contains(entry)) {</b>
+<b class="nc">&nbsp;                result.add(entry);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the name of the underlying group
+&nbsp;     *
+&nbsp;     * @return String the name of the group
+&nbsp;     */
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return getGroup().getName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public GroupTreeNode addSubgroup(AbstractGroup subgroup) {
+<b class="nc">&nbsp;        GroupTreeNode child = GroupTreeNode.fromGroup(subgroup);</b>
+<b class="nc">&nbsp;        addChild(child);</b>
+<b class="nc">&nbsp;        return child;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public GroupTreeNode copyNode() {
+<b class="nc">&nbsp;        return GroupTreeNode.fromGroup(getGroup());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the entries in the specified list which are matched by this group.
+&nbsp;     *
+&nbsp;     * @param entries list of entries to be searched
+&nbsp;     * @return matched entries
+&nbsp;     */
+&nbsp;    public List&lt;BibEntry&gt; findMatches(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        SearchMatcher matcher = getSearchMatcher();</b>
+<b class="nc">&nbsp;        return entries.stream()</b>
+<b class="nc">&nbsp;                      .filter(matcher::isMatch)</b>
+<b class="nc">&nbsp;                      .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the entries in the specified database which are matched by this group.
+&nbsp;     *
+&nbsp;     * @param database database to be searched
+&nbsp;     * @return matched entries
+&nbsp;     */
+&nbsp;    public List&lt;BibEntry&gt; findMatches(BibDatabase database) {
+<b class="nc">&nbsp;        return findMatches(database.getEntries());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns whether this group matches the specified {@link BibEntry} while taking the hierarchical information into account.
+&nbsp;     */
+&nbsp;    public boolean matches(BibEntry entry) {
+<b class="nc">&nbsp;        return getSearchMatcher().isMatch(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the path from the root of the tree as a string (every group name is separated by {@link #PATH_DELIMITER}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The name of the root is not included.
+&nbsp;     */
+&nbsp;    public String getPath() {
+<b class="nc">&nbsp;        return getPathFromRoot().stream()</b>
+<b class="nc">&nbsp;                                .skip(1) // Skip root</b>
+<b class="nc">&nbsp;                                .map(GroupTreeNode::getName)</b>
+<b class="nc">&nbsp;                                .collect(Collectors.joining(PATH_DELIMITER));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;GroupTreeNode{&quot; +</b>
+<b class="nc">&nbsp;                &quot;group=&quot; + getGroup() +</b>
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Finds a children using the given path. Each group name should be separated by {@link #PATH_DELIMITER}.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The path should be generated using {@link #getPath()}.
+&nbsp;     */
+&nbsp;    public Optional&lt;GroupTreeNode&gt; getChildByPath(String pathToSource) {
+<b class="nc">&nbsp;        GroupTreeNode present = this;</b>
+<b class="nc">&nbsp;        for (String groupName : pathToSource.split(PATH_DELIMITER)) {</b>
+<b class="nc">&nbsp;            Optional&lt;GroupTreeNode&gt; childWithName = present</b>
+<b class="nc">&nbsp;                    .getChildren().stream()</b>
+<b class="nc">&nbsp;                    .filter(group -&gt; Objects.equals(group.getName(), groupName))</b>
+<b class="nc">&nbsp;                    .findFirst();</b>
+<b class="nc">&nbsp;            if (childWithName.isPresent()) {</b>
+<b class="nc">&nbsp;                present = childWithName.get();</b>
+&nbsp;            } else {
+&nbsp;                // No child with that name found -&gt; path seems to be invalid
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.of(present);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds the specified entries to this group. If the group does not support explicit adding of entries (i.e., does not implement {@link GroupEntryChanger}), then no action is performed.
+&nbsp;     */
+&nbsp;    public List&lt;FieldChange&gt; addEntriesToGroup(Collection&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        if (getGroup() instanceof GroupEntryChanger) {</b>
+<b class="nc">&nbsp;            return ((GroupEntryChanger) getGroup()).add(entries);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the given entries from this group. If the group does not support the explicit removal of entries (i.e., does not implement {@link GroupEntryChanger}), then no action is performed.
+&nbsp;     */
+&nbsp;    public List&lt;FieldChange&gt; removeEntriesFromGroup(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        if (getGroup() instanceof GroupEntryChanger) {</b>
+<b class="nc">&nbsp;            return ((GroupEntryChanger) getGroup()).remove(entries);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns true if the underlying groups of both {@link GroupTreeNode}s is the same.
+&nbsp;     */
+&nbsp;    public boolean isSameGroupAs(GroupTreeNode other) {
+<b class="nc">&nbsp;        return Objects.equals(getGroup(), other.getGroup());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean containsGroup(AbstractGroup other) {
+<b class="nc">&nbsp;        if (this.getGroup() == other) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return this.getChildren().stream().anyMatch(child -&gt; child.getGroup() == other);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

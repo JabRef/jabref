@@ -1,0 +1,173 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BaseDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: BaseDialog (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BaseDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.Dialog;
+&nbsp;import javafx.scene.image.Image;
+&nbsp;import javafx.scene.input.KeyCode;
+&nbsp;import javafx.stage.Stage;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;
+&nbsp;public class BaseDialog&lt;T&gt; extends Dialog&lt;T&gt; {
+&nbsp;
+<b class="nc">&nbsp;    protected BaseDialog() {</b>
+<b class="nc">&nbsp;        getDialogPane().getScene().setOnKeyPressed(event -&gt; {</b>
+<b class="nc">&nbsp;            KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);</b>
+<b class="nc">&nbsp;            if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.CLOSE, event)) {</b>
+&nbsp;                close();
+<b class="nc">&nbsp;            } else if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.DEFAULT_DIALOG_ACTION, event)) {</b>
+<b class="nc">&nbsp;                getDefaultButton().ifPresent(Button::fire);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // all buttons in base dialogs react on enter
+<b class="nc">&nbsp;            if (event.getCode() == KeyCode.ENTER) {</b>
+<b class="nc">&nbsp;                if (event.getTarget() instanceof Button) {</b>
+<b class="nc">&nbsp;                    ((Button) event.getTarget()).fire();</b>
+<b class="nc">&nbsp;                    event.consume();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        setDialogIcon(IconTheme.getJabRefImage());</b>
+<b class="nc">&nbsp;        setResizable(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;Button&gt; getDefaultButton() {
+<b class="nc">&nbsp;        return Optional.ofNullable((Button) getDialogPane().lookupButton(getDefaultButtonType()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ButtonType getDefaultButtonType() {
+<b class="nc">&nbsp;        return getDialogPane().getButtonTypes().stream()</b>
+<b class="nc">&nbsp;                              .filter(buttonType -&gt; buttonType.getButtonData().isDefaultButton())</b>
+<b class="nc">&nbsp;                              .findFirst()</b>
+<b class="nc">&nbsp;                              .orElse(ButtonType.OK);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setDialogIcon(Image image) {
+<b class="nc">&nbsp;        Stage dialogWindow = (Stage) getDialogPane().getScene().getWindow();</b>
+<b class="nc">&nbsp;        dialogWindow.getIcons().add(image);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

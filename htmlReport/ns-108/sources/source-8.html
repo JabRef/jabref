@@ -1,0 +1,144 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FieldProperty</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.field</a>
+</div>
+
+<h1>Coverage Summary for Class: FieldProperty (org.jabref.model.entry.field)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FieldProperty</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (20/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.field;
+&nbsp;
+&nbsp;/// @implNote Introduce a new FieldProperty only if multiple fields with the same property exist.
+&nbsp;/// For instance, &quot;gender&quot; exists only in field &quot;Gender&quot;, whereas &quot;identifier&quot; is the property of multiple fields.
+&nbsp;/// It is confusing to have a FieldProperty for a single field.
+&nbsp;/// We accept that some developers might be confused for different handling at [org.jabref.logic.integrity.FieldCheckers#getForField(Field)].
+<b class="fc">&nbsp;public enum FieldProperty {</b>
+<b class="fc">&nbsp;    BOOK_NAME,</b>
+<b class="fc">&nbsp;    DATE,</b>
+<b class="fc">&nbsp;    EDITOR_TYPE,</b>
+<b class="fc">&nbsp;    EXTERNAL,</b>
+<b class="fc">&nbsp;    FILE_EDITOR,</b>
+<b class="fc">&nbsp;    JOURNAL_NAME,</b>
+&nbsp;
+&nbsp;    // globally unique identifier for the concrete article
+<b class="fc">&nbsp;    IDENTIFIER,</b>
+&nbsp;
+<b class="fc">&nbsp;    LANGUAGE,</b>
+&nbsp;
+&nbsp;    // Field content is text, but should be interpreted as markdown
+&nbsp;    // AKA: Field content is not LaTeX
+<b class="fc">&nbsp;    MARKDOWN,</b>
+&nbsp;
+<b class="fc">&nbsp;    MONTH,</b>
+&nbsp;
+<b class="fc">&nbsp;    YEARDIVISION,</b>
+&nbsp;
+<b class="fc">&nbsp;    MULTILINE_TEXT,</b>
+<b class="fc">&nbsp;    NUMERIC,</b>
+<b class="fc">&nbsp;    PAGINATION,</b>
+<b class="fc">&nbsp;    PERSON_NAMES,</b>
+&nbsp;
+<b class="fc">&nbsp;    SINGLE_ENTRY_LINK,</b>
+<b class="fc">&nbsp;    MULTIPLE_ENTRY_LINK,</b>
+&nbsp;
+&nbsp;    // Field content should be treated as data
+<b class="fc">&nbsp;    VERBATIM,</b>
+&nbsp;
+<b class="fc">&nbsp;    YES_NO</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

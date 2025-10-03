@@ -1,0 +1,240 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BstBaseVisitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bst</a>
+</div>
+
+<h1>Coverage Summary for Class: BstBaseVisitor (org.jabref.logic.bst)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BstBaseVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;// Generated from org/jabref/logic/bst/Bst.g4 by ANTLR 4.13.2
+&nbsp;
+&nbsp;package org.jabref.logic.bst;
+&nbsp;
+&nbsp;import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class provides an empty implementation of {@link BstVisitor},
+&nbsp; * which can be extended to create a visitor which only needs to handle a subset
+&nbsp; * of the available methods.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; The return type of the visit operation. Use {@link Void} for
+&nbsp; * operations with no return type.
+&nbsp; */
+&nbsp;@SuppressWarnings(&quot;CheckReturnValue&quot;)
+<b class="nc">&nbsp;public class BstBaseVisitor&lt;T&gt; extends AbstractParseTreeVisitor&lt;T&gt; implements BstVisitor&lt;T&gt; {</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitBstFile(BstParser.BstFileContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitStringsCommand(BstParser.StringsCommandContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitIntegersCommand(BstParser.IntegersCommandContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitFunctionCommand(BstParser.FunctionCommandContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitMacroCommand(BstParser.MacroCommandContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitReadCommand(BstParser.ReadCommandContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitExecuteCommand(BstParser.ExecuteCommandContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitIterateCommand(BstParser.IterateCommandContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitReverseCommand(BstParser.ReverseCommandContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitEntryCommand(BstParser.EntryCommandContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitSortCommand(BstParser.SortCommandContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitIdentifier(BstParser.IdentifierContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitIdListObl(BstParser.IdListOblContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitIdListOpt(BstParser.IdListOptContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitBstFunction(BstParser.BstFunctionContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitStack(BstParser.StackContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;	/**
+&nbsp;	 * {@inheritDoc}
+&nbsp;	 *
+&nbsp;	 * &lt;p&gt;The default implementation returns the result of calling
+&nbsp;	 * {@link #visitChildren} on {@code ctx}.&lt;/p&gt;
+&nbsp;	 */
+<b class="nc">&nbsp;	@Override public T visitStackitem(BstParser.StackitemContext ctx) { return visitChildren(ctx); }</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

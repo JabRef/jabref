@@ -1,0 +1,191 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TextBasedPreviewLayout</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout</a>
+</div>
+
+<h1>Coverage Summary for Class: TextBasedPreviewLayout (org.jabref.logic.layout)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TextBasedPreviewLayout</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Reader;
+&nbsp;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preview.PreviewLayout;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Implements the preview based JabRef&#39;s &lt;a href=&quot;https://docs.jabref.org/import-export/export/customexports&quot;&gt;Custom export filters&lt;/a&gt;.
+&nbsp; */
+&nbsp;public final class TextBasedPreviewLayout implements PreviewLayout {
+&nbsp;    public static final String NAME = &quot;PREVIEW&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(TextBasedPreviewLayout.class);</b>
+&nbsp;    private Layout layout;
+&nbsp;    private String text;
+&nbsp;    private LayoutFormatterPreferences layoutFormatterPreferences;
+&nbsp;    private JournalAbbreviationRepository abbreviationRepository;
+&nbsp;
+<b class="nc">&nbsp;    public TextBasedPreviewLayout(String text, LayoutFormatterPreferences layoutFormatterPreferences, JournalAbbreviationRepository abbreviationRepository) {</b>
+<b class="nc">&nbsp;        this.layoutFormatterPreferences = layoutFormatterPreferences;</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+<b class="nc">&nbsp;        setText(text);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public TextBasedPreviewLayout(Layout layout) {</b>
+<b class="nc">&nbsp;        this.layout = layout;</b>
+<b class="nc">&nbsp;        this.text = layout.getText();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setText(String text) {
+<b class="nc">&nbsp;        this.text = text;</b>
+<b class="nc">&nbsp;        Reader reader = Reader.of(text.replace(&quot;__NEWLINE__&quot;, &quot;\n&quot;));</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            layout = new LayoutHelper(reader, layoutFormatterPreferences, abbreviationRepository).getLayoutFromText();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not generate layout&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String generatePreview(BibEntry entry, BibDatabaseContext databaseContext) {
+<b class="nc">&nbsp;        if (layout != null) {</b>
+<b class="nc">&nbsp;            return layout.doLayout(entry, databaseContext.getDatabase());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getText() {
+<b class="nc">&nbsp;        return text.replace(&quot;__NEWLINE__&quot;, &quot;\n&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return NAME;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getShortTitle() {
+<b class="nc">&nbsp;        return NAME;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDisplayName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Customized preview style&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AtomicFileWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: AtomicFileWriter (org.jabref.logic.exporter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AtomicFileWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.exporter;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStreamWriter;
+&nbsp;import java.nio.charset.Charset;
+&nbsp;import java.nio.charset.CharsetEncoder;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;
+&nbsp;/**
+&nbsp; * Writer that similar to the built-in {@link java.io.FileWriter} but uses the {@link AtomicFileOutputStream} as the
+&nbsp; * underlying output stream. In this way, we make sure that the errors during the write process do not destroy the
+&nbsp; * contents of the target file.
+&nbsp; * Moreover, this writer checks if the chosen encoding supports all text that is written. Characters whose encoding
+&nbsp; * was problematic can be retrieved by {@link #getEncodingProblems()}.
+&nbsp; */
+&nbsp;public class AtomicFileWriter extends OutputStreamWriter {
+&nbsp;
+&nbsp;    private final CharsetEncoder encoder;
+<b class="nc">&nbsp;    private final Set&lt;Character&gt; problemCharacters = new TreeSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public AtomicFileWriter(Path file, Charset encoding) throws IOException {
+<b class="nc">&nbsp;        this(file, encoding, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public AtomicFileWriter(Path file, Charset encoding, boolean keepBackup) throws IOException {
+<b class="nc">&nbsp;        super(new AtomicFileOutputStream(file, keepBackup), encoding);</b>
+<b class="nc">&nbsp;        encoder = encoding.newEncoder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void write(String str) throws IOException {
+<b class="nc">&nbsp;        super.write(str);</b>
+<b class="nc">&nbsp;        if (!encoder.canEncode(str)) {</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; str.length(); i++) {</b>
+<b class="nc">&nbsp;                char character = str.charAt(i);</b>
+<b class="nc">&nbsp;                if (!encoder.canEncode(character)) {</b>
+<b class="nc">&nbsp;                    problemCharacters.add(character);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasEncodingProblems() {
+<b class="nc">&nbsp;        return !problemCharacters.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Set&lt;Character&gt; getEncodingProblems() {
+<b class="nc">&nbsp;        return Collections.unmodifiableSet(problemCharacters);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,234 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConstantsPropertiesViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.libraryproperties.constants</a>
+</div>
+
+<h1>Coverage Summary for Class: ConstantsPropertiesViewModel (org.jabref.gui.libraryproperties.constants)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConstantsPropertiesViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.libraryproperties.constants;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.value.ObservableValue;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.gui.help.HelpAction;
+&nbsp;import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
+&nbsp;import org.jabref.logic.bibtex.comparator.BibtexStringComparator;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibtexString;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;
+&nbsp;public class ConstantsPropertiesViewModel implements PropertiesTabViewModel {
+&nbsp;
+&nbsp;    private static final String NEW_STRING_LABEL = &quot;NewString&quot;; // must not contain spaces
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;ConstantsItemModel&gt; stringsListProperty =</b>
+<b class="nc">&nbsp;            new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty validProperty = new SimpleBooleanProperty();</b>
+&nbsp;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public ConstantsPropertiesViewModel(BibDatabaseContext databaseContext, DialogService dialogService, ExternalApplicationsPreferences externalApplicationsPreferences) {</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.externalApplicationsPreferences = externalApplicationsPreferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        ObservableList&lt;ObservableValue&lt;Boolean&gt;&gt; allValidProperty =</b>
+<b class="nc">&nbsp;                EasyBind.map(stringsListProperty, ConstantsItemModel::combinedValidationValidProperty);</b>
+<b class="nc">&nbsp;        validProperty.bind(EasyBind.combine(allValidProperty, stream -&gt; stream.allMatch(valid -&gt; valid)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        stringsListProperty.addAll(databaseContext.getDatabase().getStringValues().stream()</b>
+<b class="nc">&nbsp;                                                  .sorted(new BibtexStringComparator(false))</b>
+<b class="nc">&nbsp;                                                  .map(this::convertFromBibTexString)</b>
+<b class="nc">&nbsp;                                                  .toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addNewString() {
+&nbsp;        ConstantsItemModel newItem;
+<b class="nc">&nbsp;        if (labelAlreadyExists(NEW_STRING_LABEL).isPresent()) {</b>
+<b class="nc">&nbsp;            int i = 1;</b>
+<b class="nc">&nbsp;            while (labelAlreadyExists(NEW_STRING_LABEL + i).isPresent()) {</b>
+<b class="nc">&nbsp;                i++;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            newItem = new ConstantsItemModel(NEW_STRING_LABEL + i, &quot;&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            newItem = new ConstantsItemModel(NEW_STRING_LABEL, &quot;&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        stringsListProperty.add(newItem);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeString(ConstantsItemModel item) {
+<b class="nc">&nbsp;        stringsListProperty.remove(item);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resortStrings() {
+&nbsp;        // Resort the strings list in the same order as setValues() does
+<b class="nc">&nbsp;        stringsListProperty.sort(Comparator.comparing(c -&gt; c.labelProperty().get().toLowerCase(Locale.ROOT)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ConstantsItemModel convertFromBibTexString(BibtexString bibtexString) {
+<b class="nc">&nbsp;        return new ConstantsItemModel(bibtexString.getName(), bibtexString.getContent());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        List&lt;BibtexString&gt; strings = stringsListProperty.stream()</b>
+<b class="nc">&nbsp;                                                        .map(this::fromBibtexStringViewModel)</b>
+<b class="nc">&nbsp;                                                        .toList();</b>
+<b class="nc">&nbsp;        databaseContext.getDatabase().setStrings(strings);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibtexString fromBibtexStringViewModel(ConstantsItemModel viewModel) {
+<b class="nc">&nbsp;        String label = viewModel.labelProperty().getValue();</b>
+<b class="nc">&nbsp;        String content = viewModel.contentProperty().getValue();</b>
+<b class="nc">&nbsp;        return new BibtexString(label, content);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;ConstantsItemModel&gt; labelAlreadyExists(String label) {
+<b class="nc">&nbsp;        return stringsListProperty.stream()</b>
+<b class="nc">&nbsp;                                  .filter(item -&gt; item.labelProperty().getValue().equals(label))</b>
+<b class="nc">&nbsp;                                  .findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void openHelpPage() {
+<b class="nc">&nbsp;        new HelpAction(HelpFile.STRING_EDITOR, dialogService, externalApplicationsPreferences).execute();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;ConstantsItemModel&gt; stringsListProperty() {
+<b class="nc">&nbsp;        return stringsListProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty validProperty() {
+<b class="nc">&nbsp;        return validProperty;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

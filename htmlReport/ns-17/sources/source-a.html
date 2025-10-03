@@ -1,0 +1,236 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExternalChangesResolverViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.collab</a>
+</div>
+
+<h1>Coverage Summary for Class: ExternalChangesResolverViewModel (org.jabref.gui.collab)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExternalChangesResolverViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.collab;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.BooleanBinding;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class ExternalChangesResolverViewModel extends AbstractViewModel {</b>
+&nbsp;
+<b class="nc">&nbsp;    private final static Logger LOGGER = LoggerFactory.getLogger(ExternalChangesResolverViewModel.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ObservableList&lt;DatabaseChange&gt; visibleChanges = FXCollections.observableArrayList();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Because visible changes list will be bound to the UI, certain changes can be removed. This list is used to keep
+&nbsp;     * track of changes even when they&#39;re removed from the UI.
+&nbsp;     */
+<b class="nc">&nbsp;    private final ObservableList&lt;DatabaseChange&gt; changes = FXCollections.observableArrayList();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;DatabaseChange&gt; selectedChange = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final BooleanBinding areAllChangesResolved;
+&nbsp;
+&nbsp;    private BooleanBinding areAllChangesAccepted;
+&nbsp;
+&nbsp;    private BooleanBinding areAllChangesDenied;
+&nbsp;
+&nbsp;    private final BooleanBinding canAskUserToResolveChange;
+&nbsp;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;
+<b class="nc">&nbsp;    public ExternalChangesResolverViewModel(List&lt;DatabaseChange&gt; externalChanges, UndoManager undoManager) {</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(externalChanges);</b>
+<b class="nc">&nbsp;        assert !externalChanges.isEmpty();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.visibleChanges.addAll(externalChanges);</b>
+<b class="nc">&nbsp;        this.changes.addAll(externalChanges);</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+&nbsp;
+<b class="nc">&nbsp;        areAllChangesResolved = Bindings.createBooleanBinding(visibleChanges::isEmpty, visibleChanges);</b>
+<b class="nc">&nbsp;        areAllChangesAccepted = Bindings.createBooleanBinding(() -&gt; changes.stream().allMatch(DatabaseChange::isAccepted));</b>
+<b class="nc">&nbsp;        areAllChangesDenied = Bindings.createBooleanBinding(() -&gt; changes.stream().noneMatch(DatabaseChange::isAccepted));</b>
+<b class="nc">&nbsp;        canAskUserToResolveChange = Bindings.createBooleanBinding(() -&gt; selectedChange.isNotNull().get() &amp;&amp; selectedChange.get().getExternalChangeResolver().isPresent(), selectedChange);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;DatabaseChange&gt; getVisibleChanges() {
+<b class="nc">&nbsp;        return visibleChanges;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;DatabaseChange&gt; selectedChangeProperty() {
+<b class="nc">&nbsp;        return selectedChange;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;DatabaseChange&gt; getSelectedChange() {
+<b class="nc">&nbsp;        return Optional.ofNullable(selectedChangeProperty().get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanBinding areAllChangesResolvedProperty() {
+<b class="nc">&nbsp;        return areAllChangesResolved;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean areAllChangesResolved() {
+<b class="nc">&nbsp;        return areAllChangesResolvedProperty().get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanBinding areAllChangesAcceptedProperty() {
+<b class="nc">&nbsp;        return areAllChangesAccepted;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean areAllChangesAccepted() {
+<b class="nc">&nbsp;        return areAllChangesAcceptedProperty().get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanBinding areAllChangesDeniedProperty() {
+<b class="nc">&nbsp;        return areAllChangesDenied;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean areAllChangesDenied() {
+<b class="nc">&nbsp;        return areAllChangesDeniedProperty().get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanBinding canAskUserToResolveChangeProperty() {
+<b class="nc">&nbsp;        return canAskUserToResolveChange;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void acceptChange() {
+<b class="nc">&nbsp;        getSelectedChange().ifPresent(selectedChange -&gt; {</b>
+<b class="nc">&nbsp;            selectedChange.accept();</b>
+<b class="nc">&nbsp;            getVisibleChanges().remove(selectedChange);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void denyChange() {
+<b class="nc">&nbsp;        getSelectedChange().ifPresent(getVisibleChanges()::remove);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void acceptMergedChange(DatabaseChange databaseChange) {
+<b class="nc">&nbsp;        Objects.requireNonNull(databaseChange);</b>
+&nbsp;
+<b class="nc">&nbsp;        getSelectedChange().ifPresent(oldChange -&gt; {</b>
+<b class="nc">&nbsp;            changes.remove(oldChange);</b>
+<b class="nc">&nbsp;            changes.add(databaseChange);</b>
+<b class="nc">&nbsp;            databaseChange.accept();</b>
+<b class="nc">&nbsp;            getVisibleChanges().remove(oldChange);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

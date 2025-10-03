@@ -1,0 +1,167 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > YearChecker</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.integrity</a>
+</div>
+
+<h1>Coverage Summary for Class: YearChecker (org.jabref.logic.integrity)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">YearChecker</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.integrity;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+<b class="nc">&nbsp;public class YearChecker implements ValueChecker {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Predicate&lt;String&gt; CONTAINS_FOUR_DIGIT = Pattern.compile(&quot;([^0-9]|^)[0-9]{4}([^0-9]|$)&quot;).asPredicate();</b>
+<b class="nc">&nbsp;    private static final Predicate&lt;String&gt; ENDS_WITH_FOUR_DIGIT = Pattern.compile(&quot;[0-9]{4}$&quot;).asPredicate();</b>
+&nbsp;    private static final String PUNCTUATION_MARKS = &quot;[(){},.;!?&lt;&gt;%&amp;$]&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks, if the number String contains a four digit year and ends with it.
+&nbsp;     * Official bibtex spec:
+&nbsp;     * Generally it should consist of four numerals, such as 1984, although the standard styles
+&nbsp;     * can handle any year whose last four nonpunctuation characters are numerals, such as ‘(about 1984)’.
+&nbsp;     * Source: http://ftp.fernuni-hagen.de/ftp-dir/pub/mirrors/www.ctan.org/biblio/bibtex/base/btxdoc.pdf
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public Optional&lt;String&gt; checkValue(String value) {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(value)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!CONTAINS_FOUR_DIGIT.test(value.trim())) {</b>
+<b class="nc">&nbsp;            return Optional.of(Localization.lang(&quot;should contain a four digit number&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!ENDS_WITH_FOUR_DIGIT.test(value.replaceAll(PUNCTUATION_MARKS, &quot;&quot;))) {</b>
+<b class="nc">&nbsp;            return Optional.of(Localization.lang(&quot;last four nonpunctuation characters should be numerals&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isValueCorrectlyFormatted(String value) {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(value)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!CONTAINS_FOUR_DIGIT.test(value.trim())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return ENDS_WITH_FOUR_DIGIT.test(value.replaceAll(PUNCTUATION_MARKS, &quot;&quot;));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

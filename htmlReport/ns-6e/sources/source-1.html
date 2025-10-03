@@ -1,0 +1,199 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LinkedFilesTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.linkedfiles</a>
+</div>
+
+<h1>Coverage Summary for Class: LinkedFilesTab (org.jabref.gui.preferences.linkedfiles)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LinkedFilesTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.linkedfiles;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.RadioButton;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.help.HelpAction;
+&nbsp;import org.jabref.gui.preferences.AbstractPreferenceTabView;
+&nbsp;import org.jabref.gui.preferences.PreferencesTab;
+&nbsp;import org.jabref.gui.util.IconValidationDecorator;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;
+&nbsp;public class LinkedFilesTab extends AbstractPreferenceTabView&lt;LinkedFilesTabViewModel&gt; implements PreferencesTab {
+&nbsp;
+&nbsp;    @FXML private TextField mainFileDirectory;
+&nbsp;    @FXML private RadioButton useMainFileDirectory;
+&nbsp;    @FXML private RadioButton useBibLocationAsPrimary;
+&nbsp;    @FXML private Button browseDirectory;
+&nbsp;    @FXML private Button autolinkRegexHelp;
+&nbsp;    @FXML private RadioButton autolinkFileStartsBibtex;
+&nbsp;    @FXML private RadioButton autolinkFileExactBibtex;
+&nbsp;    @FXML private RadioButton autolinkUseRegex;
+&nbsp;    @FXML private RadioButton openFileExplorerInFilesDirectory;
+&nbsp;    @FXML private RadioButton openFileExplorerInLastDirectory;
+&nbsp;    @FXML private TextField autolinkRegexKey;
+&nbsp;
+&nbsp;    @FXML private CheckBox fulltextIndex;
+&nbsp;    @FXML private CheckBox autoRenameFilesOnChange;
+&nbsp;
+&nbsp;    @FXML private ComboBox&lt;String&gt; fileNamePattern;
+&nbsp;    @FXML private TextField fileDirectoryPattern;
+&nbsp;    @FXML private CheckBox confirmLinkedFileDelete;
+&nbsp;    @FXML private CheckBox moveToTrash;
+&nbsp;
+<b class="nc">&nbsp;    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();</b>
+&nbsp;
+<b class="nc">&nbsp;    public LinkedFilesTab() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTabName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Linked files&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void initialize() {
+<b class="nc">&nbsp;        this.viewModel = new LinkedFilesTabViewModel(dialogService, preferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        mainFileDirectory.textProperty().bindBidirectional(viewModel.mainFileDirectoryProperty());</b>
+<b class="nc">&nbsp;        mainFileDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());</b>
+<b class="nc">&nbsp;        browseDirectory.disableProperty().bind(viewModel.useBibLocationAsPrimaryProperty());</b>
+<b class="nc">&nbsp;        useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());</b>
+<b class="nc">&nbsp;        useMainFileDirectory.selectedProperty().bindBidirectional(viewModel.useMainFileDirectoryProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        moveToTrash.selectedProperty().bindBidirectional(viewModel.moveToTrashProperty());</b>
+<b class="nc">&nbsp;        moveToTrash.setDisable(!NativeDesktop.get().moveToTrashSupported());</b>
+&nbsp;
+<b class="nc">&nbsp;        autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());</b>
+<b class="nc">&nbsp;        autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());</b>
+<b class="nc">&nbsp;        autolinkUseRegex.selectedProperty().bindBidirectional(viewModel.autolinkUseRegexProperty());</b>
+<b class="nc">&nbsp;        autolinkRegexKey.textProperty().bindBidirectional(viewModel.autolinkRegexKeyProperty());</b>
+<b class="nc">&nbsp;        autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());</b>
+<b class="nc">&nbsp;        fulltextIndex.selectedProperty().bindBidirectional(viewModel.fulltextIndexProperty());</b>
+<b class="nc">&nbsp;        autoRenameFilesOnChange.selectedProperty().bindBidirectional(viewModel.autoRenameFilesOnChangeProperty());</b>
+<b class="nc">&nbsp;        fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());</b>
+<b class="nc">&nbsp;        fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());</b>
+<b class="nc">&nbsp;        fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());</b>
+<b class="nc">&nbsp;        confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());</b>
+<b class="nc">&nbsp;        openFileExplorerInFilesDirectory.selectedProperty().bindBidirectional(viewModel.openFileExplorerInFilesDirectoryProperty());</b>
+<b class="nc">&nbsp;        openFileExplorerInLastDirectory.selectedProperty().bindBidirectional(viewModel.openFileExplorerInLastDirectoryProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        ActionFactory actionFactory = new ActionFactory();</b>
+<b class="nc">&nbsp;        actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferences.getExternalApplicationsPreferences()), autolinkRegexHelp);</b>
+&nbsp;
+<b class="nc">&nbsp;        validationVisualizer.setDecoration(new IconValidationDecorator());</b>
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; validationVisualizer.initVisualization(viewModel.mainFileDirValidationStatus(), mainFileDirectory));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void mainFileDirBrowse() {
+<b class="nc">&nbsp;        viewModel.mainFileDirBrowse();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

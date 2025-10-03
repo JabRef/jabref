@@ -1,0 +1,197 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NameDisplayPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: NameDisplayPreferences (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NameDisplayPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">NameDisplayPreferences$AbbreviationStyle</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">NameDisplayPreferences$DisplayStyle</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;
+&nbsp;public class NameDisplayPreferences {
+&nbsp;
+<b class="nc">&nbsp;    public enum DisplayStyle {</b>
+<b class="nc">&nbsp;        NATBIB, AS_IS, FIRSTNAME_LASTNAME, LASTNAME_FIRSTNAME</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public enum AbbreviationStyle {</b>
+<b class="nc">&nbsp;        NONE, LASTNAME_ONLY, FULL</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;DisplayStyle&gt; displayStyle = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;AbbreviationStyle&gt; abbreviationStyle = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public NameDisplayPreferences(DisplayStyle displayStyle,
+<b class="nc">&nbsp;                                  AbbreviationStyle abbreviationStyle) {</b>
+<b class="nc">&nbsp;        this.displayStyle.set(displayStyle);</b>
+<b class="nc">&nbsp;        this.abbreviationStyle.set(abbreviationStyle);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DisplayStyle getDisplayStyle() {
+<b class="nc">&nbsp;        return displayStyle.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;DisplayStyle&gt; displayStyleProperty() {
+<b class="nc">&nbsp;        return displayStyle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDisplayStyle(DisplayStyle displayStyle) {
+<b class="nc">&nbsp;        this.displayStyle.set(displayStyle);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public AbbreviationStyle getAbbreviationStyle() {
+<b class="nc">&nbsp;        return abbreviationStyle.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;AbbreviationStyle&gt; abbreviationStyleProperty() {
+<b class="nc">&nbsp;        return abbreviationStyle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAbbreviationStyle(AbbreviationStyle abbreviationStyle) {
+<b class="nc">&nbsp;        this.abbreviationStyle.set(abbreviationStyle);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

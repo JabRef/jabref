@@ -1,0 +1,177 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileAnnotationTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor.fileannotationtab</a>
+</div>
+
+<h1>Coverage Summary for Class: FileAnnotationTab (org.jabref.gui.entryeditor.fileannotationtab)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileAnnotationTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor.fileannotationtab;
+&nbsp;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.entryeditor.EntryEditorPreferences;
+&nbsp;import org.jabref.gui.entryeditor.EntryEditorTab;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.pdf.FileAnnotationCache;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;
+&nbsp;public class FileAnnotationTab extends EntryEditorTab {
+&nbsp;
+&nbsp;    public static final String NAME = &quot;File annotations&quot;;
+&nbsp;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final EntryEditorPreferences entryEditorPreferences;
+&nbsp;
+&nbsp;    public FileAnnotationTab(StateManager stateManager,
+<b class="nc">&nbsp;                             GuiPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.entryEditorPreferences = preferences.getEntryEditorPreferences();</b>
+&nbsp;
+<b class="nc">&nbsp;        setText(Localization.lang(&quot;File annotations&quot;));</b>
+<b class="nc">&nbsp;        setTooltip(new Tooltip(Localization.lang(&quot;Show file annotations&quot;)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean shouldShow(BibEntry entry) {
+<b class="nc">&nbsp;        if (!entryEditorPreferences.shouldShowFileAnnotationsTab()) {</b>
+<b class="nc">&nbsp;            return entry.getField(StandardField.FILE).isPresent();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return entry.getField(StandardField.FILE).isPresent()</b>
+<b class="nc">&nbsp;                &amp;&amp; stateManager.activeTabProperty().get()</b>
+<b class="nc">&nbsp;                               .map(tab -&gt; tab.getAnnotationCache()</b>
+<b class="nc">&nbsp;                                              .getFromCache(entry)</b>
+<b class="nc">&nbsp;                                              .values()</b>
+<b class="nc">&nbsp;                                              .stream()</b>
+<b class="nc">&nbsp;                                              .anyMatch(list -&gt; !list.isEmpty()))</b>
+<b class="nc">&nbsp;                               .orElse(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        if (stateManager.activeTabProperty().get().isPresent()) {</b>
+<b class="nc">&nbsp;            FileAnnotationCache cache = stateManager.activeTabProperty().get().get().getAnnotationCache();</b>
+<b class="nc">&nbsp;            Parent content = ViewLoader.view(new FileAnnotationTabView(entry, cache))</b>
+<b class="nc">&nbsp;                                       .load()</b>
+<b class="nc">&nbsp;                                       .getView();</b>
+<b class="nc">&nbsp;            setContent(content);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            setContent(null);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

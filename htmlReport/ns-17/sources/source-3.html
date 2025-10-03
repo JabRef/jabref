@@ -1,0 +1,147 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DatabaseChangeDetailsView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.collab</a>
+</div>
+
+<h1>Coverage Summary for Class: DatabaseChangeDetailsView (org.jabref.gui.collab)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DatabaseChangeDetailsView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.collab;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.layout.AnchorPane;
+&nbsp;
+&nbsp;import org.jabref.gui.collab.entrychange.EntryChangeDetailsView;
+&nbsp;import org.jabref.gui.collab.entrychange.EntryWithPreviewAndSourceDetailsView;
+&nbsp;import org.jabref.gui.collab.groupchange.GroupChangeDetailsView;
+&nbsp;import org.jabref.gui.collab.metedatachange.MetadataChangeDetailsView;
+&nbsp;import org.jabref.gui.collab.preamblechange.PreambleChangeDetailsView;
+&nbsp;import org.jabref.gui.collab.stringadd.BibTexStringAddDetailsView;
+&nbsp;import org.jabref.gui.collab.stringchange.BibTexStringChangeDetailsView;
+&nbsp;import org.jabref.gui.collab.stringdelete.BibTexStringDeleteDetailsView;
+&nbsp;import org.jabref.gui.collab.stringrename.BibTexStringRenameDetailsView;
+&nbsp;
+<b class="nc">&nbsp;public sealed abstract class DatabaseChangeDetailsView extends AnchorPane permits</b>
+&nbsp;        EntryWithPreviewAndSourceDetailsView,
+&nbsp;        GroupChangeDetailsView,
+&nbsp;        MetadataChangeDetailsView,
+&nbsp;        PreambleChangeDetailsView,
+&nbsp;        BibTexStringAddDetailsView,
+&nbsp;        BibTexStringChangeDetailsView,
+&nbsp;        BibTexStringDeleteDetailsView,
+&nbsp;        BibTexStringRenameDetailsView,
+&nbsp;        EntryChangeDetailsView {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set left, top, right, bottom anchors based on common offset parameter for the given child
+&nbsp;     * and attach it to children.
+&nbsp;     *
+&nbsp;     * @param child the child node of the implementation
+&nbsp;     * @see AnchorPane#getChildren()
+&nbsp;     * @see javafx.collections.ObservableList#setAll(Object[])
+&nbsp;     */
+&nbsp;    protected void setAllAnchorsAndAttachChild(Node child) {
+<b class="nc">&nbsp;        double ANCHOR_PANE_OFFSET = 8D;</b>
+<b class="nc">&nbsp;        setLeftAnchor(child, ANCHOR_PANE_OFFSET);</b>
+<b class="nc">&nbsp;        setTopAnchor(child, ANCHOR_PANE_OFFSET);</b>
+<b class="nc">&nbsp;        setRightAnchor(child, ANCHOR_PANE_OFFSET);</b>
+<b class="nc">&nbsp;        setBottomAnchor(child, ANCHOR_PANE_OFFSET);</b>
+<b class="nc">&nbsp;        this.getChildren().setAll(child);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

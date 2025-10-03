@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SearchToLuceneVisitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.search.query</a>
+</div>
+
+<h1>Coverage Summary for Class: SearchToLuceneVisitor (org.jabref.logic.search.query)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SearchToLuceneVisitor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.search.query;
+&nbsp;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;
+&nbsp;import org.jabref.model.search.LinkedFilesConstants;
+&nbsp;import org.jabref.model.search.SearchFlags;
+&nbsp;import org.jabref.search.SearchBaseVisitor;
+&nbsp;import org.jabref.search.SearchParser;
+&nbsp;
+&nbsp;import org.apache.lucene.queryparser.classic.QueryParser;
+&nbsp;
+&nbsp;/// Tests are located in `org.jabref.logic.search.query.SearchQueryLuceneConversionTest`.
+&nbsp;public class SearchToLuceneVisitor extends SearchBaseVisitor&lt;String&gt; {
+&nbsp;    private final EnumSet&lt;SearchFlags&gt; searchFlags;
+&nbsp;
+<b class="nc">&nbsp;    public SearchToLuceneVisitor(EnumSet&lt;SearchFlags&gt; searchFlags) {</b>
+<b class="nc">&nbsp;        this.searchFlags = searchFlags;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitStart(SearchParser.StartContext ctx) {
+<b class="nc">&nbsp;        return visit(ctx.andExpression());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitImplicitAndExpression(SearchParser.ImplicitAndExpressionContext ctx) {
+<b class="nc">&nbsp;        List&lt;String&gt; children = ctx.expression().stream().map(this::visit).toList();</b>
+<b class="nc">&nbsp;        return children.size() == 1 ? children.getFirst() : String.join(&quot; &quot;, children);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitParenExpression(SearchParser.ParenExpressionContext ctx) {
+<b class="nc">&nbsp;        String expr = visit(ctx.andExpression());</b>
+<b class="nc">&nbsp;        return expr.isEmpty() ? &quot;&quot; : &quot;(&quot; + expr + &quot;)&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitNegatedExpression(SearchParser.NegatedExpressionContext ctx) {
+<b class="nc">&nbsp;        return &quot;NOT (&quot; + visit(ctx.expression()) + &quot;)&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitBinaryExpression(SearchParser.BinaryExpressionContext ctx) {
+<b class="nc">&nbsp;        String left = visit(ctx.left);</b>
+<b class="nc">&nbsp;        String right = visit(ctx.right);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (left.isEmpty() &amp;&amp; right.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (left.isEmpty()) {</b>
+<b class="nc">&nbsp;            return right;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (right.isEmpty()) {</b>
+<b class="nc">&nbsp;            return left;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String operator = ctx.bin_op.getType() == SearchParser.AND ? &quot; AND &quot; : &quot; OR &quot;;</b>
+<b class="nc">&nbsp;        return left + operator + right;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String visitComparison(SearchParser.ComparisonContext ctx) {
+<b class="nc">&nbsp;        String term = SearchQueryConversion.unescapeSearchValue(ctx.searchValue());</b>
+<b class="nc">&nbsp;        boolean isQuoted = ctx.searchValue().getStart().getType() == SearchParser.STRING_LITERAL;</b>
+&nbsp;
+&nbsp;        // unfielded expression
+<b class="nc">&nbsp;        if (ctx.FIELD() == null) {</b>
+<b class="nc">&nbsp;            if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {</b>
+<b class="nc">&nbsp;                return &quot;/&quot; + term + &quot;/&quot;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return isQuoted ? &quot;\&quot;&quot; + escapeQuotes(term) + &quot;\&quot;&quot; : QueryParser.escape(term);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String field = ctx.FIELD().getText().toLowerCase(Locale.ROOT);</b>
+<b class="nc">&nbsp;        if (!isValidField(field)) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        field = &quot;any&quot;.equals(field) || &quot;anyfield&quot;.equals(field) ? &quot;&quot; : field + &quot;:&quot;;</b>
+<b class="nc">&nbsp;        int operator = ctx.operator().getStart().getType();</b>
+<b class="nc">&nbsp;        return buildFieldExpression(field, term, operator, isQuoted);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isValidField(String field) {
+<b class="nc">&nbsp;        return &quot;any&quot;.equals(field) || &quot;anyfield&quot;.equals(field) || LinkedFilesConstants.PDF_FIELDS.contains(field);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String buildFieldExpression(String field, String term, int operator, boolean isQuoted) {
+<b class="nc">&nbsp;        boolean isRegexOp = isRegexOperator(operator);</b>
+<b class="nc">&nbsp;        boolean isNegationOp = isNegationOperator(operator);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isRegexOp) {</b>
+<b class="nc">&nbsp;            String expression = field + &quot;/&quot; + term + &quot;/&quot;;</b>
+<b class="nc">&nbsp;            return isNegationOp ? &quot;NOT &quot; + expression : expression;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            term = isQuoted ? &quot;\&quot;&quot; + escapeQuotes(term) + &quot;\&quot;&quot; : QueryParser.escape(term);</b>
+<b class="nc">&nbsp;            String expression = field + term;</b>
+<b class="nc">&nbsp;            return isNegationOp ? &quot;NOT &quot; + expression : expression;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String escapeQuotes(String term) {
+<b class="nc">&nbsp;        return term.replace(&quot;\&quot;&quot;, &quot;\\\&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isNegationOperator(int operator) {
+<b class="nc">&nbsp;        return switch (operator) {</b>
+&nbsp;            case SearchParser.NEQUAL,
+&nbsp;                 SearchParser.NCEQUAL,
+&nbsp;                 SearchParser.NEEQUAL,
+&nbsp;                 SearchParser.NCEEQUAL,
+&nbsp;                 SearchParser.NREQUAL,
+&nbsp;                 SearchParser.NCREEQUAL -&gt;
+<b class="nc">&nbsp;                    true;</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    false;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean isRegexOperator(int operator) {
+<b class="nc">&nbsp;        return switch (operator) {</b>
+&nbsp;            case SearchParser.REQUAL,
+&nbsp;                 SearchParser.CREEQUAL,
+&nbsp;                 SearchParser.NREQUAL,
+&nbsp;                 SearchParser.NCREEQUAL -&gt;
+<b class="nc">&nbsp;                    true;</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    false;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

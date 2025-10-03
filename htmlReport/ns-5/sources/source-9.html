@@ -1,0 +1,472 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JabRefGuiStateManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui</a>
+</div>
+
+<h1>Coverage Summary for Class: JabRefGuiStateManager (org.jabref.gui)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JabRefGuiStateManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.7%
+  </span>
+  <span class="absValue">
+    (3/45)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.5%
+  </span>
+  <span class="absValue">
+    (31/85)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JabRefGuiStateManager$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    6.4%
+  </span>
+  <span class="absValue">
+    (3/47)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    35.6%
+  </span>
+  <span class="absValue">
+    (31/87)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import javafx.beans.Observable;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.BooleanBinding;
+&nbsp;import javafx.beans.binding.ObjectBinding;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.IntegerProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleIntegerProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.collections.ObservableMap;
+&nbsp;import javafx.collections.transformation.FilteredList;
+&nbsp;import javafx.concurrent.Task;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.util.Pair;
+&nbsp;
+&nbsp;import org.jabref.gui.ai.components.aichat.AiChatWindow;
+&nbsp;import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
+&nbsp;import org.jabref.gui.search.SearchType;
+&nbsp;import org.jabref.gui.sidepane.SidePaneType;
+&nbsp;import org.jabref.gui.util.CustomLocalDragboard;
+&nbsp;import org.jabref.gui.util.DialogWindowState;
+&nbsp;import org.jabref.gui.walkthrough.Walkthrough;
+&nbsp;import org.jabref.logic.command.CommandSelectionTab;
+&nbsp;import org.jabref.logic.search.IndexManager;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.OptionalObjectProperty;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;import org.jabref.model.search.query.SearchQuery;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import com.tobiasdiez.easybind.EasyBinding;
+&nbsp;import com.tobiasdiez.easybind.PreboundBinding;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class manages the GUI-state of JabRef, including:
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; *   &lt;li&gt;currently selected database&lt;/li&gt;
+&nbsp; *   &lt;li&gt;currently selected group&lt;/li&gt;
+&nbsp; *   &lt;li&gt;active search&lt;/li&gt;
+&nbsp; *   &lt;li&gt;active number of search results&lt;/li&gt;
+&nbsp; *   &lt;li&gt;focus owner&lt;/li&gt;
+&nbsp; *   &lt;li&gt;dialog window sizes/positions&lt;/li&gt;
+&nbsp; *   &lt;li&gt;opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; */
+<b class="fc">&nbsp;public class JabRefGuiStateManager implements StateManager {</b>
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiStateManager.class);</b>
+<b class="fc">&nbsp;    private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();</b>
+<b class="fc">&nbsp;    private final ObservableList&lt;BibDatabaseContext&gt; openDatabases = FXCollections.observableArrayList();</b>
+<b class="fc">&nbsp;    private final OptionalObjectProperty&lt;BibDatabaseContext&gt; activeDatabase = OptionalObjectProperty.empty();</b>
+<b class="fc">&nbsp;    private final OptionalObjectProperty&lt;LibraryTab&gt; activeTab = OptionalObjectProperty.empty();</b>
+<b class="fc">&nbsp;    private final ObservableList&lt;BibEntry&gt; selectedEntries = FXCollections.observableArrayList();</b>
+<b class="fc">&nbsp;    private final ObservableMap&lt;String, ObservableList&lt;GroupTreeNode&gt;&gt; selectedGroups = FXCollections.observableHashMap();</b>
+<b class="fc">&nbsp;    private final ObservableMap&lt;String, IndexManager&gt; indexManagers = FXCollections.observableHashMap();</b>
+<b class="fc">&nbsp;    private final OptionalObjectProperty&lt;SearchQuery&gt; activeSearchQuery = OptionalObjectProperty.empty();</b>
+<b class="fc">&nbsp;    private final OptionalObjectProperty&lt;SearchQuery&gt; activeGlobalSearchQuery = OptionalObjectProperty.empty();</b>
+<b class="fc">&nbsp;    private final StringProperty searchQueryProperty = new SimpleStringProperty();</b>
+<b class="fc">&nbsp;    private final IntegerProperty searchResultSize = new SimpleIntegerProperty(0);</b>
+<b class="fc">&nbsp;    private final IntegerProperty globalSearchResultSize = new SimpleIntegerProperty(0);</b>
+<b class="fc">&nbsp;    private final OptionalObjectProperty&lt;Node&gt; focusOwner = OptionalObjectProperty.empty();</b>
+<b class="fc">&nbsp;    private final ObservableList&lt;Pair&lt;BackgroundTask&lt;?&gt;, Task&lt;?&gt;&gt;&gt; backgroundTasksPairs = FXCollections.observableArrayList(task -&gt; new Observable[] {task.getValue().progressProperty(), task.getValue().runningProperty()});</b>
+<b class="fc">&nbsp;    private final ObservableList&lt;Task&lt;?&gt;&gt; backgroundTasks = EasyBind.map(backgroundTasksPairs, Pair::getValue);</b>
+<b class="fc">&nbsp;    private final FilteredList&lt;Task&lt;?&gt;&gt; runningBackgroundTasks = new FilteredList&lt;&gt;(backgroundTasks, Task::isRunning);</b>
+<b class="fc">&nbsp;    private final BooleanBinding anyTaskRunning = Bindings.createBooleanBinding(() -&gt; !runningBackgroundTasks.isEmpty(), runningBackgroundTasks);</b>
+<b class="pc">&nbsp;    private final EasyBinding&lt;Boolean&gt; anyTasksThatWillNotBeRecoveredRunning = EasyBind.reduce(backgroundTasksPairs, tasks -&gt; tasks.anyMatch(task -&gt; !task.getKey().willBeRecoveredAutomatically() &amp;&amp; task.getValue().isRunning()));</b>
+<b class="fc">&nbsp;    private final EasyBinding&lt;Double&gt; tasksProgress = EasyBind.reduce(backgroundTasksPairs, tasks -&gt; tasks.map(Pair::getValue).filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));</b>
+<b class="fc">&nbsp;    private final ObservableMap&lt;String, DialogWindowState&gt; dialogWindowStates = FXCollections.observableHashMap();</b>
+<b class="fc">&nbsp;    private final ObservableList&lt;SidePaneType&gt; visibleSidePanes = FXCollections.observableArrayList();</b>
+<b class="fc">&nbsp;    private final ObjectProperty&lt;LastAutomaticFieldEditorEdit&gt; lastAutomaticFieldEditorEdit = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final ObservableList&lt;String&gt; searchHistory = FXCollections.observableArrayList();</b>
+<b class="fc">&nbsp;    private final List&lt;AiChatWindow&gt; aiChatWindows = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final BooleanProperty editorShowing = new SimpleBooleanProperty(false);</b>
+<b class="fc">&nbsp;    private final OptionalObjectProperty&lt;Walkthrough&gt; activeWalkthrough = OptionalObjectProperty.empty();</b>
+<b class="fc">&nbsp;    private final BooleanProperty canGoBack = new SimpleBooleanProperty(false);</b>
+<b class="fc">&nbsp;    private final BooleanProperty canGoForward = new SimpleBooleanProperty(false);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ObservableList&lt;SidePaneType&gt; getVisibleSidePaneComponents() {
+<b class="nc">&nbsp;        return visibleSidePanes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public CustomLocalDragboard getLocalDragboard() {
+<b class="nc">&nbsp;        return localDragboard;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ObservableList&lt;BibDatabaseContext&gt; getOpenDatabases() {
+<b class="nc">&nbsp;        return openDatabases;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public OptionalObjectProperty&lt;BibDatabaseContext&gt; activeDatabaseProperty() {
+<b class="nc">&nbsp;        return activeDatabase;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public OptionalObjectProperty&lt;LibraryTab&gt; activeTabProperty() {
+<b class="nc">&nbsp;        return activeTab;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public OptionalObjectProperty&lt;SearchQuery&gt; activeSearchQuery(SearchType type) {
+<b class="nc">&nbsp;        return type == SearchType.NORMAL_SEARCH ? activeSearchQuery : activeGlobalSearchQuery;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StringProperty searchQueryProperty() {
+<b class="nc">&nbsp;        return searchQueryProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public IntegerProperty searchResultSize(SearchType type) {
+<b class="nc">&nbsp;        return type == SearchType.NORMAL_SEARCH ? searchResultSize : globalSearchResultSize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ObservableList&lt;BibEntry&gt; getSelectedEntries() {
+<b class="nc">&nbsp;        return selectedEntries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setSelectedEntries(List&lt;BibEntry&gt; newSelectedEntries) {
+<b class="nc">&nbsp;        selectedEntries.setAll(newSelectedEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setSelectedGroups(BibDatabaseContext context, List&lt;GroupTreeNode&gt; newSelectedGroups) {
+<b class="nc">&nbsp;        Objects.requireNonNull(newSelectedGroups);</b>
+<b class="nc">&nbsp;        selectedGroups.computeIfAbsent(context.getUid(), k -&gt; FXCollections.observableArrayList()).setAll(newSelectedGroups);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ObservableList&lt;GroupTreeNode&gt; getSelectedGroups(BibDatabaseContext context) {
+<b class="nc">&nbsp;        return selectedGroups.computeIfAbsent(context.getUid(), k -&gt; FXCollections.observableArrayList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void clearSelectedGroups(BibDatabaseContext context) {
+<b class="nc">&nbsp;        selectedGroups.computeIfAbsent(context.getUid(), k -&gt; FXCollections.observableArrayList()).clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setIndexManager(BibDatabaseContext database, IndexManager indexManager) {
+<b class="nc">&nbsp;        indexManagers.put(database.getUid(), indexManager);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;IndexManager&gt; getIndexManager(BibDatabaseContext database) {
+<b class="nc">&nbsp;        return Optional.ofNullable(indexManagers.get(database.getUid()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;BibDatabaseContext&gt; getActiveDatabase() {
+<b class="nc">&nbsp;        return activeDatabase.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setActiveDatabase(BibDatabaseContext database) {
+<b class="nc">&nbsp;        if (database == null) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;No open database detected&quot;);</b>
+<b class="nc">&nbsp;            activeDatabaseProperty().set(Optional.empty());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            activeDatabaseProperty().set(Optional.of(database));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public OptionalObjectProperty&lt;Node&gt; focusOwnerProperty() {
+<b class="nc">&nbsp;        return focusOwner;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;Node&gt; getFocusOwner() {
+<b class="nc">&nbsp;        return focusOwner.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ObservableList&lt;Task&lt;?&gt;&gt; getBackgroundTasks() {
+<b class="fc">&nbsp;        return backgroundTasks;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ObservableList&lt;Task&lt;?&gt;&gt; getRunningBackgroundTasks() {
+<b class="nc">&nbsp;        return runningBackgroundTasks;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void addBackgroundTask(BackgroundTask&lt;?&gt; backgroundTask, Task&lt;?&gt; task) {
+<b class="nc">&nbsp;        this.backgroundTasksPairs.addFirst(new Pair&lt;&gt;(backgroundTask, task));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BooleanBinding getAnyTaskRunning() {
+<b class="nc">&nbsp;        return anyTaskRunning;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public EasyBinding&lt;Boolean&gt; getAnyTasksThatWillNotBeRecoveredRunning() {
+<b class="nc">&nbsp;        return anyTasksThatWillNotBeRecoveredRunning;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public EasyBinding&lt;Double&gt; getTasksProgress() {
+<b class="nc">&nbsp;        return tasksProgress;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public DialogWindowState getDialogWindowState(String className) {
+<b class="nc">&nbsp;        return dialogWindowStates.get(className);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setDialogWindowState(String className, DialogWindowState state) {
+<b class="nc">&nbsp;        dialogWindowStates.put(className, state);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ObjectProperty&lt;LastAutomaticFieldEditorEdit&gt; lastAutomaticFieldEditorEditProperty() {
+<b class="nc">&nbsp;        return lastAutomaticFieldEditorEdit;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit) {
+<b class="nc">&nbsp;        lastAutomaticFieldEditorEditProperty().set(automaticFieldEditorEdit);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; getAllDatabasePaths() {
+<b class="nc">&nbsp;        List&lt;String&gt; list = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        getOpenDatabases().stream()</b>
+<b class="nc">&nbsp;                          .map(BibDatabaseContext::getDatabasePath)</b>
+<b class="nc">&nbsp;                          .forEachOrdered(pathOptional -&gt; pathOptional.ifPresentOrElse(</b>
+<b class="nc">&nbsp;                                  path -&gt; list.add(path.toAbsolutePath().toString()),</b>
+<b class="nc">&nbsp;                                  () -&gt; list.add(&quot;&quot;)));</b>
+<b class="nc">&nbsp;        return list;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ObjectBinding&lt;Optional&lt;CommandSelectionTab&gt;&gt; getActiveSelectionTabProperty() {
+<b class="nc">&nbsp;        return new PreboundBinding&lt;&gt;(activeTab) {</b>
+&nbsp;            @Override
+&nbsp;            protected Optional&lt;CommandSelectionTab&gt; computeValue() {
+<b class="nc">&nbsp;                return activeTab.getValue().map(Function.identity());</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void addSearchHistory(String search) {
+<b class="nc">&nbsp;        searchHistory.remove(search);</b>
+<b class="nc">&nbsp;        searchHistory.add(search);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ObservableList&lt;String&gt; getWholeSearchHistory() {
+<b class="nc">&nbsp;        return searchHistory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; getLastSearchHistory(int size) {
+<b class="nc">&nbsp;        int sizeSearches = searchHistory.size();</b>
+<b class="nc">&nbsp;        if (size &lt; sizeSearches) {</b>
+<b class="nc">&nbsp;            return searchHistory.subList(sizeSearches - size, sizeSearches);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return searchHistory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void clearSearchHistory() {
+<b class="nc">&nbsp;        searchHistory.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;AiChatWindow&gt; getAiChatWindows() {
+<b class="nc">&nbsp;        return aiChatWindows;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BooleanProperty getEditorShowing() {
+<b class="nc">&nbsp;        return editorShowing;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setActiveWalkthrough(Walkthrough walkthrough) {
+<b class="nc">&nbsp;        activeWalkthrough.set(Optional.ofNullable(walkthrough));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;Walkthrough&gt; getActiveWalkthrough() {
+<b class="nc">&nbsp;        return activeWalkthrough.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BooleanProperty canGoBackProperty() {
+<b class="nc">&nbsp;        return canGoBack;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BooleanProperty canGoForwardProperty() {
+<b class="nc">&nbsp;        return canGoForward;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

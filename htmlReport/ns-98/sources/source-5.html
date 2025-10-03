@@ -1,0 +1,237 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SelectedItemsContainer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.http.server.cayw.gui</a>
+</div>
+
+<h1>Coverage Summary for Class: SelectedItemsContainer (org.jabref.http.server.cayw.gui)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SelectedItemsContainer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SelectedItemsContainer$Chip</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.http.server.cayw.gui;
+&nbsp;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.geometry.Insets;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.layout.FlowPane;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;
+&nbsp;public class SelectedItemsContainer extends FlowPane {
+&nbsp;
+&nbsp;    private final ObservableList&lt;CAYWEntry&gt; items;
+&nbsp;
+<b class="nc">&nbsp;    public SelectedItemsContainer(ObservableList&lt;CAYWEntry&gt; items) {</b>
+<b class="nc">&nbsp;        this.items = items;</b>
+<b class="nc">&nbsp;        setup();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setup() {
+<b class="nc">&nbsp;        this.setHgap(8);</b>
+<b class="nc">&nbsp;        this.setVgap(8);</b>
+<b class="nc">&nbsp;        this.setPadding(new Insets(10));</b>
+&nbsp;
+<b class="nc">&nbsp;        items.forEach(this::addChip);</b>
+&nbsp;
+<b class="nc">&nbsp;        items.addListener((ListChangeListener&lt;CAYWEntry&gt;) change -&gt; {</b>
+<b class="nc">&nbsp;            while (change.next()) {</b>
+<b class="nc">&nbsp;                if (change.wasAdded()) {</b>
+<b class="nc">&nbsp;                    change.getAddedSubList().forEach(this::addChip);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (change.wasRemoved()) {</b>
+<b class="nc">&nbsp;                    change.getRemoved().forEach(this::removeChip);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addChip(CAYWEntry entry) {
+<b class="nc">&nbsp;        Chip chip = new Chip(entry, items);</b>
+<b class="nc">&nbsp;        getChildren().add(chip);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeChip(CAYWEntry entry) {
+<b class="nc">&nbsp;        getChildren().removeIf(node -&gt; {</b>
+<b class="nc">&nbsp;            if (node instanceof SelectedItemsContainer.Chip chip) {</b>
+<b class="nc">&nbsp;                return chip.getEntry().equals(entry);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class Chip extends HBox {
+&nbsp;        private final CAYWEntry entry;
+&nbsp;
+<b class="nc">&nbsp;        public Chip(CAYWEntry entry, ObservableList&lt;CAYWEntry&gt; parentList) {</b>
+<b class="nc">&nbsp;            this.entry = entry;</b>
+&nbsp;
+<b class="nc">&nbsp;            this.setAlignment(Pos.CENTER_LEFT);</b>
+<b class="nc">&nbsp;            this.setSpacing(5);</b>
+<b class="nc">&nbsp;            this.setPadding(new Insets(5, 10, 5, 10));</b>
+&nbsp;
+<b class="nc">&nbsp;            this.getStyleClass().add(&quot;chip-style&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            Button removeButton = new Button(&quot;×&quot;);</b>
+<b class="nc">&nbsp;            removeButton.getStyleClass().add(&quot;chip-remove-button&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            removeButton.setOnAction(e -&gt; {</b>
+<b class="nc">&nbsp;                e.consume();</b>
+<b class="nc">&nbsp;                parentList.remove(entry);</b>
+&nbsp;            });
+&nbsp;
+<b class="nc">&nbsp;            Label label = new Label(entry.shortLabel());</b>
+&nbsp;
+<b class="nc">&nbsp;            getChildren().addAll(label, removeButton);</b>
+&nbsp;
+<b class="nc">&nbsp;            this.setOnMouseClicked(e -&gt; {</b>
+&nbsp;                // TODO: Handle the click event and show custom fields like prefix/suffix etc.
+<b class="nc">&nbsp;            });</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public CAYWEntry getEntry() {
+<b class="nc">&nbsp;            return entry;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,195 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MergeReviewIntoCommentMigration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.migrations</a>
+</div>
+
+<h1>Coverage Summary for Class: MergeReviewIntoCommentMigration (org.jabref.migrations)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MergeReviewIntoCommentMigration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.migrations;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class MergeReviewIntoCommentMigration {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MergeReviewIntoCommentMigration.class);</b>
+&nbsp;
+&nbsp;    public static boolean needsMigration(ParserResult parserResult) {
+<b class="nc">&nbsp;        return parserResult.getDatabase().getEntries().stream()</b>
+<b class="nc">&nbsp;                           .anyMatch(bibEntry -&gt; bibEntry.getField(StandardField.REVIEW).isPresent());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void performMigration(ParserResult parserResult) {
+&nbsp;        /* This migration only handles the non-conflicting entries.
+&nbsp;         * For the other see this.performConflictingMigration().
+&nbsp;         */
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = Objects.requireNonNull(parserResult).getDatabase().getEntries();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!entries.isEmpty()) {</b>
+<b class="nc">&nbsp;            parserResult.setChangedOnMigration(true);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        entries.stream()</b>
+<b class="nc">&nbsp;               .filter(MergeReviewIntoCommentMigration::hasReviewField)</b>
+<b class="nc">&nbsp;               .filter(entry -&gt; !MergeReviewIntoCommentMigration.hasCommentField(entry))</b>
+<b class="nc">&nbsp;               .forEach(entry -&gt; migrate(entry, parserResult));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;BibEntry&gt; collectConflicts(ParserResult parserResult) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = Objects.requireNonNull(parserResult).getDatabase().getEntries();</b>
+&nbsp;
+<b class="nc">&nbsp;        return entries.stream()</b>
+<b class="nc">&nbsp;                      .filter(MergeReviewIntoCommentMigration::hasReviewField)</b>
+<b class="nc">&nbsp;                      .filter(MergeReviewIntoCommentMigration::hasCommentField)</b>
+<b class="nc">&nbsp;                      .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void performConflictingMigration(ParserResult parserResult) {
+<b class="nc">&nbsp;        collectConflicts(parserResult).forEach(entry -&gt; migrate(entry, parserResult));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasCommentField(BibEntry entry) {
+<b class="nc">&nbsp;        return entry.getField(StandardField.COMMENT).isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean hasReviewField(BibEntry entry) {
+<b class="nc">&nbsp;        return entry.getField(StandardField.REVIEW).isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String mergeCommentFieldIfPresent(BibEntry entry, String review) {
+<b class="nc">&nbsp;        if (entry.getField(StandardField.COMMENT).isPresent()) {</b>
+<b class="nc">&nbsp;            LOGGER.info(&quot;Both Comment and Review fields are present in {}. Merging them into the comment field.&quot;, entry.getCitationKey().orElse(entry.getAuthorTitleYear(150)));</b>
+<b class="nc">&nbsp;            return &quot;%s\n%s:\n%s&quot;.formatted(entry.getField(StandardField.COMMENT).get().trim(), Localization.lang(&quot;Review&quot;), review.trim());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return review;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void migrate(BibEntry entry, ParserResult parserResult) {
+<b class="nc">&nbsp;        if (hasReviewField(entry)) {</b>
+<b class="nc">&nbsp;            updateFields(entry, mergeCommentFieldIfPresent(entry, entry.getField(StandardField.REVIEW).get()));</b>
+<b class="nc">&nbsp;            parserResult.setChangedOnMigration(true);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateFields(BibEntry entry, String review) {
+<b class="nc">&nbsp;        entry.setField(StandardField.COMMENT, review);</b>
+<b class="nc">&nbsp;        entry.clearField(StandardField.REVIEW);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,166 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LocalizationKey</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.l10n</a>
+</div>
+
+<h1>Coverage Summary for Class: LocalizationKey (org.jabref.logic.l10n)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LocalizationKey</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (3/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    78.6%
+  </span>
+  <span class="absValue">
+    (11/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.l10n;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;/**
+&nbsp; * Model for a localization to translate. The key is the English text.
+&nbsp; */
+&nbsp;public class LocalizationKey {
+&nbsp;
+&nbsp;    private final String key;
+&nbsp;    private final String escapedPropertyKey;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param key plain key - no escaping. E.g., &quot;Copy \cite{key}&quot; or &quot;Newline follows\nsecond line&quot; are valid parameters.
+&nbsp;     */
+<b class="fc">&nbsp;    private LocalizationKey(String key) {</b>
+<b class="fc">&nbsp;        this.key = key;</b>
+&nbsp;        // space, #, !, = and : are not allowed in properties file keys
+&nbsp;        // # and ! are only disallowed at the beginning of the key but easier to escape every instance
+<b class="fc">&nbsp;        this.escapedPropertyKey = key</b>
+<b class="fc">&nbsp;                .replace(&quot;\n&quot;, &quot;\\n&quot;)</b>
+<b class="fc">&nbsp;                .replace(&quot; &quot;, &quot;\\ &quot;)</b>
+<b class="fc">&nbsp;                .replace(&quot;#&quot;, &quot;\\#&quot;)</b>
+<b class="fc">&nbsp;                .replace(&quot;!&quot;, &quot;\\!&quot;)</b>
+<b class="fc">&nbsp;                .replace(&quot;=&quot;, &quot;\\=&quot;)</b>
+<b class="fc">&nbsp;                .replace(&quot;:&quot;, &quot;\\:&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param key plain key - no escaping. E.g., &quot;Copy \cite{key}&quot; or &quot;Newline follows\nsecond line&quot; are valid parameters.
+&nbsp;     */
+&nbsp;    public static LocalizationKey fromKey(String key) {
+<b class="fc">&nbsp;        return new LocalizationKey(Objects.requireNonNull(key));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static LocalizationKey fromEscapedJavaString(String key) {
+&nbsp;        // &quot;\n&quot; in the string is an escaped newline. That needs to be kept.
+&nbsp;        // &quot;\\&quot; in the string can stay --&gt; needs to be kept
+<b class="nc">&nbsp;        return new LocalizationKey(Objects.requireNonNull(key));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;    public static LocalizationKey fromPropertyKey(String key) {
+&nbsp;        String propertyKey = key;
+&nbsp;        // we ne need to unescape the escaped characters (see org.jabref.logic.l10n.LocalizationKey.LocalizationKey)
+&nbsp;        String javaCodeKey = key.replaceAll(&quot;\\\\([ #!=:])&quot;, &quot;$1&quot;);
+&nbsp;        return new LocalizationKey(javaCodeKey, propertyKey);
+&nbsp;    }
+&nbsp;    */
+&nbsp;    public String getEscapedPropertiesKey() {
+<b class="nc">&nbsp;        return this.escapedPropertyKey;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getValueForEnglishPropertiesFile() {
+&nbsp;        // Newline needs to be escaped
+<b class="nc">&nbsp;        return this.key.replace(&quot;\n&quot;, &quot;\\n&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getKey() {
+<b class="fc">&nbsp;        return this.key;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BstVM</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bst</a>
+</div>
+
+<h1>Coverage Summary for Class: BstVM (org.jabref.logic.bst)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BstVM</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BstVM$ThrowingErrorListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bst;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Deque;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.antlr.v4.runtime.BailErrorStrategy;
+&nbsp;import org.antlr.v4.runtime.BaseErrorListener;
+&nbsp;import org.antlr.v4.runtime.CharStream;
+&nbsp;import org.antlr.v4.runtime.CharStreams;
+&nbsp;import org.antlr.v4.runtime.CommonTokenStream;
+&nbsp;import org.antlr.v4.runtime.RecognitionException;
+&nbsp;import org.antlr.v4.runtime.Recognizer;
+&nbsp;import org.antlr.v4.runtime.misc.ParseCancellationException;
+&nbsp;import org.antlr.v4.runtime.tree.ParseTree;
+&nbsp;
+&nbsp;public class BstVM {
+&nbsp;
+<b class="nc">&nbsp;    protected static final Integer FALSE = 0;</b>
+<b class="nc">&nbsp;    protected static final Integer TRUE = 1;</b>
+&nbsp;
+&nbsp;    protected final ParseTree tree;
+&nbsp;    protected BstVMContext latestContext; // for testing
+&nbsp;
+<b class="nc">&nbsp;    private Path path = null;</b>
+&nbsp;
+&nbsp;    public BstVM(Path path) throws RecognitionException, IOException {
+<b class="nc">&nbsp;        this(CharStreams.fromPath(path));</b>
+<b class="nc">&nbsp;        this.path = path;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BstVM(String s) throws RecognitionException {
+<b class="nc">&nbsp;        this(CharStreams.fromString(s));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected BstVM(CharStream bst) throws RecognitionException {
+<b class="nc">&nbsp;        this(charStream2CommonTree(bst));</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private BstVM(ParseTree tree) {</b>
+<b class="nc">&nbsp;        this.tree = tree;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ParseTree charStream2CommonTree(CharStream query) {
+<b class="nc">&nbsp;        BstLexer lexer = new BstLexer(query);</b>
+<b class="nc">&nbsp;        lexer.removeErrorListeners();</b>
+<b class="nc">&nbsp;        lexer.addErrorListener(ThrowingErrorListener.INSTANCE);</b>
+<b class="nc">&nbsp;        BstParser parser = new BstParser(new CommonTokenStream(lexer));</b>
+<b class="nc">&nbsp;        parser.removeErrorListeners();</b>
+<b class="nc">&nbsp;        parser.addErrorListener(ThrowingErrorListener.INSTANCE);</b>
+<b class="nc">&nbsp;        parser.setErrorHandler(new BailErrorStrategy());</b>
+<b class="nc">&nbsp;        return parser.bstFile();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Transforms the given list of BibEntries to a rendered list of references using the parsed bst program
+&nbsp;     *
+&nbsp;     * @param bibEntries  list of entries to convert
+&nbsp;     * @param bibDatabase (may be null) the bibDatabase used for resolving strings / crossref
+&nbsp;     * @return list of references in plain text form
+&nbsp;     */
+&nbsp;    public String render(Collection&lt;BibEntry&gt; bibEntries, BibDatabase bibDatabase) {
+<b class="nc">&nbsp;        Objects.requireNonNull(bibEntries);</b>
+&nbsp;
+&nbsp;        // needs to be modifiable due to sort operations later
+<b class="nc">&nbsp;        List&lt;BstEntry&gt; entries = bibEntries.stream().map(BstEntry::new).collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder resultBuffer = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        BstVMContext bstVMContext = new BstVMContext(entries, bibDatabase, path);</b>
+<b class="nc">&nbsp;        bstVMContext.functions().putAll(new BstFunctions(bstVMContext, resultBuffer).getBuiltInFunctions());</b>
+<b class="nc">&nbsp;        bstVMContext.integers().put(&quot;entry.max$&quot;, Integer.MAX_VALUE);</b>
+<b class="nc">&nbsp;        bstVMContext.integers().put(&quot;global.max$&quot;, Integer.MAX_VALUE);</b>
+&nbsp;
+<b class="nc">&nbsp;        BstVMVisitor bstVMVisitor = new BstVMVisitor(bstVMContext, resultBuffer);</b>
+<b class="nc">&nbsp;        bstVMVisitor.visit(tree);</b>
+&nbsp;
+<b class="nc">&nbsp;        latestContext = bstVMContext;</b>
+&nbsp;
+<b class="nc">&nbsp;        return resultBuffer.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String render(Collection&lt;BibEntry&gt; bibEntries) {
+<b class="nc">&nbsp;        return render(bibEntries, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Deque&lt;Object&gt; getStack() {
+<b class="nc">&nbsp;        if (latestContext != null) {</b>
+<b class="nc">&nbsp;            return latestContext.stack();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new BstVMException(&quot;BstVM must have rendered at least once to provide the latest stack&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static class ThrowingErrorListener extends BaseErrorListener {</b>
+<b class="nc">&nbsp;        public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void syntaxError(Recognizer&lt;?, ?&gt; recognizer, Object offendingSymbol,
+&nbsp;                                int line, int charPositionInLine, String msg, RecognitionException e)
+&nbsp;                throws ParseCancellationException {
+<b class="nc">&nbsp;            throw new ParseCancellationException(&quot;line &quot; + line + &quot;:&quot; + charPositionInLine + &quot; &quot; + msg);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

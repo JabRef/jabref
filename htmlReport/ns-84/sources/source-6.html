@@ -1,0 +1,297 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UiThreadObservableList</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util.uithreadaware</a>
+</div>
+
+<h1>Coverage Summary for Class: UiThreadObservableList (org.jabref.gui.util.uithreadaware)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UiThreadObservableList</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util.uithreadaware;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Iterator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.ListIterator;
+&nbsp;
+&nbsp;import javafx.beans.InvalidationListener;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class can be used to wrap an @see ObservableList inside it. When wrapped, any Listener listening for updates to the wrapped ObservableList (for example because of a binding to it) is ensured to be notified on the JavaFX Application Thread. It should be used to implement bindings where updates come in from a background thread but should be reflected in the UI where it is necessary that changes to the UI are performed on the JavaFX Application thread.
+&nbsp; *
+&nbsp; * @param &lt;E&gt; the type of the elements of the wrapped ObservableList.
+&nbsp; */
+&nbsp;public class UiThreadObservableList&lt;E&gt; implements ObservableList&lt;E&gt; {
+&nbsp;
+&nbsp;    private final ObservableList&lt;E&gt; delegate;
+&nbsp;
+<b class="nc">&nbsp;    public UiThreadObservableList(ObservableList&lt;E&gt; delegate) {</b>
+<b class="nc">&nbsp;        this.delegate = delegate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void addListener(ListChangeListener&lt;? super E&gt; listener) {
+<b class="nc">&nbsp;        delegate.addListener(new UiThreadListChangeListener&lt;&gt;(listener));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void removeListener(ListChangeListener&lt;? super E&gt; listener) {
+<b class="nc">&nbsp;        delegate.removeListener(listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SafeVarargs
+&nbsp;    @Override
+&nbsp;    public final boolean addAll(E... elements) {
+<b class="nc">&nbsp;        return delegate.addAll(elements);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SafeVarargs
+&nbsp;    @Override
+&nbsp;    public final boolean setAll(E... elements) {
+<b class="nc">&nbsp;        return delegate.setAll(elements);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean setAll(Collection&lt;? extends E&gt; col) {
+<b class="nc">&nbsp;        return delegate.setAll(col);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SafeVarargs
+&nbsp;    @Override
+&nbsp;    public final boolean removeAll(E... elements) {
+<b class="nc">&nbsp;        return delegate.removeAll(elements);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SafeVarargs
+&nbsp;    @Override
+&nbsp;    public final boolean retainAll(E... elements) {
+<b class="nc">&nbsp;        return delegate.retainAll(elements);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void remove(int from, int to) {
+<b class="nc">&nbsp;        delegate.remove(from, to);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int size() {
+<b class="nc">&nbsp;        return delegate.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isEmpty() {
+<b class="nc">&nbsp;        return delegate.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean contains(Object o) {
+<b class="nc">&nbsp;        return delegate.contains(o);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Iterator&lt;E&gt; iterator() {
+<b class="nc">&nbsp;        return delegate.iterator();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Object[] toArray() {
+<b class="nc">&nbsp;        return delegate.toArray();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public &lt;T&gt; T[] toArray(T[] a) {
+<b class="nc">&nbsp;        return delegate.toArray(a);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean add(E e) {
+<b class="nc">&nbsp;        return delegate.add(e);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean remove(Object o) {
+<b class="nc">&nbsp;        return delegate.remove(o);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean containsAll(Collection&lt;?&gt; c) {
+<b class="nc">&nbsp;        return delegate.containsAll(c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean addAll(Collection&lt;? extends E&gt; c) {
+<b class="nc">&nbsp;        return delegate.addAll(c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean addAll(int index, Collection&lt;? extends E&gt; c) {
+<b class="nc">&nbsp;        return delegate.addAll(index, c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean removeAll(Collection&lt;?&gt; c) {
+<b class="nc">&nbsp;        return delegate.removeAll(c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean retainAll(Collection&lt;?&gt; c) {
+<b class="nc">&nbsp;        return delegate.retainAll(c);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void clear() {
+<b class="nc">&nbsp;        delegate.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public E get(int index) {
+<b class="nc">&nbsp;        return delegate.get(index);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public E set(int index, E element) {
+<b class="nc">&nbsp;        return delegate.set(index, element);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void add(int index, E element) {
+<b class="nc">&nbsp;        delegate.add(index, element);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public E remove(int index) {
+<b class="nc">&nbsp;        return delegate.remove(index);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int indexOf(Object o) {
+<b class="nc">&nbsp;        return delegate.indexOf(o);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int lastIndexOf(Object o) {
+<b class="nc">&nbsp;        return delegate.lastIndexOf(o);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ListIterator&lt;E&gt; listIterator() {
+<b class="nc">&nbsp;        return delegate.listIterator();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ListIterator&lt;E&gt; listIterator(int index) {
+<b class="nc">&nbsp;        return delegate.listIterator(index);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;E&gt; subList(int fromIndex, int toIndex) {
+<b class="nc">&nbsp;        return delegate.subList(fromIndex, toIndex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void addListener(InvalidationListener listener) {
+<b class="nc">&nbsp;        delegate.addListener(new UiThreadInvalidationListener(listener));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void removeListener(InvalidationListener listener) {
+<b class="nc">&nbsp;        delegate.removeListener(listener);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

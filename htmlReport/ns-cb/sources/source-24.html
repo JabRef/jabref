@@ -1,0 +1,347 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MedlineFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: MedlineFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MedlineFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/73)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.net.URLConnection;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.xml.stream.XMLInputFactory;
+&nbsp;import javax.xml.stream.XMLStreamConstants;
+&nbsp;import javax.xml.stream.XMLStreamException;
+&nbsp;import javax.xml.stream.XMLStreamReader;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanup;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.IdBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.ImporterPreferences;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.SearchBasedFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.transformers.MedlineQueryTransformer;
+&nbsp;import org.jabref.logic.importer.fileformat.MedlineImporter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fetch or search from PubMed &lt;a href=&quot;http://www.ncbi.nlm.nih.gov/sites/entrez/&quot;&gt;www.ncbi.nlm.nih.gov&lt;/a&gt;
+&nbsp; * The MedlineFetcher fetches the entries from the PubMed database.
+&nbsp; * See &lt;a href=&quot;https://docs.jabref.org/collect/import-using-online-bibliographic-database#medline-pubmed&quot;&gt;docs.jabref.org&lt;/a&gt; for a detailed documentation of the available fields.
+&nbsp; */
+&nbsp;public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher, CustomizableKeyFetcher {
+&nbsp;    public static final String FETCHER_NAME = &quot;Medline/PubMed&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MedlineFetcher.class);</b>
+&nbsp;
+&nbsp;    private static final int NUMBER_TO_FETCH = 50;
+&nbsp;    private static final String ID_URL = &quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi&quot;;
+&nbsp;    private static final String SEARCH_URL = &quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi&quot;;
+&nbsp;    private static final String TEST_URL_WITHOUT_API_KEY = &quot;https://www.ncbi.nlm.nih.gov/entrez/eutils/einfo.fcgi?db=pubmed&amp;api_key=&quot;;
+&nbsp;
+&nbsp;    private final ImporterPreferences importerPreferences;
+&nbsp;    private int numberOfResultsFound;
+&nbsp;
+<b class="nc">&nbsp;    public MedlineFetcher(ImporterPreferences importerPreferences) {</b>
+<b class="nc">&nbsp;        this.importerPreferences = importerPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * When using &#39;esearch.fcgi?db=&amp;lt;database&gt;&amp;term=&amp;lt;query&gt;&#39; we will get a list of IDs matching the query.
+&nbsp;     * Input: Any text query (&amp;term)
+&nbsp;     * Output: List of UIDs matching the query
+&nbsp;     *
+&nbsp;     * @see &lt;a href=&quot;https://www.ncbi.nlm.nih.gov/books/NBK25500/&quot;&gt;www.ncbi.nlm.nih.gov/books/NBK25500/&lt;/a&gt;
+&nbsp;     */
+&nbsp;    private List&lt;String&gt; getPubMedIdsFromQuery(String query) throws FetcherException {
+<b class="nc">&nbsp;        boolean fetchIDs = false;</b>
+<b class="nc">&nbsp;        boolean firstOccurrenceOfCount = false;</b>
+<b class="nc">&nbsp;        List&lt;String&gt; idList = new ArrayList&lt;&gt;();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            URL ncbi = createSearchUrl(query);</b>
+&nbsp;
+<b class="nc">&nbsp;            XMLInputFactory inputFactory = XMLInputFactory.newFactory();</b>
+<b class="nc">&nbsp;            XMLStreamReader streamReader = inputFactory.createXMLStreamReader(ncbi.openStream());</b>
+&nbsp;
+&nbsp;            fetchLoop:
+<b class="nc">&nbsp;            while (streamReader.hasNext()) {</b>
+<b class="nc">&nbsp;                int event = streamReader.getEventType();</b>
+&nbsp;
+<b class="nc">&nbsp;                switch (event) {</b>
+&nbsp;                    case XMLStreamConstants.START_ELEMENT:
+<b class="nc">&nbsp;                        if (&quot;Count&quot;.equals(streamReader.getName().toString())) {</b>
+<b class="nc">&nbsp;                            firstOccurrenceOfCount = true;</b>
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        if (&quot;IdList&quot;.equals(streamReader.getName().toString())) {</b>
+<b class="nc">&nbsp;                            fetchIDs = true;</b>
+&nbsp;                        }
+&nbsp;                        break;
+&nbsp;
+&nbsp;                    case XMLStreamConstants.CHARACTERS:
+<b class="nc">&nbsp;                        if (firstOccurrenceOfCount) {</b>
+<b class="nc">&nbsp;                            numberOfResultsFound = Integer.parseInt(streamReader.getText());</b>
+<b class="nc">&nbsp;                            firstOccurrenceOfCount = false;</b>
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        if (fetchIDs) {</b>
+<b class="nc">&nbsp;                            idList.add(streamReader.getText());</b>
+&nbsp;                        }
+&nbsp;                        break;
+&nbsp;
+&nbsp;                    case XMLStreamConstants.END_ELEMENT:
+&nbsp;                        // Everything relevant is listed before the IdList. So we break the loop right after the IdList tag closes.
+<b class="nc">&nbsp;                        if (&quot;IdList&quot;.equals(streamReader.getName().toString())) {</b>
+&nbsp;                            break fetchLoop;
+&nbsp;                        }
+&nbsp;                }
+<b class="nc">&nbsp;                streamReader.next();</b>
+&nbsp;            }
+&nbsp;            streamReader.close();
+<b class="nc">&nbsp;            return idList;</b>
+&nbsp;        } catch (IOException | URISyntaxException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Unable to get PubMed IDs&quot;, Localization.lang(&quot;Unable to get PubMed IDs&quot;), e);</b>
+&nbsp;        } catch (XMLStreamException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Error while parsing ID list&quot;, Localization.lang(&quot;Error while parsing ID list&quot;),</b>
+&nbsp;                    e);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;Medline/PubMed&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;HelpFile&gt; getHelpPage() {
+<b class="nc">&nbsp;        return Optional.of(HelpFile.FETCHER_MEDLINE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(ID_URL);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;db&quot;, &quot;pubmed&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;retmode&quot;, &quot;xml&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;id&quot;, identifier);</b>
+<b class="nc">&nbsp;        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -&gt; uriBuilder.addParameter(&quot;api_key&quot;, apiKey));</b>
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return new MedlineImporter();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doPostCleanup(BibEntry entry) {
+<b class="nc">&nbsp;        new FieldFormatterCleanup(new UnknownField(&quot;journal-abbreviation&quot;), new ClearFormatter()).cleanup(entry);</b>
+<b class="nc">&nbsp;        new FieldFormatterCleanup(new UnknownField(&quot;status&quot;), new ClearFormatter()).cleanup(entry);</b>
+<b class="nc">&nbsp;        new FieldFormatterCleanup(new UnknownField(&quot;copyright&quot;), new ClearFormatter()).cleanup(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()).cleanup(entry);</b>
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private URL createSearchUrl(String query) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;db&quot;, &quot;pubmed&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;sort&quot;, &quot;relevance&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;retmax&quot;, String.valueOf(NUMBER_TO_FETCH));</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;term&quot;, query); // already lucene query</b>
+<b class="nc">&nbsp;        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -&gt; uriBuilder.addParameter(&quot;api_key&quot;, apiKey));</b>
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fetch and parse an medline item from eutils.ncbi.nlm.nih.gov.
+&nbsp;     * The E-utilities generate a huge XML file containing all entries for the ids
+&nbsp;     *
+&nbsp;     * @param ids A list of IDs to search for.
+&nbsp;     * @return Will return an empty list on error.
+&nbsp;     */
+&nbsp;    private List&lt;BibEntry&gt; fetchMedline(List&lt;String&gt; ids) throws FetcherException {
+&nbsp;        try {
+&nbsp;            // Separate the IDs with a comma to search multiple entries
+<b class="nc">&nbsp;            URL fetchURL = getUrlForIdentifier(String.join(&quot;,&quot;, ids));</b>
+<b class="nc">&nbsp;            URLConnection data = fetchURL.openConnection();</b>
+<b class="nc">&nbsp;            ParserResult result = new MedlineImporter().importDatabase(</b>
+<b class="nc">&nbsp;                    new BufferedReader(new InputStreamReader(data.getInputStream(), StandardCharsets.UTF_8)));</b>
+<b class="nc">&nbsp;            if (result.hasWarnings()) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(result.getErrorMessage());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; resultList = result.getDatabase().getEntries();</b>
+<b class="nc">&nbsp;            resultList.forEach(this::doPostCleanup);</b>
+<b class="nc">&nbsp;            return resultList;</b>
+&nbsp;        } catch (URISyntaxException | MalformedURLException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Error while generating fetch URL&quot;,</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Error while generating fetch URL&quot;), e);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Error while fetching from Medline&quot;,</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Error while fetching from %0&quot;, &quot;Medline&quot;), e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BibEntry&gt; performSearch(BaseQueryNode queryNode) throws FetcherException {
+&nbsp;        List&lt;BibEntry&gt; entryList;
+<b class="nc">&nbsp;        MedlineQueryTransformer transformer = new MedlineQueryTransformer();</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; transformedQuery = transformer.transformSearchQuery(queryNode);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (transformedQuery.isEmpty() || transformedQuery.get().isBlank()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        } else {
+&nbsp;            // searching for pubmed ids matching the query
+<b class="nc">&nbsp;            List&lt;String&gt; idList = getPubMedIdsFromQuery(transformedQuery.get());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (idList.isEmpty()) {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;No results found.&quot;);</b>
+<b class="nc">&nbsp;                return List.of();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (numberOfResultsFound &gt; NUMBER_TO_FETCH) {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;{} results found. Only 50 relevant results will be fetched by default.&quot;, numberOfResultsFound);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
+<b class="nc">&nbsp;            entryList = fetchMedline(idList);</b>
+&nbsp;
+<b class="nc">&nbsp;            return entryList;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTestUrl() {
+<b class="nc">&nbsp;        return TEST_URL_WITHOUT_API_KEY;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,446 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > XmpUtilWriter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.xmp</a>
+</div>
+
+<h1>Coverage Summary for Class: XmpUtilWriter (org.jabref.logic.xmp)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XmpUtilWriter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/83)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.xmp;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.UnsupportedEncodingException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.xml.transform.TransformerException;
+&nbsp;
+&nbsp;import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
+&nbsp;import org.jabref.logic.formatter.casechanger.UnprotectTermsFormatter;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.schema.DublinCoreSchemaCustom;
+&nbsp;
+&nbsp;import org.apache.pdfbox.Loader;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocument;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocumentInformation;
+&nbsp;import org.apache.pdfbox.pdmodel.common.PDMetadata;
+&nbsp;import org.apache.xmpbox.XMPMetadata;
+&nbsp;import org.apache.xmpbox.schema.DublinCoreSchema;
+&nbsp;import org.apache.xmpbox.xml.XmpSerializer;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Writes given BibEntries into the XMP part of a PDF file.
+&nbsp; * &lt;p&gt;
+&nbsp; * The conversion of a BibEntry to the XMP data (using Dublin Core) is done at
+&nbsp; * {@link DublinCoreExtractor#fillDublinCoreSchema()}
+&nbsp; */
+&nbsp;public class XmpUtilWriter {
+&nbsp;
+&nbsp;    private static final String XMP_BEGIN_END_TAG = &quot;?xpacket&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilWriter.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final XmpUtilShared XMP_UTIL_SHARED = new XmpUtilShared();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();</b>
+&nbsp;    private final XmpPreferences xmpPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public XmpUtilWriter(XmpPreferences xmpPreferences) {</b>
+<b class="nc">&nbsp;        this.xmpPreferences = xmpPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Try to write the given BibTexEntry in the XMP-stream of the given
+&nbsp;     * PDF-file.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Throws an IOException if the file cannot be read or written, so the user
+&nbsp;     * can remove a lock or cancel the operation.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The method will overwrite existing BibTeX-XMP-data, but keep other
+&nbsp;     * existing metadata.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This is a convenience method for writeXMP(File, Collection).
+&nbsp;     *
+&nbsp;     * @param file     The path to write to.
+&nbsp;     * @param entry    The entry to write.
+&nbsp;     * @param database An optional database which the given bibtex entries belong to, which will be used to
+&nbsp;     *                 resolve strings. If the database is null the strings will not be resolved.
+&nbsp;     * @throws TransformerException If the entry was malformed or unsupported.
+&nbsp;     * @throws IOException          If the file could not be written to or could not be found.
+&nbsp;     */
+&nbsp;    public void writeXmp(Path file,
+&nbsp;                         BibEntry entry,
+&nbsp;                         BibDatabase database)
+&nbsp;            throws IOException, TransformerException {
+<b class="nc">&nbsp;        writeXmp(file, List.of(entry), database);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Writes the information of the bib entry to the dublin core schema using a custom extractor.
+&nbsp;     *
+&nbsp;     * @param dcSchema Dublin core schema, which is filled with the bib entry.
+&nbsp;     * @param entry    The entry, which is added to the dublin core metadata.
+&nbsp;     */
+&nbsp;    private void writeToDCSchema(DublinCoreSchema dcSchema,
+&nbsp;                                 BibEntry entry) {
+<b class="nc">&nbsp;        DublinCoreExtractor dcExtractor = new DublinCoreExtractor(dcSchema, xmpPreferences, entry);</b>
+<b class="nc">&nbsp;        dcExtractor.fillDublinCoreSchema();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Try to write the given BibTexEntries as DublinCore XMP Schemas
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Existing DublinCore schemas in the document are removed
+&nbsp;     *
+&nbsp;     * @param document The pdf document to write to.
+&nbsp;     * @param entries  The BibTeX entries that are written as schemas
+&nbsp;     * @param database An optional database which the given BibTeX entries belong to, which will be used to
+&nbsp;     *                 resolve strings. If the database is null the strings will not be resolved.
+&nbsp;     */
+&nbsp;    private void writeDublinCore(PDDocument document,
+&nbsp;                                 List&lt;BibEntry&gt; entries,
+&nbsp;                                 BibDatabase database)
+&nbsp;            throws IOException, TransformerException {
+&nbsp;
+&nbsp;        List&lt;BibEntry&gt; resolvedEntries;
+<b class="nc">&nbsp;        if (database == null) {</b>
+<b class="nc">&nbsp;            resolvedEntries = entries;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            resolvedEntries = database.resolveForStrings(entries, false);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        PDDocumentCatalog catalog = document.getDocumentCatalog();</b>
+<b class="nc">&nbsp;        PDMetadata metaRaw = catalog.getMetadata();</b>
+&nbsp;
+&nbsp;        XMPMetadata meta;
+<b class="nc">&nbsp;        if (metaRaw == null) {</b>
+<b class="nc">&nbsp;            meta = XMPMetadata.createXMPMetadata();</b>
+&nbsp;        } else {
+&nbsp;            try {
+<b class="nc">&nbsp;                meta = XMP_UTIL_SHARED.parseXmpMetadata(metaRaw.createInputStream());</b>
+&nbsp;                // In case, that the pdf file has no namespace definition for xmp,
+&nbsp;                // but metadata in a different format, the parser throws an exception
+&nbsp;                // Creating an empty xmp metadata element solves this problem
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                meta = XMPMetadata.createXMPMetadata();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Remove all current Dublin-Core schemas
+<b class="nc">&nbsp;        meta.removeSchema(meta.getDublinCoreSchema());</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry entry : resolvedEntries) {</b>
+<b class="nc">&nbsp;            DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.createAndAddDublinCoreSchema());</b>
+<b class="nc">&nbsp;            writeToDCSchema(dcSchema, entry);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Save to stream and then input that stream to the PDF
+<b class="nc">&nbsp;        ByteArrayOutputStream os = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;        XmpSerializer serializer = new XmpSerializer();</b>
+<b class="nc">&nbsp;        serializer.serialize(meta, os, true);</b>
+<b class="nc">&nbsp;        ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());</b>
+<b class="nc">&nbsp;        PDMetadata metadataStream = new PDMetadata(document, is);</b>
+<b class="nc">&nbsp;        catalog.setMetadata(metadataStream);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method generates an xmp metadata string in dublin core format.
+&nbsp;     *
+&nbsp;     * @param entries A list of entries, which are added to the dublin core metadata.
+&nbsp;     * @return If something goes wrong (e.g. an exception is thrown), the method returns an empty string,
+&nbsp;     * otherwise it returns the xmp metadata as a string in dublin core format.
+&nbsp;     */
+&nbsp;    private String generateXmpStringWithXmpDeclaration(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        XMPMetadata meta = XMPMetadata.createXMPMetadata();</b>
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            DublinCoreSchema dcSchema = meta.createAndAddDublinCoreSchema();</b>
+<b class="nc">&nbsp;            writeToDCSchema(dcSchema, entry);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {</b>
+<b class="nc">&nbsp;            XmpSerializer serializer = new XmpSerializer();</b>
+<b class="nc">&nbsp;            serializer.serialize(meta, os, true);</b>
+<b class="nc">&nbsp;            return os.toString(StandardCharsets.UTF_8);</b>
+&nbsp;        } catch (TransformerException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Transformation into XMP not possible: {}&quot;, e.getMessage(), e);</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        } catch (UnsupportedEncodingException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Unsupported encoding to UTF-8 of bib entries in XMP metadata.&quot;, e);</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;IO Exception thrown by closing the output stream.&quot;, e);</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method generates an xmp metadata string in dublin core format without the
+&nbsp;     * metadata section {@code &lt;?xpacket begin=...&gt;}.
+&nbsp;     *
+&nbsp;     * @param entries A list of entries, which are added to the dublin core metadata.
+&nbsp;     * @return If something goes wrong (e.g. an exception is thrown), the method returns an empty string,
+&nbsp;     * otherwise it returns the xmp metadata without metadata description as a string in dublin core format.
+&nbsp;     */
+&nbsp;    public String generateXmpStringWithoutXmpDeclaration(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        String xmpContent = generateXmpStringWithXmpDeclaration(entries);</b>
+&nbsp;        // remove the &lt;?xpacket *&gt; tags to enable the usage of the CTAN package xmpincl
+<b class="nc">&nbsp;        Predicate&lt;String&gt; isBeginOrEndTag = s -&gt; s.contains(XMP_BEGIN_END_TAG);</b>
+&nbsp;
+<b class="nc">&nbsp;        return Arrays.stream(xmpContent.split(System.lineSeparator()))</b>
+<b class="nc">&nbsp;                     .filter(isBeginOrEndTag.negate())</b>
+<b class="nc">&nbsp;                     .collect(Collectors.joining(System.lineSeparator()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Try to write the given BibTexEntry in the Document Information (the
+&nbsp;     * properties of the pdf).
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Existing fields values are overridden if the bibtex entry has the
+&nbsp;     * corresponding value set.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The method to write DublinCore is {@link DublinCoreExtractor#fillDublinCoreSchema()}
+&nbsp;     *
+&nbsp;     * @param document The pdf document to write to.
+&nbsp;     * @param entry    The BibEntry that is written into the PDF properties.
+&nbsp;     * @param database An optional database which the given bibtex entries belong to, which will be used to
+&nbsp;     *                 resolve strings. If the database is null the strings will not be resolved.
+&nbsp;     */
+&nbsp;    private void writeDocumentInformation(PDDocument document,
+&nbsp;                                          BibEntry entry,
+&nbsp;                                          BibDatabase database) {
+<b class="nc">&nbsp;        PDDocumentInformation di = document.getDocumentInformation();</b>
+<b class="nc">&nbsp;        BibEntry resolvedEntry = getDefaultOrDatabaseEntry(entry, database);</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean useXmpPrivacyFilter = xmpPreferences.shouldUseXmpPrivacyFilter();</b>
+<b class="nc">&nbsp;        for (Field field : resolvedEntry.getFields()) {</b>
+<b class="nc">&nbsp;            if (useXmpPrivacyFilter &amp;&amp; xmpPreferences.getXmpPrivacyFilter().contains(field)) {</b>
+&nbsp;                // erase field instead of adding it
+<b class="nc">&nbsp;                switch (field) {</b>
+&nbsp;                    case StandardField.AUTHOR -&gt;
+<b class="nc">&nbsp;                            di.setAuthor(null);</b>
+&nbsp;                    case StandardField.TITLE -&gt;
+<b class="nc">&nbsp;                            di.setTitle(null);</b>
+&nbsp;                    case StandardField.KEYWORDS -&gt;
+<b class="nc">&nbsp;                            di.setKeywords(null);</b>
+&nbsp;                    case StandardField.ABSTRACT -&gt;
+<b class="nc">&nbsp;                            di.setSubject(null);</b>
+&nbsp;                    // do not write file field
+&nbsp;                    case StandardField.FILE -&gt; {
+&nbsp;                    }
+&nbsp;                    case null,
+&nbsp;                         default -&gt;
+<b class="nc">&nbsp;                            di.setCustomMetadataValue(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName(), null);</b>
+&nbsp;                }
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+&nbsp;            // LaTeX content is removed from the string for &quot;standard&quot; fields in the PDF
+<b class="nc">&nbsp;            String value = unprotectTermsFormatter.format(resolvedEntry.getField(field).orElse(&quot;&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;            switch (field) {</b>
+&nbsp;                case StandardField.AUTHOR -&gt;
+<b class="nc">&nbsp;                        di.setAuthor(value);</b>
+&nbsp;                case StandardField.TITLE -&gt;
+<b class="nc">&nbsp;                        di.setTitle(value);</b>
+&nbsp;                case StandardField.KEYWORDS -&gt;
+<b class="nc">&nbsp;                        di.setKeywords(value);</b>
+&nbsp;                case StandardField.ABSTRACT -&gt;
+<b class="nc">&nbsp;                        di.setSubject(value);</b>
+&nbsp;                case StandardField.FILE -&gt; {
+&nbsp;                    // do not write file field
+&nbsp;                }
+&nbsp;                case null,
+&nbsp;                     default -&gt;
+&nbsp;                    // We hit the case of an PDF-unsupported field --&gt; write it directly
+<b class="nc">&nbsp;                        resolvedEntry.getField(field).ifPresent(val -&gt; di.setCustomMetadataValue(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName(), val));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        di.setCustomMetadataValue(&quot;bibtex/entrytype&quot;, resolvedEntry.getType().getDisplayName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Try to write the given BibTexEntry in the XMP-stream of the given
+&nbsp;     * PDF-file.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Throws an IOException if the file cannot be read or written, so the user
+&nbsp;     * can remove a lock or cancel the operation.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The method will overwrite existing BibTeX-XMP-data, but keep other
+&nbsp;     * existing metadata.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The code for using PDFBox is also used at {@link EmbeddedBibFilePdfExporter#embedBibTex(String, Path)}.
+&nbsp;     *
+&nbsp;     * @param path          The file to write the entries to.
+&nbsp;     * @param bibtexEntries The entries to write to the file. *
+&nbsp;     * @param database      An optional database which the given bibtex entries belong to, which will be used
+&nbsp;     *                      to resolve strings. If the database is null the strings will not be resolved.
+&nbsp;     * @throws TransformerException If the entry was malformed or unsupported.
+&nbsp;     * @throws IOException          If the file could not be written to or could not be found.
+&nbsp;     */
+&nbsp;    public void writeXmp(Path path,
+&nbsp;                         List&lt;BibEntry&gt; bibtexEntries,
+&nbsp;                         BibDatabase database)
+&nbsp;            throws IOException, TransformerException {
+&nbsp;        List&lt;BibEntry&gt; resolvedEntries;
+<b class="nc">&nbsp;        if (database == null) {</b>
+<b class="nc">&nbsp;            resolvedEntries = bibtexEntries;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            resolvedEntries = database.resolveForStrings(bibtexEntries, false);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Read from another file
+&nbsp;        // Reason: Apache PDFBox does not support writing while the file is opened
+&nbsp;        // See https://issues.apache.org/jira/browse/PDFBOX-4028
+<b class="nc">&nbsp;        Path newFile = Files.createTempFile(&quot;JabRef&quot;, &quot;pdf&quot;);</b>
+<b class="nc">&nbsp;        try (PDDocument document = Loader.loadPDF(path.toFile())) {</b>
+<b class="nc">&nbsp;            if (document.isEncrypted()) {</b>
+<b class="nc">&nbsp;                throw new EncryptedPdfsNotSupportedException();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Write schemas (PDDocumentInformation and DublinCoreSchema) to the document metadata
+<b class="nc">&nbsp;            if (!resolvedEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;                writeDocumentInformation(document, resolvedEntries.getFirst(), null);</b>
+<b class="nc">&nbsp;                writeDublinCore(document, resolvedEntries, null);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Save updates to original file
+&nbsp;            try {
+<b class="nc">&nbsp;                document.save(newFile.toFile());</b>
+<b class="nc">&nbsp;                FileUtil.copyFile(newFile, path, true);</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Could not write XMP metadata&quot;, e);</b>
+<b class="nc">&nbsp;                throw new TransformerException(&quot;Could not write XMP metadata: &quot; + e.getLocalizedMessage(), e);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        Files.delete(newFile);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private BibEntry getDefaultOrDatabaseEntry(BibEntry defaultEntry, BibDatabase database) {
+<b class="nc">&nbsp;        if (database == null) {</b>
+<b class="nc">&nbsp;            return defaultEntry;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return database.resolveForStrings(defaultEntry, false);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,183 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StateManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui</a>
+</div>
+
+<h1>Coverage Summary for Class: StateManager (org.jabref.gui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">StateManager</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.binding.BooleanBinding;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.IntegerProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.concurrent.Task;
+&nbsp;import javafx.scene.Node;
+&nbsp;
+&nbsp;import org.jabref.gui.ai.components.aichat.AiChatWindow;
+&nbsp;import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
+&nbsp;import org.jabref.gui.search.SearchType;
+&nbsp;import org.jabref.gui.sidepane.SidePaneType;
+&nbsp;import org.jabref.gui.util.CustomLocalDragboard;
+&nbsp;import org.jabref.gui.util.DialogWindowState;
+&nbsp;import org.jabref.gui.walkthrough.Walkthrough;
+&nbsp;import org.jabref.http.SrvStateManager;
+&nbsp;import org.jabref.logic.search.IndexManager;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.OptionalObjectProperty;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;import org.jabref.model.search.query.SearchQuery;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBinding;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class manages the GUI-state of JabRef, including:
+&nbsp; *
+&nbsp; * &lt;ul&gt;
+&nbsp; *   &lt;li&gt;currently selected database&lt;/li&gt;
+&nbsp; *   &lt;li&gt;currently selected group&lt;/li&gt;
+&nbsp; *   &lt;li&gt;active search&lt;/li&gt;
+&nbsp; *   &lt;li&gt;active number of search results&lt;/li&gt;
+&nbsp; *   &lt;li&gt;focus owner&lt;/li&gt;
+&nbsp; *   &lt;li&gt;dialog window sizes/positions&lt;/li&gt;
+&nbsp; *   &lt;li&gt;opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})&lt;/li&gt;
+&nbsp; * &lt;/ul&gt;
+&nbsp; */
+&nbsp;public interface StateManager extends SrvStateManager {
+&nbsp;
+&nbsp;    ObservableList&lt;SidePaneType&gt; getVisibleSidePaneComponents();
+&nbsp;
+&nbsp;    CustomLocalDragboard getLocalDragboard();
+&nbsp;
+&nbsp;    OptionalObjectProperty&lt;LibraryTab&gt; activeTabProperty();
+&nbsp;
+&nbsp;    OptionalObjectProperty&lt;SearchQuery&gt; activeSearchQuery(SearchType type);
+&nbsp;
+&nbsp;    StringProperty searchQueryProperty();
+&nbsp;
+&nbsp;    IntegerProperty searchResultSize(SearchType type);
+&nbsp;
+&nbsp;    void setIndexManager(BibDatabaseContext database, IndexManager indexManager);
+&nbsp;
+&nbsp;    void setSelectedEntries(List&lt;BibEntry&gt; newSelectedEntries);
+&nbsp;
+&nbsp;    void setSelectedGroups(BibDatabaseContext context, List&lt;GroupTreeNode&gt; newSelectedGroups);
+&nbsp;
+&nbsp;    ObservableList&lt;GroupTreeNode&gt; getSelectedGroups(BibDatabaseContext context);
+&nbsp;
+&nbsp;    void clearSelectedGroups(BibDatabaseContext context);
+&nbsp;
+&nbsp;    void setActiveDatabase(BibDatabaseContext database);
+&nbsp;
+&nbsp;    OptionalObjectProperty&lt;Node&gt; focusOwnerProperty();
+&nbsp;
+&nbsp;    Optional&lt;Node&gt; getFocusOwner();
+&nbsp;
+&nbsp;    ObservableList&lt;Task&lt;?&gt;&gt; getBackgroundTasks();
+&nbsp;
+&nbsp;    ObservableList&lt;Task&lt;?&gt;&gt; getRunningBackgroundTasks();
+&nbsp;
+&nbsp;    void addBackgroundTask(BackgroundTask&lt;?&gt; backgroundTask, Task&lt;?&gt; task);
+&nbsp;
+&nbsp;    BooleanBinding getAnyTaskRunning();
+&nbsp;
+&nbsp;    EasyBinding&lt;Boolean&gt; getAnyTasksThatWillNotBeRecoveredRunning();
+&nbsp;
+&nbsp;    EasyBinding&lt;Double&gt; getTasksProgress();
+&nbsp;
+&nbsp;    DialogWindowState getDialogWindowState(String className);
+&nbsp;
+&nbsp;    void setDialogWindowState(String className, DialogWindowState state);
+&nbsp;
+&nbsp;    ObjectProperty&lt;LastAutomaticFieldEditorEdit&gt; lastAutomaticFieldEditorEditProperty();
+&nbsp;
+&nbsp;    void setLastAutomaticFieldEditorEdit(LastAutomaticFieldEditorEdit automaticFieldEditorEdit);
+&nbsp;
+&nbsp;    void addSearchHistory(String search);
+&nbsp;
+&nbsp;    ObservableList&lt;String&gt; getWholeSearchHistory();
+&nbsp;
+&nbsp;    List&lt;String&gt; getLastSearchHistory(int size);
+&nbsp;
+&nbsp;    void clearSearchHistory();
+&nbsp;
+&nbsp;    List&lt;AiChatWindow&gt; getAiChatWindows();
+&nbsp;
+&nbsp;    BooleanProperty getEditorShowing();
+&nbsp;
+&nbsp;    void setActiveWalkthrough(Walkthrough walkthrough);
+&nbsp;
+&nbsp;    Optional&lt;Walkthrough&gt; getActiveWalkthrough();
+&nbsp;
+&nbsp;    BooleanProperty canGoBackProperty();
+&nbsp;
+&nbsp;    BooleanProperty canGoForwardProperty();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

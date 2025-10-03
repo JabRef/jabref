@@ -1,0 +1,348 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FieldFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.field</a>
+</div>
+
+<h1>Coverage Summary for Class: FieldFactory (org.jabref.model.entry.field)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FieldFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    20.8%
+  </span>
+  <span class="absValue">
+    (5/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    33.3%
+  </span>
+  <span class="absValue">
+    (2/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    29.9%
+  </span>
+  <span class="absValue">
+    (26/87)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.field;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.SequencedSet;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.preferences.JabRefCliPreferences;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;import org.jabref.model.util.OptionalUtil;
+&nbsp;
+<b class="nc">&nbsp;public class FieldFactory {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Character separating field names that are to be used in sequence as fallbacks for a single column
+&nbsp;     * (e.g. &quot;author/editor&quot; to use editor where author is not set):
+&nbsp;     */
+&nbsp;    private static final String FIELD_OR_SEPARATOR = &quot;/&quot;;
+&nbsp;    private static final String DELIMITER = &quot;;&quot;;
+&nbsp;
+<b class="fc">&nbsp;    private static final Pattern UNKNOWNFIELD_PATTERN = Pattern.compile(&quot;UnknownField\\{name=&#39;(?&lt;fieldName&gt;[^&#39;]+)&#39;&quot;);</b>
+&nbsp;
+&nbsp;    public static String serializeOrFields(Field... fields) {
+<b class="nc">&nbsp;        return serializeOrFields(new OrFields(fields));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String serializeOrFields(OrFields fields) {
+<b class="nc">&nbsp;        return fields.getFields().stream()</b>
+<b class="nc">&nbsp;                     .map(Field::getName)</b>
+<b class="nc">&nbsp;                     .collect(Collectors.joining(FIELD_OR_SEPARATOR));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String serializeOrFieldsList(Set&lt;OrFields&gt; fields) {
+<b class="nc">&nbsp;        return fields.stream().map(FieldFactory::serializeOrFields).collect(Collectors.joining(DELIMITER));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks whether the given field contains LaTeX code or something else
+&nbsp;     */
+&nbsp;    public static boolean isLatexField(Field field) {
+<b class="nc">&nbsp;        return Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.MARKDOWN, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.SINGLE_ENTRY_LINK, FieldProperty.MULTIPLE_ENTRY_LINK));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a collection of StandardFields where the content should not be interpreted as &quot;plain&quot; text, but something else (such as links to other fields, numbers, ...)
+&nbsp;     */
+&nbsp;    public static Collection&lt;Field&gt; getNotTextFields() {
+<b class="nc">&nbsp;        Set&lt;Field&gt; result = Arrays.stream(StandardField.values())</b>
+<b class="nc">&nbsp;                                  .filter(field -&gt; !Collections.disjoint(field.getProperties(), Set.of(FieldProperty.VERBATIM, FieldProperty.NUMERIC, FieldProperty.DATE, FieldProperty.MULTIPLE_ENTRY_LINK)))</b>
+<b class="nc">&nbsp;                                  .collect(Collectors.toSet());</b>
+&nbsp;
+&nbsp;        // These fields are not marked as verbatim, because they could include LaTeX code
+<b class="nc">&nbsp;        result.add(StandardField.MONTH);</b>
+<b class="nc">&nbsp;        result.add(StandardField.DATE);</b>
+<b class="nc">&nbsp;        result.add(StandardField.LANGUAGEID);</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static OrFields parseOrFields(String fieldNames) {
+<b class="nc">&nbsp;        Set&lt;Field&gt; fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))</b>
+<b class="nc">&nbsp;                                  .filter(StringUtil::isNotBlank)</b>
+<b class="nc">&nbsp;                                  .map(FieldFactory::parseField)</b>
+<b class="nc">&nbsp;                                  .collect(Collectors.toCollection(LinkedHashSet::new));</b>
+<b class="nc">&nbsp;        return new OrFields(fields);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static SequencedSet&lt;OrFields&gt; parseOrFieldsList(String fieldNames) {
+<b class="nc">&nbsp;        return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))</b>
+<b class="nc">&nbsp;                     .filter(StringUtil::isNotBlank)</b>
+<b class="nc">&nbsp;                     .map(FieldFactory::parseOrFields)</b>
+<b class="nc">&nbsp;                     .collect(Collectors.toCollection(LinkedHashSet::new));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static SequencedSet&lt;Field&gt; parseFieldList(String fieldNames) {
+<b class="fc">&nbsp;        return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))</b>
+<b class="fc">&nbsp;                     .filter(StringUtil::isNotBlank)</b>
+<b class="fc">&nbsp;                     .map(FieldFactory::parseField)</b>
+<b class="fc">&nbsp;                     .collect(Collectors.toCollection(LinkedHashSet::new));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String serializeFieldsList(Collection&lt;Field&gt; fields) {
+<b class="nc">&nbsp;        return fields.stream()</b>
+<b class="nc">&nbsp;                     .map(Field::getName)</b>
+<b class="nc">&nbsp;                     .collect(Collectors.joining(DELIMITER));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Type T is an entry type and is used to direct the mapping to the Java field class.
+&nbsp;     * This somehow acts as filter, BibLaTeX &quot;APA&quot; entry type has field &quot;article&quot;, but we want to have StandardField (if not explicitly requested otherwise)
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Supports also parsing of &quot;UnknownField{name=&#39;rights&#39;}&quot; as field name (written by JabRef 5.x)
+&nbsp;     */
+&nbsp;    public static &lt;T extends EntryType&gt; Field parseField(T type, String fieldName) {
+&nbsp;        // Check if the field name starts with &quot;comment-&quot; which indicates it&#39;s a UserSpecificCommentField
+<b class="pc">&nbsp;        if (fieldName.startsWith(&quot;comment-&quot;)) {</b>
+<b class="nc">&nbsp;            String username = fieldName.substring(&quot;comment-&quot;.length());</b>
+<b class="nc">&nbsp;            return new UserSpecificCommentField(username);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Support for UnknownField{name=&#39;rights&#39;} and similar constructs
+<b class="fc">&nbsp;        Matcher matcher = UNKNOWNFIELD_PATTERN.matcher(fieldName);</b>
+<b class="pc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            fieldName = matcher.group(&quot;fieldName&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return OptionalUtil.&lt;Field&gt;orElse(</b>
+<b class="fc">&nbsp;                                   OptionalUtil.&lt;Field&gt;orElse(</b>
+<b class="fc">&nbsp;                                           OptionalUtil.&lt;Field&gt;orElse(</b>
+<b class="fc">&nbsp;                                                   OptionalUtil.&lt;Field&gt;orElse(</b>
+<b class="fc">&nbsp;                                                           OptionalUtil.&lt;Field&gt;orElse(</b>
+<b class="fc">&nbsp;                                                                   OptionalUtil.&lt;Field&gt;orElse(</b>
+<b class="fc">&nbsp;                                                                           InternalField.fromName(fieldName),</b>
+<b class="fc">&nbsp;                                                                           StandardField.fromName(fieldName)),</b>
+<b class="fc">&nbsp;                                                                   SpecialField.fromName(fieldName)),</b>
+<b class="fc">&nbsp;                                                           IEEEField.fromName(fieldName)),</b>
+<b class="fc">&nbsp;                                                   BiblatexSoftwareField.fromName(type, fieldName)),</b>
+<b class="fc">&nbsp;                                           BiblatexApaField.fromName(type, fieldName)),</b>
+<b class="fc">&nbsp;                                   AMSField.fromName(type, fieldName))</b>
+<b class="fc">&nbsp;                           .orElse(new UnknownField(fieldName));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Field parseField(String fieldName) {
+<b class="fc">&nbsp;        return parseField(null, fieldName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isInternalField(Field field) {
+<b class="nc">&nbsp;        return field.getName().startsWith(&quot;__&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Set&lt;Field&gt; getJournalNameFields() {
+<b class="nc">&nbsp;        return getFieldsFiltered(field -&gt; field.getProperties().contains(FieldProperty.JOURNAL_NAME));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a Set with all standard fields and including some common internal fields
+&nbsp;     */
+&nbsp;    public static Set&lt;Field&gt; getCommonFields() {
+<b class="nc">&nbsp;        EnumSet&lt;StandardField&gt; allFields = EnumSet.allOf(StandardField.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        LinkedHashSet&lt;Field&gt; publicAndInternalFields = new LinkedHashSet&lt;&gt;(allFields.size() + 3);</b>
+<b class="nc">&nbsp;        publicAndInternalFields.add(InternalField.INTERNAL_ALL_FIELD);</b>
+<b class="nc">&nbsp;        publicAndInternalFields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);</b>
+<b class="nc">&nbsp;        publicAndInternalFields.add(InternalField.KEY_FIELD);</b>
+<b class="nc">&nbsp;        publicAndInternalFields.addAll(allFields);</b>
+&nbsp;
+<b class="nc">&nbsp;        return publicAndInternalFields;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns an alphabetically sorted Set of Fields with all fields without internal ones
+&nbsp;     */
+&nbsp;    public static Set&lt;Field&gt; getAllFieldsWithOutInternal() {
+<b class="nc">&nbsp;        Set&lt;Field&gt; fields = new TreeSet&lt;&gt;(Comparator.comparing(Field::getName));</b>
+<b class="nc">&nbsp;        fields.addAll(getAllFields());</b>
+<b class="nc">&nbsp;        fields.removeAll(EnumSet.allOf(InternalField.class));</b>
+&nbsp;
+<b class="nc">&nbsp;        return fields;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a list with all standard fields and the citation key field
+&nbsp;     */
+&nbsp;    public static SequencedSet&lt;Field&gt; getStandardFieldsWithCitationKey() {
+<b class="nc">&nbsp;        EnumSet&lt;StandardField&gt; allFields = EnumSet.allOf(StandardField.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        LinkedHashSet&lt;Field&gt; standardFieldsWithBibtexKey = new LinkedHashSet&lt;&gt;(allFields.size() + 1);</b>
+<b class="nc">&nbsp;        standardFieldsWithBibtexKey.add(InternalField.KEY_FIELD);</b>
+<b class="nc">&nbsp;        standardFieldsWithBibtexKey.addAll(allFields);</b>
+&nbsp;
+<b class="nc">&nbsp;        return standardFieldsWithBibtexKey;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Set&lt;Field&gt; getBookNameFields() {
+<b class="nc">&nbsp;        return getFieldsFiltered(field -&gt; field.getProperties().contains(FieldProperty.BOOK_NAME));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Set&lt;Field&gt; getPersonNameFields() {
+<b class="nc">&nbsp;        return getFieldsFiltered(field -&gt; field.getProperties().contains(FieldProperty.PERSON_NAMES));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Set&lt;Field&gt; getFieldsFiltered(Predicate&lt;Field&gt; selector) {
+<b class="nc">&nbsp;        return getAllFields().stream()</b>
+<b class="nc">&nbsp;                             .filter(selector)</b>
+<b class="nc">&nbsp;                             .collect(Collectors.toSet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Set&lt;Field&gt; getAllFields() {
+<b class="nc">&nbsp;        Set&lt;Field&gt; fields = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        fields.addAll(EnumSet.allOf(BiblatexApaField.class));</b>
+<b class="nc">&nbsp;        fields.addAll(EnumSet.allOf(BiblatexSoftwareField.class));</b>
+<b class="nc">&nbsp;        fields.addAll(EnumSet.allOf(IEEEField.class));</b>
+<b class="nc">&nbsp;        fields.addAll(EnumSet.allOf(InternalField.class));</b>
+<b class="nc">&nbsp;        fields.addAll(EnumSet.allOf(SpecialField.class));</b>
+<b class="nc">&nbsp;        fields.addAll(EnumSet.allOf(StandardField.class));</b>
+<b class="nc">&nbsp;        return fields;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * These are the fields JabRef always displays as default {@link JabRefCliPreferences#setLanguageDependentDefaultValues()}
+&nbsp;     * &lt;p&gt;
+&nbsp;     * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
+&nbsp;     * a separate preferences object
+&nbsp;     */
+&nbsp;    public static List&lt;Field&gt; getDefaultGeneralFields() {
+<b class="fc">&nbsp;        List&lt;Field&gt; defaultGeneralFields = new ArrayList&lt;&gt;(List.of(StandardField.DOI, StandardField.ICORERANKING, StandardField.CITATIONCOUNT, StandardField.CROSSREF, StandardField.KEYWORDS, StandardField.EPRINT, StandardField.URL, StandardField.FILE, StandardField.GROUPS, StandardField.OWNER, StandardField.TIMESTAMP));</b>
+<b class="fc">&nbsp;        defaultGeneralFields.addAll(EnumSet.allOf(SpecialField.class));</b>
+<b class="fc">&nbsp;        return defaultGeneralFields;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Note: User configurability is discussed at &lt;a href=&quot;https://github.com/JabRef/jabref/issues/9840&quot;&gt;#9840&lt;/a&gt;.
+&nbsp;     *
+&nbsp;     * @param nonWrappableFields This comes from the preferences - and introduces user configuration.
+&nbsp;     */
+&nbsp;    // TODO: Move somewhere more appropriate in the future
+&nbsp;    public static boolean isMultiLineField(final Field field, List&lt;Field&gt; nonWrappableFields) {
+<b class="nc">&nbsp;        return field.getProperties().contains(FieldProperty.MULTILINE_TEXT) || nonWrappableFields.contains(field);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

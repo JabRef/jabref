@@ -1,0 +1,243 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Season</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry</a>
+</div>
+
+<h1>Coverage Summary for Class: Season (org.jabref.model.entry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Season</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a Season of the Year.
+&nbsp; */
+<b class="nc">&nbsp;public enum Season {</b>
+&nbsp;
+<b class="nc">&nbsp;    SPRING(&quot;spring&quot;, 21),</b>
+<b class="nc">&nbsp;    SUMMER(&quot;summer&quot;, 22),</b>
+<b class="nc">&nbsp;    AUTUMN(&quot;autumn&quot;, 23),</b>
+<b class="nc">&nbsp;    WINTER(&quot;winter&quot;, 24);</b>
+&nbsp;
+&nbsp;    private final String name;
+&nbsp;    private final int number;
+&nbsp;
+<b class="nc">&nbsp;    Season(String name, int number) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.number = number;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find season by number.
+&nbsp;     * If the number is not in the valid range, then an empty Optional is returned.
+&nbsp;     *
+&nbsp;     * @param number 21-24 is valid
+&nbsp;     */
+&nbsp;    public static Optional&lt;Season&gt; getSeasonByNumber(int number) {
+<b class="nc">&nbsp;        for (Season season : Season.values()) {</b>
+<b class="nc">&nbsp;            if (season.number == number) {</b>
+<b class="nc">&nbsp;                return Optional.of(season);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find season by name case-insensitive.
+&nbsp;     * If no matching season is found, then an empty Optional is returned.
+&nbsp;     *
+&nbsp;     * @param name spring, summer, autumn, winter
+&nbsp;     */
+&nbsp;    public static Optional&lt;Season&gt; getSeasonByName(String name) {
+<b class="nc">&nbsp;        for (Season season : Season.values()) {</b>
+<b class="nc">&nbsp;            if (season.name.equalsIgnoreCase(name)) {</b>
+<b class="nc">&nbsp;                return Optional.of(season);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method accepts three types of seasons:
+&nbsp;     * - Double Digit seasons from 21 to 24
+&nbsp;     * - Full English Season identifiers.
+&nbsp;     *
+&nbsp;     * @param value the given value
+&nbsp;     * @return the corresponding Season instance
+&nbsp;     */
+&nbsp;    public static Optional&lt;Season&gt; parse(String value) {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(value)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String testString = value;</b>
+<b class="nc">&nbsp;        Optional&lt;Season&gt; season = Season.getSeasonByName(testString);</b>
+<b class="nc">&nbsp;        if (season.isPresent()) {</b>
+<b class="nc">&nbsp;            return season;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        season = Season.parseGermanSeason(testString);</b>
+<b class="nc">&nbsp;        if (season.isPresent()) {</b>
+<b class="nc">&nbsp;            return season;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            int number = Integer.parseInt(value);</b>
+<b class="nc">&nbsp;            return Season.getSeasonByNumber(number);</b>
+&nbsp;        } catch (NumberFormatException e) {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses a season having the string in German standard form
+&nbsp;     *
+&nbsp;     * @param value a String that represents a season in German form
+&nbsp;     * @return the corresponding season instance, empty if input is not in German
+&nbsp;     * form
+&nbsp;     */
+&nbsp;    static Optional&lt;Season&gt; parseGermanSeason(String value) {
+<b class="nc">&nbsp;        value = value.toLowerCase();</b>
+<b class="nc">&nbsp;        return switch (value) {</b>
+&nbsp;            case &quot;frühling&quot; -&gt;
+<b class="nc">&nbsp;                    Optional.of(SPRING);</b>
+&nbsp;            case &quot;sommer&quot; -&gt;
+<b class="nc">&nbsp;                    Optional.of(SUMMER);</b>
+&nbsp;            case &quot;herbst&quot; -&gt;
+<b class="nc">&nbsp;                    Optional.of(AUTUMN);</b>
+&nbsp;            case &quot;winter&quot; -&gt;
+<b class="nc">&nbsp;                    Optional.of(WINTER);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    Optional.empty();</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the number of the Season: SPRING -&gt; 21, SUMMER -&gt; 22  etc.
+&nbsp;     *
+&nbsp;     * @return number of the season in the Year
+&nbsp;     */
+&nbsp;    public int getNumber() {
+<b class="nc">&nbsp;        return number;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the name of the long in unabbreviated english.
+&nbsp;     *
+&nbsp;     * @return Season
+&nbsp;     */
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

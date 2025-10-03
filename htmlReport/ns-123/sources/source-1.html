@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibEntryAssert</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.support</a>
+</div>
+
+<h1>Coverage Summary for Class: BibEntryAssert (org.jabref.support)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibEntryAssert</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.support;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.Reader;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.junit.jupiter.api.Assertions;
+&nbsp;import org.mockito.Answers;
+&nbsp;
+&nbsp;import static org.junit.jupiter.api.Assertions.assertNotNull;
+&nbsp;import static org.mockito.Mockito.mock;
+&nbsp;
+&nbsp;/**
+&nbsp; * TODO: Make this a &quot;public&quot; class to enable jablib consumers benefitting from it, too.
+&nbsp; */
+<b class="nc">&nbsp;public class BibEntryAssert {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads a single entry from the resource using `getResourceAsStream` from the given class. The resource has to
+&nbsp;     * contain a single entry
+&nbsp;     *
+&nbsp;     * @param clazz        the class where to call `getResourceAsStream`
+&nbsp;     * @param resourceName the resource to read
+&nbsp;     * @param entry        the entry to compare with
+&nbsp;     */
+&nbsp;    public static void assertEquals(Class&lt;?&gt; clazz, String resourceName, BibEntry entry)
+&nbsp;            throws IOException {
+<b class="nc">&nbsp;        assertNotNull(clazz);</b>
+<b class="nc">&nbsp;        assertNotNull(resourceName);</b>
+<b class="nc">&nbsp;        assertNotNull(entry);</b>
+<b class="nc">&nbsp;        try (InputStream shouldBeIs = clazz.getResourceAsStream(resourceName)) {</b>
+<b class="nc">&nbsp;            BibEntryAssert.assertEquals(shouldBeIs, entry);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads a single entry from the resource using `getResourceAsStream` from the given class. The resource has to
+&nbsp;     * contain a single entry
+&nbsp;     *
+&nbsp;     * @param clazz        the class where to call `getResourceAsStream`
+&nbsp;     * @param resourceName the resource to read
+&nbsp;     * @param asIsEntries  a list containing a single entry to compare with
+&nbsp;     */
+&nbsp;    public static void assertEquals(Class&lt;?&gt; clazz, String resourceName, List&lt;BibEntry&gt; asIsEntries)
+&nbsp;            throws IOException {
+<b class="nc">&nbsp;        assertNotNull(clazz);</b>
+<b class="nc">&nbsp;        assertNotNull(resourceName);</b>
+<b class="nc">&nbsp;        assertNotNull(asIsEntries);</b>
+<b class="nc">&nbsp;        try (InputStream shouldBeIs = clazz.getResourceAsStream(resourceName)) {</b>
+<b class="nc">&nbsp;            BibEntryAssert.assertEquals(shouldBeIs, asIsEntries);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;BibEntry&gt; getListFromInputStream(InputStream is) throws IOException {
+&nbsp;        ParserResult result;
+<b class="nc">&nbsp;        try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {</b>
+&nbsp;            // Option A: Remove mock
+&nbsp;            // Option B: copy class completely -- chosen option in DevCall 2025-04-21
+&nbsp;            // Option C: create separate test module
+&nbsp;            // Option D: Add parameter (passing through several methods)
+&nbsp;            // Option E: Add gradle test fixtures - https://blog.cronn.de/en/testing/java/gradle/2023/04/20/gradle-testfixtures.html
+<b class="nc">&nbsp;            BibtexParser parser = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));</b>
+<b class="nc">&nbsp;            result = parser.parse(reader);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        assertNotNull(result);</b>
+<b class="nc">&nbsp;        assertNotNull(result.getDatabase());</b>
+<b class="nc">&nbsp;        assertNotNull(result.getDatabase().getEntries());</b>
+<b class="nc">&nbsp;        return result.getDatabase().getEntries();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads a bibtex database from the given InputStream. The list is compared with the given list.
+&nbsp;     *
+&nbsp;     * @param expectedInputStream the inputStream reading the entry from
+&nbsp;     * @param actualEntries       a list containing a single entry to compare with
+&nbsp;     */
+&nbsp;    public static void assertEquals(InputStream expectedInputStream, List&lt;BibEntry&gt; actualEntries)
+&nbsp;            throws IOException {
+<b class="nc">&nbsp;        assertNotNull(expectedInputStream);</b>
+<b class="nc">&nbsp;        assertNotNull(actualEntries);</b>
+&nbsp;        // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; expectedEntries = getListFromInputStream(expectedInputStream);</b>
+<b class="nc">&nbsp;        Assertions.assertEquals(expectedEntries, actualEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void assertEquals(List&lt;BibEntry&gt; expectedEntries, InputStream actualInputStream)
+&nbsp;            throws IOException {
+<b class="nc">&nbsp;        assertNotNull(actualInputStream);</b>
+<b class="nc">&nbsp;        assertNotNull(expectedEntries);</b>
+&nbsp;        // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
+<b class="nc">&nbsp;        Assertions.assertEquals(expectedEntries, getListFromInputStream(actualInputStream));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Reads a bibtex database from the given InputStream. The result has to contain a single BibEntry. This entry is
+&nbsp;     * compared to the given entry
+&nbsp;     *
+&nbsp;     * @param expected the inputStream reading the entry from
+&nbsp;     * @param actual   the entry to compare with
+&nbsp;     */
+&nbsp;    public static void assertEquals(InputStream expected, BibEntry actual)
+&nbsp;            throws IOException {
+<b class="nc">&nbsp;        assertEquals(expected, List.of(actual));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compares two InputStreams. For each InputStream a list will be created. expectedIs is read directly, actualIs is
+&nbsp;     * filtered through importer to convert to a list of BibEntries.
+&nbsp;     *
+&nbsp;     * @param expectedIs   A BibtexImporter InputStream.
+&nbsp;     * @param fileToImport The path to the file to be imported.
+&nbsp;     * @param importer     The fileformat you want to use to read the passed file to get the list of expected
+&nbsp;     *                     BibEntries
+&nbsp;     */
+&nbsp;    public static void assertEquals(InputStream expectedIs, Path fileToImport, Importer importer)
+&nbsp;            throws IOException {
+<b class="nc">&nbsp;        assertEquals(getListFromInputStream(expectedIs), fileToImport, importer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void assertEquals(InputStream expectedIs, URL fileToImport, Importer importer)
+&nbsp;            throws URISyntaxException, IOException {
+<b class="nc">&nbsp;        assertEquals(expectedIs, Path.of(fileToImport.toURI()), importer);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Compares a list of BibEntries to an InputStream. actualIs is filtered through importerForActualIs to convert to a
+&nbsp;     * list of BibEntries.
+&nbsp;     *
+&nbsp;     * @param expected     A BibtexImporter InputStream.
+&nbsp;     * @param fileToImport The path to the file to be imported.
+&nbsp;     * @param importer     The fileformat you want to use to read the passed file to get the list of expected
+&nbsp;     *                     BibEntries
+&nbsp;     */
+&nbsp;    public static void assertEquals(List&lt;BibEntry&gt; expected, Path fileToImport, Importer importer)
+&nbsp;            throws IOException {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; actualEntries = importer.importDatabase(fileToImport)</b>
+<b class="nc">&nbsp;                                               .getDatabase().getEntries();</b>
+&nbsp;        // explicit reference of Assertions is needed here to disambiguate from the methods defined by this class
+<b class="nc">&nbsp;        Assertions.assertEquals(expected, actualEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void assertEquals(List&lt;BibEntry&gt; expected, URL fileToImport, Importer importer)
+&nbsp;            throws URISyntaxException, IOException {
+<b class="nc">&nbsp;        assertEquals(expected, Path.of(fileToImport.toURI()), importer);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

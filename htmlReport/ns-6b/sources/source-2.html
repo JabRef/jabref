@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbbreviationsFileViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.journals</a>
+</div>
+
+<h1>Coverage Summary for Class: AbbreviationsFileViewModel (org.jabref.gui.preferences.journals)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbbreviationsFileViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.journals;
+&nbsp;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.property.ReadOnlyBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;
+&nbsp;import org.jabref.logic.journals.Abbreviation;
+&nbsp;import org.jabref.logic.journals.AbbreviationWriter;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationLoader;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class provides a model for abbreviation files. It actually doesn&#39;t save the files as objects but rather saves
+&nbsp; * their paths. This also allows to specify pseudo files as placeholder objects.
+&nbsp; */
+&nbsp;public class AbbreviationsFileViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private final SimpleListProperty&lt;AbbreviationViewModel&gt; abbreviations = new SimpleListProperty&lt;&gt;(</b>
+<b class="nc">&nbsp;            FXCollections.observableArrayList());</b>
+&nbsp;    private final ReadOnlyBooleanProperty isBuiltInList;
+&nbsp;    private final String name;
+&nbsp;    private final Optional&lt;Path&gt; path;
+&nbsp;
+<b class="nc">&nbsp;    public AbbreviationsFileViewModel(Path filePath) {</b>
+<b class="nc">&nbsp;        this.path = Optional.ofNullable(filePath);</b>
+<b class="nc">&nbsp;        this.name = path.get().toAbsolutePath().toString();</b>
+<b class="nc">&nbsp;        this.isBuiltInList = new SimpleBooleanProperty(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This constructor should only be called to create a pseudo abbreviation file for built in lists. This means it is
+&nbsp;     * a placeholder and its path will be null meaning it has no place on the filesystem. Its isPseudoFile property
+&nbsp;     * will therefore be set to true.
+&nbsp;     */
+<b class="nc">&nbsp;    public AbbreviationsFileViewModel(List&lt;AbbreviationViewModel&gt; abbreviations, String name) {</b>
+<b class="nc">&nbsp;        this.abbreviations.addAll(abbreviations);</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.path = Optional.empty();</b>
+<b class="nc">&nbsp;        this.isBuiltInList = new SimpleBooleanProperty(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void readAbbreviations() throws IOException {
+<b class="nc">&nbsp;        if (path.isPresent()) {</b>
+<b class="nc">&nbsp;            Collection&lt;Abbreviation&gt; abbreviationList = JournalAbbreviationLoader.readAbbreviationsFromCsvFile(path.get());</b>
+<b class="nc">&nbsp;            abbreviationList.forEach(abbreviation -&gt; abbreviations.addAll(new AbbreviationViewModel(abbreviation)));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new FileNotFoundException();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method will write all abbreviations of this abbreviation file to the file on the file system.
+&nbsp;     * It essentially will check if the current file is a builtin list and if not it will call
+&nbsp;     * {@link AbbreviationWriter#writeOrCreate}.
+&nbsp;     */
+&nbsp;    public void writeOrCreate() throws IOException {
+<b class="nc">&nbsp;        if (!isBuiltInList.get()) {</b>
+<b class="nc">&nbsp;            List&lt;Abbreviation&gt; actualAbbreviations =</b>
+<b class="nc">&nbsp;                    abbreviations.stream().filter(abb -&gt; !abb.isPseudoAbbreviation())</b>
+<b class="nc">&nbsp;                                 .map(AbbreviationViewModel::getAbbreviationObject)</b>
+<b class="nc">&nbsp;                                 .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;            AbbreviationWriter.writeOrCreate(path.get(), actualAbbreviations);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public SimpleListProperty&lt;AbbreviationViewModel&gt; abbreviationsProperty() {
+<b class="nc">&nbsp;        return abbreviations;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean exists() {
+<b class="nc">&nbsp;        return path.isPresent() &amp;&amp; Files.exists(path.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Path&gt; getAbsolutePath() {
+<b class="nc">&nbsp;        return path;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReadOnlyBooleanProperty isBuiltInListProperty() {
+<b class="nc">&nbsp;        return isBuiltInList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object obj) {
+<b class="nc">&nbsp;        if (obj instanceof AbbreviationsFileViewModel model) {</b>
+<b class="nc">&nbsp;            return Objects.equals(this.name, model.name);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

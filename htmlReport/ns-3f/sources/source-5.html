@@ -1,0 +1,180 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JabRefMaterialDesignIcon</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.icon</a>
+</div>
+
+<h1>Coverage Summary for Class: JabRefMaterialDesignIcon (org.jabref.gui.icon)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JabRefMaterialDesignIcon</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.8%
+  </span>
+  <span class="absValue">
+    (24/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.icon;
+&nbsp;
+&nbsp;import org.kordamp.ikonli.Ikon;
+&nbsp;
+&nbsp;/**
+&nbsp; * Provides the same true-type font interface as MaterialDesignIcon itself, but uses a font we created ourselves that
+&nbsp; * contains icons that are not available in MaterialDesignIcons.
+&nbsp; * &lt;p&gt;
+&nbsp; * The glyphs of the ttf (speak: the icons) were created with Illustrator and a template from the material design icons
+&nbsp; * web-page. The art boards for each icon was exported as SVG and then converted with &lt;a href=&quot;https://icomoon.io/app&quot;&gt;
+&nbsp; * IcoMoon&lt;/a&gt;. The final TTF font is located in the resource folder.
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;https://github.com/JabRef/jabref/wiki/Custom-SVG-Icons-for-JabRef&quot;&gt;Tutorial on our Wiki&lt;/a&gt;
+&nbsp; * @see &lt;a href=&quot;https://materialdesignicons.com/custom&quot;&gt;Material Design Icon custom page&lt;/a&gt;
+&nbsp; */
+<b class="fc">&nbsp;public enum JabRefMaterialDesignIcon implements Ikon {</b>
+&nbsp;
+<b class="fc">&nbsp;    TEX_STUDIO(&quot;jab-texstudio&quot;, &#39;\ue900&#39;),</b>
+<b class="fc">&nbsp;    TEX_MAKER(&quot;jab-textmaker&quot;, &#39;\ue901&#39;),</b>
+<b class="fc">&nbsp;    EMACS(&quot;jab-emacs&quot;, &#39;\ue902&#39;),</b>
+<b class="fc">&nbsp;    OPEN_OFFICE(&quot;jab-oo&quot;, &#39;\ue903&#39;),</b>
+<b class="fc">&nbsp;    VIM(&quot;jab-vim&quot;, &#39;\ue904&#39;),</b>
+<b class="fc">&nbsp;    VIM2(&quot;jab-vim2&quot;, &#39;\ue905&#39;),</b>
+<b class="fc">&nbsp;    LYX(&quot;jab-lyx&quot;, &#39;\ue906&#39;),</b>
+<b class="fc">&nbsp;    WINEDT(&quot;jab-winedt&quot;, &#39;\ue907&#39;),</b>
+<b class="fc">&nbsp;    ARXIV(&quot;jab-arxiv&quot;, &#39;\ue908&#39;),</b>
+<b class="fc">&nbsp;    COPY(&quot;jab-copy&quot;, &#39;\ue909&#39;),</b>
+<b class="fc">&nbsp;    PASTE(&quot;jab-paste&quot;, &#39;\ue90a&#39;),</b>
+<b class="fc">&nbsp;    SET_CENTER(&quot;jab-setcenter&quot;, &#39;\ue90b&#39;),</b>
+<b class="fc">&nbsp;    SET_ALL(&quot;jab-setall&quot;, &#39;\ue90c&#39;),</b>
+<b class="fc">&nbsp;    VSCODE(&quot;jab-vsvode&quot;, &#39;\ue90d&#39;),</b>
+<b class="fc">&nbsp;    CANCEL(&quot;jab-cancel&quot;, &#39;\ue90e&#39;),</b>
+<b class="fc">&nbsp;    SUBLIME_TEXT(&quot;jab-sublime-text&quot;, &#39;\ue90f&#39;),</b>
+<b class="fc">&nbsp;    TEXSHOP(&quot;jab-texshop&quot;, &#39;\ue910&#39;),</b>
+<b class="fc">&nbsp;    TEXWORKS(&quot;jab-texworks&quot;, &#39;\ue911&#39;),</b>
+<b class="fc">&nbsp;    BIBLIOGRAPHY(&quot;jab-bibliography&quot;, &#39;\ue912&#39;);</b>
+&nbsp;
+&nbsp;    private final String description;
+&nbsp;    private final int code;
+&nbsp;
+<b class="fc">&nbsp;    JabRefMaterialDesignIcon(String description, int code) {</b>
+<b class="fc">&nbsp;        this.description = description;</b>
+<b class="fc">&nbsp;        this.code = code;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static JabRefMaterialDesignIcon findByDescription(String description) {
+<b class="nc">&nbsp;        for (JabRefMaterialDesignIcon font : values()) {</b>
+<b class="nc">&nbsp;            if (font.getDescription().equals(description)) {</b>
+<b class="nc">&nbsp;                return font;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        throw new IllegalArgumentException(&quot;Icon description &#39;&quot; + description + &quot;&#39; is invalid!&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int getCode() {
+<b class="fc">&nbsp;        return code;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

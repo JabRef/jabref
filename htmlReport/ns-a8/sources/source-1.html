@@ -1,0 +1,247 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GenerateSummaryForSeveralTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.ai.summarization</a>
+</div>
+
+<h1>Coverage Summary for Class: GenerateSummaryForSeveralTask (org.jabref.logic.ai.summarization)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GenerateSummaryForSeveralTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.ai.summarization;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;
+&nbsp;import javafx.beans.property.ReadOnlyBooleanProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.util.Pair;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;import org.jabref.logic.ai.processingstatus.ProcessingInfo;
+&nbsp;import org.jabref.logic.ai.processingstatus.ProcessingState;
+&nbsp;import org.jabref.logic.ai.templates.AiTemplatesService;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.ProgressCounter;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import dev.langchain4j.model.chat.ChatModel;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This task generates summaries for several {@link BibEntry}ies (typically used for groups).
+&nbsp; * It will check if summaries were already generated.
+&nbsp; * And it also will store the summaries.
+&nbsp; */
+&nbsp;public class GenerateSummaryForSeveralTask extends BackgroundTask&lt;Void&gt; {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateSummaryForSeveralTask.class);</b>
+&nbsp;
+&nbsp;    private final StringProperty groupName;
+&nbsp;    private final List&lt;ProcessingInfo&lt;BibEntry, Summary&gt;&gt; entries;
+&nbsp;    private final BibDatabaseContext bibDatabaseContext;
+&nbsp;    private final SummariesStorage summariesStorage;
+&nbsp;    private final ChatModel chatLanguageModel;
+&nbsp;    private final AiTemplatesService aiTemplatesService;
+&nbsp;    private final ReadOnlyBooleanProperty shutdownSignal;
+&nbsp;    private final AiPreferences aiPreferences;
+&nbsp;    private final FilePreferences filePreferences;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+<b class="nc">&nbsp;    private final ProgressCounter progressCounter = new ProgressCounter();</b>
+&nbsp;
+<b class="nc">&nbsp;    private String currentFile = &quot;&quot;;</b>
+&nbsp;
+&nbsp;    public GenerateSummaryForSeveralTask(
+&nbsp;            StringProperty groupName,
+&nbsp;            List&lt;ProcessingInfo&lt;BibEntry, Summary&gt;&gt; entries,
+&nbsp;            BibDatabaseContext bibDatabaseContext,
+&nbsp;            SummariesStorage summariesStorage,
+&nbsp;            ChatModel chatLanguageModel,
+&nbsp;            AiTemplatesService aiTemplatesService,
+&nbsp;            ReadOnlyBooleanProperty shutdownSignal,
+&nbsp;            AiPreferences aiPreferences,
+&nbsp;            FilePreferences filePreferences,
+&nbsp;            TaskExecutor taskExecutor
+<b class="nc">&nbsp;    ) {</b>
+<b class="nc">&nbsp;        this.groupName = groupName;</b>
+<b class="nc">&nbsp;        this.entries = entries;</b>
+<b class="nc">&nbsp;        this.bibDatabaseContext = bibDatabaseContext;</b>
+<b class="nc">&nbsp;        this.summariesStorage = summariesStorage;</b>
+<b class="nc">&nbsp;        this.chatLanguageModel = chatLanguageModel;</b>
+<b class="nc">&nbsp;        this.aiTemplatesService = aiTemplatesService;</b>
+<b class="nc">&nbsp;        this.shutdownSignal = shutdownSignal;</b>
+<b class="nc">&nbsp;        this.aiPreferences = aiPreferences;</b>
+<b class="nc">&nbsp;        this.filePreferences = filePreferences;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+&nbsp;
+<b class="nc">&nbsp;        configure();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void configure() {
+<b class="nc">&nbsp;        showToUser(true);</b>
+<b class="nc">&nbsp;        titleProperty().set(Localization.lang(&quot;Generating summaries for %0&quot;, groupName.get()));</b>
+<b class="nc">&nbsp;        groupName.addListener((_, _, newValue) -&gt; titleProperty().set(Localization.lang(&quot;Generating summaries for %0&quot;, newValue)));</b>
+&nbsp;
+<b class="nc">&nbsp;        progressCounter.increaseWorkMax(entries.size());</b>
+<b class="nc">&nbsp;        progressCounter.listenToAllProperties(this::updateProgress);</b>
+<b class="nc">&nbsp;        updateProgress();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Void call() throws ExecutionException, InterruptedException {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Starting summaries generation of several files for {}&quot;, groupName.get());</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Pair&lt;? extends Future&lt;?&gt;, BibEntry&gt;&gt; futures = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        entries</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(processingInfo -&gt; {</b>
+<b class="nc">&nbsp;                    processingInfo.setState(ProcessingState.PROCESSING);</b>
+<b class="nc">&nbsp;                    return new Pair&lt;&gt;(</b>
+&nbsp;                            new GenerateSummaryTask(
+<b class="nc">&nbsp;                                    processingInfo.getObject(),</b>
+&nbsp;                                    bibDatabaseContext,
+&nbsp;                                    summariesStorage,
+&nbsp;                                    chatLanguageModel,
+&nbsp;                                    aiTemplatesService,
+&nbsp;                                    shutdownSignal,
+&nbsp;                                    aiPreferences,
+&nbsp;                                    filePreferences
+&nbsp;                            )
+<b class="nc">&nbsp;                                    .showToUser(false)</b>
+<b class="nc">&nbsp;                                    .onSuccess(processingInfo::setSuccess)</b>
+<b class="nc">&nbsp;                                    .onFailure(processingInfo::setException)</b>
+<b class="nc">&nbsp;                                    .onFinished(() -&gt; progressCounter.increaseWorkDone(1))</b>
+<b class="nc">&nbsp;                                    .executeWith(taskExecutor),</b>
+<b class="nc">&nbsp;                            processingInfo.getObject());</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .forEach(futures::add);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Pair&lt;? extends Future&lt;?&gt;, BibEntry&gt; pair : futures) {</b>
+<b class="nc">&nbsp;            currentFile = pair.getValue().getCitationKey().orElse(&quot;&lt;no citation key&gt;&quot;);</b>
+<b class="nc">&nbsp;            pair.getKey().get();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Finished embeddings generation task of several files for {}&quot;, groupName.get());</b>
+<b class="nc">&nbsp;        progressCounter.stop();</b>
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateProgress() {
+<b class="nc">&nbsp;        updateProgress(progressCounter.getWorkDone(), progressCounter.getWorkMax());</b>
+<b class="nc">&nbsp;        updateMessage(progressCounter.getMessage() + &quot; - &quot; + currentFile + &quot;, ...&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,278 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ArgumentProcessor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.cli</a>
+</div>
+
+<h1>Coverage Summary for Class: ArgumentProcessor (org.jabref.cli)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ArgumentProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (5/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.7%
+  </span>
+  <span class="absValue">
+    (10/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    53.5%
+  </span>
+  <span class="absValue">
+    (23/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ArgumentProcessor$Mode</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ArgumentProcessor$SharedOptions</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (6/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    41.7%
+  </span>
+  <span class="absValue">
+    (10/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    52.2%
+  </span>
+  <span class="absValue">
+    (24/46)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.cli;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.prefs.BackingStoreException;
+&nbsp;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.logic.UiCommand;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+&nbsp;import org.jabref.logic.util.BuildInfo;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import picocli.CommandLine;
+&nbsp;
+&nbsp;public class ArgumentProcessor {
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    public enum Mode { INITIAL_START, REMOTE_START }</b>
+&nbsp;
+&nbsp;    private final Mode startupMode;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final GuiCommandLine guiCli;
+&nbsp;    private final CommandLine cli;
+&nbsp;
+<b class="fc">&nbsp;    private final List&lt;UiCommand&gt; uiCommands = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;    private boolean guiNeeded = true;</b>
+&nbsp;
+&nbsp;    public ArgumentProcessor(String[] args,
+&nbsp;                             Mode startupMode,
+<b class="fc">&nbsp;                             GuiPreferences preferences) {</b>
+<b class="fc">&nbsp;        this.startupMode = startupMode;</b>
+<b class="fc">&nbsp;        this.preferences = preferences;</b>
+<b class="fc">&nbsp;        this.guiCli = new GuiCommandLine();</b>
+&nbsp;
+<b class="fc">&nbsp;        cli = new CommandLine(this.guiCli);</b>
+<b class="fc">&nbsp;        cli.parseArgs(args);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;UiCommand&gt; processArguments() {
+<b class="fc">&nbsp;        uiCommands.clear();</b>
+<b class="fc">&nbsp;        guiNeeded = true;</b>
+&nbsp;
+<b class="pc">&nbsp;        if ((startupMode == Mode.INITIAL_START) &amp;&amp; cli.isVersionHelpRequested()) {</b>
+<b class="nc">&nbsp;            System.out.printf(BuildInfo.JABREF_BANNER + &quot;%n&quot;, new BuildInfo().version);</b>
+<b class="nc">&nbsp;            guiNeeded = false;</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if ((startupMode == Mode.INITIAL_START) &amp;&amp; cli.isUsageHelpRequested()) {</b>
+<b class="nc">&nbsp;            System.out.printf(BuildInfo.JABREF_BANNER + &quot;%n&quot;, new BuildInfo().version);</b>
+<b class="nc">&nbsp;            System.out.println(cli.getUsageMessage());</b>
+&nbsp;
+<b class="nc">&nbsp;            guiNeeded = false;</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Check if we should reset all preferences to default values:
+<b class="pc">&nbsp;        if (guiCli.resetPreferences) {</b>
+<b class="nc">&nbsp;            resetPreferences();</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (guiCli.blank) {</b>
+<b class="nc">&nbsp;            uiCommands.add(new UiCommand.BlankWorkspace());</b>
+<b class="nc">&nbsp;            return uiCommands;</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (StringUtil.isBlank(guiCli.jumpToKey)) {</b>
+<b class="fc">&nbsp;            uiCommands.add(new UiCommand.JumpToEntryKey(guiCli.jumpToKey));</b>
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (guiCli.libraries != null &amp;&amp; !guiCli.libraries.isEmpty()) {</b>
+<b class="nc">&nbsp;            if (guiCli.append) {</b>
+<b class="nc">&nbsp;                uiCommands.add(new UiCommand.AppendToCurrentLibrary(guiCli.libraries));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                uiCommands.add(new UiCommand.OpenLibraries(guiCli.libraries));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="pc">&nbsp;        if (guiCli.importToOpen != null) {</b>
+<b class="nc">&nbsp;            uiCommands.add(new UiCommand.AppendFileOrUrlToCurrentLibrary(guiCli.importToOpen));</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (guiCli.importBibtex != null) {</b>
+<b class="nc">&nbsp;            uiCommands.add(new UiCommand.AppendBibTeXToCurrentLibrary(guiCli.importBibtex));</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return uiCommands;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void resetPreferences() {
+&nbsp;        try {
+<b class="nc">&nbsp;            System.out.println(Localization.lang(&quot;Setting all preferences to default values.&quot;));</b>
+<b class="nc">&nbsp;            preferences.clear();</b>
+<b class="nc">&nbsp;            new SharedDatabasePreferences().clear();</b>
+&nbsp;        } catch (BackingStoreException e) {
+<b class="nc">&nbsp;            System.err.println(Localization.lang(&quot;Unable to clear preferences.&quot;));</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Unable to clear preferences&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShutDown() {
+<b class="fc">&nbsp;        return !guiNeeded;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public GuiCommandLine getGuiCli() {
+<b class="fc">&nbsp;        return guiCli;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

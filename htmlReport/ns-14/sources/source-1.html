@@ -1,0 +1,177 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BackupResolverDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.backup</a>
+</div>
+
+<h1>Coverage Summary for Class: BackupResolverDialog (org.jabref.gui.backup)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BackupResolverDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.backup;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.scene.control.ButtonBar;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.Hyperlink;
+&nbsp;
+&nbsp;import org.jabref.gui.FXDialog;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackupFileType;
+&nbsp;import org.jabref.logic.util.io.BackupFileUtil;
+&nbsp;
+&nbsp;import org.controlsfx.control.HyperlinkLabel;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class BackupResolverDialog extends FXDialog {
+<b class="nc">&nbsp;    public static final ButtonType RESTORE_FROM_BACKUP = new ButtonType(Localization.lang(&quot;Restore from backup&quot;), ButtonBar.ButtonData.OK_DONE);</b>
+<b class="nc">&nbsp;    public static final ButtonType REVIEW_BACKUP = new ButtonType(Localization.lang(&quot;Review backup&quot;), ButtonBar.ButtonData.LEFT);</b>
+<b class="nc">&nbsp;    public static final ButtonType IGNORE_BACKUP = new ButtonType(Localization.lang(&quot;Ignore backup&quot;), ButtonBar.ButtonData.CANCEL_CLOSE);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BackupResolverDialog.class);</b>
+&nbsp;
+&nbsp;    public BackupResolverDialog(Path originalPath, Path backupDir, ExternalApplicationsPreferences externalApplicationsPreferences) {
+<b class="nc">&nbsp;        super(AlertType.CONFIRMATION, Localization.lang(&quot;Backup found&quot;), true);</b>
+<b class="nc">&nbsp;        setHeaderText(null);</b>
+<b class="nc">&nbsp;        getDialogPane().setMinHeight(180);</b>
+<b class="nc">&nbsp;        getDialogPane().getButtonTypes().setAll(RESTORE_FROM_BACKUP, REVIEW_BACKUP, IGNORE_BACKUP);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;Path&gt; backupPathOpt = BackupFileUtil.getPathOfLatestExistingBackupFile(originalPath, BackupFileType.BACKUP, backupDir);</b>
+<b class="nc">&nbsp;        String backupFilename = backupPathOpt.map(Path::getFileName).map(Path::toString).orElse(Localization.lang(&quot;File not found&quot;));</b>
+<b class="nc">&nbsp;        String content = Localization.lang(&quot;A backup file for &#39;%0&#39; was found at [%1]&quot;, originalPath.getFileName().toString(), backupFilename) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;This could indicate that JabRef did not shut down cleanly last time the file was used.&quot;) + &quot;\n\n&quot; +</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Do you want to recover the library from the backup file?&quot;);</b>
+<b class="nc">&nbsp;        setContentText(content);</b>
+&nbsp;
+<b class="nc">&nbsp;        HyperlinkLabel contentLabel = new HyperlinkLabel(content);</b>
+<b class="nc">&nbsp;        contentLabel.setPrefWidth(360);</b>
+<b class="nc">&nbsp;        contentLabel.setOnAction(e -&gt; {</b>
+<b class="nc">&nbsp;            if (backupPathOpt.isPresent()) {</b>
+<b class="nc">&nbsp;                if (!(e.getSource() instanceof Hyperlink)) {</b>
+&nbsp;                    return;
+&nbsp;                }
+<b class="nc">&nbsp;                String clickedLinkText = ((Hyperlink) (e.getSource())).getText();</b>
+<b class="nc">&nbsp;                if (backupFilename.equals(clickedLinkText)) {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        NativeDesktop.openFolderAndSelectFile(backupPathOpt.get(), externalApplicationsPreferences, null);</b>
+&nbsp;                    } catch (IOException ex) {
+<b class="nc">&nbsp;                        LOGGER.error(&quot;Could not open backup folder&quot;, ex);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        getDialogPane().setContent(contentLabel);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,334 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TooltipTextUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: TooltipTextUtil (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TooltipTextUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TooltipTextUtil$TextReplacement</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">TooltipTextUtil$TextType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/76)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility class with static methods for javafx {@link Text} objects
+&nbsp; */
+<b class="nc">&nbsp;public class TooltipTextUtil {</b>
+&nbsp;
+&nbsp;    // (?s) tells Java that &quot;.&quot; also matches the newline character
+&nbsp;    // (?&lt;...&gt;...) are named groups in Java regular expressions: https://stackoverflow.com/a/415635/873282
+&nbsp;    // .*? tells to match non-greedy (see https://stackoverflow.com/q/7124778/873282 for details)
+<b class="nc">&nbsp;    private static final Pattern TT_TEXT = Pattern.compile(&quot;(?s)(?&lt;before&gt;.*?)&lt;tt&gt;(?&lt;in&gt;.*?)&lt;/tt&gt;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern B_TEXT = Pattern.compile(&quot;(?s)(?&lt;before&gt;.*?)&lt;b&gt;(?&lt;in&gt;.*?)&lt;/b&gt;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    public enum TextType {</b>
+<b class="nc">&nbsp;        NORMAL, BOLD, ITALIC, MONOSPACED</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Text createText(String textString, TextType textType) {
+<b class="nc">&nbsp;        Text text = new Text(textString);</b>
+<b class="nc">&nbsp;        switch (textType) {</b>
+&nbsp;            case BOLD:
+<b class="nc">&nbsp;                text.getStyleClass().setAll(&quot;tooltip-text-bold&quot;);</b>
+&nbsp;                break;
+&nbsp;            case ITALIC:
+<b class="nc">&nbsp;                text.getStyleClass().setAll(&quot;tooltip-text-italic&quot;);</b>
+&nbsp;                break;
+&nbsp;            case MONOSPACED:
+<b class="nc">&nbsp;                text.getStyleClass().setAll(&quot;tooltip-text-monospaced&quot;);</b>
+&nbsp;                break;
+&nbsp;            default:
+&nbsp;                break;
+&nbsp;        }
+<b class="nc">&nbsp;        return text;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Text createText(String textString) {
+<b class="nc">&nbsp;        return createText(textString, TextType.NORMAL);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a list of Text elements respecting &lt;code&gt;tt&lt;/code&gt; and &lt;code&gt;b&lt;/code&gt; markers.
+&nbsp;     * Nesting of these markers is not possible.
+&nbsp;     */
+&nbsp;    public static List&lt;Text&gt; createTextsFromHtml(String htmlString) {
+<b class="nc">&nbsp;        List&lt;Text&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        Matcher matcher = TT_TEXT.matcher(htmlString);</b>
+<b class="nc">&nbsp;        int lastMatchPos = 0;</b>
+<b class="nc">&nbsp;        while (matcher.find()) {</b>
+<b class="nc">&nbsp;            lastMatchPos = matcher.end();</b>
+<b class="nc">&nbsp;            String before = matcher.group(&quot;before&quot;);</b>
+<b class="nc">&nbsp;            if (!before.isBlank()) {</b>
+<b class="nc">&nbsp;                result.addAll(convertHtmlBold(before));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            String in = matcher.group(&quot;in&quot;);</b>
+<b class="nc">&nbsp;            result.add(TooltipTextUtil.createText(in, TooltipTextUtil.TextType.MONOSPACED));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (lastMatchPos &lt; htmlString.length()) {</b>
+<b class="nc">&nbsp;            String remaining = htmlString.substring(lastMatchPos);</b>
+<b class="nc">&nbsp;            result.addAll(convertHtmlBold(remaining));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;Text&gt; convertHtmlBold(String htmlString) {
+<b class="nc">&nbsp;        List&lt;Text&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        Matcher matcher = B_TEXT.matcher(htmlString);</b>
+<b class="nc">&nbsp;        int lastMatchPos = 0;</b>
+<b class="nc">&nbsp;        while (matcher.find()) {</b>
+<b class="nc">&nbsp;            lastMatchPos = matcher.end();</b>
+<b class="nc">&nbsp;            String before = matcher.group(&quot;before&quot;);</b>
+<b class="nc">&nbsp;            if (!before.isBlank()) {</b>
+<b class="nc">&nbsp;                result.add(TooltipTextUtil.createText(before));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            String in = matcher.group(&quot;in&quot;);</b>
+<b class="nc">&nbsp;            result.add(TooltipTextUtil.createText(in, TextType.BOLD));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (lastMatchPos &lt; htmlString.length()) {</b>
+<b class="nc">&nbsp;            String remaining = htmlString.substring(lastMatchPos);</b>
+<b class="nc">&nbsp;            result.add(TooltipTextUtil.createText(remaining));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Formats a String to multiple Texts by replacing some parts and adding font characteristics.
+&nbsp;     */
+&nbsp;    public static List&lt;Text&gt; formatToTexts(String original, TextReplacement... replacements) {
+<b class="nc">&nbsp;        List&lt;Text&gt; textList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        textList.add(new Text(original));</b>
+<b class="nc">&nbsp;        for (TextReplacement replacement : replacements) {</b>
+<b class="nc">&nbsp;            splitReplace(textList, replacement);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return textList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void splitReplace(List&lt;Text&gt; textList, TextReplacement replacement) {
+<b class="nc">&nbsp;        Optional&lt;Text&gt; textContainingReplacement = textList.stream().filter(it -&gt; it.getText().contains(replacement.toReplace)).findFirst();</b>
+<b class="nc">&nbsp;        if (textContainingReplacement.isPresent()) {</b>
+<b class="nc">&nbsp;            int index = textList.indexOf(textContainingReplacement.get());</b>
+<b class="nc">&nbsp;            String original = textContainingReplacement.get().getText();</b>
+<b class="nc">&nbsp;            textList.remove(index);</b>
+<b class="nc">&nbsp;            String[] textParts = original.split(replacement.toReplace);</b>
+<b class="nc">&nbsp;            if (textParts.length == 2) {</b>
+<b class="nc">&nbsp;                if (&quot;&quot;.equals(textParts[0])) {</b>
+<b class="nc">&nbsp;                    textList.add(index, TooltipTextUtil.createText(replacement.replacement, replacement.textType));</b>
+<b class="nc">&nbsp;                    textList.add(index + 1, TooltipTextUtil.createText(textParts[1], TooltipTextUtil.TextType.NORMAL));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    textList.add(index, TooltipTextUtil.createText(textParts[0], TooltipTextUtil.TextType.NORMAL));</b>
+<b class="nc">&nbsp;                    textList.add(index + 1, TooltipTextUtil.createText(replacement.replacement, replacement.textType));</b>
+<b class="nc">&nbsp;                    textList.add(index + 2, TooltipTextUtil.createText(textParts[1], TooltipTextUtil.TextType.NORMAL));</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (textParts.length == 1) {</b>
+<b class="nc">&nbsp;                textList.add(index, TooltipTextUtil.createText(textParts[0], TooltipTextUtil.TextType.NORMAL));</b>
+<b class="nc">&nbsp;                textList.add(index + 1, TooltipTextUtil.createText(replacement.replacement, replacement.textType));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                throw new IllegalStateException(&quot;It is not allowed that the toReplace string: &#39;&quot; + replacement.toReplace</b>
+&nbsp;                        + &quot;&#39; exists multiple times in the original string&quot;);
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;It is not allowed that the toReplace string: &#39;&quot; + replacement.toReplace</b>
+&nbsp;                    + &quot;&#39; does not exist in the original string&quot;);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class TextReplacement {
+&nbsp;        private final String toReplace;
+&nbsp;        private final String replacement;
+&nbsp;        private final TooltipTextUtil.TextType textType;
+&nbsp;
+<b class="nc">&nbsp;        public TextReplacement(String toReplace, String replacement, TooltipTextUtil.TextType textType) {</b>
+<b class="nc">&nbsp;            this.toReplace = toReplace;</b>
+<b class="nc">&nbsp;            this.replacement = replacement;</b>
+<b class="nc">&nbsp;            this.textType = textType;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String textToHtmlString(Text text) {
+<b class="nc">&nbsp;        String textString = text.getText();</b>
+<b class="nc">&nbsp;        textString = textString.replace(&quot;\n&quot;, &quot;&lt;br&gt;&quot;);</b>
+<b class="nc">&nbsp;        if (text.getStyleClass().toString().contains(&quot;tooltip-text-monospaced&quot;)) {</b>
+<b class="nc">&nbsp;            textString = &quot;&lt;tt&gt;%s&lt;/tt&gt;&quot;.formatted(textString);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (text.getStyleClass().toString().contains(&quot;tooltip-text-bold&quot;)) {</b>
+<b class="nc">&nbsp;            textString = &quot;&lt;b&gt;%s&lt;/b&gt;&quot;.formatted(textString);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (text.getStyleClass().toString().contains(&quot;tooltip-text-italic&quot;)) {</b>
+<b class="nc">&nbsp;            textString = &quot;&lt;i&gt;%s&lt;/i&gt;&quot;.formatted(textString);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return textString;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

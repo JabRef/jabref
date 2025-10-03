@@ -1,0 +1,194 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ExporterFactory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: ExporterFactory (org.jabref.logic.exporter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExporterFactory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.exporter;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.FieldPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.layout.LayoutFormatterPreferences;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.xmp.XmpPreferences;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.metadata.SelfContainedSaveOrder;
+&nbsp;
+&nbsp;public class ExporterFactory {
+&nbsp;
+&nbsp;    private final List&lt;Exporter&gt; exporters;
+&nbsp;
+<b class="nc">&nbsp;    private ExporterFactory(List&lt;Exporter&gt; exporters) {</b>
+<b class="nc">&nbsp;        this.exporters = Objects.requireNonNull(exporters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ExporterFactory create(CliPreferences preferences) {
+<b class="nc">&nbsp;        List&lt;TemplateExporter&gt; customFormats = preferences.getExportPreferences().getCustomExporters();</b>
+<b class="nc">&nbsp;        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences();</b>
+<b class="nc">&nbsp;        SelfContainedSaveOrder saveOrder = SelfContainedSaveOrder.of(preferences.getSelfContainedExportConfiguration().getSaveOrder());</b>
+<b class="nc">&nbsp;        XmpPreferences xmpPreferences = preferences.getXmpPreferences();</b>
+<b class="nc">&nbsp;        FieldPreferences fieldPreferences = preferences.getFieldPreferences();</b>
+<b class="nc">&nbsp;        BibDatabaseMode bibDatabaseMode = preferences.getLibraryPreferences().getDefaultBibDatabaseMode();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Exporter&gt; exporters = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Initialize build-in exporters
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;HTML&quot;, &quot;html&quot;, &quot;html&quot;, null, StandardFileType.HTML, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(Localization.lang(&quot;Simple HTML&quot;), &quot;simplehtml&quot;, &quot;simplehtml&quot;, null, StandardFileType.HTML, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;DocBook 5.1&quot;, &quot;docbook5&quot;, &quot;docbook5&quot;, null, StandardFileType.XML, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;DocBook 4&quot;, &quot;docbook4&quot;, &quot;docbook4&quot;, null, StandardFileType.XML, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;DIN 1505&quot;, &quot;din1505&quot;, &quot;din1505winword&quot;, &quot;din1505&quot;, StandardFileType.RTF, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;BibO RDF&quot;, &quot;bibordf&quot;, &quot;bibordf&quot;, null, StandardFileType.RDF, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(Localization.lang(&quot;HTML table&quot;), &quot;tablerefs&quot;, &quot;tablerefs&quot;, &quot;tablerefs&quot;, StandardFileType.HTML, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(Localization.lang(&quot;HTML list&quot;), &quot;listrefs&quot;, &quot;listrefs&quot;, &quot;listrefs&quot;, StandardFileType.HTML, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(Localization.lang(&quot;HTML table (with Abstract &amp; BibTeX)&quot;), &quot;tablerefsabsbib&quot;, &quot;tablerefsabsbib&quot;, &quot;tablerefsabsbib&quot;, StandardFileType.HTML, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(Localization.lang(&quot;Markdown titles&quot;), &quot;title-md&quot;, &quot;title-md&quot;, &quot;title-markdown&quot;, StandardFileType.MARKDOWN, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;Harvard RTF&quot;, &quot;harvard&quot;, &quot;harvard&quot;, &quot;harvard&quot;, StandardFileType.RTF, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;ISO 690 RTF&quot;, &quot;iso690rtf&quot;, &quot;iso690RTF&quot;, &quot;iso690rtf&quot;, StandardFileType.RTF, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;ISO 690&quot;, &quot;iso690txt&quot;, &quot;iso690&quot;, &quot;iso690txt&quot;, StandardFileType.TXT, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;Endnote&quot;, &quot;endnote&quot;, &quot;EndNote&quot;, &quot;endnote&quot;, StandardFileType.TXT, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;OpenOffice/LibreOffice CSV&quot;, &quot;oocsv&quot;, &quot;openoffice-csv&quot;, &quot;openoffice&quot;, StandardFileType.CSV, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;RIS&quot;, &quot;ris&quot;, &quot;ris&quot;, &quot;ris&quot;, StandardFileType.RIS, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;MIS Quarterly&quot;, &quot;misq&quot;, &quot;misq&quot;, &quot;misq&quot;, StandardFileType.RTF, layoutPreferences, saveOrder));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;CSL YAML&quot;, &quot;yaml&quot;, &quot;yaml&quot;, null, StandardFileType.YAML, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));</b>
+<b class="nc">&nbsp;        exporters.add(new TemplateExporter(&quot;Hayagriva YAML&quot;, &quot;hayagrivayaml&quot;, &quot;hayagrivayaml&quot;, null, StandardFileType.YAML, layoutPreferences, saveOrder, BlankLineBehaviour.DELETE_BLANKS));</b>
+<b class="nc">&nbsp;        exporters.add(new OpenOfficeDocumentCreator());</b>
+<b class="nc">&nbsp;        exporters.add(new OpenDocumentSpreadsheetCreator());</b>
+<b class="nc">&nbsp;        exporters.add(new MSBibExporter());</b>
+<b class="nc">&nbsp;        exporters.add(new ModsExporter());</b>
+<b class="nc">&nbsp;        exporters.add(new XmpExporter(xmpPreferences));</b>
+<b class="nc">&nbsp;        exporters.add(new XmpPdfExporter(xmpPreferences));</b>
+<b class="nc">&nbsp;        exporters.add(new EmbeddedBibFilePdfExporter(bibDatabaseMode, preferences.getCustomEntryTypesRepository(), fieldPreferences));</b>
+<b class="nc">&nbsp;        exporters.add(new CffExporter());</b>
+<b class="nc">&nbsp;        exporters.add(new EndnoteXmlExporter(preferences.getBibEntryPreferences()));</b>
+&nbsp;
+&nbsp;        // Now add custom export formats
+<b class="nc">&nbsp;        exporters.addAll(customFormats);</b>
+&nbsp;
+<b class="nc">&nbsp;        return new ExporterFactory(exporters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get a list of all exporters.
+&nbsp;     *
+&nbsp;     * @return A list containing all exporters
+&nbsp;     */
+&nbsp;    public List&lt;Exporter&gt; getExporters() {
+<b class="nc">&nbsp;        return Collections.unmodifiableList(exporters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Look up the named exporter (case-insensitive).
+&nbsp;     *
+&nbsp;     * @param consoleName The export name given in the JabRef console help information.
+&nbsp;     * @return The exporter, or an empty option if no exporter with that name is registered.
+&nbsp;     */
+&nbsp;    public Optional&lt;Exporter&gt; getExporterByName(String consoleName) {
+<b class="nc">&nbsp;        return exporters.stream().filter(exporter -&gt; exporter.getId().equalsIgnoreCase(consoleName)).findFirst();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

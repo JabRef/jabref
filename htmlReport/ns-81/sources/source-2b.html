@@ -1,0 +1,243 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebViewStore</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: WebViewStore (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebViewStore</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (5/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (2/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    55%
+  </span>
+  <span class="absValue">
+    (11/20)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WebViewStore$Configuration</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    63.6%
+  </span>
+  <span class="absValue">
+    (7/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    25%
+  </span>
+  <span class="absValue">
+    (2/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    56.5%
+  </span>
+  <span class="absValue">
+    (13/23)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.util.ArrayDeque;
+&nbsp;import java.util.Queue;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.scene.web.WebView;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A dynamic web view store. This is used primarily to prevent UI freezes while constructing web view instances.
+&nbsp; */
+<b class="nc">&nbsp;public class WebViewStore {</b>
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(WebViewStore.class);</b>
+<b class="fc">&nbsp;    private final static Queue&lt;WebView&gt; WEB_VIEWS = new ArrayDeque&lt;&gt;();</b>
+<b class="fc">&nbsp;    private static boolean isInitialized = false;</b>
+&nbsp;    private static Configuration config;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialize {@code WebViewStore} and preload web view instances.
+&nbsp;     * &lt;p&gt; Note that this method must be called at application startup. &lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static void init(Configuration config) {
+<b class="fc">&nbsp;        WebViewStore.config = config;</b>
+<b class="fc">&nbsp;        for (int i = 0; i &lt; config.getNumberOfPreloadedInstances(); i++) {</b>
+<b class="fc">&nbsp;            addWebViewLater();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        isInitialized = true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialize {@code WebViewStore} and preload web view instance.
+&nbsp;     * &lt;p&gt; Note that this method must be called at application startup. &lt;/p&gt;
+&nbsp;     */
+&nbsp;    public static void init() {
+<b class="fc">&nbsp;        init(new Configuration(4, 2));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a preloaded web view instance if available; And it will create a new one if not.
+&nbsp;     *
+&nbsp;     * @return {@code WebView} instance
+&nbsp;     * @throws IllegalStateException if the webViewStore has not been initialized
+&nbsp;     */
+&nbsp;    public static WebView get() {
+<b class="nc">&nbsp;        if (!isInitialized) {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;WebViewStore is uninitialized&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (WEB_VIEWS.size() &lt;= config.getMinimumNumberOfInstances()) {</b>
+<b class="nc">&nbsp;            addWebViewLater();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (hasMore()) {</b>
+<b class="nc">&nbsp;            return WEB_VIEWS.poll();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return new WebView();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addWebViewLater() {
+<b class="fc">&nbsp;        Platform.runLater(() -&gt; {</b>
+<b class="fc">&nbsp;            WEB_VIEWS.add(new WebView());</b>
+<b class="fc">&nbsp;            LOGGER.debug(&quot;Cached Web views: {}&quot;, WEB_VIEWS.size());</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return {@code true} if the store has at least one web view instance available; {@code false} otherwise
+&nbsp;     */
+&nbsp;    public static boolean hasMore() {
+<b class="nc">&nbsp;        return !WEB_VIEWS.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public record Configuration(</b>
+&nbsp;            int numberOfPreloadedInstances,
+&nbsp;            int minimumNumberOfInstances) {
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @return The number of web view instances to be loaded at application startup
+&nbsp;         */
+&nbsp;        public int getNumberOfPreloadedInstances() {
+<b class="fc">&nbsp;            return numberOfPreloadedInstances;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        /**
+&nbsp;         * @return The minimum number of web views the store can reach. The store needs to load more instances once it reaches this threshold
+&nbsp;         */
+&nbsp;        public int getMinimumNumberOfInstances() {
+<b class="nc">&nbsp;            return minimumNumberOfInstances;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

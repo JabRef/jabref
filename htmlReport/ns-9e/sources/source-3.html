@@ -1,0 +1,241 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LspDiagnosticHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.languageserver.util</a>
+</div>
+
+<h1>Coverage Summary for Class: LspDiagnosticHandler (org.jabref.languageserver.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LspDiagnosticHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.languageserver.util;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.Reader;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.languageserver.ExtensionSettings;
+&nbsp;import org.jabref.languageserver.LspClientHandler;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;
+&nbsp;import org.eclipse.lsp4j.Diagnostic;
+&nbsp;import org.eclipse.lsp4j.DiagnosticSeverity;
+&nbsp;import org.eclipse.lsp4j.PublishDiagnosticsParams;
+&nbsp;import org.eclipse.lsp4j.services.LanguageClient;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class LspDiagnosticHandler {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LspDiagnosticHandler.class);</b>
+&nbsp;    private static final int NO_VERSION = -1;
+&nbsp;
+&nbsp;    private final CliPreferences jabRefCliPreferences;
+&nbsp;    private final LspIntegrityCheck lspIntegrityCheck;
+&nbsp;    private final LspConsistencyCheck lspConsistencyCheck;
+&nbsp;    private final LspClientHandler clientHandler;
+&nbsp;    private final Map&lt;String, List&lt;Diagnostic&gt;&gt; integrityDiagnosticsCache; // Maps file URIs to the corresponding list of integrity diagnostics
+&nbsp;    private final Map&lt;String, List&lt;Diagnostic&gt;&gt; consistencyDiagnosticsCache; // Maps file URIs to the corresponding list of consistency diagnostics
+&nbsp;
+&nbsp;    private LanguageClient client;
+&nbsp;
+<b class="nc">&nbsp;    public LspDiagnosticHandler(LspClientHandler clientHandler, CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {</b>
+<b class="nc">&nbsp;        this.clientHandler = clientHandler;</b>
+<b class="nc">&nbsp;        this.jabRefCliPreferences = cliPreferences;</b>
+<b class="nc">&nbsp;        this.lspIntegrityCheck = new LspIntegrityCheck(cliPreferences, abbreviationRepository);</b>
+<b class="nc">&nbsp;        this.lspConsistencyCheck = new LspConsistencyCheck(clientHandler.getSettings());</b>
+<b class="nc">&nbsp;        this.integrityDiagnosticsCache = new ConcurrentHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        this.consistencyDiagnosticsCache = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void computeAndPublishDiagnostics(LanguageClient client, String uri, String content, Integer version) {
+<b class="nc">&nbsp;        List&lt;Diagnostic&gt; diagnostics = computeDiagnostics(content, uri);</b>
+<b class="nc">&nbsp;        publishDiagnostics(client, uri, version, diagnostics);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void publishDiagnostics(LanguageClient client, String uri, Integer version, List&lt;Diagnostic&gt; diagnostics) {
+<b class="nc">&nbsp;        PublishDiagnosticsParams params = new PublishDiagnosticsParams();</b>
+<b class="nc">&nbsp;        params.setUri(uri);</b>
+<b class="nc">&nbsp;        params.setVersion(version);</b>
+<b class="nc">&nbsp;        params.setDiagnostics(diagnostics);</b>
+<b class="nc">&nbsp;        client.publishDiagnostics(params);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void publishDiagnostics(LanguageClient client, String uri, List&lt;Diagnostic&gt; diagnostics) {
+<b class="nc">&nbsp;        publishDiagnostics(client, uri, NO_VERSION, diagnostics);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Diagnostic&gt; computeDiagnostics(String content, String uri) {
+<b class="nc">&nbsp;        List&lt;Diagnostic&gt; diagnostics = new ArrayList&lt;&gt;();</b>
+&nbsp;        ParserResult parserResult;
+&nbsp;        try {
+<b class="nc">&nbsp;            parserResult = parserResultFromString(content, jabRefCliPreferences.getImportFormatPreferences());</b>
+&nbsp;        } catch (JabRefException | IOException e) {
+<b class="nc">&nbsp;            Diagnostic parseDiagnostic = LspDiagnosticBuilder.create(Localization.lang(</b>
+&nbsp;                    &quot;Failed to parse entries.\nThe following error was encountered:\n%0&quot;,
+<b class="nc">&nbsp;                    e.getMessage())).setSeverity(DiagnosticSeverity.Error).build();</b>
+<b class="nc">&nbsp;            return List.of(parseDiagnostic);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        parserResult.getWarningsMap().forEach((range, message) -&gt; {</b>
+<b class="nc">&nbsp;            Diagnostic warningDiagnostic = LspDiagnosticBuilder.create(message).setRange(range).setSeverity(DiagnosticSeverity.Error).build();</b>
+<b class="nc">&nbsp;            diagnostics.add(warningDiagnostic);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        if (clientHandler.getSettings().isIntegrityCheck()) {</b>
+<b class="nc">&nbsp;            integrityDiagnosticsCache.put(uri, lspIntegrityCheck.check(parserResult));</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Cached integrity diagnostics for {}&quot;, uri);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (clientHandler.getSettings().isConsistencyCheck()) {</b>
+<b class="nc">&nbsp;            consistencyDiagnosticsCache.put(uri, lspConsistencyCheck.check(parserResult));</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Cached consistency diagnostics for {}&quot;, uri);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Stream.of(getFinalDiagnosticsList(uri), diagnostics).flatMap(List::stream).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Diagnostic&gt; getFinalDiagnosticsList(String uri) {
+<b class="nc">&nbsp;        ExtensionSettings settings = clientHandler.getSettings();</b>
+<b class="nc">&nbsp;        return Stream.concat(</b>
+<b class="nc">&nbsp;                settings.isIntegrityCheck() ?</b>
+<b class="nc">&nbsp;                integrityDiagnosticsCache.getOrDefault(uri, List.of()).stream() :</b>
+<b class="nc">&nbsp;                Stream.empty(),</b>
+<b class="nc">&nbsp;                settings.isConsistencyCheck() ?</b>
+<b class="nc">&nbsp;                consistencyDiagnosticsCache.getOrDefault(uri, List.of()).stream() :</b>
+<b class="nc">&nbsp;                Stream.empty()</b>
+<b class="nc">&nbsp;        ).toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void refreshDiagnostics(LanguageClient client) {
+<b class="nc">&nbsp;        Set&lt;String&gt; allUris = new HashSet&lt;&gt;(integrityDiagnosticsCache.keySet());</b>
+<b class="nc">&nbsp;        allUris.addAll(consistencyDiagnosticsCache.keySet());</b>
+<b class="nc">&nbsp;        allUris.forEach(uri -&gt; {</b>
+<b class="nc">&nbsp;            List&lt;Diagnostic&gt; diagnostics = getFinalDiagnosticsList(uri);</b>
+<b class="nc">&nbsp;            publishDiagnostics(client, uri, diagnostics);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private ParserResult parserResultFromString(String content, ImportFormatPreferences importFormatPreferences) throws JabRefException, IOException {
+<b class="nc">&nbsp;        BibtexParser parser = new BibtexParser(importFormatPreferences);</b>
+<b class="nc">&nbsp;        return parser.parse(Reader.of(content));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

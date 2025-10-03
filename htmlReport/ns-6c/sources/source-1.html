@@ -1,0 +1,272 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > KeyBindingViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preferences.keybindings</a>
+</div>
+
+<h1>Coverage Summary for Class: KeyBindingViewModel (org.jabref.gui.preferences.keybindings)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">KeyBindingViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preferences.keybindings;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.input.KeyCode;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.icon.JabRefIcon;
+&nbsp;import org.jabref.gui.keyboard.KeyBinding;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingCategory;
+&nbsp;import org.jabref.gui.keyboard.KeyBindingRepository;
+&nbsp;
+&nbsp;import com.google.common.base.CaseFormat;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class represents a view model for objects of the KeyBinding
+&nbsp; * class. It has two properties representing the localized name of an
+&nbsp; * action and its key bind. It can also represent a key binding category
+&nbsp; * instead of a key bind itself.
+&nbsp; *
+&nbsp; */
+&nbsp;public class KeyBindingViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private KeyBinding keyBinding = null;</b>
+<b class="nc">&nbsp;    private String realBinding = &quot;&quot;;</b>
+<b class="nc">&nbsp;    private final ObservableList&lt;KeyBindingViewModel&gt; children = FXCollections.observableArrayList();</b>
+&nbsp;    private final KeyBindingRepository keyBindingRepository;
+<b class="nc">&nbsp;    private final SimpleStringProperty displayName = new SimpleStringProperty();</b>
+<b class="nc">&nbsp;    private final SimpleStringProperty shownBinding = new SimpleStringProperty();</b>
+&nbsp;
+&nbsp;    private final KeyBindingCategory category;
+&nbsp;
+&nbsp;    public KeyBindingViewModel(KeyBindingRepository keyBindingRepository, KeyBinding keyBinding, String binding) {
+<b class="nc">&nbsp;        this(keyBindingRepository, keyBinding.getCategory());</b>
+<b class="nc">&nbsp;        this.keyBinding = keyBinding;</b>
+<b class="nc">&nbsp;        setDisplayName();</b>
+<b class="nc">&nbsp;        setBinding(binding);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public KeyBindingViewModel(KeyBindingRepository keyBindingRepository, KeyBindingCategory category) {</b>
+<b class="nc">&nbsp;        this.keyBindingRepository = keyBindingRepository;</b>
+<b class="nc">&nbsp;        this.category = category;</b>
+<b class="nc">&nbsp;        setDisplayName();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;KeyBindingViewModel&gt; getChildren() {
+<b class="nc">&nbsp;        return children;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeyBinding getKeyBinding() {
+<b class="nc">&nbsp;        return keyBinding;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty shownBindingProperty() {
+<b class="nc">&nbsp;        return this.shownBinding;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getBinding() {
+<b class="nc">&nbsp;        return realBinding;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setBinding(String bind) {
+<b class="nc">&nbsp;        this.realBinding = bind;</b>
+<b class="nc">&nbsp;        String[] parts = bind.split(&quot; &quot;);</b>
+<b class="nc">&nbsp;        StringBuilder displayBind = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (String part : parts) {</b>
+<b class="nc">&nbsp;            displayBind.append(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, part)).append(&quot; &quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.shownBinding.set(displayBind.toString().trim().replace(&quot; &quot;, &quot; + &quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setDisplayName() {
+<b class="nc">&nbsp;        this.displayName.set(keyBinding == null ? this.category.getName() : keyBinding.getLocalization());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty nameProperty() {
+<b class="nc">&nbsp;        return this.displayName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isCategory() {
+<b class="nc">&nbsp;        return keyBinding == null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets a a new key bind to this objects key binding object if
+&nbsp;     * the given key event is a valid combination of keys.
+&nbsp;     *
+&nbsp;     * @param evt as KeyEvent
+&nbsp;     * @return true if the KeyEvent is a valid binding, false else
+&nbsp;     */
+&nbsp;    public boolean setNewBinding(KeyEvent evt) {
+&nbsp;        // validate the shortcut is no modifier key
+&nbsp;
+<b class="nc">&nbsp;        KeyCode code = evt.getCode();</b>
+<b class="nc">&nbsp;        if (code.isModifierKey() || (code == KeyCode.BACK_SPACE) || (code == KeyCode.SPACE) || (code == KeyCode.TAB)</b>
+&nbsp;                || (code == KeyCode.ENTER) || (code == KeyCode.UNDEFINED)) {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // gather the pressed modifier keys
+<b class="nc">&nbsp;        String modifiers = &quot;&quot;;</b>
+<b class="nc">&nbsp;        if (evt.isControlDown()) {</b>
+<b class="nc">&nbsp;            modifiers = &quot;ctrl+&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (evt.isShiftDown()) {</b>
+<b class="nc">&nbsp;            modifiers += &quot;shift+&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (evt.isAltDown()) {</b>
+<b class="nc">&nbsp;            modifiers += &quot;alt+&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // if no modifier keys are pressed, only special keys can be shortcuts
+<b class="nc">&nbsp;        if (modifiers.isEmpty()) {</b>
+<b class="nc">&nbsp;            if (!(code.isFunctionKey() || (code == KeyCode.ESCAPE) || (code == KeyCode.DELETE))) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String newShortcut = modifiers + code;</b>
+<b class="nc">&nbsp;        setBinding(newShortcut);</b>
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method will reset the key bind of this models KeyBinding object to it&#39;s default bind
+&nbsp;     */
+&nbsp;    public void resetToDefault() {
+<b class="nc">&nbsp;        if (!isCategory()) {</b>
+<b class="nc">&nbsp;            String key = getKeyBinding().getConstant();</b>
+<b class="nc">&nbsp;            keyBindingRepository.resetToDefault(key);</b>
+<b class="nc">&nbsp;            setBinding(keyBindingRepository.get(key));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clear() {
+<b class="nc">&nbsp;        if (!isCategory()) {</b>
+<b class="nc">&nbsp;            String key = getKeyBinding().getConstant();</b>
+<b class="nc">&nbsp;            keyBindingRepository.put(key, &quot;&quot;);</b>
+<b class="nc">&nbsp;            setBinding(keyBindingRepository.get(key));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;JabRefIcon&gt; getResetIcon() {
+<b class="nc">&nbsp;        return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcons.REFRESH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;JabRefIcon&gt; getClearIcon() {
+<b class="nc">&nbsp;        return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcons.CLEANUP_ENTRIES);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SidePaneComponent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.sidepane</a>
+</div>
+
+<h1>Coverage Summary for Class: SidePaneComponent (org.jabref.gui.sidepane)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SidePaneComponent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.sidepane;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.layout.BorderPane;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.groups.GroupTreeView;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;public class SidePaneComponent extends BorderPane {
+&nbsp;    private final SidePaneType sidePaneType;
+&nbsp;    private final SimpleCommand closeCommand;
+&nbsp;    private final SimpleCommand moveUpCommand;
+&nbsp;    private final SimpleCommand moveDownCommand;
+&nbsp;    private final SidePaneContentFactory contentFactory;
+&nbsp;
+&nbsp;    private HBox buttonContainer;
+&nbsp;
+&nbsp;    public SidePaneComponent(SidePaneType sidePaneType,
+&nbsp;                             SimpleCommand closeCommand,
+&nbsp;                             SimpleCommand moveUpCommand,
+&nbsp;                             SimpleCommand moveDownCommand,
+<b class="nc">&nbsp;                             SidePaneContentFactory contentFactory) {</b>
+<b class="nc">&nbsp;        this.sidePaneType = sidePaneType;</b>
+<b class="nc">&nbsp;        this.closeCommand = closeCommand;</b>
+<b class="nc">&nbsp;        this.moveUpCommand = moveUpCommand;</b>
+<b class="nc">&nbsp;        this.moveDownCommand = moveDownCommand;</b>
+<b class="nc">&nbsp;        this.contentFactory = contentFactory;</b>
+<b class="nc">&nbsp;        initialize();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        getStyleClass().add(&quot;sidePaneComponent&quot;);</b>
+<b class="nc">&nbsp;        setTop(createHeaderView());</b>
+<b class="nc">&nbsp;        setCenter(contentFactory.create(sidePaneType));</b>
+<b class="nc">&nbsp;        VBox.setVgrow(this, sidePaneType == SidePaneType.GROUPS ? Priority.ALWAYS : Priority.NEVER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node createHeaderView() {
+<b class="nc">&nbsp;        Button closeButton = IconTheme.JabRefIcons.CLOSE.asButton();</b>
+<b class="nc">&nbsp;        closeButton.setTooltip(new Tooltip(Localization.lang(&quot;Hide panel&quot;)));</b>
+<b class="nc">&nbsp;        closeButton.setOnAction(e -&gt; closeCommand.execute());</b>
+&nbsp;
+<b class="nc">&nbsp;        Button upButton = IconTheme.JabRefIcons.UP.asButton();</b>
+<b class="nc">&nbsp;        upButton.setTooltip(new Tooltip(Localization.lang(&quot;Move panel up&quot;)));</b>
+<b class="nc">&nbsp;        upButton.setOnAction(e -&gt; moveUpCommand.execute());</b>
+&nbsp;
+<b class="nc">&nbsp;        Button downButton = IconTheme.JabRefIcons.DOWN.asButton();</b>
+<b class="nc">&nbsp;        downButton.setTooltip(new Tooltip(Localization.lang(&quot;Move panel down&quot;)));</b>
+<b class="nc">&nbsp;        downButton.setOnAction(e -&gt; moveDownCommand.execute());</b>
+&nbsp;
+<b class="nc">&nbsp;        this.buttonContainer = new HBox();</b>
+<b class="nc">&nbsp;        buttonContainer.getChildren().addAll(upButton, downButton, closeButton);</b>
+&nbsp;
+<b class="nc">&nbsp;        Label label = new Label(sidePaneType.getTitle());</b>
+&nbsp;
+<b class="nc">&nbsp;        BorderPane headerView = new BorderPane();</b>
+<b class="nc">&nbsp;        headerView.setLeft(label);</b>
+<b class="nc">&nbsp;        headerView.setRight(buttonContainer);</b>
+<b class="nc">&nbsp;        headerView.getStyleClass().add(&quot;sidePaneComponentHeader&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return headerView;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void addExtraNodeToHeader(Node button, int position) {
+<b class="nc">&nbsp;        this.buttonContainer.getChildren().add(position, button);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void requestFocus() {
+<b class="nc">&nbsp;        for (Node child : getChildren()) {</b>
+<b class="nc">&nbsp;            if (child instanceof GroupTreeView groupTreeView) {</b>
+<b class="nc">&nbsp;                groupTreeView.requestFocusGroupTree();</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

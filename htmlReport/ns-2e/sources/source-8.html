@@ -1,0 +1,171 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EntryEditorTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor</a>
+</div>
+
+<h1>Coverage Summary for Class: EntryEditorTab (org.jabref.gui.entryeditor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EntryEditorTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor;
+&nbsp;
+&nbsp;import javafx.scene.control.Tab;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public abstract class EntryEditorTab extends Tab {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(EntryEditorTab.class);</b>
+&nbsp;
+&nbsp;    protected BibEntry currentEntry;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Needed to track for which type of entry this tab was build and to rebuild it if the type changes
+&nbsp;     */
+&nbsp;    private EntryType currentEntryType;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Decide whether to show this tab for the given entry.
+&nbsp;     */
+&nbsp;    public abstract boolean shouldShow(BibEntry entry);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates the view with the contents of the given entry.
+&nbsp;     */
+&nbsp;    protected abstract void bindToEntry(BibEntry entry);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The tab just got the focus. Override this method if you want to perform a special action on focus (like selecting
+&nbsp;     * the first field in the editor)
+&nbsp;     */
+&nbsp;    protected void handleFocus() {
+&nbsp;        // Do nothing by default
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Notifies the tab that it got focus and should display the given entry.
+&nbsp;     */
+&nbsp;    public void notifyAboutFocus(BibEntry entry) {
+<b class="nc">&nbsp;        if (!entry.equals(currentEntry) || !entry.getType().equals(currentEntryType)) {</b>
+&nbsp;            // TODO: Shouldn&#39;t &quot;bindToEntry&quot; called when changing the entry?
+<b class="nc">&nbsp;            LOGGER.trace(&quot;Tab got focus with different entry (or entry type) {}&quot;, entry);</b>
+<b class="nc">&nbsp;            LOGGER.trace(&quot;Different entry: {}&quot;, entry.equals(currentEntry));</b>
+<b class="nc">&nbsp;            LOGGER.trace(&quot;Different entry type: {}&quot;, !entry.getType().equals(currentEntryType));</b>
+<b class="nc">&nbsp;            currentEntry = entry;</b>
+<b class="nc">&nbsp;            currentEntryType = entry.getType();</b>
+<b class="nc">&nbsp;            bindToEntry(entry);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        handleFocus();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

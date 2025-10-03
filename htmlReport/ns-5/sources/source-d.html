@@ -1,0 +1,292 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WorkspacePreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui</a>
+</div>
+
+<h1>Coverage Summary for Class: WorkspacePreferences (org.jabref.gui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WorkspacePreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    38.2%
+  </span>
+  <span class="absValue">
+    (13/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    54.3%
+  </span>
+  <span class="absValue">
+    (25/46)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.IntegerProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleIntegerProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.gui.theme.Theme;
+&nbsp;import org.jabref.logic.l10n.Language;
+&nbsp;
+&nbsp;public class WorkspacePreferences {
+&nbsp;    private final ObjectProperty&lt;Language&gt; language;
+&nbsp;    private final BooleanProperty shouldOverrideDefaultFontSize;
+&nbsp;    private final IntegerProperty mainFontSize;
+&nbsp;    private final IntegerProperty defaultFontSize;
+&nbsp;    private final ObjectProperty&lt;Theme&gt; theme;
+&nbsp;    private final BooleanProperty themeSyncOs;
+&nbsp;    private final BooleanProperty shouldOpenLastEdited;
+&nbsp;    private final BooleanProperty showAdvancedHints;
+&nbsp;    private final BooleanProperty warnAboutDuplicatesInInspection;
+&nbsp;    private final BooleanProperty confirmDelete;
+&nbsp;    private final BooleanProperty confirmHideTabBar;
+&nbsp;    private final ObservableList&lt;String&gt; selectedSlrCatalogs;
+&nbsp;
+&nbsp;    public WorkspacePreferences(Language language,
+&nbsp;                                boolean shouldOverrideDefaultFontSize,
+&nbsp;                                int mainFontSize,
+&nbsp;                                int defaultFontSize,
+&nbsp;                                Theme theme,
+&nbsp;                                boolean themeSyncOs,
+&nbsp;                                boolean shouldOpenLastEdited,
+&nbsp;                                boolean showAdvancedHints,
+&nbsp;                                boolean warnAboutDuplicatesInInspection,
+&nbsp;                                boolean confirmDelete,
+&nbsp;                                boolean confirmHideTabBar,
+<b class="fc">&nbsp;                                List&lt;String&gt; selectedSlrCatalogs) {</b>
+<b class="fc">&nbsp;        this.language = new SimpleObjectProperty&lt;&gt;(language);</b>
+<b class="fc">&nbsp;        this.shouldOverrideDefaultFontSize = new SimpleBooleanProperty(shouldOverrideDefaultFontSize);</b>
+<b class="fc">&nbsp;        this.mainFontSize = new SimpleIntegerProperty(mainFontSize);</b>
+<b class="fc">&nbsp;        this.defaultFontSize = new SimpleIntegerProperty(defaultFontSize);</b>
+<b class="fc">&nbsp;        this.theme = new SimpleObjectProperty&lt;&gt;(theme);</b>
+<b class="fc">&nbsp;        this.themeSyncOs = new SimpleBooleanProperty(themeSyncOs);</b>
+<b class="fc">&nbsp;        this.shouldOpenLastEdited = new SimpleBooleanProperty(shouldOpenLastEdited);</b>
+<b class="fc">&nbsp;        this.showAdvancedHints = new SimpleBooleanProperty(showAdvancedHints);</b>
+<b class="fc">&nbsp;        this.warnAboutDuplicatesInInspection = new SimpleBooleanProperty(warnAboutDuplicatesInInspection);</b>
+<b class="fc">&nbsp;        this.confirmDelete = new SimpleBooleanProperty(confirmDelete);</b>
+<b class="fc">&nbsp;        this.confirmHideTabBar = new SimpleBooleanProperty(confirmHideTabBar);</b>
+<b class="fc">&nbsp;        this.selectedSlrCatalogs = FXCollections.observableArrayList(selectedSlrCatalogs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Language getLanguage() {
+<b class="nc">&nbsp;        return language.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Language&gt; languageProperty() {
+<b class="fc">&nbsp;        return language;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLanguage(Language language) {
+<b class="nc">&nbsp;        this.language.set(language);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldOverrideDefaultFontSize() {
+<b class="nc">&nbsp;        return shouldOverrideDefaultFontSize.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShouldOverrideDefaultFontSize(boolean newValue) {
+<b class="nc">&nbsp;        shouldOverrideDefaultFontSize.set(newValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldOverrideDefaultFontSizeProperty() {
+<b class="fc">&nbsp;        return shouldOverrideDefaultFontSize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getMainFontSize() {
+<b class="nc">&nbsp;        return mainFontSize.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getDefaultFontSize() {
+<b class="nc">&nbsp;        return defaultFontSize.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMainFontSize(int mainFontSize) {
+<b class="nc">&nbsp;        this.mainFontSize.set(mainFontSize);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegerProperty mainFontSizeProperty() {
+<b class="fc">&nbsp;        return mainFontSize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Theme getTheme() {
+<b class="fc">&nbsp;        return theme.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTheme(Theme theme) {
+<b class="nc">&nbsp;        this.theme.set(theme);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Theme&gt; themeProperty() {
+<b class="fc">&nbsp;        return theme;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldThemeSyncOs() {
+<b class="nc">&nbsp;        return themeSyncOs.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty themeSyncOsProperty() {
+<b class="fc">&nbsp;        return themeSyncOs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setThemeSyncOs(boolean themeSyncOs) {
+<b class="nc">&nbsp;        this.themeSyncOs.set(themeSyncOs);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldOpenLastEdited() {
+<b class="nc">&nbsp;        return shouldOpenLastEdited.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty openLastEditedProperty() {
+<b class="fc">&nbsp;        return shouldOpenLastEdited;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setOpenLastEdited(boolean shouldOpenLastEdited) {
+<b class="nc">&nbsp;        this.shouldOpenLastEdited.set(shouldOpenLastEdited);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShowAdvancedHints() {
+<b class="nc">&nbsp;        return showAdvancedHints.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty showAdvancedHintsProperty() {
+<b class="fc">&nbsp;        return showAdvancedHints;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShowAdvancedHints(boolean showAdvancedHints) {
+<b class="nc">&nbsp;        this.showAdvancedHints.set(showAdvancedHints);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldWarnAboutDuplicatesInInspection() {
+<b class="nc">&nbsp;        return warnAboutDuplicatesInInspection.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty warnAboutDuplicatesInInspectionProperty() {
+<b class="fc">&nbsp;        return warnAboutDuplicatesInInspection;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setWarnAboutDuplicatesInInspection(boolean warnAboutDuplicatesInInspection) {
+<b class="nc">&nbsp;        this.warnAboutDuplicatesInInspection.set(warnAboutDuplicatesInInspection);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldConfirmDelete() {
+<b class="nc">&nbsp;        return confirmDelete.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty confirmDeleteProperty() {
+<b class="fc">&nbsp;        return confirmDelete;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setConfirmDelete(boolean confirmDelete) {
+<b class="nc">&nbsp;        this.confirmDelete.set(confirmDelete);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldHideTabBar() {
+<b class="nc">&nbsp;        return confirmHideTabBar.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty hideTabBarProperty() {
+<b class="fc">&nbsp;        return confirmHideTabBar;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setHideTabBar(boolean hideTabBar) {
+<b class="nc">&nbsp;        this.confirmHideTabBar.set(hideTabBar);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;String&gt; getSelectedSlrCatalogs() {
+<b class="fc">&nbsp;        return selectedSlrCatalogs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSelectedSlrCatalogs(List&lt;String&gt; catalogs) {
+<b class="nc">&nbsp;        selectedSlrCatalogs.setAll(catalogs);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

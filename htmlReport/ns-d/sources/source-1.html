@@ -1,0 +1,309 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SummaryComponent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.ai.components.summary</a>
+</div>
+
+<h1>Coverage Summary for Class: SummaryComponent (org.jabref.gui.ai.components.summary)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SummaryComponent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SummaryComponent$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/57)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.ai.components.summary;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponent;
+&nbsp;import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
+&nbsp;import org.jabref.gui.entryeditor.AdaptVisibleTabs;
+&nbsp;import org.jabref.gui.frame.ExternalApplicationsPreferences;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.ai.processingstatus.ProcessingInfo;
+&nbsp;import org.jabref.logic.ai.summarization.Summary;
+&nbsp;import org.jabref.logic.ai.util.CitationKeyCheck;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(SummaryComponent.class);</b>
+&nbsp;
+&nbsp;    private final BibDatabaseContext bibDatabaseContext;
+&nbsp;    private final BibEntry entry;
+&nbsp;    private final CitationKeyGenerator citationKeyGenerator;
+&nbsp;    private final AiService aiService;
+&nbsp;    private final AiPreferences aiPreferences;
+&nbsp;
+&nbsp;    public SummaryComponent(BibDatabaseContext bibDatabaseContext,
+&nbsp;                            BibEntry entry,
+&nbsp;                            AiService aiService,
+&nbsp;                            AiPreferences aiPreferences,
+&nbsp;                            ExternalApplicationsPreferences externalApplicationsPreferences,
+&nbsp;                            CitationKeyPatternPreferences citationKeyPatternPreferences,
+&nbsp;                            DialogService dialogService,
+&nbsp;                            AdaptVisibleTabs adaptVisibleTabs
+&nbsp;    ) {
+<b class="nc">&nbsp;        super(aiPreferences, externalApplicationsPreferences, dialogService, adaptVisibleTabs);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.bibDatabaseContext = bibDatabaseContext;</b>
+<b class="nc">&nbsp;        this.entry = entry;</b>
+<b class="nc">&nbsp;        this.citationKeyGenerator = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences);</b>
+<b class="nc">&nbsp;        this.aiService = aiService;</b>
+<b class="nc">&nbsp;        this.aiPreferences = aiPreferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        aiService.getSummariesService().summarize(entry, bibDatabaseContext).stateProperty().addListener(o -&gt; rebuildUi());</b>
+&nbsp;
+<b class="nc">&nbsp;        rebuildUi();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected Node showPrivacyPolicyGuardedContent() {
+<b class="nc">&nbsp;        if (bibDatabaseContext.getDatabasePath().isEmpty()) {</b>
+<b class="nc">&nbsp;            return showErrorNoDatabasePath();</b>
+<b class="nc">&nbsp;        } else if (entry.getFiles().isEmpty()) {</b>
+<b class="nc">&nbsp;            return showErrorNoFiles();</b>
+<b class="nc">&nbsp;        } else if (entry.getFiles().stream().map(LinkedFile::getLink).map(Path::of).noneMatch(FileUtil::isPDFFile)) {</b>
+<b class="nc">&nbsp;            return showErrorNotPdfs();</b>
+<b class="nc">&nbsp;        } else if (!CitationKeyCheck.citationKeyIsPresentAndUnique(bibDatabaseContext, entry)) {</b>
+<b class="nc">&nbsp;            return tryToGenerateCitationKeyThenBind(entry);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return tryToShowSummary();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node showErrorNoDatabasePath() {
+<b class="nc">&nbsp;        return new ErrorStateComponent(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Unable to generate summary&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;The path of the current library is not set, but it is required for summarization&quot;)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node showErrorNotPdfs() {
+<b class="nc">&nbsp;        return new ErrorStateComponent(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Unable to generate summary&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Only PDF files are supported.&quot;)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node showErrorNoFiles() {
+<b class="nc">&nbsp;        return new ErrorStateComponent(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Unable to generate summary&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Please attach at least one PDF file to enable summarization of PDF file(s).&quot;)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node tryToGenerateCitationKeyThenBind(BibEntry entry) {
+<b class="nc">&nbsp;        if (citationKeyGenerator.generateAndSetKey(entry).isEmpty()) {</b>
+<b class="nc">&nbsp;            return new ErrorStateComponent(</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Unable to generate summary&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Please provide a non-empty and unique citation key for this entry.&quot;)</b>
+&nbsp;            );
+&nbsp;        } else {
+<b class="nc">&nbsp;            return showPrivacyPolicyGuardedContent();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node tryToShowSummary() {
+<b class="nc">&nbsp;        ProcessingInfo&lt;BibEntry, Summary&gt; processingInfo = aiService.getSummariesService().summarize(entry, bibDatabaseContext);</b>
+&nbsp;
+<b class="nc">&nbsp;        return switch (processingInfo.getState()) {</b>
+&nbsp;            case SUCCESS -&gt; {
+<b class="nc">&nbsp;                assert processingInfo.getData().isPresent(); // When the state is SUCCESS, the data must be present.</b>
+<b class="nc">&nbsp;                yield showSummary(processingInfo.getData().get());</b>
+&nbsp;            }
+&nbsp;            case ERROR -&gt;
+<b class="nc">&nbsp;                    showErrorWhileSummarizing(processingInfo);</b>
+&nbsp;            case PROCESSING,
+&nbsp;                 STOPPED -&gt;
+<b class="nc">&nbsp;                    showErrorNotSummarized();</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node showErrorWhileSummarizing(ProcessingInfo&lt;BibEntry, Summary&gt; processingInfo) {
+<b class="nc">&nbsp;        assert processingInfo.getException().isPresent(); // When the state is ERROR, the exception must be present.</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.error(&quot;Got an error while generating a summary for entry {}&quot;, entry.getCitationKey().orElse(&quot;&lt;no citation key&gt;&quot;), processingInfo.getException().get());</b>
+&nbsp;
+<b class="nc">&nbsp;        return ErrorStateComponent.withTextAreaAndButton(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Unable to chat&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Got error while processing the file:&quot;),</b>
+<b class="nc">&nbsp;                processingInfo.getException().get().getLocalizedMessage(),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Regenerate&quot;),</b>
+<b class="nc">&nbsp;                () -&gt; aiService.getSummariesService().regenerateSummary(entry, bibDatabaseContext)</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node showErrorNotSummarized() {
+<b class="nc">&nbsp;        return ErrorStateComponent.withSpinner(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Processing...&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;The attached file(s) are currently being processed by %0. Once completed, you will be able to see the summary.&quot;, aiPreferences.getSelectedChatModel())</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private Node showSummary(Summary summary) {
+<b class="nc">&nbsp;        return new SummaryShowingComponent(summary, () -&gt; {</b>
+<b class="nc">&nbsp;            if (bibDatabaseContext.getDatabasePath().isEmpty()) {</b>
+<b class="nc">&nbsp;                LOGGER.error(&quot;Bib database path is not set, but it was expected to be present. Unable to regenerate summary&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (entry.getCitationKey().isEmpty()) {</b>
+<b class="nc">&nbsp;                LOGGER.error(&quot;Citation key is not set, but it was expected to be present. Unable to regenerate summary&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            aiService.getSummariesService().regenerateSummary(entry, bibDatabaseContext);</b>
+&nbsp;            // No need to rebuildUi(), because this class listens to the state of ProcessingInfo of the summary.
+&nbsp;        });
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

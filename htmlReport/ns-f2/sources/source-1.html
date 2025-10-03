@@ -1,0 +1,595 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibFieldsIndexer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.search.indexing</a>
+</div>
+
+<h1>Coverage Summary for Class: BibFieldsIndexer (org.jabref.logic.search.indexing)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibFieldsIndexer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/171)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.search.indexing;
+&nbsp;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.PreparedStatement;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.HeadlessExecutorService;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryPreferences;
+&nbsp;import org.jabref.model.entry.KeywordList;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldProperty;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.search.PostgreConstants;
+&nbsp;import org.jabref.model.strings.LatexToUnicodeAdapter;
+&nbsp;
+&nbsp;import io.github.thibaultmeyer.cuid.CUID;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import static org.jabref.model.entry.field.InternalField.TYPE_HEADER;
+&nbsp;import static org.jabref.model.search.PostgreConstants.ENTRY_ID;
+&nbsp;import static org.jabref.model.search.PostgreConstants.FIELD_NAME;
+&nbsp;import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_LITERAL;
+&nbsp;import static org.jabref.model.search.PostgreConstants.FIELD_VALUE_TRANSFORMED;
+&nbsp;import static org.jabref.model.search.PostgreConstants.SPLIT_TABLE_SUFFIX;
+&nbsp;
+<b class="nc">&nbsp;public class BibFieldsIndexer {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile(&quot;\s*,\s*&quot;);</b>
+<b class="nc">&nbsp;    private static final Set&lt;Field&gt; DATE_FIELDS = Set.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY);</b>
+&nbsp;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final Connection connection;
+&nbsp;    private final String libraryName;
+&nbsp;    private final String mainTable;
+&nbsp;    private final String schemaMainTableReference;
+&nbsp;    private final String splitValuesTable;
+&nbsp;    private final String schemaSplitValuesTableReference;
+&nbsp;    private final Character keywordSeparator;
+&nbsp;
+<b class="nc">&nbsp;    public BibFieldsIndexer(BibEntryPreferences bibEntryPreferences, BibDatabaseContext databaseContext, Connection connection) {</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.connection = connection;</b>
+<b class="nc">&nbsp;        this.keywordSeparator = bibEntryPreferences.getKeywordSeparator();</b>
+<b class="nc">&nbsp;        this.libraryName = databaseContext.getDatabasePath().map(path -&gt; path.getFileName().toString()).orElse(&quot;unsaved&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.mainTable = CUID.randomCUID2(12).toString();</b>
+<b class="nc">&nbsp;        this.splitValuesTable = mainTable + SPLIT_TABLE_SUFFIX;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.schemaMainTableReference = PostgreConstants.getMainTableSchemaReference(mainTable);</b>
+<b class="nc">&nbsp;        this.schemaSplitValuesTableReference = PostgreConstants.getSplitTableSchemaReference(mainTable);</b>
+&nbsp;        // TODO: Set-up should be in a background task
+<b class="nc">&nbsp;        setup();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a table for the library in the database, and sets up indexes on the columns.
+&nbsp;     */
+&nbsp;    private void setup() {
+&nbsp;        try {
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    CREATE TABLE IF NOT EXISTS %s (
+&nbsp;                        %s TEXT NOT NULL,
+&nbsp;                        %s TEXT NOT NULL,
+&nbsp;                        %s TEXT,
+&nbsp;                        %s TEXT,
+&nbsp;                        PRIMARY KEY (%s, %s)
+&nbsp;                    )
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(</b>
+&nbsp;                    schemaMainTableReference,
+&nbsp;                    ENTRY_ID,
+&nbsp;                    FIELD_NAME,
+&nbsp;                    FIELD_VALUE_LITERAL,
+&nbsp;                    FIELD_VALUE_TRANSFORMED,
+&nbsp;                    ENTRY_ID, FIELD_NAME));
+&nbsp;
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    CREATE TABLE IF NOT EXISTS %s (
+&nbsp;                        %s TEXT NOT NULL,
+&nbsp;                        %s TEXT NOT NULL,
+&nbsp;                        %s TEXT,
+&nbsp;                        %s TEXT
+&nbsp;                    )
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(</b>
+&nbsp;                    schemaSplitValuesTableReference,
+&nbsp;                    ENTRY_ID,
+&nbsp;                    FIELD_NAME,
+&nbsp;                    FIELD_VALUE_LITERAL,
+&nbsp;                    FIELD_VALUE_TRANSFORMED));
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Created tables for library: {}&quot;, libraryName);</b>
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not create tables for library: {}&quot;, libraryName, e);</b>
+&nbsp;        }
+&nbsp;        try {
+&nbsp;            // region btree index on id column
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    CREATE INDEX IF NOT EXISTS &quot;%s_%s_index&quot; ON %s (&quot;%s&quot;)
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(</b>
+&nbsp;                    mainTable, ENTRY_ID,
+&nbsp;                    schemaMainTableReference,
+&nbsp;                    ENTRY_ID));
+&nbsp;
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    CREATE INDEX IF NOT EXISTS &quot;%s_%s_index&quot; ON %s (&quot;%s&quot;)
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(</b>
+&nbsp;                    splitValuesTable, ENTRY_ID,
+&nbsp;                    schemaSplitValuesTableReference,
+&nbsp;                    ENTRY_ID));
+&nbsp;            // endregion
+&nbsp;
+&nbsp;            // region btree index on field name column
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    CREATE INDEX IF NOT EXISTS &quot;%s_%s_index&quot; ON %s (&quot;%s&quot;)
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(</b>
+&nbsp;                    mainTable, FIELD_NAME,
+&nbsp;                    schemaMainTableReference,
+&nbsp;                    FIELD_NAME));
+&nbsp;
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    CREATE INDEX IF NOT EXISTS &quot;%s_%s_index&quot; ON %s (&quot;%s&quot;)
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(</b>
+&nbsp;                    splitValuesTable, FIELD_NAME,
+&nbsp;                    schemaSplitValuesTableReference,
+&nbsp;                    FIELD_NAME));
+&nbsp;            // endregion
+&nbsp;
+&nbsp;            // trigram index on field value column
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    CREATE INDEX IF NOT EXISTS &quot;%s_%s_index&quot; ON %s USING gin (&quot;%s&quot; gin_trgm_ops, &quot;%s&quot; gin_trgm_ops)
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(</b>
+&nbsp;                    mainTable, FIELD_VALUE_LITERAL,
+&nbsp;                    schemaMainTableReference,
+&nbsp;                    FIELD_VALUE_LITERAL, FIELD_VALUE_TRANSFORMED));
+&nbsp;
+&nbsp;            // region btree index on spilt table
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    CREATE INDEX IF NOT EXISTS &quot;%s_%s_index&quot; ON %s (&quot;%s&quot;, &quot;%s&quot;)
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(</b>
+&nbsp;                    splitValuesTable, FIELD_VALUE_LITERAL,
+&nbsp;                    schemaSplitValuesTableReference,
+&nbsp;                    FIELD_VALUE_LITERAL, FIELD_VALUE_TRANSFORMED));
+&nbsp;            // endregion
+&nbsp;
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Created indexes for library: {}&quot;, libraryName);</b>
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not create indexes for library: {}&quot;, libraryName, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void updateOnStart(BackgroundTask&lt;?&gt; task) {
+<b class="nc">&nbsp;        addToIndex(databaseContext.getDatabase().getEntries(), task);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void addToIndex(List&lt;BibEntry&gt; entries, BackgroundTask&lt;?&gt; task) {
+<b class="nc">&nbsp;        int count = entries.size();</b>
+<b class="nc">&nbsp;        if (count &gt; 1) {</b>
+<b class="nc">&nbsp;            task.showToUser(true);</b>
+<b class="nc">&nbsp;            task.setTitle(Localization.lang(&quot;Indexing bib fields for %0&quot;, libraryName));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        long startTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Adding {} entries to index&quot;, count);</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; count; i++) {</b>
+<b class="nc">&nbsp;            if (task.isCancelled()) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Indexing canceled&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            BibEntry entry = entries.get(i);</b>
+<b class="nc">&nbsp;            addToIndex(entry);</b>
+<b class="nc">&nbsp;            task.updateProgress(i, count);</b>
+<b class="nc">&nbsp;            task.updateMessage(Localization.lang(&quot;%0 of %1 entries added to the index.&quot;, i, count));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Added {} entries to index in {} ms&quot;, count, System.currentTimeMillis() - startTime);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addToIndex(BibEntry bibEntry) {
+<b class="nc">&nbsp;        String insertFieldQuery = &quot;&quot;&quot;</b>
+&nbsp;                INSERT INTO %s (&quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;)
+&nbsp;                VALUES (?, ?, ?, ?)
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+&nbsp;                schemaMainTableReference,
+&nbsp;                ENTRY_ID,
+&nbsp;                FIELD_NAME,
+&nbsp;                FIELD_VALUE_LITERAL,
+&nbsp;                FIELD_VALUE_TRANSFORMED);
+&nbsp;
+<b class="nc">&nbsp;        String insertIntoSplitTable = &quot;&quot;&quot;</b>
+&nbsp;                INSERT INTO %s (&quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;)
+&nbsp;                VALUES (?, ?, ?, ?)
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+&nbsp;                schemaSplitValuesTableReference,
+&nbsp;                ENTRY_ID,
+&nbsp;                FIELD_NAME,
+&nbsp;                FIELD_VALUE_LITERAL,
+&nbsp;                FIELD_VALUE_TRANSFORMED);
+&nbsp;
+<b class="nc">&nbsp;        try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery);</b>
+<b class="nc">&nbsp;             PreparedStatement preparedStatementSplitValues = connection.prepareStatement(insertIntoSplitTable)) {</b>
+<b class="nc">&nbsp;            String entryId = bibEntry.getId();</b>
+<b class="nc">&nbsp;            LOGGER.atTrace().setMessage(&quot;Adding entry {}&quot;).addArgument(() -&gt; bibEntry.getKeyAuthorTitleYear()).log();</b>
+<b class="nc">&nbsp;            for (Map.Entry&lt;Field, String&gt; fieldPair : bibEntry.getFieldMap().entrySet()) {</b>
+<b class="nc">&nbsp;                Field field = fieldPair.getKey();</b>
+<b class="nc">&nbsp;                String value = fieldPair.getValue();</b>
+&nbsp;
+&nbsp;                // Skip indexing of date-related fields separately to ensure proper handling later in the process.
+<b class="nc">&nbsp;                if (!DATE_FIELDS.contains(field)) {</b>
+&nbsp;                    // If a field exists, there also exists a resolved field latex free.
+&nbsp;                    // Only exception: If the content of the field is empty, then the resolved field is also empty. Example: `series = {{}}`.
+<b class="nc">&nbsp;                    String resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase()).orElse(&quot;&quot;);</b>
+&nbsp;
+&nbsp;                    // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
+<b class="nc">&nbsp;                    addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                // region Handling of known multi-value fields
+&nbsp;                // split and convert to Unicode
+<b class="nc">&nbsp;                if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {</b>
+<b class="nc">&nbsp;                    addAuthors(value, preparedStatementSplitValues, entryId, field);</b>
+<b class="nc">&nbsp;                } else if (field == StandardField.KEYWORDS) {</b>
+<b class="nc">&nbsp;                    addKeywords(value, preparedStatementSplitValues, entryId, field, keywordSeparator);</b>
+<b class="nc">&nbsp;                } else if (field == StandardField.GROUPS) {</b>
+<b class="nc">&nbsp;                    addGroups(value, preparedStatementSplitValues, entryId, field);</b>
+<b class="nc">&nbsp;                } else if (field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {</b>
+<b class="nc">&nbsp;                    addEntryLinks(bibEntry, field, preparedStatementSplitValues, entryId);</b>
+<b class="nc">&nbsp;                } else if (field == StandardField.FILE) {</b>
+&nbsp;                    // No handling of File, because due to relative paths, we think, there won&#39;t be any exact match operation
+&nbsp;                    // We could add the filename itself (with and without extension). However, the user can also use regular expressions to achieve the same.
+&nbsp;                    // The use case to search for file names seems pretty seldom, therefore we omit it.
+&nbsp;                } else {
+&nbsp;                    // No other multi-value fields are known
+&nbsp;                    // No action needed -&gt; main table has the value
+&nbsp;                }
+&nbsp;                // endregion
+&nbsp;            }
+&nbsp;            // ensure all date-related fields are indexed.
+<b class="nc">&nbsp;            for (Field dateField : DATE_FIELDS) {</b>
+<b class="nc">&nbsp;                Optional&lt;String&gt; resolvedDateValue = bibEntry.getResolvedFieldOrAlias(dateField, this.databaseContext.getDatabase());</b>
+<b class="nc">&nbsp;                resolvedDateValue.ifPresent(dateValue -&gt; addBatch(preparedStatement, entryId, dateField, dateValue));</b>
+&nbsp;            }
+&nbsp;            // add entry type
+<b class="nc">&nbsp;            addBatch(preparedStatement, entryId, TYPE_HEADER, bibEntry.getType().getName());</b>
+&nbsp;
+<b class="nc">&nbsp;            preparedStatement.executeBatch();</b>
+<b class="nc">&nbsp;            preparedStatementSplitValues.executeBatch();</b>
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not add an entry to the index.&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeFromIndex(Collection&lt;BibEntry&gt; entries, BackgroundTask&lt;?&gt; task) {
+<b class="nc">&nbsp;        if (entries.size() &gt; 1) {</b>
+<b class="nc">&nbsp;            task.showToUser(true);</b>
+<b class="nc">&nbsp;            task.setTitle(Localization.lang(&quot;Removing entries from index for %0&quot;, libraryName));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        int i = 1;</b>
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            if (task.isCancelled()) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Removing entries canceled&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            removeFromIndex(entry);</b>
+<b class="nc">&nbsp;            task.updateProgress(i, entries.size());</b>
+<b class="nc">&nbsp;            task.updateMessage(Localization.lang(&quot;%0 of %1 entries removed from the index.&quot;, i, entries.size()));</b>
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeFromIndex(BibEntry entry) {
+&nbsp;        try {
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    DELETE FROM %s
+&nbsp;                    WHERE &quot;%s&quot; = &#39;%s&#39;
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(schemaMainTableReference, ENTRY_ID, entry.getId()));</b>
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    DELETE FROM %s
+&nbsp;                    WHERE &quot;%s&quot; = &#39;%s&#39;
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(schemaSplitValuesTableReference, ENTRY_ID, entry.getId()));</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Entry {} removed from index&quot;, entry.getId());</b>
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error deleting entry from index&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void updateEntry(BibEntry entry, Field field) {
+<b class="nc">&nbsp;        synchronized (entry.getId()) {</b>
+<b class="nc">&nbsp;            removeField(entry, field);</b>
+<b class="nc">&nbsp;            insertField(entry, field);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void insertField(BibEntry entry, Field field) {
+<b class="nc">&nbsp;        String insertFieldQuery = &quot;&quot;&quot;</b>
+&nbsp;                INSERT INTO %s (&quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;)
+&nbsp;                VALUES (?, ?, ?, ?)
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+&nbsp;                schemaMainTableReference,
+&nbsp;                ENTRY_ID,
+&nbsp;                FIELD_NAME,
+&nbsp;                FIELD_VALUE_LITERAL,
+&nbsp;                FIELD_VALUE_TRANSFORMED);
+&nbsp;
+&nbsp;        // Inserts or updates date-related fields (e.g., date, year, month, day) into the index.
+&nbsp;        // If a conflict occurs (e.g., the same ENTRY_ID and FIELD_NAME already exist),
+&nbsp;        // the existing values are overwritten with the new ones to ensure the latest data is stored.
+<b class="nc">&nbsp;        String insertDateFieldQuery = &quot;&quot;&quot;</b>
+&nbsp;                INSERT INTO %s (&quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;)
+&nbsp;                VALUES (?, ?, ?, ?)
+&nbsp;                ON CONFLICT (&quot;%s&quot;, &quot;%s&quot;)
+&nbsp;                DO UPDATE SET &quot;%s&quot; = EXCLUDED.&quot;%s&quot;, &quot;%s&quot; = EXCLUDED.&quot;%s&quot;
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+&nbsp;                schemaMainTableReference,
+&nbsp;                ENTRY_ID,
+&nbsp;                FIELD_NAME,
+&nbsp;                FIELD_VALUE_LITERAL,
+&nbsp;                FIELD_VALUE_TRANSFORMED,
+&nbsp;                ENTRY_ID, FIELD_NAME,
+&nbsp;                FIELD_VALUE_LITERAL, FIELD_VALUE_LITERAL,
+&nbsp;                FIELD_VALUE_TRANSFORMED, FIELD_VALUE_TRANSFORMED);
+&nbsp;
+<b class="nc">&nbsp;        String entryId = entry.getId();</b>
+<b class="nc">&nbsp;        if (DATE_FIELDS.contains(field)) {</b>
+<b class="nc">&nbsp;            try (PreparedStatement preparedStatement = connection.prepareStatement(insertDateFieldQuery)) {</b>
+<b class="nc">&nbsp;                for (Field dateField : DATE_FIELDS) {</b>
+<b class="nc">&nbsp;                    Optional&lt;String&gt; resolvedDateValue = entry.getResolvedFieldOrAlias(dateField, this.databaseContext.getDatabase());</b>
+<b class="nc">&nbsp;                    resolvedDateValue.ifPresent(dateValue -&gt; addBatch(preparedStatement, entryId, dateField, dateValue));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                preparedStatement.executeBatch();</b>
+&nbsp;            } catch (SQLException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Could not add an entry to the index.&quot;, e);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery)) {</b>
+<b class="nc">&nbsp;                String value = entry.getField(field).orElse(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;                Optional&lt;String&gt; resolvedFieldLatexFree = entry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());</b>
+<b class="nc">&nbsp;                assert resolvedFieldLatexFree.isPresent();</b>
+<b class="nc">&nbsp;                addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;                preparedStatement.executeBatch();</b>
+&nbsp;            } catch (SQLException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Could not add an entry to the index.&quot;, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String insertIntoSplitTable = &quot;&quot;&quot;</b>
+&nbsp;                INSERT INTO %s (&quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;, &quot;%s&quot;)
+&nbsp;                VALUES (?, ?, ?, ?)
+<b class="nc">&nbsp;                &quot;&quot;&quot;.formatted(</b>
+&nbsp;                schemaSplitValuesTableReference,
+&nbsp;                ENTRY_ID,
+&nbsp;                FIELD_NAME,
+&nbsp;                FIELD_VALUE_LITERAL,
+&nbsp;                FIELD_VALUE_TRANSFORMED);
+&nbsp;
+<b class="nc">&nbsp;        try (PreparedStatement preparedStatement = connection.prepareStatement(insertIntoSplitTable)) {</b>
+<b class="nc">&nbsp;            String value = entry.getField(field).orElse(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {</b>
+<b class="nc">&nbsp;                addAuthors(value, preparedStatement, entryId, field);</b>
+<b class="nc">&nbsp;            } else if (field == StandardField.KEYWORDS) {</b>
+<b class="nc">&nbsp;                addKeywords(value, preparedStatement, entryId, field, keywordSeparator);</b>
+<b class="nc">&nbsp;            } else if (field == StandardField.GROUPS) {</b>
+<b class="nc">&nbsp;                addGroups(value, preparedStatement, entryId, field);</b>
+<b class="nc">&nbsp;            } else if (field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {</b>
+<b class="nc">&nbsp;                addEntryLinks(entry, field, preparedStatement, entryId);</b>
+<b class="nc">&nbsp;            } else if (field == StandardField.FILE) {</b>
+&nbsp;                // No handling of File, because due to relative paths, we think, there won&#39;t be any exact match operation
+&nbsp;            }
+<b class="nc">&nbsp;            preparedStatement.executeBatch();</b>
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not add an entry to the index.&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeField(BibEntry entry, Field field) {
+&nbsp;        try {
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    DELETE FROM %s
+&nbsp;                    WHERE &quot;%s&quot; = &#39;%s&#39; AND &quot;%s&quot; = &#39;%s&#39;
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(schemaMainTableReference, ENTRY_ID, entry.getId(), FIELD_NAME, field.getName()));</b>
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    DELETE FROM %s
+&nbsp;                    WHERE &quot;%s&quot; = &#39;%s&#39; AND &quot;%s&quot; = &#39;%s&#39;
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(schemaSplitValuesTableReference, ENTRY_ID, entry.getId(), FIELD_NAME, field.getName()));</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Field {} removed from entry {} in index&quot;, field.getName(), entry.getId());</b>
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error deleting field from entry in index&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        HeadlessExecutorService.INSTANCE.execute(this::closeIndex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void closeAndWait() {
+<b class="nc">&nbsp;        HeadlessExecutorService.INSTANCE.executeAndWait(this::closeIndex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void closeIndex() {
+&nbsp;        try {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Closing connection to Postgres server for library: {}&quot;, libraryName);</b>
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    DROP TABLE IF EXISTS %s
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(schemaMainTableReference));</b>
+<b class="nc">&nbsp;            connection.createStatement().executeUpdate(&quot;&quot;&quot;</b>
+&nbsp;                    DROP TABLE IF EXISTS %s
+<b class="nc">&nbsp;                    &quot;&quot;&quot;.formatted(schemaSplitValuesTableReference));</b>
+<b class="nc">&nbsp;            connection.close();</b>
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not drop table for library: {}&quot;, libraryName, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTable() {
+<b class="nc">&nbsp;        return mainTable;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addEntryLinks(BibEntry bibEntry, Field field, PreparedStatement preparedStatementSplitValues, String entryId) {
+<b class="nc">&nbsp;        bibEntry.getEntryLinkList(field, databaseContext.getDatabase()).stream()</b>
+<b class="nc">&nbsp;                .distinct()</b>
+<b class="nc">&nbsp;                .forEach(link -&gt; addBatch(preparedStatementSplitValues, entryId, field, link.getKey()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addGroups(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {
+&nbsp;        // We could use KeywordList, but we are afraid that group names could have &quot;&gt;&quot; in their name, and then they would not be handled correctly
+<b class="nc">&nbsp;        Arrays.stream(GROUPS_SEPARATOR_REGEX.split(value))</b>
+<b class="nc">&nbsp;              .distinct()</b>
+<b class="nc">&nbsp;              .forEach(group -&gt; addBatch(preparedStatementSplitValues, entryId, field, group));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addKeywords(String keywordsString, PreparedStatement preparedStatementSplitValues, String entryId, Field field, Character keywordSeparator) {
+<b class="nc">&nbsp;        KeywordList keywordList = KeywordList.parse(keywordsString, keywordSeparator);</b>
+<b class="nc">&nbsp;        keywordList.stream().flatMap(keyword -&gt; keyword.flatten().stream()).forEach(keyword -&gt; {</b>
+<b class="nc">&nbsp;            String value = keyword.toString();</b>
+<b class="nc">&nbsp;            addBatch(preparedStatementSplitValues, entryId, field, value);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addAuthors(String value, PreparedStatement preparedStatementSplitValues, String entryId, Field field) {
+<b class="nc">&nbsp;        AuthorList.parse(value).getAuthors().forEach(author -&gt; {</b>
+&nbsp;            // Author object does not support literal values
+&nbsp;            // We use the method giving us the most complete information for the literal value;
+<b class="nc">&nbsp;            String literal = author.getGivenFamily(false);</b>
+<b class="nc">&nbsp;            String transformed = author.latexFree().getGivenFamily(false);</b>
+<b class="nc">&nbsp;            addBatch(preparedStatementSplitValues, entryId, field, literal, transformed);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addBatch(PreparedStatement preparedStatement, String entryId, Field field, String value) {
+<b class="nc">&nbsp;        addBatch(preparedStatement, entryId, field, value, LatexToUnicodeAdapter.format(value));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The values are passed as they should be inserted into the database table
+&nbsp;     */
+&nbsp;    private static void addBatch(PreparedStatement preparedStatement, String entryId, Field field, String value, String normalized) {
+&nbsp;        try {
+<b class="nc">&nbsp;            preparedStatement.setString(1, entryId);</b>
+<b class="nc">&nbsp;            preparedStatement.setString(2, field.getName());</b>
+<b class="nc">&nbsp;            preparedStatement.setString(3, value);</b>
+<b class="nc">&nbsp;            preparedStatement.setString(4, normalized);</b>
+<b class="nc">&nbsp;            preparedStatement.addBatch();</b>
+&nbsp;        } catch (SQLException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not add field {} having value {} of entry {} to the index.&quot;, field.getName(), value, entryId, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

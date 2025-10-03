@@ -1,0 +1,689 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MarkdownTextFlow</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: MarkdownTextFlow (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MarkdownTextFlow</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/76)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/99)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MarkdownTextFlow$MarkdownAwareHyperlink</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MarkdownTextFlow$MarkdownAwareText</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">MarkdownTextFlow$MarkdownRenderer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/109)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/146)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/214)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.util.ArrayDeque;
+&nbsp;import java.util.Deque;
+&nbsp;import java.util.StringJoiner;
+&nbsp;
+&nbsp;import javafx.geometry.NodeOrientation;
+&nbsp;import javafx.scene.control.Hyperlink;
+&nbsp;import javafx.scene.layout.Pane;
+&nbsp;import javafx.scene.text.Text;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.edit.OpenBrowserAction;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import com.vladsch.flexmark.ast.BlockQuote;
+&nbsp;import com.vladsch.flexmark.ast.BulletList;
+&nbsp;import com.vladsch.flexmark.ast.BulletListItem;
+&nbsp;import com.vladsch.flexmark.ast.Code;
+&nbsp;import com.vladsch.flexmark.ast.Emphasis;
+&nbsp;import com.vladsch.flexmark.ast.FencedCodeBlock;
+&nbsp;import com.vladsch.flexmark.ast.Heading;
+&nbsp;import com.vladsch.flexmark.ast.HtmlBlock;
+&nbsp;import com.vladsch.flexmark.ast.HtmlInline;
+&nbsp;import com.vladsch.flexmark.ast.IndentedCodeBlock;
+&nbsp;import com.vladsch.flexmark.ast.Link;
+&nbsp;import com.vladsch.flexmark.ast.LinkRef;
+&nbsp;import com.vladsch.flexmark.ast.ListBlock;
+&nbsp;import com.vladsch.flexmark.ast.ListItem;
+&nbsp;import com.vladsch.flexmark.ast.OrderedList;
+&nbsp;import com.vladsch.flexmark.ast.OrderedListItem;
+&nbsp;import com.vladsch.flexmark.ast.Paragraph;
+&nbsp;import com.vladsch.flexmark.ast.StrongEmphasis;
+&nbsp;import com.vladsch.flexmark.html.HtmlRenderer;
+&nbsp;import com.vladsch.flexmark.parser.Parser;
+&nbsp;import com.vladsch.flexmark.util.ast.DelimitedNode;
+&nbsp;import com.vladsch.flexmark.util.ast.Document;
+&nbsp;import com.vladsch.flexmark.util.ast.Node;
+&nbsp;import com.vladsch.flexmark.util.ast.NodeVisitor;
+&nbsp;import com.vladsch.flexmark.util.ast.VisitHandler;
+&nbsp;import com.vladsch.flexmark.util.data.MutableDataSet;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;
+&nbsp;public class MarkdownTextFlow extends SelectableTextFlow {
+&nbsp;    private static final String BULLET_LIST_PATTERN = &quot;^\\s*[-*•]\\s+$&quot;;
+&nbsp;    private static final String NUMBERED_LIST_PATTERN = &quot;^\\s*\\d+\\.\\s+$&quot;;
+&nbsp;    private static final String UNICODE_BULLET = &quot;\u2022&quot;;
+&nbsp;    private static final String BLOCKQUOTE_MARKER = &quot;&gt; &quot;;
+&nbsp;
+&nbsp;    private final Parser parser;
+&nbsp;    private final HtmlRenderer htmlRenderer;
+&nbsp;
+&nbsp;    public MarkdownTextFlow(Pane parent) {
+<b class="nc">&nbsp;        super(parent);</b>
+<b class="nc">&nbsp;        this.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);</b>
+<b class="nc">&nbsp;        this.getStyleClass().add(&quot;markdown-textflow&quot;);</b>
+<b class="nc">&nbsp;        MutableDataSet options = new MutableDataSet();</b>
+<b class="nc">&nbsp;        this.parser = Parser.builder(options).build();</b>
+<b class="nc">&nbsp;        this.htmlRenderer = HtmlRenderer.builder(options).build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMarkdown(@NonNull String markdownText) {
+<b class="nc">&nbsp;        super.clearSelection();</b>
+<b class="nc">&nbsp;        getChildren().clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (markdownText.trim().isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MarkdownRenderer renderer = new MarkdownRenderer();</b>
+<b class="nc">&nbsp;        renderer.render(parser.parse(markdownText));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addTextNode(@Nullable String content, Node astNode, String... styleClasses) {
+<b class="nc">&nbsp;        if (content == null || content.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MarkdownAwareText textNode = new MarkdownAwareText(content, astNode);</b>
+<b class="nc">&nbsp;        if (styleClasses != null) {</b>
+<b class="nc">&nbsp;            for (String styleClass : styleClasses) {</b>
+<b class="nc">&nbsp;                if (styleClass != null &amp;&amp; !styleClass.isEmpty()) {</b>
+<b class="nc">&nbsp;                    textNode.getStyleClass().add(styleClass);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        getChildren().add(textNode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addHyperlinkNode(String text, String url, Node astNode, String... styleClasses) {
+<b class="nc">&nbsp;        if (text == null || text.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        MarkdownAwareHyperlink hyperlink = new MarkdownAwareHyperlink(text, astNode);</b>
+<b class="nc">&nbsp;        hyperlink.setOnAction(_ -&gt; new OpenBrowserAction(</b>
+&nbsp;                url,
+<b class="nc">&nbsp;                Injector.instantiateModelOrService(DialogService.class),</b>
+<b class="nc">&nbsp;                Injector.instantiateModelOrService(GuiPreferences.class)</b>
+<b class="nc">&nbsp;                        .getExternalApplicationsPreferences()).execute()</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (styleClasses != null) {</b>
+<b class="nc">&nbsp;            for (String styleClass : styleClasses) {</b>
+<b class="nc">&nbsp;                if (styleClass != null &amp;&amp; !styleClass.isEmpty()) {</b>
+<b class="nc">&nbsp;                    hyperlink.getStyleClass().add(styleClass);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        hyperlink.getStyleClass().add(&quot;markdown-link&quot;);</b>
+<b class="nc">&nbsp;        getChildren().add(hyperlink);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void copySelectedText() {
+<b class="nc">&nbsp;        if (!isSelectionActive()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int selStart = getSelectionStartIndex();</b>
+<b class="nc">&nbsp;        int selEnd = getSelectionEndIndex();</b>
+&nbsp;
+<b class="nc">&nbsp;        StringJoiner result = new StringJoiner(&quot;&quot;);</b>
+<b class="nc">&nbsp;        int currentPos = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (javafx.scene.Node fxNode : getChildren()) {</b>
+&nbsp;            String renderedText;
+&nbsp;            String markdownText;
+&nbsp;            Node astNode;
+&nbsp;
+<b class="nc">&nbsp;            if (fxNode instanceof MarkdownAwareText mat) {</b>
+<b class="nc">&nbsp;                renderedText = mat.getText();</b>
+<b class="nc">&nbsp;                astNode = mat.astNode;</b>
+<b class="nc">&nbsp;                markdownText = getMarkdownRepresentation(astNode, renderedText);</b>
+<b class="nc">&nbsp;            } else if (fxNode instanceof MarkdownAwareHyperlink mah) {</b>
+<b class="nc">&nbsp;                renderedText = mah.getText();</b>
+<b class="nc">&nbsp;                astNode = mah.astNode;</b>
+<b class="nc">&nbsp;                markdownText = getMarkdownRepresentation(astNode, renderedText);</b>
+&nbsp;            } else {
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            int segmentStart = currentPos;</b>
+<b class="nc">&nbsp;            int segmentEnd = currentPos + renderedText.length();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (segmentEnd &lt;= selStart || segmentStart &gt;= selEnd) {</b>
+<b class="nc">&nbsp;                currentPos = segmentEnd;</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            int overlapStart = Math.max(segmentStart, selStart);</b>
+<b class="nc">&nbsp;            int overlapEnd = Math.min(segmentEnd, selEnd);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (overlapStart &lt; overlapEnd) {</b>
+<b class="nc">&nbsp;                int startInSegment = overlapStart - segmentStart;</b>
+<b class="nc">&nbsp;                int endInSegment = overlapEnd - segmentStart;</b>
+&nbsp;
+<b class="nc">&nbsp;                if (startInSegment == 0 &amp;&amp; endInSegment == renderedText.length()) {</b>
+<b class="nc">&nbsp;                    result.add(markdownText);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    String partialText = renderedText.substring(startInSegment, endInSegment);</b>
+<b class="nc">&nbsp;                    if (astNode instanceof DelimitedNode delimitedNode) {</b>
+&nbsp;                        // e.g., select &quot;llo&quot; inside &quot;*hello*&quot; would return &quot;*llo*&quot;
+<b class="nc">&nbsp;                        partialText = delimitedNode.getOpeningMarker() + partialText + delimitedNode.getClosingMarker();</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    result.add(partialText);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            currentPos = segmentEnd;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (result.length() == 0) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);</b>
+<b class="nc">&nbsp;        clipBoardManager.setHtmlContent(htmlRenderer.render(parser.parse(result.toString())), result.toString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getMarkdownRepresentation(Node astNode, String renderedText) {
+<b class="nc">&nbsp;        if (&quot;\n&quot;.equals(renderedText) || &quot;\n\n&quot;.equals(renderedText)) {</b>
+<b class="nc">&nbsp;            return renderedText;</b>
+<b class="nc">&nbsp;        } else if (astNode instanceof Heading heading) {</b>
+<b class="nc">&nbsp;            return &quot;#&quot;.repeat(heading.getLevel()) + &quot; &quot; + heading.getText().toString().trim();</b>
+<b class="nc">&nbsp;        } else if (astNode instanceof Code) {</b>
+<b class="nc">&nbsp;            return &quot;`&quot; + astNode.getChildChars() + &quot;`&quot;;</b>
+<b class="nc">&nbsp;        } else if (astNode instanceof Emphasis) {</b>
+<b class="nc">&nbsp;            return &quot;*&quot; + astNode.getChildChars() + &quot;*&quot;;</b>
+<b class="nc">&nbsp;        } else if (astNode instanceof StrongEmphasis) {</b>
+<b class="nc">&nbsp;            return &quot;**&quot; + astNode.getChildChars() + &quot;**&quot;;</b>
+<b class="nc">&nbsp;        } else if (astNode instanceof Link link) {</b>
+<b class="nc">&nbsp;            String linkText = link.getText().toString();</b>
+<b class="nc">&nbsp;            String url = link.getUrl().toString();</b>
+<b class="nc">&nbsp;            String title = link.getTitle().toString();</b>
+<b class="nc">&nbsp;            if (title.isEmpty()) {</b>
+<b class="nc">&nbsp;                return &quot;[&quot; + linkText + &quot;](&quot; + url + &quot;)&quot;;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return &quot;[&quot; + linkText + &quot;](&quot; + url + &quot; \&quot;&quot; + title + &quot;\&quot;)&quot;;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (astNode instanceof LinkRef linkRef) {</b>
+<b class="nc">&nbsp;            String linkText = linkRef.getText().toString();</b>
+<b class="nc">&nbsp;            String reference = linkRef.getReference().toString();</b>
+<b class="nc">&nbsp;            return &quot;[&quot; + linkText + &quot;][&quot; + reference + &quot;]&quot;;</b>
+<b class="nc">&nbsp;        } else if (astNode instanceof FencedCodeBlock fencedCodeBlock) {</b>
+<b class="nc">&nbsp;            String info = fencedCodeBlock.getInfo().toString();</b>
+<b class="nc">&nbsp;            String openingFence = fencedCodeBlock.getOpeningFence().toString();</b>
+<b class="nc">&nbsp;            String closingFence = fencedCodeBlock.getClosingFence().toString();</b>
+&nbsp;            // NOTE: Hack. Flexmark always add \n at beginning, \n\n at end.
+<b class="nc">&nbsp;            String content = fencedCodeBlock.getContentChars().toString();</b>
+<b class="nc">&nbsp;            return openingFence + info + content.substring(0, content.length() - 1) + closingFence;</b>
+<b class="nc">&nbsp;        } else if (astNode instanceof IndentedCodeBlock) {</b>
+<b class="nc">&nbsp;            return astNode.getChars().toString();</b>
+<b class="nc">&nbsp;        } else if (astNode instanceof BlockQuote) {</b>
+<b class="nc">&nbsp;            return renderedText;</b>
+<b class="nc">&nbsp;        } else if (renderedText.matches(BULLET_LIST_PATTERN)) {</b>
+<b class="nc">&nbsp;            return renderedText.replace(UNICODE_BULLET, &quot;-&quot;);</b>
+<b class="nc">&nbsp;        } else if (renderedText.matches(NUMBERED_LIST_PATTERN)) {</b>
+<b class="nc">&nbsp;            return renderedText;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return renderedText;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private class MarkdownRenderer {
+&nbsp;        private final NodeVisitor visitor;
+<b class="nc">&nbsp;        private final Deque&lt;Integer&gt; orderedListCounters = new ArrayDeque&lt;&gt;();</b>
+<b class="nc">&nbsp;        private int listIndentationLevel = 0;</b>
+<b class="nc">&nbsp;        private boolean isFirstBlockElement = true;</b>
+<b class="nc">&nbsp;        private Node previousBlock = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        MarkdownRenderer() {</b>
+<b class="nc">&nbsp;            visitor = new NodeVisitor(</b>
+&nbsp;                    new VisitHandler&lt;&gt;(Document.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(Heading.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(Paragraph.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(com.vladsch.flexmark.ast.Text.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(Emphasis.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(StrongEmphasis.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(Code.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(Link.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(FencedCodeBlock.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(IndentedCodeBlock.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(BulletList.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(OrderedList.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(BulletListItem.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(OrderedListItem.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(BlockQuote.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(HtmlInline.class, this::visit),
+&nbsp;                    new VisitHandler&lt;&gt;(HtmlBlock.class, this::visit)
+&nbsp;            );
+&nbsp;        }
+&nbsp;
+&nbsp;        void render(Node node) {
+<b class="nc">&nbsp;            visitor.visit(node);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(Document document) {
+<b class="nc">&nbsp;            for (Node child : document.getChildren()) {</b>
+<b class="nc">&nbsp;                visitor.visit(child);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(Heading heading) {
+<b class="nc">&nbsp;            addNewlinesBetweenBlocks(heading);</b>
+<b class="nc">&nbsp;            String text = heading.getText().toString();</b>
+<b class="nc">&nbsp;            addTextNode(text, heading, &quot;markdown-h&quot; + heading.getLevel());</b>
+<b class="nc">&nbsp;            previousBlock = heading;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(Paragraph paragraph) {
+<b class="nc">&nbsp;            boolean isInListItem = isInsideListItem(paragraph);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!isInListItem) {</b>
+<b class="nc">&nbsp;                addNewlinesBetweenBlocks(paragraph);</b>
+<b class="nc">&nbsp;            } else if (paragraph.getPrevious() instanceof Paragraph) {</b>
+<b class="nc">&nbsp;                addTextNode(&quot;\n&quot;, paragraph);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            for (Node child : paragraph.getChildren()) {</b>
+<b class="nc">&nbsp;                visitor.visit(child);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (!isInListItem) {</b>
+<b class="nc">&nbsp;                previousBlock = paragraph;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(com.vladsch.flexmark.ast.Text text) {
+<b class="nc">&nbsp;            addTextNode(text.getChars().toString(), text);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(Emphasis emphasis) {
+<b class="nc">&nbsp;            addTextNode(emphasis.getText().toString(), emphasis, &quot;markdown-italic&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(StrongEmphasis strong) {
+<b class="nc">&nbsp;            addTextNode(strong.getText().toString(), strong, &quot;markdown-bold&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(Code code) {
+<b class="nc">&nbsp;            addTextNode(code.getText().toString(), code, &quot;markdown-code&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(Link link) {
+<b class="nc">&nbsp;            String text = link.getText().toString();</b>
+<b class="nc">&nbsp;            String url = link.getUrl().toString();</b>
+<b class="nc">&nbsp;            addHyperlinkNode(text, url, link);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(FencedCodeBlock codeBlock) {
+<b class="nc">&nbsp;            addNewlinesBetweenBlocks(codeBlock);</b>
+<b class="nc">&nbsp;            String content = codeBlock.getContentChars().toString();</b>
+&nbsp;            /*
+&nbsp;             * NOTE: Flexmark always append \n at the beginning and \n\n at the end.
+&nbsp;             * For example, ```java
+&nbsp;             * public class HelloWorld { ... }
+&nbsp;             * ``` -&gt; contains content `\npublic class HelloWorld { ... }\n\n`
+&nbsp;             * Therefore, we need to remove the first and last characters.
+&nbsp;             */
+<b class="nc">&nbsp;            String processedContent = content;</b>
+<b class="nc">&nbsp;            if (content.length() &gt;= 3 &amp;&amp; content.startsWith(&quot;\n&quot;) &amp;&amp; content.endsWith(&quot;\n\n&quot;)) {</b>
+<b class="nc">&nbsp;                processedContent = content.substring(1, content.length() - 2);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            addTextNode(processedContent, codeBlock, &quot;markdown-code-block&quot;);</b>
+<b class="nc">&nbsp;            previousBlock = codeBlock;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(IndentedCodeBlock codeBlock) {
+<b class="nc">&nbsp;            addNewlinesBetweenBlocks(codeBlock);</b>
+<b class="nc">&nbsp;            String content = codeBlock.getContentChars().toString();</b>
+&nbsp;            // NOTE: Similar to FencedCodeBlock, Flexmark always appends \n at the beginning and \n\n at the end.
+<b class="nc">&nbsp;            String processedContent = content;</b>
+<b class="nc">&nbsp;            if (content.length() &gt;= 3 &amp;&amp; content.startsWith(&quot;\n&quot;) &amp;&amp; content.endsWith(&quot;\n\n&quot;)) {</b>
+<b class="nc">&nbsp;                processedContent = content.substring(1, content.length() - 2);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            addTextNode(processedContent, codeBlock, &quot;markdown-code-block&quot;);</b>
+<b class="nc">&nbsp;            previousBlock = codeBlock;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(BulletList list) {
+<b class="nc">&nbsp;            addNewlinesBetweenBlocks(list);</b>
+<b class="nc">&nbsp;            listIndentationLevel++;</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Node child : list.getChildren()) {</b>
+<b class="nc">&nbsp;                visitor.visit(child);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            listIndentationLevel--;</b>
+<b class="nc">&nbsp;            if (listIndentationLevel == 0) {</b>
+<b class="nc">&nbsp;                previousBlock = list;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(OrderedList list) {
+<b class="nc">&nbsp;            addNewlinesBetweenBlocks(list);</b>
+<b class="nc">&nbsp;            orderedListCounters.push(list.getStartNumber() - 1);</b>
+<b class="nc">&nbsp;            listIndentationLevel++;</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Node child : list.getChildren()) {</b>
+<b class="nc">&nbsp;                visitor.visit(child);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            listIndentationLevel--;</b>
+<b class="nc">&nbsp;            orderedListCounters.pop();</b>
+<b class="nc">&nbsp;            if (listIndentationLevel == 0) {</b>
+<b class="nc">&nbsp;                previousBlock = list;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(BulletListItem item) {
+<b class="nc">&nbsp;            if (item.getPrevious() != null) {</b>
+<b class="nc">&nbsp;                addTextNode(&quot;\n&quot;, item);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String indent = &quot;  &quot;.repeat(Math.max(0, listIndentationLevel - 1));</b>
+<b class="nc">&nbsp;            addTextNode(indent + &quot;• &quot;, item, &quot;markdown-list-bullet&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Node child : item.getChildren()) {</b>
+<b class="nc">&nbsp;                visitor.visit(child);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(OrderedListItem item) {
+<b class="nc">&nbsp;            if (item.getPrevious() != null) {</b>
+<b class="nc">&nbsp;                addTextNode(&quot;\n&quot;, item);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            int number = orderedListCounters.pop() + 1;</b>
+<b class="nc">&nbsp;            orderedListCounters.push(number);</b>
+&nbsp;
+<b class="nc">&nbsp;            String indent = &quot;  &quot;.repeat(Math.max(0, listIndentationLevel - 1));</b>
+<b class="nc">&nbsp;            addTextNode(indent + number + &quot;. &quot;, item, &quot;markdown-list-number&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Node child : item.getChildren()) {</b>
+<b class="nc">&nbsp;                visitor.visit(child);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(BlockQuote quote) {
+<b class="nc">&nbsp;            addNewlinesBetweenBlocks(quote);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Node child : quote.getChildren()) {</b>
+<b class="nc">&nbsp;                if (child instanceof Paragraph) {</b>
+<b class="nc">&nbsp;                    processQuoteParagraph(quote, child);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    addTextNode(BLOCKQUOTE_MARKER, quote, &quot;markdown-blockquote-marker&quot;);</b>
+<b class="nc">&nbsp;                    visitor.visit(child);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            previousBlock = quote;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(HtmlInline html) {
+<b class="nc">&nbsp;            addTextNode(html.getChars().toString(), html, &quot;markdown-code&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void visit(HtmlBlock html) {
+<b class="nc">&nbsp;            addNewlinesBetweenBlocks(html);</b>
+<b class="nc">&nbsp;            addTextNode(html.getChars().toString(), html, &quot;markdown-code-block&quot;);</b>
+<b class="nc">&nbsp;            previousBlock = html;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void processQuoteParagraph(BlockQuote quote, Node child) {
+<b class="nc">&nbsp;            String text = child.getChildChars().toString();</b>
+<b class="nc">&nbsp;            String[] lines = text.split(&quot;\n&quot;, -1);</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; lines.length; i++) {</b>
+<b class="nc">&nbsp;                if (i &gt; 0) {</b>
+<b class="nc">&nbsp;                    addTextNode(&quot;\n&quot;, quote);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                addTextNode(BLOCKQUOTE_MARKER, quote, &quot;markdown-blockquote-marker&quot;);</b>
+<b class="nc">&nbsp;                addTextNode(lines[i], child, &quot;markdown-blockquote&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private boolean isInsideListItem(Node node) {
+<b class="nc">&nbsp;            Node parent = node.getParent();</b>
+<b class="nc">&nbsp;            while (parent != null) {</b>
+<b class="nc">&nbsp;                if (parent instanceof ListItem) {</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                parent = parent.getParent();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private void addNewlinesBetweenBlocks(Node currentBlock) {
+<b class="nc">&nbsp;            if (isFirstBlockElement) {</b>
+<b class="nc">&nbsp;                isFirstBlockElement = false;</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            int newlineCount = 1;</b>
+&nbsp;
+<b class="nc">&nbsp;            if (previousBlock instanceof Heading || currentBlock instanceof Heading) {</b>
+<b class="nc">&nbsp;                newlineCount = 2;</b>
+<b class="nc">&nbsp;            } else if (previousBlock instanceof Paragraph) {</b>
+<b class="nc">&nbsp;                newlineCount = 2;</b>
+<b class="nc">&nbsp;            } else if (currentBlock instanceof ListBlock &amp;&amp; listIndentationLevel == 0) {</b>
+<b class="nc">&nbsp;                newlineCount = 2;</b>
+<b class="nc">&nbsp;            } else if (previousBlock instanceof FencedCodeBlock || previousBlock instanceof IndentedCodeBlock ||</b>
+&nbsp;                    currentBlock instanceof FencedCodeBlock || currentBlock instanceof IndentedCodeBlock) {
+<b class="nc">&nbsp;                newlineCount = 2;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            addTextNode(&quot;\n&quot;.repeat(newlineCount), currentBlock);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class MarkdownAwareText extends Text {
+&nbsp;        private final Node astNode;
+&nbsp;
+&nbsp;        public MarkdownAwareText(String text, Node astNode) {
+<b class="nc">&nbsp;            super(text);</b>
+<b class="nc">&nbsp;            this.astNode = astNode;</b>
+<b class="nc">&nbsp;            setUserData(astNode);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static class MarkdownAwareHyperlink extends Hyperlink {
+&nbsp;        private final Node astNode;
+&nbsp;
+&nbsp;        public MarkdownAwareHyperlink(String text, Node astNode) {
+<b class="nc">&nbsp;            super(text);</b>
+<b class="nc">&nbsp;            this.astNode = astNode;</b>
+<b class="nc">&nbsp;            setUserData(astNode);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

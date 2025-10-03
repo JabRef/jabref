@@ -1,0 +1,395 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FilePreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic</a>
+</div>
+
+<h1>Coverage Summary for Class: FilePreferences (org.jabref.logic)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FilePreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    34.6%
+  </span>
+  <span class="absValue">
+    (18/52)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    59.1%
+  </span>
+  <span class="absValue">
+    (52/88)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;/**
+&nbsp; * Preferences for the linked files
+&nbsp; */
+&nbsp;public class FilePreferences {
+&nbsp;
+<b class="fc">&nbsp;    public static final String[] DEFAULT_FILENAME_PATTERNS = new String[] {&quot;[bibtexkey]&quot;, &quot;[bibtexkey] - [title]&quot;};</b>
+&nbsp;
+<b class="fc">&nbsp;    private final StringProperty userAndHost = new SimpleStringProperty();</b>
+<b class="fc">&nbsp;    private final SimpleStringProperty mainFileDirectory = new SimpleStringProperty();</b>
+<b class="fc">&nbsp;    private final BooleanProperty storeFilesRelativeToBibFile = new SimpleBooleanProperty();</b>
+<b class="fc">&nbsp;    private final BooleanProperty autoRenameFilesOnChange = new SimpleBooleanProperty();</b>
+<b class="fc">&nbsp;    private final StringProperty fileNamePattern = new SimpleStringProperty();</b>
+<b class="fc">&nbsp;    private final StringProperty fileDirectoryPattern = new SimpleStringProperty();</b>
+<b class="fc">&nbsp;    private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();</b>
+<b class="fc">&nbsp;    private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();</b>
+<b class="fc">&nbsp;    private final ObjectProperty&lt;Path&gt; workingDirectory = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final BooleanProperty createBackup = new SimpleBooleanProperty();</b>
+<b class="fc">&nbsp;    private final ObjectProperty&lt;Path&gt; backupDirectory = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();</b>
+<b class="fc">&nbsp;    private final BooleanProperty moveToTrash = new SimpleBooleanProperty();</b>
+<b class="fc">&nbsp;    private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();</b>
+<b class="fc">&nbsp;    private final ObjectProperty&lt;Path&gt; lastUsedDirectory = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="fc">&nbsp;    private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty();</b>
+<b class="fc">&nbsp;    private final BooleanProperty openFileExplorerInLastUsedDirectory = new SimpleBooleanProperty();</b>
+&nbsp;
+&nbsp;    public FilePreferences(String userAndHost,
+&nbsp;                           String mainFileDirectory,
+&nbsp;                           boolean storeFilesRelativeToBibFile,
+&nbsp;                           boolean autoRenameFilesOnChange,
+&nbsp;                           String fileNamePattern,
+&nbsp;                           String fileDirectoryPattern,
+&nbsp;                           boolean downloadLinkedFiles,
+&nbsp;                           boolean fulltextIndexLinkedFiles,
+&nbsp;                           Path workingDirectory,
+&nbsp;                           boolean createBackup,
+&nbsp;                           Path backupDirectory,
+&nbsp;                           boolean confirmDeleteLinkedFile,
+&nbsp;                           boolean moveToTrash,
+&nbsp;                           boolean shouldKeepDownloadUrl,
+&nbsp;                           Path lastUsedDirectory,
+&nbsp;                           boolean openFileExplorerInFileDirectory,
+<b class="fc">&nbsp;                           boolean openFileExplorerInLastUsedDirectory) {</b>
+<b class="fc">&nbsp;        this.userAndHost.setValue(userAndHost);</b>
+<b class="fc">&nbsp;        this.mainFileDirectory.setValue(mainFileDirectory);</b>
+<b class="fc">&nbsp;        this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);</b>
+<b class="fc">&nbsp;        this.autoRenameFilesOnChange.setValue(autoRenameFilesOnChange);</b>
+<b class="fc">&nbsp;        this.fileNamePattern.setValue(fileNamePattern);</b>
+<b class="fc">&nbsp;        this.fileDirectoryPattern.setValue(fileDirectoryPattern);</b>
+<b class="fc">&nbsp;        this.downloadLinkedFiles.setValue(downloadLinkedFiles);</b>
+<b class="fc">&nbsp;        this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);</b>
+<b class="fc">&nbsp;        this.workingDirectory.setValue(workingDirectory);</b>
+<b class="fc">&nbsp;        this.createBackup.setValue(createBackup);</b>
+<b class="fc">&nbsp;        this.backupDirectory.setValue(backupDirectory);</b>
+<b class="fc">&nbsp;        this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);</b>
+<b class="fc">&nbsp;        this.moveToTrash.setValue(moveToTrash);</b>
+<b class="fc">&nbsp;        this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);</b>
+<b class="fc">&nbsp;        this.lastUsedDirectory.setValue(lastUsedDirectory);</b>
+<b class="fc">&nbsp;        this.openFileExplorerInFileDirectory.set(openFileExplorerInFileDirectory);</b>
+<b class="fc">&nbsp;        this.openFileExplorerInLastUsedDirectory.set(openFileExplorerInLastUsedDirectory);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getUserAndHost() {
+<b class="nc">&nbsp;        return userAndHost.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty getUserAndHostProperty() {
+<b class="nc">&nbsp;        return userAndHost;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;Path&gt; getMainFileDirectory() {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(mainFileDirectory.getValue())) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.of(Path.of(mainFileDirectory.getValue()));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty mainFileDirectoryProperty() {
+<b class="fc">&nbsp;        return mainFileDirectory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMainFileDirectory(String mainFileDirectory) {
+<b class="nc">&nbsp;        this.mainFileDirectory.set(mainFileDirectory);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldStoreFilesRelativeToBibFile() {
+<b class="nc">&nbsp;        return storeFilesRelativeToBibFile.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty storeFilesRelativeToBibFileProperty() {
+<b class="fc">&nbsp;        return storeFilesRelativeToBibFile;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setStoreFilesRelativeToBibFile(boolean shouldStoreFilesRelativeToBibFile) {
+<b class="nc">&nbsp;        this.storeFilesRelativeToBibFile.set(shouldStoreFilesRelativeToBibFile);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldAutoRenameFilesOnChange() {
+<b class="nc">&nbsp;        return autoRenameFilesOnChange.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty autoRenameFilesOnChangeProperty() {
+<b class="fc">&nbsp;        return autoRenameFilesOnChange;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAutoRenameFilesOnChange(boolean autoRenameFilesOnChange) {
+<b class="nc">&nbsp;        this.autoRenameFilesOnChange.set(autoRenameFilesOnChange);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFileNamePattern() {
+<b class="nc">&nbsp;        return fileNamePattern.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty fileNamePatternProperty() {
+<b class="fc">&nbsp;        return fileNamePattern;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFileNamePattern(String fileNamePattern) {
+<b class="nc">&nbsp;        this.fileNamePattern.set(fileNamePattern);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getFileDirectoryPattern() {
+<b class="nc">&nbsp;        return fileDirectoryPattern.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty fileDirectoryPatternProperty() {
+<b class="fc">&nbsp;        return fileDirectoryPattern;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFileDirectoryPattern(String fileDirectoryPattern) {
+<b class="nc">&nbsp;        this.fileDirectoryPattern.set(fileDirectoryPattern);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldDownloadLinkedFiles() {
+<b class="nc">&nbsp;        return downloadLinkedFiles.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty downloadLinkedFilesProperty() {
+<b class="fc">&nbsp;        return downloadLinkedFiles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDownloadLinkedFiles(boolean shouldDownloadLinkedFiles) {
+<b class="nc">&nbsp;        this.downloadLinkedFiles.set(shouldDownloadLinkedFiles);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldFulltextIndexLinkedFiles() {
+<b class="nc">&nbsp;        return fulltextIndexLinkedFiles.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty fulltextIndexLinkedFilesProperty() {
+<b class="fc">&nbsp;        return fulltextIndexLinkedFiles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFulltextIndexLinkedFiles(boolean shouldFulltextIndexLinkedFiles) {
+<b class="nc">&nbsp;        this.fulltextIndexLinkedFiles.set(shouldFulltextIndexLinkedFiles);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Path getWorkingDirectory() {
+<b class="nc">&nbsp;        return workingDirectory.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Path&gt; workingDirectoryProperty() {
+<b class="fc">&nbsp;        return workingDirectory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setWorkingDirectory(Path workingDirectory) {
+<b class="nc">&nbsp;        this.workingDirectory.set(workingDirectory);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCreateBackup(boolean createBackup) {
+<b class="nc">&nbsp;        this.createBackup.set(createBackup);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldCreateBackup() {
+<b class="nc">&nbsp;        return this.createBackup.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty createBackupProperty() {
+<b class="fc">&nbsp;        return this.createBackup;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Path&gt; backupDirectoryProperty() {
+<b class="fc">&nbsp;        return this.backupDirectory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setBackupDirectory(Path backupPath) {
+<b class="nc">&nbsp;        this.backupDirectory.set(backupPath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Path getBackupDirectory() {
+<b class="nc">&nbsp;        return this.backupDirectory.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean confirmDeleteLinkedFile() {
+<b class="nc">&nbsp;        return confirmDeleteLinkedFile.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty confirmDeleteLinkedFileProperty() {
+<b class="fc">&nbsp;        return confirmDeleteLinkedFile;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void confirmDeleteLinkedFile(boolean confirmLinkedFileDelete) {
+<b class="nc">&nbsp;        this.confirmDeleteLinkedFile.set(confirmLinkedFileDelete);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean moveToTrash() {
+<b class="nc">&nbsp;        return moveToTrash.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty moveToTrashProperty() {
+<b class="fc">&nbsp;        return moveToTrash;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void moveToTrash(boolean moveToTrash) {
+<b class="nc">&nbsp;        this.moveToTrash.set(moveToTrash);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldKeepDownloadUrl() {
+<b class="nc">&nbsp;        return shouldKeepDownloadUrl.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty shouldKeepDownloadUrlProperty() {
+<b class="fc">&nbsp;        return shouldKeepDownloadUrl;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setKeepDownloadUrl(boolean shouldKeepDownloadUrl) {
+<b class="nc">&nbsp;        this.shouldKeepDownloadUrl.set(shouldKeepDownloadUrl);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Path getLastUsedDirectory() {
+<b class="nc">&nbsp;        return lastUsedDirectory.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Path&gt; lastUsedDirectoryProperty() {
+<b class="fc">&nbsp;        return lastUsedDirectory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLastUsedDirectory(Path lastUsedDirectory) {
+<b class="nc">&nbsp;        this.lastUsedDirectory.set(lastUsedDirectory);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldOpenFileExplorerInFileDirectory() {
+<b class="nc">&nbsp;        return openFileExplorerInFileDirectory.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty openFileExplorerInFileDirectoryProperty() {
+<b class="fc">&nbsp;        return openFileExplorerInFileDirectory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setOpenFileExplorerInFileDirectory(boolean value) {
+<b class="nc">&nbsp;        this.openFileExplorerInFileDirectory.set(value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldOpenFileExplorerInLastUsedDirectory() {
+<b class="nc">&nbsp;        return openFileExplorerInLastUsedDirectory.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty openFileExplorerInLastUsedDirectoryProperty() {
+<b class="fc">&nbsp;        return openFileExplorerInLastUsedDirectory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setOpenFileExplorerInLastUsedDirectory(boolean value) {
+<b class="nc">&nbsp;        this.openFileExplorerInLastUsedDirectory.set(value);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

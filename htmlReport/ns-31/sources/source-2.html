@@ -1,0 +1,244 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ErrorConsoleViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.errorconsole</a>
+</div>
+
+<h1>Coverage Summary for Class: ErrorConsoleViewModel (org.jabref.gui.errorconsole)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ErrorConsoleViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.errorconsole;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ReadOnlyListWrapper;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.gui.AbstractViewModel;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.desktop.os.NativeDesktop;
+&nbsp;import org.jabref.gui.logging.LogMessages;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.util.BuildInfo;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class ErrorConsoleViewModel extends AbstractViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorConsoleViewModel.class);</b>
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;    private final BuildInfo buildInfo;
+&nbsp;    private final ListProperty&lt;LogEventViewModel&gt; allMessagesData;
+&nbsp;
+<b class="nc">&nbsp;    public ErrorConsoleViewModel(DialogService dialogService, GuiPreferences preferences, ClipBoardManager clipBoardManager, BuildInfo buildInfo) {</b>
+<b class="nc">&nbsp;        this.dialogService = Objects.requireNonNull(dialogService);</b>
+<b class="nc">&nbsp;        this.preferences = Objects.requireNonNull(preferences);</b>
+<b class="nc">&nbsp;        this.clipBoardManager = Objects.requireNonNull(clipBoardManager);</b>
+<b class="nc">&nbsp;        this.buildInfo = Objects.requireNonNull(buildInfo);</b>
+<b class="nc">&nbsp;        ObservableList&lt;LogEventViewModel&gt; eventViewModels = EasyBind.map(BindingsHelper.forUI(LogMessages.getInstance().getMessages()), LogEventViewModel::new);</b>
+<b class="nc">&nbsp;        allMessagesData = new ReadOnlyListWrapper&lt;&gt;(eventViewModels);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;LogEventViewModel&gt; allMessagesDataProperty() {
+<b class="nc">&nbsp;        return this.allMessagesData;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Concatenates the formatted message of the given {@link LogEventViewModel}s by using a new line separator.
+&nbsp;     *
+&nbsp;     * @return all messages as String
+&nbsp;     */
+&nbsp;    private String getLogMessagesAsString(List&lt;LogEventViewModel&gt; messages) {
+<b class="nc">&nbsp;        return messages.stream()</b>
+<b class="nc">&nbsp;                       .map(LogEventViewModel::getDetailedText)</b>
+<b class="nc">&nbsp;                       .collect(Collectors.joining(OS.NEWLINE));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Copies the whole log to the clipboard
+&nbsp;     */
+&nbsp;    public void copyLog() {
+<b class="nc">&nbsp;        copyLog(allMessagesData);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Copies the given list of {@link LogEventViewModel}s to the clipboard.
+&nbsp;     */
+&nbsp;    public void copyLog(List&lt;LogEventViewModel&gt; messages) {
+<b class="nc">&nbsp;        if (messages.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        clipBoardManager.setContent(getLogMessagesAsString(messages));</b>
+<b class="nc">&nbsp;        dialogService.notify(Localization.lang(&quot;Log copied to clipboard.&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Copies the detailed text of the given {@link LogEventViewModel} to the clipboard.
+&nbsp;     */
+&nbsp;    public void copyLogEntry(LogEventViewModel logEvent) {
+<b class="nc">&nbsp;        clipBoardManager.setContent(logEvent.getDetailedText());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Clears the current log
+&nbsp;     */
+&nbsp;    public void clearLog() {
+<b class="nc">&nbsp;        LogMessages.getInstance().clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Opens a new issue on GitHub and copies log to clipboard.
+&nbsp;     */
+&nbsp;    public void reportIssue() {
+&nbsp;        try {
+&nbsp;            // System info
+<b class="nc">&nbsp;            String systemInfo = &quot;JabRef %s%n%s %s %s %nJava %s&quot;.formatted(buildInfo.version, BuildInfo.OS,</b>
+&nbsp;                    BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
+&nbsp;            // Steps to reproduce
+<b class="nc">&nbsp;            String howToReproduce = &quot;Steps to reproduce:\n\n1. ...\n2. ...\n3. ...&quot;;</b>
+&nbsp;            // Log messages
+<b class="nc">&nbsp;            String issueDetails = &quot;&lt;details&gt;\n&quot; + &quot;&lt;summary&gt;&quot; + &quot;Detail information:&quot; + &quot;&lt;/summary&gt;\n\n```\n&quot;</b>
+<b class="nc">&nbsp;                    + getLogMessagesAsString(allMessagesData) + &quot;\n```\n\n&lt;/details&gt;&quot;;</b>
+<b class="nc">&nbsp;            clipBoardManager.setContent(issueDetails);</b>
+&nbsp;            // Bug report body
+<b class="nc">&nbsp;            String issueBody = systemInfo + &quot;\n\n&quot; + howToReproduce + &quot;\n\n&quot; + &quot;Paste your log details here.&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Issue on GitHub successfully reported.&quot;));</b>
+<b class="nc">&nbsp;            dialogService.showInformationDialogAndWait(Localization.lang(&quot;Issue report successful&quot;),</b>
+<b class="nc">&nbsp;                    Localization.lang(&quot;Your issue was reported in your browser.&quot;) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;The log and exception information was copied to your clipboard.&quot;) + &quot; &quot; +</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Please paste this information (with Ctrl+V) in the issue description.&quot;) + &quot;\n&quot; +</b>
+<b class="nc">&nbsp;                            Localization.lang(&quot;Please also add all steps to reproduce this issue, if possible.&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;            URIBuilder uriBuilder = new URIBuilder()</b>
+<b class="nc">&nbsp;                    .setScheme(&quot;https&quot;).setHost(&quot;github.com&quot;)</b>
+<b class="nc">&nbsp;                    .setPath(&quot;/JabRef/jabref/issues/new&quot;)</b>
+<b class="nc">&nbsp;                    .setParameter(&quot;body&quot;, issueBody);</b>
+<b class="nc">&nbsp;            NativeDesktop.openBrowser(uriBuilder.build().toString(), preferences.getExternalApplicationsPreferences());</b>
+&nbsp;        } catch (IOException | URISyntaxException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Problem opening url&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

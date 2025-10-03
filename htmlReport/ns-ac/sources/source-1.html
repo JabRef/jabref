@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AuxParserResult</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.auxparser</a>
+</div>
+
+<h1>Coverage Summary for Class: AuxParserResult (org.jabref.logic.auxparser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AuxParserResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.auxparser;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibtexString;
+&nbsp;
+&nbsp;public class AuxParserResult {
+&nbsp;
+&nbsp;    private final BibDatabase masterDatabase;
+<b class="nc">&nbsp;    private final Set&lt;String&gt; uniqueKeys = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final List&lt;String&gt; unresolvedKeys = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final BibDatabase auxDatabase = new BibDatabase();</b>
+&nbsp;    private int nestedAuxCount;
+&nbsp;    private int crossRefEntriesCount;
+&nbsp;    private int insertedStrings;
+&nbsp;
+<b class="nc">&nbsp;    public AuxParserResult(BibDatabase masterDatabase) {</b>
+<b class="nc">&nbsp;        this.masterDatabase = masterDatabase;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibDatabase getGeneratedBibDatabase() {
+<b class="nc">&nbsp;        return auxDatabase;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getUnresolvedKeys() {
+<b class="nc">&nbsp;        return unresolvedKeys;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getFoundKeysInAux() {
+<b class="nc">&nbsp;        return uniqueKeys.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getResolvedKeysCount() {
+<b class="nc">&nbsp;        return auxDatabase.getEntryCount() - crossRefEntriesCount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getUnresolvedKeysCount() {
+<b class="nc">&nbsp;        return unresolvedKeys.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Query the number of extra entries pulled in due to crossrefs from other entries.
+&nbsp;     *
+&nbsp;     * @return The number of additional entries pulled in due to crossref
+&nbsp;     */
+&nbsp;    public int getCrossRefEntriesCount() {
+<b class="nc">&nbsp;        return crossRefEntriesCount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void increaseCrossRefEntriesCounter() {
+<b class="nc">&nbsp;        crossRefEntriesCount++;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void increaseNestedAuxFilesCounter() {
+<b class="nc">&nbsp;        nestedAuxCount++;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void insertStrings(Collection&lt;BibtexString&gt; usedStrings) {
+<b class="nc">&nbsp;        for (BibtexString string : usedStrings) {</b>
+<b class="nc">&nbsp;            auxDatabase.addString(string);</b>
+<b class="nc">&nbsp;            insertedStrings++;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibDatabase getMasterDatabase() {
+<b class="nc">&nbsp;        return masterDatabase;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getNestedAuxCount() {
+<b class="nc">&nbsp;        return nestedAuxCount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getInsertedStrings() {
+<b class="nc">&nbsp;        return insertedStrings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Set&lt;String&gt; getUniqueKeys() {
+<b class="nc">&nbsp;        return uniqueKeys;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

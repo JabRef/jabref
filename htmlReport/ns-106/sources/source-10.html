@@ -1,0 +1,211 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Langid</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry</a>
+</div>
+
+<h1>Coverage Summary for Class: Langid (org.jabref.model.entry)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Langid</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.FieldWriter;
+&nbsp;
+&nbsp;/**
+&nbsp; * Language identifiers based on BibLaTeX manual specifications.
+&nbsp; * See the BibLaTeX documentation for full details:
+&nbsp; * &lt;a href=&quot;http://mirrors.ctan.org/macros/latex/contrib/biblatex/doc/biblatex.pdfhangelo&quot;&gt;BibLaTeX manual&lt;/a&gt;
+&nbsp; */
+&nbsp;
+<b class="nc">&nbsp;public enum Langid {</b>
+<b class="nc">&nbsp;    BASQUE(&quot;Basque&quot;, &quot;basque&quot;),</b>
+<b class="nc">&nbsp;    BULGARIAN(&quot;Bulgarian&quot;, &quot;bulgarian&quot;),</b>
+<b class="nc">&nbsp;    CATALAN(&quot;Catalan&quot;, &quot;catalan&quot;),</b>
+<b class="nc">&nbsp;    CROATIAN(&quot;Croatian&quot;, &quot;croatian&quot;),</b>
+<b class="nc">&nbsp;    CZECH(&quot;Czech&quot;, &quot;czech&quot;),</b>
+<b class="nc">&nbsp;    DANISH(&quot;Danish&quot;, &quot;danish&quot;),</b>
+<b class="nc">&nbsp;    AMERICAN(&quot;American&quot;, &quot;american&quot;),</b>
+<b class="nc">&nbsp;    USENGLISH(&quot;US English&quot;, &quot;USenglish&quot;),</b>
+<b class="nc">&nbsp;    ENGLISH(&quot;English&quot;, &quot;english&quot;),</b>
+<b class="nc">&nbsp;    BRITISH(&quot;British&quot;, &quot;british&quot;),</b>
+<b class="nc">&nbsp;    UKENGLISH(&quot;UK English&quot;, &quot;UKenglish&quot;),</b>
+<b class="nc">&nbsp;    CANADIAN(&quot;Canadian&quot;, &quot;canadian&quot;),</b>
+<b class="nc">&nbsp;    AUSTRALIAN(&quot;Australian&quot;, &quot;australian&quot;),</b>
+<b class="nc">&nbsp;    NEWZEALAND(&quot;New Zealand&quot;, &quot;newzealand&quot;),</b>
+<b class="nc">&nbsp;    ESTONIAN(&quot;Estonian&quot;, &quot;estonian&quot;),</b>
+<b class="nc">&nbsp;    FINNISH(&quot;Finnish&quot;, &quot;finnish&quot;),</b>
+<b class="nc">&nbsp;    FRENCH(&quot;French&quot;, &quot;french&quot;),</b>
+<b class="nc">&nbsp;    GERMAN(&quot;German&quot;, &quot;german&quot;),</b>
+<b class="nc">&nbsp;    AUSTRIAN(&quot;Austrian&quot;, &quot;austrian&quot;),</b>
+<b class="nc">&nbsp;    SWISSGERMAN(&quot;Swiss German&quot;, &quot;swissgerman&quot;),</b>
+<b class="nc">&nbsp;    NGERMAN(&quot;German (New)&quot;, &quot;ngerman&quot;),</b>
+<b class="nc">&nbsp;    NAUSTRIAN(&quot;Austrian (New)&quot;, &quot;naustrian&quot;),</b>
+<b class="nc">&nbsp;    NSWISSGERMAN(&quot;Swiss German (New)&quot;, &quot;nswissgerman&quot;),</b>
+<b class="nc">&nbsp;    GREEK(&quot;Greek&quot;, &quot;greek&quot;),</b>
+<b class="nc">&nbsp;    MAGYAR(&quot;Hungarian&quot;, &quot;hungarian&quot;),</b>
+<b class="nc">&nbsp;    HUNGARIAN(&quot;Hungarian&quot;, &quot;hungarian&quot;),</b>
+<b class="nc">&nbsp;    ICELANDIC(&quot;Icelandic&quot;, &quot;icelandic&quot;),</b>
+<b class="nc">&nbsp;    ITALIAN(&quot;Italian&quot;, &quot;italian&quot;),</b>
+<b class="nc">&nbsp;    LATVIAN(&quot;Latvian&quot;, &quot;latvian&quot;),</b>
+<b class="nc">&nbsp;    LITHUANIAN(&quot;Lithuanian&quot;, &quot;lithuanian&quot;),</b>
+<b class="nc">&nbsp;    MARATHI(&quot;Marathi&quot;, &quot;marathi&quot;),</b>
+<b class="nc">&nbsp;    NORSK(&quot;Norwegian (Bokmål)&quot;, &quot;norsk&quot;),</b>
+<b class="nc">&nbsp;    NYNORSK(&quot;Norwegian (Nynorsk)&quot;, &quot;nynorsk&quot;),</b>
+<b class="nc">&nbsp;    POLISH(&quot;Polish&quot;, &quot;polish&quot;),</b>
+<b class="nc">&nbsp;    BRAZIL(&quot;Portuguese (Brazilian)&quot;, &quot;brazil&quot;),</b>
+<b class="nc">&nbsp;    PORTUGUESE(&quot;Portuguese&quot;, &quot;portuguese&quot;),</b>
+<b class="nc">&nbsp;    PORTUGES(&quot;Portuguese (alt)&quot;, &quot;portuges&quot;),</b>
+<b class="nc">&nbsp;    ROMANIAN(&quot;Romanian&quot;, &quot;romanian&quot;),</b>
+<b class="nc">&nbsp;    RUSSIAN(&quot;Russian&quot;, &quot;russian&quot;),</b>
+<b class="nc">&nbsp;    SERBIAN(&quot;Serbian (Latin)&quot;, &quot;serbian&quot;),</b>
+<b class="nc">&nbsp;    SERBIANC(&quot;Serbian (Cyrillic)&quot;, &quot;serbianc&quot;),</b>
+<b class="nc">&nbsp;    SLOVAK(&quot;Slovak&quot;, &quot;slovak&quot;),</b>
+<b class="nc">&nbsp;    SLOVENE(&quot;Slovene&quot;, &quot;slovene&quot;),</b>
+<b class="nc">&nbsp;    SLOVENIAN(&quot;Slovenian&quot;, &quot;slovenian&quot;),</b>
+<b class="nc">&nbsp;    SPANISH(&quot;Spanish&quot;, &quot;spanish&quot;),</b>
+<b class="nc">&nbsp;    SWEDISH(&quot;Swedish&quot;, &quot;swedish&quot;),</b>
+<b class="nc">&nbsp;    TURKISH(&quot;Turkish&quot;, &quot;turkish&quot;),</b>
+<b class="nc">&nbsp;    UKRAINIAN(&quot;Ukrainian&quot;, &quot;ukrainian&quot;);</b>
+&nbsp;
+&nbsp;    private final String name;
+&nbsp;    private final String langid;
+&nbsp;
+<b class="nc">&nbsp;    Langid(String name, String langid) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.langid = langid;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLangid() {
+<b class="nc">&nbsp;        return langid;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;Langid&gt; getByLangid(String id) {
+<b class="nc">&nbsp;        for (Langid lang : Langid.values()) {</b>
+<b class="nc">&nbsp;            if (lang.langid.equalsIgnoreCase(id)) {</b>
+<b class="nc">&nbsp;                return Optional.of(lang);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;Langid&gt; parse(String value) {
+<b class="nc">&nbsp;        return Langid.getByLangid(value.trim().toLowerCase());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getJabRefFormat() {
+<b class="nc">&nbsp;        return (FieldWriter.BIBTEX_STRING_START_END_SYMBOL + &quot;%s&quot; + FieldWriter.BIBTEX_STRING_START_END_SYMBOL).formatted(langid);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

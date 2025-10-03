@@ -1,0 +1,415 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BstNameFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bst.util</a>
+</div>
+
+<h1>Coverage Summary for Class: BstNameFormatter (org.jabref.logic.bst.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BstNameFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/132)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/150)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.bst.util;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.bst.BstVMException;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * From Bibtex:
+&nbsp; * &lt;p&gt;
+&nbsp; * &quot;The |built_in| function {\.{format.name\$}} pops the
+&nbsp; * top three literals (they are a string, an integer, and a string
+&nbsp; * literal, in that order). The last string literal represents a
+&nbsp; * name list (each name corresponding to a person), the integer
+&nbsp; * literal specifies which name to pick from this list, and the
+&nbsp; * first string literal specifies how to format this name, as
+&nbsp; * described in the \BibTeX\ documentation. Finally, this function
+&nbsp; * pushes the formatted name. If any of the types is incorrect, it
+&nbsp; * complains and pushes the null string.&quot;
+&nbsp; * &lt;p&gt;
+&nbsp; * Sounds easy - is a nightmare... X-(
+&nbsp; *
+&nbsp; */
+&nbsp;public class BstNameFormatter {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BstNameFormatter.class);</b>
+&nbsp;
+&nbsp;    private BstNameFormatter() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Formats the nth author of the author name list by a given format string
+&nbsp;     *
+&nbsp;     * @param authorsNameList The string from an author field
+&nbsp;     * @param whichName       index of the list, starting with 1
+&nbsp;     * @param formatString    TODO
+&nbsp;     */
+&nbsp;    public static String formatName(String authorsNameList, int whichName, String formatString) {
+<b class="nc">&nbsp;        AuthorList al = AuthorList.parse(authorsNameList);</b>
+&nbsp;
+<b class="nc">&nbsp;        if ((whichName &lt; 1) &amp;&amp; (whichName &gt; al.getNumberOfAuthors())) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;AuthorList {} does not contain an author with number {}&quot;, authorsNameList, whichName);</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return BstNameFormatter.formatName(al.getAuthor(whichName - 1), formatString);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String formatName(Author author, String format) {
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        char[] c = format.toCharArray();</b>
+<b class="nc">&nbsp;        int n = c.length;</b>
+<b class="nc">&nbsp;        int braceLevel = 0;</b>
+<b class="nc">&nbsp;        int group = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        int i = 0;</b>
+<b class="nc">&nbsp;        while (i &lt; n) {</b>
+<b class="nc">&nbsp;            if (c[i] == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                group++;</b>
+<b class="nc">&nbsp;                i++;</b>
+<b class="nc">&nbsp;                braceLevel++;</b>
+<b class="nc">&nbsp;                StringBuilder level1Chars = new StringBuilder();</b>
+<b class="nc">&nbsp;                StringBuilder wholeChar = new StringBuilder();</b>
+<b class="nc">&nbsp;                while ((i &lt; n) &amp;&amp; (braceLevel &gt; 0)) {</b>
+<b class="nc">&nbsp;                    wholeChar.append(c[i]);</b>
+<b class="nc">&nbsp;                    if (c[i] == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                        braceLevel++;</b>
+<b class="nc">&nbsp;                        i++;</b>
+&nbsp;                        continue;
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (c[i] == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                        braceLevel--;</b>
+<b class="nc">&nbsp;                        i++;</b>
+&nbsp;                        continue;
+&nbsp;                    }
+<b class="nc">&nbsp;                    if ((braceLevel == 1) &amp;&amp; Character.isLetter(c[i])) {</b>
+<b class="nc">&nbsp;                        if (&quot;fvlj&quot;.indexOf(c[i]) == -1) {</b>
+<b class="nc">&nbsp;                            LOGGER.warn(&quot;Format string in format.name$ may only contain fvlj on brace level 1 in group {}: {}&quot;, group, format);</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            level1Chars.append(c[i]);</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    i++;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                i--; // unskip last brace (for last i++ at the end)</b>
+<b class="nc">&nbsp;                String control = level1Chars.toString().toLowerCase(Locale.ROOT);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (control.isEmpty()) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (control.length() &gt; 2) {</b>
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Format string in format.name$ may only be one or two character long on brace level 1 in group {}: {}&quot;, group, format);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                char type = control.charAt(0);</b>
+&nbsp;
+<b class="nc">&nbsp;                Optional&lt;String&gt; tokenS = switch (type) {</b>
+&nbsp;                    case &#39;f&#39; -&gt;
+<b class="nc">&nbsp;                            author.getGivenName();</b>
+&nbsp;                    case &#39;v&#39; -&gt;
+<b class="nc">&nbsp;                            author.getNamePrefix();</b>
+&nbsp;                    case &#39;l&#39; -&gt;
+<b class="nc">&nbsp;                            author.getFamilyName();</b>
+&nbsp;                    case &#39;j&#39; -&gt;
+<b class="nc">&nbsp;                            author.getNameSuffix();</b>
+&nbsp;                    default -&gt;
+<b class="nc">&nbsp;                            throw new BstVMException(&quot;Internal error&quot;);</b>
+<b class="nc">&nbsp;                };</b>
+&nbsp;
+<b class="nc">&nbsp;                if (tokenS.isEmpty()) {</b>
+<b class="nc">&nbsp;                    i++;</b>
+&nbsp;                    continue;
+&nbsp;                }
+<b class="nc">&nbsp;                String[] tokens = tokenS.get().split(&quot; &quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;                boolean abbreviateThatIsSingleLetter = true;</b>
+&nbsp;
+<b class="nc">&nbsp;                if (control.length() == 2) {</b>
+<b class="nc">&nbsp;                    if (control.charAt(1) == control.charAt(0)) {</b>
+<b class="nc">&nbsp;                        abbreviateThatIsSingleLetter = false;</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        LOGGER.warn(&quot;Format string in format.name$ may only contain one type of vlfj on brace level 1 in group {}: {}&quot;, group, format);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+&nbsp;                // Now we know what to do
+&nbsp;
+<b class="nc">&nbsp;                if ((braceLevel == 0) &amp;&amp; (wholeChar.charAt(wholeChar.length() - 1) == &#39;}&#39;)) {</b>
+<b class="nc">&nbsp;                    wholeChar.deleteCharAt(wholeChar.length() - 1);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                char[] d = wholeChar.toString().toCharArray();</b>
+&nbsp;
+<b class="nc">&nbsp;                int bLevel = 1;</b>
+&nbsp;
+<b class="nc">&nbsp;                String interToken = null;</b>
+<b class="nc">&nbsp;                int groupStart = sb.length();</b>
+&nbsp;
+<b class="nc">&nbsp;                for (int j = 0; j &lt; d.length; j++) {</b>
+<b class="nc">&nbsp;                    if (Character.isLetter(d[j]) &amp;&amp; (bLevel == 1)) {</b>
+<b class="nc">&nbsp;                        groupStart = sb.length();</b>
+<b class="nc">&nbsp;                        if (!abbreviateThatIsSingleLetter) {</b>
+<b class="nc">&nbsp;                            j++;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        if (((j + 1) &lt; d.length) &amp;&amp; (d[j + 1] == &#39;{&#39;)) {</b>
+<b class="nc">&nbsp;                            StringBuilder interTokenSb = new StringBuilder();</b>
+<b class="nc">&nbsp;                            j = BstNameFormatter.consumeToMatchingBrace(interTokenSb, d, j + 1);</b>
+<b class="nc">&nbsp;                            interToken = interTokenSb.substring(1, interTokenSb.length() - 1);</b>
+&nbsp;                        }
+&nbsp;
+<b class="nc">&nbsp;                        for (int k = 0; k &lt; tokens.length; k++) {</b>
+<b class="nc">&nbsp;                            String token = tokens[k];</b>
+<b class="nc">&nbsp;                            if (abbreviateThatIsSingleLetter) {</b>
+<b class="nc">&nbsp;                                String[] dashes = token.split(&quot;-&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;                                token = Arrays.stream(dashes).map(BstNameFormatter::getFirstCharOfString)</b>
+<b class="nc">&nbsp;                                              .collect(Collectors.joining(&quot;.-&quot;));</b>
+&nbsp;                            }
+&nbsp;
+&nbsp;                            // Output token
+<b class="nc">&nbsp;                            sb.append(token);</b>
+&nbsp;
+<b class="nc">&nbsp;                            if (k &lt; (tokens.length - 1)) {</b>
+&nbsp;                                // Output Intertoken String
+<b class="nc">&nbsp;                                if (interToken == null) {</b>
+<b class="nc">&nbsp;                                    if (abbreviateThatIsSingleLetter) {</b>
+<b class="nc">&nbsp;                                        sb.append(&#39;.&#39;);</b>
+&nbsp;                                    }
+&nbsp;                                    // No clue what this means (What the hell are tokens anyway???
+&nbsp;                                    // if (lex_class[name_sep_char[cur_token]] = sep_char) then
+&nbsp;                                    //    append_ex_buf_char_and_check (name_sep_char[cur_token])
+<b class="nc">&nbsp;                                    if ((k == (tokens.length - 2)) || (BstNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 3) &lt; 3)) {</b>
+<b class="nc">&nbsp;                                        sb.append(&#39;~&#39;);</b>
+&nbsp;                                    } else {
+<b class="nc">&nbsp;                                        sb.append(&#39; &#39;);</b>
+&nbsp;                                    }
+&nbsp;                                } else {
+<b class="nc">&nbsp;                                    sb.append(interToken);</b>
+&nbsp;                                }
+&nbsp;                            }
+&nbsp;                        }
+<b class="nc">&nbsp;                    } else if (d[j] == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                        bLevel--;</b>
+<b class="nc">&nbsp;                        if (bLevel &gt; 0) {</b>
+<b class="nc">&nbsp;                            sb.append(&#39;}&#39;);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    } else if (d[j] == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                        bLevel++;</b>
+<b class="nc">&nbsp;                        sb.append(&#39;{&#39;);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        sb.append(d[j]);</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                if (!sb.isEmpty()) {</b>
+<b class="nc">&nbsp;                    boolean noDisTie = false;</b>
+<b class="nc">&nbsp;                    if ((sb.charAt(sb.length() - 1) == &#39;~&#39;) &amp;&amp;</b>
+<b class="nc">&nbsp;                            ((BstNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 4) &gt;= 4) ||</b>
+<b class="nc">&nbsp;                                    ((sb.length() &gt; 1) &amp;&amp; (noDisTie = sb.charAt(sb.length() - 2) == &#39;~&#39;)))) {</b>
+<b class="nc">&nbsp;                        sb.deleteCharAt(sb.length() - 1);</b>
+<b class="nc">&nbsp;                        if (!noDisTie) {</b>
+<b class="nc">&nbsp;                            sb.append(&#39; &#39;);</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (c[i] == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Unmatched brace in format string: {}&quot;, format);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                sb.append(c[i]); // verbatim</b>
+&nbsp;            }
+<b class="nc">&nbsp;            i++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (braceLevel != 0) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Unbalanced brace in format string for nameFormat: {}&quot;, format);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Including the matching brace.
+&nbsp;     */
+&nbsp;    public static int consumeToMatchingBrace(StringBuilder interTokenSb, char[] c, int pos) {
+<b class="nc">&nbsp;        int braceLevel = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = pos; i &lt; c.length; i++) {</b>
+<b class="nc">&nbsp;            if (c[i] == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                braceLevel--;</b>
+<b class="nc">&nbsp;                if (braceLevel == 0) {</b>
+<b class="nc">&nbsp;                    interTokenSb.append(&#39;}&#39;);</b>
+<b class="nc">&nbsp;                    return i;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (c[i] == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                braceLevel++;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            interTokenSb.append(c[i]);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return c.length;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Takes care of special characters too
+&nbsp;     */
+&nbsp;    public static String getFirstCharOfString(String s) {
+<b class="nc">&nbsp;        char[] c = s.toCharArray();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; c.length; i++) {</b>
+<b class="nc">&nbsp;            if (Character.isLetter(c[i])) {</b>
+<b class="nc">&nbsp;                return String.valueOf(c[i]);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c[i] == &#39;{&#39;) &amp;&amp; ((i + 1) &lt; c.length) &amp;&amp; (c[i + 1] == &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;                StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;                BstNameFormatter.consumeToMatchingBrace(sb, c, i);</b>
+<b class="nc">&nbsp;                return sb.toString();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int numberOfChars(String token, int inStop) {
+<b class="nc">&nbsp;        int stop = inStop;</b>
+<b class="nc">&nbsp;        if (stop &lt; 0) {</b>
+<b class="nc">&nbsp;            stop = Integer.MAX_VALUE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int result = 0;</b>
+<b class="nc">&nbsp;        int i = 0;</b>
+<b class="nc">&nbsp;        char[] c = token.toCharArray();</b>
+<b class="nc">&nbsp;        int n = c.length;</b>
+&nbsp;
+<b class="nc">&nbsp;        int braceLevel = 0;</b>
+<b class="nc">&nbsp;        while ((i &lt; n) &amp;&amp; (result &lt; stop)) {</b>
+<b class="nc">&nbsp;            i++;</b>
+<b class="nc">&nbsp;            if (c[i - 1] == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                braceLevel++;</b>
+<b class="nc">&nbsp;                if ((braceLevel == 1) &amp;&amp; (i &lt; n) &amp;&amp; (c[i] == &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;                    i++;</b>
+<b class="nc">&nbsp;                    while ((i &lt; n) &amp;&amp; (braceLevel &gt; 0)) {</b>
+<b class="nc">&nbsp;                        if (c[i] == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                            braceLevel--;</b>
+<b class="nc">&nbsp;                        } else if (c[i] == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                            braceLevel++;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        i++;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (c[i - 1] == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                braceLevel--;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            result++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

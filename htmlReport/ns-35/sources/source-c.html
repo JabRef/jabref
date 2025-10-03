@@ -1,0 +1,264 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FieldEditors</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors</a>
+</div>
+
+<h1>Coverage Summary for Class: FieldEditors (org.jabref.gui.fieldeditors)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FieldEditors</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors;
+&nbsp;
+&nbsp;import java.time.format.DateTimeFormatter;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProviders;
+&nbsp;import org.jabref.gui.fieldeditors.identifier.IdentifierEditor;
+&nbsp;import org.jabref.gui.fieldeditors.optioneditors.LanguageEditorViewModel;
+&nbsp;import org.jabref.gui.fieldeditors.optioneditors.MonthEditorViewModel;
+&nbsp;import org.jabref.gui.fieldeditors.optioneditors.OptionEditor;
+&nbsp;import org.jabref.gui.fieldeditors.optioneditors.mapbased.CustomFieldEditorViewModel;
+&nbsp;import org.jabref.gui.fieldeditors.optioneditors.mapbased.EditorTypeEditorViewModel;
+&nbsp;import org.jabref.gui.fieldeditors.optioneditors.mapbased.GenderEditorViewModel;
+&nbsp;import org.jabref.gui.fieldeditors.optioneditors.mapbased.PaginationEditorViewModel;
+&nbsp;import org.jabref.gui.fieldeditors.optioneditors.mapbased.PatentTypeEditorViewModel;
+&nbsp;import org.jabref.gui.fieldeditors.optioneditors.mapbased.TypeEditorViewModel;
+&nbsp;import org.jabref.gui.fieldeditors.optioneditors.mapbased.YesNoEditorViewModel;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.undo.RedoAction;
+&nbsp;import org.jabref.gui.undo.UndoAction;
+&nbsp;import org.jabref.logic.integrity.FieldCheckers;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.FieldProperty;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.IEEETranEntryType;
+&nbsp;import org.jabref.model.metadata.MetaData;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;@SuppressWarnings(&quot;unchecked&quot;)
+<b class="nc">&nbsp;public class FieldEditors {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(FieldEditors.class);</b>
+&nbsp;
+&nbsp;    public static FieldEditorFX getForField(final Field field,
+&nbsp;                                            final JournalAbbreviationRepository journalAbbreviationRepository,
+&nbsp;                                            final GuiPreferences preferences,
+&nbsp;                                            final BibDatabaseContext databaseContext,
+&nbsp;                                            final EntryType entryType,
+&nbsp;                                            final SuggestionProviders suggestionProviders,
+&nbsp;                                            final UndoManager undoManager,
+&nbsp;                                            final UndoAction undoAction,
+&nbsp;                                            final RedoAction redoAction) {
+<b class="nc">&nbsp;        final Set&lt;FieldProperty&gt; fieldProperties = field.getProperties();</b>
+&nbsp;
+<b class="nc">&nbsp;        final SuggestionProvider&lt;?&gt; suggestionProvider = getSuggestionProvider(field, suggestionProviders, databaseContext.getMetaData());</b>
+&nbsp;
+<b class="nc">&nbsp;        final FieldCheckers fieldCheckers = new FieldCheckers(</b>
+&nbsp;                databaseContext,
+<b class="nc">&nbsp;                preferences.getFilePreferences(),</b>
+&nbsp;                journalAbbreviationRepository,
+<b class="nc">&nbsp;                preferences.getEntryEditorPreferences().shouldAllowIntegerEditionBibtex());</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean isMultiLine = FieldFactory.isMultiLineField(field, preferences.getFieldPreferences().getNonWrappableFields());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (preferences.getTimestampPreferences().getTimestampField().equals(field)) {</b>
+<b class="nc">&nbsp;            return new DateEditor(field, DateTimeFormatter.ofPattern(preferences.getTimestampPreferences().getTimestampFormat()), suggestionProvider, fieldCheckers, undoAction, redoAction);</b>
+<b class="nc">&nbsp;        } else if (fieldProperties.contains(FieldProperty.DATE)) {</b>
+<b class="nc">&nbsp;            return new DateEditor(field, DateTimeFormatter.ofPattern(&quot;[uuuu][-MM][-dd]&quot;), suggestionProvider, fieldCheckers, undoAction, redoAction);</b>
+<b class="nc">&nbsp;        } else if (fieldProperties.contains(FieldProperty.EXTERNAL)) {</b>
+<b class="nc">&nbsp;            return new UrlEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);</b>
+<b class="nc">&nbsp;        } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)) {</b>
+<b class="nc">&nbsp;            return new JournalEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);</b>
+<b class="nc">&nbsp;        } else if (fieldProperties.contains(FieldProperty.IDENTIFIER) &amp;&amp; field != StandardField.PMID || field == StandardField.ISBN) {</b>
+&nbsp;            // Identifier editor does not support PMID, therefore excluded at the condition above
+<b class="nc">&nbsp;            return new IdentifierEditor(field, suggestionProvider, fieldCheckers);</b>
+<b class="nc">&nbsp;        } else if (field == StandardField.CITATIONCOUNT) {</b>
+<b class="nc">&nbsp;            return new CitationCountEditor(field, suggestionProvider, fieldCheckers);</b>
+<b class="nc">&nbsp;        } else if (field == StandardField.ISSN) {</b>
+<b class="nc">&nbsp;            return new ISSNEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);</b>
+<b class="nc">&nbsp;        } else if (field == StandardField.OWNER) {</b>
+<b class="nc">&nbsp;            return new OwnerEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);</b>
+<b class="nc">&nbsp;        } else if (field == StandardField.GROUPS) {</b>
+<b class="nc">&nbsp;            return new GroupEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager, undoAction, redoAction);</b>
+<b class="nc">&nbsp;        } else if (field == StandardField.FILE) {</b>
+<b class="nc">&nbsp;            return new LinkedFilesEditor(field, databaseContext, suggestionProvider, fieldCheckers);</b>
+<b class="nc">&nbsp;        } else if (fieldProperties.contains(FieldProperty.YES_NO)) {</b>
+<b class="nc">&nbsp;            return new OptionEditor&lt;&gt;(new YesNoEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));</b>
+<b class="nc">&nbsp;        } else if (fieldProperties.contains(FieldProperty.MONTH)) {</b>
+<b class="nc">&nbsp;            return new OptionEditor&lt;&gt;(new</b>
+<b class="nc">&nbsp;                    MonthEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));</b>
+<b class="nc">&nbsp;        } else if (fieldProperties.contains(FieldProperty.LANGUAGE)) {</b>
+<b class="nc">&nbsp;            return new OptionEditor&lt;&gt;(new LanguageEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));</b>
+<b class="nc">&nbsp;        } else if (field == StandardField.GENDER) {</b>
+<b class="nc">&nbsp;            return new OptionEditor&lt;&gt;(new GenderEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));</b>
+<b class="nc">&nbsp;        } else if (fieldProperties.contains(FieldProperty.EDITOR_TYPE)) {</b>
+<b class="nc">&nbsp;            return new OptionEditor&lt;&gt;(new EditorTypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));</b>
+<b class="nc">&nbsp;        } else if (fieldProperties.contains(FieldProperty.PAGINATION)) {</b>
+<b class="nc">&nbsp;            return new OptionEditor&lt;&gt;(new PaginationEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));</b>
+<b class="nc">&nbsp;        } else if (field == StandardField.TYPE) {</b>
+<b class="nc">&nbsp;            if (entryType.equals(IEEETranEntryType.Patent)) {</b>
+<b class="nc">&nbsp;                return new OptionEditor&lt;&gt;(new PatentTypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return new OptionEditor&lt;&gt;(new TypeEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {</b>
+<b class="nc">&nbsp;            return new LinkedEntriesEditor(field, databaseContext, suggestionProvider, fieldCheckers);</b>
+<b class="nc">&nbsp;        } else if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {</b>
+<b class="nc">&nbsp;            return new PersonsEditor(field, suggestionProvider, fieldCheckers, isMultiLine, undoManager, undoAction, redoAction);</b>
+<b class="nc">&nbsp;        } else if (StandardField.KEYWORDS == field) {</b>
+<b class="nc">&nbsp;            return new KeywordsEditor(field, suggestionProvider, fieldCheckers);</b>
+<b class="nc">&nbsp;        } else if (field == InternalField.KEY_FIELD) {</b>
+<b class="nc">&nbsp;            return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext, undoAction, redoAction);</b>
+<b class="nc">&nbsp;        } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {</b>
+<b class="nc">&nbsp;            return new MarkdownEditor(field, suggestionProvider, fieldCheckers, preferences, undoManager, undoAction, redoAction);</b>
+<b class="nc">&nbsp;        } else if (field == StandardField.ICORERANKING) {</b>
+<b class="nc">&nbsp;            return new ICORERankingEditor(field, suggestionProvider, fieldCheckers);</b>
+&nbsp;        } else {
+&nbsp;            // There was no specific editor found
+&nbsp;
+&nbsp;            // Check whether there are selectors defined for the field at hand
+<b class="nc">&nbsp;            List&lt;String&gt; selectorValues = databaseContext.getMetaData().getContentSelectorValuesForField(field);</b>
+<b class="nc">&nbsp;            if (!isMultiLine &amp;&amp; !selectorValues.isEmpty()) {</b>
+<b class="nc">&nbsp;                return new OptionEditor&lt;&gt;(new CustomFieldEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager, selectorValues));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return new SimpleEditor(field, suggestionProvider, fieldCheckers, preferences, isMultiLine, undoManager, undoAction, redoAction);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static SuggestionProvider&lt;?&gt; getSuggestionProvider(Field field, SuggestionProviders suggestionProviders, MetaData metaData) {
+<b class="nc">&nbsp;        SuggestionProvider&lt;?&gt; suggestionProvider = suggestionProviders.getForField(field);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; contentSelectorValues = metaData.getContentSelectorValuesForField(field);</b>
+<b class="nc">&nbsp;        if (!contentSelectorValues.isEmpty()) {</b>
+&nbsp;            // Enrich auto completion by content selector values
+&nbsp;            try {
+<b class="nc">&nbsp;                return new ContentSelectorSuggestionProvider((SuggestionProvider&lt;String&gt;) suggestionProvider, contentSelectorValues);</b>
+&nbsp;            } catch (ClassCastException exception) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Content selectors are only supported for normal fields with string-based auto completion.&quot;);</b>
+<b class="nc">&nbsp;                return suggestionProvider;</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            return suggestionProvider;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

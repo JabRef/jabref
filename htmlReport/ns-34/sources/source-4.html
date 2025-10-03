@@ -1,0 +1,179 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StandardExternalFileType</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.externalfiletype</a>
+</div>
+
+<h1>Coverage Summary for Class: StandardExternalFileType (org.jabref.gui.externalfiletype)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StandardExternalFileType</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.externalfiletype;
+&nbsp;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.icon.JabRefIcon;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+<b class="nc">&nbsp;public enum StandardExternalFileType implements ExternalFileType {</b>
+&nbsp;
+<b class="nc">&nbsp;    PDF(&quot;PDF&quot;, &quot;pdf&quot;, &quot;application/pdf&quot;, &quot;evince&quot;, &quot;pdfSmall&quot;, IconTheme.JabRefIcons.PDF_FILE),</b>
+<b class="nc">&nbsp;    PostScript(&quot;PostScript&quot;, &quot;ps&quot;, &quot;application/postscript&quot;, &quot;evince&quot;, &quot;psSmall&quot;, IconTheme.JabRefIcons.FILE),</b>
+<b class="nc">&nbsp;    Word(&quot;Word&quot;, &quot;doc&quot;, &quot;application/msword&quot;, &quot;oowriter&quot;, &quot;openoffice&quot;, IconTheme.JabRefIcons.FILE_WORD),</b>
+<b class="nc">&nbsp;    Word_NEW(&quot;Word 2007+&quot;, &quot;docx&quot;, &quot;application/vnd.openxmlformats-officedocument.wordprocessingml.document&quot;, &quot;oowriter&quot;, &quot;openoffice&quot;, IconTheme.JabRefIcons.FILE_WORD),</b>
+<b class="nc">&nbsp;    OpenDocument_TEXT(Localization.lang(&quot;OpenDocument text&quot;), &quot;odt&quot;, &quot;application/vnd.oasis.opendocument.text&quot;, &quot;oowriter&quot;, &quot;openoffice&quot;, IconTheme.JabRefIcons.FILE_OPENOFFICE),</b>
+<b class="nc">&nbsp;    Excel(&quot;Excel&quot;, &quot;xls&quot;, &quot;application/excel&quot;, &quot;oocalc&quot;, &quot;openoffice&quot;, IconTheme.JabRefIcons.FILE_EXCEL),</b>
+<b class="nc">&nbsp;    Excel_NEW(&quot;Excel 2007+&quot;, &quot;xlsx&quot;, &quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;, &quot;oocalc&quot;, &quot;openoffice&quot;, IconTheme.JabRefIcons.FILE_EXCEL),</b>
+<b class="nc">&nbsp;    OpenDocumentSpreadsheet(Localization.lang(&quot;OpenDocument spreadsheet&quot;), &quot;ods&quot;, &quot;application/vnd.oasis.opendocument.spreadsheet&quot;, &quot;oocalc&quot;, &quot;openoffice&quot;, IconTheme.JabRefIcons.FILE_OPENOFFICE),</b>
+<b class="nc">&nbsp;    PowerPoint(&quot;PowerPoint&quot;, &quot;ppt&quot;, &quot;application/vnd.ms-powerpoint&quot;, &quot;ooimpress&quot;, &quot;openoffice&quot;, IconTheme.JabRefIcons.FILE_POWERPOINT),</b>
+<b class="nc">&nbsp;    PowerPoint_NEW(&quot;PowerPoint 2007+&quot;, &quot;pptx&quot;, &quot;application/vnd.openxmlformats-officedocument.presentationml.presentation&quot;, &quot;ooimpress&quot;, &quot;openoffice&quot;, IconTheme.JabRefIcons.FILE_POWERPOINT),</b>
+<b class="nc">&nbsp;    OpenDocumentPresentation(Localization.lang(&quot;OpenDocument presentation&quot;), &quot;odp&quot;, &quot;application/vnd.oasis.opendocument.presentation&quot;, &quot;ooimpress&quot;, &quot;openoffice&quot;, IconTheme.JabRefIcons.FILE_OPENOFFICE),</b>
+<b class="nc">&nbsp;    RTF(&quot;Rich Text Format&quot;, &quot;rtf&quot;, &quot;application/rtf&quot;, &quot;oowriter&quot;, &quot;openoffice&quot;, IconTheme.JabRefIcons.FILE_TEXT),</b>
+<b class="nc">&nbsp;    PNG(Localization.lang(&quot;%0 image&quot;, &quot;PNG&quot;), &quot;png&quot;, &quot;image/png&quot;, &quot;gimp&quot;, &quot;picture&quot;, IconTheme.JabRefIcons.PICTURE),</b>
+<b class="nc">&nbsp;    GIF(Localization.lang(&quot;%0 image&quot;, &quot;GIF&quot;), &quot;gif&quot;, &quot;image/gif&quot;, &quot;gimp&quot;, &quot;picture&quot;, IconTheme.JabRefIcons.PICTURE),</b>
+<b class="nc">&nbsp;    JPG(Localization.lang(&quot;%0 image&quot;, &quot;JPG&quot;), &quot;jpg&quot;, &quot;image/jpeg&quot;, &quot;gimp&quot;, &quot;picture&quot;, IconTheme.JabRefIcons.PICTURE),</b>
+<b class="nc">&nbsp;    Djvu(&quot;Djvu&quot;, &quot;djvu&quot;, &quot;image/vnd.djvu&quot;, &quot;evince&quot;, &quot;psSmall&quot;, IconTheme.JabRefIcons.FILE),</b>
+<b class="nc">&nbsp;    TXT(&quot;Text&quot;, &quot;txt&quot;, &quot;text/plain&quot;, &quot;emacs&quot;, &quot;emacs&quot;, IconTheme.JabRefIcons.FILE_TEXT),</b>
+<b class="nc">&nbsp;    TEX(&quot;LaTeX&quot;, &quot;tex&quot;, &quot;application/x-latex&quot;, &quot;emacs&quot;, &quot;emacs&quot;, IconTheme.JabRefIcons.FILE_TEXT),</b>
+<b class="nc">&nbsp;    CHM(&quot;CHM&quot;, &quot;chm&quot;, &quot;application/mshelp&quot;, &quot;gnochm&quot;, &quot;www&quot;, IconTheme.JabRefIcons.WWW),</b>
+<b class="nc">&nbsp;    TIFF(Localization.lang(&quot;%0 image&quot;, &quot;TIFF&quot;), &quot;tiff&quot;, &quot;image/tiff&quot;, &quot;gimp&quot;, &quot;picture&quot;, IconTheme.JabRefIcons.PICTURE),</b>
+<b class="nc">&nbsp;    URL(&quot;URL&quot;, &quot;html&quot;, &quot;text/html&quot;, &quot;firefox&quot;, &quot;www&quot;, IconTheme.JabRefIcons.WWW),</b>
+<b class="nc">&nbsp;    MHT(&quot;MHT&quot;, &quot;mht&quot;, &quot;multipart/related&quot;, &quot;firefox&quot;, &quot;www&quot;, IconTheme.JabRefIcons.WWW),</b>
+<b class="nc">&nbsp;    ePUB(&quot;ePUB&quot;, &quot;epub&quot;, &quot;application/epub+zip&quot;, &quot;firefox&quot;, &quot;www&quot;, IconTheme.JabRefIcons.WWW),</b>
+<b class="nc">&nbsp;    MARKDOWN(&quot;Markdown&quot;, &quot;md&quot;, &quot;text/markdown&quot;, &quot;emacs&quot;, &quot;emacs&quot;, IconTheme.JabRefIcons.FILE_TEXT);</b>
+&nbsp;    private final String name;
+&nbsp;    private final String extension;
+&nbsp;    private final String mimeType;
+&nbsp;    private final String openWith;
+&nbsp;    private final String iconName;
+&nbsp;    private final JabRefIcon icon;
+&nbsp;
+&nbsp;    StandardExternalFileType(String name, String extension, String mimeType,
+<b class="nc">&nbsp;                             String openWith, String iconName, JabRefIcon icon) {</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.extension = extension;</b>
+<b class="nc">&nbsp;        this.mimeType = mimeType;</b>
+<b class="nc">&nbsp;        this.openWith = openWith;</b>
+<b class="nc">&nbsp;        this.iconName = iconName;</b>
+<b class="nc">&nbsp;        this.icon = icon;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getExtension() {
+<b class="nc">&nbsp;        return extension;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getMimeType() {
+<b class="nc">&nbsp;        return mimeType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getOpenWithApplication() {
+&nbsp;        // On all OSes there is a generic application available to handle file opening, so use this one
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public JabRefIcon getIcon() {
+<b class="nc">&nbsp;        return icon;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

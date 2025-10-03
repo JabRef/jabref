@@ -1,0 +1,181 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CollectionOfComputerScienceBibliographiesParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: CollectionOfComputerScienceBibliographiesParser (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CollectionOfComputerScienceBibliographiesParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Scanner;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;public class CollectionOfComputerScienceBibliographiesParser implements Parser {
+&nbsp;
+<b class="nc">&nbsp;    final static Pattern REGEX_FOR_LINKS = Pattern.compile(&quot;&lt;item&gt;[\\s\\S]*?&lt;link&gt;([\\s\\S]*?)&lt;\\/link&gt;[\\s\\S]*?&lt;\\/item&gt;&quot;);</b>
+<b class="nc">&nbsp;    final static Pattern REGEX_FOR_BIBTEX = Pattern.compile(&quot;&lt;pre class=\&quot;bibtex\&quot;&gt;([\\s\\S]*?)&lt;\\/pre&gt;&quot;);</b>
+&nbsp;
+&nbsp;    final BibtexParser bibtexParser;
+&nbsp;    final HtmlToUnicodeFormatter htmlToUnicodeFormatter;
+&nbsp;
+<b class="nc">&nbsp;    public CollectionOfComputerScienceBibliographiesParser(ImportFormatPreferences importFormatPreferences) {</b>
+<b class="nc">&nbsp;        this.bibtexParser = new BibtexParser(importFormatPreferences);</b>
+<b class="nc">&nbsp;        this.htmlToUnicodeFormatter = new HtmlToUnicodeFormatter();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BibEntry&gt; parseEntries(InputStream inputStream) throws ParseException {
+&nbsp;        try {
+<b class="nc">&nbsp;            List&lt;String&gt; links = matchRegexFromInputStreamHtml(inputStream, REGEX_FOR_LINKS);</b>
+<b class="nc">&nbsp;            String bibtexDataString = String.join(&quot;&quot;, parseBibtexStringsFromLinks(links));</b>
+&nbsp;
+<b class="nc">&nbsp;            return bibtexParser.parseEntries(bibtexDataString);</b>
+&nbsp;        } catch (IOException | FetcherException e) {
+<b class="nc">&nbsp;            throw new ParseException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;String&gt; matchRegexFromInputStreamHtml(InputStream inputStream, Pattern pattern) {
+<b class="nc">&nbsp;        try (Scanner scanner = new Scanner(inputStream)) {</b>
+<b class="nc">&nbsp;            return scanner.findAll(pattern)</b>
+<b class="nc">&nbsp;                          .map(match -&gt; htmlToUnicodeFormatter.format(match.group(1)))</b>
+<b class="nc">&nbsp;                          .collect(Collectors.toList());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;String&gt; parseBibtexStringsFromLinks(List&lt;String&gt; links) throws IOException, FetcherException {
+<b class="nc">&nbsp;        List&lt;String&gt; bibtexStringsFromAllLinks = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (String link : links) {</b>
+<b class="nc">&nbsp;            try (InputStream inputStream = new URLDownload(link).asInputStream()) {</b>
+<b class="nc">&nbsp;                List&lt;String&gt; bibtexStringsFromLink = matchRegexFromInputStreamHtml(inputStream, REGEX_FOR_BIBTEX);</b>
+<b class="nc">&nbsp;                bibtexStringsFromAllLinks.addAll(bibtexStringsFromLink);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return bibtexStringsFromAllLinks;</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

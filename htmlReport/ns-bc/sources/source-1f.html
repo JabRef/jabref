@@ -1,0 +1,253 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UnitsToLatexFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.formatter.bibtexfields</a>
+</div>
+
+<h1>Coverage Summary for Class: UnitsToLatexFormatter (org.jabref.logic.formatter.bibtexfields)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UnitsToLatexFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.formatter.bibtexfields;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.Formatter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.strings.StringLengthComparator;
+&nbsp;
+&nbsp;public class UnitsToLatexFormatter extends Formatter {
+&nbsp;
+<b class="nc">&nbsp;    private static final List&lt;String&gt; UNIT_LIST = Arrays.asList(</b>
+&nbsp;            &quot;A&quot;, // Ampere
+&nbsp;            &quot;Ah&quot;, // Ampere hours
+&nbsp;            &quot;B&quot;, // Byte
+&nbsp;            &quot;Bq&quot;, // Bequerel
+&nbsp;            &quot;C&quot;, // Coulomb
+&nbsp;            &quot;F&quot;, // Farad
+&nbsp;            &quot;Gy&quot;, // Gray
+&nbsp;            &quot;H&quot;, // Henry
+&nbsp;            &quot;Hz&quot;, // Hertz
+&nbsp;            &quot;J&quot;, // Joule
+&nbsp;            &quot;K&quot;, // Kelvin
+&nbsp;            &quot;N&quot;, // Newton
+&nbsp;            &quot;\\$\\\\Omega\\$&quot;, // Ohm
+&nbsp;            &quot;Pa&quot;, // Pascal
+&nbsp;            &quot;S&quot;, // Siemens, Samples
+&nbsp;            &quot;Sa&quot;, // Samples
+&nbsp;            &quot;Sv&quot;, // Sv
+&nbsp;            &quot;T&quot;, // Tesla
+&nbsp;            &quot;V&quot;, // Volt
+&nbsp;            &quot;VA&quot;, // Volt ampere
+&nbsp;            &quot;W&quot;, // Watt
+&nbsp;            &quot;Wb&quot;, // Weber
+&nbsp;            &quot;Wh&quot;, // Watt hours
+&nbsp;            &quot;bar&quot;, // bar
+&nbsp;            &quot;b&quot;, // bit
+&nbsp;            &quot;cd&quot;, // candela
+&nbsp;            &quot;dB&quot;, // decibel
+&nbsp;            &quot;dBm&quot;, // decibel
+&nbsp;            &quot;dBc&quot;, // decibel
+&nbsp;            &quot;eV&quot;, // electron volts
+&nbsp;            &quot;inch&quot;, // inch
+&nbsp;            &quot;kat&quot;, // katal
+&nbsp;            &quot;lm&quot;, // lumen
+&nbsp;            &quot;lx&quot;, // lux
+&nbsp;            &quot;m&quot;, // meters
+&nbsp;            &quot;mol&quot;, // mol
+&nbsp;            &quot;rad&quot;, // radians
+&nbsp;            &quot;s&quot;, // seconds
+&nbsp;            &quot;sr&quot; // steradians
+&nbsp;    );
+&nbsp;
+<b class="nc">&nbsp;    private static final List&lt;String&gt; UNIT_PREFIX_LIST = Arrays.asList(</b>
+&nbsp;            &quot;y&quot;, // yocto
+&nbsp;            &quot;z&quot;, // zepto
+&nbsp;            &quot;a&quot;, // atto
+&nbsp;            &quot;f&quot;, // femto
+&nbsp;            &quot;p&quot;, // pico
+&nbsp;            &quot;n&quot;, // nano
+&nbsp;            &quot;\\$\\\\mu\\$&quot;, // micro
+&nbsp;            &quot;u&quot;, // micro
+&nbsp;            &quot;m&quot;, // milli
+&nbsp;            &quot;c&quot;, // centi
+&nbsp;            &quot;d&quot;, // deci
+&nbsp;            &quot;&quot;, // no prefix
+&nbsp;            &quot;da&quot;, // deca
+&nbsp;            &quot;h&quot;, // hekto
+&nbsp;            &quot;k&quot;, // kilo
+&nbsp;            &quot;M&quot;, // mega
+&nbsp;            &quot;G&quot;, // giga
+&nbsp;            &quot;T&quot;, // tera
+&nbsp;            &quot;P&quot;, // peta
+&nbsp;            &quot;E&quot;, // exa
+&nbsp;            &quot;Z&quot;, // zetta
+&nbsp;            &quot;Y&quot; // yotta
+&nbsp;    );
+&nbsp;
+&nbsp;    private final List&lt;String&gt; prefixUnitCombinations;
+&nbsp;
+<b class="nc">&nbsp;    public UnitsToLatexFormatter() {</b>
+<b class="nc">&nbsp;        prefixUnitCombinations = new ArrayList&lt;&gt;(</b>
+<b class="nc">&nbsp;                UnitsToLatexFormatter.UNIT_LIST.size() * UnitsToLatexFormatter.UNIT_PREFIX_LIST.size());</b>
+<b class="nc">&nbsp;        for (String unit : UnitsToLatexFormatter.UNIT_LIST) {</b>
+<b class="nc">&nbsp;            for (String prefix : UnitsToLatexFormatter.UNIT_PREFIX_LIST) {</b>
+<b class="nc">&nbsp;                prefixUnitCombinations.add(prefix + unit);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        prefixUnitCombinations.sort(new StringLengthComparator()); // Sort based on string length</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String text) {
+<b class="nc">&nbsp;        Objects.requireNonNull(text);</b>
+<b class="nc">&nbsp;        if (text.isEmpty()) {</b>
+<b class="nc">&nbsp;            return text;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Replace the hyphen in 12-bit etc with a non-breaking hyphen, will also avoid bad casing of 12-Bit
+<b class="nc">&nbsp;        String result = text.replaceAll(&quot;([0-9,\\.]+)-([Bb][Ii][Tt])&quot;, &quot;$1\\\\mbox\\{-\\}$2&quot;);</b>
+&nbsp;
+&nbsp;        // Replace the space in 12 bit etc with a non-breaking space, will also avoid bad casing of 12 Bit
+<b class="nc">&nbsp;        result = result.replaceAll(&quot;([0-9,\\.]+) ([Bb][Ii][Tt])&quot;, &quot;$1~$2&quot;);</b>
+&nbsp;
+&nbsp;        // For each word in the list
+<b class="nc">&nbsp;        for (String listOfWord : prefixUnitCombinations) {</b>
+&nbsp;            // Add {} if the character before is a space, -, /, (, [, or } or if it is at the start of the string but not if it is followed by a }
+<b class="nc">&nbsp;            result = result.replaceAll(&quot;([0-9])(&quot; + listOfWord + &quot;)&quot;, &quot;$1\\{$2\\}&quot;); // Only add brackets to keep case</b>
+<b class="nc">&nbsp;            result = result.replaceAll(&quot;([0-9])-(&quot; + listOfWord + &quot;)&quot;, &quot;$1\\\\mbox\\{-\\}\\{$2\\}&quot;); // Replace hyphen with non-break hyphen</b>
+<b class="nc">&nbsp;            result = result.replaceAll(&quot;([0-9]) (&quot; + listOfWord + &quot;)&quot;, &quot;$1~\\{$2\\}&quot;); // Replace space with a hard space</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Converts units to LaTeX formatting.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getExampleInput() {
+<b class="nc">&nbsp;        return &quot;1 Hz&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Units to LaTeX&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getKey() {
+<b class="nc">&nbsp;        return &quot;units_to_latex&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

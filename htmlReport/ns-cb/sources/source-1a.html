@@ -1,0 +1,420 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IEEE</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: IEEE (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IEEE</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/124)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.FulltextFetcher;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ImporterPreferences;
+&nbsp;import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.util.URLUtil;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Class for finding PDF URLs for entries on IEEE.
+&nbsp; * Will first look for URLs of the type &lt;code&gt;https://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&amp;amp;]arnumber=...&lt;/code&gt;.
+&nbsp; * If not found, will resolve the DOI, if it starts with 10.1109, and try to find a similar link on the HTML page.
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;https://developer.ieee.org/docs&quot;&gt;API documentation&lt;/a&gt;
+&nbsp; */
+&nbsp;public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher, CustomizableKeyFetcher {
+&nbsp;
+&nbsp;    public static final String FETCHER_NAME = &quot;IEEEXplore&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);</b>
+&nbsp;
+&nbsp;    private static final String STAMP_BASE_STRING_DOCUMENT = &quot;/stamp/stamp.jsp?tp=&amp;arnumber=&quot;;
+<b class="nc">&nbsp;    private static final Pattern STAMP_PATTERN = Pattern.compile(&quot;(/stamp/stamp.jsp\\?t?p?=?&amp;?arnumber=[0-9]+)&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern DOCUMENT_PATTERN = Pattern.compile(&quot;document/([0-9]+)/&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern PDF_PATTERN = Pattern.compile(&quot;\&quot;(https://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\&quot;]+)\&quot;&quot;);</b>
+&nbsp;    private static final String IEEE_DOI = &quot;10.1109&quot;;
+&nbsp;    private static final String BASE_URL = &quot;https://ieeexplore.ieee.org&quot;;
+&nbsp;    private static final String TEST_URL_WITHOUT_API_KEY = &quot;https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&amp;apikey=&quot;;
+&nbsp;
+&nbsp;    private final ImportFormatPreferences importFormatPreferences;
+&nbsp;    private final ImporterPreferences importerPreferences;
+&nbsp;
+&nbsp;    private IEEEQueryTransformer transformer;
+&nbsp;
+<b class="nc">&nbsp;    public IEEE(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {</b>
+<b class="nc">&nbsp;        this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);</b>
+<b class="nc">&nbsp;        this.importerPreferences = Objects.requireNonNull(importerPreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @implNote &lt;a href=&quot;https://developer.ieee.org/docs/read/Metadata_API_responses&quot;&gt;documentation&lt;/a&gt;
+&nbsp;     */
+&nbsp;    private static BibEntry parseJsonResponse(JSONObject jsonEntry, Character keywordSeparator) {
+<b class="nc">&nbsp;        BibEntry entry = new BibEntry();</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (jsonEntry.optString(&quot;content_type&quot;)) {</b>
+&nbsp;            case &quot;Books&quot; -&gt;
+<b class="nc">&nbsp;                    entry.setType(StandardEntryType.Book);</b>
+&nbsp;            case &quot;Conferences&quot; -&gt;
+<b class="nc">&nbsp;                    entry.setType(StandardEntryType.InProceedings);</b>
+&nbsp;            case &quot;Courses&quot; -&gt;
+<b class="nc">&nbsp;                    entry.setType(StandardEntryType.Misc);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    entry.setType(StandardEntryType.Article);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        entry.setField(StandardField.ABSTRACT, jsonEntry.optString(&quot;abstract&quot;));</b>
+&nbsp;        // entry.setField(StandardField.IEEE_ID, jsonEntry.optString(&quot;article_number&quot;));
+&nbsp;
+<b class="nc">&nbsp;        final List&lt;String&gt; authors = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        JSONObject authorsContainer = jsonEntry.optJSONObject(&quot;authors&quot;);</b>
+<b class="nc">&nbsp;        authorsContainer.getJSONArray(&quot;authors&quot;).forEach(authorPure -&gt; {</b>
+<b class="nc">&nbsp;            JSONObject author = (JSONObject) authorPure;</b>
+<b class="nc">&nbsp;            authors.add(author.optString(&quot;full_name&quot;));</b>
+&nbsp;        });
+<b class="nc">&nbsp;        entry.setField(StandardField.AUTHOR, String.join(&quot; and &quot;, authors));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.LOCATION, jsonEntry.optString(&quot;conference_location&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.DOI, jsonEntry.optString(&quot;doi&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.YEAR, jsonEntry.optString(&quot;publication_year&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.PAGES, jsonEntry.optString(&quot;start_page&quot;) + &quot;--&quot; + jsonEntry.optString(&quot;end_page&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        JSONObject keywordsContainer = jsonEntry.optJSONObject(&quot;index_terms&quot;);</b>
+<b class="nc">&nbsp;        if (keywordsContainer != null) {</b>
+<b class="nc">&nbsp;            if (keywordsContainer.has(&quot;ieee_terms&quot;)) {</b>
+<b class="nc">&nbsp;                keywordsContainer.getJSONObject(&quot;ieee_terms&quot;).getJSONArray(&quot;terms&quot;).forEach(data -&gt; {</b>
+<b class="nc">&nbsp;                    String keyword = (String) data;</b>
+<b class="nc">&nbsp;                    entry.addKeyword(keyword, keywordSeparator);</b>
+&nbsp;                });
+&nbsp;            }
+<b class="nc">&nbsp;            if (keywordsContainer.has(&quot;author_terms&quot;)) {</b>
+<b class="nc">&nbsp;                keywordsContainer.getJSONObject(&quot;author_terms&quot;).getJSONArray(&quot;terms&quot;).forEach(data -&gt; {</b>
+<b class="nc">&nbsp;                    String keyword = (String) data;</b>
+<b class="nc">&nbsp;                    entry.addKeyword(keyword, keywordSeparator);</b>
+&nbsp;                });
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        entry.setField(StandardField.ISBN, jsonEntry.optString(&quot;isbn&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.ISSN, jsonEntry.optString(&quot;issn&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.ISSUE, jsonEntry.optString(&quot;issue&quot;));</b>
+<b class="nc">&nbsp;        String pdfUrl = jsonEntry.optString(&quot;pdf_url&quot;);</b>
+<b class="nc">&nbsp;        if (!StringUtil.isBlank(pdfUrl)) {</b>
+<b class="nc">&nbsp;            entry.addFile(new LinkedFile(&quot;&quot;, pdfUrl, &quot;PDF&quot;));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        entry.setField(StandardField.JOURNALTITLE, jsonEntry.optString(&quot;publication_title&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.DATE, jsonEntry.optString(&quot;publication_date&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.EVENTTITLEADDON, jsonEntry.optString(&quot;conference_location&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.EVENTDATE, jsonEntry.optString(&quot;conference_dates&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.PUBLISHER, jsonEntry.optString(&quot;publisher&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.TITLE, jsonEntry.optString(&quot;title&quot;));</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.VOLUME, jsonEntry.optString(&quot;volume&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;URL&gt; findFullText(BibEntry entry) throws FetcherException {
+<b class="nc">&nbsp;        Objects.requireNonNull(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        String stampString = &quot;&quot;;</b>
+&nbsp;
+&nbsp;        // Try URL first -- will primarily work for entries from the old IEEE search
+<b class="nc">&nbsp;        Optional&lt;String&gt; urlString = entry.getField(StandardField.URL);</b>
+<b class="nc">&nbsp;        if (urlString.isPresent()) {</b>
+<b class="nc">&nbsp;            Matcher documentUrlMatcher = DOCUMENT_PATTERN.matcher(urlString.get());</b>
+<b class="nc">&nbsp;            if (documentUrlMatcher.find()) {</b>
+<b class="nc">&nbsp;                String docId = documentUrlMatcher.group(1);</b>
+<b class="nc">&nbsp;                stampString = STAMP_BASE_STRING_DOCUMENT + docId;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // You get this url if you export bibtex from IEEE
+<b class="nc">&nbsp;            Matcher stampMatcher = STAMP_PATTERN.matcher(urlString.get());</b>
+<b class="nc">&nbsp;            if (stampMatcher.find()) {</b>
+&nbsp;                // Found it
+<b class="nc">&nbsp;                stampString = stampMatcher.group(1);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // If not, try DOI
+<b class="nc">&nbsp;        if (stampString.isEmpty()) {</b>
+<b class="nc">&nbsp;            Optional&lt;DOI&gt; doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);</b>
+<b class="nc">&nbsp;            if (doi.isPresent() &amp;&amp; doi.get().asString().startsWith(IEEE_DOI) &amp;&amp; doi.get().getExternalURI().isPresent()) {</b>
+&nbsp;                // Download the HTML page from IEEE
+<b class="nc">&nbsp;                URLDownload urlDownload = null;</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    urlDownload = new URLDownload(doi.get().getExternalURI().get().toURL());</b>
+&nbsp;                } catch (MalformedURLException e) {
+<b class="nc">&nbsp;                    throw new FetcherException(&quot;Malformed URL&quot;, e);</b>
+&nbsp;                }
+&nbsp;                // We don&#39;t need to modify the cookies, but we need support for them
+<b class="nc">&nbsp;                urlDownload.getCookieFromUrl();</b>
+&nbsp;
+<b class="nc">&nbsp;                String resolvedDOIPage = urlDownload.asString();</b>
+&nbsp;                // Try to find the link
+<b class="nc">&nbsp;                Matcher matcher = STAMP_PATTERN.matcher(resolvedDOIPage);</b>
+<b class="nc">&nbsp;                if (matcher.find()) {</b>
+&nbsp;                    // Found it
+<b class="nc">&nbsp;                    stampString = matcher.group(1);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Any success?
+<b class="nc">&nbsp;        if (stampString.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Download the HTML page containing a frame with the PDF
+&nbsp;        URLDownload urlDownload;
+&nbsp;        try {
+<b class="nc">&nbsp;            urlDownload = new URLDownload(BASE_URL + stampString);</b>
+&nbsp;        } catch (MalformedURLException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Malformed URL&quot;, e);</b>
+&nbsp;        }
+&nbsp;        // We don&#39;t need to modify the cookies, but we need support for them
+<b class="nc">&nbsp;        urlDownload.getCookieFromUrl();</b>
+&nbsp;
+<b class="nc">&nbsp;        String framePage = urlDownload.asString();</b>
+&nbsp;        // Try to find the direct PDF link
+<b class="nc">&nbsp;        Matcher matcher = PDF_PATTERN.matcher(framePage);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+&nbsp;            // The PDF was found
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Full text document found on IEEE Xplore&quot;);</b>
+&nbsp;            URL value;
+&nbsp;            try {
+<b class="nc">&nbsp;                value = URLUtil.create(matcher.group(1));</b>
+&nbsp;            } catch (MalformedURLException e) {
+<b class="nc">&nbsp;                throw new FetcherException(&quot;Malformed URL&quot;, e);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return Optional.of(value);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TrustLevel getTrustLevel() {
+<b class="nc">&nbsp;        return TrustLevel.PUBLISHER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return inputStream -&gt; {</b>
+<b class="nc">&nbsp;            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));</b>
+<b class="nc">&nbsp;            JSONObject jsonObject = new JSONObject(response);</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; entries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            if (jsonObject.has(&quot;articles&quot;)) {</b>
+<b class="nc">&nbsp;                JSONArray results = jsonObject.getJSONArray(&quot;articles&quot;);</b>
+<b class="nc">&nbsp;                for (int i = 0; i &lt; results.length(); i++) {</b>
+<b class="nc">&nbsp;                    JSONObject jsonEntry = results.getJSONObject(i);</b>
+<b class="nc">&nbsp;                    BibEntry entry = parseJsonResponse(jsonEntry, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());</b>
+&nbsp;                    boolean addEntry;
+&nbsp;                    // In case entry has no year, add it
+&nbsp;                    // In case an entry has a year, check if its in the year range
+&nbsp;                    // The implementation uses some Java 8 Optional magic to implement that
+<b class="nc">&nbsp;                    if (entry.hasField(StandardField.YEAR)) {</b>
+<b class="nc">&nbsp;                        addEntry = entry.getField(StandardField.YEAR).filter(year -&gt; {</b>
+<b class="nc">&nbsp;                            int yearAsInteger = Integer.parseInt(year);</b>
+<b class="nc">&nbsp;                            return</b>
+<b class="nc">&nbsp;                                    transformer.getStartYear().map(startYear -&gt; yearAsInteger &gt;= startYear).orElse(true) &amp;&amp;</b>
+<b class="nc">&nbsp;                                            transformer.getEndYear().map(endYear -&gt; yearAsInteger &lt;= endYear).orElse(true);</b>
+<b class="nc">&nbsp;                        }).isPresent();</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        addEntry = true;</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (addEntry) {</b>
+<b class="nc">&nbsp;                        entries.add(entry);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return entries;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return FETCHER_NAME;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;HelpFile&gt; getHelpPage() {
+<b class="nc">&nbsp;        return Optional.of(HelpFile.FETCHER_IEEEXPLORE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getTestUrl() {
+<b class="nc">&nbsp;        return TEST_URL_WITHOUT_API_KEY;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getURLForQuery(BaseQueryNode queryNode, int pageNumber) throws URISyntaxException, MalformedURLException {
+&nbsp;        // transformer is stored globally, because we need to filter out the bib entries by the year manually
+&nbsp;        // the transformer stores the min and max year
+<b class="nc">&nbsp;        transformer = new IEEEQueryTransformer();</b>
+<b class="nc">&nbsp;        String transformedQuery = transformer.transformSearchQuery(queryNode).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(&quot;https://ieeexploreapi.ieee.org/api/v1/search/articles&quot;);</b>
+<b class="nc">&nbsp;        importerPreferences.getApiKey(FETCHER_NAME).ifPresent(apiKey -&gt; uriBuilder.addParameter(&quot;apikey&quot;, apiKey));</b>
+<b class="nc">&nbsp;        if (!transformedQuery.isBlank()) {</b>
+<b class="nc">&nbsp;            uriBuilder.addParameter(&quot;querytext&quot;, transformedQuery);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;max_records&quot;, String.valueOf(getPageSize()));</b>
+&nbsp;        // Currently not working as part of the query string
+<b class="nc">&nbsp;        if (transformer.getJournal().isPresent()) {</b>
+<b class="nc">&nbsp;            uriBuilder.addParameter(&quot;publication_title&quot;, transformer.getJournal().get());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (transformer.getStartYear().isPresent()) {</b>
+<b class="nc">&nbsp;            uriBuilder.addParameter(&quot;start_year&quot;, String.valueOf(transformer.getStartYear().get()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (transformer.getEndYear().isPresent()) {</b>
+<b class="nc">&nbsp;            uriBuilder.addParameter(&quot;end_year&quot;, String.valueOf(transformer.getEndYear().get()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (transformer.getArticleNumber().isPresent()) {</b>
+<b class="nc">&nbsp;            uriBuilder.addParameter(&quot;article_number&quot;, transformer.getArticleNumber().get());</b>
+&nbsp;        }
+&nbsp;        // Starts to index at 1 for the first entry
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;start_record&quot;, String.valueOf(getPageSize() * pageNumber) + 1);</b>
+&nbsp;
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

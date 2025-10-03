@@ -1,0 +1,323 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > KeyBindingRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.keyboard</a>
+</div>
+
+<h1>Coverage Summary for Class: KeyBindingRepository (org.jabref.gui.keyboard)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">KeyBindingRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    13%
+  </span>
+  <span class="absValue">
+    (3/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.4%
+  </span>
+  <span class="absValue">
+    (3/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.3%
+  </span>
+  <span class="absValue">
+    (7/57)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.keyboard;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SortedMap;
+&nbsp;import java.util.TreeMap;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.property.MapProperty;
+&nbsp;import javafx.beans.property.SimpleMapProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.scene.input.KeyCode;
+&nbsp;import javafx.scene.input.KeyCombination;
+&nbsp;import javafx.scene.input.KeyEvent;
+&nbsp;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;
+&nbsp;/**
+&nbsp; * Handles keyboard shortcuts. Including checking whether a keybinding matches.
+&nbsp; * See {@link #matches}.
+&nbsp; */
+&nbsp;public class KeyBindingRepository {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * sorted by localization
+&nbsp;     */
+&nbsp;    private final MapProperty&lt;KeyBinding, String&gt; bindings;
+&nbsp;
+&nbsp;    public KeyBindingRepository() {
+<b class="nc">&nbsp;        this(List.of(), List.of());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public KeyBindingRepository(SortedMap&lt;KeyBinding, String&gt; bindings) {</b>
+<b class="nc">&nbsp;        this.bindings = new SimpleMapProperty&lt;&gt;(FXCollections.observableMap(bindings));</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public KeyBindingRepository(List&lt;String&gt; bindNames, List&lt;String&gt; bindings) {</b>
+<b class="fc">&nbsp;        this.bindings = new SimpleMapProperty&lt;&gt;(FXCollections.observableMap(new TreeMap&lt;&gt;(Comparator.comparing(KeyBinding::getLocalization))));</b>
+&nbsp;
+<b class="pc">&nbsp;        if ((bindNames.isEmpty()) || (bindings.isEmpty()) || (bindNames.size() != bindings.size())) {</b>
+&nbsp;            // Use default key bindings
+<b class="fc">&nbsp;            for (KeyBinding keyBinding : KeyBinding.values()) {</b>
+<b class="fc">&nbsp;                put(keyBinding, keyBinding.getDefaultKeyBinding());</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            for (int i = 0; i &lt; bindNames.size(); i++) {</b>
+<b class="nc">&nbsp;                put(bindNames.get(i), bindings.get(i));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check if the given keyCombination equals the given keyEvent
+&nbsp;     *
+&nbsp;     * @param combination as KeyCombination
+&nbsp;     * @param keyEvent    as KeEvent
+&nbsp;     * @return true if matching, else false
+&nbsp;     */
+&nbsp;    public static boolean checkKeyCombinationEquality(KeyCombination combination, KeyEvent keyEvent) {
+<b class="nc">&nbsp;        KeyCode code = keyEvent.getCode();</b>
+<b class="nc">&nbsp;        if (code == KeyCode.UNDEFINED) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return combination.match(keyEvent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; get(KeyBinding key) {
+<b class="nc">&nbsp;        return Optional.ofNullable(bindings.get(key));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String get(String key) {
+<b class="nc">&nbsp;        Optional&lt;KeyBinding&gt; keyBinding = getKeyBinding(key);</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; result = keyBinding.flatMap(k -&gt; Optional.ofNullable(bindings.get(k)));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (result.isPresent()) {</b>
+<b class="nc">&nbsp;            return result.get();</b>
+<b class="nc">&nbsp;        } else if (keyBinding.isPresent()) {</b>
+<b class="nc">&nbsp;            return keyBinding.get().getDefaultKeyBinding();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return &quot;Not associated&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the HashMap containing all key bindings.
+&nbsp;     */
+&nbsp;    public SortedMap&lt;KeyBinding, String&gt; getKeyBindings() {
+<b class="nc">&nbsp;        return new TreeMap&lt;&gt;(bindings);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void put(KeyBinding key, String value) {
+<b class="fc">&nbsp;        bindings.put(key, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void put(String key, String value) {
+<b class="nc">&nbsp;        getKeyBinding(key).ifPresent(binding -&gt; put(binding, value));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;KeyBinding&gt; getKeyBinding(String key) {
+<b class="nc">&nbsp;        return Arrays.stream(KeyBinding.values()).filter(b -&gt; b.getConstant().equals(key)).findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetToDefault(String key) {
+<b class="nc">&nbsp;        getKeyBinding(key).ifPresent(b -&gt; bindings.put(b, b.getDefaultKeyBinding()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetToDefault() {
+<b class="nc">&nbsp;        bindings.forEach((b, s) -&gt; bindings.put(b, b.getDefaultKeyBinding()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int size() {
+<b class="nc">&nbsp;        return this.bindings.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Searches the key bindings for the given KeyEvent. Only the first matching key binding is returned.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If you need all matching key bindings, use {@link #mapToKeyBindings(KeyEvent)} instead.
+&nbsp;     */
+&nbsp;    public Optional&lt;KeyBinding&gt; mapToKeyBinding(KeyEvent keyEvent) {
+<b class="nc">&nbsp;        for (KeyBinding binding : KeyBinding.values()) {</b>
+<b class="nc">&nbsp;            if (checkKeyCombinationEquality(binding, keyEvent)) {</b>
+<b class="nc">&nbsp;                return Optional.of(binding);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Used if the same key could be used by multiple actions
+&nbsp;     */
+&nbsp;    private Set&lt;KeyBinding&gt; mapToKeyBindings(KeyEvent keyEvent) {
+<b class="nc">&nbsp;        return Arrays.stream(KeyBinding.values())</b>
+<b class="nc">&nbsp;                     .filter(binding -&gt; checkKeyCombinationEquality(binding, keyEvent))</b>
+<b class="nc">&nbsp;                     .collect(Collectors.toSet());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the given KeyEvent matches the given KeyBinding.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Used if a keyboard shortcut leads to multiple actions (e.g., ESC for closing a dialog and clearing the search).
+&nbsp;     */
+&nbsp;    public boolean matches(KeyEvent event, KeyBinding keyBinding) {
+<b class="nc">&nbsp;        return mapToKeyBindings(event)</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .anyMatch(binding -&gt; binding == keyBinding);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;KeyCombination&gt; getKeyCombination(KeyBinding bindName) {
+<b class="nc">&nbsp;        String binding = get(bindName.getConstant());</b>
+<b class="nc">&nbsp;        if (binding.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (OS.OS_X) {</b>
+<b class="nc">&nbsp;            binding = binding.replace(&quot;ctrl&quot;, &quot;meta&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(KeyCombination.valueOf(binding));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check if the given KeyBinding equals the given keyEvent
+&nbsp;     *
+&nbsp;     * @param binding  as KeyBinding
+&nbsp;     * @param keyEvent as KeEvent
+&nbsp;     * @return true if matching, else false
+&nbsp;     */
+&nbsp;    public boolean checkKeyCombinationEquality(KeyBinding binding, KeyEvent keyEvent) {
+<b class="nc">&nbsp;        return getKeyCombination(binding).filter(combination -&gt; checkKeyCombinationEquality(combination, keyEvent))</b>
+<b class="nc">&nbsp;                                         .isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getBindNames() {
+<b class="nc">&nbsp;        return bindings.keySet().stream().map(KeyBinding::getConstant).collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getBindings() {
+<b class="nc">&nbsp;        return new ArrayList&lt;&gt;(bindings.values());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MapProperty&lt;KeyBinding, String&gt; getBindingsProperty() {
+<b class="fc">&nbsp;        return bindings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (o == null || getClass() != o.getClass()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        KeyBindingRepository that = (KeyBindingRepository) o;</b>
+&nbsp;
+<b class="nc">&nbsp;        return bindings.equals(that.bindings);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return bindings.hashCode();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

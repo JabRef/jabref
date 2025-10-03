@@ -1,0 +1,209 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GuiPushToApplicationSettings</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.push</a>
+</div>
+
+<h1>Coverage Summary for Class: GuiPushToApplicationSettings (org.jabref.gui.push)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GuiPushToApplicationSettings</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/37)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.push;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.layout.ColumnConstraints;
+&nbsp;import javafx.scene.layout.GridPane;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.util.FileDialogConfiguration;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.push.AbstractPushToApplication;
+&nbsp;import org.jabref.logic.push.PushToApplication;
+&nbsp;import org.jabref.logic.push.PushToApplicationPreferences;
+&nbsp;
+&nbsp;public class GuiPushToApplicationSettings {
+&nbsp;
+&nbsp;    protected final Label commandLabel;
+&nbsp;    protected final TextField path;
+&nbsp;    protected final GridPane settingsPane;
+&nbsp;    protected final PushToApplicationPreferences preferences;
+&nbsp;    protected final AbstractPushToApplication application;
+&nbsp;
+&nbsp;    public GuiPushToApplicationSettings(PushToApplication application,
+&nbsp;                                        DialogService dialogService,
+&nbsp;                                        FilePreferences filePreferences,
+<b class="nc">&nbsp;                                        PushToApplicationPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.application = (AbstractPushToApplication) application;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+&nbsp;
+<b class="nc">&nbsp;        settingsPane = new GridPane();</b>
+<b class="nc">&nbsp;        commandLabel = new Label();</b>
+<b class="nc">&nbsp;        path = new TextField();</b>
+<b class="nc">&nbsp;        Button browse = new Button();</b>
+&nbsp;
+<b class="nc">&nbsp;        settingsPane.setHgap(4.0);</b>
+<b class="nc">&nbsp;        settingsPane.setVgap(4.0);</b>
+&nbsp;
+<b class="nc">&nbsp;        browse.setTooltip(new Tooltip(Localization.lang(&quot;Browse&quot;)));</b>
+<b class="nc">&nbsp;        browse.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());</b>
+<b class="nc">&nbsp;        browse.getStyleClass().addAll(&quot;icon-button&quot;, &quot;narrow&quot;);</b>
+<b class="nc">&nbsp;        browse.setPrefHeight(20.0);</b>
+<b class="nc">&nbsp;        browse.setPrefWidth(20.0);</b>
+&nbsp;
+&nbsp;        // In case the application name and the actual command is not the same, add the command in brackets
+<b class="nc">&nbsp;        StringBuilder commandLine = new StringBuilder(Localization.lang(&quot;Path to %0&quot;, application.getDisplayName()));</b>
+<b class="nc">&nbsp;        if (this.application.getCommandName() == null) {</b>
+<b class="nc">&nbsp;            commandLine.append(&#39;:&#39;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            commandLine.append(&quot; (&quot;).append(this.application.getCommandName()).append(&quot;):&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        commandLabel.setText(commandLine.toString());</b>
+<b class="nc">&nbsp;        settingsPane.add(commandLabel, 0, 0);</b>
+&nbsp;
+<b class="nc">&nbsp;        path.setText(preferences.getCommandPaths().get(this.application.getDisplayName()));</b>
+<b class="nc">&nbsp;        settingsPane.add(path, 1, 0);</b>
+&nbsp;
+<b class="nc">&nbsp;        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()</b>
+<b class="nc">&nbsp;                .withInitialDirectory(filePreferences.getWorkingDirectory()).build();</b>
+<b class="nc">&nbsp;        browse.setOnAction(e -&gt; dialogService.showFileOpenDialog(fileDialogConfiguration)</b>
+<b class="nc">&nbsp;                                             .ifPresent(f -&gt; path.setText(f.toAbsolutePath().toString())));</b>
+<b class="nc">&nbsp;        settingsPane.add(browse, 2, 0);</b>
+&nbsp;
+<b class="nc">&nbsp;        ColumnConstraints textConstraints = new ColumnConstraints();</b>
+<b class="nc">&nbsp;        ColumnConstraints pathConstraints = new ColumnConstraints();</b>
+<b class="nc">&nbsp;        pathConstraints.setHgrow(Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        ColumnConstraints browseConstraints = new ColumnConstraints(20.0);</b>
+<b class="nc">&nbsp;        browseConstraints.setHgrow(Priority.NEVER);</b>
+<b class="nc">&nbsp;        settingsPane.getColumnConstraints().addAll(textConstraints, pathConstraints, browseConstraints);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method is called to indicate that the settings panel returned from the getSettingsPanel() method has been
+&nbsp;     * shown to the user and that the user has indicated that the settings should be stored. This method must store the
+&nbsp;     * state of the widgets in the settings panel to Globals.prefs.
+&nbsp;     */
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; commandPaths = new HashMap&lt;&gt;(preferences.getCommandPaths());</b>
+<b class="nc">&nbsp;        commandPaths.put(application.getDisplayName(), path.getText());</b>
+<b class="nc">&nbsp;        preferences.setCommandPaths(commandPaths);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public GridPane getSettingsPane() {
+<b class="nc">&nbsp;        return this.settingsPane;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

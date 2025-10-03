@@ -1,0 +1,160 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TestEntry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util</a>
+</div>
+
+<h1>Coverage Summary for Class: TestEntry (org.jabref.logic.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TestEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/31)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;public class TestEntry {
+&nbsp;
+&nbsp;    private TestEntry() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static BibEntry getTestEntry() {
+<b class="nc">&nbsp;        BibEntry entry = new BibEntry(StandardEntryType.Article)</b>
+<b class="nc">&nbsp;                .withCitationKey(&quot;Smith2016&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.AUTHOR, &quot;Smith, Bill and Jones, Bob and Williams, Jeff&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.EDITOR, &quot;Taylor, Phil&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.TITLE, &quot;Title of the test entry&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.NUMBER, &quot;3&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.VOLUME, &quot;34&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.ISSUE, &quot;7&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.YEAR, &quot;2016&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.PAGES, &quot;45--67&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.MONTH, &quot;July&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.FILE, &quot;:testentry.pdf:PDF&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.JOURNAL, &quot;BibTeX Journal&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.PUBLISHER, &quot;JabRef Publishing&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.ADDRESS, &quot;Trondheim&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.URL, &quot;https://github.com/JabRef&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.DOI, &quot;10.1001/bla.blubb&quot;)</b>
+<b class="nc">&nbsp;                .withField(StandardField.ABSTRACT,</b>
+&nbsp;                        &quot;This entry describes a test scenario which may be useful in JabRef. By providing a test entry it is possible to see how certain things will look in this graphical BIB-file mananger.&quot;)
+<b class="nc">&nbsp;                .withField(StandardField.COMMENT, &quot;&quot;&quot;</b>
+&nbsp;                        Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et
+&nbsp;                          dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat.
+&nbsp;                          Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non
+&nbsp;                          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+&nbsp;                        &quot;&quot;&quot;);
+<b class="nc">&nbsp;        entry.putKeywords(List.of(&quot;KeyWord1&quot;, &quot;KeyWord2&quot;, &quot;KeyWord3&quot;, &quot;Keyword4&quot;), &#39;;&#39;);</b>
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static BibEntry getTestEntryBook() {
+<b class="nc">&nbsp;        BibEntry entry = new BibEntry(StandardEntryType.Book);</b>
+<b class="nc">&nbsp;        entry.setCitationKey(&quot;Harrer2018&quot;);</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.AUTHOR, &quot;Simon Harrer and Jörg Lenhard and Linus Dietz&quot;);</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.EDITOR, &quot;Andrea Steward&quot;);</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.TITLE, &quot;Java by Comparison&quot;);</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.YEAR, &quot;2018&quot;);</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.MONTH, &quot;March&quot;);</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.PUBLISHER, &quot;Pragmatic Bookshelf&quot;);</b>
+<b class="nc">&nbsp;        entry.setField(StandardField.ADDRESS, &quot;Raleigh, NC&quot;);</b>
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

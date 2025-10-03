@@ -1,0 +1,167 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GitMergeUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.git.merge</a>
+</div>
+
+<h1>Coverage Summary for Class: GitMergeUtil (org.jabref.logic.git.merge)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GitMergeUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.git.merge;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+<b class="nc">&nbsp;public class GitMergeUtil {</b>
+&nbsp;    /**
+&nbsp;     * Replace conflicting entries in the remote context with user-resolved versions.
+&nbsp;     *
+&nbsp;     * @param remote          the original remote BibDatabaseContext
+&nbsp;     * @param resolvedEntries list of entries that the user has manually resolved via GUI
+&nbsp;     * @return a new BibDatabaseContext with resolved entries replacing original ones
+&nbsp;     */
+&nbsp;    public static BibDatabaseContext replaceEntries(BibDatabaseContext remote, List&lt;BibEntry&gt; resolvedEntries) {
+&nbsp;        // 1. make a copy of the remote database
+<b class="nc">&nbsp;        BibDatabase newDatabase = new BibDatabase();</b>
+&nbsp;        // 2. build a map of resolved entries by citation key (assuming all resolved entries have keys)
+<b class="nc">&nbsp;        Map&lt;String, BibEntry&gt; resolvedMap = resolvedEntries.stream()</b>
+<b class="nc">&nbsp;                                                           .filter(entry -&gt; entry.getCitationKey().isPresent())</b>
+<b class="nc">&nbsp;                                                           .collect(Collectors.toMap(</b>
+<b class="nc">&nbsp;                                                                   entry -&gt; entry.getCitationKey().get(),</b>
+<b class="nc">&nbsp;                                                                   Function.identity()));</b>
+&nbsp;
+&nbsp;        // 3. Iterate original remote entries
+<b class="nc">&nbsp;        for (BibEntry entry : remote.getDatabase().getEntries()) {</b>
+<b class="nc">&nbsp;            String citationKey = entry.getCitationKey().orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (citationKey != null &amp;&amp; resolvedMap.containsKey(citationKey)) {</b>
+&nbsp;                // Skip: this entry will be replaced
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+&nbsp;            // Clone the entry and add it to new DB
+<b class="nc">&nbsp;            newDatabase.insertEntry(new BibEntry(entry));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // 4. Insert all resolved entries (cloned for safety)
+<b class="nc">&nbsp;        for (BibEntry resolved : resolvedEntries) {</b>
+<b class="nc">&nbsp;            newDatabase.insertEntry(new BibEntry(resolved));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // 5. Construct a new BibDatabaseContext with this new database and same metadata
+<b class="nc">&nbsp;        return new BibDatabaseContext(newDatabase, remote.getMetaData());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

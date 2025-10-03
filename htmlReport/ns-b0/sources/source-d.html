@@ -1,0 +1,270 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BstListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bst</a>
+</div>
+
+<h1>Coverage Summary for Class: BstListener (org.jabref.logic.bst)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">BstListener</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;// Generated from org/jabref/logic/bst/Bst.g4 by ANTLR 4.13.2
+&nbsp;
+&nbsp;package org.jabref.logic.bst;
+&nbsp;
+&nbsp;import org.antlr.v4.runtime.tree.ParseTreeListener;
+&nbsp;
+&nbsp;/**
+&nbsp; * This interface defines a complete listener for a parse tree produced by
+&nbsp; * {@link BstParser}.
+&nbsp; */
+&nbsp;public interface BstListener extends ParseTreeListener {
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by {@link BstParser#bstFile}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterBstFile(BstParser.BstFileContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by {@link BstParser#bstFile}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitBstFile(BstParser.BstFileContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code stringsCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterStringsCommand(BstParser.StringsCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code stringsCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitStringsCommand(BstParser.StringsCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code integersCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterIntegersCommand(BstParser.IntegersCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code integersCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitIntegersCommand(BstParser.IntegersCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code functionCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterFunctionCommand(BstParser.FunctionCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code functionCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitFunctionCommand(BstParser.FunctionCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code macroCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterMacroCommand(BstParser.MacroCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code macroCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitMacroCommand(BstParser.MacroCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code readCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterReadCommand(BstParser.ReadCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code readCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitReadCommand(BstParser.ReadCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code executeCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterExecuteCommand(BstParser.ExecuteCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code executeCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitExecuteCommand(BstParser.ExecuteCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code iterateCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterIterateCommand(BstParser.IterateCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code iterateCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitIterateCommand(BstParser.IterateCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code reverseCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterReverseCommand(BstParser.ReverseCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code reverseCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitReverseCommand(BstParser.ReverseCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code entryCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterEntryCommand(BstParser.EntryCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code entryCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitEntryCommand(BstParser.EntryCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by the {@code sortCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterSortCommand(BstParser.SortCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by the {@code sortCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitSortCommand(BstParser.SortCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by {@link BstParser#identifier}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterIdentifier(BstParser.IdentifierContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by {@link BstParser#identifier}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitIdentifier(BstParser.IdentifierContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by {@link BstParser#idListObl}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterIdListObl(BstParser.IdListOblContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by {@link BstParser#idListObl}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitIdListObl(BstParser.IdListOblContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by {@link BstParser#idListOpt}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterIdListOpt(BstParser.IdListOptContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by {@link BstParser#idListOpt}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitIdListOpt(BstParser.IdListOptContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by {@link BstParser#bstFunction}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterBstFunction(BstParser.BstFunctionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by {@link BstParser#bstFunction}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitBstFunction(BstParser.BstFunctionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by {@link BstParser#stack}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterStack(BstParser.StackContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by {@link BstParser#stack}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitStack(BstParser.StackContext ctx);
+&nbsp;	/**
+&nbsp;	 * Enter a parse tree produced by {@link BstParser#stackitem}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void enterStackitem(BstParser.StackitemContext ctx);
+&nbsp;	/**
+&nbsp;	 * Exit a parse tree produced by {@link BstParser#stackitem}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 */
+&nbsp;	void exitStackitem(BstParser.StackitemContext ctx);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

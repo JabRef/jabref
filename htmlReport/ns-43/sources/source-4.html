@@ -1,0 +1,318 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IntegrityCheckDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.integrity</a>
+</div>
+
+<h1>Coverage Summary for Class: IntegrityCheckDialog (org.jabref.gui.integrity)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">IntegrityCheckDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/72)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.integrity;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.beans.property.ReadOnlyStringWrapper;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.MenuButton;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;import javafx.scene.control.TableView;
+&nbsp;import javafx.scene.input.MouseButton;
+&nbsp;import javafx.scene.input.MouseEvent;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.stage.Modality;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.LibraryTab;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.entryeditor.EntryEditor;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.ValueTableCellFactory;
+&nbsp;import org.jabref.gui.util.ViewModelTableRowFactory;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.integrity.IntegrityMessage;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.airhacks.afterburner.views.ViewLoaderResult;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import org.controlsfx.control.table.TableFilter;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class IntegrityCheckDialog extends BaseDialog&lt;Void&gt; {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(IntegrityCheckDialog.class);</b>
+&nbsp;
+&nbsp;    @FXML private TableView&lt;IntegrityMessage&gt; messagesTable;
+&nbsp;    @FXML private TableColumn&lt;IntegrityMessage, String&gt; keyColumn;
+&nbsp;    @FXML private TableColumn&lt;IntegrityMessage, String&gt; fieldColumn;
+&nbsp;    @FXML private TableColumn&lt;IntegrityMessage, String&gt; messageColumn;
+&nbsp;    @FXML private MenuButton keyFilterButton;
+&nbsp;    @FXML private MenuButton fieldFilterButton;
+&nbsp;    @FXML private MenuButton messageFilterButton;
+&nbsp;    @FXML private VBox dialogVBox;
+&nbsp;
+&nbsp;    @Inject private EntryEditor entryEditor;
+&nbsp;    @Inject private StateManager stateManager;
+&nbsp;    private final List&lt;IntegrityMessage&gt; messages;
+&nbsp;    private final LibraryTab libraryTab;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private IntegrityCheckDialogViewModel viewModel;
+&nbsp;    private TableFilter&lt;IntegrityMessage&gt; tableFilter;
+&nbsp;    private BibLogSettingsPane bibLogSettingsPane;
+<b class="nc">&nbsp;    private final List&lt;IntegrityMessage&gt; blgWarnings = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    public IntegrityCheckDialog(List&lt;IntegrityMessage&gt; messages, LibraryTab libraryTab, DialogService dialogService) {</b>
+<b class="nc">&nbsp;        this.messages = messages;</b>
+<b class="nc">&nbsp;        this.libraryTab = libraryTab;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.setTitle(Localization.lang(&quot;Check integrity&quot;));</b>
+<b class="nc">&nbsp;        this.initModality(Modality.NONE);</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .load()</b>
+<b class="nc">&nbsp;                  .setAsDialogPane(this);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleRowClick(IntegrityMessage message, MouseEvent event) {
+<b class="nc">&nbsp;        if (event.getButton() == MouseButton.PRIMARY) {</b>
+<b class="nc">&nbsp;            libraryTab.clearAndSelect(message.entry());</b>
+&nbsp;
+<b class="nc">&nbsp;            stateManager.getEditorShowing().setValue(true);</b>
+&nbsp;
+&nbsp;            // Focus field async to give entry editor time to load
+<b class="nc">&nbsp;            Platform.runLater(() -&gt; entryEditor.setFocusToField(message.field()));</b>
+<b class="nc">&nbsp;            if (event.getClickCount() == 2) {</b>
+&nbsp;                this.close();
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegrityCheckDialogViewModel getViewModel() {
+<b class="nc">&nbsp;        return viewModel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        viewModel = new IntegrityCheckDialogViewModel(messages);</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelTableRowFactory&lt;IntegrityMessage&gt;()</b>
+<b class="nc">&nbsp;                .withOnMouseClickedEvent(this::handleRowClick)</b>
+<b class="nc">&nbsp;                .install(messagesTable);</b>
+<b class="nc">&nbsp;        messagesTable.setItems(viewModel.getMessages());</b>
+<b class="nc">&nbsp;        keyColumn.setCellValueFactory(row -&gt; new ReadOnlyStringWrapper(row.getValue().entry().getCitationKey().orElse(&quot;&quot;)));</b>
+<b class="nc">&nbsp;        fieldColumn.setCellValueFactory(row -&gt; new ReadOnlyStringWrapper(FieldTextMapper.getDisplayName(row.getValue().field())));</b>
+<b class="nc">&nbsp;        messageColumn.setCellValueFactory(row -&gt; new ReadOnlyStringWrapper(row.getValue().message()));</b>
+&nbsp;
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;IntegrityMessage, String&gt;()</b>
+<b class="nc">&nbsp;                .withText(Function.identity())</b>
+<b class="nc">&nbsp;                .withTooltip(Function.identity())</b>
+<b class="nc">&nbsp;                .install(messageColumn);</b>
+&nbsp;
+<b class="nc">&nbsp;        tableFilter = TableFilter.forTableView(messagesTable)</b>
+<b class="nc">&nbsp;                                 .apply();</b>
+&nbsp;
+<b class="nc">&nbsp;        addMessageColumnFilter(keyColumn, keyFilterButton);</b>
+<b class="nc">&nbsp;        addMessageColumnFilter(fieldColumn, fieldFilterButton);</b>
+<b class="nc">&nbsp;        addMessageColumnFilter(messageColumn, messageFilterButton);</b>
+&nbsp;
+<b class="nc">&nbsp;        loadBibLogSettingsPane();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addMessageColumnFilter(TableColumn&lt;IntegrityMessage, String&gt; messageColumn, MenuButton messageFilterButton) {
+<b class="nc">&nbsp;        tableFilter.getColumnFilter(messageColumn).ifPresent(columnFilter -&gt; {</b>
+<b class="nc">&nbsp;            ContextMenu messageContextMenu = messageColumn.getContextMenu();</b>
+<b class="nc">&nbsp;            if (messageContextMenu != null) {</b>
+<b class="nc">&nbsp;                messageFilterButton.setContextMenu(messageContextMenu);</b>
+<b class="nc">&nbsp;                messageFilterButton.setOnMouseClicked(event -&gt; {</b>
+<b class="nc">&nbsp;                    if (event.getButton() == MouseButton.PRIMARY) {</b>
+<b class="nc">&nbsp;                        if (messageContextMenu.isShowing()) {</b>
+<b class="nc">&nbsp;                            messageContextMenu.setX(event.getScreenX());</b>
+<b class="nc">&nbsp;                            messageContextMenu.setY(event.getScreenY());</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            messageContextMenu.show(messageFilterButton, event.getScreenX(), event.getScreenY());</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                });
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void clearFilters() {
+<b class="nc">&nbsp;        if (tableFilter != null) {</b>
+<b class="nc">&nbsp;            tableFilter.resetFilter();</b>
+<b class="nc">&nbsp;            messagesTable.getColumns().forEach(column -&gt; {</b>
+<b class="nc">&nbsp;                tableFilter.selectAllValues(column);</b>
+<b class="nc">&nbsp;                column.setGraphic(null);</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Loads the BibLogSettingsPane.fxml view
+&nbsp;     * and initializes its controller.
+&nbsp;     */
+&nbsp;    private void loadBibLogSettingsPane() {
+&nbsp;        try {
+<b class="nc">&nbsp;            ViewLoaderResult result = ViewLoader.view(BibLogSettingsPane.class).load();</b>
+&nbsp;
+<b class="nc">&nbsp;            Node settingsNode = result.getView();</b>
+<b class="nc">&nbsp;            bibLogSettingsPane = (BibLogSettingsPane) result.getController();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (bibLogSettingsPane == null) {</b>
+<b class="nc">&nbsp;                LOGGER.error(&quot;Failed to get controller from ViewLoader&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            bibLogSettingsPane.initializeViewModel(</b>
+<b class="nc">&nbsp;                    libraryTab.getBibDatabaseContext(),</b>
+&nbsp;                    this::reloadBlgWarnings
+&nbsp;            );
+<b class="nc">&nbsp;            dialogVBox.getChildren().add(1, settingsNode);</b>
+<b class="nc">&nbsp;            reloadBlgWarnings();</b>
+&nbsp;        } catch (JabRefException e) {
+<b class="nc">&nbsp;            dialogService.notify(e.getLocalizedMessage());</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Failed to initialize BibLogSettingsPane&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Called on:
+&nbsp;     * (1) Dialog initialization (default load)
+&nbsp;     * (2) User triggers Browse or Reset in BibLogSettingsPane
+&nbsp;     * &lt;p&gt;
+&nbsp;     * This reloads .blg warnings and merges them into the main message list.
+&nbsp;     */
+&nbsp;    private void reloadBlgWarnings() {
+&nbsp;        try {
+<b class="nc">&nbsp;            bibLogSettingsPane.refreshWarnings(libraryTab.getBibDatabaseContext());</b>
+&nbsp;        } catch (JabRefException e) {
+<b class="nc">&nbsp;            dialogService.notify(e.getLocalizedMessage());</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Failed to load .blg warnings&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        List&lt;IntegrityMessage&gt; newWarnings = new ArrayList&lt;&gt;(bibLogSettingsPane.getBlgWarnings());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (newWarnings.isEmpty() &amp;&amp; bibLogSettingsPane.wasBlgFileManuallySelected()) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;No warnings found. Please check if the .blg file matches the current library.&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        messages.removeAll(blgWarnings);</b>
+<b class="nc">&nbsp;        blgWarnings.clear();</b>
+<b class="nc">&nbsp;        blgWarnings.addAll(newWarnings);</b>
+<b class="nc">&nbsp;        messages.addAll(newWarnings);</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel.getMessages().setAll(messages);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

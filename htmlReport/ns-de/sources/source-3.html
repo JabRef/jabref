@@ -1,0 +1,267 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProxyPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.net</a>
+</div>
+
+<h1>Coverage Summary for Class: ProxyPreferences (org.jabref.logic.net)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProxyPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    37.5%
+  </span>
+  <span class="absValue">
+    (9/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    32.7%
+  </span>
+  <span class="absValue">
+    (16/49)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.net;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;
+&nbsp;public class ProxyPreferences {
+&nbsp;
+&nbsp;    private final BooleanProperty useProxy;
+&nbsp;    private final StringProperty hostname;
+&nbsp;    private final StringProperty port;
+&nbsp;    private final BooleanProperty useAuthentication;
+&nbsp;    private final StringProperty username;
+&nbsp;    private final StringProperty password;
+&nbsp;    private final BooleanProperty persistPassword;
+&nbsp;
+&nbsp;    public ProxyPreferences(Boolean useProxy,
+&nbsp;                            String hostname,
+&nbsp;                            String port,
+&nbsp;                            Boolean useAuthentication,
+&nbsp;                            String username,
+&nbsp;                            String password,
+<b class="fc">&nbsp;                            boolean persistPassword) {</b>
+<b class="fc">&nbsp;        this.useProxy = new SimpleBooleanProperty(useProxy);</b>
+<b class="fc">&nbsp;        this.hostname = new SimpleStringProperty(hostname);</b>
+<b class="fc">&nbsp;        this.port = new SimpleStringProperty(port);</b>
+<b class="fc">&nbsp;        this.useAuthentication = new SimpleBooleanProperty(useAuthentication);</b>
+<b class="fc">&nbsp;        this.username = new SimpleStringProperty(username);</b>
+<b class="fc">&nbsp;        this.password = new SimpleStringProperty(password);</b>
+<b class="fc">&nbsp;        this.persistPassword = new SimpleBooleanProperty(persistPassword);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public final boolean shouldUseProxy() {
+<b class="fc">&nbsp;        return useProxy.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty useProxyProperty() {
+<b class="fc">&nbsp;        return useProxy;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUseProxy(boolean useProxy) {
+<b class="nc">&nbsp;        this.useProxy.set(useProxy);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public final String getHostname() {
+<b class="nc">&nbsp;        return hostname.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty hostnameProperty() {
+<b class="fc">&nbsp;        return hostname;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setHostname(String hostname) {
+<b class="nc">&nbsp;        this.hostname.set(hostname);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public final String getPort() {
+<b class="nc">&nbsp;        return port.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty portProperty() {
+<b class="fc">&nbsp;        return port;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPort(String port) {
+<b class="nc">&nbsp;        this.port.set(port);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public final boolean shouldUseAuthentication() {
+<b class="nc">&nbsp;        return useAuthentication.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty useAuthenticationProperty() {
+<b class="fc">&nbsp;        return useAuthentication;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUseAuthentication(boolean useAuthentication) {
+<b class="nc">&nbsp;        this.useAuthentication.set(useAuthentication);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public final String getUsername() {
+<b class="nc">&nbsp;        return username.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty usernameProperty() {
+<b class="fc">&nbsp;        return username;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUsername(String username) {
+<b class="nc">&nbsp;        this.username.set(username);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public final String getPassword() {
+<b class="nc">&nbsp;        return password.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty passwordProperty() {
+<b class="fc">&nbsp;        return password;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPassword(String password) {
+<b class="nc">&nbsp;        this.password.set(password);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldPersistPassword() {
+<b class="nc">&nbsp;        return persistPassword.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty persistPasswordProperty() {
+<b class="fc">&nbsp;        return persistPassword;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPersistPassword(boolean persistPassword) {
+<b class="nc">&nbsp;        this.persistPassword.set(persistPassword);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (o == null || getClass() != o.getClass()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ProxyPreferences other = (ProxyPreferences) o;</b>
+<b class="nc">&nbsp;        return Objects.equals(useProxy.getValue(), other.useProxy.getValue())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(hostname.getValue(), other.hostname.getValue())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(port.getValue(), other.port.getValue())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(useAuthentication.getValue(), other.useAuthentication.getValue())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(username.getValue(), other.username.getValue())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(password.getValue(), other.password.getValue())</b>
+<b class="nc">&nbsp;                &amp;&amp; Objects.equals(persistPassword.getValue(), other.persistPassword.getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(</b>
+<b class="nc">&nbsp;                useProxy.getValue(),</b>
+<b class="nc">&nbsp;                hostname.getValue(),</b>
+<b class="nc">&nbsp;                port.getValue(),</b>
+<b class="nc">&nbsp;                useAuthentication.getValue(),</b>
+<b class="nc">&nbsp;                username.getValue(),</b>
+<b class="nc">&nbsp;                password.getValue(),</b>
+<b class="nc">&nbsp;                persistPassword.getValue());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

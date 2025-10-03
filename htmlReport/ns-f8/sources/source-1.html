@@ -1,0 +1,172 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PostgresSQLNotificationListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.shared.listener</a>
+</div>
+
+<h1>Coverage Summary for Class: PostgresSQLNotificationListener (org.jabref.logic.shared.listener)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PostgresSQLNotificationListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.shared.listener;
+&nbsp;
+&nbsp;import java.sql.SQLException;
+&nbsp;
+&nbsp;import org.jabref.logic.shared.DBMSProcessor;
+&nbsp;import org.jabref.logic.shared.DBMSSynchronizer;
+&nbsp;
+&nbsp;import org.postgresql.PGConnection;
+&nbsp;import org.postgresql.PGNotification;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A listener for PostgreSQL database notifications.
+&nbsp; */
+&nbsp;public class PostgresSQLNotificationListener implements Runnable {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PostgresSQLNotificationListener.class);</b>
+&nbsp;
+&nbsp;    private final DBMSSynchronizer dbmsSynchronizer;
+&nbsp;    private final PGConnection pgConnection;
+&nbsp;    private volatile boolean stop;
+&nbsp;
+<b class="nc">&nbsp;    public PostgresSQLNotificationListener(DBMSSynchronizer dbmsSynchronizer, PGConnection pgConnection) {</b>
+<b class="nc">&nbsp;        this.dbmsSynchronizer = dbmsSynchronizer;</b>
+<b class="nc">&nbsp;        this.pgConnection = pgConnection;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void run() {
+<b class="nc">&nbsp;        stop = false;</b>
+&nbsp;        try {
+&nbsp;            // noinspection InfiniteLoopStatement
+<b class="nc">&nbsp;            while (!stop) {</b>
+<b class="nc">&nbsp;                PGNotification[] notifications = pgConnection.getNotifications();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (notifications != null) {</b>
+<b class="nc">&nbsp;                    for (PGNotification notification : notifications) {</b>
+<b class="nc">&nbsp;                        if (!DBMSProcessor.PROCESSOR_ID.equals(notification.getName())) {</b>
+<b class="nc">&nbsp;                            dbmsSynchronizer.pullChanges();</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+&nbsp;                // Wait a while before checking again for new notifications
+<b class="nc">&nbsp;                Thread.sleep(500);</b>
+&nbsp;            }
+&nbsp;        } catch (SQLException | InterruptedException exception) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error while listening for updates to PostgresSQL&quot;, exception);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void stop() {
+<b class="nc">&nbsp;        stop = true;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ChangeEntryTypeMenu</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.menus</a>
+</div>
+
+<h1>Coverage Summary for Class: ChangeEntryTypeMenu (org.jabref.gui.menus)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChangeEntryTypeMenu</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.menus;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.Menu;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.SeparatorMenuItem;
+&nbsp;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
+&nbsp;import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
+&nbsp;
+&nbsp;public class ChangeEntryTypeMenu {
+&nbsp;
+&nbsp;    private final List&lt;BibEntry&gt; entries;
+&nbsp;    private final BibDatabaseContext bibDatabaseContext;
+&nbsp;    private final UndoManager undoManager;
+&nbsp;    private final ActionFactory factory;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;
+&nbsp;    public ChangeEntryTypeMenu(List&lt;BibEntry&gt; entries,
+&nbsp;                               BibDatabaseContext bibDatabaseContext,
+&nbsp;                               UndoManager undoManager,
+<b class="nc">&nbsp;                               BibEntryTypesManager entryTypesManager) {</b>
+<b class="nc">&nbsp;        this.entries = entries;</b>
+<b class="nc">&nbsp;        this.bibDatabaseContext = bibDatabaseContext;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.factory = new ActionFactory();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ContextMenu asContextMenu() {
+<b class="nc">&nbsp;        ContextMenu menu = new ContextMenu();</b>
+<b class="nc">&nbsp;        menu.getItems().setAll(getMenuItems(entries, bibDatabaseContext, undoManager));</b>
+<b class="nc">&nbsp;        return menu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Menu asSubMenu() {
+<b class="nc">&nbsp;        Menu menu = new Menu(Localization.lang(&quot;Change entry type&quot;));</b>
+<b class="nc">&nbsp;        menu.getItems().setAll(getMenuItems(entries, bibDatabaseContext, undoManager));</b>
+<b class="nc">&nbsp;        return menu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ObservableList&lt;MenuItem&gt; getMenuItems(List&lt;BibEntry&gt; entries, BibDatabaseContext bibDatabaseContext, UndoManager undoManager) {
+<b class="nc">&nbsp;        ObservableList&lt;MenuItem&gt; items = FXCollections.observableArrayList();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (bibDatabaseContext.isBiblatexMode()) {</b>
+&nbsp;            // Default BibLaTeX
+<b class="nc">&nbsp;            items.addAll(fromEntryTypes(entryTypesManager.getAllTypes(BibDatabaseMode.BIBLATEX), entries, undoManager));</b>
+&nbsp;
+&nbsp;            // Custom types
+<b class="nc">&nbsp;            createSubMenu(Localization.lang(&quot;Custom&quot;), entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX), entries, undoManager)</b>
+<b class="nc">&nbsp;                    .ifPresent(subMenu -&gt;</b>
+<b class="nc">&nbsp;                            items.addAll(new SeparatorMenuItem(),</b>
+&nbsp;                                    subMenu
+&nbsp;                            ));
+&nbsp;        } else {
+&nbsp;            // Default BibTeX
+<b class="nc">&nbsp;            createSubMenu(BibDatabaseMode.BIBTEX.getFormattedName(), BibtexEntryTypeDefinitions.ALL, entries, undoManager)</b>
+<b class="nc">&nbsp;                    .ifPresent(items::add);</b>
+&nbsp;
+&nbsp;            // IEEETran
+<b class="nc">&nbsp;            createSubMenu(&quot;IEEETran&quot;, IEEETranEntryTypeDefinitions.ALL, entries, undoManager)</b>
+<b class="nc">&nbsp;                    .ifPresent(subMenu -&gt; items.addAll(</b>
+&nbsp;                            new SeparatorMenuItem(),
+&nbsp;                            subMenu
+&nbsp;                    ));
+&nbsp;
+&nbsp;            // Custom types
+<b class="nc">&nbsp;            createSubMenu(Localization.lang(&quot;Custom&quot;), entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX), entries, undoManager)</b>
+<b class="nc">&nbsp;                    .ifPresent(subMenu -&gt; items.addAll(</b>
+&nbsp;                            new SeparatorMenuItem(),
+&nbsp;                            subMenu
+&nbsp;                    ));
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return items;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;Menu&gt; createSubMenu(String text, List&lt;BibEntryType&gt; entryTypes, List&lt;BibEntry&gt; entries, UndoManager undoManager) {
+<b class="nc">&nbsp;        Menu subMenu = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!entryTypes.isEmpty()) {</b>
+<b class="nc">&nbsp;            subMenu = factory.createMenu(() -&gt; text);</b>
+<b class="nc">&nbsp;            subMenu.getItems().addAll(fromEntryTypes(entryTypes, entries, undoManager));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.ofNullable(subMenu);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;MenuItem&gt; fromEntryTypes(Collection&lt;BibEntryType&gt; types, List&lt;BibEntry&gt; entries, UndoManager undoManager) {
+<b class="nc">&nbsp;        return types.stream()</b>
+<b class="nc">&nbsp;                    .map(BibEntryType::getType)</b>
+<b class="nc">&nbsp;                    .map(type -&gt; factory.createMenuItem(type::getDisplayName, new ChangeEntryTypeAction(type, entries, undoManager)))</b>
+<b class="nc">&nbsp;                    .toList();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

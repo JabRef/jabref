@@ -1,0 +1,331 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DOAJFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: DOAJFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DOAJFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/62)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/79)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.SearchBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.transformers.DefaultSearchQueryTransformer;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fetches data from the Directory of Open Access Journals (DOAJ)
+&nbsp; *
+&nbsp; * @see &lt;a href=&quot;https://doaj.org/api/v1/docs&quot;&gt;API documentation&lt;/a&gt;
+&nbsp; */
+&nbsp;public class DOAJFetcher implements SearchBasedParserFetcher {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(DOAJFetcher.class);</b>
+&nbsp;
+&nbsp;    private static final String SEARCH_URL = &quot;https://doaj.org/api/v1/search/articles/&quot;;
+&nbsp;    private final ImportFormatPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    public DOAJFetcher(ImportFormatPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.preferences = Objects.requireNonNull(preferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Convert a JSONObject containing a bibJSON entry to a BibEntry
+&nbsp;     *
+&nbsp;     * @param bibJsonEntry The JSONObject to convert
+&nbsp;     * @return the converted BibEntry
+&nbsp;     */
+&nbsp;    public static BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry, Character keywordSeparator) {
+&nbsp;        // Fields that are directly accessible at the top level BibJson object
+<b class="nc">&nbsp;        List&lt;Field&gt; singleFields = List.of(StandardField.YEAR, StandardField.TITLE, StandardField.ABSTRACT, StandardField.MONTH);</b>
+&nbsp;
+&nbsp;        // Fields that are accessible in the journal part of the BibJson object
+<b class="nc">&nbsp;        List&lt;Field&gt; journalSingleFields = List.of(StandardField.PUBLISHER, StandardField.NUMBER, StandardField.VOLUME);</b>
+&nbsp;
+<b class="nc">&nbsp;        BibEntry entry = new BibEntry(StandardEntryType.Article);</b>
+&nbsp;
+&nbsp;        // Authors
+<b class="nc">&nbsp;        if (bibJsonEntry.has(&quot;author&quot;)) {</b>
+<b class="nc">&nbsp;            JSONArray authors = bibJsonEntry.getJSONArray(&quot;author&quot;);</b>
+<b class="nc">&nbsp;            List&lt;String&gt; authorList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; authors.length(); i++) {</b>
+<b class="nc">&nbsp;                if (authors.getJSONObject(i).has(&quot;name&quot;)) {</b>
+<b class="nc">&nbsp;                    authorList.add(authors.getJSONObject(i).getString(&quot;name&quot;));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.info(&quot;Empty author name.&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            entry.setField(StandardField.AUTHOR, String.join(&quot; and &quot;, authorList));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.info(&quot;No author found.&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Direct accessible fields
+<b class="nc">&nbsp;        for (Field field : singleFields) {</b>
+<b class="nc">&nbsp;            if (bibJsonEntry.has(field.getName())) {</b>
+<b class="nc">&nbsp;                entry.setField(field, bibJsonEntry.getString(field.getName()));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Page numbers
+<b class="nc">&nbsp;        if (bibJsonEntry.has(&quot;start_page&quot;)) {</b>
+<b class="nc">&nbsp;            if (bibJsonEntry.has(&quot;end_page&quot;)) {</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.PAGES,</b>
+<b class="nc">&nbsp;                        bibJsonEntry.getString(&quot;start_page&quot;) + &quot;--&quot; + bibJsonEntry.getString(&quot;end_page&quot;));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                entry.setField(StandardField.PAGES, bibJsonEntry.getString(&quot;start_page&quot;));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Journal
+<b class="nc">&nbsp;        if (bibJsonEntry.has(&quot;journal&quot;)) {</b>
+<b class="nc">&nbsp;            JSONObject journal = bibJsonEntry.getJSONObject(&quot;journal&quot;);</b>
+&nbsp;            // Journal title
+<b class="nc">&nbsp;            if (journal.has(&quot;title&quot;)) {</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.JOURNAL, journal.getString(&quot;title&quot;).trim());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.info(&quot;No journal title found.&quot;);</b>
+&nbsp;            }
+&nbsp;            // Other journal related fields
+<b class="nc">&nbsp;            for (Field field : journalSingleFields) {</b>
+<b class="nc">&nbsp;                if (journal.has(field.getName())) {</b>
+<b class="nc">&nbsp;                    entry.setField(field, journal.getString(field.getName()));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.info(&quot;No journal information found.&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Keywords
+<b class="nc">&nbsp;        if (bibJsonEntry.has(&quot;keywords&quot;)) {</b>
+<b class="nc">&nbsp;            JSONArray keywords = bibJsonEntry.getJSONArray(&quot;keywords&quot;);</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; keywords.length(); i++) {</b>
+<b class="nc">&nbsp;                if (!keywords.isNull(i)) {</b>
+<b class="nc">&nbsp;                    entry.addKeyword(keywords.getString(i).trim(), keywordSeparator);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Identifiers
+<b class="nc">&nbsp;        if (bibJsonEntry.has(&quot;identifier&quot;)) {</b>
+<b class="nc">&nbsp;            JSONArray identifiers = bibJsonEntry.getJSONArray(&quot;identifier&quot;);</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; identifiers.length(); i++) {</b>
+<b class="nc">&nbsp;                String type = identifiers.getJSONObject(i).getString(&quot;type&quot;);</b>
+<b class="nc">&nbsp;                if (&quot;doi&quot;.equals(type)) {</b>
+<b class="nc">&nbsp;                    entry.setField(StandardField.DOI, identifiers.getJSONObject(i).getString(&quot;id&quot;));</b>
+<b class="nc">&nbsp;                } else if (&quot;pissn&quot;.equals(type)) {</b>
+<b class="nc">&nbsp;                    entry.setField(StandardField.ISSN, identifiers.getJSONObject(i).getString(&quot;id&quot;));</b>
+<b class="nc">&nbsp;                } else if (&quot;eissn&quot;.equals(type)) {</b>
+<b class="nc">&nbsp;                    entry.setField(StandardField.ISSN, identifiers.getJSONObject(i).getString(&quot;id&quot;));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Links
+<b class="nc">&nbsp;        if (bibJsonEntry.has(&quot;link&quot;)) {</b>
+<b class="nc">&nbsp;            JSONArray links = bibJsonEntry.getJSONArray(&quot;link&quot;);</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; links.length(); i++) {</b>
+<b class="nc">&nbsp;                if (links.getJSONObject(i).has(&quot;type&quot;)) {</b>
+<b class="nc">&nbsp;                    String type = links.getJSONObject(i).getString(&quot;type&quot;);</b>
+<b class="nc">&nbsp;                    if (&quot;fulltext&quot;.equals(type) &amp;&amp; links.getJSONObject(i).has(&quot;url&quot;)) {</b>
+<b class="nc">&nbsp;                        entry.setField(StandardField.URL, links.getJSONObject(i).getString(&quot;url&quot;));</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void addPath(URIBuilder base, String subPath) {
+&nbsp;        // slightly altered version based on https://gist.github.com/enginer/230e2dc2f1d213a825d5
+<b class="nc">&nbsp;        if (!StringUtil.isBlank(subPath) &amp;&amp; !&quot;/&quot;.equals(subPath)) {</b>
+<b class="nc">&nbsp;            base.setPath(appendSegmentToPath(base.getPath(), subPath));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String appendSegmentToPath(String path, String segment) {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(path)) {</b>
+<b class="nc">&nbsp;            path = &quot;/&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (path.charAt(path.length() - 1) == &#39;/&#39; || segment.startsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;            return path + segment;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return path + &quot;/&quot; + segment;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;DOAJ&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;HelpFile&gt; getHelpPage() {
+<b class="nc">&nbsp;        return Optional.of(HelpFile.FETCHER_DOAJ);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);</b>
+<b class="nc">&nbsp;        DOAJFetcher.addPath(uriBuilder, new DefaultSearchQueryTransformer().transformSearchQuery(queryNode).orElse(&quot;&quot;));</b>
+&nbsp;        // Number of results
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;pageSize&quot;, &quot;30&quot;);</b>
+&nbsp;        // Page (not needed so far)
+&nbsp;        // uriBuilder.addParameter(&quot;page&quot;, &quot;1&quot;);
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return inputStream -&gt; {</b>
+<b class="nc">&nbsp;            String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));</b>
+<b class="nc">&nbsp;            JSONObject jsonObject = new JSONObject(response);</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; entries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            if (jsonObject.has(&quot;results&quot;)) {</b>
+<b class="nc">&nbsp;                JSONArray results = jsonObject.getJSONArray(&quot;results&quot;);</b>
+<b class="nc">&nbsp;                for (int i = 0; i &lt; results.length(); i++) {</b>
+<b class="nc">&nbsp;                    JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject(&quot;bibjson&quot;);</b>
+<b class="nc">&nbsp;                    BibEntry entry = parseBibJSONtoBibtex(bibJsonEntry, preferences.bibEntryPreferences().getKeywordSeparator());</b>
+<b class="nc">&nbsp;                    entries.add(entry);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return entries;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

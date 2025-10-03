@@ -1,0 +1,204 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BaseWindowEffect</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough.effects</a>
+</div>
+
+<h1>Coverage Summary for Class: BaseWindowEffect (org.jabref.gui.walkthrough.effects)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BaseWindowEffect</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough.effects;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.Scene;
+&nbsp;import javafx.scene.layout.Pane;
+&nbsp;import javafx.stage.Window;
+&nbsp;
+&nbsp;import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
+&nbsp;
+&nbsp;import com.sun.javafx.scene.TreeShowingProperty;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import com.tobiasdiez.easybind.Subscription;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;
+&nbsp;/// Base class for walkthrough effects [Spotlight], [FullScreenDarken], and [Ping].
+&nbsp;public sealed abstract class BaseWindowEffect permits Spotlight, FullScreenDarken, Ping {
+&nbsp;    protected final Pane pane;
+<b class="nc">&nbsp;    protected final List&lt;Subscription&gt; subscriptions = new ArrayList&lt;&gt;();</b>
+&nbsp;    private final WalkthroughUtils.DebouncedInvalidationListener debouncedUpdater;
+&nbsp;
+&nbsp;    /// Constructor for WalkthroughEffect. No scene graph modification is done here. The effect is not attached to the
+&nbsp;    /// pane until [#attach(Node)] is called.
+&nbsp;    ///
+&nbsp;    /// @param pane The pane where the effect will be applied. Usually obtained from [Window#getScene()] and
+&nbsp;    ///                         [Scene#getRoot()]
+<b class="nc">&nbsp;    protected BaseWindowEffect(@NonNull Pane pane) {</b>
+<b class="nc">&nbsp;        this.pane = pane;</b>
+<b class="nc">&nbsp;        this.debouncedUpdater = WalkthroughUtils.debounced(_ -&gt; this.updateLayout());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// The effect is no longer usable and permanently removed from the scene graph. To use this effect again, you can
+&nbsp;    /// ONLY create a new instance of [BaseWindowEffect].
+&nbsp;    public void detach() {
+<b class="nc">&nbsp;        hideEffect();</b>
+<b class="nc">&nbsp;        cleanupListeners();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Updates the layout of the effect. This method is called whenever the pane or the target node (if any) changes
+&nbsp;    /// its size or position.
+&nbsp;    protected abstract void updateLayout();
+&nbsp;
+&nbsp;    /// Hides the effect. The WalkthroughEffect can still be shown again after this method is called by calling
+&nbsp;    /// [BaseWindowEffect#updateLayout()], either manually or due to a layout change in the pane or the target node.
+&nbsp;    protected abstract void hideEffect();
+&nbsp;
+&nbsp;    protected void cleanupListeners() {
+<b class="nc">&nbsp;        debouncedUpdater.cancel();</b>
+<b class="nc">&nbsp;        subscriptions.forEach(Subscription::unsubscribe);</b>
+<b class="nc">&nbsp;        subscriptions.clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void setupListeners(@NonNull Node node) {
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(node.localToSceneTransformProperty(), debouncedUpdater));</b>
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(node.boundsInLocalProperty(), debouncedUpdater));</b>
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(new TreeShowingProperty(node), debouncedUpdater));</b>
+&nbsp;
+<b class="nc">&nbsp;        Scene scene = node.getScene();</b>
+<b class="nc">&nbsp;        if (scene != null) {</b>
+<b class="nc">&nbsp;            subscriptions.add(EasyBind.listen(scene.widthProperty(), debouncedUpdater));</b>
+<b class="nc">&nbsp;            subscriptions.add(EasyBind.listen(scene.heightProperty(), debouncedUpdater));</b>
+<b class="nc">&nbsp;            setupWindowListeners(scene.getWindow());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(node.sceneProperty(), (_, _, newScene) -&gt; {</b>
+<b class="nc">&nbsp;            if (newScene != null) {</b>
+<b class="nc">&nbsp;                subscriptions.add(EasyBind.listen(newScene.widthProperty(), debouncedUpdater));</b>
+<b class="nc">&nbsp;                subscriptions.add(EasyBind.listen(newScene.heightProperty(), debouncedUpdater));</b>
+<b class="nc">&nbsp;                setupWindowListeners(newScene.getWindow());</b>
+&nbsp;            }
+&nbsp;        }));
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void setupPaneListeners() {
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(pane.widthProperty(), debouncedUpdater));</b>
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(pane.heightProperty(), debouncedUpdater));</b>
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(pane.layoutBoundsProperty(), debouncedUpdater));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupWindowListeners(@NonNull Window window) {
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(window.xProperty(), debouncedUpdater));</b>
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(window.yProperty(), debouncedUpdater));</b>
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(window.widthProperty(), debouncedUpdater));</b>
+<b class="nc">&nbsp;        subscriptions.add(EasyBind.listen(window.heightProperty(), debouncedUpdater));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

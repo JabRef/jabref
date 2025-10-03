@@ -1,0 +1,209 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LspConsistencyCheck</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.languageserver.util</a>
+</div>
+
+<h1>Coverage Summary for Class: LspConsistencyCheck (org.jabref.languageserver.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LspConsistencyCheck</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.languageserver.util;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.languageserver.ExtensionSettings;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.field.BibField;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;import com.google.common.collect.Sets;
+&nbsp;import org.eclipse.lsp4j.Diagnostic;
+&nbsp;import org.eclipse.lsp4j.DiagnosticSeverity;
+&nbsp;
+&nbsp;public class LspConsistencyCheck {
+&nbsp;
+&nbsp;    private final ExtensionSettings settings;
+&nbsp;
+<b class="nc">&nbsp;    public LspConsistencyCheck(ExtensionSettings settings) {</b>
+<b class="nc">&nbsp;        this.settings = settings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Diagnostic&gt; check(ParserResult parserResult) {
+<b class="nc">&nbsp;        List&lt;Diagnostic&gt; diagnostics = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();</b>
+<b class="nc">&nbsp;        BibliographyConsistencyCheck.Result result = consistencyCheck.check(parserResult.getDatabaseContext(), (_, _) -&gt; {</b>
+<b class="nc">&nbsp;        });</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;Field&gt; allReportedFields = result.entryTypeToResultMap().values().stream().flatMap(entryTypeResult -&gt; entryTypeResult.fields().stream()).collect(Collectors.toUnmodifiableSet());</b>
+&nbsp;
+<b class="nc">&nbsp;        result.entryTypeToResultMap().forEach((entryType, entryTypeResult) -&gt; {</b>
+<b class="nc">&nbsp;            Optional&lt;BibEntryType&gt; bibEntryType = new BibEntryTypesManager().enrich(entryType, parserResult.getDatabaseContext().getMode());</b>
+<b class="nc">&nbsp;            Set&lt;Field&gt; requiredFields = bibEntryType.map(BibEntryType::getRequiredFields)</b>
+<b class="nc">&nbsp;                                                    .stream()</b>
+<b class="nc">&nbsp;                                                    .flatMap(Collection::stream)</b>
+<b class="nc">&nbsp;                                                    .flatMap(orFields -&gt; orFields.getFields().stream())</b>
+<b class="nc">&nbsp;                                                    .collect(Collectors.toUnmodifiableSet());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (settings.isConsistencyCheckRequired()) {</b>
+<b class="nc">&nbsp;                entryTypeResult.sortedEntries().forEach(entry -&gt; requiredFields.forEach(requiredField -&gt; {</b>
+<b class="nc">&nbsp;                    if (entry.getFieldOrAlias(requiredField).isEmpty()) {</b>
+<b class="nc">&nbsp;                        LspDiagnosticBuilder diagnosticBuilder = LspDiagnosticBuilder.create(parserResult, Localization.lang(&quot;Required field \&quot;%0\&quot; is empty.&quot;, requiredField.getName()));</b>
+<b class="nc">&nbsp;                        diagnosticBuilder.setSeverity(DiagnosticSeverity.Error);</b>
+<b class="nc">&nbsp;                        diagnosticBuilder.setField(requiredField);</b>
+<b class="nc">&nbsp;                        diagnosticBuilder.setEntry(entry);</b>
+<b class="nc">&nbsp;                        diagnostics.add(diagnosticBuilder.build());</b>
+&nbsp;                    }
+&nbsp;                }));
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Set&lt;Field&gt; optionalFields = bibEntryType.map(BibEntryType::getOptionalFields)</b>
+<b class="nc">&nbsp;                                                    .stream()</b>
+<b class="nc">&nbsp;                                                    .flatMap(Collection::stream)</b>
+<b class="nc">&nbsp;                                                    .map(BibField::field)</b>
+<b class="nc">&nbsp;                                                    .filter(allReportedFields::contains)</b>
+<b class="nc">&nbsp;                                                    .collect(Collectors.toUnmodifiableSet());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (settings.isConsistencyCheckOptional()) {</b>
+<b class="nc">&nbsp;                optionalFields.forEach(optionalField -&gt; entryTypeResult.sortedEntries().forEach(entry -&gt; {</b>
+<b class="nc">&nbsp;                    if (entry.getFieldOrAlias(optionalField).isEmpty()) {</b>
+<b class="nc">&nbsp;                        LspDiagnosticBuilder diagnosticBuilder = LspDiagnosticBuilder.create(parserResult, Localization.lang(&quot;Optional field \&quot;%0\&quot; is empty.&quot;, optionalField.getName()));</b>
+<b class="nc">&nbsp;                        diagnosticBuilder.setEntry(entry);</b>
+<b class="nc">&nbsp;                        diagnosticBuilder.setField(optionalField);</b>
+<b class="nc">&nbsp;                        diagnostics.add(diagnosticBuilder.build());</b>
+&nbsp;                    }
+&nbsp;                }));
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Set&lt;Field&gt; unknownFields = Sets.difference(allReportedFields, Sets.union(requiredFields, optionalFields));</b>
+&nbsp;
+<b class="nc">&nbsp;            if (settings.isConsistencyCheckUnknown()) {</b>
+<b class="nc">&nbsp;                unknownFields.forEach(unknownField -&gt; entryTypeResult.sortedEntries().forEach(entry -&gt; {</b>
+<b class="nc">&nbsp;                    if (entry.getField(unknownField).isPresent()) {</b>
+<b class="nc">&nbsp;                        LspDiagnosticBuilder diagnosticBuilder = LspDiagnosticBuilder.create(parserResult, Localization.lang(&quot;Unknown field \&quot;%0\&quot;.&quot;, unknownField.getName()));</b>
+<b class="nc">&nbsp;                        diagnosticBuilder.setEntry(entry);</b>
+<b class="nc">&nbsp;                        diagnosticBuilder.setField(unknownField);</b>
+<b class="nc">&nbsp;                        diagnostics.add(diagnosticBuilder.build());</b>
+&nbsp;                    }
+&nbsp;                }));
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        return diagnostics;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

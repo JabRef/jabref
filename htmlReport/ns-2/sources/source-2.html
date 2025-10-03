@@ -1,0 +1,346 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Launcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref</a>
+</div>
+
+<h1>Coverage Summary for Class: Launcher (org.jabref)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Launcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    71.4%
+  </span>
+  <span class="absValue">
+    (5/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (8/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    63.5%
+  </span>
+  <span class="absValue">
+    (40/63)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Launcher$MultipleInstanceAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    36.4%
+  </span>
+  <span class="absValue">
+    (8/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    65.7%
+  </span>
+  <span class="absValue">
+    (44/67)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.Authenticator;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.jabref.cli.ArgumentProcessor;
+&nbsp;import org.jabref.gui.JabRefGUI;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preferences.JabRefGuiPreferences;
+&nbsp;import org.jabref.logic.UiCommand;
+&nbsp;import org.jabref.logic.citationstyle.CSLStyleLoader;
+&nbsp;import org.jabref.logic.net.ProxyAuthenticator;
+&nbsp;import org.jabref.logic.net.ProxyPreferences;
+&nbsp;import org.jabref.logic.net.ProxyRegisterer;
+&nbsp;import org.jabref.logic.net.ssl.SSLPreferences;
+&nbsp;import org.jabref.logic.net.ssl.TrustStoreManager;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.logic.remote.RemotePreferences;
+&nbsp;import org.jabref.logic.remote.client.RemoteClient;
+&nbsp;import org.jabref.logic.search.PostgreServer;
+&nbsp;import org.jabref.logic.util.BuildInfo;
+&nbsp;import org.jabref.logic.util.Directories;
+&nbsp;import org.jabref.migrations.PreferencesMigrations;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.slf4j.bridge.SLF4JBridgeHandler;
+&nbsp;import org.tinylog.Level;
+&nbsp;import org.tinylog.configuration.Configuration;
+&nbsp;
+&nbsp;/// The main entry point for the JabRef application.
+&nbsp;///
+&nbsp;/// It has two main functions:
+&nbsp;///
+&nbsp;/// - Handle the command line arguments
+&nbsp;/// - Start the JavaFX application
+<b class="nc">&nbsp;public class Launcher {</b>
+&nbsp;    private static Logger LOGGER;
+&nbsp;
+<b class="fc">&nbsp;    public enum MultipleInstanceAction {</b>
+<b class="fc">&nbsp;        CONTINUE,</b>
+<b class="fc">&nbsp;        SHUTDOWN,</b>
+<b class="fc">&nbsp;        FOCUS</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void main(String[] args) {
+<b class="fc">&nbsp;        initLogging(args);</b>
+&nbsp;
+<b class="fc">&nbsp;        Injector.setModelOrService(BuildInfo.class, new BuildInfo());</b>
+&nbsp;
+<b class="fc">&nbsp;        final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();</b>
+&nbsp;
+<b class="fc">&nbsp;        ArgumentProcessor argumentProcessor = new ArgumentProcessor(</b>
+&nbsp;                args,
+&nbsp;                ArgumentProcessor.Mode.INITIAL_START,
+&nbsp;                preferences);
+&nbsp;
+<b class="pc">&nbsp;        if (!argumentProcessor.getGuiCli().usageHelpRequested) {</b>
+<b class="fc">&nbsp;            Injector.setModelOrService(CliPreferences.class, preferences);</b>
+<b class="fc">&nbsp;            Injector.setModelOrService(GuiPreferences.class, preferences);</b>
+&nbsp;
+&nbsp;            // Early exit in case another instance is already running
+<b class="fc">&nbsp;            MultipleInstanceAction instanceAction = handleMultipleAppInstances(args, preferences.getRemotePreferences());</b>
+<b class="pc">&nbsp;            if (instanceAction == MultipleInstanceAction.SHUTDOWN) {</b>
+<b class="nc">&nbsp;                systemExit();</b>
+<b class="pc">&nbsp;            } else if (instanceAction == MultipleInstanceAction.FOCUS) {</b>
+&nbsp;                // Send focus command to running instance
+<b class="nc">&nbsp;                RemotePreferences remotePreferences = preferences.getRemotePreferences();</b>
+<b class="nc">&nbsp;                RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());</b>
+<b class="nc">&nbsp;                remoteClient.sendFocus();</b>
+<b class="nc">&nbsp;                systemExit();</b>
+&nbsp;            }
+&nbsp;
+<b class="fc">&nbsp;            configureProxy(preferences.getProxyPreferences());</b>
+<b class="fc">&nbsp;            configureSSL(preferences.getSSLPreferences());</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        List&lt;UiCommand&gt; uiCommands = argumentProcessor.processArguments();</b>
+<b class="pc">&nbsp;        if (argumentProcessor.shouldShutDown()) {</b>
+<b class="nc">&nbsp;            systemExit();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        PreferencesMigrations.runMigrations(preferences);</b>
+&nbsp;
+<b class="fc">&nbsp;        PostgreServer postgreServer = new PostgreServer();</b>
+<b class="fc">&nbsp;        Injector.setModelOrService(PostgreServer.class, postgreServer);</b>
+&nbsp;
+<b class="fc">&nbsp;        CSLStyleLoader.loadInternalStyles();</b>
+&nbsp;
+<b class="fc">&nbsp;        JabRefGUI.setup(uiCommands, preferences);</b>
+<b class="fc">&nbsp;        JabRefGUI.launch(JabRefGUI.class, args);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This needs to be called as early as possible. After the first log write, it
+&nbsp;     * is not possible to alter the log configuration programmatically anymore.
+&nbsp;     */
+&nbsp;    public static void initLogging(String[] args) {
+&nbsp;        // routeLoggingToSlf4J
+<b class="fc">&nbsp;        SLF4JBridgeHandler.removeHandlersForRootLogger();</b>
+<b class="fc">&nbsp;        SLF4JBridgeHandler.install();</b>
+&nbsp;
+&nbsp;        // We must configure logging as soon as possible, which is why we cannot wait for the usual
+&nbsp;        // argument parsing workflow to parse logging options e.g. --debug
+<b class="pc">&nbsp;        Level logLevel = Arrays.stream(args).anyMatch(&quot;--debug&quot;::equalsIgnoreCase)</b>
+<b class="nc">&nbsp;                         ? Level.DEBUG</b>
+<b class="fc">&nbsp;                         : Level.INFO;</b>
+&nbsp;
+&nbsp;        // addLogToDisk
+&nbsp;        // We cannot use `Injector.instantiateModelOrService(BuildInfo.class).version` here, because this initializes logging
+<b class="fc">&nbsp;        Path directory = Directories.getLogDirectory(new BuildInfo().version);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Files.createDirectories(directory);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER = LoggerFactory.getLogger(Launcher.class);</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not create log directory {}&quot;, directory, e);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // The &quot;Shared File Writer&quot; is explained at
+&nbsp;        // https://tinylog.org/v2/configuration/#shared-file-writer
+<b class="fc">&nbsp;        Map&lt;String, String&gt; configuration = Map.of(</b>
+<b class="fc">&nbsp;                &quot;level&quot;, logLevel.name().toLowerCase(),</b>
+&nbsp;                &quot;writerFile&quot;, &quot;rolling file&quot;,
+<b class="fc">&nbsp;                &quot;writerFile.level&quot;, logLevel.name().toLowerCase(),</b>
+&nbsp;                // We need to manually join the path, because &quot;.resolve&quot; does not work on Windows, because &quot;:&quot; is not allowed in file names on Windows
+&nbsp;                &quot;writerFile.file&quot;, directory + File.separator + &quot;log_{date:yyyy-MM-dd_HH-mm-ss}.txt&quot;,
+&nbsp;                &quot;writerFile.charset&quot;, &quot;UTF-8&quot;,
+&nbsp;                &quot;writerFile.policies&quot;, &quot;startup&quot;,
+&nbsp;                &quot;writerFile.backups&quot;, &quot;30&quot;);
+<b class="fc">&nbsp;        configuration.forEach(Configuration::set);</b>
+&nbsp;
+<b class="fc">&nbsp;        LOGGER = LoggerFactory.getLogger(Launcher.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void systemExit() {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;JabRef shut down after processing command line arguments&quot;);</b>
+&nbsp;        // A clean shutdown takes 60s time
+&nbsp;        // We don&#39;t need the clean shutdown here
+<b class="nc">&nbsp;        System.exit(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return MultipleInstanceAction: CONTINUE if JabRef should continue starting up, SHUTDOWN if it should quit, FOCUS if it should focus the existing instance.
+&nbsp;     */
+&nbsp;    private static MultipleInstanceAction handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
+<b class="fc">&nbsp;        LOGGER.trace(&quot;Checking for remote handling...&quot;);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (remotePreferences.useRemoteServer()) {</b>
+&nbsp;            // Try to contact already running JabRef
+<b class="fc">&nbsp;            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());</b>
+<b class="pc">&nbsp;            if (remoteClient.ping()) {</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Pinging other instance succeeded.&quot;);</b>
+<b class="nc">&nbsp;                if (args.length == 0) {</b>
+&nbsp;                    // There is already a server out there, avoid showing log &quot;Passing arguments&quot; while no arguments are provided.
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;A JabRef instance is already running. Switching to that instance.&quot;);</b>
+<b class="nc">&nbsp;                    return MultipleInstanceAction.FOCUS;</b>
+&nbsp;                } else {
+&nbsp;                    // We are not alone, there is already a server out there, send command line arguments to other instance
+<b class="nc">&nbsp;                    LOGGER.debug(&quot;Passing arguments passed on to running JabRef...&quot;);</b>
+<b class="nc">&nbsp;                    if (remoteClient.sendCommandLineArguments(args)) {</b>
+&nbsp;                        // So we assume it&#39;s all taken care of, and quit.
+&nbsp;                        // Output to both to the log and the screen. Therefore, we do not have an additional System.out.println.
+<b class="nc">&nbsp;                        LOGGER.info(&quot;Arguments passed on to running JabRef instance. Shutting down.&quot;);</b>
+<b class="nc">&nbsp;                        return MultipleInstanceAction.SHUTDOWN;</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        LOGGER.warn(&quot;Could not communicate with other running JabRef instance.&quot;);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                // We do not launch a new instance in presence if there is another instance running
+<b class="nc">&nbsp;                return MultipleInstanceAction.SHUTDOWN;</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                LOGGER.debug(&quot;Could not ping JabRef instance.&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return MultipleInstanceAction.CONTINUE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void configureProxy(ProxyPreferences proxyPreferences) {
+<b class="fc">&nbsp;        ProxyRegisterer.register(proxyPreferences);</b>
+<b class="pc">&nbsp;        if (proxyPreferences.shouldUseProxy() &amp;&amp; proxyPreferences.shouldUseAuthentication()) {</b>
+<b class="nc">&nbsp;            Authenticator.setDefault(new ProxyAuthenticator());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void configureSSL(SSLPreferences sslPreferences) {
+<b class="fc">&nbsp;        TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,217 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SpecialField</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry.field</a>
+</div>
+
+<h1>Coverage Summary for Class: SpecialField (org.jabref.model.entry.field)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SpecialField</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    45.5%
+  </span>
+  <span class="absValue">
+    (5/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    76.9%
+  </span>
+  <span class="absValue">
+    (20/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry.field;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.model.entry.KeywordList;
+&nbsp;
+<b class="fc">&nbsp;public enum SpecialField implements Field {</b>
+&nbsp;
+<b class="fc">&nbsp;    PRINTED(&quot;printed&quot;,</b>
+&nbsp;            SpecialFieldValue.PRINTED
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    PRIORITY(&quot;priority&quot;,</b>
+&nbsp;            SpecialFieldValue.CLEAR_PRIORITY,
+&nbsp;            SpecialFieldValue.PRIORITY_HIGH,
+&nbsp;            SpecialFieldValue.PRIORITY_MEDIUM,
+&nbsp;            SpecialFieldValue.PRIORITY_LOW
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    QUALITY(&quot;qualityassured&quot;,</b>
+&nbsp;            SpecialFieldValue.QUALITY_ASSURED
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    RANKING(&quot;ranking&quot;,</b>
+&nbsp;            SpecialFieldValue.CLEAR_RANK,
+&nbsp;            SpecialFieldValue.RANK_1,
+&nbsp;            SpecialFieldValue.RANK_2,
+&nbsp;            SpecialFieldValue.RANK_3,
+&nbsp;            SpecialFieldValue.RANK_4,
+&nbsp;            SpecialFieldValue.RANK_5
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    READ_STATUS(&quot;readstatus&quot;,</b>
+&nbsp;            SpecialFieldValue.CLEAR_READ_STATUS,
+&nbsp;            SpecialFieldValue.READ,
+&nbsp;            SpecialFieldValue.SKIMMED
+&nbsp;    ),
+&nbsp;
+<b class="fc">&nbsp;    RELEVANCE(&quot;relevance&quot;,</b>
+&nbsp;            SpecialFieldValue.RELEVANT
+&nbsp;    );
+&nbsp;
+&nbsp;    private final List&lt;SpecialFieldValue&gt; values;
+&nbsp;    private final KeywordList keywords;
+&nbsp;    private final HashMap&lt;String, SpecialFieldValue&gt; map;
+&nbsp;    private final String fieldName;
+&nbsp;
+<b class="fc">&nbsp;    SpecialField(String fieldName, SpecialFieldValue... values) {</b>
+<b class="fc">&nbsp;        this.fieldName = fieldName;</b>
+<b class="fc">&nbsp;        this.values = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        this.keywords = new KeywordList();</b>
+<b class="fc">&nbsp;        this.map = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        for (SpecialFieldValue value : values) {</b>
+<b class="fc">&nbsp;            this.values.add(value);</b>
+<b class="fc">&nbsp;            value.getKeyword().ifPresent(keywords::add);</b>
+<b class="fc">&nbsp;            value.getFieldValue().ifPresent(fieldValue -&gt; map.put(fieldValue, value));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;SpecialFieldValue&gt; getValues() {
+<b class="nc">&nbsp;        return this.values;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public KeywordList getKeyWords() {
+<b class="nc">&nbsp;        return this.keywords;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;SpecialField&gt; fromName(String name) {
+<b class="fc">&nbsp;        return Arrays.stream(SpecialField.values())</b>
+<b class="fc">&nbsp;                     .filter(field -&gt; field.getName().equalsIgnoreCase(name))</b>
+<b class="fc">&nbsp;                     .findAny();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isSingleValueField() {
+<b class="nc">&nbsp;        return this.values.size() == 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;SpecialFieldValue&gt; parseValue(String value) {
+<b class="nc">&nbsp;        return Optional.ofNullable(map.get(value));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public EnumSet&lt;FieldProperty&gt; getProperties() {
+<b class="nc">&nbsp;        return EnumSet.noneOf(FieldProperty.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="fc">&nbsp;        return fieldName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isStandardField() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

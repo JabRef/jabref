@@ -1,0 +1,238 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ChatMessageComponent</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.ai.components.aichat.chatmessage</a>
+</div>
+
+<h1>Coverage Summary for Class: ChatMessageComponent (org.jabref.gui.ai.components.aichat.chatmessage)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ChatMessageComponent</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.ai.components.aichat.chatmessage;
+&nbsp;
+&nbsp;import java.util.function.Consumer;
+&nbsp;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.geometry.NodeOrientation;
+&nbsp;import javafx.geometry.Pos;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Pane;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.util.MarkdownTextFlow;
+&nbsp;import org.jabref.logic.ai.util.ErrorMessage;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import dev.langchain4j.data.message.AiMessage;
+&nbsp;import dev.langchain4j.data.message.ChatMessage;
+&nbsp;import dev.langchain4j.data.message.UserMessage;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class ChatMessageComponent extends HBox {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ChatMessageComponent.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;ChatMessage&gt; chatMessage = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Consumer&lt;ChatMessageComponent&gt;&gt; onDelete = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @FXML private HBox wrapperHBox;
+&nbsp;    @FXML private VBox vBox;
+&nbsp;    @FXML private Label sourceLabel;
+&nbsp;    @FXML private Pane markdownContentPane;
+&nbsp;    @FXML private VBox buttonsVBox;
+&nbsp;
+&nbsp;    private final MarkdownTextFlow markdownTextFlow;
+&nbsp;
+<b class="nc">&nbsp;    public ChatMessageComponent() {</b>
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .root(this)</b>
+<b class="nc">&nbsp;                  .load();</b>
+&nbsp;
+<b class="nc">&nbsp;        chatMessage.addListener((_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            if (newValue != null) {</b>
+<b class="nc">&nbsp;                loadChatMessage();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        markdownTextFlow = new MarkdownTextFlow(markdownContentPane);</b>
+<b class="nc">&nbsp;        markdownContentPane.getChildren().add(markdownTextFlow);</b>
+<b class="nc">&nbsp;        markdownContentPane.minHeightProperty().bind(markdownTextFlow.heightProperty());</b>
+<b class="nc">&nbsp;        markdownContentPane.prefHeightProperty().bind(markdownTextFlow.heightProperty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ChatMessageComponent(ChatMessage chatMessage, Consumer&lt;ChatMessageComponent&gt; onDeleteCallback) {
+<b class="nc">&nbsp;        this();</b>
+<b class="nc">&nbsp;        setChatMessage(chatMessage);</b>
+<b class="nc">&nbsp;        setOnDelete(onDeleteCallback);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setChatMessage(ChatMessage chatMessage) {
+<b class="nc">&nbsp;        this.chatMessage.set(chatMessage);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ChatMessage getChatMessage() {
+<b class="nc">&nbsp;        return chatMessage.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setOnDelete(Consumer&lt;ChatMessageComponent&gt; onDeleteCallback) {
+<b class="nc">&nbsp;        this.onDelete.set(onDeleteCallback);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void loadChatMessage() {
+<b class="nc">&nbsp;        switch (chatMessage.get()) {</b>
+<b class="nc">&nbsp;            case UserMessage userMessage -&gt; {</b>
+<b class="nc">&nbsp;                setColor(&quot;-jr-ai-message-user&quot;, &quot;-jr-ai-message-user-border&quot;);</b>
+<b class="nc">&nbsp;                setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);</b>
+<b class="nc">&nbsp;                wrapperHBox.setAlignment(Pos.TOP_RIGHT);</b>
+<b class="nc">&nbsp;                sourceLabel.setText(Localization.lang(&quot;User&quot;));</b>
+<b class="nc">&nbsp;                markdownTextFlow.setMarkdown(userMessage.singleText());</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            case AiMessage aiMessage -&gt; {</b>
+<b class="nc">&nbsp;                setColor(&quot;-jr-ai-message-ai&quot;, &quot;-jr-ai-message-ai-border&quot;);</b>
+<b class="nc">&nbsp;                setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);</b>
+<b class="nc">&nbsp;                wrapperHBox.setAlignment(Pos.TOP_LEFT);</b>
+<b class="nc">&nbsp;                sourceLabel.setText(Localization.lang(&quot;AI&quot;));</b>
+<b class="nc">&nbsp;                markdownTextFlow.setMarkdown(aiMessage.text());</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            case ErrorMessage errorMessage -&gt; {</b>
+<b class="nc">&nbsp;                setColor(&quot;-jr-ai-message-error&quot;, &quot;-jr-ai-message-error-border&quot;);</b>
+<b class="nc">&nbsp;                setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);</b>
+<b class="nc">&nbsp;                sourceLabel.setText(Localization.lang(&quot;Error&quot;));</b>
+<b class="nc">&nbsp;                markdownTextFlow.setMarkdown(errorMessage.getText());</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    LOGGER.error(&quot;ChatMessageComponent supports only user, AI, or error messages, but other type was passed: {}&quot;, chatMessage.get().type().name());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        buttonsVBox.visibleProperty().bind(wrapperHBox.hoverProperty());</b>
+<b class="nc">&nbsp;        HBox.setHgrow(this, Priority.ALWAYS);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void onDeleteClick() {
+<b class="nc">&nbsp;        if (onDelete.get() != null) {</b>
+<b class="nc">&nbsp;            onDelete.get().accept(this);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setColor(String fillColor, String borderColor) {
+<b class="nc">&nbsp;        vBox.setStyle(&quot;-fx-background-color: &quot; + fillColor + &quot;; -fx-border-radius: 10; -fx-background-radius: 10; -fx-border-color: &quot; + borderColor + &quot;; -fx-border-width: 3;&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

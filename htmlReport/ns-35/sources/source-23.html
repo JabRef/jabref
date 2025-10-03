@@ -1,0 +1,195 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SimpleEditor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors</a>
+</div>
+
+<h1>Coverage Summary for Class: SimpleEditor (org.jabref.gui.fieldeditors)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimpleEditor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.scene.Parent;
+&nbsp;import javafx.scene.control.TextInputControl;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;
+&nbsp;import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
+&nbsp;import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.undo.RedoAction;
+&nbsp;import org.jabref.gui.undo.UndoAction;
+&nbsp;import org.jabref.logic.integrity.FieldCheckers;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;public class SimpleEditor extends HBox implements FieldEditorFX {
+&nbsp;
+&nbsp;    private final SimpleEditorViewModel viewModel;
+&nbsp;    private final TextInputControl textInput;
+&nbsp;    private final boolean isMultiLine;
+&nbsp;
+&nbsp;    public SimpleEditor(final Field field,
+&nbsp;                        final SuggestionProvider&lt;?&gt; suggestionProvider,
+&nbsp;                        final FieldCheckers fieldCheckers,
+&nbsp;                        final GuiPreferences preferences,
+&nbsp;                        final boolean isMultiLine,
+&nbsp;                        final UndoManager undoManager,
+&nbsp;                        UndoAction undoAction,
+<b class="nc">&nbsp;                        RedoAction redoAction) {</b>
+<b class="nc">&nbsp;        this.viewModel = new SimpleEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager);</b>
+<b class="nc">&nbsp;        this.isMultiLine = isMultiLine;</b>
+&nbsp;
+<b class="nc">&nbsp;        textInput = createTextInputControl();</b>
+<b class="nc">&nbsp;        HBox.setHgrow(textInput, Priority.ALWAYS);</b>
+&nbsp;
+<b class="nc">&nbsp;        establishBinding(textInput, viewModel.textProperty(), preferences.getKeyBindingRepository(), undoAction, redoAction);</b>
+&nbsp;
+<b class="nc">&nbsp;        ((ContextMenuAddable) textInput).initContextMenu(new DefaultMenu(textInput), preferences.getKeyBindingRepository());</b>
+<b class="nc">&nbsp;        this.getChildren().add(textInput);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!isMultiLine) {</b>
+<b class="nc">&nbsp;            AutoCompletionTextInputBinding&lt;?&gt; autoCompleter = AutoCompletionTextInputBinding.autoComplete(textInput, viewModel::complete, viewModel.getAutoCompletionStrategy());</b>
+<b class="nc">&nbsp;            if (suggestionProvider instanceof ContentSelectorSuggestionProvider) {</b>
+&nbsp;                // If content selector values are present, then we want to show the auto complete suggestions immediately on focus
+<b class="nc">&nbsp;                autoCompleter.setShowOnFocus(true);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected TextInputControl createTextInputControl() {
+<b class="nc">&nbsp;        return isMultiLine ? new EditorTextArea() : new EditorTextField();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void bindToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        viewModel.bindToEntry(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parent getNode() {
+<b class="nc">&nbsp;        return this;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void requestFocus() {
+<b class="nc">&nbsp;        textInput.requestFocus();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected TextInputControl getTextInput() {
+<b class="nc">&nbsp;        return textInput;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

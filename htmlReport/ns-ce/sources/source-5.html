@@ -1,0 +1,284 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OpenLibraryIsbnFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher.isbntobibtex</a>
+</div>
+
+<h1>Coverage Summary for Class: OpenLibraryIsbnFetcher (org.jabref.logic.importer.fetcher.isbntobibtex)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OpenLibraryIsbnFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/76)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher.isbntobibtex;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.IntStream;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.AuthorListParser;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
+&nbsp;import org.jabref.logic.importer.util.JsonReader;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Date;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import kong.unirest.core.JsonNode;
+&nbsp;import kong.unirest.core.Unirest;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONException;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fetcher for OpenLibrary.
+&nbsp; * &lt;a href=&quot;https://openlibrary.org/dev/docs/api/books&quot;&gt;API documentation&lt;/a&gt;.
+&nbsp; */
+&nbsp;public class OpenLibraryIsbnFetcher extends AbstractIsbnFetcher {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(OpenLibraryIsbnFetcher.class);</b>
+&nbsp;    private static final String BASE_URL = &quot;https://openlibrary.org&quot;;
+&nbsp;
+&nbsp;    public OpenLibraryIsbnFetcher(ImportFormatPreferences importFormatPreferences) {
+<b class="nc">&nbsp;        super(importFormatPreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;OpenLibrary&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        this.ensureThatIsbnIsValid(identifier);</b>
+<b class="nc">&nbsp;        return new URIBuilder(BASE_URL)</b>
+<b class="nc">&nbsp;                .setPathSegments(&quot;isbn&quot;, identifier + &quot;.json&quot;)</b>
+<b class="nc">&nbsp;                .build()</b>
+<b class="nc">&nbsp;                .toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return inputStream -&gt; {</b>
+<b class="nc">&nbsp;            JSONObject response = JsonReader.toJsonObject(inputStream);</b>
+<b class="nc">&nbsp;            if (response.isEmpty()) {</b>
+<b class="nc">&nbsp;                return List.of();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String error = response.optString(&quot;error&quot;);</b>
+<b class="nc">&nbsp;            if (StringUtil.isNotBlank(error)) {</b>
+<b class="nc">&nbsp;                throw new ParseException(error);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            BibEntry entry = jsonItemToBibEntry(response);</b>
+<b class="nc">&nbsp;            return List.of(entry);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doPostCleanup(BibEntry entry) {
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
+&nbsp;        try {
+<b class="nc">&nbsp;            BibEntry entry = new BibEntry(StandardEntryType.Book);</b>
+<b class="nc">&nbsp;            String authors = toAuthors(item.optJSONArray(&quot;authors&quot;));</b>
+<b class="nc">&nbsp;            if (authors.isEmpty()) {</b>
+<b class="nc">&nbsp;                JSONArray works = item.optJSONArray(&quot;works&quot;);</b>
+<b class="nc">&nbsp;                authors = fromWorksToAuthors(works);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            entry.setField(StandardField.AUTHOR, authors);</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.PAGES, item.optString(&quot;number_of_pages&quot;));</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.ISBN,</b>
+<b class="nc">&nbsp;                    Optional.ofNullable(item.optJSONArray(&quot;isbn_13&quot;)).map(array -&gt; array.getString(0))</b>
+<b class="nc">&nbsp;                            .or(() -&gt; Optional.ofNullable(item.optJSONArray(&quot;isbn_10&quot;)).map(array -&gt; array.getString(0)))</b>
+<b class="nc">&nbsp;                            .orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.TITLE,</b>
+<b class="nc">&nbsp;                    Optional.ofNullable(item.optString(&quot;full_title&quot;, null))</b>
+<b class="nc">&nbsp;                            .or(() -&gt; Optional.ofNullable(item.optString(&quot;title&quot;, null)))</b>
+<b class="nc">&nbsp;                            .orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.SUBTITLE, item.optString(&quot;subtitle&quot;));</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; yearOpt = Date.parse(item.optString(&quot;publish_date&quot;)).flatMap(Date::getYear).map(</b>
+&nbsp;                    Object::toString);
+<b class="nc">&nbsp;            yearOpt.ifPresent(year -&gt; entry.setField(StandardField.YEAR, year));</b>
+<b class="nc">&nbsp;            entry.setField(StandardField.PUBLISHER,</b>
+<b class="nc">&nbsp;                    Optional.ofNullable(item.optJSONArray(&quot;publishers&quot;)).map(array -&gt; array.getString(0))</b>
+<b class="nc">&nbsp;                            .orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;            return entry;</b>
+&nbsp;        } catch (JSONException exception) {
+<b class="nc">&nbsp;            throw new ParseException(&quot;CrossRef API JSON format has changed&quot;, exception);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String toAuthors(JSONArray authors) {
+<b class="nc">&nbsp;        if (authors == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return IntStream.range(0, authors.length())</b>
+<b class="nc">&nbsp;                        .mapToObj(authors::getJSONObject)</b>
+<b class="nc">&nbsp;                        .map(authorObject -&gt; toAuthor(authorObject.getString(&quot;key&quot;)))</b>
+<b class="nc">&nbsp;                        .collect(AuthorList.collect())</b>
+<b class="nc">&nbsp;                        .getAsLastFirstNamesWithAnd(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Author toAuthor(String key) {
+<b class="nc">&nbsp;        JsonNode authorResponse = Unirest.get(BASE_URL + key + &quot;.json&quot;).asJson().getBody();</b>
+<b class="nc">&nbsp;        if (authorResponse == null) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not parse author&quot;);</b>
+<b class="nc">&nbsp;            return new Author(null, null, null, null, null);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        JSONObject result = authorResponse.getObject();</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; nameOptional = Optional.ofNullable(result.optString(&quot;personal_name&quot;, null)).or(() -&gt; Optional.ofNullable(result.optString(&quot;name&quot;, null)));</b>
+<b class="nc">&nbsp;        if (nameOptional.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not parse author name&quot;);</b>
+<b class="nc">&nbsp;            return new Author(null, null, null, null, null);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        AuthorListParser authorListParser = new AuthorListParser();</b>
+<b class="nc">&nbsp;        AuthorList authorList = authorListParser.parse(nameOptional.get());</b>
+<b class="nc">&nbsp;        return authorList.getAuthor(0);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String fromWorksToAuthors(JSONArray works) {
+<b class="nc">&nbsp;        if (works == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Author&gt; authors = IntStream.range(0, works.length())</b>
+<b class="nc">&nbsp;                                        .mapToObj(works::getJSONObject)</b>
+<b class="nc">&nbsp;                                        .map(obj -&gt; obj.getString(&quot;key&quot;))</b>
+<b class="nc">&nbsp;                                        .map(worksLink -&gt; BASE_URL + worksLink + &quot;.json&quot;)</b>
+<b class="nc">&nbsp;                                        .flatMap(this::fromWorkToAuthors)</b>
+<b class="nc">&nbsp;                                        .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;        return AuthorList.of(authors).getAsLastFirstNamesWithAnd(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Stream&lt;Author&gt; fromWorkToAuthors(String link) {
+<b class="nc">&nbsp;        JsonNode body = Unirest.get(link).asJson().getBody();</b>
+<b class="nc">&nbsp;        JSONArray authors = body.getObject().optJSONArray(&quot;authors&quot;);</b>
+<b class="nc">&nbsp;        if (authors == null) {</b>
+<b class="nc">&nbsp;            return Stream.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return IntStream.range(0, authors.length())</b>
+<b class="nc">&nbsp;                        .mapToObj(authors::getJSONObject)</b>
+<b class="nc">&nbsp;                        .map(authorObject -&gt; toAuthor(authorObject.getJSONObject(&quot;author&quot;).getString(&quot;key&quot;)));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

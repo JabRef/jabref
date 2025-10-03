@@ -1,0 +1,234 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > INSPIREFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: INSPIREFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">INSPIREFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URI;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanup;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.EntryBasedFetcher;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.SearchBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexParser;
+&nbsp;import org.jabref.logic.importer.util.MediaTypes;
+&nbsp;import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
+&nbsp;import org.jabref.logic.net.URLDownload;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Fetches data from the INSPIRE database.
+&nbsp; */
+&nbsp;public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetcher {
+&nbsp;
+&nbsp;    private static final String INSPIRE_HOST = &quot;https://inspirehep.net/api/literature/&quot;;
+&nbsp;    private static final String INSPIRE_DOI_HOST = &quot;https://inspirehep.net/api/doi/&quot;;
+&nbsp;    private static final String INSPIRE_ARXIV_HOST = &quot;https://inspirehep.net/api/arxiv/&quot;;
+&nbsp;
+&nbsp;    private final ImportFormatPreferences importFormatPreferences;
+&nbsp;
+<b class="nc">&nbsp;    public INSPIREFetcher(ImportFormatPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.importFormatPreferences = preferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;INSPIRE&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;HelpFile&gt; getHelpPage() {
+<b class="nc">&nbsp;        return Optional.of(HelpFile.FETCHER_INSPIRE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(INSPIRE_HOST);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;q&quot;, new DefaultQueryTransformer().transformSearchQuery(queryNode).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URLDownload getUrlDownload(URL url) {
+<b class="nc">&nbsp;        URLDownload download = new URLDownload(url);</b>
+<b class="nc">&nbsp;        download.addHeader(&quot;Accept&quot;, MediaTypes.APPLICATION_BIBTEX);</b>
+<b class="nc">&nbsp;        return download;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doPostCleanup(BibEntry entry) {
+&nbsp;        // Remove strange &quot;SLACcitation&quot; field
+<b class="nc">&nbsp;        new FieldFormatterCleanup(new UnknownField(&quot;SLACcitation&quot;), new ClearFormatter()).cleanup(entry);</b>
+&nbsp;
+&nbsp;        // Remove braces around content of &quot;title&quot; field
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.TITLE, new RemoveEnclosingBracesFormatter()).cleanup(entry);</b>
+&nbsp;
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.TITLE, new LatexToUnicodeFormatter()).cleanup(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return new BibtexParser(importFormatPreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;BibEntry&gt; performSearch(BibEntry entry) throws FetcherException {
+<b class="nc">&nbsp;        Optional&lt;String&gt; doi = entry.getField(StandardField.DOI);</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; archiveprefix = entry.getFieldOrAlias(StandardField.ARCHIVEPREFIX);</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; eprint = entry.getField(StandardField.EPRINT);</b>
+&nbsp;
+&nbsp;        String urlString;
+<b class="nc">&nbsp;        if (archiveprefix.filter(&quot;arxiv&quot;::equals).isPresent() &amp;&amp; eprint.isPresent()) {</b>
+<b class="nc">&nbsp;            urlString = INSPIRE_ARXIV_HOST + eprint.get();</b>
+<b class="nc">&nbsp;        } else if (doi.isPresent()) {</b>
+<b class="nc">&nbsp;            urlString = INSPIRE_DOI_HOST + doi.get();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        URL url;
+&nbsp;        try {
+<b class="nc">&nbsp;            url = new URI(urlString).toURL();</b>
+&nbsp;        } catch (MalformedURLException | URISyntaxException e) {
+<b class="nc">&nbsp;            throw new FetcherException(&quot;Invalid URL&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            URLDownload download = getUrlDownload(url);</b>
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; results = getParser().parseEntries(download.asInputStream());</b>
+<b class="nc">&nbsp;            results.forEach(this::doPostCleanup);</b>
+<b class="nc">&nbsp;            return results;</b>
+&nbsp;        } catch (ParseException e) {
+<b class="nc">&nbsp;            throw new FetcherException(url, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

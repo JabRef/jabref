@@ -1,0 +1,286 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > XMLUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util.io</a>
+</div>
+
+<h1>Coverage Summary for Class: XMLUtil (org.jabref.logic.util.io)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XMLUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">XMLUtil$NodeListWrapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util.io;
+&nbsp;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.util.AbstractList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.RandomAccess;
+&nbsp;
+&nbsp;import javax.xml.transform.OutputKeys;
+&nbsp;import javax.xml.transform.Transformer;
+&nbsp;import javax.xml.transform.TransformerException;
+&nbsp;import javax.xml.transform.TransformerFactory;
+&nbsp;import javax.xml.transform.dom.DOMSource;
+&nbsp;import javax.xml.transform.stream.StreamResult;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseStandardStreams;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.w3c.dom.Element;
+&nbsp;import org.w3c.dom.NamedNodeMap;
+&nbsp;import org.w3c.dom.Node;
+&nbsp;import org.w3c.dom.NodeList;
+&nbsp;
+&nbsp;/**
+&nbsp; * Currently used for debugging only
+&nbsp; */
+&nbsp;@AllowedToUseStandardStreams(&quot;Used for debugging only&quot;)
+&nbsp;public class XMLUtil {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(XMLUtil.class);</b>
+&nbsp;
+&nbsp;    private XMLUtil() {
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Prints out the document to standard out. Used to generate files for test cases.
+&nbsp;     */
+&nbsp;    public static void printDocument(Document doc) {
+&nbsp;        try {
+<b class="nc">&nbsp;            DOMSource domSource = new DOMSource(doc);</b>
+<b class="nc">&nbsp;            StringWriter writer = new StringWriter();</b>
+<b class="nc">&nbsp;            StreamResult result = new StreamResult(writer);</b>
+<b class="nc">&nbsp;            TransformerFactory tf = TransformerFactory.newInstance();</b>
+<b class="nc">&nbsp;            Transformer transformer = tf.newTransformer();</b>
+<b class="nc">&nbsp;            transformer.setOutputProperty(OutputKeys.INDENT, &quot;yes&quot;);</b>
+<b class="nc">&nbsp;            transformer.transform(domSource, result);</b>
+<b class="nc">&nbsp;            System.out.println(writer);</b>
+&nbsp;        } catch (TransformerException ex) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;&quot;, ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;Node&gt; asList(NodeList n) {
+<b class="nc">&nbsp;        return n.getLength() == 0 ? List.of() : new NodeListWrapper(n);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the content of a subnode.
+&nbsp;     * For example,
+&nbsp;     * &lt;pre&gt;{@code &lt;item&gt;
+&nbsp;     *     &lt;nodeName&gt;content&lt;/nodeName&gt;
+&nbsp;     * &lt;/item&gt;}&lt;/pre&gt;
+&nbsp;     */
+&nbsp;    public static Optional&lt;String&gt; getNodeContent(Node item, String nodeName) {
+<b class="nc">&nbsp;        if (item.getNodeType() != Node.ELEMENT_NODE) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        NodeList metadata = ((Element) item).getElementsByTagName(nodeName);</b>
+<b class="nc">&nbsp;        if (metadata.getLength() == 1) {</b>
+<b class="nc">&nbsp;            return Optional.ofNullable(metadata.item(0).getTextContent());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the content of an attribute.
+&nbsp;     * For example,
+&nbsp;     * {@code &lt;item attributeName=&quot;content&quot; /&gt;}
+&nbsp;     */
+&nbsp;    public static Optional&lt;String&gt; getAttributeContent(Node item, String attributeName) {
+<b class="nc">&nbsp;        NamedNodeMap attributes = item.getAttributes();</b>
+<b class="nc">&nbsp;        return Optional.ofNullable(attributes.getNamedItem(attributeName)).map(Node::getTextContent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a list of subnodes with the specified tag name.
+&nbsp;     * For example,
+&nbsp;     * &lt;pre&gt;{@code &lt;item&gt;
+&nbsp;     *     &lt;node&gt;first hit&lt;/node&gt;
+&nbsp;     *     &lt;node&gt;second hit&lt;/node&gt;
+&nbsp;     * &lt;/item&gt;}&lt;/pre&gt;
+&nbsp;     */
+&nbsp;    public static List&lt;Node&gt; getNodesByName(Node item, String nodeName) {
+<b class="nc">&nbsp;        if (item.getNodeType() != Node.ELEMENT_NODE) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        NodeList nodes = ((Element) item).getElementsByTagName(nodeName);</b>
+<b class="nc">&nbsp;        return asList(nodes);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets a the first subnode with the specified tag name.
+&nbsp;     * For example,
+&nbsp;     * &lt;pre&gt;{@code &lt;item&gt;
+&nbsp;     *     &lt;node&gt;hit&lt;/node&gt;
+&nbsp;     *     &lt;node&gt;second hit, but not returned&lt;/node&gt;
+&nbsp;     * &lt;/item&gt;}&lt;/pre&gt;
+&nbsp;     */
+&nbsp;    public static Optional&lt;Node&gt; getNode(Node item, String nodeName) {
+<b class="nc">&nbsp;        return getNodesByName(item, nodeName).stream().findFirst();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Wrapper to make NodeList iterable,
+&nbsp;    // taken from &lt;a href=&quot;http://stackoverflow.com/questions/19589231/can-i-iterate-through-a-nodelist-using-for-each-in-java&quot;&gt;StackOverflow Answer&lt;/a&gt;.
+&nbsp;    private static final class NodeListWrapper extends AbstractList&lt;Node&gt; implements RandomAccess {
+&nbsp;
+&nbsp;        private final NodeList list;
+&nbsp;
+<b class="nc">&nbsp;        NodeListWrapper(NodeList list) {</b>
+<b class="nc">&nbsp;            this.list = list;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public Node get(int index) {
+<b class="nc">&nbsp;            return list.item(index);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int size() {
+<b class="nc">&nbsp;            return list.getLength();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

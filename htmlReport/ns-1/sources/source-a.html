@@ -1,0 +1,122 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Org_jabref_gradle_modulePlugin</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">&lt;empty package name&gt;</a>
+</div>
+
+<h1>Coverage Summary for Class: Org_jabref_gradle_modulePlugin (&lt;empty package name&gt;)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Org_jabref_gradle_modulePlugin</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/**
+&nbsp; * Precompiled [org.jabref.gradle.module.gradle.kts][Org_jabref_gradle_module_gradle] script plugin.
+&nbsp; *
+&nbsp; * @see Org_jabref_gradle_module_gradle
+&nbsp; */
+<b class="nc">&nbsp;public</b>
+&nbsp;class Org_jabref_gradle_modulePlugin : org.gradle.api.Plugin&lt;org.gradle.api.Project&gt; {
+&nbsp;    override fun apply(target: org.gradle.api.Project) {
+&nbsp;        try {
+&nbsp;            Class
+<b class="nc">&nbsp;                .forName(&quot;Org_jabref_gradle_module_gradle&quot;)</b>
+<b class="nc">&nbsp;                .getDeclaredConstructor(org.gradle.api.Project::class.java, org.gradle.api.Project::class.java)</b>
+<b class="nc">&nbsp;                .newInstance(target, target)</b>
+&nbsp;        } catch (e: java.lang.reflect.InvocationTargetException) {
+<b class="nc">&nbsp;            throw e.targetException</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

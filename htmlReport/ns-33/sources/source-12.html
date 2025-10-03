@@ -1,0 +1,522 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UnlinkedFilesDialogView</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.externalfiles</a>
+</div>
+
+<h1>Coverage Summary for Class: UnlinkedFilesDialogView (org.jabref.gui.externalfiles)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UnlinkedFilesDialogView</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/127)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UnlinkedFilesDialogView$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">UnlinkedFilesDialogView$SearchContextAction</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/136)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.externalfiles;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.beans.InvalidationListener;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.BooleanBinding;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.scene.control.Accordion;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.CheckBoxTreeItem;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.ContextMenu;
+&nbsp;import javafx.scene.control.Control;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.OverrunStyle;
+&nbsp;import javafx.scene.control.ProgressIndicator;
+&nbsp;import javafx.scene.control.SelectionMode;
+&nbsp;import javafx.scene.control.TableColumn;
+&nbsp;import javafx.scene.control.TableView;
+&nbsp;import javafx.scene.control.TextField;
+&nbsp;import javafx.scene.control.TitledPane;
+&nbsp;import javafx.scene.control.TreeItem;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.icon.JabRefIcon;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.FileNodeViewModel;
+&nbsp;import org.jabref.gui.util.IconValidationDecorator;
+&nbsp;import org.jabref.gui.util.RecursiveTreeItem;
+&nbsp;import org.jabref.gui.util.ValueTableCellFactory;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.gui.util.ViewModelTreeCellFactory;
+&nbsp;import org.jabref.logic.externalfiles.DateRange;
+&nbsp;import org.jabref.logic.externalfiles.ExternalFileSorter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import org.controlsfx.control.CheckTreeView;
+&nbsp;
+&nbsp;public class UnlinkedFilesDialogView extends BaseDialog&lt;Void&gt; {
+&nbsp;    private static final String REFRESH_CLASS = &quot;refresh&quot;;
+&nbsp;
+&nbsp;    @FXML private TextField directoryPathField;
+&nbsp;    @FXML private ComboBox&lt;FileExtensionViewModel&gt; fileTypeCombo;
+&nbsp;    @FXML private ComboBox&lt;DateRange&gt; fileDateCombo;
+&nbsp;    @FXML private ComboBox&lt;ExternalFileSorter&gt; fileSortCombo;
+&nbsp;    @FXML private CheckTreeView&lt;FileNodeViewModel&gt; unlinkedFilesList;
+&nbsp;    @FXML private Button scanButton;
+&nbsp;    @FXML private Button exportButton;
+&nbsp;    @FXML private Button importButton;
+&nbsp;    @FXML private Label progressText;
+&nbsp;    @FXML private Accordion accordion;
+&nbsp;    @FXML private ProgressIndicator progressDisplay;
+&nbsp;    @FXML private VBox progressPane;
+&nbsp;
+&nbsp;    @FXML private TableView&lt;ImportFilesResultItemViewModel&gt; importResultTable;
+&nbsp;    @FXML private TableColumn&lt;ImportFilesResultItemViewModel, JabRefIcon&gt; colStatus;
+&nbsp;    @FXML private TableColumn&lt;ImportFilesResultItemViewModel, String&gt; colMessage;
+&nbsp;    @FXML private TableColumn&lt;ImportFilesResultItemViewModel, String&gt; colFile;
+&nbsp;
+&nbsp;    @FXML private TitledPane filePane;
+&nbsp;    @FXML private TitledPane resultPane;
+&nbsp;
+&nbsp;    @Inject private GuiPreferences preferences;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;    @Inject private StateManager stateManager;
+&nbsp;    @Inject private UndoManager undoManager;
+&nbsp;    @Inject private TaskExecutor taskExecutor;
+&nbsp;    @Inject private FileUpdateMonitor fileUpdateMonitor;
+&nbsp;
+&nbsp;    private final ControlsFxVisualizer validationVisualizer;
+&nbsp;    private UnlinkedFilesDialogViewModel viewModel;
+&nbsp;
+&nbsp;    private BibDatabaseContext bibDatabaseContext;
+&nbsp;
+<b class="nc">&nbsp;    public UnlinkedFilesDialogView() {</b>
+<b class="nc">&nbsp;        this.validationVisualizer = new ControlsFxVisualizer();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.setTitle(Localization.lang(&quot;Search for unlinked local files&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .load()</b>
+<b class="nc">&nbsp;                  .setAsDialogPane(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        setResultConverter(button -&gt; {</b>
+<b class="nc">&nbsp;            if (button == ButtonType.CANCEL) {</b>
+<b class="nc">&nbsp;                viewModel.cancelTasks();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            saveConfiguration();</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        viewModel = new UnlinkedFilesDialogViewModel(</b>
+&nbsp;                dialogService,
+&nbsp;                undoManager,
+&nbsp;                fileUpdateMonitor,
+&nbsp;                preferences,
+&nbsp;                stateManager,
+&nbsp;                taskExecutor);
+&nbsp;
+<b class="nc">&nbsp;        this.bibDatabaseContext = stateManager.getActiveDatabase().orElseThrow(() -&gt; new NullPointerException(&quot;No active library&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        progressDisplay.progressProperty().bind(viewModel.progressValueProperty());</b>
+<b class="nc">&nbsp;        progressText.textProperty().bind(viewModel.progressTextProperty());</b>
+<b class="nc">&nbsp;        progressPane.managedProperty().bind(viewModel.taskActiveProperty());</b>
+<b class="nc">&nbsp;        progressPane.visibleProperty().bind(viewModel.taskActiveProperty());</b>
+<b class="nc">&nbsp;        accordion.disableProperty().bind(viewModel.taskActiveProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel.treeRootProperty().addListener(observable -&gt; {</b>
+<b class="nc">&nbsp;            scanButton.setDefaultButton(false);</b>
+<b class="nc">&nbsp;            importButton.setDefaultButton(true);</b>
+<b class="nc">&nbsp;            scanButton.setDefaultButton(false);</b>
+<b class="nc">&nbsp;            filePane.setExpanded(true);</b>
+<b class="nc">&nbsp;            resultPane.setExpanded(false);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        viewModel.resultTableItems().addListener((InvalidationListener) observable -&gt; {</b>
+<b class="nc">&nbsp;            filePane.setExpanded(false);</b>
+<b class="nc">&nbsp;            resultPane.setExpanded(true);</b>
+<b class="nc">&nbsp;            resultPane.setDisable(false);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        initDirectorySelection();</b>
+<b class="nc">&nbsp;        initUnlinkedFilesList();</b>
+<b class="nc">&nbsp;        initResultTable();</b>
+<b class="nc">&nbsp;        initButtons();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initDirectorySelection() {
+<b class="nc">&nbsp;        validationVisualizer.setDecoration(new IconValidationDecorator());</b>
+&nbsp;
+<b class="nc">&nbsp;        directoryPathField.textProperty().bindBidirectional(viewModel.directoryPathProperty());</b>
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; validationVisualizer.initVisualization(viewModel.directoryPathValidationStatus(), directoryPathField));</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;FileExtensionViewModel&gt;()</b>
+<b class="nc">&nbsp;                .withText(FileExtensionViewModel::getDescription)</b>
+<b class="nc">&nbsp;                .withIcon(FileExtensionViewModel::getIcon)</b>
+<b class="nc">&nbsp;                .install(fileTypeCombo);</b>
+<b class="nc">&nbsp;        fileTypeCombo.setItems(viewModel.getFileFilters());</b>
+<b class="nc">&nbsp;        fileTypeCombo.valueProperty().bindBidirectional(viewModel.selectedExtensionProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;DateRange&gt;()</b>
+<b class="nc">&nbsp;                .withText(DateRange::getDateRange)</b>
+<b class="nc">&nbsp;                .install(fileDateCombo);</b>
+<b class="nc">&nbsp;        fileDateCombo.setItems(viewModel.getDateFilters());</b>
+<b class="nc">&nbsp;        fileDateCombo.valueProperty().bindBidirectional(viewModel.selectedDateProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;ExternalFileSorter&gt;()</b>
+<b class="nc">&nbsp;                .withText(ExternalFileSorter::getSorter)</b>
+<b class="nc">&nbsp;                .install(fileSortCombo);</b>
+<b class="nc">&nbsp;        fileSortCombo.setItems(viewModel.getSorters());</b>
+<b class="nc">&nbsp;        fileSortCombo.valueProperty().bindBidirectional(viewModel.selectedSortProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        directoryPathField.setText(bibDatabaseContext.getFirstExistingFileDir(preferences.getFilePreferences()).map(Path::toString).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;        loadSavedConfiguration();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initUnlinkedFilesList() {
+<b class="nc">&nbsp;        new ViewModelTreeCellFactory&lt;FileNodeViewModel&gt;()</b>
+<b class="nc">&nbsp;                .withText(FileNodeViewModel::getDisplayTextWithEditDate)</b>
+<b class="nc">&nbsp;                .install(unlinkedFilesList);</b>
+&nbsp;
+<b class="nc">&nbsp;        unlinkedFilesList.maxHeightProperty().bind(((Control) filePane.contentProperty().get()).heightProperty());</b>
+<b class="nc">&nbsp;        unlinkedFilesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);</b>
+<b class="nc">&nbsp;        unlinkedFilesList.rootProperty().bind(EasyBind.map(viewModel.treeRootProperty(),</b>
+<b class="nc">&nbsp;                fileNode -&gt; fileNode.map(fileNodeViewModel -&gt; new RecursiveTreeItem&lt;&gt;(fileNodeViewModel, FileNodeViewModel::getChildren))</b>
+<b class="nc">&nbsp;                                    .orElse(null)));</b>
+&nbsp;
+<b class="nc">&nbsp;        unlinkedFilesList.setContextMenu(createSearchContextMenu());</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.subscribe(unlinkedFilesList.rootProperty(), root -&gt; {</b>
+<b class="nc">&nbsp;            if (root != null) {</b>
+<b class="nc">&nbsp;                ((CheckBoxTreeItem&lt;FileNodeViewModel&gt;) root).setSelected(true);</b>
+<b class="nc">&nbsp;                root.setExpanded(true);</b>
+<b class="nc">&nbsp;                EasyBind.bindContent(viewModel.checkedFileListProperty(), unlinkedFilesList.getCheckModel().getCheckedItems());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                EasyBind.bindContent(viewModel.checkedFileListProperty(), FXCollections.observableArrayList());</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initResultTable() {
+<b class="nc">&nbsp;        colFile.setCellValueFactory(cellData -&gt; cellData.getValue().file());</b>
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;ImportFilesResultItemViewModel, String&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic(this::createEllipsisLabel)</b>
+<b class="nc">&nbsp;                .withTooltip(item -&gt; item)</b>
+<b class="nc">&nbsp;                .install(colFile);</b>
+&nbsp;
+<b class="nc">&nbsp;        colMessage.setCellValueFactory(cellData -&gt; cellData.getValue().message());</b>
+<b class="nc">&nbsp;        new ValueTableCellFactory&lt;ImportFilesResultItemViewModel, String&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic(this::createEllipsisLabel)</b>
+<b class="nc">&nbsp;                .withTooltip(item -&gt; item)</b>
+<b class="nc">&nbsp;                .install(colMessage);</b>
+&nbsp;
+<b class="nc">&nbsp;        colStatus.setCellValueFactory(cellData -&gt; cellData.getValue().icon());</b>
+<b class="nc">&nbsp;        colStatus.setCellFactory(new ValueTableCellFactory&lt;ImportFilesResultItemViewModel, JabRefIcon&gt;().withGraphic(JabRefIcon::getGraphicNode));</b>
+<b class="nc">&nbsp;        colFile.setResizable(true);</b>
+<b class="nc">&nbsp;        colStatus.setResizable(true);</b>
+<b class="nc">&nbsp;        colMessage.setResizable(true);</b>
+<b class="nc">&nbsp;        importResultTable.setItems(viewModel.resultTableItems());</b>
+<b class="nc">&nbsp;        importResultTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initButtons() {
+<b class="nc">&nbsp;        BooleanBinding noItemsChecked = Bindings.isNull(unlinkedFilesList.rootProperty())</b>
+<b class="nc">&nbsp;                                                .or(Bindings.isEmpty(viewModel.checkedFileListProperty()));</b>
+<b class="nc">&nbsp;        exportButton.disableProperty().bind(noItemsChecked);</b>
+<b class="nc">&nbsp;        importButton.disableProperty().bind(noItemsChecked);</b>
+&nbsp;
+<b class="nc">&nbsp;        scanButton.setDefaultButton(true);</b>
+<b class="nc">&nbsp;        scanButton.disableProperty().bind(viewModel.taskActiveProperty().or(viewModel.directoryPathValidationStatus().validProperty().not()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void loadSavedConfiguration() {
+<b class="nc">&nbsp;        UnlinkedFilesDialogPreferences unlinkedFilesDialogPreferences = preferences.getUnlinkedFilesDialogPreferences();</b>
+&nbsp;
+<b class="nc">&nbsp;        FileExtensionViewModel selectedExtension = fileTypeCombo.getItems()</b>
+<b class="nc">&nbsp;                                                                .stream()</b>
+<b class="nc">&nbsp;                                                                .filter(item -&gt; Objects.equals(item.getName(), unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedExtension()))</b>
+<b class="nc">&nbsp;                                                                .findFirst()</b>
+<b class="nc">&nbsp;                                                                .orElseGet(() -&gt; new FileExtensionViewModel(StandardFileType.ANY_FILE, preferences.getExternalApplicationsPreferences()));</b>
+<b class="nc">&nbsp;        fileTypeCombo.getSelectionModel().select(selectedExtension);</b>
+<b class="nc">&nbsp;        fileDateCombo.getSelectionModel().select(unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedDateRange());</b>
+<b class="nc">&nbsp;        fileSortCombo.getSelectionModel().select(unlinkedFilesDialogPreferences.getUnlinkedFilesSelectedSort());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void saveConfiguration() {
+<b class="nc">&nbsp;        preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedExtension(fileTypeCombo.getValue().getName());</b>
+<b class="nc">&nbsp;        preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedDateRange(fileDateCombo.getValue());</b>
+<b class="nc">&nbsp;        preferences.getUnlinkedFilesDialogPreferences().setUnlinkedFilesSelectedSort(fileSortCombo.getValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void browseFileDirectory() {
+<b class="nc">&nbsp;        viewModel.browseFileDirectory();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void scanFiles() {
+<b class="nc">&nbsp;        viewModel.startSearch();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void startImport() {
+<b class="nc">&nbsp;        viewModel.startImport();</b>
+&nbsp;
+&nbsp;        // Already imported files should not be re-added at a second click on &quot;Import&quot;. Therefore, all imported files are unchecked.
+<b class="nc">&nbsp;        unlinkedFilesList.getCheckModel().clearChecks();</b>
+&nbsp;
+&nbsp;        // JavaFX does not re-render everything necessary after the file import, and hence it ends up with some misalignment (see https://github.com/JabRef/jabref/issues/12713). Thus, we remove and add the CSS property to force it to re-render.
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;            accordion.getStyleClass().remove(REFRESH_CLASS);</b>
+<b class="nc">&nbsp;            accordion.getStyleClass().add(REFRESH_CLASS);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    void exportSelected() {
+<b class="nc">&nbsp;        viewModel.startExport();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a Label with a maximum width and ellipsis for overflow.
+&nbsp;     * Truncates text if it exceeds two-thirds of the screen width.
+&nbsp;     */
+&nbsp;    private Label createEllipsisLabel(String text) {
+<b class="nc">&nbsp;        Label label = new Label(text);</b>
+<b class="nc">&nbsp;        double maxWidth = colFile.getMaxWidth();</b>
+<b class="nc">&nbsp;        label.setMaxWidth(maxWidth);</b>
+<b class="nc">&nbsp;        label.setTextOverrun(OverrunStyle.LEADING_ELLIPSIS);</b>
+<b class="nc">&nbsp;        return label;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Expands or collapses the specified tree according to the &lt;code&gt;expand&lt;/code&gt;-parameter.
+&nbsp;     */
+&nbsp;    private void expandTree(TreeItem&lt;?&gt; item, boolean expand) {
+<b class="nc">&nbsp;        if ((item != null) &amp;&amp; !item.isLeaf()) {</b>
+<b class="nc">&nbsp;            item.setExpanded(expand);</b>
+<b class="nc">&nbsp;            for (TreeItem&lt;?&gt; child : item.getChildren()) {</b>
+<b class="nc">&nbsp;                expandTree(child, expand);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private ContextMenu createSearchContextMenu() {
+<b class="nc">&nbsp;        ContextMenu contextMenu = new ContextMenu();</b>
+<b class="nc">&nbsp;        ActionFactory factory = new ActionFactory();</b>
+&nbsp;
+<b class="nc">&nbsp;        contextMenu.getItems().add(factory.createMenuItem(StandardActions.SELECT_ALL, new SearchContextAction(StandardActions.SELECT_ALL)));</b>
+<b class="nc">&nbsp;        contextMenu.getItems().add(factory.createMenuItem(StandardActions.UNSELECT_ALL, new SearchContextAction(StandardActions.UNSELECT_ALL)));</b>
+<b class="nc">&nbsp;        contextMenu.getItems().add(factory.createMenuItem(StandardActions.EXPAND_ALL, new SearchContextAction(StandardActions.EXPAND_ALL)));</b>
+<b class="nc">&nbsp;        contextMenu.getItems().add(factory.createMenuItem(StandardActions.COLLAPSE_ALL, new SearchContextAction(StandardActions.COLLAPSE_ALL)));</b>
+&nbsp;
+<b class="nc">&nbsp;        return contextMenu;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private class SearchContextAction extends SimpleCommand {
+&nbsp;
+&nbsp;        private final StandardActions command;
+&nbsp;
+<b class="nc">&nbsp;        public SearchContextAction(StandardActions command) {</b>
+<b class="nc">&nbsp;            this.command = command;</b>
+&nbsp;
+<b class="nc">&nbsp;            this.executable.bind(unlinkedFilesList.rootProperty().isNotNull());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void execute() {
+<b class="nc">&nbsp;            switch (command) {</b>
+&nbsp;                case SELECT_ALL -&gt;
+<b class="nc">&nbsp;                        unlinkedFilesList.getCheckModel().checkAll();</b>
+&nbsp;                case UNSELECT_ALL -&gt;
+<b class="nc">&nbsp;                        unlinkedFilesList.getCheckModel().clearChecks();</b>
+&nbsp;                case EXPAND_ALL -&gt;
+<b class="nc">&nbsp;                        expandTree(unlinkedFilesList.getRoot(), true);</b>
+&nbsp;                case COLLAPSE_ALL -&gt;
+<b class="nc">&nbsp;                        expandTree(unlinkedFilesList.getRoot(), false);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

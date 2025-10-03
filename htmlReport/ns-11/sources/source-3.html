@@ -1,0 +1,213 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AutoCompletePreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.autocompleter</a>
+</div>
+
+<h1>Coverage Summary for Class: AutoCompletePreferences (org.jabref.gui.autocompleter)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AutoCompletePreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AutoCompletePreferences$NameFormat</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.autocompleter;
+&nbsp;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableSet;
+&nbsp;
+&nbsp;import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;public class AutoCompletePreferences {
+&nbsp;
+<b class="nc">&nbsp;    public enum NameFormat {</b>
+<b class="nc">&nbsp;        LAST_FIRST, FIRST_LAST, BOTH</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private final BooleanProperty shouldAutoComplete;
+&nbsp;    private final ObjectProperty&lt;AutoCompleteFirstNameMode&gt; firstNameMode;
+&nbsp;    private final ObjectProperty&lt;NameFormat&gt; nameFormat;
+&nbsp;    private final ObservableSet&lt;Field&gt; completeFields;
+&nbsp;
+&nbsp;    public AutoCompletePreferences(boolean shouldAutoComplete,
+&nbsp;                                   AutoCompleteFirstNameMode firstNameMode,
+&nbsp;                                   NameFormat nameFormat,
+<b class="nc">&nbsp;                                   Set&lt;Field&gt; completeFields) {</b>
+<b class="nc">&nbsp;        this.shouldAutoComplete = new SimpleBooleanProperty(shouldAutoComplete);</b>
+<b class="nc">&nbsp;        this.firstNameMode = new SimpleObjectProperty&lt;&gt;(firstNameMode);</b>
+<b class="nc">&nbsp;        this.nameFormat = new SimpleObjectProperty&lt;&gt;(nameFormat);</b>
+<b class="nc">&nbsp;        this.completeFields = FXCollections.observableSet(completeFields);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldAutoComplete() {
+<b class="nc">&nbsp;        return shouldAutoComplete.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty autoCompleteProperty() {
+<b class="nc">&nbsp;        return shouldAutoComplete;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAutoComplete(boolean shouldAutoComplete) {
+<b class="nc">&nbsp;        this.shouldAutoComplete.set(shouldAutoComplete);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns how the first names are handled.
+&nbsp;     */
+&nbsp;    public AutoCompleteFirstNameMode getFirstNameMode() {
+<b class="nc">&nbsp;        return firstNameMode.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;AutoCompleteFirstNameMode&gt; firstNameModeProperty() {
+<b class="nc">&nbsp;        return firstNameMode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setFirstNameMode(AutoCompleteFirstNameMode firstNameMode) {
+<b class="nc">&nbsp;        this.firstNameMode.set(firstNameMode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public NameFormat getNameFormat() {
+<b class="nc">&nbsp;        return nameFormat.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;NameFormat&gt; nameFormatProperty() {
+<b class="nc">&nbsp;        return nameFormat;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setNameFormat(NameFormat nameFormat) {
+<b class="nc">&nbsp;        this.nameFormat.set(nameFormat);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the list of fields for which autocomplete is enabled
+&nbsp;     *
+&nbsp;     * @return List of field names
+&nbsp;     */
+&nbsp;    public ObservableSet&lt;Field&gt; getCompleteFields() {
+<b class="nc">&nbsp;        return completeFields;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

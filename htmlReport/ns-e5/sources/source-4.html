@@ -1,0 +1,259 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JStyleLoader</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.openoffice.style</a>
+</div>
+
+<h1>Coverage Summary for Class: JStyleLoader (org.jabref.logic.openoffice.style)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JStyleLoader</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.openoffice.style;
+&nbsp;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.layout.LayoutFormatterPreferences;
+&nbsp;import org.jabref.logic.openoffice.OpenOfficePreferences;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class JStyleLoader {
+&nbsp;
+&nbsp;    public static final String DEFAULT_AUTHORYEAR_STYLE_PATH = &quot;/resource/openoffice/default_authoryear.jstyle&quot;;
+&nbsp;    public static final String DEFAULT_NUMERICAL_STYLE_PATH = &quot;/resource/openoffice/default_numerical.jstyle&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(JStyleLoader.class);</b>
+&nbsp;
+&nbsp;    // All internal styles
+<b class="nc">&nbsp;    private final List&lt;String&gt; internalStyleFiles = List.of(DEFAULT_AUTHORYEAR_STYLE_PATH, DEFAULT_NUMERICAL_STYLE_PATH);</b>
+&nbsp;
+&nbsp;    private final OpenOfficePreferences openOfficePreferences;
+&nbsp;    private final LayoutFormatterPreferences layoutFormatterPreferences;
+&nbsp;    private final JournalAbbreviationRepository abbreviationRepository;
+&nbsp;
+&nbsp;    // Lists of the internal
+&nbsp;    // and external styles
+<b class="nc">&nbsp;    private final List&lt;JStyle&gt; internalStyles = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final List&lt;JStyle&gt; externalStyles = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;    public JStyleLoader(OpenOfficePreferences openOfficePreferences,
+&nbsp;                        LayoutFormatterPreferences formatterPreferences,
+<b class="nc">&nbsp;                        JournalAbbreviationRepository abbreviationRepository) {</b>
+<b class="nc">&nbsp;        this.openOfficePreferences = Objects.requireNonNull(openOfficePreferences);</b>
+<b class="nc">&nbsp;        this.layoutFormatterPreferences = Objects.requireNonNull(formatterPreferences);</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = Objects.requireNonNull(abbreviationRepository);</b>
+<b class="nc">&nbsp;        loadInternalStyles();</b>
+<b class="nc">&nbsp;        loadExternalStyles();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;JStyle&gt; getStyles() {
+<b class="nc">&nbsp;        List&lt;JStyle&gt; result = new ArrayList&lt;&gt;(internalStyles);</b>
+<b class="nc">&nbsp;        result.addAll(externalStyles);</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds the given style to the list of styles
+&nbsp;     *
+&nbsp;     * @param filename The filename of the style
+&nbsp;     * @return True if the added style is valid, false otherwise
+&nbsp;     */
+&nbsp;    public boolean addStyleIfValid(Path filename) {
+<b class="nc">&nbsp;        Objects.requireNonNull(filename);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            JStyle newStyle = new JStyle(filename, layoutFormatterPreferences, abbreviationRepository);</b>
+<b class="nc">&nbsp;            if (externalStyles.contains(newStyle)) {</b>
+<b class="nc">&nbsp;                LOGGER.info(&quot;External style file {} already existing.&quot;, filename);</b>
+<b class="nc">&nbsp;            } else if (newStyle.isValid()) {</b>
+<b class="nc">&nbsp;                externalStyles.add(newStyle);</b>
+<b class="nc">&nbsp;                storeExternalStyles();</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Style with filename {} is invalid&quot;, filename);</b>
+&nbsp;            }
+&nbsp;        } catch (FileNotFoundException e) {
+&nbsp;            // The file couldn&#39;t be found... should we tell anyone?
+<b class="nc">&nbsp;            LOGGER.info(&quot;Cannot find external style file {}&quot;, filename, e);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.info(&quot;Problem reading external style file {}&quot;, filename, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void loadExternalStyles() {
+<b class="nc">&nbsp;        externalStyles.clear();</b>
+&nbsp;        // Read external lists
+<b class="nc">&nbsp;        List&lt;String&gt; lists = openOfficePreferences.getExternalJStyles();</b>
+<b class="nc">&nbsp;        for (String filename : lists) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                JStyle style = new JStyle(Path.of(filename), layoutFormatterPreferences, abbreviationRepository);</b>
+<b class="nc">&nbsp;                if (style.isValid()) { // Problem!</b>
+<b class="nc">&nbsp;                    externalStyles.add(style);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.error(&quot;Style with filename {} is invalid&quot;, filename);</b>
+&nbsp;                }
+&nbsp;            } catch (FileNotFoundException e) {
+&nbsp;                // The file couldn&#39;t be found... should we tell anyone?
+<b class="nc">&nbsp;                LOGGER.info(&quot;Cannot find external style file {}&quot;, filename);</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.info(&quot;Problem reading external style file {}&quot;, filename, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void loadInternalStyles() {
+<b class="nc">&nbsp;        internalStyles.clear();</b>
+<b class="nc">&nbsp;        for (String filename : internalStyleFiles) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                internalStyles.add(new JStyle(filename, layoutFormatterPreferences, abbreviationRepository));</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.info(&quot;Problem reading internal style file {}&quot;, filename, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void storeExternalStyles() {
+<b class="nc">&nbsp;        List&lt;String&gt; filenames = new ArrayList&lt;&gt;(externalStyles.size());</b>
+<b class="nc">&nbsp;        for (JStyle style : externalStyles) {</b>
+<b class="nc">&nbsp;            filenames.add(style.getPath());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        openOfficePreferences.setExternalJStyles(filenames);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean removeStyle(JStyle style) {
+<b class="nc">&nbsp;        Objects.requireNonNull(style);</b>
+<b class="nc">&nbsp;        if (!style.isInternalStyle()) {</b>
+<b class="nc">&nbsp;            boolean result = externalStyles.remove(style);</b>
+<b class="nc">&nbsp;            storeExternalStyles();</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JStyle getUsedJstyle() {
+<b class="nc">&nbsp;        String filename = openOfficePreferences.getCurrentJStyle();</b>
+<b class="nc">&nbsp;        if (filename != null) {</b>
+<b class="nc">&nbsp;            for (JStyle style : getStyles()) {</b>
+<b class="nc">&nbsp;                if (filename.equals(style.getPath())) {</b>
+<b class="nc">&nbsp;                    return style;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        // Pick the first internal
+<b class="nc">&nbsp;        openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());</b>
+<b class="nc">&nbsp;        return internalStyles.getFirst();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,5 +1,5 @@
 package org.jabref.logic.bst.util;
-
+import static org.junit.jupiter.api.Assertions.*;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bst.util.BstCaseChanger.FormatMode;
@@ -18,6 +18,13 @@ class BstCaseChangersTest {
     @MethodSource("provideStringsForTitleLowers")
     void changeCaseTitleLowers(String expected, String toBeFormatted) {
         assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.TITLE_LOWERS));
+    }
+    static Stream<BstCaseChanger.FormatMode> provideFormatModes() {
+        return Stream.of(
+                BstCaseChanger.FormatMode.TITLE_LOWERS,
+                BstCaseChanger.FormatMode.ALL_LOWERS,
+                BstCaseChanger.FormatMode.ALL_UPPERS
+        );
     }
 
     private static Stream<Arguments> provideStringsForTitleLowers() {
@@ -60,6 +67,20 @@ class BstCaseChangersTest {
     @MethodSource("provideStringsForAllLowers")
     void changeCaseAllLowers(String expected, String toBeFormatted) {
         assertEquals(expected, BstCaseChanger.changeCase(toBeFormatted, FormatMode.ALL_LOWERS));
+    }
+    //Swen 777 Test
+    @Test
+    void changeCase_empty_noChange() {
+        assertEquals("", BstCaseChanger.changeCase("", FormatMode.ALL_LOWERS));
+        assertEquals("", BstCaseChanger.changeCase("", FormatMode.ALL_UPPERS));
+        assertEquals("", BstCaseChanger.changeCase("", FormatMode.TITLE_LOWERS));
+    }
+ //Swen 777 tests
+    @Test
+    void changeCase_titleCase_wordBoundaries() {
+        assertEquals("hello world", BstCaseChanger.changeCase("hello world", FormatMode.TITLE_LOWERS));
+        assertEquals("hello   world", BstCaseChanger.changeCase("hello   world", FormatMode.TITLE_LOWERS));
+        assertEquals("hello-world", BstCaseChanger.changeCase("hello-world", FormatMode.TITLE_LOWERS));
     }
 
     private static Stream<Arguments> provideStringsForAllLowers() {

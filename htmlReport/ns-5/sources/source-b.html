@@ -1,0 +1,193 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NavigationHistory</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui</a>
+</div>
+
+<h1>Coverage Summary for Class: NavigationHistory (org.jabref.gui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NavigationHistory</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;/**
+&nbsp; * Manages the navigation history of viewed entries using two stacks.
+&nbsp; * This class encapsulates the logic of moving back and forward by maintaining a &quot;back&quot; stack for past entries
+&nbsp; * and a &quot;forward&quot; stack for future entries.
+&nbsp; */
+<b class="nc">&nbsp;public class NavigationHistory {</b>
+<b class="nc">&nbsp;    private final List&lt;BibEntry&gt; previousEntries = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final List&lt;BibEntry&gt; nextEntries = new ArrayList&lt;&gt;();</b>
+&nbsp;    private BibEntry currentEntry;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets a new entry as the current one, clearing the forward history.
+&nbsp;     * The previously current entry is moved to the back stack.
+&nbsp;     *
+&nbsp;     * @param entry The BibEntry to add to the history.
+&nbsp;     */
+&nbsp;    public void add(BibEntry entry) {
+<b class="nc">&nbsp;        if (Objects.equals(currentEntry, entry)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // a new selection invalidates the forward history
+<b class="nc">&nbsp;        nextEntries.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (currentEntry != null) {</b>
+<b class="nc">&nbsp;            previousEntries.add(currentEntry);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        currentEntry = entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Moves to the previous entry in the history.
+&nbsp;     * The current entry is pushed to the forward stack, and the last entry from the back stack becomes current.
+&nbsp;     *
+&nbsp;     * @return An Optional containing the previous BibEntry, or an empty Optional if there&#39;s no history to go back to.
+&nbsp;     */
+&nbsp;    public Optional&lt;BibEntry&gt; back() {
+<b class="nc">&nbsp;        if (canGoBack()) {</b>
+<b class="nc">&nbsp;            nextEntries.add(currentEntry);</b>
+<b class="nc">&nbsp;            currentEntry = previousEntries.removeLast();</b>
+<b class="nc">&nbsp;            return Optional.of(currentEntry);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Moves to the next entry in the history.
+&nbsp;     * The current entry is pushed to the back stack, and the last entry from the forward stack becomes current.
+&nbsp;     *
+&nbsp;     * @return An Optional containing the next BibEntry, or an empty Optional if there is no &quot;forward&quot; history.
+&nbsp;     */
+&nbsp;    public Optional&lt;BibEntry&gt; forward() {
+<b class="nc">&nbsp;        if (canGoForward()) {</b>
+<b class="nc">&nbsp;            previousEntries.add(currentEntry);</b>
+<b class="nc">&nbsp;            currentEntry = nextEntries.removeLast();</b>
+<b class="nc">&nbsp;            return Optional.of(currentEntry);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canGoBack() {
+<b class="nc">&nbsp;        return !previousEntries.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canGoForward() {
+<b class="nc">&nbsp;        return !nextEntries.isEmpty();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

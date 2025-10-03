@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MSBibDatabase</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.msbib</a>
+</div>
+
+<h1>Coverage Summary for Class: MSBibDatabase (org.jabref.logic.msbib)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MSBibDatabase</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/45)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.msbib;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javax.xml.parsers.DocumentBuilder;
+&nbsp;import javax.xml.parsers.DocumentBuilderFactory;
+&nbsp;import javax.xml.parsers.ParserConfigurationException;
+&nbsp;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.w3c.dom.Document;
+&nbsp;import org.w3c.dom.Element;
+&nbsp;import org.w3c.dom.Node;
+&nbsp;import org.w3c.dom.NodeList;
+&nbsp;import org.xml.sax.InputSource;
+&nbsp;import org.xml.sax.SAXException;
+&nbsp;
+&nbsp;/**
+&nbsp; * Microsoft Word bibliography.
+&nbsp; * The class is uesed both for import and export
+&nbsp; * See http://www.ecma-international.org/publications/standards/Ecma-376.htm
+&nbsp; */
+&nbsp;public class MSBibDatabase {
+&nbsp;
+&nbsp;    public static final String NAMESPACE = &quot;http://schemas.openxmlformats.org/officeDocument/2006/bibliography&quot;;
+&nbsp;    public static final String PREFIX = &quot;b:&quot;;
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(MSBibDatabase.class);</b>
+&nbsp;
+&nbsp;    private final DocumentBuilderFactory factory;
+&nbsp;
+&nbsp;    private Set&lt;MSBibEntry&gt; entriesForExport;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a {@link MSBibDatabase} for &lt;b&gt;import&lt;/b&gt;
+&nbsp;     */
+<b class="nc">&nbsp;    public MSBibDatabase() {</b>
+<b class="nc">&nbsp;        entriesForExport = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        factory = DocumentBuilderFactory.newInstance();</b>
+<b class="nc">&nbsp;        factory.setNamespaceAware(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new {@link MSBibDatabase} for &lt;b&gt;export&lt;/b&gt;.
+&nbsp;     * Directly converts the given entries.
+&nbsp;     *
+&nbsp;     * @param database The bib database
+&nbsp;     * @param entries  List of {@link BibEntry}
+&nbsp;     */
+&nbsp;    public MSBibDatabase(BibDatabase database, List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        this();</b>
+&nbsp;        List&lt;BibEntry&gt; resolvedEntries;
+<b class="nc">&nbsp;        if (entries == null) {</b>
+<b class="nc">&nbsp;            resolvedEntries = database.resolveForStrings(database.getEntries(), false);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            resolvedEntries = database.resolveForStrings(entries, false);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        setEntriesForExport(resolvedEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Imports entries from an office XML file
+&nbsp;     *
+&nbsp;     * @return List of {@link BibEntry}
+&nbsp;     */
+&nbsp;    public List&lt;BibEntry&gt; importEntriesFromXml(BufferedReader reader) {
+<b class="nc">&nbsp;        entriesForExport = new HashSet&lt;&gt;();</b>
+&nbsp;        Document inputDocument;
+&nbsp;        try {
+<b class="nc">&nbsp;            DocumentBuilder documentBuilder = factory.newDocumentBuilder();</b>
+<b class="nc">&nbsp;            inputDocument = documentBuilder.parse(new InputSource(reader));</b>
+&nbsp;        } catch (ParserConfigurationException | SAXException | IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not parse document&quot;, e);</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        NodeList rootList = inputDocument.getElementsByTagNameNS(&quot;*&quot;, &quot;Sources&quot;);</b>
+<b class="nc">&nbsp;        if (rootList.getLength() == 0) {</b>
+<b class="nc">&nbsp;            rootList = inputDocument.getElementsByTagNameNS(&quot;*&quot;, &quot;Sources&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; bibitems = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        if (rootList.getLength() == 0) {</b>
+<b class="nc">&nbsp;            return bibitems;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        NodeList sourceList = ((Element) rootList.item(0)).getElementsByTagNameNS(&quot;*&quot;, &quot;Source&quot;);</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; sourceList.getLength(); i++) {</b>
+<b class="nc">&nbsp;            MSBibEntry entry = new MSBibEntry((Element) sourceList.item(i));</b>
+<b class="nc">&nbsp;            entriesForExport.add(entry);</b>
+<b class="nc">&nbsp;            bibitems.add(BibTeXConverter.convert(entry));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return bibitems;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setEntriesForExport(List&lt;BibEntry&gt; entriesToAdd) {
+<b class="nc">&nbsp;        entriesForExport = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (BibEntry entry : entriesToAdd) {</b>
+<b class="nc">&nbsp;            MSBibEntry newMods = MSBibConverter.convert(entry);</b>
+<b class="nc">&nbsp;            entriesForExport.add(newMods);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Document getDomForExport() {
+<b class="nc">&nbsp;        Document document = null;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            DocumentBuilder documentBuilder = factory.newDocumentBuilder();</b>
+<b class="nc">&nbsp;            document = documentBuilder.newDocument();</b>
+&nbsp;
+<b class="nc">&nbsp;            Element rootNode = document.createElementNS(NAMESPACE, PREFIX + &quot;Sources&quot;);</b>
+<b class="nc">&nbsp;            rootNode.setAttributeNS(&quot;http://www.w3.org/2000/xmlns/&quot;, &quot;xmlns&quot;, NAMESPACE);</b>
+<b class="nc">&nbsp;            rootNode.setAttributeNS(&quot;http://www.w3.org/2000/xmlns/&quot;,</b>
+<b class="nc">&nbsp;                    &quot;xmlns:&quot; + PREFIX.substring(0, PREFIX.length() - 1), NAMESPACE);</b>
+<b class="nc">&nbsp;            rootNode.setAttribute(&quot;SelectedStyle&quot;, &quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (MSBibEntry entry : entriesForExport) {</b>
+<b class="nc">&nbsp;                Node node = entry.getEntryDom(document);</b>
+<b class="nc">&nbsp;                rootNode.appendChild(node);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            document.appendChild(rootNode);</b>
+&nbsp;        } catch (ParserConfigurationException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not build XML document&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return document;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

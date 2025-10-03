@@ -1,0 +1,287 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EmbeddedBibFilePdfExporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: EmbeddedBibFilePdfExporter (org.jabref.logic.exporter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EmbeddedBibFilePdfExporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.exporter;
+&nbsp;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.BibEntryWriter;
+&nbsp;import org.jabref.logic.bibtex.FieldPreferences;
+&nbsp;import org.jabref.logic.bibtex.FieldWriter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.logic.xmp.XmpUtilWriter;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;
+&nbsp;import org.apache.pdfbox.Loader;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocument;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocumentNameDictionary;
+&nbsp;import org.apache.pdfbox.pdmodel.PDEmbeddedFilesNameTreeNode;
+&nbsp;import org.apache.pdfbox.pdmodel.PDPage;
+&nbsp;import org.apache.pdfbox.pdmodel.PDPageContentStream;
+&nbsp;import org.apache.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecification;
+&nbsp;import org.apache.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile;
+&nbsp;import org.apache.pdfbox.pdmodel.font.PDType1Font;
+&nbsp;import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * A custom exporter to write bib entries to an embedded bib file.
+&nbsp; */
+&nbsp;public class EmbeddedBibFilePdfExporter extends Exporter {
+<b class="nc">&nbsp;    public static String EMBEDDED_FILE_NAME = &quot;main.bib&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedBibFilePdfExporter.class);</b>
+&nbsp;
+&nbsp;    private final BibDatabaseMode bibDatabaseMode;
+&nbsp;    private final BibEntryTypesManager bibEntryTypesManager;
+&nbsp;    private final FieldPreferences fieldPreferences;
+&nbsp;
+&nbsp;    public EmbeddedBibFilePdfExporter(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager bibEntryTypesManager, FieldPreferences fieldPreferences) {
+<b class="nc">&nbsp;        super(&quot;bib&quot;, &quot;Embedded BibTeX&quot;, StandardFileType.PDF);</b>
+<b class="nc">&nbsp;        this.bibDatabaseMode = bibDatabaseMode;</b>
+<b class="nc">&nbsp;        this.bibEntryTypesManager = bibEntryTypesManager;</b>
+<b class="nc">&nbsp;        this.fieldPreferences = fieldPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param databaseContext the database to export from
+&nbsp;     * @param file            the file to write to. If it contains &quot;split&quot;, then the output is split into different files
+&nbsp;     * @param entries         a list containing all entries that should be exported
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void export(BibDatabaseContext databaseContext, Path file, List&lt;BibEntry&gt; entries) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(databaseContext);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(file);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(entries);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!Files.exists(file)) {</b>
+<b class="nc">&nbsp;            try (PDDocument document = new PDDocument()) {</b>
+<b class="nc">&nbsp;                PDPage page = new PDPage();</b>
+<b class="nc">&nbsp;                document.addPage(page);</b>
+&nbsp;
+<b class="nc">&nbsp;                try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {</b>
+<b class="nc">&nbsp;                    contentStream.beginText();</b>
+<b class="nc">&nbsp;                    contentStream.newLineAtOffset(25, 500);</b>
+<b class="nc">&nbsp;                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);</b>
+<b class="nc">&nbsp;                    contentStream.showText(&quot;This PDF was created by JabRef. It demonstrates the embedding of BibTeX data in PDF files. Please open the file metadata view of your PDF viewer to see the attached files.&quot;);</b>
+<b class="nc">&nbsp;                    contentStream.endText();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                document.save(file.toString());</b>
+&nbsp;            } catch (IOException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Could not create PDF file&quot;, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String bibString = getBibString(entries);</b>
+<b class="nc">&nbsp;        embedBibTex(bibString, file);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Similar method: {@link XmpUtilWriter#writeXmp(Path, BibEntry, org.jabref.model.database.BibDatabase)}
+&nbsp;     */
+&nbsp;    private void embedBibTex(String bibTeX, Path path) throws IOException {
+<b class="nc">&nbsp;        if (!Files.exists(path) || !FileUtil.isPDFFile(path)) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // Read from another file
+&nbsp;        // Reason: Apache PDFBox does not support writing while the file is opened
+&nbsp;        // See https://issues.apache.org/jira/browse/PDFBOX-4028
+<b class="nc">&nbsp;        Path newFile = Files.createTempFile(&quot;JabRef&quot;, &quot;pdf&quot;);</b>
+<b class="nc">&nbsp;        try (PDDocument document = Loader.loadPDF(path.toFile())) {</b>
+<b class="nc">&nbsp;            PDDocumentNameDictionary nameDictionary = document.getDocumentCatalog().getNames();</b>
+&nbsp;            PDEmbeddedFilesNameTreeNode efTree;
+&nbsp;            Map&lt;String, PDComplexFileSpecification&gt; names;
+&nbsp;
+<b class="nc">&nbsp;            if (nameDictionary == null) {</b>
+<b class="nc">&nbsp;                efTree = new PDEmbeddedFilesNameTreeNode();</b>
+<b class="nc">&nbsp;                names = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;                nameDictionary = new PDDocumentNameDictionary(document.getDocumentCatalog());</b>
+<b class="nc">&nbsp;                nameDictionary.setEmbeddedFiles(efTree);</b>
+<b class="nc">&nbsp;                document.getDocumentCatalog().setNames(nameDictionary);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                efTree = nameDictionary.getEmbeddedFiles();</b>
+<b class="nc">&nbsp;                if (efTree == null) {</b>
+<b class="nc">&nbsp;                    efTree = new PDEmbeddedFilesNameTreeNode();</b>
+<b class="nc">&nbsp;                    nameDictionary.setEmbeddedFiles(efTree);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                names = efTree.getNames();</b>
+<b class="nc">&nbsp;                if (names == null) {</b>
+<b class="nc">&nbsp;                    names = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;                    efTree.setNames(names);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            PDComplexFileSpecification fileSpecification;
+<b class="nc">&nbsp;            if (names.containsKey(EMBEDDED_FILE_NAME)) {</b>
+<b class="nc">&nbsp;                fileSpecification = names.get(EMBEDDED_FILE_NAME);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                fileSpecification = new PDComplexFileSpecification();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (efTree != null) {</b>
+<b class="nc">&nbsp;                InputStream inputStream = new ByteArrayInputStream(bibTeX.getBytes(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;                fileSpecification.setFile(EMBEDDED_FILE_NAME);</b>
+<b class="nc">&nbsp;                PDEmbeddedFile embeddedFile = new PDEmbeddedFile(document, inputStream);</b>
+<b class="nc">&nbsp;                embeddedFile.setSubtype(&quot;text/x-bibtex&quot;);</b>
+<b class="nc">&nbsp;                embeddedFile.setSize(bibTeX.length());</b>
+<b class="nc">&nbsp;                fileSpecification.setEmbeddedFile(embeddedFile);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (!names.containsKey(EMBEDDED_FILE_NAME)) {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        names.put(EMBEDDED_FILE_NAME, fileSpecification);</b>
+&nbsp;                    } catch (UnsupportedOperationException e) {
+<b class="nc">&nbsp;                        throw new IOException(Localization.lang(&quot;File &#39;%0&#39; is write protected.&quot;, path.toString()));</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                efTree.setNames(names);</b>
+<b class="nc">&nbsp;                nameDictionary.setEmbeddedFiles(efTree);</b>
+<b class="nc">&nbsp;                document.getDocumentCatalog().setNames(nameDictionary);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            document.save(newFile.toFile());</b>
+<b class="nc">&nbsp;            FileUtil.copyFile(newFile, path, true);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Files.delete(newFile);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getBibString(List&lt;BibEntry&gt; entries) throws IOException {
+<b class="nc">&nbsp;        StringWriter stringWriter = new StringWriter();</b>
+<b class="nc">&nbsp;        BibWriter bibWriter = new BibWriter(stringWriter, OS.NEWLINE);</b>
+<b class="nc">&nbsp;        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldPreferences);</b>
+<b class="nc">&nbsp;        BibEntryWriter bibEntryWriter = new BibEntryWriter(fieldWriter, bibEntryTypesManager);</b>
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            bibEntryWriter.write(entry, bibWriter, bibDatabaseMode);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return stringWriter.toString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

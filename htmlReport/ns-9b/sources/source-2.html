@@ -1,0 +1,200 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ServerUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.http.server.services</a>
+</div>
+
+<h1>Coverage Summary for Class: ServerUtils (org.jabref.http.server.services)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServerUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.http.server.services;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Path;
+&nbsp;
+&nbsp;import org.jabref.http.SrvStateManager;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.fileformat.BibtexImporter;
+&nbsp;import org.jabref.logic.util.io.BackupFileUtil;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.util.DummyFileUpdateMonitor;
+&nbsp;
+&nbsp;import jakarta.ws.rs.InternalServerErrorException;
+&nbsp;import jakarta.ws.rs.NotFoundException;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class ServerUtils {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ServerUtils.class);</b>
+&nbsp;
+&nbsp;    private static java.nio.file.Path getLibraryPath(String id, FilesToServe filesToServe) {
+<b class="nc">&nbsp;        return filesToServe.getFilesToServe()</b>
+<b class="nc">&nbsp;                           .stream()</b>
+<b class="nc">&nbsp;                           .filter(p -&gt; (p.getFileName() + &quot;-&quot; + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))</b>
+<b class="nc">&nbsp;                           .findAny()</b>
+<b class="nc">&nbsp;                           .orElseThrow(NotFoundException::new);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static java.nio.file.Path getLibraryPath(String id, SrvStateManager srvStateManager) {
+<b class="nc">&nbsp;        return srvStateManager.getOpenDatabases()</b>
+<b class="nc">&nbsp;                              .stream()</b>
+<b class="nc">&nbsp;                              .filter(context -&gt; context.getDatabasePath().isPresent())</b>
+<b class="nc">&nbsp;                              .map(context -&gt; context.getDatabasePath().get())</b>
+<b class="nc">&nbsp;                              .filter(p -&gt; (p.getFileName() + &quot;-&quot; + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))</b>
+<b class="nc">&nbsp;                              .findAny()</b>
+<b class="nc">&nbsp;                              .orElseThrow(NotFoundException::new);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// @throws NotFoundException if no file with the given id is found in either filesToServe or contextsToServe
+&nbsp;    public static @NonNull Path getLibraryPath(String id, FilesToServe filesToServe, SrvStateManager srvStateManager) {
+<b class="nc">&nbsp;        if (filesToServe.isEmpty()) {</b>
+<b class="nc">&nbsp;            return getLibraryPath(id, srvStateManager);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return getLibraryPath(id, filesToServe);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /// @param id - also &quot;demo&quot; for the demo library
+&nbsp;    /// @throws NotFoundException if no file with the given id is found in either filesToServe or contextsToServe
+&nbsp;    public static @NonNull BibDatabaseContext getBibDatabaseContext(String id, FilesToServe filesToServe, SrvStateManager srvStateManager, ImportFormatPreferences importFormatPreferences) throws IOException {
+<b class="nc">&nbsp;        BibtexImporter bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());</b>
+<b class="nc">&nbsp;        if (&quot;demo&quot;.equals(id)) {</b>
+<b class="nc">&nbsp;            try (InputStream chocolateBibInputStream = BibDatabase.class.getResourceAsStream(&quot;/Chocolate.bib&quot;)) {</b>
+<b class="nc">&nbsp;                BufferedReader reader = new BufferedReader(new InputStreamReader(chocolateBibInputStream, StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;                return bibtexImporter.importDatabase(reader).getDatabaseContext();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (filesToServe.isEmpty()) {</b>
+<b class="nc">&nbsp;            return srvStateManager.getOpenDatabases().stream()</b>
+<b class="nc">&nbsp;                                  .filter(context -&gt; context.getDatabasePath().isPresent())</b>
+<b class="nc">&nbsp;                                  .filter(context -&gt; {</b>
+<b class="nc">&nbsp;                                      Path p = context.getDatabasePath().get();</b>
+<b class="nc">&nbsp;                                      return (p.getFileName() + &quot;-&quot; + BackupFileUtil.getUniqueFilePrefix(p)).equals(id);</b>
+&nbsp;                                  })
+<b class="nc">&nbsp;                                  .findFirst()</b>
+<b class="nc">&nbsp;                                  .orElseThrow(() -&gt; new NotFoundException(&quot;No library with id &quot; + id + &quot; found&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Path library = getLibraryPath(id, filesToServe);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return bibtexImporter.importDatabase(library).getDatabaseContext();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not find open library file {}&quot;, library, e);</b>
+<b class="nc">&nbsp;            throw new InternalServerErrorException(&quot;Could not parse library&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

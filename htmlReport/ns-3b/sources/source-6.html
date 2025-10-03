@@ -1,0 +1,596 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MainMenu</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.frame</a>
+</div>
+
+<h1>Coverage Summary for Class: MainMenu (org.jabref.gui.frame)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MainMenu</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/162)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">MainMenu$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/164)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.frame;
+&nbsp;
+&nbsp;import java.util.function.Supplier;
+&nbsp;
+&nbsp;import javafx.event.ActionEvent;
+&nbsp;import javafx.scene.control.Menu;
+&nbsp;import javafx.scene.control.MenuBar;
+&nbsp;import javafx.scene.control.MenuItem;
+&nbsp;import javafx.scene.control.SeparatorMenuItem;
+&nbsp;import javafx.stage.Stage;
+&nbsp;
+&nbsp;import org.jabref.gui.ClipBoardManager;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.actions.ActionFactory;
+&nbsp;import org.jabref.gui.actions.SimpleCommand;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.ai.ClearEmbeddingsAction;
+&nbsp;import org.jabref.gui.auximport.NewSubLibraryAction;
+&nbsp;import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
+&nbsp;import org.jabref.gui.cleanup.CleanupAction;
+&nbsp;import org.jabref.gui.consistency.ConsistencyCheckAction;
+&nbsp;import org.jabref.gui.copyfiles.CopyFilesAction;
+&nbsp;import org.jabref.gui.documentviewer.ShowDocumentViewerAction;
+&nbsp;import org.jabref.gui.duplicationFinder.DuplicateSearch;
+&nbsp;import org.jabref.gui.edit.EditAction;
+&nbsp;import org.jabref.gui.edit.ManageKeywordsAction;
+&nbsp;import org.jabref.gui.edit.OpenBrowserAction;
+&nbsp;import org.jabref.gui.edit.ReplaceStringAction;
+&nbsp;import org.jabref.gui.edit.automaticfiededitor.AutomaticFieldEditorAction;
+&nbsp;import org.jabref.gui.entryeditor.OpenEntryEditorAction;
+&nbsp;import org.jabref.gui.entryeditor.PreviewSwitchAction;
+&nbsp;import org.jabref.gui.exporter.ExportCommand;
+&nbsp;import org.jabref.gui.exporter.SaveAction;
+&nbsp;import org.jabref.gui.exporter.SaveAllAction;
+&nbsp;import org.jabref.gui.exporter.WriteMetadataToLinkedPdfsAction;
+&nbsp;import org.jabref.gui.externalfiles.AutoLinkFilesAction;
+&nbsp;import org.jabref.gui.externalfiles.DownloadFullTextAction;
+&nbsp;import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
+&nbsp;import org.jabref.gui.git.GitCommitAction;
+&nbsp;import org.jabref.gui.git.GitPullAction;
+&nbsp;import org.jabref.gui.git.GitPushAction;
+&nbsp;import org.jabref.gui.git.GitShareToGitHubAction;
+&nbsp;import org.jabref.gui.help.AboutAction;
+&nbsp;import org.jabref.gui.help.ErrorConsoleAction;
+&nbsp;import org.jabref.gui.help.HelpAction;
+&nbsp;import org.jabref.gui.help.SearchForUpdateAction;
+&nbsp;import org.jabref.gui.importer.ImportCommand;
+&nbsp;import org.jabref.gui.importer.NewDatabaseAction;
+&nbsp;import org.jabref.gui.importer.NewEntryAction;
+&nbsp;import org.jabref.gui.importer.actions.OpenDatabaseAction;
+&nbsp;import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
+&nbsp;import org.jabref.gui.integrity.IntegrityCheckAction;
+&nbsp;import org.jabref.gui.journals.AbbreviateAction;
+&nbsp;import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
+&nbsp;import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
+&nbsp;import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
+&nbsp;import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
+&nbsp;import org.jabref.gui.maintable.RightClickMenu;
+&nbsp;import org.jabref.gui.mergeentries.BatchEntryMergeWithFetchedDataAction;
+&nbsp;import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
+&nbsp;import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesAction;
+&nbsp;import org.jabref.gui.newentry.NewEntryDialogTab;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preferences.ShowPreferencesAction;
+&nbsp;import org.jabref.gui.preview.PreviewControls;
+&nbsp;import org.jabref.gui.push.GuiPushToApplicationCommand;
+&nbsp;import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
+&nbsp;import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
+&nbsp;import org.jabref.gui.shared.PullChangesFromSharedAction;
+&nbsp;import org.jabref.gui.sidepane.SidePane;
+&nbsp;import org.jabref.gui.sidepane.SidePaneType;
+&nbsp;import org.jabref.gui.slr.EditExistingStudyAction;
+&nbsp;import org.jabref.gui.slr.ExistingStudySearchAction;
+&nbsp;import org.jabref.gui.slr.StartNewStudyAction;
+&nbsp;import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
+&nbsp;import org.jabref.gui.texparser.ParseLatexAction;
+&nbsp;import org.jabref.gui.undo.CountingUndoManager;
+&nbsp;import org.jabref.gui.undo.RedoAction;
+&nbsp;import org.jabref.gui.undo.UndoAction;
+&nbsp;import org.jabref.gui.util.URLs;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.git.util.GitHandlerRegistry;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.IdFetcher;
+&nbsp;import org.jabref.logic.importer.WebFetchers;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.field.SpecialField;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;
+&nbsp;public class MainMenu extends MenuBar {
+&nbsp;    private final JabRefFrame frame;
+&nbsp;    private final FileHistoryMenu fileHistoryMenu;
+&nbsp;    private final SidePane sidePane;
+&nbsp;    private final GuiPushToApplicationCommand pushToApplicationCommand;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final JournalAbbreviationRepository abbreviationRepository;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+&nbsp;    private final CountingUndoManager undoManager;
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;    private final Supplier&lt;OpenDatabaseAction&gt; openDatabaseActionSupplier;
+&nbsp;    private final AiService aiService;
+&nbsp;    private final PreviewControls previewControls;
+&nbsp;    private final GitHandlerRegistry gitHandlerRegistry;
+&nbsp;
+&nbsp;    public MainMenu(JabRefFrame frame,
+&nbsp;                    FileHistoryMenu fileHistoryMenu,
+&nbsp;                    SidePane sidePane,
+&nbsp;                    GuiPushToApplicationCommand pushToApplicationCommand,
+&nbsp;                    GuiPreferences preferences,
+&nbsp;                    StateManager stateManager,
+&nbsp;                    FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                    TaskExecutor taskExecutor,
+&nbsp;                    DialogService dialogService,
+&nbsp;                    JournalAbbreviationRepository abbreviationRepository,
+&nbsp;                    BibEntryTypesManager entryTypesManager,
+&nbsp;                    CountingUndoManager undoManager,
+&nbsp;                    ClipBoardManager clipBoardManager,
+&nbsp;                    Supplier&lt;OpenDatabaseAction&gt; openDatabaseActionSupplier,
+&nbsp;                    AiService aiService,
+&nbsp;                    PreviewControls previewControls,
+<b class="nc">&nbsp;                    GitHandlerRegistry gitHandlerRegistry) {</b>
+<b class="nc">&nbsp;        this.frame = frame;</b>
+<b class="nc">&nbsp;        this.fileHistoryMenu = fileHistoryMenu;</b>
+<b class="nc">&nbsp;        this.sidePane = sidePane;</b>
+<b class="nc">&nbsp;        this.pushToApplicationCommand = pushToApplicationCommand;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.abbreviationRepository = abbreviationRepository;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.clipBoardManager = clipBoardManager;</b>
+<b class="nc">&nbsp;        this.openDatabaseActionSupplier = openDatabaseActionSupplier;</b>
+<b class="nc">&nbsp;        this.aiService = aiService;</b>
+<b class="nc">&nbsp;        this.previewControls = previewControls;</b>
+<b class="nc">&nbsp;        this.gitHandlerRegistry = gitHandlerRegistry;</b>
+&nbsp;
+<b class="nc">&nbsp;        createMenu();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createMenu() {
+<b class="nc">&nbsp;        ActionFactory factory = new ActionFactory();</b>
+<b class="nc">&nbsp;        Menu file = new Menu(Localization.lang(&quot;File&quot;));</b>
+<b class="nc">&nbsp;        Menu edit = new Menu(Localization.lang(&quot;Edit&quot;));</b>
+<b class="nc">&nbsp;        Menu library = new Menu(Localization.lang(&quot;Library&quot;));</b>
+<b class="nc">&nbsp;        Menu quality = new Menu(Localization.lang(&quot;Quality&quot;));</b>
+<b class="nc">&nbsp;        Menu lookup = new Menu(Localization.lang(&quot;Lookup&quot;));</b>
+<b class="nc">&nbsp;        Menu view = new Menu(Localization.lang(&quot;View&quot;));</b>
+<b class="nc">&nbsp;        Menu tools = new Menu(Localization.lang(&quot;Tools&quot;));</b>
+<b class="nc">&nbsp;        Menu help = new Menu(Localization.lang(&quot;Help&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        file.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.NEW_LIBRARY, new NewDatabaseAction(frame, preferences)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.OPEN_LIBRARY, openDatabaseActionSupplier.get()),</b>
+&nbsp;                fileHistoryMenu,
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService, stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createSubMenu(StandardActions.IMPORT,</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.IMPORT_INTO_CURRENT_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.TO_EXISTING, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService)),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.IMPORT_INTO_NEW_LIBRARY, new ImportCommand(frame, ImportCommand.ImportMethod.AS_NEW, preferences, stateManager, fileUpdateMonitor, taskExecutor, dialogService))),</b>
+&nbsp;
+<b class="nc">&nbsp;                factory.createSubMenu(StandardActions.EXPORT,</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, frame::getCurrentLibraryTab, stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, frame::getCurrentLibraryTab, stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+&nbsp;                // region: Sharing of the library
+&nbsp;                // TODO: Should be only enabled if not yet shared.
+<b class="nc">&nbsp;                factory.createSubMenu(StandardActions.GIT,</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.GIT_COMMIT, new GitCommitAction(dialogService, stateManager)),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.GIT_PULL, new GitPullAction(dialogService, stateManager, preferences, taskExecutor, gitHandlerRegistry)),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(dialogService, stateManager, preferences, taskExecutor, gitHandlerRegistry)),</b>
+&nbsp;                        new SeparatorMenuItem(),
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.GIT_SHARE, new GitShareToGitHubAction(dialogService, stateManager))</b>
+&nbsp;                ),
+&nbsp;
+<b class="nc">&nbsp;                factory.createSubMenu(StandardActions.REMOTE_DB,</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.CONNECT_TO_SHARED_DB, new ConnectToSharedDatabaseCommand(frame, dialogService)),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.PULL_CHANGES_FROM_SHARED_DB, new PullChangesFromSharedAction(stateManager))),</b>
+&nbsp;
+&nbsp;                // endregion
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SHOW_PREFS, new ShowPreferencesAction(frame, dialogService)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.QUIT, new JabRefFrame.CloseAction(frame))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        edit.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.UNDO, new UndoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.REDO, new RedoAction(frame::getCurrentLibraryTab, undoManager, dialogService, stateManager)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, frame::getCurrentLibraryTab, stateManager, undoManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, frame::getCurrentLibraryTab, stateManager, undoManager)),</b>
+<b class="nc">&nbsp;                RightClickMenu.createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, frame::getCurrentLibraryTab, stateManager, undoManager)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.REPLACE_ALL, new ReplaceStringAction(frame::getCurrentLibraryTab, stateManager, dialogService)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.GENERATE_CITE_KEYS, new GenerateCitationKeyAction(frame::getCurrentLibraryTab, dialogService, stateManager, taskExecutor, preferences, undoManager)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.MANAGE_KEYWORDS, new ManageKeywordsAction(stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.AUTOMATIC_FIELD_EDITOR, new AutomaticFieldEditorAction(stateManager, dialogService, undoManager)));</b>
+<b class="nc">&nbsp;        SeparatorMenuItem specialFieldsSeparator = new SeparatorMenuItem();</b>
+<b class="nc">&nbsp;        specialFieldsSeparator.visibleProperty().bind(preferences.getSpecialFieldsPreferences().specialFieldsEnabledProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        edit.getItems().addAll(</b>
+&nbsp;                specialFieldsSeparator,
+&nbsp;                // ToDo: SpecialField needs the active BasePanel to mark it as changed.
+&nbsp;                //  Refactor BasePanel, should mark the BibDatabaseContext or the UndoManager as dirty instead!
+<b class="nc">&nbsp;                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.RANKING, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),</b>
+<b class="nc">&nbsp;                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.RELEVANCE, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),</b>
+<b class="nc">&nbsp;                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.QUALITY, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),</b>
+<b class="nc">&nbsp;                SpecialFieldMenuItemFactory.getSpecialFieldSingleItem(SpecialField.PRINTED, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),</b>
+<b class="nc">&nbsp;                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.PRIORITY, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager),</b>
+<b class="nc">&nbsp;                SpecialFieldMenuItemFactory.createSpecialFieldMenu(SpecialField.READ_STATUS, factory, frame::getCurrentLibraryTab, dialogService, preferences, undoManager, stateManager));</b>
+<b class="nc">&nbsp;        edit.addEventHandler(ActionEvent.ACTION, event -&gt; {</b>
+&nbsp;            // Work around for mac only issue, where cmd+v on a dialogue triggers the paste action of menu item, resulting in addition of the pasted content in the MainTable.
+&nbsp;            // If the mainscreen is not focused, the actions captured by menu are consumed.
+<b class="nc">&nbsp;            boolean isStageUnfocused = !Injector.instantiateModelOrService(Stage.class).focusedProperty().get();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (OS.OS_X &amp;&amp; isStageUnfocused) {</b>
+<b class="nc">&nbsp;                event.consume();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        library.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.ADD_ENTRY_IMMEDIATE, new NewEntryAction(true, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.ADD_ENTRY, new NewEntryAction(false, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.ADD_ENTRY_IDENTIFIER, new NewEntryAction(NewEntryDialogTab.ENTER_IDENTIFIER, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.ADD_ENTRY_PLAINTEXT, new NewEntryAction(NewEntryDialogTab.INTERPRET_CITATIONS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new JabRefFrame.OpenDatabaseFolder(dialogService, stateManager, preferences, () -&gt; stateManager.getActiveDatabase().orElse(null))),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, preferences, dialogService)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(stateManager))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        quality.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.FIND_DUPLICATES, new DuplicateSearch(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, taskExecutor)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, (UiTaskExecutor) taskExecutor, abbreviationRepository)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.CHECK_CONSISTENCY, new ConsistencyCheckAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, (UiTaskExecutor) taskExecutor)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, (UiTaskExecutor) taskExecutor)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createSubMenu(StandardActions.ABBREVIATE,</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.ABBREVIATE_LTWA, new AbbreviateAction(StandardActions.ABBREVIATE_LTWA, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))),</b>
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);</b>
+<b class="nc">&nbsp;        for (IdFetcher&lt;?&gt; fetcher : WebFetchers.getIdFetchers(preferences.getImportFormatPreferences())) {</b>
+<b class="nc">&nbsp;            LookupIdentifierAction&lt;?&gt; identifierAction = new LookupIdentifierAction&lt;&gt;(fetcher, stateManager, undoManager, dialogService, taskExecutor);</b>
+<b class="nc">&nbsp;            lookupIdentifiers.getItems().add(factory.createMenuItem(identifierAction.getAction(), identifierAction));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        lookup.getItems().addAll(</b>
+&nbsp;                // region identifier-related
+&nbsp;                lookupIdentifiers,
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(</b>
+&nbsp;                        StandardActions.MERGE_WITH_FETCHED_ENTRY,
+&nbsp;                        new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(</b>
+&nbsp;                        StandardActions.BATCH_MERGE_WITH_FETCHED_ENTRY,
+&nbsp;                        new BatchEntryMergeWithFetchedDataAction(stateManager, undoManager, preferences, dialogService, taskExecutor)),
+&nbsp;                // endregion
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+&nbsp;                // region file-related
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, preferences, (UiTaskExecutor) taskExecutor)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager))</b>
+&nbsp;                // endregion
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);</b>
+<b class="nc">&nbsp;        pushToApplicationCommand.registerReconfigurable(pushToApplicationMenuItem);</b>
+&nbsp;
+<b class="nc">&nbsp;        tools.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.PARSE_LATEX, new ParseLatexAction(stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.NEW_SUB_LIBRARY_FROM_AUX, new NewSubLibraryAction(frame, stateManager, dialogService)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.NEW_LIBRARY_FROM_PDF_ONLINE, new NewLibraryFromPdfActionOnline(frame, stateManager, dialogService, preferences, taskExecutor)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.NEW_LIBRARY_FROM_PDF_OFFLINE, new NewLibraryFromPdfActionOffline(frame, stateManager, dialogService, preferences, taskExecutor)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.WRITE_METADATA_TO_PDF,</b>
+<b class="nc">&nbsp;                        new WriteMetadataToLinkedPdfsAction(dialogService, preferences.getFieldPreferences(), preferences.getFilePreferences(), preferences.getXmpPreferences(), entryTypesManager, abbreviationRepository, taskExecutor, stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.COPY_LINKED_FILES, new CopyFilesAction(dialogService, preferences, stateManager, (UiTaskExecutor) taskExecutor)), // we know at this point that this is a UITaskExecutor</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                createSendSubMenu(factory, dialogService, stateManager, preferences),</b>
+&nbsp;                pushToApplicationMenuItem,
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+&nbsp;                // Systematic Literature Review (SLR)
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.START_NEW_STUDY, new StartNewStudyAction(frame, openDatabaseActionSupplier, fileUpdateMonitor, taskExecutor, preferences, stateManager, dialogService)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.EDIT_EXISTING_STUDY, new EditExistingStudyAction(dialogService, stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.UPDATE_SEARCH_RESULTS_OF_STUDY, new ExistingStudySearchAction(frame, openDatabaseActionSupplier, dialogService, fileUpdateMonitor, taskExecutor, preferences, stateManager)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, frame::getCurrentLibraryTab, dialogService, preferences)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.CLEAR_EMBEDDINGS_CACHE, new ClearEmbeddingsAction(stateManager, dialogService, aiService, taskExecutor)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.REDOWNLOAD_MISSING_FILES, new RedownloadMissingFilesAction(stateManager, dialogService, preferences.getExternalApplicationsPreferences(), preferences.getFilePreferences(), taskExecutor))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        SidePaneType webSearchPane = SidePaneType.WEB_SEARCH;</b>
+<b class="nc">&nbsp;        SidePaneType groupsPane = SidePaneType.GROUPS;</b>
+<b class="nc">&nbsp;        SidePaneType openOfficePane = SidePaneType.OPEN_OFFICE;</b>
+<b class="nc">&nbsp;        view.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createCheckMenuItem(webSearchPane.getToggleAction(), sidePane.getToggleCommandFor(webSearchPane), sidePane.paneVisibleBinding(webSearchPane)),</b>
+<b class="nc">&nbsp;                factory.createCheckMenuItem(groupsPane.getToggleAction(), sidePane.getToggleCommandFor(groupsPane), sidePane.paneVisibleBinding(groupsPane)),</b>
+<b class="nc">&nbsp;                factory.createCheckMenuItem(openOfficePane.getToggleAction(), sidePane.getToggleCommandFor(openOfficePane), sidePane.paneVisibleBinding(openOfficePane)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.NEXT_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.NEXT, previewControls, stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.PREVIOUS_PREVIEW_STYLE, new PreviewSwitchAction(PreviewSwitchAction.Direction.PREVIOUS, previewControls, stateManager)),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SHOW_PDF_VIEWER, new ShowDocumentViewerAction(stateManager, preferences)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.EDIT_ENTRY, new OpenEntryEditorAction(frame::getCurrentLibraryTab, stateManager)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, preferences, dialogService))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        help.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService, preferences.getExternalApplicationsPreferences())),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction(URLs.DONATE_URL, dialogService, preferences.getExternalApplicationsPreferences())),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.ERROR_CONSOLE, new ErrorConsoleAction()),</b>
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction(URLs.DONATION_URL, dialogService, preferences.getExternalApplicationsPreferences())),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(preferences, dialogService, taskExecutor)),</b>
+<b class="nc">&nbsp;                factory.createSubMenu(StandardActions.WEB_MENU,</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction(URLs.WEBPAGE_URL, dialogService, preferences.getExternalApplicationsPreferences())),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.OPEN_PRIVACY_POLICY, new OpenBrowserAction(URLs.PRIVACY_POLICY_URL, dialogService, preferences.getExternalApplicationsPreferences())),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction(URLs.BLOG_URL, dialogService, preferences.getExternalApplicationsPreferences())),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.OPEN_LINKEDIN, new OpenBrowserAction(URLs.LINKEDIN_URL, dialogService, preferences.getExternalApplicationsPreferences())),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction(URLs.FACEBOOK_URL, dialogService, preferences.getExternalApplicationsPreferences())),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.OPEN_MASTODON, new OpenBrowserAction(URLs.MASTODON_URL, dialogService, preferences.getExternalApplicationsPreferences())),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.OPEN_GITHUB, new OpenBrowserAction(URLs.GITHUB_URL, dialogService, preferences.getExternalApplicationsPreferences())),</b>
+&nbsp;
+&nbsp;                        new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction(URLs.DEV_VERSION_LINK_URL, dialogService, preferences.getExternalApplicationsPreferences())),</b>
+<b class="nc">&nbsp;                        factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction(URLs.CHANGELOG_URL, dialogService, preferences.getExternalApplicationsPreferences()))</b>
+&nbsp;                ),
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.OPEN_WELCOME_TAB, new SimpleCommand() {</b>
+&nbsp;                    @Override
+&nbsp;                    public void execute() {
+<b class="nc">&nbsp;                        frame.showWelcomeTab();</b>
+&nbsp;                    }
+&nbsp;                }),
+&nbsp;
+&nbsp;                new SeparatorMenuItem(),
+&nbsp;
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.ABOUT, new AboutAction(dialogService))</b>
+&nbsp;        );
+&nbsp;
+&nbsp;        // @formatter:on
+<b class="nc">&nbsp;        getStyleClass().add(&quot;mainMenu&quot;);</b>
+<b class="nc">&nbsp;        getMenus().addAll(</b>
+&nbsp;                file,
+&nbsp;                edit,
+&nbsp;                library,
+&nbsp;                quality,
+&nbsp;                lookup,
+&nbsp;                tools,
+&nbsp;                view,
+&nbsp;                help);
+<b class="nc">&nbsp;        setUseSystemMenuBar(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Menu createSendSubMenu(ActionFactory factory,
+&nbsp;                                   DialogService dialogService,
+&nbsp;                                   StateManager stateManager,
+&nbsp;                                   GuiPreferences preferences) {
+<b class="nc">&nbsp;        Menu sendMenu = factory.createMenu(StandardActions.SEND);</b>
+<b class="nc">&nbsp;        sendMenu.getItems().addAll(</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsStandardEmailAction(dialogService, preferences, stateManager, entryTypesManager, taskExecutor)),</b>
+<b class="nc">&nbsp;                factory.createMenuItem(StandardActions.SEND_TO_KINDLE, new SendAsKindleEmailAction(dialogService, preferences, stateManager, taskExecutor))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        return sendMenu;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

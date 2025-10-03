@@ -1,0 +1,144 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileMerger</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.mergeentries.threewaymerge.fieldsmerger</a>
+</div>
+
+<h1>Coverage Summary for Class: FileMerger (org.jabref.gui.mergeentries.threewaymerge.fieldsmerger)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileMerger</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.mergeentries.threewaymerge.fieldsmerger;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.logic.bibtex.FileFieldWriter;
+&nbsp;import org.jabref.logic.importer.util.FileFieldParser;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;/// A merger for the {@link org.jabref.model.entry.field.StandardField#FILE} field
+<b class="nc">&nbsp;public class FileMerger implements FieldMerger {</b>
+&nbsp;    @Override
+&nbsp;    public String merge(String filesA, String filesB) {
+<b class="nc">&nbsp;        if (StringUtil.isBlank(filesA + filesB)) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+<b class="nc">&nbsp;        } else if (StringUtil.isBlank(filesA)) {</b>
+<b class="nc">&nbsp;            return filesB;</b>
+<b class="nc">&nbsp;        } else if (StringUtil.isBlank(filesB)) {</b>
+<b class="nc">&nbsp;            return filesA;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            List&lt;LinkedFile&gt; linkedFilesA = FileFieldParser.parse(filesA);</b>
+<b class="nc">&nbsp;            List&lt;LinkedFile&gt; linkedFilesB = FileFieldParser.parse(filesB);</b>
+&nbsp;
+<b class="nc">&nbsp;            linkedFilesA.addAll(linkedFilesB);</b>
+<b class="nc">&nbsp;            return FileFieldWriter.getStringRepresentation(linkedFilesA);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

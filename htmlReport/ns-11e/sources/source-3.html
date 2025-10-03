@@ -1,0 +1,363 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UnicodeToReadableCharMap</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.strings</a>
+</div>
+
+<h1>Coverage Summary for Class: UnicodeToReadableCharMap (org.jabref.model.strings)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UnicodeToReadableCharMap</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (247/247)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.strings;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;
+&nbsp;public class UnicodeToReadableCharMap extends HashMap&lt;String, String&gt; {
+<b class="fc">&nbsp;    public UnicodeToReadableCharMap() {</b>
+<b class="fc">&nbsp;        put(&quot;\u00C0&quot;, &quot;A&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00C1&quot;, &quot;A&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00C2&quot;, &quot;A&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00C3&quot;, &quot;A&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00C4&quot;, &quot;Ae&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00C5&quot;, &quot;Aa&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00C6&quot;, &quot;Ae&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00C7&quot;, &quot;C&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00C8&quot;, &quot;E&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00C9&quot;, &quot;E&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00CA&quot;, &quot;E&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00CB&quot;, &quot;E&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00CC&quot;, &quot;I&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00CD&quot;, &quot;I&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00CE&quot;, &quot;I&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00CF&quot;, &quot;I&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00D0&quot;, &quot;D&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00D1&quot;, &quot;N&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00D2&quot;, &quot;O&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00D3&quot;, &quot;O&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00D4&quot;, &quot;O&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00D5&quot;, &quot;O&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00D6&quot;, &quot;Oe&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00D8&quot;, &quot;Oe&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00D9&quot;, &quot;U&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00DA&quot;, &quot;U&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00DB&quot;, &quot;U&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00DC&quot;, &quot;Ue&quot;); // U umlaut ..</b>
+<b class="fc">&nbsp;        put(&quot;\u00DD&quot;, &quot;Y&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00DF&quot;, &quot;ss&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00E0&quot;, &quot;a&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00E1&quot;, &quot;a&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00E2&quot;, &quot;a&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00E3&quot;, &quot;a&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00E4&quot;, &quot;ae&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00E5&quot;, &quot;aa&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00E6&quot;, &quot;ae&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00E7&quot;, &quot;c&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00E8&quot;, &quot;e&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00E9&quot;, &quot;e&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00EA&quot;, &quot;e&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00EB&quot;, &quot;e&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00EC&quot;, &quot;i&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00ED&quot;, &quot;i&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00EE&quot;, &quot;i&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00EF&quot;, &quot;i&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00F0&quot;, &quot;o&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00F1&quot;, &quot;n&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00F2&quot;, &quot;o&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00F3&quot;, &quot;o&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00F4&quot;, &quot;o&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00F5&quot;, &quot;o&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00F6&quot;, &quot;oe&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00F8&quot;, &quot;oe&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00F9&quot;, &quot;u&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00FA&quot;, &quot;u&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00FB&quot;, &quot;u&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00FC&quot;, &quot;ue&quot;); // u umlaut...</b>
+<b class="fc">&nbsp;        put(&quot;\u00FD&quot;, &quot;y&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00FF&quot;, &quot;y&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0100&quot;, &quot;A&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0101&quot;, &quot;a&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0102&quot;, &quot;A&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0103&quot;, &quot;a&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0104&quot;, &quot;A&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0105&quot;, &quot;a&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0106&quot;, &quot;C&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0107&quot;, &quot;c&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0108&quot;, &quot;C&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0109&quot;, &quot;c&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u010A&quot;, &quot;C&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u010B&quot;, &quot;c&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u010C&quot;, &quot;C&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u010D&quot;, &quot;c&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u010E&quot;, &quot;D&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u010F&quot;, &quot;d&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0110&quot;, &quot;D&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0111&quot;, &quot;d&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0112&quot;, &quot;E&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0113&quot;, &quot;e&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0114&quot;, &quot;E&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0115&quot;, &quot;e&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0116&quot;, &quot;E&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0117&quot;, &quot;e&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0118&quot;, &quot;E&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0119&quot;, &quot;e&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u011A&quot;, &quot;E&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u011B&quot;, &quot;e&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u011C&quot;, &quot;G&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u011D&quot;, &quot;g&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u011E&quot;, &quot;G&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u011F&quot;, &quot;g&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0120&quot;, &quot;G&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0121&quot;, &quot;g&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0122&quot;, &quot;G&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0123&quot;, &quot;g&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0124&quot;, &quot;H&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0125&quot;, &quot;h&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0127&quot;, &quot;h&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0128&quot;, &quot;I&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0129&quot;, &quot;i&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u012A&quot;, &quot;I&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u012B&quot;, &quot;i&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u012C&quot;, &quot;I&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u012D&quot;, &quot;i&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u012E&quot;, &quot;I&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u012F&quot;, &quot;i&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0130&quot;, &quot;I&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0131&quot;, &quot;i&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0132&quot;, &quot;IJ&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0133&quot;, &quot;ij&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0134&quot;, &quot;J&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0135&quot;, &quot;j&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0136&quot;, &quot;K&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0137&quot;, &quot;k&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0138&quot;, &quot;k&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0139&quot;, &quot;L&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u013A&quot;, &quot;l&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u013B&quot;, &quot;L&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u013C&quot;, &quot;l&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u013D&quot;, &quot;L&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u013E&quot;, &quot;l&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u013F&quot;, &quot;L&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0140&quot;, &quot;l&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0141&quot;, &quot;L&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0142&quot;, &quot;l&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0143&quot;, &quot;N&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0144&quot;, &quot;n&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0145&quot;, &quot;N&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0146&quot;, &quot;n&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0147&quot;, &quot;N&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0148&quot;, &quot;n&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0149&quot;, &quot;n&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u014A&quot;, &quot;N&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u014B&quot;, &quot;n&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u014C&quot;, &quot;O&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u014D&quot;, &quot;o&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u014E&quot;, &quot;O&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u014F&quot;, &quot;o&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0150&quot;, &quot;Oe&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0151&quot;, &quot;oe&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0152&quot;, &quot;OE&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0153&quot;, &quot;oe&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0154&quot;, &quot;R&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0155&quot;, &quot;r&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0156&quot;, &quot;R&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0157&quot;, &quot;r&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0158&quot;, &quot;R&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0159&quot;, &quot;r&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u015A&quot;, &quot;S&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u015B&quot;, &quot;s&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u015C&quot;, &quot;S&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u015D&quot;, &quot;s&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u015E&quot;, &quot;S&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u015F&quot;, &quot;s&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0160&quot;, &quot;S&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0161&quot;, &quot;s&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0162&quot;, &quot;T&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0163&quot;, &quot;t&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0164&quot;, &quot;T&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0165&quot;, &quot;t&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0166&quot;, &quot;T&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0167&quot;, &quot;t&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0168&quot;, &quot;U&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0169&quot;, &quot;u&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u016A&quot;, &quot;U&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u016B&quot;, &quot;u&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u016C&quot;, &quot;U&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u016D&quot;, &quot;u&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u016E&quot;, &quot;UU&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u016F&quot;, &quot;uu&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0170&quot;, &quot;Ue&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0171&quot;, &quot;ue&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0172&quot;, &quot;U&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0173&quot;, &quot;u&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0174&quot;, &quot;W&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0175&quot;, &quot;w&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0176&quot;, &quot;Y&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0177&quot;, &quot;y&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0178&quot;, &quot;Y&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0179&quot;, &quot;Z&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u017A&quot;, &quot;z&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u017B&quot;, &quot;Z&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u017C&quot;, &quot;z&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u017D&quot;, &quot;Z&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u017E&quot;, &quot;z&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EBC&quot;, &quot;E&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EBD&quot;, &quot;e&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EF8&quot;, &quot;Y&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EF9&quot;, &quot;y&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u01CD&quot;, &quot;A&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u01CE&quot;, &quot;a&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u01CF&quot;, &quot;I&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u01D0&quot;, &quot;i&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u01D1&quot;, &quot;O&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u01D2&quot;, &quot;o&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u01D3&quot;, &quot;U&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u01D4&quot;, &quot;u&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0232&quot;, &quot;Y&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u0233&quot;, &quot;y&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u01EA&quot;, &quot;O&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u01EB&quot;, &quot;o&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E0C&quot;, &quot;D&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E0D&quot;, &quot;d&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E1A&quot;, &quot;E&quot;); // &quot;~&quot; subscript</b>
+<b class="fc">&nbsp;        put(&quot;\u1E1B&quot;, &quot;e&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E2C&quot;, &quot;I&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E2D&quot;, &quot;i&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E24&quot;, &quot;H&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E25&quot;, &quot;h&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E36&quot;, &quot;L&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E37&quot;, &quot;l&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E38&quot;, &quot;L&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E39&quot;, &quot;l&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E42&quot;, &quot;M&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E43&quot;, &quot;m&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E46&quot;, &quot;N&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E47&quot;, &quot;n&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E5A&quot;, &quot;R&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E5B&quot;, &quot;r&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E5C&quot;, &quot;R&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E5D&quot;, &quot;r&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E62&quot;, &quot;S&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E63&quot;, &quot;s&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E6C&quot;, &quot;T&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E6D&quot;, &quot;t&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E74&quot;, &quot;U&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1E75&quot;, &quot;u&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EA2&quot;, &quot;A&quot;); // hook</b>
+<b class="fc">&nbsp;        put(&quot;\u1EA3&quot;, &quot;a&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EBA&quot;, &quot;E&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EBB&quot;, &quot;e&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EC8&quot;, &quot;I&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EC9&quot;, &quot;i&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1ECE&quot;, &quot;O&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1ECF&quot;, &quot;o&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EE6&quot;, &quot;U&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EE7&quot;, &quot;u&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EF6&quot;, &quot;Y&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u1EF7&quot;, &quot;y&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        put(&quot;\u00CF&quot;, &quot;I&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        put(&quot;\u008C&quot;, &quot;AE&quot;); // doesn&#39;t work?</b>
+<b class="fc">&nbsp;        put(&quot;\u016E&quot;, &quot;U&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u016F&quot;, &quot;u&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        put(&quot;\u0178&quot;, &quot;Y&quot;);</b>
+<b class="fc">&nbsp;        put(&quot;\u00FE&quot;, &quot;&quot;); // thorn character</b>
+&nbsp;
+&nbsp;        // UNICODE_CHARS.put(&quot;\u0100&quot;, &quot;&quot;);
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

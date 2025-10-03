@@ -1,0 +1,205 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RecursiveTreeItem</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.util</a>
+</div>
+
+<h1>Coverage Summary for Class: RecursiveTreeItem (org.jabref.gui.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecursiveTreeItem</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.util;
+&nbsp;
+&nbsp;import java.util.function.Predicate;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.value.ObservableValue;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.collections.transformation.FilteredList;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.CheckBoxTreeItem;
+&nbsp;import javafx.util.Callback;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;
+&nbsp;/**
+&nbsp; * Taken from https://gist.github.com/lestard/011e9ed4433f9eb791a8
+&nbsp; * As CheckBoxTreeItem extends TreeItem, this class will work for both.
+&nbsp; */
+&nbsp;public class RecursiveTreeItem&lt;T&gt; extends CheckBoxTreeItem&lt;T&gt; {
+&nbsp;
+&nbsp;    private final Callback&lt;T, BooleanProperty&gt; expandedProperty;
+&nbsp;    private final Callback&lt;T, ObservableList&lt;T&gt;&gt; childrenFactory;
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Predicate&lt;T&gt;&gt; filter = new SimpleObjectProperty&lt;&gt;();</b>
+&nbsp;    private FilteredList&lt;RecursiveTreeItem&lt;T&gt;&gt; children;
+&nbsp;
+&nbsp;    public RecursiveTreeItem(final T value, Callback&lt;T, ObservableList&lt;T&gt;&gt; func) {
+<b class="nc">&nbsp;        this(value, func, null, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RecursiveTreeItem(final T value, Callback&lt;T, ObservableList&lt;T&gt;&gt; func, Callback&lt;T, BooleanProperty&gt; expandedProperty, ObservableValue&lt;Predicate&lt;T&gt;&gt; filter) {
+<b class="nc">&nbsp;        this(value, null, func, expandedProperty, filter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RecursiveTreeItem(final T value, Callback&lt;T, ObservableList&lt;T&gt;&gt; func, ObservableValue&lt;Predicate&lt;T&gt;&gt; filter) {
+<b class="nc">&nbsp;        this(value, null, func, null, filter);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private RecursiveTreeItem(final T value, Node graphic, Callback&lt;T, ObservableList&lt;T&gt;&gt; func, Callback&lt;T, BooleanProperty&gt; expandedProperty, ObservableValue&lt;Predicate&lt;T&gt;&gt; filter) {
+<b class="nc">&nbsp;        super(value, graphic);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.childrenFactory = func;</b>
+<b class="nc">&nbsp;        this.expandedProperty = expandedProperty;</b>
+<b class="nc">&nbsp;        if (filter != null) {</b>
+<b class="nc">&nbsp;            this.filter.bind(filter);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (value != null) {</b>
+<b class="nc">&nbsp;            addChildrenListener(value);</b>
+<b class="nc">&nbsp;            bindExpandedProperty(value, expandedProperty);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        valueProperty().addListener((obs, oldValue, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            if (newValue != null) {</b>
+<b class="nc">&nbsp;                addChildrenListener(newValue);</b>
+<b class="nc">&nbsp;                bindExpandedProperty(newValue, expandedProperty);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void bindExpandedProperty(T value, Callback&lt;T, BooleanProperty&gt; expandedProperty) {
+<b class="nc">&nbsp;        if (expandedProperty != null) {</b>
+<b class="nc">&nbsp;            expandedProperty().bindBidirectional(expandedProperty.call(value));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addChildrenListener(T value) {
+<b class="nc">&nbsp;        children = EasyBind.mapBacked(childrenFactory.call(value), child -&gt; new RecursiveTreeItem&lt;&gt;(child, getGraphic(), childrenFactory, expandedProperty, filter))</b>
+<b class="nc">&nbsp;                           .filtered(Bindings.createObjectBinding(() -&gt; this::showNode, filter));</b>
+&nbsp;
+<b class="nc">&nbsp;        Bindings.bindContent(getChildren(), children);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean showNode(RecursiveTreeItem&lt;T&gt; node) {
+<b class="nc">&nbsp;        if (filter.get() == null) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (filter.get().test(node.getValue())) {</b>
+&nbsp;            // Node is directly matched -&gt; so show it
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Are there children (or children of children...) that are matched? If yes we also need to show this node
+<b class="nc">&nbsp;        return node.children.getSource().stream().anyMatch(this::showNode);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

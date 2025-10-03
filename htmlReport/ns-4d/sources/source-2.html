@@ -1,0 +1,335 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SavingPropertiesViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.libraryproperties.saving</a>
+</div>
+
+<h1>Coverage Summary for Class: SavingPropertiesViewModel (org.jabref.gui.libraryproperties.saving)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SavingPropertiesViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/67)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SavingPropertiesViewModel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.libraryproperties.saving;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;
+&nbsp;import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
+&nbsp;import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
+&nbsp;import org.jabref.logic.cleanup.CleanupPreferences;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanup;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanups;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.metadata.MetaData;
+&nbsp;import org.jabref.model.metadata.SaveOrder;
+&nbsp;
+&nbsp;public class SavingPropertiesViewModel implements PropertiesTabViewModel {
+&nbsp;
+<b class="nc">&nbsp;    private static final SaveOrder UI_DEFAULT_SAVE_ORDER = new SaveOrder(SaveOrder.OrderType.ORIGINAL, List.of(</b>
+&nbsp;            new SaveOrder.SortCriterion(StandardField.AUTHOR),
+&nbsp;            new SaveOrder.SortCriterion(StandardField.YEAR),
+&nbsp;            new SaveOrder.SortCriterion(StandardField.TITLE),
+&nbsp;            // Pro users generate their citation keys well. They can just delete the above three proposals and get a well-sorted library.
+&nbsp;            new SaveOrder.SortCriterion(InternalField.KEY_FIELD)
+&nbsp;    ));
+&nbsp;
+<b class="nc">&nbsp;    private final BooleanProperty protectDisableProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty libraryProtectedProperty = new SimpleBooleanProperty();</b>
+&nbsp;
+&nbsp;    // SaveOrderConfigPanel
+<b class="nc">&nbsp;    private final BooleanProperty saveInOriginalProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty saveInTableOrderProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final BooleanProperty saveInSpecifiedOrderProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;Field&gt; sortableFieldsProperty = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;SortCriterionViewModel&gt; sortCriteriaProperty = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList(new ArrayList&lt;&gt;()));</b>
+&nbsp;
+&nbsp;    // FieldFormatterCleanupsPanel
+<b class="nc">&nbsp;    private final BooleanProperty cleanupsDisableProperty = new SimpleBooleanProperty();</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;FieldFormatterCleanup&gt; cleanupsProperty = new SimpleListProperty&lt;&gt;(FXCollections.emptyObservableList());</b>
+&nbsp;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final MetaData initialMetaData;
+&nbsp;    private final SaveOrder saveOrder;
+&nbsp;    private final CliPreferences preferences;
+&nbsp;
+<b class="nc">&nbsp;    public SavingPropertiesViewModel(BibDatabaseContext databaseContext, CliPreferences preferences) {</b>
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.preferences = preferences;</b>
+<b class="nc">&nbsp;        this.initialMetaData = databaseContext.getMetaData();</b>
+<b class="nc">&nbsp;        this.saveOrder = initialMetaData.getSaveOrder().orElse(UI_DEFAULT_SAVE_ORDER);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+<b class="nc">&nbsp;        libraryProtectedProperty.setValue(initialMetaData.isProtected());</b>
+&nbsp;
+&nbsp;        // SaveOrderConfigPanel, included via &lt;?import ...&gt; in FXML
+&nbsp;
+<b class="nc">&nbsp;        switch (saveOrder.getOrderType()) {</b>
+&nbsp;            case SPECIFIED -&gt;
+<b class="nc">&nbsp;                    saveInSpecifiedOrderProperty.setValue(true);</b>
+&nbsp;            case ORIGINAL -&gt;
+<b class="nc">&nbsp;                    saveInOriginalProperty.setValue(true);</b>
+&nbsp;            case TABLE -&gt;
+<b class="nc">&nbsp;                    saveInTableOrderProperty.setValue(true);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sortableFieldsProperty.clear();</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;Field&gt; fields = FieldFactory.getAllFieldsWithOutInternal();</b>
+<b class="nc">&nbsp;        fields.add(InternalField.INTERNAL_ALL_FIELD);</b>
+<b class="nc">&nbsp;        fields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);</b>
+<b class="nc">&nbsp;        fields.add(InternalField.KEY_FIELD);</b>
+<b class="nc">&nbsp;        fields.add(InternalField.TYPE_HEADER);</b>
+&nbsp;
+<b class="nc">&nbsp;        sortableFieldsProperty.addAll(FieldFactory.getStandardFieldsWithCitationKey());</b>
+<b class="nc">&nbsp;        sortCriteriaProperty.clear();</b>
+<b class="nc">&nbsp;        sortCriteriaProperty.addAll(saveOrder.getSortCriteria().stream()</b>
+<b class="nc">&nbsp;                                             .map(SortCriterionViewModel::new)</b>
+<b class="nc">&nbsp;                                             .toList());</b>
+&nbsp;
+&nbsp;        // FieldFormatterCleanupsPanel, included via &lt;?import ...&gt; in FXML
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;FieldFormatterCleanups&gt; saveActions = initialMetaData.getSaveActions();</b>
+<b class="nc">&nbsp;        saveActions.ifPresentOrElse(value -&gt; {</b>
+<b class="nc">&nbsp;            cleanupsDisableProperty.setValue(!value.isEnabled());</b>
+<b class="nc">&nbsp;            cleanupsProperty.setValue(FXCollections.observableArrayList(value.getConfiguredActions()));</b>
+&nbsp;        }, () -&gt; {
+<b class="nc">&nbsp;            CleanupPreferences defaultPreset = preferences.getDefaultCleanupPreset();</b>
+<b class="nc">&nbsp;            cleanupsDisableProperty.setValue(!defaultPreset.getFieldFormatterCleanups().isEnabled());</b>
+<b class="nc">&nbsp;            cleanupsProperty.setValue(FXCollections.observableArrayList(defaultPreset.getFieldFormatterCleanups().getConfiguredActions()));</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        MetaData newMetaData = databaseContext.getMetaData();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (libraryProtectedProperty.getValue()) {</b>
+<b class="nc">&nbsp;            newMetaData.markAsProtected();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            newMetaData.markAsNotProtected();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        FieldFormatterCleanups fieldFormatterCleanups = new FieldFormatterCleanups(</b>
+<b class="nc">&nbsp;                !cleanupsDisableProperty().getValue(),</b>
+<b class="nc">&nbsp;                cleanupsProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS.equals(fieldFormatterCleanups.getConfiguredActions())) {</b>
+<b class="nc">&nbsp;            newMetaData.clearSaveActions();</b>
+&nbsp;        } else {
+&nbsp;            // if all actions have been removed, remove the save actions from the MetaData
+<b class="nc">&nbsp;            if (fieldFormatterCleanups.getConfiguredActions().isEmpty()) {</b>
+<b class="nc">&nbsp;                newMetaData.clearSaveActions();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                newMetaData.setSaveActions(fieldFormatterCleanups);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SaveOrder newSaveOrder = new SaveOrder(</b>
+<b class="nc">&nbsp;                SaveOrder.OrderType.fromBooleans(saveInSpecifiedOrderProperty.getValue(), saveInOriginalProperty.getValue()),</b>
+<b class="nc">&nbsp;                sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!newSaveOrder.equals(saveOrder)) {</b>
+<b class="nc">&nbsp;            if (newSaveOrder.equals(SaveOrder.getDefaultSaveOrder())) {</b>
+<b class="nc">&nbsp;                newMetaData.clearSaveOrder();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                newMetaData.setSaveOrder(newSaveOrder);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        databaseContext.setMetaData(newMetaData);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty protectDisableProperty() {
+<b class="nc">&nbsp;        return protectDisableProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty libraryProtectedProperty() {
+<b class="nc">&nbsp;        return libraryProtectedProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // SaveOrderConfigPanel
+&nbsp;
+&nbsp;    public BooleanProperty saveInOriginalProperty() {
+<b class="nc">&nbsp;        return saveInOriginalProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty saveInTableOrderProperty() {
+<b class="nc">&nbsp;        return saveInTableOrderProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty saveInSpecifiedOrderProperty() {
+<b class="nc">&nbsp;        return saveInSpecifiedOrderProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;Field&gt; sortableFieldsProperty() {
+<b class="nc">&nbsp;        return sortableFieldsProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;SortCriterionViewModel&gt; sortCriteriaProperty() {
+<b class="nc">&nbsp;        return sortCriteriaProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // FieldFormatterCleanupsPanel
+&nbsp;
+&nbsp;    public BooleanProperty cleanupsDisableProperty() {
+<b class="nc">&nbsp;        return cleanupsDisableProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;FieldFormatterCleanup&gt; cleanupsProperty() {
+<b class="nc">&nbsp;        return cleanupsProperty;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

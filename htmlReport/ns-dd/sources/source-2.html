@@ -1,0 +1,266 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MSBibConverter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.msbib</a>
+</div>
+
+<h1>Coverage Summary for Class: MSBibConverter (org.jabref.logic.msbib)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MSBibConverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.msbib;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Month;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UnknownField;
+&nbsp;import org.jabref.model.entry.types.IEEETranEntryType;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;public class MSBibConverter {
+&nbsp;
+&nbsp;    private static final String MSBIB_PREFIX = &quot;msbib-&quot;;
+&nbsp;    private static final String BIBTEX_PREFIX = &quot;BIBTEX_&quot;;
+<b class="nc">&nbsp;    private static final RemoveEnclosingBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();</b>
+&nbsp;
+&nbsp;    private MSBibConverter() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static MSBibEntry convert(BibEntry entry) {
+<b class="nc">&nbsp;        MSBibEntry result = new MSBibEntry();</b>
+&nbsp;
+&nbsp;        // memorize original type
+<b class="nc">&nbsp;        result.fields.put(BIBTEX_PREFIX + &quot;Entry&quot;, entry.getType().getName());</b>
+&nbsp;        // define new type
+<b class="nc">&nbsp;        String msBibType = MSBibMapping.getMSBibEntryType(entry.getType()).name();</b>
+<b class="nc">&nbsp;        result.fields.put(&quot;SourceType&quot;, msBibType);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Field field : entry.getFields()) {</b>
+<b class="nc">&nbsp;            String msBibField = MSBibMapping.getMSBibField(field);</b>
+<b class="nc">&nbsp;            if (msBibField != null) {</b>
+<b class="nc">&nbsp;                String value = entry.getFieldLatexFree(field).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;                result.fields.put(msBibField, value);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Duplicate: also added as BookTitle
+<b class="nc">&nbsp;        entry.getFieldLatexFree(StandardField.BOOKTITLE).ifPresent(booktitle -&gt; result.conferenceName = booktitle);</b>
+<b class="nc">&nbsp;        entry.getFieldLatexFree(StandardField.PAGES).ifPresent(pages -&gt; result.pages = new PageNumbers(pages));</b>
+<b class="nc">&nbsp;        entry.getFieldLatexFree(new UnknownField(MSBIB_PREFIX + &quot;accessed&quot;)).ifPresent(accesed -&gt; result.dateAccessed = accesed);</b>
+&nbsp;
+<b class="nc">&nbsp;        entry.getFieldLatexFree(StandardField.URLDATE).ifPresent(acessed -&gt; result.dateAccessed = acessed);</b>
+&nbsp;
+&nbsp;        // TODO: currently this can never happen
+<b class="nc">&nbsp;        if (&quot;SoundRecording&quot;.equals(msBibType)) {</b>
+<b class="nc">&nbsp;            result.albumTitle = entry.getFieldLatexFree(StandardField.TITLE).orElse(null);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // TODO: currently this can never happen
+<b class="nc">&nbsp;        if (&quot;Interview&quot;.equals(msBibType)) {</b>
+<b class="nc">&nbsp;            result.broadcastTitle = entry.getFieldLatexFree(StandardField.TITLE).orElse(null);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        result.number = entry.getFieldLatexFree(StandardField.NUMBER).orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entry.getType().equals(IEEETranEntryType.Patent)) {</b>
+<b class="nc">&nbsp;            result.patentNumber = entry.getFieldLatexFree(StandardField.NUMBER).orElse(null);</b>
+<b class="nc">&nbsp;            result.number = null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        result.day = entry.getFieldOrAliasLatexFree(StandardField.DAY).orElse(null);</b>
+<b class="nc">&nbsp;        result.month = entry.getMonth().map(Month::getFullName).orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entry.getFieldLatexFree(StandardField.YEAR).isEmpty()) {</b>
+<b class="nc">&nbsp;            result.year = entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(null);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        result.journalName = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(null);</b>
+&nbsp;
+&nbsp;        // Value must be converted
+<b class="nc">&nbsp;        entry.getFieldLatexFree(StandardField.LANGUAGE)</b>
+<b class="nc">&nbsp;             .ifPresent(lang -&gt; result.fields.put(&quot;LCID&quot;, String.valueOf(MSBibMapping.getLCID(lang))));</b>
+<b class="nc">&nbsp;        StringBuilder sbNumber = new StringBuilder();</b>
+<b class="nc">&nbsp;        entry.getFieldLatexFree(StandardField.ISBN).ifPresent(isbn -&gt; sbNumber.append(&quot; ISBN: &quot;).append(isbn));</b>
+<b class="nc">&nbsp;        entry.getFieldLatexFree(StandardField.ISSN).ifPresent(issn -&gt; sbNumber.append(&quot; ISSN: &quot;).append(issn));</b>
+<b class="nc">&nbsp;        entry.getFieldLatexFree(new UnknownField(&quot;lccn&quot;)).ifPresent(lccn -&gt; sbNumber.append(&quot;LCCN: &quot;).append(lccn));</b>
+<b class="nc">&nbsp;        entry.getFieldLatexFree(StandardField.MR_NUMBER).ifPresent(mrnumber -&gt; sbNumber.append(&quot; MRN: &quot;).append(mrnumber));</b>
+&nbsp;
+<b class="nc">&nbsp;        result.standardNumber = sbNumber.toString();</b>
+<b class="nc">&nbsp;        if (result.standardNumber.isEmpty()) {</b>
+<b class="nc">&nbsp;            result.standardNumber = null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        result.address = entry.getFieldOrAliasLatexFree(StandardField.ADDRESS).orElse(null);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entry.getFieldLatexFree(StandardField.TYPE).isPresent()) {</b>
+<b class="nc">&nbsp;            result.thesisType = entry.getFieldLatexFree(StandardField.TYPE).get();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (entry.getType().equals(StandardEntryType.TechReport)) {</b>
+<b class="nc">&nbsp;                result.thesisType = &quot;Tech. rep.&quot;;</b>
+<b class="nc">&nbsp;            } else if (entry.getType().equals(StandardEntryType.MastersThesis)) {</b>
+<b class="nc">&nbsp;                result.thesisType = &quot;Master&#39;s thesis&quot;;</b>
+<b class="nc">&nbsp;            } else if (entry.getType().equals(StandardEntryType.PhdThesis)) {</b>
+<b class="nc">&nbsp;                result.thesisType = &quot;Ph.D. dissertation&quot;;</b>
+<b class="nc">&nbsp;            } else if (entry.getType().equals(StandardEntryType.Unpublished)) {</b>
+<b class="nc">&nbsp;                result.thesisType = &quot;unpublished&quot;;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // TODO: currently this can never happen
+<b class="nc">&nbsp;        if (&quot;InternetSite&quot;.equals(msBibType) || &quot;DocumentFromInternetSite&quot;.equals(msBibType)) {</b>
+<b class="nc">&nbsp;            result.internetSiteTitle = entry.getFieldLatexFree(StandardField.TITLE).orElse(null);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // TODO: currently only Misc can happen
+<b class="nc">&nbsp;        if (&quot;Art&quot;.equals(msBibType) || &quot;Misc&quot;.equals(msBibType)) {</b>
+<b class="nc">&nbsp;            result.publicationTitle = entry.getFieldLatexFree(StandardField.TITLE).orElse(null);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (entry.getType().equals(IEEETranEntryType.Patent)) {</b>
+<b class="nc">&nbsp;            entry.getField(StandardField.AUTHOR).ifPresent(authors -&gt; result.inventors = getAuthors(entry, authors, StandardField.AUTHOR));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            entry.getField(StandardField.AUTHOR).ifPresent(authors -&gt; result.authors = getAuthors(entry, authors, StandardField.AUTHOR));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        entry.getField(StandardField.EDITOR).ifPresent(editors -&gt; result.editors = getAuthors(entry, editors, StandardField.EDITOR));</b>
+<b class="nc">&nbsp;        entry.getField(StandardField.TRANSLATOR).ifPresent(translator -&gt; result.translators = getAuthors(entry, translator, StandardField.EDITOR));</b>
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;MsBibAuthor&gt; getAuthors(BibEntry entry, String authors, Field field) {
+<b class="nc">&nbsp;        List&lt;MsBibAuthor&gt; result = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Only one corporate author is supported
+&nbsp;        // Heuristics: If the author is surrounded by curly braces, it is a corporate author
+<b class="nc">&nbsp;        boolean corporate = !REMOVE_BRACES_FORMATTER.format(authors).equals(authors);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;String&gt; authorLatexFreeOpt = entry.getFieldLatexFree(field);</b>
+<b class="nc">&nbsp;        if (authorLatexFreeOpt.isEmpty()) {</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String authorLatexFree = authorLatexFreeOpt.get();</b>
+&nbsp;
+&nbsp;        // We re-add the curly braces to keep the corporate author as is.
+&nbsp;        // See https://github.com/JabRef/jabref-issue-melting-pot/issues/386 for details
+<b class="nc">&nbsp;        if (corporate) {</b>
+<b class="nc">&nbsp;            authorLatexFree = &quot;{&quot; + authorLatexFree + &quot;}&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return AuthorList.parse(authorLatexFree).getAuthors()</b>
+<b class="nc">&nbsp;                         .stream()</b>
+<b class="nc">&nbsp;                         .map(author -&gt; new MsBibAuthor(author, corporate))</b>
+<b class="nc">&nbsp;                         .toList();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

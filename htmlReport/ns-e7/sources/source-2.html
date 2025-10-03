@@ -1,0 +1,186 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FileAnnotationCache</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.pdf</a>
+</div>
+
+<h1>Coverage Summary for Class: FileAnnotationCache (org.jabref.logic.pdf)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FileAnnotationCache</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FileAnnotationCache$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.pdf;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.pdf.FileAnnotation;
+&nbsp;
+&nbsp;import com.google.common.cache.CacheBuilder;
+&nbsp;import com.google.common.cache.CacheLoader;
+&nbsp;import com.google.common.cache.LoadingCache;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;public class FileAnnotationCache {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotationCache.class);</b>
+&nbsp;
+&nbsp;    private static final int CACHE_SIZE = 1024;
+&nbsp;
+&nbsp;    // the inner list holds the annotations per file, the outer collection maps this to a BibEntry.
+&nbsp;    private LoadingCache&lt;BibEntry, Map&lt;Path, List&lt;FileAnnotation&gt;&gt;&gt; annotationCache;
+&nbsp;
+&nbsp;    /// Creates an empty file annotation cache. Required to allow the annotation cache to be injected into views without
+&nbsp;    /// hitting the bug &lt;https://github.com/AdamBien/afterburner.fx/issues/71&gt;.
+<b class="nc">&nbsp;    public FileAnnotationCache() {</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public FileAnnotationCache(BibDatabaseContext context, FilePreferences filePreferences) {</b>
+<b class="nc">&nbsp;        annotationCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).build(new CacheLoader&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public Map&lt;Path, List&lt;FileAnnotation&gt;&gt; load(BibEntry entry) {
+<b class="nc">&nbsp;                return new EntryAnnotationImporter(entry).importAnnotationsFromFiles(context, filePreferences);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Note that entry becomes the most recent entry in the cache
+&nbsp;     *
+&nbsp;     * @param entry entry for which to get the annotations
+&nbsp;     * @return Map containing a list of annotations in a list for each file
+&nbsp;     */
+&nbsp;    public Map&lt;Path, List&lt;FileAnnotation&gt;&gt; getFromCache(BibEntry entry) {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Loading BibEntry &#39;{}&#39; from cache.&quot;, entry.getCitationKey().orElse(entry.getId()));</b>
+<b class="nc">&nbsp;        return annotationCache.getUnchecked(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void remove(BibEntry entry) {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Deleted BibEntry &#39;{}&#39; from cache.&quot;, entry.getCitationKey().orElse(entry.getId()));</b>
+<b class="nc">&nbsp;        annotationCache.invalidate(entry);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

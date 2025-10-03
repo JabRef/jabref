@@ -1,0 +1,241 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CiteSeerQueryTransformer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher.transformers</a>
+</div>
+
+<h1>Coverage Summary for Class: CiteSeerQueryTransformer (org.jabref.logic.importer.fetcher.transformers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CiteSeerQueryTransformer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher.transformers;
+&nbsp;
+&nbsp;import java.util.Calendar;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import kong.unirest.core.json.JSONArray;
+&nbsp;import kong.unirest.core.json.JSONObject;
+&nbsp;
+&nbsp;public class CiteSeerQueryTransformer extends AbstractQueryTransformer {
+&nbsp;
+<b class="nc">&nbsp;    private JSONObject payload = new JSONObject();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default values for necessary parameters set in constructor
+&nbsp;     */
+<b class="nc">&nbsp;    public CiteSeerQueryTransformer() {</b>
+<b class="nc">&nbsp;        handlePage(&quot;1&quot;);</b>
+<b class="nc">&nbsp;        handlePageSize(&quot;20&quot;);</b>
+<b class="nc">&nbsp;        this.getJSONPayload().put(&quot;must_have_pdf&quot;, &quot;false&quot;);</b>
+<b class="nc">&nbsp;        handleSortBy(&quot;relevance&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String getLogicalAndOperator() {
+<b class="nc">&nbsp;        return &quot; &quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String getLogicalOrOperator() {
+<b class="nc">&nbsp;        return &quot; &quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String getLogicalNotOperator() {
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleAuthor(String author) {
+<b class="nc">&nbsp;        if (!getJSONPayload().has(&quot;author&quot;)) {</b>
+<b class="nc">&nbsp;            this.getJSONPayload().put(&quot;author&quot;, new JSONArray());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.getJSONPayload().getJSONArray(&quot;author&quot;).put(author).toString();</b>
+<b class="nc">&nbsp;        return StringUtil.quoteStringIfSpaceIsContained(author);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleTitle(String title) {
+<b class="nc">&nbsp;        this.getJSONPayload().put(&quot;queryString&quot;, title);</b>
+<b class="nc">&nbsp;        return StringUtil.quoteStringIfSpaceIsContained(title);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleJournal(String journalTitle) {
+<b class="nc">&nbsp;        this.getJSONPayload().put(&quot;journal&quot;, journalTitle);</b>
+<b class="nc">&nbsp;        return StringUtil.quoteStringIfSpaceIsContained(journalTitle);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleYear(String year) {
+<b class="nc">&nbsp;        this.getJSONPayload().put(&quot;yearStart&quot;, Integer.parseInt(year));</b>
+<b class="nc">&nbsp;        this.getJSONPayload().put(&quot;yearEnd&quot;, Integer.parseInt(year));</b>
+<b class="nc">&nbsp;        return StringUtil.quoteStringIfSpaceIsContained(year);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleYearRange(String yearRange) {
+<b class="nc">&nbsp;        parseYearRange(yearRange);</b>
+<b class="nc">&nbsp;        if (endYear == Integer.MAX_VALUE) { // invalid year range</b>
+<b class="nc">&nbsp;            Calendar calendar = Calendar.getInstance();</b>
+<b class="nc">&nbsp;            this.getJSONPayload().put(&quot;yearEnd&quot;, calendar.get(Calendar.YEAR));</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.getJSONPayload().put(&quot;yearStart&quot;, startYear);</b>
+<b class="nc">&nbsp;        this.getJSONPayload().put(&quot;yearEnd&quot;, endYear);</b>
+<b class="nc">&nbsp;        return yearRange;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * covers the five fields that are required to make a POST request
+&nbsp;     * except &quot;must_have_pdf&quot; as FullTextFetcher is not yet implemented for CiteSeer
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    protected Optional&lt;String&gt; handleOtherField(String fieldAsString, String term) {
+<b class="nc">&nbsp;        return switch (fieldAsString) {</b>
+&nbsp;            case &quot;page&quot; -&gt;
+<b class="nc">&nbsp;                    handlePage(term);</b>
+&nbsp;            case &quot;pageSize&quot; -&gt;
+<b class="nc">&nbsp;                    handlePageSize(term);</b>
+&nbsp;            case &quot;must_have_pdf&quot; -&gt;
+<b class="nc">&nbsp;                    handleMustHavePdf(term);</b>
+&nbsp;            case &quot;sortBy&quot; -&gt;
+<b class="nc">&nbsp;                    handleSortBy(term);</b>
+&nbsp;            default -&gt;
+<b class="nc">&nbsp;                    super.handleOtherField(fieldAsString, term);</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    // as mentioned before, there may be a Jabref constant for page/page-size
+&nbsp;    private Optional&lt;String&gt; handlePage(String page) {
+<b class="nc">&nbsp;        this.getJSONPayload().put(&quot;page&quot;, StringUtil.intValueOf(page));</b>
+<b class="nc">&nbsp;        return Optional.of(page);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;String&gt; handlePageSize(String pageSize) {
+<b class="nc">&nbsp;        this.getJSONPayload().put(&quot;pageSize&quot;, StringUtil.intValueOf(pageSize));</b>
+<b class="nc">&nbsp;        return Optional.of(pageSize);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;String&gt; handleMustHavePdf(String mustHavePdf) {
+<b class="nc">&nbsp;        this.getJSONPayload().put(&quot;must_have_pdf&quot;, mustHavePdf);</b>
+<b class="nc">&nbsp;        return Optional.of(mustHavePdf);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Optional&lt;String&gt; handleSortBy(String sortBy) {
+<b class="nc">&nbsp;        this.getJSONPayload().put(&quot;sortBy&quot;, sortBy);</b>
+<b class="nc">&nbsp;        return Optional.of(sortBy);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public JSONObject getJSONPayload() {
+<b class="nc">&nbsp;        return this.payload;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SearchPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.search</a>
+</div>
+
+<h1>Coverage Summary for Class: SearchPreferences (org.jabref.logic.search)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SearchPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.search;
+&nbsp;
+&nbsp;import java.util.EnumSet;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.DoubleProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleDoubleProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableSet;
+&nbsp;
+&nbsp;import org.jabref.model.search.SearchDisplayMode;
+&nbsp;import org.jabref.model.search.SearchFlags;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;
+&nbsp;public class SearchPreferences {
+&nbsp;
+&nbsp;    private final ObservableSet&lt;SearchFlags&gt; searchFlags;
+&nbsp;    private final BooleanProperty keepWindowOnTop;
+&nbsp;    private final DoubleProperty searchWindowHeight;
+&nbsp;    private final DoubleProperty searchWindowWidth;
+&nbsp;    private final DoubleProperty searchWindowDividerPosition;
+&nbsp;    private final BooleanProperty keepSearchString;
+&nbsp;    private final ObjectProperty&lt;SearchDisplayMode&gt; searchDisplayMode;
+&nbsp;
+&nbsp;    public SearchPreferences(SearchDisplayMode searchDisplayMode,
+&nbsp;                             boolean isRegularExpression,
+&nbsp;                             boolean isCaseSensitive,
+&nbsp;                             boolean isFulltext,
+&nbsp;                             boolean keepSearchString,
+&nbsp;                             boolean keepWindowOnTop,
+&nbsp;                             double searchWindowHeight,
+&nbsp;                             double searchWindowWidth,
+&nbsp;                             double searchWindowDividerPosition) {
+<b class="nc">&nbsp;        this(searchDisplayMode, EnumSet.noneOf(SearchFlags.class), keepSearchString, keepWindowOnTop, searchWindowHeight, searchWindowWidth, searchWindowDividerPosition);</b>
+<b class="nc">&nbsp;        if (isRegularExpression) {</b>
+<b class="nc">&nbsp;            searchFlags.add(SearchFlags.REGULAR_EXPRESSION);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (isCaseSensitive) {</b>
+<b class="nc">&nbsp;            searchFlags.add(SearchFlags.CASE_SENSITIVE);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (isFulltext) {</b>
+<b class="nc">&nbsp;            searchFlags.add(SearchFlags.FULLTEXT);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @VisibleForTesting
+<b class="nc">&nbsp;    public SearchPreferences(SearchDisplayMode searchDisplayMode, EnumSet&lt;SearchFlags&gt; searchFlags, boolean keepSearchString, boolean keepWindowOnTop, double searchWindowHeight, double searchWindowWidth, double searchWindowDividerPosition) {</b>
+<b class="nc">&nbsp;        this.searchDisplayMode = new SimpleObjectProperty&lt;&gt;(searchDisplayMode);</b>
+<b class="nc">&nbsp;        this.searchFlags = FXCollections.observableSet(searchFlags);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.keepWindowOnTop = new SimpleBooleanProperty(keepWindowOnTop);</b>
+<b class="nc">&nbsp;        this.searchWindowHeight = new SimpleDoubleProperty(searchWindowHeight);</b>
+<b class="nc">&nbsp;        this.searchWindowWidth = new SimpleDoubleProperty(searchWindowWidth);</b>
+<b class="nc">&nbsp;        this.searchWindowDividerPosition = new SimpleDoubleProperty(searchWindowDividerPosition);</b>
+<b class="nc">&nbsp;        this.keepSearchString = new SimpleBooleanProperty(keepSearchString);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public EnumSet&lt;SearchFlags&gt; getSearchFlags() {
+&nbsp;        // copy of returns an exception when the EnumSet is empty
+<b class="nc">&nbsp;        if (searchFlags.isEmpty()) {</b>
+<b class="nc">&nbsp;            return EnumSet.noneOf(SearchFlags.class);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return EnumSet.copyOf(searchFlags);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableSet&lt;SearchFlags&gt; getObservableSearchFlags() {
+<b class="nc">&nbsp;        return searchFlags;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSearchFlag(SearchFlags flag, boolean value) {
+<b class="nc">&nbsp;        if (searchFlags.contains(flag) &amp;&amp; !value) {</b>
+<b class="nc">&nbsp;            searchFlags.remove(flag);</b>
+<b class="nc">&nbsp;        } else if (!searchFlags.contains(flag) &amp;&amp; value) {</b>
+<b class="nc">&nbsp;            searchFlags.add(flag);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isRegularExpression() {
+<b class="nc">&nbsp;        return searchFlags.contains(SearchFlags.REGULAR_EXPRESSION);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isCaseSensitive() {
+<b class="nc">&nbsp;        return searchFlags.contains(SearchFlags.CASE_SENSITIVE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isFulltext() {
+<b class="nc">&nbsp;        return searchFlags.contains(SearchFlags.FULLTEXT);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldKeepSearchString() {
+<b class="nc">&nbsp;        return keepSearchString.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldKeepWindowOnTop() {
+<b class="nc">&nbsp;        return keepWindowOnTop.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty keepWindowOnTopProperty() {
+<b class="nc">&nbsp;        return keepWindowOnTop;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setKeepWindowOnTop(boolean keepWindowOnTop) {
+<b class="nc">&nbsp;        this.keepWindowOnTop.set(keepWindowOnTop);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getSearchWindowHeight() {
+<b class="nc">&nbsp;        return this.searchWindowHeight.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getSearchWindowWidth() {
+<b class="nc">&nbsp;        return this.searchWindowWidth.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Double getSearchWindowDividerPosition() {
+<b class="nc">&nbsp;        return this.searchWindowDividerPosition.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty getSearchWindowHeightProperty() {
+<b class="nc">&nbsp;        return this.searchWindowHeight;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty getSearchWindowWidthProperty() {
+<b class="nc">&nbsp;        return this.searchWindowWidth;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SearchDisplayMode getSearchDisplayMode() {
+<b class="nc">&nbsp;        return searchDisplayMode.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DoubleProperty getSearchWindowDividerPositionProperty() {
+<b class="nc">&nbsp;        return this.searchWindowDividerPosition;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;SearchDisplayMode&gt; searchDisplayModeProperty() {
+<b class="nc">&nbsp;        return this.searchDisplayMode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty keepSearchStringProperty() {
+<b class="nc">&nbsp;        return keepSearchString;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSearchWindowHeight(double height) {
+<b class="nc">&nbsp;        this.searchWindowHeight.set(height);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSearchWindowWidth(double width) {
+<b class="nc">&nbsp;        this.searchWindowWidth.set(width);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSearchWindowDividerPosition(double position) {
+<b class="nc">&nbsp;        this.searchWindowDividerPosition.set(position);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSearchDisplayMode(SearchDisplayMode searchDisplayMode) {
+<b class="nc">&nbsp;        this.searchDisplayMode.set(searchDisplayMode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setKeepSearchString(boolean keepSearchString) {
+<b class="nc">&nbsp;        this.keepSearchString.set(keepSearchString);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,281 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CommentsTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.entryeditor</a>
+</div>
+
+<h1>Coverage Summary for Class: CommentsTab (org.jabref.gui.entryeditor)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CommentsTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.entryeditor;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.LinkedHashSet;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.SequencedSet;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;import javafx.geometry.VPos;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.RowConstraints;
+&nbsp;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.fieldeditors.FieldEditorFX;
+&nbsp;import org.jabref.gui.fieldeditors.FieldNameLabel;
+&nbsp;import org.jabref.gui.fieldeditors.MarkdownEditor;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.preview.PreviewPanel;
+&nbsp;import org.jabref.gui.undo.RedoAction;
+&nbsp;import org.jabref.gui.undo.UndoAction;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.field.UserSpecificCommentField;
+&nbsp;
+&nbsp;public class CommentsTab extends FieldsEditorTab {
+&nbsp;    public static final String NAME = &quot;Comments&quot;;
+&nbsp;
+&nbsp;    private final String defaultOwner;
+&nbsp;    private final UserSpecificCommentField userSpecificCommentField;
+&nbsp;    private final EntryEditorPreferences entryEditorPreferences;
+&nbsp;    private boolean isFieldCurrentlyVisible;
+&nbsp;    private boolean shouldShowHideButton;
+&nbsp;
+&nbsp;    public CommentsTab(GuiPreferences preferences,
+&nbsp;                       UndoManager undoManager,
+&nbsp;                       UndoAction undoAction,
+&nbsp;                       RedoAction redoAction,
+&nbsp;                       JournalAbbreviationRepository journalAbbreviationRepository,
+&nbsp;                       StateManager stateManager,
+&nbsp;                       PreviewPanel previewPanel) {
+<b class="nc">&nbsp;        super(false,</b>
+&nbsp;                undoManager,
+&nbsp;                undoAction,
+&nbsp;                redoAction,
+&nbsp;                preferences,
+&nbsp;                journalAbbreviationRepository,
+&nbsp;                stateManager,
+&nbsp;                previewPanel);
+<b class="nc">&nbsp;        this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll(&quot;[^a-z0-9]&quot;, &quot;-&quot;);</b>
+<b class="nc">&nbsp;        setText(Localization.lang(&quot;Comments&quot;));</b>
+<b class="nc">&nbsp;        setGraphic(IconTheme.JabRefIcons.COMMENT.getGraphicNode());</b>
+&nbsp;
+<b class="nc">&nbsp;        userSpecificCommentField = new UserSpecificCommentField(defaultOwner);</b>
+<b class="nc">&nbsp;        entryEditorPreferences = preferences.getEntryEditorPreferences();</b>
+<b class="nc">&nbsp;        shouldShowHideButton = true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected SequencedSet&lt;Field&gt; determineFieldsToShow(BibEntry entry) {
+<b class="nc">&nbsp;        SequencedSet&lt;Field&gt; comments = new LinkedHashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // First comes the standard comment field
+<b class="nc">&nbsp;        comments.add(StandardField.COMMENT);</b>
+&nbsp;
+&nbsp;        // Only show the user-specific comment field if it&#39;s enabled and should be visible
+<b class="nc">&nbsp;        if (entryEditorPreferences.shouldShowUserCommentsFields() &amp;&amp; shouldShowHideButton) {</b>
+<b class="nc">&nbsp;            comments.add(userSpecificCommentField);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Show all non-empty comment fields (otherwise, they are completely hidden)
+<b class="nc">&nbsp;        comments.addAll(entry.getFields().stream()</b>
+<b class="nc">&nbsp;                             .filter(field -&gt; (field instanceof UserSpecificCommentField &amp;&amp; !field.equals(userSpecificCommentField))</b>
+<b class="nc">&nbsp;                                     || field.getName().toLowerCase().contains(&quot;comment&quot;))</b>
+<b class="nc">&nbsp;                             .sorted(Comparator.comparing(Field::getName))</b>
+<b class="nc">&nbsp;                             .collect(Collectors.toCollection(LinkedHashSet::new)));</b>
+&nbsp;
+<b class="nc">&nbsp;        return comments;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Comment editors: three times size of button
+&nbsp;     */
+&nbsp;    private void setCompressedRowLayout() {
+<b class="nc">&nbsp;        int numberOfComments = gridPane.getRowCount() - 1;</b>
+<b class="nc">&nbsp;        double totalWeight = numberOfComments * 3 + 1;</b>
+&nbsp;
+<b class="nc">&nbsp;        RowConstraints commentConstraint = new RowConstraints();</b>
+<b class="nc">&nbsp;        commentConstraint.setVgrow(Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        commentConstraint.setValignment(VPos.TOP);</b>
+<b class="nc">&nbsp;        double commentHeightPercent = 3.0 / totalWeight * 100.0;</b>
+<b class="nc">&nbsp;        commentConstraint.setPercentHeight(commentHeightPercent);</b>
+&nbsp;
+<b class="nc">&nbsp;        RowConstraints buttonConstraint = new RowConstraints();</b>
+<b class="nc">&nbsp;        buttonConstraint.setVgrow(Priority.ALWAYS);</b>
+<b class="nc">&nbsp;        buttonConstraint.setValignment(VPos.TOP);</b>
+<b class="nc">&nbsp;        double addButtonHeightPercent = 1.0 / totalWeight * 100.0;</b>
+<b class="nc">&nbsp;        buttonConstraint.setPercentHeight(addButtonHeightPercent);</b>
+&nbsp;
+<b class="nc">&nbsp;        ObservableList&lt;RowConstraints&gt; rowConstraints = gridPane.getRowConstraints();</b>
+<b class="nc">&nbsp;        rowConstraints.clear();</b>
+<b class="nc">&nbsp;        for (int i = 1; i &lt;= numberOfComments; i++) {</b>
+<b class="nc">&nbsp;            rowConstraints.add(commentConstraint);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        rowConstraints.add(buttonConstraint);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void setupPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed) {
+<b class="nc">&nbsp;        super.setupPanel(bibDatabaseContext, entry, compressed);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;FieldEditorFX&gt; fieldEditorForUserDefinedComment = editors.entrySet().stream().filter(f -&gt; f.getKey().getName().contains(defaultOwner)).map(Map.Entry::getValue).findFirst();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Map.Entry&lt;Field, FieldEditorFX&gt; fieldEditorEntry : editors.entrySet()) {</b>
+<b class="nc">&nbsp;            Field field = fieldEditorEntry.getKey();</b>
+<b class="nc">&nbsp;            MarkdownEditor editor = (MarkdownEditor) fieldEditorEntry.getValue().getNode();</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean isStandardBibtexComment = field == StandardField.COMMENT;</b>
+<b class="nc">&nbsp;            boolean isDefaultOwnerComment = field.equals(userSpecificCommentField);</b>
+<b class="nc">&nbsp;            boolean shouldBeEnabled = isStandardBibtexComment || isDefaultOwnerComment;</b>
+<b class="nc">&nbsp;            editor.setEditable(shouldBeEnabled);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (entryEditorPreferences.shouldShowUserCommentsFields()) {</b>
+&nbsp;            // Show &quot;Hide&quot; button only if user-specific comment field is empty
+<b class="nc">&nbsp;            if (!entry.hasField(userSpecificCommentField)) {</b>
+<b class="nc">&nbsp;                if (shouldShowHideButton) {</b>
+<b class="nc">&nbsp;                    Button hideDefaultOwnerCommentButton = new Button(Localization.lang(&quot;Hide user-specific comments field&quot;));</b>
+<b class="nc">&nbsp;                    hideDefaultOwnerCommentButton.setOnAction(e -&gt; {</b>
+<b class="nc">&nbsp;                        gridPane.getChildren().removeIf(node -&gt;</b>
+<b class="nc">&nbsp;                                (node instanceof FieldNameLabel fieldNameLabel &amp;&amp; fieldNameLabel.getText().equals(userSpecificCommentField.getName()))</b>
+&nbsp;                        );
+<b class="nc">&nbsp;                        fieldEditorForUserDefinedComment.ifPresent(f -&gt; gridPane.getChildren().remove(f.getNode()));</b>
+<b class="nc">&nbsp;                        editors.remove(userSpecificCommentField);</b>
+<b class="nc">&nbsp;                        entry.clearField(userSpecificCommentField);</b>
+<b class="nc">&nbsp;                        shouldShowHideButton = false;</b>
+&nbsp;
+<b class="nc">&nbsp;                        setupPanel(bibDatabaseContext, entry, false);</b>
+&nbsp;                    });
+<b class="nc">&nbsp;                    gridPane.add(hideDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);</b>
+<b class="nc">&nbsp;                    setCompressedRowLayout();</b>
+&nbsp;                } else {
+&nbsp;                    // Show &quot;Show&quot; button when user comments field is hidden
+<b class="nc">&nbsp;                    Button showDefaultOwnerCommentButton = new Button(Localization.lang(&quot;Show user-specific comments field&quot;));</b>
+<b class="nc">&nbsp;                    showDefaultOwnerCommentButton.setOnAction(e -&gt; {</b>
+<b class="nc">&nbsp;                        shouldShowHideButton = true;</b>
+<b class="nc">&nbsp;                        setupPanel(bibDatabaseContext, entry, false);</b>
+&nbsp;                    });
+<b class="nc">&nbsp;                    gridPane.add(showDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);</b>
+<b class="nc">&nbsp;                    setCompressedRowLayout();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,274 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LibraryResource</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.http.server.resources</a>
+</div>
+
+<h1>Coverage Summary for Class: LibraryResource (org.jabref.http.server.resources)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LibraryResource</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.http.server.resources;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.http.JabrefMediaType;
+&nbsp;import org.jabref.http.SrvStateManager;
+&nbsp;import org.jabref.http.dto.BibEntryDTO;
+&nbsp;import org.jabref.http.dto.LinkedPdfFileDTO;
+&nbsp;import org.jabref.http.server.services.FilesToServe;
+&nbsp;import org.jabref.http.server.services.ServerUtils;
+&nbsp;import org.jabref.logic.citationstyle.JabRefItemDataProvider;
+&nbsp;import org.jabref.logic.preferences.CliPreferences;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import com.google.gson.Gson;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import jakarta.ws.rs.GET;
+&nbsp;import jakarta.ws.rs.InternalServerErrorException;
+&nbsp;import jakarta.ws.rs.NotFoundException;
+&nbsp;import jakarta.ws.rs.Path;
+&nbsp;import jakarta.ws.rs.PathParam;
+&nbsp;import jakarta.ws.rs.Produces;
+&nbsp;import jakarta.ws.rs.core.MediaType;
+&nbsp;import jakarta.ws.rs.core.Response;
+&nbsp;import jakarta.ws.rs.core.StreamingOutput;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;@Path(&quot;libraries/{id}&quot;)
+<b class="nc">&nbsp;public class LibraryResource {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryResource.class);</b>
+&nbsp;
+&nbsp;    @Inject
+&nbsp;    CliPreferences preferences;
+&nbsp;
+&nbsp;    @Inject
+&nbsp;    SrvStateManager srvStateManager;
+&nbsp;
+&nbsp;    @Inject
+&nbsp;    FilesToServe filesToServe;
+&nbsp;
+&nbsp;    @Inject
+&nbsp;    Gson gson;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * At http://localhost:23119/libraries/{id}
+&nbsp;     *
+&nbsp;     * @param id The specified library
+&nbsp;     * @return specified library in JSON format
+&nbsp;     * @throws IOException
+&nbsp;     */
+&nbsp;    @GET
+&nbsp;    @Produces(MediaType.APPLICATION_JSON)
+&nbsp;    public String getJson(@PathParam(&quot;id&quot;) String id) throws IOException {
+<b class="nc">&nbsp;        BibDatabaseContext databaseContext = getDatabaseContext(id);</b>
+<b class="nc">&nbsp;        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);</b>
+<b class="nc">&nbsp;        List&lt;BibEntryDTO&gt; list = databaseContext.getDatabase().getEntries().stream()</b>
+<b class="nc">&nbsp;                                                .peek(bibEntry -&gt; bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))</b>
+<b class="nc">&nbsp;                                                .map(entry -&gt; new BibEntryDTO(entry, databaseContext.getMode(), preferences.getFieldPreferences(), entryTypesManager))</b>
+<b class="nc">&nbsp;                                                .toList();</b>
+<b class="nc">&nbsp;        return gson.toJson(list);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GET
+&nbsp;    @Produces(JabrefMediaType.JSON_CSL_ITEM)
+&nbsp;    public String getClsItemJson(@PathParam(&quot;id&quot;) String id) throws IOException {
+<b class="nc">&nbsp;        BibDatabaseContext databaseContext = getDatabaseContext(id);</b>
+<b class="nc">&nbsp;        JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();</b>
+<b class="nc">&nbsp;        jabRefItemDataProvider.setData(databaseContext, new BibEntryTypesManager());</b>
+<b class="nc">&nbsp;        return jabRefItemDataProvider.toJson();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GET
+&nbsp;    @Produces(JabrefMediaType.BIBTEX)
+&nbsp;    public Response getBibtex(@PathParam(&quot;id&quot;) String id) {
+<b class="nc">&nbsp;        if (&quot;demo&quot;.equals(id)) {</b>
+<b class="nc">&nbsp;            StreamingOutput stream = output -&gt; {</b>
+<b class="nc">&nbsp;                try (InputStream in = getChocolateBibAsStream()) {</b>
+<b class="nc">&nbsp;                    in.transferTo(output);</b>
+&nbsp;                }
+&nbsp;            };
+&nbsp;
+<b class="nc">&nbsp;            return Response.ok(stream)</b>
+&nbsp;                           // org.glassfish.jersey.media would be required for a &quot;nice&quot; Java to create ContentDisposition; we avoid this
+<b class="nc">&nbsp;                           .header(&quot;Content-Disposition&quot;, &quot;attachment; filename=\&quot;Chocolate.bib\&quot;&quot;)</b>
+<b class="nc">&nbsp;                           .build();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        java.nio.file.Path library = ServerUtils.getLibraryPath(id, filesToServe, srvStateManager);</b>
+&nbsp;        String libraryAsString;
+&nbsp;        try {
+<b class="nc">&nbsp;            libraryAsString = Files.readString(library);</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Could not read library {}&quot;, library, e);</b>
+<b class="nc">&nbsp;            throw new InternalServerErrorException(&quot;Could not read library &quot; + library, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Response.ok()</b>
+<b class="nc">&nbsp;                       .header(&quot;Content-Disposition&quot;, &quot;attachment; filename=\&quot;&quot; + library.getFileName() + &quot;\&quot;&quot;)</b>
+<b class="nc">&nbsp;                       .entity(libraryAsString)</b>
+<b class="nc">&nbsp;                       .build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Loops through all entries in the specified library and adds attached files of type &quot;PDF&quot; to
+&nbsp;    /// a list and JSON serialises it.
+&nbsp;    /// FIXME: JabMap should serve the files per BibEntry. See &lt;https://github.com/JabRef/jabmap/issues/56&gt; for details
+&nbsp;    @GET
+&nbsp;    @Path(&quot;entries/pdffiles&quot;)
+&nbsp;    @Produces(MediaType.APPLICATION_JSON + &quot;;charset=UTF-8&quot;)
+&nbsp;    public String getPDFFilesAsList(@PathParam(&quot;id&quot;) String id) throws IOException {
+&nbsp;        // get a list of all entries in library (specified by &quot;id&quot;)
+<b class="nc">&nbsp;        BibDatabaseContext databaseContext = getDatabaseContext(id);</b>
+<b class="nc">&nbsp;        List&lt;LinkedPdfFileDTO&gt; response = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; entries = databaseContext.getDatabase().getEntries();</b>
+<b class="nc">&nbsp;        if (entries.isEmpty()) {</b>
+<b class="nc">&nbsp;            throw new NotFoundException(&quot;No entries found for library: &quot; + id);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // loop through all entries to extract pdfs and paths
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            List&lt;LinkedFile&gt; pathsToFiles = entry.getFiles();</b>
+<b class="nc">&nbsp;            if (!pathsToFiles.isEmpty()) {</b>
+<b class="nc">&nbsp;                for (LinkedFile file : pathsToFiles) {</b>
+&nbsp;                    // ignore all non pdf files and online references
+<b class="nc">&nbsp;                    if (!&quot;PDF&quot;.equals(file.getFileType()) || LinkedFile.isOnlineLink(file.getLink())) {</b>
+&nbsp;                        continue;
+&nbsp;                    }
+&nbsp;                    // add file to response body
+<b class="nc">&nbsp;                    LinkedPdfFileDTO localPdfFile = new LinkedPdfFileDTO(entry, file);</b>
+<b class="nc">&nbsp;                    response.add(localPdfFile);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return gson.toJson(response);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return a stream to the Chocolate.bib file in the classpath (is null only if the file was moved or there are issues with the classpath)
+&nbsp;     */
+&nbsp;    private @Nullable InputStream getChocolateBibAsStream() {
+<b class="nc">&nbsp;        return BibDatabase.class.getResourceAsStream(&quot;/Chocolate.bib&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// @param id - also &quot;demo&quot; for the Chocolate.bib file
+&nbsp;    private BibDatabaseContext getDatabaseContext(String id) throws IOException {
+<b class="nc">&nbsp;        return ServerUtils.getBibDatabaseContext(id, filesToServe, srvStateManager, preferences.getImportFormatPreferences());</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

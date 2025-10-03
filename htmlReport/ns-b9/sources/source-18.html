@@ -1,0 +1,186 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > XmpExporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.exporter</a>
+</div>
+
+<h1>Coverage Summary for Class: XmpExporter (org.jabref.logic.exporter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">XmpExporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.exporter;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.xmp.XmpPreferences;
+&nbsp;import org.jabref.logic.xmp.XmpUtilWriter;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;
+&nbsp;/**
+&nbsp; * A custom exporter to write bib entries to a .xmp file for further processing
+&nbsp; * in other scenarios and applications. The xmp metadata are written in dublin
+&nbsp; * core format.
+&nbsp; */
+&nbsp;public class XmpExporter extends Exporter {
+&nbsp;
+&nbsp;    public static final String XMP_SPLIT_DIRECTORY_INDICATOR = &quot;split&quot;;
+&nbsp;
+&nbsp;    private final XmpPreferences xmpPreferences;
+&nbsp;
+&nbsp;    public XmpExporter(XmpPreferences xmpPreferences) {
+<b class="nc">&nbsp;        super(&quot;xmp&quot;, &quot;Plain XMP&quot;, StandardFileType.XMP);</b>
+<b class="nc">&nbsp;        this.xmpPreferences = xmpPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param databaseContext the database to export from
+&nbsp;     * @param file            the file to write to. If it contains &quot;split&quot;, then the output is split into different files
+&nbsp;     * @param entries         a list containing all entries that should be exported
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void export(BibDatabaseContext databaseContext, Path file, List&lt;BibEntry&gt; entries) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(databaseContext);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(file);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(entries);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entries.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // This is a distinction between writing all entries from the supplied list to a single .xmp file,
+&nbsp;        // or write every entry to a separate file.
+<b class="nc">&nbsp;        if (XMP_SPLIT_DIRECTORY_INDICATOR.equals(file.getFileName().toString().trim())) {</b>
+<b class="nc">&nbsp;            for (BibEntry entry : entries) {</b>
+&nbsp;                // Avoid situations, where two citation keys are null
+&nbsp;                Path entryFile;
+<b class="nc">&nbsp;                String suffix = entry.getId() + &quot;_&quot; + entry.getField(InternalField.KEY_FIELD).orElse(&quot;null&quot;) + &quot;.xmp&quot;;</b>
+<b class="nc">&nbsp;                if (file.getParent() == null) {</b>
+<b class="nc">&nbsp;                    entryFile = Path.of(suffix);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    entryFile = Path.of(file.getParent() + &quot;/&quot; + suffix);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                this.writeBibToXmp(entryFile, List.of(entry));</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.writeBibToXmp(file, entries);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void writeBibToXmp(Path file, List&lt;BibEntry&gt; entries) throws IOException {
+<b class="nc">&nbsp;        String xmpContent = new XmpUtilWriter(this.xmpPreferences).generateXmpStringWithoutXmpDeclaration(entries);</b>
+<b class="nc">&nbsp;        Files.writeString(file, xmpContent);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

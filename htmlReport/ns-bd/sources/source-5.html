@@ -1,0 +1,180 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProtectTermsFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.formatter.casechanger</a>
+</div>
+
+<h1>Coverage Summary for Class: ProtectTermsFormatter (org.jabref.logic.formatter.casechanger)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProtectTermsFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.formatter.casechanger;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.Formatter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+&nbsp;import org.jabref.logic.util.strings.StringLengthComparator;
+&nbsp;
+&nbsp;/// Adds {} brackets around acronyms, month names and countries to preserve their case.
+&nbsp;/// Related formatter: [org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter]
+&nbsp;public class ProtectTermsFormatter extends Formatter {
+&nbsp;
+&nbsp;    private final ProtectedTermsLoader protectedTermsLoader;
+&nbsp;
+<b class="nc">&nbsp;    public ProtectTermsFormatter(ProtectedTermsLoader protectedTermsLoader) {</b>
+<b class="nc">&nbsp;        this.protectedTermsLoader = protectedTermsLoader;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String format(String text, List&lt;String&gt; listOfWords) {
+<b class="nc">&nbsp;        String result = text;</b>
+&nbsp;        // Treat longer terms first to avoid substring issues
+<b class="nc">&nbsp;        listOfWords.sort(new StringLengthComparator());</b>
+&nbsp;        // For each word in the list
+<b class="nc">&nbsp;        for (String listOfWord : listOfWords) {</b>
+&nbsp;            // Add {} if the character before is a space, -, /, (, [, &quot;, or } or if it is at the start of the string but not if it is followed by a }
+<b class="nc">&nbsp;            result = result.replaceAll(&quot;(^|[- /\\[(}\&quot;])&quot; + listOfWord + &quot;($|[^a-zA-Z}])&quot;, &quot;$1\\{&quot; + listOfWord + &quot;\\}$2&quot;);</b>
+&nbsp;        }
+&nbsp;        // Remove the empty brackets
+<b class="nc">&nbsp;        result = result.replace(&quot;{}&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String text) {
+<b class="nc">&nbsp;        Objects.requireNonNull(text);</b>
+<b class="nc">&nbsp;        if (text.isEmpty()) {</b>
+<b class="nc">&nbsp;            return text;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return this.format(text, this.protectedTermsLoader.getProtectedTerms());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(</b>
+&nbsp;                &quot;Adds {} brackets around acronyms, month names and countries to preserve their case.&quot;);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getExampleInput() {
+<b class="nc">&nbsp;        return &quot;In CDMA&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Protect terms&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getKey() {
+<b class="nc">&nbsp;        return &quot;protect_terms&quot;;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

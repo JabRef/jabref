@@ -1,0 +1,1372 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LibraryTab</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui</a>
+</div>
+
+<h1>Coverage Summary for Class: LibraryTab (org.jabref.gui)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LibraryTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/85)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/142)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/378)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LibraryTab$DatabaseNotification</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LibraryTab$GroupTreeListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">LibraryTab$IndexUpdateListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/95)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/150)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/397)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Random;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.animation.PauseTransition;
+&nbsp;import javafx.application.Platform;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.IntegerProperty;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleIntegerProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.value.ObservableBooleanValue;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.event.ActionEvent;
+&nbsp;import javafx.event.Event;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Alert;
+&nbsp;import javafx.scene.control.ButtonBar;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.ProgressIndicator;
+&nbsp;import javafx.scene.control.Tab;
+&nbsp;import javafx.scene.control.TabPane;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.layout.BorderPane;
+&nbsp;import javafx.util.Duration;
+&nbsp;
+&nbsp;import org.jabref.gui.actions.StandardActions;
+&nbsp;import org.jabref.gui.autocompleter.AutoCompletePreferences;
+&nbsp;import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProviders;
+&nbsp;import org.jabref.gui.autosaveandbackup.AutosaveManager;
+&nbsp;import org.jabref.gui.autosaveandbackup.BackupManager;
+&nbsp;import org.jabref.gui.collab.DatabaseChangeMonitor;
+&nbsp;import org.jabref.gui.dialogs.AutosaveUiManager;
+&nbsp;import org.jabref.gui.exporter.SaveDatabaseAction;
+&nbsp;import org.jabref.gui.externalfiles.AutoRenameFileOnEntryChange;
+&nbsp;import org.jabref.gui.externalfiles.ImportHandler;
+&nbsp;import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+&nbsp;import org.jabref.gui.importer.actions.OpenDatabaseAction;
+&nbsp;import org.jabref.gui.linkedfile.DeleteFileAction;
+&nbsp;import org.jabref.gui.maintable.BibEntryTableViewModel;
+&nbsp;import org.jabref.gui.maintable.MainTable;
+&nbsp;import org.jabref.gui.maintable.MainTableDataModel;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.undo.CountingUndoManager;
+&nbsp;import org.jabref.gui.undo.NamedCompoundEdit;
+&nbsp;import org.jabref.gui.undo.UndoableFieldChange;
+&nbsp;import org.jabref.gui.undo.UndoableInsertEntries;
+&nbsp;import org.jabref.gui.undo.UndoableRemoveEntries;
+&nbsp;import org.jabref.gui.util.UiTaskExecutor;
+&nbsp;import org.jabref.logic.ai.AiService;
+&nbsp;import org.jabref.logic.citationstyle.CitationStyleCache;
+&nbsp;import org.jabref.logic.command.CommandSelectionTab;
+&nbsp;import org.jabref.logic.importer.FetcherClientException;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.FetcherServerException;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.pdf.FileAnnotationCache;
+&nbsp;import org.jabref.logic.search.IndexManager;
+&nbsp;import org.jabref.logic.search.PostgreServer;
+&nbsp;import org.jabref.logic.shared.DatabaseLocation;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.CoarseChangeFilter;
+&nbsp;import org.jabref.logic.util.OptionalObjectProperty;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.FieldChange;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+&nbsp;import org.jabref.model.database.event.EntriesAddedEvent;
+&nbsp;import org.jabref.model.database.event.EntriesRemovedEvent;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.BibtexString;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.event.EntriesEventSource;
+&nbsp;import org.jabref.model.entry.event.FieldChangedEvent;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;import org.jabref.model.search.query.SearchQuery;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.injection.Injector;
+&nbsp;import com.google.common.eventbus.Subscribe;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import com.tobiasdiez.easybind.Subscription;
+&nbsp;import org.controlsfx.control.NotificationPane;
+&nbsp;import org.controlsfx.control.action.Action;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
+&nbsp; */
+<b class="nc">&nbsp;public class LibraryTab extends Tab implements CommandSelectionTab {</b>
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);</b>
+&nbsp;    private final LibraryTabContainer tabContainer;
+&nbsp;    private final CountingUndoManager undoManager;
+&nbsp;    private final DialogService dialogService;
+&nbsp;    private final GuiPreferences preferences;
+&nbsp;    private final FileUpdateMonitor fileUpdateMonitor;
+&nbsp;    private final StateManager stateManager;
+&nbsp;    private final BibEntryTypesManager entryTypesManager;
+<b class="nc">&nbsp;    private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final BooleanProperty nonUndoableChangeProperty = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final NavigationHistory navigationHistory = new NavigationHistory();</b>
+<b class="nc">&nbsp;    private final BooleanProperty canGoBackProperty = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final BooleanProperty canGoForwardProperty = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private boolean backOrForwardNavigationActionTriggered = false;</b>
+&nbsp;
+&nbsp;    private BibDatabaseContext bibDatabaseContext;
+&nbsp;
+&nbsp;    // All subscribers needing &quot;coarse&quot; change events should use this filter
+&nbsp;    // See https://devdocs.jabref.org/code-howtos/eventbus.html for details
+&nbsp;    private CoarseChangeFilter coarseChangeFilter;
+&nbsp;
+&nbsp;    private MainTableDataModel tableModel;
+&nbsp;    private FileAnnotationCache annotationCache;
+&nbsp;    private MainTable mainTable;
+&nbsp;    private DatabaseNotification databaseNotificationPane;
+&nbsp;    private AutoRenameFileOnEntryChange autoRenameFileOnEntryChange;
+&nbsp;
+&nbsp;    // Indicates whether the tab is loading data using a dataloading task
+&nbsp;    // The constructors take care to the right true/false assignment during start.
+<b class="nc">&nbsp;    private final SimpleBooleanProperty loading = new SimpleBooleanProperty(false);</b>
+&nbsp;
+&nbsp;    // initially, the dialog is loading, not saving
+<b class="nc">&nbsp;    private boolean saving = false;</b>
+&nbsp;
+&nbsp;    private PersonNameSuggestionProvider searchAutoCompleter;
+&nbsp;
+&nbsp;    private SuggestionProviders suggestionProviders;
+&nbsp;
+&nbsp;    @SuppressWarnings({&quot;FieldCanBeLocal&quot;})
+&nbsp;    private Subscription dividerPositionSubscription;
+&nbsp;
+&nbsp;    private ListProperty&lt;GroupTreeNode&gt; selectedGroupsProperty;
+<b class="nc">&nbsp;    private final OptionalObjectProperty&lt;SearchQuery&gt; searchQueryProperty = OptionalObjectProperty.empty();</b>
+<b class="nc">&nbsp;    private final IntegerProperty resultSize = new SimpleIntegerProperty(0);</b>
+&nbsp;
+<b class="nc">&nbsp;    private Optional&lt;DatabaseChangeMonitor&gt; changeMonitor = Optional.empty();</b>
+&nbsp;
+&nbsp;    private BackgroundTask&lt;ParserResult&gt; dataLoadingTask;
+&nbsp;
+&nbsp;    private final ClipBoardManager clipBoardManager;
+&nbsp;    private final TaskExecutor taskExecutor;
+&nbsp;
+&nbsp;    private ImportHandler importHandler;
+&nbsp;    private IndexManager indexManager;
+&nbsp;
+&nbsp;    private final AiService aiService;
+&nbsp;
+&nbsp;    private Runnable autoCompleterChangedListener;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param isDummyContext Indicates whether the database context is a dummy. A dummy context is used to display a progress indicator while parsing the database.
+&nbsp;     *                       If the context is a dummy, the Lucene index should not be created, as both the dummy context and the actual context share the same index path {@link BibDatabaseContext#getFulltextIndexPath()}.
+&nbsp;     *                       If the index is created for the dummy context, the actual context will not be able to open the index until it is closed by the dummy context.
+&nbsp;     *                       Closing the index takes time and will slow down opening the library.
+&nbsp;     */
+&nbsp;    private LibraryTab(@NonNull BibDatabaseContext bibDatabaseContext,
+&nbsp;                       @NonNull LibraryTabContainer tabContainer,
+&nbsp;                       DialogService dialogService,
+&nbsp;                       AiService aiService,
+&nbsp;                       GuiPreferences preferences,
+&nbsp;                       StateManager stateManager,
+&nbsp;                       FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                       BibEntryTypesManager entryTypesManager,
+&nbsp;                       CountingUndoManager undoManager,
+&nbsp;                       ClipBoardManager clipBoardManager,
+&nbsp;                       TaskExecutor taskExecutor,
+<b class="nc">&nbsp;                       boolean isDummyContext) {</b>
+<b class="nc">&nbsp;        this.bibDatabaseContext = bibDatabaseContext;</b>
+<b class="nc">&nbsp;        this.tabContainer = tabContainer;</b>
+<b class="nc">&nbsp;        this.undoManager = undoManager;</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+<b class="nc">&nbsp;        this.preferences = Objects.requireNonNull(preferences);</b>
+<b class="nc">&nbsp;        this.stateManager = Objects.requireNonNull(stateManager);</b>
+<b class="nc">&nbsp;        assert bibDatabaseContext.getDatabasePath().isEmpty() || fileUpdateMonitor != null;</b>
+<b class="nc">&nbsp;        this.fileUpdateMonitor = fileUpdateMonitor;</b>
+<b class="nc">&nbsp;        this.entryTypesManager = entryTypesManager;</b>
+<b class="nc">&nbsp;        this.clipBoardManager = clipBoardManager;</b>
+<b class="nc">&nbsp;        this.taskExecutor = taskExecutor;</b>
+<b class="nc">&nbsp;        this.aiService = aiService;</b>
+&nbsp;
+<b class="nc">&nbsp;        initializeComponentsAndListeners(isDummyContext);</b>
+&nbsp;
+&nbsp;        // set LibraryTab ID for drag&#39;n&#39;drop
+&nbsp;        // ID content doesn&#39;t matter, we only need different tabs to have different ID
+<b class="nc">&nbsp;        this.setId(Long.valueOf(new Random().nextLong()).toString());</b>
+&nbsp;
+<b class="nc">&nbsp;        setOnCloseRequest(this::onCloseRequest);</b>
+<b class="nc">&nbsp;        setOnClosed(this::onClosed);</b>
+&nbsp;
+<b class="nc">&nbsp;        stateManager.activeDatabaseProperty().addListener((_, _, _) -&gt; {</b>
+<b class="nc">&nbsp;            if (preferences.getSearchPreferences().isFulltext()) {</b>
+<b class="nc">&nbsp;                mainTable.getTableModel().refreshSearchMatches();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeComponentsAndListeners(boolean isDummyContext) {
+<b class="nc">&nbsp;        if (!isDummyContext) {</b>
+<b class="nc">&nbsp;            createIndexManager();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (tableModel != null) {</b>
+<b class="nc">&nbsp;            tableModel.unbind();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        this.selectedGroupsProperty = new SimpleListProperty&lt;&gt;(stateManager.getSelectedGroups(bibDatabaseContext));</b>
+<b class="nc">&nbsp;        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, getIndexManager(), selectedGroupsProperty(), searchQueryProperty, resultSizeProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        new CitationStyleCache(bibDatabaseContext);</b>
+<b class="nc">&nbsp;        annotationCache = new FileAnnotationCache(bibDatabaseContext, preferences.getFilePreferences());</b>
+<b class="nc">&nbsp;        importHandler = new ImportHandler(</b>
+&nbsp;                bibDatabaseContext,
+&nbsp;                preferences,
+&nbsp;                fileUpdateMonitor,
+&nbsp;                undoManager,
+&nbsp;                stateManager,
+&nbsp;                dialogService,
+&nbsp;                taskExecutor);
+&nbsp;
+<b class="nc">&nbsp;        setupMainPanel();</b>
+<b class="nc">&nbsp;        setupAutoCompletion();</b>
+&nbsp;
+<b class="nc">&nbsp;        this.coarseChangeFilter = new CoarseChangeFilter(bibDatabaseContext);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.getDatabase().registerListener(new IndexUpdateListener());</b>
+&nbsp;
+&nbsp;        // ensure that at each addition of a new entry, the entry is added to the groups interface
+<b class="nc">&nbsp;        this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());</b>
+&nbsp;        // ensure that all entry changes mark the panel as changed
+<b class="nc">&nbsp;        this.bibDatabaseContext.getDatabase().registerListener(this);</b>
+<b class="nc">&nbsp;        this.bibDatabaseContext.getMetaData().registerListener(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.getDatabase().registerListener(new UpdateTimestampListener(preferences));</b>
+&nbsp;
+<b class="nc">&nbsp;        autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, preferences.getFilePreferences());</b>
+<b class="nc">&nbsp;        coarseChangeFilter.registerListener(autoRenameFileOnEntryChange);</b>
+&nbsp;
+<b class="nc">&nbsp;        aiService.setupDatabase(bibDatabaseContext);</b>
+&nbsp;
+<b class="nc">&nbsp;        Platform.runLater(() -&gt; {</b>
+<b class="nc">&nbsp;            EasyBind.subscribe(changedProperty, this::updateTabTitle);</b>
+<b class="nc">&nbsp;            stateManager.getOpenDatabases().addListener((ListChangeListener&lt;BibDatabaseContext&gt;) _ -&gt;</b>
+<b class="nc">&nbsp;                    updateTabTitle(changedProperty.getValue()));</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAutoCompleterChangedListener(@NonNull Runnable listener) {
+<b class="nc">&nbsp;        this.autoCompleterChangedListener = listener;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addChangedInformation(StringBuilder text) {
+<b class="nc">&nbsp;        text.append(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;        text.append(Localization.lang(&quot;The library has been modified.&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addModeInfo(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        String mode = bibDatabaseContext.getMode().getFormattedName();</b>
+<b class="nc">&nbsp;        String modeInfo = &quot;\n%s&quot;.formatted(Localization.lang(&quot;%0 mode&quot;, mode));</b>
+<b class="nc">&nbsp;        text.append(modeInfo);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void addSharedDbInformation(StringBuilder text, BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        text.append(bibDatabaseContext.getDBMSSynchronizer().getDBName());</b>
+<b class="nc">&nbsp;        text.append(&quot; [&quot;);</b>
+<b class="nc">&nbsp;        text.append(Localization.lang(&quot;shared&quot;));</b>
+<b class="nc">&nbsp;        text.append(&quot;]&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setDataLoadingTask(BackgroundTask&lt;ParserResult&gt; dataLoadingTask) {
+<b class="nc">&nbsp;        this.loading.set(true);</b>
+<b class="nc">&nbsp;        this.dataLoadingTask = dataLoadingTask;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The layout to display in the tab when it is loading
+&nbsp;     */
+&nbsp;    private Node createLoadingAnimationLayout() {
+<b class="nc">&nbsp;        ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);</b>
+<b class="nc">&nbsp;        BorderPane pane = new BorderPane();</b>
+<b class="nc">&nbsp;        pane.setCenter(progressIndicator);</b>
+<b class="nc">&nbsp;        return pane;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onDatabaseLoadingStarted() {
+<b class="nc">&nbsp;        Node loadingLayout = createLoadingAnimationLayout();</b>
+<b class="nc">&nbsp;        getMainTable().placeholderProperty().setValue(loadingLayout);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onDatabaseLoadingSucceed(ParserResult result) {
+<b class="nc">&nbsp;        OpenDatabaseAction.performPostOpenActions(result, dialogService, preferences);</b>
+<b class="nc">&nbsp;        if (result.getChangedOnMigration()) {</b>
+<b class="nc">&nbsp;            this.markBaseChanged();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        setDatabaseContext(result.getDatabaseContext());</b>
+&nbsp;        // Notify listeners that the auto-completer may have changed
+<b class="nc">&nbsp;        if (autoCompleterChangedListener != null) {</b>
+<b class="nc">&nbsp;            autoCompleterChangedListener.run();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        LOGGER.trace(&quot;loading.set(false);&quot;);</b>
+<b class="nc">&nbsp;        loading.set(false);</b>
+<b class="nc">&nbsp;        dataLoadingTask = null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void createIndexManager() {
+<b class="nc">&nbsp;        indexManager = new IndexManager(bibDatabaseContext, taskExecutor, preferences, Injector.instantiateModelOrService(PostgreServer.class));</b>
+<b class="nc">&nbsp;        stateManager.setIndexManager(bibDatabaseContext, indexManager);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IndexManager getIndexManager() {
+<b class="nc">&nbsp;        return indexManager;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void closeIndexManger() {
+<b class="nc">&nbsp;        indexManager.close();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onDatabaseLoadingFailed(Exception ex) {
+<b class="nc">&nbsp;        loading.set(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        String title = Localization.lang(&quot;Connection error&quot;);</b>
+<b class="nc">&nbsp;        String content = &quot;%s\n\n%s&quot;.formatted(ex.getMessage(), Localization.lang(&quot;A local copy will be opened.&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        dialogService.showErrorDialogAndWait(title, content, ex);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
+<b class="nc">&nbsp;        TabPane tabPane = this.getTabPane();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (tabPane == null) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;User interrupted loading. Not showing any library.&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (tabPane.getSelectionModel().selectedItemProperty().get().equals(this)) {</b>
+<b class="nc">&nbsp;            LOGGER.debug(&quot;This case should not happen.&quot;);</b>
+<b class="nc">&nbsp;            stateManager.setActiveDatabase(bibDatabaseContext);</b>
+<b class="nc">&nbsp;            stateManager.activeTabProperty().set(Optional.of(this));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Remove existing dummy BibDatabaseContext and add correct BibDatabaseContext from ParserResult to trigger changes in the openDatabases list in the stateManager
+<b class="nc">&nbsp;        Optional&lt;BibDatabaseContext&gt; foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -&gt; databaseContext.equals(this.bibDatabaseContext)).findFirst();</b>
+<b class="nc">&nbsp;        foundExistingBibDatabase.ifPresent(databaseContext -&gt; stateManager.getOpenDatabases().remove(databaseContext));</b>
+&nbsp;
+<b class="nc">&nbsp;        this.bibDatabaseContext = bibDatabaseContext;</b>
+&nbsp;
+<b class="nc">&nbsp;        stateManager.getOpenDatabases().add(bibDatabaseContext);</b>
+&nbsp;
+<b class="nc">&nbsp;        initializeComponentsAndListeners(false);</b>
+<b class="nc">&nbsp;        installAutosaveManagerAndBackupManager();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void installAutosaveManagerAndBackupManager() {
+<b class="nc">&nbsp;        if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {</b>
+<b class="nc">&nbsp;            AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext, coarseChangeFilter);</b>
+<b class="nc">&nbsp;            autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager, stateManager));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (isDatabaseReadyForBackup(bibDatabaseContext) &amp;&amp; preferences.getFilePreferences().shouldCreateBackup()) {</b>
+<b class="nc">&nbsp;            BackupManager.start(this, bibDatabaseContext, coarseChangeFilter, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
+<b class="nc">&nbsp;        return ((context.getLocation() == DatabaseLocation.SHARED)</b>
+<b class="nc">&nbsp;                || ((context.getLocation() == DatabaseLocation.LOCAL)</b>
+<b class="nc">&nbsp;                &amp;&amp; preferences.getLibraryPreferences().shouldAutoSave()))</b>
+<b class="nc">&nbsp;                &amp;&amp; context.getDatabasePath().isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isDatabaseReadyForBackup(BibDatabaseContext context) {
+<b class="nc">&nbsp;        return (context.getLocation() == DatabaseLocation.LOCAL) &amp;&amp; context.getDatabasePath().isPresent();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sets the title of the tab modification-asterisk filename – path-fragment
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The modification-asterisk (*) is shown if the file was modified since last save (path-fragment is only shown if filename is not (globally) unique)
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Example: *jabref-authors.bib – testbib
+&nbsp;     */
+&nbsp;    public void updateTabTitle(boolean isChanged) {
+<b class="nc">&nbsp;        boolean isAutosaveEnabled = preferences.getLibraryPreferences().shouldAutoSave();</b>
+&nbsp;
+<b class="nc">&nbsp;        DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();</b>
+<b class="nc">&nbsp;        Optional&lt;Path&gt; file = bibDatabaseContext.getDatabasePath();</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder tabTitle = new StringBuilder();</b>
+<b class="nc">&nbsp;        StringBuilder toolTipText = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (file.isPresent()) {</b>
+&nbsp;            // Modification asterisk
+<b class="nc">&nbsp;            if (isChanged &amp;&amp; !isAutosaveEnabled) {</b>
+<b class="nc">&nbsp;                tabTitle.append(&#39;*&#39;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Path databasePath = file.get();</b>
+<b class="nc">&nbsp;            tabTitle.append(databasePath.getFileName().toString());</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);</b>
+<b class="nc">&nbsp;            uniquePathPart.ifPresent(part -&gt; tabTitle.append(&quot; \u2013 &quot;).append(part));</b>
+<b class="nc">&nbsp;            toolTipText.append(databasePath.toAbsolutePath());</b>
+&nbsp;
+<b class="nc">&nbsp;            if (databaseLocation == DatabaseLocation.SHARED) {</b>
+<b class="nc">&nbsp;                tabTitle.append(&quot; \u2013 &quot;);</b>
+<b class="nc">&nbsp;                addSharedDbInformation(tabTitle, bibDatabaseContext);</b>
+<b class="nc">&nbsp;                toolTipText.append(&#39; &#39;);</b>
+<b class="nc">&nbsp;                addSharedDbInformation(toolTipText, bibDatabaseContext);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Database mode
+<b class="nc">&nbsp;            addModeInfo(toolTipText, bibDatabaseContext);</b>
+&nbsp;
+&nbsp;            // Changed information (tooltip)
+<b class="nc">&nbsp;            if (isChanged &amp;&amp; !isAutosaveEnabled) {</b>
+<b class="nc">&nbsp;                addChangedInformation(toolTipText);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (databaseLocation == DatabaseLocation.LOCAL) {</b>
+<b class="nc">&nbsp;                tabTitle.append(&#39;*&#39;);</b>
+<b class="nc">&nbsp;                tabTitle.append(Localization.lang(&quot;untitled&quot;));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                addSharedDbInformation(tabTitle, bibDatabaseContext);</b>
+<b class="nc">&nbsp;                addSharedDbInformation(toolTipText, bibDatabaseContext);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            addModeInfo(toolTipText, bibDatabaseContext);</b>
+<b class="nc">&nbsp;            if ((databaseLocation == DatabaseLocation.LOCAL) &amp;&amp; bibDatabaseContext.getDatabase().hasEntries()) {</b>
+<b class="nc">&nbsp;                addChangedInformation(toolTipText);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        UiTaskExecutor.runInJavaFXThread(() -&gt; {</b>
+<b class="nc">&nbsp;            textProperty().setValue(tabTitle.toString());</b>
+<b class="nc">&nbsp;            setTooltip(new Tooltip(toolTipText.toString()));</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    @Subscribe
+&nbsp;    public void listen(BibDatabaseContextChangedEvent event) {
+<b class="nc">&nbsp;        this.changedProperty.setValue(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a collection of suggestion providers, which are populated from the current library.
+&nbsp;     */
+&nbsp;    public SuggestionProviders getSuggestionProviders() {
+<b class="nc">&nbsp;        return suggestionProviders;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void registerUndoableChanges(List&lt;FieldChange&gt; changes) {
+<b class="nc">&nbsp;        NamedCompoundEdit compoundEdit = new NamedCompoundEdit(Localization.lang(&quot;Save actions&quot;));</b>
+<b class="nc">&nbsp;        for (FieldChange change : changes) {</b>
+<b class="nc">&nbsp;            compoundEdit.addEdit(new UndoableFieldChange(change));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        compoundEdit.end();</b>
+<b class="nc">&nbsp;        if (compoundEdit.hasEdits()) {</b>
+<b class="nc">&nbsp;            getUndoManager().addEdit(compoundEdit);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createMainTable() {
+<b class="nc">&nbsp;        mainTable = new MainTable(tableModel,</b>
+&nbsp;                this,
+&nbsp;                tabContainer,
+&nbsp;                bibDatabaseContext,
+&nbsp;                preferences,
+&nbsp;                dialogService,
+&nbsp;                stateManager,
+<b class="nc">&nbsp;                preferences.getKeyBindingRepository(),</b>
+&nbsp;                clipBoardManager,
+&nbsp;                entryTypesManager,
+&nbsp;                taskExecutor,
+&nbsp;                importHandler);
+&nbsp;
+&nbsp;        // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
+&nbsp;        // content binding between StateManager#getselectedEntries and mainTable#getSelectedEntries does not work here as it does not trigger the ActionHelper#needsEntriesSelected checker for the menubar
+<b class="nc">&nbsp;        mainTable.addSelectionListener(event -&gt; {</b>
+<b class="nc">&nbsp;            List&lt;BibEntry&gt; entries = event.getList().stream().map(BibEntryTableViewModel::getEntry).toList();</b>
+<b class="nc">&nbsp;            stateManager.setSelectedEntries(entries);</b>
+&nbsp;
+&nbsp;            // track navigation history for single selections
+<b class="nc">&nbsp;            if (entries.size() == 1) {</b>
+<b class="nc">&nbsp;                newEntryShowing(entries.getFirst());</b>
+<b class="nc">&nbsp;            } else if (entries.isEmpty()) {</b>
+&nbsp;                // an empty selection isn&#39;t a navigational step, so we don&#39;t alter the history list
+&nbsp;                // this avoids adding a &quot;null&quot; entry to the back/forward stack
+&nbsp;                // we just refresh the UI button states to ensure they are consistent with the latest history.
+<b class="nc">&nbsp;                updateNavigationState();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setupMainPanel() {
+<b class="nc">&nbsp;        createMainTable();</b>
+&nbsp;
+<b class="nc">&nbsp;        databaseNotificationPane = new DatabaseNotification(mainTable);</b>
+<b class="nc">&nbsp;        setContent(databaseNotificationPane);</b>
+&nbsp;
+&nbsp;        // Add changePane in case a file is present - otherwise just add the splitPane to the panel
+<b class="nc">&nbsp;        Optional&lt;Path&gt; file = bibDatabaseContext.getDatabasePath();</b>
+<b class="nc">&nbsp;        if (file.isPresent()) {</b>
+<b class="nc">&nbsp;            resetChangeMonitor();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (bibDatabaseContext.getDatabase().hasEntries()) {</b>
+&nbsp;                // if the database is not empty and no file is assigned,
+&nbsp;                // the database came from an import and has to be treated somehow
+&nbsp;                // -&gt; mark as changed
+<b class="nc">&nbsp;                this.changedProperty.setValue(true);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set up autocompletion for this database
+&nbsp;     */
+&nbsp;    private void setupAutoCompletion() {
+<b class="nc">&nbsp;        AutoCompletePreferences autoCompletePreferences = preferences.getAutoCompletePreferences();</b>
+<b class="nc">&nbsp;        if (autoCompletePreferences.shouldAutoComplete()) {</b>
+<b class="nc">&nbsp;            suggestionProviders = new SuggestionProviders(</b>
+<b class="nc">&nbsp;                    getDatabase(),</b>
+<b class="nc">&nbsp;                    Injector.instantiateModelOrService(JournalAbbreviationRepository.class),</b>
+&nbsp;                    autoCompletePreferences);
+&nbsp;        } else {
+&nbsp;            // Create empty suggestion providers if auto-completion is deactivated
+<b class="nc">&nbsp;            suggestionProviders = new SuggestionProviders();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        searchAutoCompleter = new PersonNameSuggestionProvider(FieldFactory.getPersonNameFields(), getDatabase());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SuggestionProvider&lt;Author&gt; getAutoCompleter() {
+<b class="nc">&nbsp;        return searchAutoCompleter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void showAndEdit(BibEntry entry) {
+<b class="nc">&nbsp;        this.clearAndSelect(entry);</b>
+<b class="nc">&nbsp;        stateManager.getEditorShowing().setValue(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method selects the given entry, and scrolls it into view in the table. If an entryEditor is shown, it is given focus afterwards.
+&nbsp;     */
+&nbsp;    public void clearAndSelect(final BibEntry bibEntry) {
+<b class="nc">&nbsp;        mainTable.clearAndSelect(bibEntry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void clearAndSelect(final List&lt;BibEntry&gt; bibEntries) {
+<b class="nc">&nbsp;        mainTable.clearAndSelect(bibEntries);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectPreviousEntry() {
+<b class="nc">&nbsp;        mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() - 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectNextEntry() {
+<b class="nc">&nbsp;        mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() + 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Put an asterisk behind the filename to indicate the database has changed.
+&nbsp;     */
+&nbsp;    public synchronized void markChangedOrUnChanged() {
+<b class="nc">&nbsp;        if (undoManager.hasChanged()) {</b>
+<b class="nc">&nbsp;            this.changedProperty.setValue(true);</b>
+<b class="nc">&nbsp;        } else if (changedProperty.getValue() &amp;&amp; !nonUndoableChangeProperty.getValue()) {</b>
+<b class="nc">&nbsp;            this.changedProperty.setValue(false);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibDatabase getDatabase() {
+<b class="nc">&nbsp;        return bibDatabaseContext.getDatabase();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initializes a pop-up dialog box to confirm whether the user wants to delete the selected entry
+&nbsp;     * Keep track of user preference:
+&nbsp;     * if the user prefers not to ask before deleting, delete the selected entry without displaying the dialog box
+&nbsp;     *
+&nbsp;     * @param numberOfEntries number of entries user is selecting
+&nbsp;     * @return true if user confirm to delete entry
+&nbsp;     */
+&nbsp;    private boolean showDeleteConfirmationDialog(int numberOfEntries) {
+<b class="nc">&nbsp;        if (preferences.getWorkspacePreferences().shouldConfirmDelete()) {</b>
+<b class="nc">&nbsp;            String title = Localization.lang(&quot;Delete entry&quot;);</b>
+<b class="nc">&nbsp;            String message = Localization.lang(&quot;Really delete the selected entry?&quot;);</b>
+<b class="nc">&nbsp;            String okButton = Localization.lang(&quot;Delete entry&quot;);</b>
+<b class="nc">&nbsp;            String cancelButton = Localization.lang(&quot;Keep entry&quot;);</b>
+<b class="nc">&nbsp;            if (numberOfEntries &gt; 1) {</b>
+<b class="nc">&nbsp;                title = Localization.lang(&quot;Delete multiple entries&quot;);</b>
+<b class="nc">&nbsp;                message = Localization.lang(&quot;Really delete the %0 selected entries?&quot;, Integer.toString(numberOfEntries));</b>
+<b class="nc">&nbsp;                okButton = Localization.lang(&quot;Delete entries&quot;);</b>
+<b class="nc">&nbsp;                cancelButton = Localization.lang(&quot;Keep entries&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return dialogService.showConfirmationDialogWithOptOutAndWait(</b>
+&nbsp;                    title,
+&nbsp;                    message,
+&nbsp;                    okButton,
+&nbsp;                    cancelButton,
+<b class="nc">&nbsp;                    Localization.lang(&quot;Do not ask again&quot;),</b>
+<b class="nc">&nbsp;                    optOut -&gt; preferences.getWorkspacePreferences().setConfirmDelete(!optOut));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean requestClose() {
+<b class="nc">&nbsp;        if (bibDatabaseContext.getLocation() == DatabaseLocation.LOCAL) {</b>
+<b class="nc">&nbsp;            if (isModified()) {</b>
+<b class="nc">&nbsp;                return confirmClose();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Ask if the user really wants to close the given database.
+&nbsp;     * Offers to save or discard the changes -- or return to the library
+&nbsp;     *
+&nbsp;     * @return &lt;code&gt;true&lt;/code&gt; if the user chooses to close the database
+&nbsp;     */
+&nbsp;    private boolean confirmClose() {
+&nbsp;        // Database could not have been changed, since it is still loading
+<b class="nc">&nbsp;        if (dataLoadingTask != null) {</b>
+<b class="nc">&nbsp;            dataLoadingTask.cancel();</b>
+<b class="nc">&nbsp;            loading.setValue(false);</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String filename = getBibDatabaseContext()</b>
+<b class="nc">&nbsp;                .getDatabasePath()</b>
+<b class="nc">&nbsp;                .map(Path::toAbsolutePath)</b>
+<b class="nc">&nbsp;                .map(Path::toString)</b>
+<b class="nc">&nbsp;                .orElse(Localization.lang(&quot;untitled&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        ButtonType saveChanges = new ButtonType(Localization.lang(&quot;Save changes&quot;), ButtonBar.ButtonData.YES);</b>
+<b class="nc">&nbsp;        ButtonType discardChanges = new ButtonType(Localization.lang(&quot;Discard changes&quot;), ButtonBar.ButtonData.NO);</b>
+<b class="nc">&nbsp;        ButtonType returnToLibrary = new ButtonType(Localization.lang(&quot;Return to library&quot;), ButtonBar.ButtonData.CANCEL_CLOSE);</b>
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;ButtonType&gt; response = dialogService.showCustomButtonDialogAndWait(Alert.AlertType.CONFIRMATION,</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Save before closing&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Library &#39;%0&#39; has been modified.&quot;, filename),</b>
+&nbsp;                saveChanges, discardChanges, returnToLibrary);
+&nbsp;
+<b class="nc">&nbsp;        if (response.isEmpty()) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ButtonType buttonType = response.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (buttonType.equals(returnToLibrary)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (buttonType.equals(saveChanges)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, Injector.instantiateModelOrService(BibEntryTypesManager.class), stateManager);</b>
+<b class="nc">&nbsp;                if (saveAction.save()) {</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+&nbsp;                // The action was either canceled or unsuccessful.
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Unable to save library&quot;));</b>
+&nbsp;            } catch (Throwable ex) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;A problem occurred when trying to save the file&quot;, ex);</b>
+<b class="nc">&nbsp;                dialogService.showErrorDialogAndWait(Localization.lang(&quot;Save library&quot;), Localization.lang(&quot;Could not save file.&quot;), ex);</b>
+&nbsp;            }
+&nbsp;            // Save was cancelled or an error occurred.
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (buttonType.equals(discardChanges)) {</b>
+<b class="nc">&nbsp;            BackupManager.discardBackup(bibDatabaseContext, preferences.getFilePreferences().getBackupDirectory());</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void onCloseRequest(Event event) {
+<b class="nc">&nbsp;        if (!requestClose()) {</b>
+<b class="nc">&nbsp;            event.consume();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Perform necessary cleanup when this Library is closed.
+&nbsp;     */
+&nbsp;    private void onClosed(Event event) {
+<b class="nc">&nbsp;        if (dataLoadingTask != null) {</b>
+<b class="nc">&nbsp;            dataLoadingTask.cancel();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED) {</b>
+<b class="nc">&nbsp;            bibDatabaseContext.convertToLocalDatabase();</b>
+<b class="nc">&nbsp;            bibDatabaseContext.getDBMSSynchronizer().closeSharedDatabase();</b>
+<b class="nc">&nbsp;            bibDatabaseContext.clearDBMSSynchronizer();</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);</b>
+&nbsp;        } catch (RuntimeException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Problem when closing change monitor&quot;, e);</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            if (indexManager != null) {</b>
+<b class="nc">&nbsp;                indexManager.close();</b>
+&nbsp;            }
+&nbsp;        } catch (RuntimeException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Problem when closing index manager&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            AutosaveManager.shutdown(bibDatabaseContext);</b>
+&nbsp;        } catch (RuntimeException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Problem when shutting down autosave manager&quot;, e);</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            BackupManager.shutdown(bibDatabaseContext,</b>
+<b class="nc">&nbsp;                    preferences.getFilePreferences().getBackupDirectory(),</b>
+<b class="nc">&nbsp;                    preferences.getFilePreferences().shouldCreateBackup());</b>
+&nbsp;        } catch (RuntimeException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Problem when shutting down backup manager&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (tableModel != null) {</b>
+<b class="nc">&nbsp;            tableModel.unbind();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (autoRenameFileOnEntryChange != null) {</b>
+<b class="nc">&nbsp;            coarseChangeFilter.unregisterListener(autoRenameFileOnEntryChange);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // clean up the groups map
+<b class="nc">&nbsp;        stateManager.clearSelectedGroups(bibDatabaseContext);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get an array containing the currently selected entries. The array is stable and not changed if the selection changes
+&nbsp;     *
+&nbsp;     * @return A list containing the selected entries. Is never null.
+&nbsp;     */
+&nbsp;    public List&lt;BibEntry&gt; getSelectedEntries() {
+<b class="nc">&nbsp;        return mainTable.getSelectedEntries();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BibDatabaseContext getBibDatabaseContext() {
+<b class="nc">&nbsp;        return this.bibDatabaseContext;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isSaving() {
+<b class="nc">&nbsp;        return saving;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSaving(boolean saving) {
+<b class="nc">&nbsp;        this.saving = saving;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableBooleanValue getLoading() {
+<b class="nc">&nbsp;        return loading;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public CountingUndoManager getUndoManager() {
+<b class="nc">&nbsp;        return undoManager;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public MainTable getMainTable() {
+<b class="nc">&nbsp;        return mainTable;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;GroupTreeNode&gt; selectedGroupsProperty() {
+<b class="nc">&nbsp;        return selectedGroupsProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OptionalObjectProperty&lt;SearchQuery&gt; searchQueryProperty() {
+<b class="nc">&nbsp;        return searchQueryProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegerProperty resultSizeProperty() {
+<b class="nc">&nbsp;        return resultSize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public FileAnnotationCache getAnnotationCache() {
+<b class="nc">&nbsp;        return annotationCache;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetChangeMonitor() {
+<b class="nc">&nbsp;        changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);</b>
+<b class="nc">&nbsp;        assert bibDatabaseContext.getDatabasePath().isEmpty() || fileUpdateMonitor != null;</b>
+<b class="nc">&nbsp;        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext,</b>
+&nbsp;                fileUpdateMonitor,
+&nbsp;                taskExecutor,
+&nbsp;                dialogService,
+&nbsp;                preferences,
+&nbsp;                databaseNotificationPane,
+&nbsp;                undoManager,
+&nbsp;                stateManager));
+&nbsp;    }
+&nbsp;
+&nbsp;    public void insertEntry(final BibEntry bibEntry) {
+<b class="nc">&nbsp;        insertEntries(List.of(bibEntry));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void insertEntries(final List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        if (entries.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        importHandler.importCleanedEntries(entries);</b>
+<b class="nc">&nbsp;        getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));</b>
+<b class="nc">&nbsp;        markBaseChanged();</b>
+<b class="nc">&nbsp;        stateManager.setSelectedEntries(entries);</b>
+<b class="nc">&nbsp;        if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {</b>
+<b class="nc">&nbsp;            showAndEdit(entries.getFirst());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            clearAndSelect(entries.getFirst());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void copyEntry() {
+<b class="nc">&nbsp;        int entriesCopied = doCopyEntry(getSelectedEntries());</b>
+<b class="nc">&nbsp;        if (entriesCopied &gt;= 0) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Copied %0 entry(s)&quot;, entriesCopied));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Copy failed&quot;, entriesCopied));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private int doCopyEntry(List&lt;BibEntry&gt; selectedEntries) {
+<b class="nc">&nbsp;        if (selectedEntries.isEmpty()) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibtexString&gt; stringConstants = bibDatabaseContext.getDatabase().getUsedStrings(selectedEntries);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            if (stringConstants.isEmpty()) {</b>
+<b class="nc">&nbsp;                clipBoardManager.setContent(selectedEntries, entryTypesManager);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                clipBoardManager.setContent(selectedEntries, entryTypesManager, stringConstants);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return selectedEntries.size();</b>
+&nbsp;        } catch (IOException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Error while copying selected entries to clipboard.&quot;, e);</b>
+<b class="nc">&nbsp;            return -1;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void pasteEntry() {
+&nbsp;        List&lt;BibEntry&gt; entriesToAdd;
+<b class="nc">&nbsp;        String content = ClipBoardManager.getContents();</b>
+<b class="nc">&nbsp;        entriesToAdd = importHandler.handleBibTeXData(content);</b>
+<b class="nc">&nbsp;        if (entriesToAdd.isEmpty()) {</b>
+<b class="nc">&nbsp;            entriesToAdd = handleNonBibTeXStringData(content);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (entriesToAdd.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntry&gt; handleNonBibTeXStringData(String data) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return this.importHandler.handleStringData(data);</b>
+&nbsp;        } catch (FetcherException exception) {
+<b class="nc">&nbsp;            if (exception instanceof FetcherClientException) {</b>
+<b class="nc">&nbsp;                dialogService.showInformationDialogAndWait(Localization.lang(&quot;Look up identifier&quot;), Localization.lang(&quot;No data was found for the identifier&quot;));</b>
+<b class="nc">&nbsp;            } else if (exception instanceof FetcherServerException) {</b>
+<b class="nc">&nbsp;                dialogService.showInformationDialogAndWait(Localization.lang(&quot;Look up identifier&quot;), Localization.lang(&quot;Server not available&quot;));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.showErrorDialogAndWait(exception);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void dropEntry(List&lt;BibEntry&gt; entriesToAdd) {
+<b class="nc">&nbsp;        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void cutEntry() {
+<b class="nc">&nbsp;        int entriesCopied = doCopyEntry(getSelectedEntries());</b>
+<b class="nc">&nbsp;        int entriesDeleted = doDeleteEntry(StandardActions.CUT, mainTable.getSelectedEntries());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (entriesCopied == entriesDeleted) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Cut %0 entry(s)&quot;, entriesCopied));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Cut failed&quot;, entriesCopied));</b>
+<b class="nc">&nbsp;            undoManager.undo();</b>
+<b class="nc">&nbsp;            clipBoardManager.setContent(&quot;&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the selected entries and files linked to selected entries from the database
+&nbsp;     */
+&nbsp;    public void deleteEntry() {
+<b class="nc">&nbsp;        int entriesDeleted = doDeleteEntry(StandardActions.DELETE_ENTRY, mainTable.getSelectedEntries());</b>
+<b class="nc">&nbsp;        if (entriesDeleted &gt; 0) {</b>
+<b class="nc">&nbsp;            dialogService.notify(Localization.lang(&quot;Deleted %0 entry(s)&quot;, entriesDeleted));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void deleteEntry(BibEntry entry) {
+<b class="nc">&nbsp;        doDeleteEntry(StandardActions.DELETE_ENTRY, List.of(entry));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the selected entries and files linked to selected entries from the database
+&nbsp;     *
+&nbsp;     * @param mode If DELETE_ENTRY the user will get asked if he really wants to delete the entries, and it will be localized as &quot;deleted&quot;. If true the action will be localized as &quot;cut&quot;
+&nbsp;     */
+&nbsp;    private int doDeleteEntry(StandardActions mode, List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        if (entries.isEmpty()) {</b>
+<b class="nc">&nbsp;            return 0;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (mode == StandardActions.DELETE_ENTRY &amp;&amp; !showDeleteConfirmationDialog(entries.size())) {</b>
+<b class="nc">&nbsp;            return -1;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Delete selected entries
+<b class="nc">&nbsp;        getUndoManager().addEdit(new UndoableRemoveEntries(bibDatabaseContext.getDatabase(), entries, mode == StandardActions.CUT));</b>
+<b class="nc">&nbsp;        bibDatabaseContext.getDatabase().removeEntries(entries);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (mode != StandardActions.CUT) {</b>
+<b class="nc">&nbsp;            List&lt;LinkedFile&gt; linkedFileList = entries.stream()</b>
+<b class="nc">&nbsp;                                                     .flatMap(entry -&gt; entry.getFiles().stream())</b>
+<b class="nc">&nbsp;                                                     .distinct()</b>
+<b class="nc">&nbsp;                                                     .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (!linkedFileList.isEmpty()) {</b>
+<b class="nc">&nbsp;                List&lt;LinkedFileViewModel&gt; viewModels = linkedFileList.stream()</b>
+<b class="nc">&nbsp;                                                                     .map(linkedFile -&gt; LinkedFileViewModel.fromLinkedFile(linkedFile, null, bibDatabaseContext, null, null, preferences))</b>
+<b class="nc">&nbsp;                                                                     .collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;                new DeleteFileAction(dialogService, preferences.getFilePreferences(), bibDatabaseContext, viewModels).execute();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        markBaseChanged();</b>
+&nbsp;
+&nbsp;        // prevent the main table from loosing focus
+<b class="nc">&nbsp;        mainTable.requestFocus();</b>
+&nbsp;
+<b class="nc">&nbsp;        return entries.size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isModified() {
+<b class="nc">&nbsp;        return changedProperty.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void markBaseChanged() {
+<b class="nc">&nbsp;        this.changedProperty.setValue(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void markNonUndoableBaseChanged() {
+<b class="nc">&nbsp;        this.nonUndoableChangeProperty.setValue(true);</b>
+<b class="nc">&nbsp;        this.changedProperty.setValue(true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void resetChangedProperties() {
+<b class="nc">&nbsp;        this.nonUndoableChangeProperty.setValue(false);</b>
+<b class="nc">&nbsp;        this.changedProperty.setValue(false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void back() {
+<b class="nc">&nbsp;        navigationHistory.back().ifPresent(this::navigateToEntry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void forward() {
+<b class="nc">&nbsp;        navigationHistory.forward().ifPresent(this::navigateToEntry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void navigateToEntry(BibEntry entry) {
+<b class="nc">&nbsp;        backOrForwardNavigationActionTriggered = true;</b>
+<b class="nc">&nbsp;        clearAndSelect(entry);</b>
+<b class="nc">&nbsp;        updateNavigationState();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canGoBack() {
+<b class="nc">&nbsp;        return navigationHistory.canGoBack();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean canGoForward() {
+<b class="nc">&nbsp;        return navigationHistory.canGoForward();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void newEntryShowing(BibEntry entry) {
+&nbsp;        // skip history updates if this is from a back/forward operation
+<b class="nc">&nbsp;        if (backOrForwardNavigationActionTriggered) {</b>
+<b class="nc">&nbsp;            backOrForwardNavigationActionTriggered = false;</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        navigationHistory.add(entry);</b>
+<b class="nc">&nbsp;        updateNavigationState();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates the StateManager with current navigation state
+&nbsp;     * Only update if this is the active tab
+&nbsp;     */
+&nbsp;    public void updateNavigationState() {
+<b class="nc">&nbsp;        canGoBackProperty.set(canGoBack());</b>
+<b class="nc">&nbsp;        canGoForwardProperty.set(canGoForward());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new library tab. Contents are loaded by the {@code dataLoadingTask}. Most of the other parameters are required by {@code resetChangeMonitor()}.
+&nbsp;     *
+&nbsp;     * @param dataLoadingTask The task to execute to load the data asynchronously.
+&nbsp;     * @param file            the path to the file (loaded by the dataLoadingTask)
+&nbsp;     */
+&nbsp;    public static LibraryTab createLibraryTab(BackgroundTask&lt;ParserResult&gt; dataLoadingTask,
+&nbsp;                                              Path file,
+&nbsp;                                              DialogService dialogService,
+&nbsp;                                              AiService aiService,
+&nbsp;                                              GuiPreferences preferences,
+&nbsp;                                              StateManager stateManager,
+&nbsp;                                              LibraryTabContainer tabContainer,
+&nbsp;                                              FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                                              BibEntryTypesManager entryTypesManager,
+&nbsp;                                              CountingUndoManager undoManager,
+&nbsp;                                              ClipBoardManager clipBoardManager,
+&nbsp;                                              TaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        BibDatabaseContext context = new BibDatabaseContext();</b>
+<b class="nc">&nbsp;        context.setDatabasePath(file);</b>
+&nbsp;
+<b class="nc">&nbsp;        LibraryTab newTab = new LibraryTab(</b>
+&nbsp;                context,
+&nbsp;                tabContainer,
+&nbsp;                dialogService,
+&nbsp;                aiService,
+&nbsp;                preferences,
+&nbsp;                stateManager,
+&nbsp;                fileUpdateMonitor,
+&nbsp;                entryTypesManager,
+&nbsp;                undoManager,
+&nbsp;                clipBoardManager,
+&nbsp;                taskExecutor,
+&nbsp;                true);
+&nbsp;
+<b class="nc">&nbsp;        newTab.setDataLoadingTask(dataLoadingTask);</b>
+<b class="nc">&nbsp;        dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)</b>
+<b class="nc">&nbsp;                       .onSuccess(newTab::onDatabaseLoadingSucceed)</b>
+<b class="nc">&nbsp;                       .onFailure(newTab::onDatabaseLoadingFailed)</b>
+<b class="nc">&nbsp;                       .executeWith(taskExecutor);</b>
+&nbsp;
+<b class="nc">&nbsp;        return newTab;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static LibraryTab createLibraryTab(@NonNull BibDatabaseContext databaseContext,
+&nbsp;                                              LibraryTabContainer tabContainer,
+&nbsp;                                              DialogService dialogService,
+&nbsp;                                              AiService aiService,
+&nbsp;                                              GuiPreferences preferences,
+&nbsp;                                              StateManager stateManager,
+&nbsp;                                              FileUpdateMonitor fileUpdateMonitor,
+&nbsp;                                              BibEntryTypesManager entryTypesManager,
+&nbsp;                                              UndoManager undoManager,
+&nbsp;                                              ClipBoardManager clipBoardManager,
+&nbsp;                                              TaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        return new LibraryTab(</b>
+&nbsp;                databaseContext,
+&nbsp;                tabContainer,
+&nbsp;                dialogService,
+&nbsp;                aiService,
+&nbsp;                preferences,
+&nbsp;                stateManager,
+&nbsp;                fileUpdateMonitor,
+&nbsp;                entryTypesManager,
+&nbsp;                (CountingUndoManager) undoManager,
+&nbsp;                clipBoardManager,
+&nbsp;                taskExecutor,
+&nbsp;                false);
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty canGoBackProperty() {
+<b class="nc">&nbsp;        return canGoBackProperty;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty canGoForwardProperty() {
+<b class="nc">&nbsp;        return canGoForwardProperty;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private class GroupTreeListener {</b>
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        public void listen(EntriesAddedEvent addedEntriesEvent) {
+&nbsp;            // if the event is an undo, don&#39;t add it to the current group
+<b class="nc">&nbsp;            if (addedEntriesEvent.getEntriesEventSource() == EntriesEventSource.UNDO) {</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;
+&nbsp;            // Automatically add new entries to the selected group (or set of groups)
+<b class="nc">&nbsp;            if (preferences.getGroupsPreferences().shouldAutoAssignGroup()) {</b>
+<b class="nc">&nbsp;                stateManager.getSelectedGroups(bibDatabaseContext).forEach(</b>
+<b class="nc">&nbsp;                        selectedGroup -&gt; selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private class IndexUpdateListener {</b>
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        public void listen(EntriesAddedEvent addedEntryEvent) {
+<b class="nc">&nbsp;            indexManager.addToIndex(addedEntryEvent.getBibEntries());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        public void listen(EntriesRemovedEvent removedEntriesEvent) {
+<b class="nc">&nbsp;            indexManager.removeFromIndex(removedEntriesEvent.getBibEntries());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Subscribe
+&nbsp;        public void listen(FieldChangedEvent fieldChangedEvent) {
+<b class="nc">&nbsp;            indexManager.updateEntry(fieldChangedEvent);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class DatabaseNotification extends NotificationPane {
+&nbsp;        public DatabaseNotification(Node content) {
+<b class="nc">&nbsp;            super(content);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void notify(Node graphic, String text, List&lt;Action&gt; actions, Duration duration) {
+<b class="nc">&nbsp;            this.setGraphic(graphic);</b>
+<b class="nc">&nbsp;            this.setText(text);</b>
+<b class="nc">&nbsp;            this.getActions().setAll(actions);</b>
+<b class="nc">&nbsp;            this.show();</b>
+<b class="nc">&nbsp;            if ((duration != null) &amp;&amp; !duration.equals(Duration.ZERO)) {</b>
+<b class="nc">&nbsp;                PauseTransition delay = new PauseTransition(duration);</b>
+<b class="nc">&nbsp;                delay.setOnFinished(this::handle);</b>
+<b class="nc">&nbsp;                delay.play();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        private void handle(ActionEvent e) {
+<b class="nc">&nbsp;            this.hide();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public DatabaseNotification getNotificationPane() {
+<b class="nc">&nbsp;        return databaseNotificationPane;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;LibraryTab{&quot; +</b>
+&nbsp;                &quot;bibDatabaseContext=&quot; + bibDatabaseContext +
+&nbsp;                &#39;}&#39;;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

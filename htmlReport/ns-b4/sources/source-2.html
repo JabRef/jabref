@@ -1,0 +1,1569 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BracketedPattern</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.citationkeypattern</a>
+</div>
+
+<h1>Coverage Summary for Class: BracketedPattern (org.jabref.logic.citationkeypattern)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BracketedPattern</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/369)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/528)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BracketedPattern$Institution</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/59)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/381)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/549)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.citationkeypattern;
+&nbsp;
+&nbsp;import java.math.BigInteger;
+&nbsp;import java.text.Normalizer;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Scanner;
+&nbsp;import java.util.StringJoiner;
+&nbsp;import java.util.StringTokenizer;
+&nbsp;import java.util.function.Function;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.Formatter;
+&nbsp;import org.jabref.logic.formatter.Formatters;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
+&nbsp;import org.jabref.logic.formatter.casechanger.Word;
+&nbsp;import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+&nbsp;import org.jabref.model.database.BibDatabase;
+&nbsp;import org.jabref.model.entry.Author;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Keyword;
+&nbsp;import org.jabref.model.entry.KeywordList;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.strings.LatexToUnicodeAdapter;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class provides methods to expand bracketed expressions, such as
+&nbsp; * &lt;code&gt;[year]_[author]_[firstpage]&lt;/code&gt;, using information from a provided BibEntry. The above-mentioned expression would yield
+&nbsp; * &lt;code&gt;2017_Kitsune_123&lt;/code&gt; when expanded using the BibTeX entry &lt;code&gt;@Article{ authors = {O. Kitsune}, year = {2017},
+&nbsp; * pages={123-6}}&lt;/code&gt;.
+&nbsp; * &lt;p&gt;
+&nbsp; * The embedding in JabRef is explained at &lt;a href=&quot;https://docs.jabref.org/setup/citationkeypattern&quot;&gt;Customize the citation key generator&lt;/a&gt;.
+&nbsp; * &lt;/p&gt;
+&nbsp; */
+&nbsp;public class BracketedPattern {
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BracketedPattern.class);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The maximum number of characters in the first author&#39;s last name.
+&nbsp;     */
+&nbsp;    private static final int CHARS_OF_FIRST = 5;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The maximum number of name abbreviations that can be used. If there are more authors, {@code MAX_ALPHA_AUTHORS -
+&nbsp;     * 1} name abbreviations will be displayed, and a + sign will be appended at the end.
+&nbsp;     */
+&nbsp;    private static final int MAX_ALPHA_AUTHORS = 4;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Matches everything that is not a unicode decimal digit.
+&nbsp;     */
+<b class="nc">&nbsp;    private static final Pattern NOT_DECIMAL_DIGIT = Pattern.compile(&quot;\\P{Nd}&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Matches everything that is not an uppercase ASCII letter. The intended use is to remove all lowercase letters
+&nbsp;     */
+<b class="nc">&nbsp;    private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile(&quot;[^A-Z]&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Matches uppercase english letters between &quot;({&quot; and &quot;})&quot;, which should be used to abbreviate the name of an institution
+&nbsp;     */
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern INLINE_ABBREVIATION = Pattern.compile(&quot;(?&lt;=\\(\\{)[A-Z]+(?=}\\))&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Matches with &quot;dep&quot;/&quot;dip&quot;, case-insensitive
+&nbsp;     */
+<b class="nc">&nbsp;    private static final Pattern DEPARTMENTS = Pattern.compile(&quot;^d[ei]p.*&quot;, Pattern.CASE_INSENSITIVE);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern WHITESPACE = Pattern.compile(&quot;\\p{javaWhitespace}&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final RemoveEnclosingBracesFormatter ENCLOSING_BRACES_FORMATTER = new RemoveEnclosingBracesFormatter();</b>
+&nbsp;
+<b class="nc">&nbsp;    private enum Institution {</b>
+<b class="nc">&nbsp;        SCHOOL,</b>
+<b class="nc">&nbsp;        DEPARTMENT,</b>
+<b class="nc">&nbsp;        UNIVERSITY,</b>
+<b class="nc">&nbsp;        TECHNOLOGY;</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Matches &quot;uni&quot; followed by &quot;v&quot; or &quot;b&quot;, at the start of a string or after a space, case insensitive
+&nbsp;         */
+<b class="nc">&nbsp;        private static final Pattern UNIVERSITIES = Pattern.compile(&quot;^uni(v|b|$).*&quot;, Pattern.CASE_INSENSITIVE);</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Matches with &quot;tech&quot;, case-insensitive
+&nbsp;         */
+<b class="nc">&nbsp;        private static final Pattern TECHNOLOGICAL_INSTITUTES = Pattern.compile(&quot;^tech.*&quot;, Pattern.CASE_INSENSITIVE);</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Matches with &quot;dep&quot;/&quot;dip&quot;/&quot;lab&quot;, case insensitive
+&nbsp;         */
+<b class="nc">&nbsp;        private static final Pattern DEPARTMENTS_OR_LABS = Pattern.compile(&quot;^(d[ei]p|lab).*&quot;, Pattern.CASE_INSENSITIVE);</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Find which types of institutions have words in common with the given name parts.
+&nbsp;         *
+&nbsp;         * @param nameParts a list of words that constitute parts of an institution&#39;s name.
+&nbsp;         * @return set containing all types that matches
+&nbsp;         */
+&nbsp;        public static EnumSet&lt;Institution&gt; findTypes(List&lt;String&gt; nameParts) {
+<b class="nc">&nbsp;            EnumSet&lt;Institution&gt; parts = EnumSet.noneOf(Institution.class);</b>
+&nbsp;            // Deciding about a part type…
+<b class="nc">&nbsp;            for (String namePart : nameParts) {</b>
+<b class="nc">&nbsp;                if (UNIVERSITIES.matcher(namePart).matches()) {</b>
+<b class="nc">&nbsp;                    parts.add(Institution.UNIVERSITY);</b>
+<b class="nc">&nbsp;                } else if (TECHNOLOGICAL_INSTITUTES.matcher(namePart).matches()) {</b>
+<b class="nc">&nbsp;                    parts.add(Institution.TECHNOLOGY);</b>
+<b class="nc">&nbsp;                } else if (StandardField.SCHOOL.getName().equalsIgnoreCase(namePart)) {</b>
+<b class="nc">&nbsp;                    parts.add(Institution.SCHOOL);</b>
+<b class="nc">&nbsp;                } else if (DEPARTMENTS_OR_LABS.matcher(namePart).matches()) {</b>
+<b class="nc">&nbsp;                    parts.add(Institution.DEPARTMENT);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (parts.contains(Institution.TECHNOLOGY)) {</b>
+<b class="nc">&nbsp;                parts.remove(Institution.UNIVERSITY); // technology institute isn&#39;t university :-)</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return parts;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private final String pattern;
+&nbsp;
+<b class="nc">&nbsp;    public BracketedPattern() {</b>
+<b class="nc">&nbsp;        this.pattern = null;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public BracketedPattern(String pattern) {</b>
+<b class="nc">&nbsp;        this.pattern = pattern;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return this.getClass().getName() + &quot;[pattern=&quot; + pattern + &quot;]&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String expand(BibEntry bibentry) {
+<b class="nc">&nbsp;        return expand(bibentry, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Expands the current pattern using the given bibentry and database. &quot;;&quot; is used as keyword delimiter.
+&nbsp;     *
+&nbsp;     * @param bibentry The bibentry to expand.
+&nbsp;     * @param database The database to use for string-lookups and cross-refs. May be null.
+&nbsp;     * @return The expanded pattern. The empty string is returned, if it could not be expanded.
+&nbsp;     */
+&nbsp;    public String expand(BibEntry bibentry, BibDatabase database) {
+<b class="nc">&nbsp;        Objects.requireNonNull(bibentry);</b>
+<b class="nc">&nbsp;        Character keywordDelimiter = &#39;;&#39;;</b>
+<b class="nc">&nbsp;        return expand(bibentry, keywordDelimiter, database);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Expands the current pattern using the given bibentry, keyword delimiter, and database.
+&nbsp;     *
+&nbsp;     * @param bibentry         The bibentry to expand.
+&nbsp;     * @param keywordDelimiter The keyword delimiter to use.
+&nbsp;     * @param database         The database to use for string-lookups and cross-refs. May be null.
+&nbsp;     * @return The expanded pattern. The empty string is returned, if it could not be expanded.
+&nbsp;     */
+&nbsp;    public String expand(BibEntry bibentry, Character keywordDelimiter, BibDatabase database) {
+<b class="nc">&nbsp;        Objects.requireNonNull(bibentry);</b>
+<b class="nc">&nbsp;        return expandBrackets(this.pattern, keywordDelimiter, bibentry, database);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Expands a pattern
+&nbsp;     *
+&nbsp;     * @param pattern          The pattern to expand
+&nbsp;     * @param keywordDelimiter The keyword delimiter to use
+&nbsp;     * @param entry            The bibEntry to use for expansion
+&nbsp;     * @param database         The database for field resolving. May be null.
+&nbsp;     * @return The expanded pattern. Not null.
+&nbsp;     */
+&nbsp;    public static String expandBrackets(@NonNull String pattern, Character keywordDelimiter, @NonNull BibEntry entry, BibDatabase database) {
+<b class="nc">&nbsp;        return expandBrackets(pattern, expandBracketContent(keywordDelimiter, entry, database));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Utility method creating a function taking the string representation of the content of a bracketed expression and
+&nbsp;     * expanding it.
+&nbsp;     *
+&nbsp;     * @param keywordDelimiter The keyword delimiter to use
+&nbsp;     * @param entry            The {@link BibEntry} to use for expansion
+&nbsp;     * @param database         The {@link BibDatabase} for field resolving. May be null.
+&nbsp;     * @return a function accepting a bracketed expression and returning the result of expanding it
+&nbsp;     */
+&nbsp;    public static Function&lt;String, String&gt; expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+<b class="nc">&nbsp;        return (String bracket) -&gt; {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; fieldParts = parseFieldAndModifiers(bracket);</b>
+&nbsp;            // check whether there is a modifier on the end such as
+&nbsp;            // &quot;:lower&quot;:
+<b class="nc">&nbsp;            String expandedPattern = getFieldValue(entry, fieldParts.getFirst(), keywordDelimiter, database);</b>
+<b class="nc">&nbsp;            if (fieldParts.size() &gt; 1) {</b>
+&nbsp;                // apply modifiers:
+<b class="nc">&nbsp;                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1, expandBracketContent(keywordDelimiter, entry, database));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return expandedPattern;</b>
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Expands a pattern.
+&nbsp;     *
+&nbsp;     * @param pattern               The pattern to expand
+&nbsp;     * @param bracketContentHandler A function taking the string representation of the content of a bracketed pattern
+&nbsp;     *                              and expanding it
+&nbsp;     * @return The expanded pattern. Not null.
+&nbsp;     */
+&nbsp;    public static String expandBrackets(@NonNull String pattern, Function&lt;String, String&gt; bracketContentHandler) {
+<b class="nc">&nbsp;        StringBuilder expandedPattern = new StringBuilder();</b>
+<b class="nc">&nbsp;        pattern = pattern.replace(&quot;\\\&quot;&quot;, &quot;\u0A17&quot;);</b>
+<b class="nc">&nbsp;        StringTokenizer parsedPattern = new StringTokenizer(pattern, &quot;\\[]\&quot;&quot;, true);</b>
+&nbsp;
+<b class="nc">&nbsp;        while (parsedPattern.hasMoreTokens()) {</b>
+<b class="nc">&nbsp;            String token = parsedPattern.nextToken();</b>
+<b class="nc">&nbsp;            switch (token) {</b>
+&nbsp;                case &quot;\&quot;&quot; -&gt;
+<b class="nc">&nbsp;                        appendQuote(expandedPattern, parsedPattern);</b>
+&nbsp;                case &quot;[&quot; -&gt; {
+<b class="nc">&nbsp;                    String fieldMarker = contentBetweenBrackets(parsedPattern, pattern);</b>
+<b class="nc">&nbsp;                    expandedPattern.append(bracketContentHandler.apply(fieldMarker));</b>
+&nbsp;                }
+&nbsp;                case &quot;\\&quot; -&gt; {
+<b class="nc">&nbsp;                    if (parsedPattern.hasMoreTokens()) {</b>
+<b class="nc">&nbsp;                        expandedPattern.append(parsedPattern.nextToken());</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        LOGGER.warn(&quot;Found a \&quot;\\\&quot; that is not part of an escape sequence&quot;);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                default -&gt;
+<b class="nc">&nbsp;                        expandedPattern.append(token);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return expandedPattern.toString().replace(&quot;\u0A17&quot;, &quot;\\\&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the content enclosed between brackets, including enclosed quotes, and excluding the paired enclosing brackets.
+&nbsp;     * There may be brackets in it.
+&nbsp;     * Intended to be used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a [
+&nbsp;     * is encountered, and has been consumed, by the {@code StringTokenizer}.
+&nbsp;     *
+&nbsp;     * @param pattern   pattern used by {@code expandBrackets}, used for logging
+&nbsp;     * @param tokenizer the tokenizer producing the tokens
+&nbsp;     * @return the content enclosed by brackets
+&nbsp;     */
+&nbsp;    private static String contentBetweenBrackets(StringTokenizer tokenizer, final String pattern) {
+<b class="nc">&nbsp;        StringBuilder bracketContent = new StringBuilder();</b>
+<b class="nc">&nbsp;        boolean foundClosingBracket = false;</b>
+<b class="nc">&nbsp;        int subBrackets = 0;</b>
+&nbsp;        // make sure to read until the paired &#39;]&#39;
+<b class="nc">&nbsp;        while (tokenizer.hasMoreTokens() &amp;&amp; !foundClosingBracket) {</b>
+<b class="nc">&nbsp;            String token = tokenizer.nextToken();</b>
+&nbsp;            // If the beginning of a quote is found, append the content
+<b class="nc">&nbsp;            switch (token) {</b>
+&nbsp;                case &quot;\&quot;&quot; -&gt;
+<b class="nc">&nbsp;                        appendQuote(bracketContent, tokenizer);</b>
+&nbsp;                case &quot;]&quot; -&gt; {
+<b class="nc">&nbsp;                    if (subBrackets == 0) {</b>
+<b class="nc">&nbsp;                        foundClosingBracket = true;</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        subBrackets--;</b>
+<b class="nc">&nbsp;                        bracketContent.append(token);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;                case &quot;[&quot; -&gt; {
+<b class="nc">&nbsp;                    subBrackets++;</b>
+<b class="nc">&nbsp;                    bracketContent.append(token);</b>
+&nbsp;                }
+&nbsp;                default -&gt;
+<b class="nc">&nbsp;                        bracketContent.append(token);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!foundClosingBracket) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Missing closing bracket &#39;]&#39; in &#39;{}&#39;&quot;, pattern);</b>
+<b class="nc">&nbsp;        } else if (bracketContent.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Found empty brackets \&quot;[]\&quot; in &#39;{}&#39;&quot;, pattern);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return bracketContent.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Appends the content between, and including, two \&quot; to the provided &lt;code&gt;StringBuilder&lt;/code&gt;. Intended to be
+&nbsp;     * used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a \&quot; is
+&nbsp;     * encountered by the StringTokenizer.
+&nbsp;     *
+&nbsp;     * @param stringBuilder the &lt;code&gt;StringBuilder&lt;/code&gt; to which tokens will be appended
+&nbsp;     * @param tokenizer     the tokenizer producing the tokens
+&nbsp;     */
+&nbsp;    private static void appendQuote(StringBuilder stringBuilder, StringTokenizer tokenizer) {
+<b class="nc">&nbsp;        stringBuilder.append(&quot;\&quot;&quot;);  // We know that the previous token was \&quot;</b>
+<b class="nc">&nbsp;        String token = &quot;&quot;;</b>
+<b class="nc">&nbsp;        while (tokenizer.hasMoreTokens() &amp;&amp; !&quot;\&quot;&quot;.equals(token)) {</b>
+<b class="nc">&nbsp;            token = tokenizer.nextToken();</b>
+<b class="nc">&nbsp;            stringBuilder.append(token);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Evaluates the given pattern to the given bibentry and database
+&nbsp;     *
+&nbsp;     * @param entry            The entry to get the field value from
+&nbsp;     * @param pattern          A pattern string (such as auth, pureauth, authorLast)
+&nbsp;     * @param keywordDelimiter The de
+&nbsp;     * @param database         The database to use for field resolving. May be null.
+&nbsp;     * @return String containing the evaluation result. Empty string if the pattern cannot be resolved.
+&nbsp;     */
+&nbsp;    public static String getFieldValue(BibEntry entry, String pattern, Character keywordDelimiter, BibDatabase database) {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (pattern.startsWith(&quot;auth&quot;) || pattern.startsWith(&quot;pureauth&quot;)) {</b>
+&nbsp;                // result the author
+<b class="nc">&nbsp;                String unparsedAuthors = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database).orElse(&quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (pattern.startsWith(&quot;pure&quot;)) {</b>
+&nbsp;                    // &quot;pure&quot; is used in the context of authors to resolve to authors only and not fallback to editors
+&nbsp;                    // The other functionality of the pattern &quot;ForeIni&quot;, ... is the same
+&nbsp;                    // Thus, remove the &quot;pure&quot; prefix so the remaining code in this section functions correctly
+&nbsp;                    //
+<b class="nc">&nbsp;                    pattern = pattern.substring(4);</b>
+<b class="nc">&nbsp;                } else if (unparsedAuthors.isEmpty()) {</b>
+&nbsp;                    // special feature: A pattern starting with &quot;auth&quot; falls back to the editor
+<b class="nc">&nbsp;                    unparsedAuthors = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(&quot;&quot;);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                AuthorList authorList = createAuthorList(unparsedAuthors);</b>
+&nbsp;
+&nbsp;                // Gather all author-related checks, so we don&#39;t
+&nbsp;                // have to check all the time.
+<b class="nc">&nbsp;                switch (pattern) {</b>
+&nbsp;                    case &quot;auth&quot;:
+<b class="nc">&nbsp;                        return firstAuthor(authorList);</b>
+&nbsp;                    case &quot;authForeIni&quot;:
+<b class="nc">&nbsp;                        return firstAuthorForenameInitials(authorList);</b>
+&nbsp;                    case &quot;authFirstFull&quot;:
+<b class="nc">&nbsp;                        return firstAuthorVonAndLast(authorList);</b>
+&nbsp;                    case &quot;authors&quot;:
+<b class="nc">&nbsp;                        return allAuthors(authorList);</b>
+&nbsp;                    case &quot;authorsAlpha&quot;:
+<b class="nc">&nbsp;                        return authorsAlpha(authorList);</b>
+&nbsp;                    case &quot;authorsAlphaLNI&quot;:
+<b class="nc">&nbsp;                        return authorsAlphaLNI(authorList);</b>
+&nbsp;                    case &quot;authorLast&quot;:
+<b class="nc">&nbsp;                        return lastAuthor(authorList);</b>
+&nbsp;                    case &quot;authorLastForeIni&quot;:
+<b class="nc">&nbsp;                        return lastAuthorForenameInitials(authorList);</b>
+&nbsp;                    case &quot;authorIni&quot;:
+<b class="nc">&nbsp;                        return oneAuthorPlusInitials(authorList);</b>
+&nbsp;                    case &quot;auth.auth.ea&quot;:
+<b class="nc">&nbsp;                        return authAuthEa(authorList);</b>
+&nbsp;                    case &quot;auth.etal&quot;:
+<b class="nc">&nbsp;                        return authEtal(authorList, &quot;.&quot;, &quot;.etal&quot;);</b>
+&nbsp;                    case &quot;authEtAl&quot;:
+<b class="nc">&nbsp;                        return authEtal(authorList, &quot;&quot;, &quot;EtAl&quot;);</b>
+&nbsp;                    case &quot;authshort&quot;:
+<b class="nc">&nbsp;                        return authShort(authorList);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (pattern.matches(&quot;authIni[\\d]+&quot;)) {</b>
+<b class="nc">&nbsp;                    int num = Integer.parseInt(pattern.substring(7));</b>
+<b class="nc">&nbsp;                    return authIniN(authorList, num);</b>
+<b class="nc">&nbsp;                } else if (pattern.matches(&quot;auth[\\d]+_[\\d]+&quot;)) {</b>
+<b class="nc">&nbsp;                    String[] nums = pattern.substring(4).split(&quot;_&quot;);</b>
+<b class="nc">&nbsp;                    return authNofMth(authorList, Integer.parseInt(nums[0]),</b>
+<b class="nc">&nbsp;                            Integer.parseInt(nums[1]));</b>
+<b class="nc">&nbsp;                } else if (pattern.matches(&quot;auth\\d+&quot;)) {</b>
+&nbsp;                    // authN. First N chars of the first author&#39;s last name.
+<b class="nc">&nbsp;                    int num = Integer.parseInt(pattern.substring(4));</b>
+<b class="nc">&nbsp;                    return authN(authorList, num);</b>
+<b class="nc">&nbsp;                } else if (pattern.matches(&quot;authors\\d+&quot;)) {</b>
+<b class="nc">&nbsp;                    return nAuthors(authorList, Integer.parseInt(pattern.substring(7)));</b>
+&nbsp;                } else {
+&nbsp;                    // This &quot;auth&quot; business was a dead end, so just
+&nbsp;                    // use it literally:
+<b class="nc">&nbsp;                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database).orElse(&quot;&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (pattern.startsWith(&quot;ed&quot;)) {</b>
+&nbsp;                // Gather all markers starting with &quot;ed&quot; here, so we
+&nbsp;                // don&#39;t have to check all the time.
+<b class="nc">&nbsp;                String unparsedEditors = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;                AuthorList editorList = createAuthorList(unparsedEditors);</b>
+&nbsp;
+<b class="nc">&nbsp;                switch (pattern) {</b>
+&nbsp;                    case &quot;edtr&quot;:
+<b class="nc">&nbsp;                        return firstAuthor(editorList);</b>
+&nbsp;                    case &quot;edtrForeIni&quot;:
+<b class="nc">&nbsp;                        return firstAuthorForenameInitials(editorList);</b>
+&nbsp;                    case &quot;editors&quot;:
+<b class="nc">&nbsp;                        return allAuthors(editorList);</b>
+&nbsp;                    case &quot;editorLast&quot;:
+<b class="nc">&nbsp;                        return lastAuthor(editorList); // Last author&#39;s last name</b>
+&nbsp;                    case &quot;editorLastForeIni&quot;:
+<b class="nc">&nbsp;                        return lastAuthorForenameInitials(editorList);</b>
+&nbsp;                    case &quot;editorIni&quot;:
+<b class="nc">&nbsp;                        return oneAuthorPlusInitials(editorList);</b>
+&nbsp;                    case &quot;edtr.edtr.ea&quot;:
+<b class="nc">&nbsp;                        return authAuthEa(editorList);</b>
+&nbsp;                    case &quot;edtrshort&quot;:
+<b class="nc">&nbsp;                        return authShort(editorList);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (pattern.matches(&quot;edtrIni[\\d]+&quot;)) {</b>
+<b class="nc">&nbsp;                    int num = Integer.parseInt(pattern.substring(7));</b>
+<b class="nc">&nbsp;                    return authIniN(editorList, num);</b>
+<b class="nc">&nbsp;                } else if (pattern.matches(&quot;edtr[\\d]+_[\\d]+&quot;)) {</b>
+<b class="nc">&nbsp;                    String[] nums = pattern.substring(4).split(&quot;_&quot;);</b>
+<b class="nc">&nbsp;                    return authNofMth(editorList,</b>
+<b class="nc">&nbsp;                            Integer.parseInt(nums[0]),</b>
+<b class="nc">&nbsp;                            Integer.parseInt(nums[1]));</b>
+<b class="nc">&nbsp;                } else if (pattern.matches(&quot;edtr\\d+&quot;)) {</b>
+<b class="nc">&nbsp;                    String fa = firstAuthor(editorList);</b>
+<b class="nc">&nbsp;                    int num = Integer.parseInt(pattern.substring(4));</b>
+<b class="nc">&nbsp;                    if (num &gt; fa.length()) {</b>
+<b class="nc">&nbsp;                        num = fa.length();</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    return fa.substring(0, num);</b>
+&nbsp;                } else {
+&nbsp;                    // This &quot;ed&quot; business was a dead end, so just
+&nbsp;                    // use it literally:
+<b class="nc">&nbsp;                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database).orElse(&quot;&quot;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (&quot;firstpage&quot;.equals(pattern)) {</b>
+<b class="nc">&nbsp;                return firstPage(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;            } else if (&quot;pageprefix&quot;.equals(pattern)) {</b>
+<b class="nc">&nbsp;                return pagePrefix(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;            } else if (&quot;lastpage&quot;.equals(pattern)) {</b>
+<b class="nc">&nbsp;                return lastPage(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;            } else if (&quot;title&quot;.equals(pattern)) {</b>
+<b class="nc">&nbsp;                return camelizeSignificantWordsInTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;            } else if (&quot;fulltitle&quot;.equals(pattern)) {</b>
+<b class="nc">&nbsp;                return entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;            } else if (&quot;shorttitle&quot;.equals(pattern)) {</b>
+<b class="nc">&nbsp;                return getTitleWords(3,</b>
+<b class="nc">&nbsp;                        removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(&quot;&quot;)));</b>
+<b class="nc">&nbsp;            } else if (&quot;shorttitleINI&quot;.equals(pattern)) {</b>
+<b class="nc">&nbsp;                return keepLettersAndDigitsOnly(</b>
+<b class="nc">&nbsp;                        applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(&quot;&quot;)),</b>
+<b class="nc">&nbsp;                                List.of(&quot;abbr&quot;), 0, Function.identity()));</b>
+<b class="nc">&nbsp;            } else if (&quot;veryshorttitle&quot;.equals(pattern)) {</b>
+<b class="nc">&nbsp;                return getTitleWords(1,</b>
+<b class="nc">&nbsp;                        removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(&quot;&quot;)));</b>
+<b class="nc">&nbsp;            } else if (pattern.matches(&quot;camel[\\d]+&quot;)) {</b>
+<b class="nc">&nbsp;                int num = Integer.parseInt(pattern.substring(5));</b>
+<b class="nc">&nbsp;                return getCamelizedTitle_N(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(&quot;&quot;), num);</b>
+<b class="nc">&nbsp;            } else if (&quot;camel&quot;.equals(pattern)) {</b>
+<b class="nc">&nbsp;                return getCamelizedTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;            } else if (&quot;shortyear&quot;.equals(pattern)) {</b>
+<b class="nc">&nbsp;                String yearString = entry.getResolvedFieldOrAlias(StandardField.YEAR, database).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;                if (yearString.isEmpty()) {</b>
+<b class="nc">&nbsp;                    return yearString;</b>
+&nbsp;                    // In press/in preparation/submitted
+<b class="nc">&nbsp;                } else if (yearString.startsWith(&quot;in&quot;) || yearString.startsWith(&quot;sub&quot;)) {</b>
+<b class="nc">&nbsp;                    return &quot;IP&quot;;</b>
+<b class="nc">&nbsp;                } else if (yearString.length() &gt; 2) {</b>
+<b class="nc">&nbsp;                    return yearString.substring(yearString.length() - 2);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    return yearString;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (&quot;entrytype&quot;.equals(pattern)) {</b>
+<b class="nc">&nbsp;                return entry.getResolvedFieldOrAlias(InternalField.TYPE_HEADER, database).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;            } else if (pattern.matches(&quot;keyword\\d+&quot;)) {</b>
+&nbsp;                // according to LabelPattern.php, it returns keyword number n
+<b class="nc">&nbsp;                int num = Integer.parseInt(pattern.substring(7));</b>
+<b class="nc">&nbsp;                KeywordList separatedKeywords = entry.getResolvedKeywords(keywordDelimiter, database);</b>
+<b class="nc">&nbsp;                if (separatedKeywords.size() &lt; num) {</b>
+&nbsp;                    // not enough keywords
+<b class="nc">&nbsp;                    return &quot;&quot;;</b>
+&nbsp;                } else {
+&nbsp;                    // num counts from 1 to n, but index in arrayList count from 0 to n-1
+<b class="nc">&nbsp;                    return separatedKeywords.get(num - 1).toString();</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (pattern.matches(&quot;keywords\\d*&quot;)) {</b>
+&nbsp;                // return all keywords, not separated
+&nbsp;                int num;
+<b class="nc">&nbsp;                if (pattern.length() &gt; 8) {</b>
+<b class="nc">&nbsp;                    num = Integer.parseInt(pattern.substring(8));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    num = Integer.MAX_VALUE;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                KeywordList separatedKeywords = entry.getResolvedKeywords(keywordDelimiter, database);</b>
+<b class="nc">&nbsp;                StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;                int i = 0;</b>
+<b class="nc">&nbsp;                for (Keyword keyword : separatedKeywords) {</b>
+&nbsp;                    // remove all spaces
+<b class="nc">&nbsp;                    sb.append(keyword.toString().replaceAll(&quot;\\s+&quot;, &quot;&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;                    i++;</b>
+<b class="nc">&nbsp;                    if (i &gt;= num) {</b>
+&nbsp;                        break;
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                return sb.toString();</b>
+&nbsp;            } else {
+&nbsp;                // we haven&#39;t seen any special demands
+<b class="nc">&nbsp;                return entry.getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database).orElse(&quot;&quot;);</b>
+&nbsp;            }
+&nbsp;        } catch (NullPointerException ex) {
+<b class="nc">&nbsp;            LOGGER.debug(&quot;Problem making expanding bracketed expression&quot;, ex);</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parses the provided string to an {@link AuthorList}, which are then formatted by {@link LatexToUnicodeAdapter}.
+&nbsp;     * Afterward, any institutions are formatted into an institution key.
+&nbsp;     *
+&nbsp;     * @param unparsedAuthors a string representation of authors or editors
+&nbsp;     * @return an {@link AuthorList} consisting of authors and institution keys with resolved latex.
+&nbsp;     */
+&nbsp;    private static AuthorList createAuthorList(String unparsedAuthors) {
+<b class="nc">&nbsp;        return AuthorList.parse(unparsedAuthors).getAuthors().stream()</b>
+<b class="nc">&nbsp;                         .map(author -&gt; {</b>
+&nbsp;                             // If the author is an institution, use an institution key instead of the full name
+<b class="nc">&nbsp;                             String lastName = author.getFamilyName()</b>
+<b class="nc">&nbsp;                                                     .map(lastPart -&gt; isInstitution(author) ?</b>
+<b class="nc">&nbsp;                                                                      generateInstitutionKey(lastPart) :</b>
+<b class="nc">&nbsp;                                                                      LatexToUnicodeAdapter.format(lastPart))</b>
+<b class="nc">&nbsp;                                                     .orElse(null);</b>
+<b class="nc">&nbsp;                             return new Author(</b>
+<b class="nc">&nbsp;                                     author.getGivenName().map(LatexToUnicodeAdapter::format).orElse(null),</b>
+<b class="nc">&nbsp;                                     author.getGivenNameAbbreviated().map(LatexToUnicodeAdapter::format).orElse(null),</b>
+<b class="nc">&nbsp;                                     author.getNamePrefix().map(LatexToUnicodeAdapter::format).orElse(null),</b>
+&nbsp;                                     lastName,
+<b class="nc">&nbsp;                                     author.getNameSuffix().map(LatexToUnicodeAdapter::format).orElse(null));</b>
+&nbsp;                         })
+<b class="nc">&nbsp;                         .collect(AuthorList.collect());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if an author is an institution which can get a citation key from {@link #generateInstitutionKey(String)}.
+&nbsp;     *
+&nbsp;     * @param author the checked author
+&nbsp;     * @return true if only the last name is present and it contains at least one whitespace character.
+&nbsp;     */
+&nbsp;    private static boolean isInstitution(Author author) {
+<b class="nc">&nbsp;        return author.getGivenName().isEmpty() &amp;&amp; author.getGivenNameAbbreviated().isEmpty() &amp;&amp; author.getNameSuffix().isEmpty()</b>
+<b class="nc">&nbsp;                &amp;&amp; author.getNamePrefix().isEmpty() &amp;&amp; author.getFamilyName().isPresent()</b>
+<b class="nc">&nbsp;                &amp;&amp; WHITESPACE.matcher(author.getFamilyName().get()).find();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Applies modifiers to a label generated based on a field marker.
+&nbsp;     *
+&nbsp;     * @param label                The generated label.
+&nbsp;     * @param parts                String array containing the modifiers.
+&nbsp;     * @param offset               The number of initial items in the modifiers array to skip.
+&nbsp;     * @param expandBracketContent a function to expand the content in the parentheses.
+&nbsp;     * @return The modified label.
+&nbsp;     */
+&nbsp;    static String applyModifiers(final String label, final List&lt;String&gt; parts, final int offset, Function&lt;String, String&gt; expandBracketContent) {
+<b class="nc">&nbsp;        String resultingLabel = label;</b>
+<b class="nc">&nbsp;        for (int j = offset; j &lt; parts.size(); j++) {</b>
+<b class="nc">&nbsp;            String modifier = parts.get(j);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (&quot;abbr&quot;.equals(modifier)) {</b>
+&nbsp;                // Abbreviate - that is,
+<b class="nc">&nbsp;                StringBuilder abbreviateSB = new StringBuilder();</b>
+<b class="nc">&nbsp;                String[] words = resultingLabel.replaceAll(&quot;[\\{\\}&#39;]&quot;, &quot;&quot;)</b>
+<b class="nc">&nbsp;                                               .split(&quot;[\\(\\) \r\n\&quot;]&quot;);</b>
+<b class="nc">&nbsp;                for (String word : words) {</b>
+<b class="nc">&nbsp;                    if (!word.isEmpty()) {</b>
+<b class="nc">&nbsp;                        abbreviateSB.append(word.charAt(0));</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                resultingLabel = abbreviateSB.toString();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                Optional&lt;Formatter&gt; formatter = Formatters.getFormatterForModifier(modifier);</b>
+<b class="nc">&nbsp;                if (formatter.isPresent()) {</b>
+<b class="nc">&nbsp;                    resultingLabel = formatter.get().format(resultingLabel);</b>
+<b class="nc">&nbsp;                } else if (!modifier.isEmpty() &amp;&amp; (modifier.length() &gt;= 2) &amp;&amp; (modifier.charAt(0) == &#39;(&#39;) &amp;&amp; modifier.endsWith(&quot;)&quot;)) {</b>
+&nbsp;                    // Alternate text modifier in parentheses. Should be inserted if the label is empty
+<b class="nc">&nbsp;                    if (label.isEmpty() &amp;&amp; (modifier.length() &gt; 2)) {</b>
+<b class="nc">&nbsp;                        resultingLabel = expandBrackets(modifier.substring(1, modifier.length() - 1), expandBracketContent);</b>
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Key generator warning: unknown modifier &#39;{}&#39;.&quot;, modifier);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return resultingLabel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines &quot;number&quot; words out of the &quot;title&quot; field in the given BibTeX entry
+&nbsp;     */
+&nbsp;    public static String getTitleWords(int number, String title) {
+<b class="nc">&nbsp;        return getTitleWordsWithSpaces(number, title);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes any &#39;-&#39;, unnecessary whitespace and latex commands formatting
+&nbsp;     */
+&nbsp;    private static String formatTitle(String title) {
+<b class="nc">&nbsp;        String ss = new RemoveLatexCommandsFormatter().format(title);</b>
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+&nbsp;        StringBuilder current;
+<b class="nc">&nbsp;        int piv = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        while (piv &lt; ss.length()) {</b>
+<b class="nc">&nbsp;            current = new StringBuilder();</b>
+&nbsp;            // Get the next word:
+<b class="nc">&nbsp;            while ((piv &lt; ss.length()) &amp;&amp; !Character.isWhitespace(ss.charAt(piv))</b>
+<b class="nc">&nbsp;                    &amp;&amp; (ss.charAt(piv) != &#39;-&#39;)) {</b>
+<b class="nc">&nbsp;                current.append(ss.charAt(piv));</b>
+<b class="nc">&nbsp;                piv++;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            piv++;</b>
+&nbsp;            // Check if it is ok:
+<b class="nc">&nbsp;            String word = current.toString().trim();</b>
+<b class="nc">&nbsp;            if (word.isEmpty()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+&nbsp;            // If we get here, the word was accepted.
+<b class="nc">&nbsp;            if (!stringBuilder.isEmpty()) {</b>
+<b class="nc">&nbsp;                stringBuilder.append(&#39; &#39;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            stringBuilder.append(word);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return stringBuilder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Capitalises and concatenates the words out of the &quot;title&quot; field in the given BibTeX entry
+&nbsp;     */
+&nbsp;    public static String getCamelizedTitle(String title) {
+<b class="nc">&nbsp;        return keepLettersAndDigitsOnly(camelizeTitle(title));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String camelizeTitle(String title) {
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+<b class="nc">&nbsp;        String formattedTitle = formatTitle(title);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (Scanner titleScanner = new Scanner(formattedTitle)) {</b>
+<b class="nc">&nbsp;            while (titleScanner.hasNext()) {</b>
+<b class="nc">&nbsp;                String word = titleScanner.next();</b>
+&nbsp;
+&nbsp;                // Camelize the word
+<b class="nc">&nbsp;                word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (!stringBuilder.isEmpty()) {</b>
+<b class="nc">&nbsp;                    stringBuilder.append(&#39; &#39;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                stringBuilder.append(word);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return stringBuilder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Capitalises and concatenates the words out of the &quot;title&quot; field in the given BibTeX entry, to a maximum of N words.
+&nbsp;     */
+&nbsp;    public static String getCamelizedTitle_N(String title, int number) {
+<b class="nc">&nbsp;        return keepLettersAndDigitsOnly(camelizeTitle_N(title, number));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String camelizeTitle_N(String title, int number) {
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+<b class="nc">&nbsp;        String formattedTitle = formatTitle(title);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (Scanner titleScanner = new Scanner(formattedTitle)) {</b>
+<b class="nc">&nbsp;            while (titleScanner.hasNext()) {</b>
+<b class="nc">&nbsp;                String word = titleScanner.next();</b>
+&nbsp;
+&nbsp;                // Camelize the word
+<b class="nc">&nbsp;                word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (!stringBuilder.isEmpty()) {</b>
+<b class="nc">&nbsp;                    stringBuilder.append(&#39; &#39;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                stringBuilder.append(word);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String camelString = stringBuilder.toString();</b>
+&nbsp;
+<b class="nc">&nbsp;        return getSomeWords(number, camelString);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Capitalises the significant words of the &quot;title&quot; field in the given BibTeX entry
+&nbsp;     */
+&nbsp;    public static String camelizeSignificantWordsInTitle(String title) {
+<b class="nc">&nbsp;        StringJoiner stringJoiner = new StringJoiner(&quot; &quot;);</b>
+<b class="nc">&nbsp;        String formattedTitle = formatTitle(title);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (Scanner titleScanner = new Scanner(formattedTitle)) {</b>
+<b class="nc">&nbsp;            while (titleScanner.hasNext()) {</b>
+<b class="nc">&nbsp;                String word = titleScanner.next();</b>
+&nbsp;
+&nbsp;                // Camelize the word if it is significant
+<b class="nc">&nbsp;                boolean camelize = !Word.SMALLER_WORDS.contains(word.toLowerCase(Locale.ROOT));</b>
+&nbsp;
+&nbsp;                // We want to capitalize significant words and the first word of the title
+<b class="nc">&nbsp;                if (camelize || (stringJoiner.length() == 0)) {</b>
+<b class="nc">&nbsp;                    word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    word = word.substring(0, 1).toLowerCase(Locale.ROOT) + word.substring(1);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                stringJoiner.add(word);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return stringJoiner.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String removeSmallWords(String title) {
+<b class="nc">&nbsp;        String formattedTitle = formatTitle(title);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (Scanner titleScanner = new Scanner(formattedTitle)) {</b>
+<b class="nc">&nbsp;            return titleScanner.tokens()</b>
+<b class="nc">&nbsp;                               .filter(Predicate.not(</b>
+&nbsp;                                       Word::isSmallerWord))
+<b class="nc">&nbsp;                               .collect(Collectors.joining(&quot; &quot;));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getTitleWordsWithSpaces(int number, String title) {
+<b class="nc">&nbsp;        String formattedTitle = formatTitle(title);</b>
+&nbsp;
+<b class="nc">&nbsp;        return getSomeWords(number, formattedTitle);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getSomeWords(int number, String string) {
+<b class="nc">&nbsp;        try (Scanner titleScanner = new Scanner(string)) {</b>
+<b class="nc">&nbsp;            return titleScanner.tokens()</b>
+<b class="nc">&nbsp;                               .limit(number)</b>
+<b class="nc">&nbsp;                               .collect(Collectors.joining(&quot; &quot;));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String keepLettersAndDigitsOnly(String in) {
+<b class="nc">&nbsp;        return in.codePoints()</b>
+<b class="nc">&nbsp;                 .filter(Character::isLetterOrDigit)</b>
+<b class="nc">&nbsp;                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)</b>
+<b class="nc">&nbsp;                 .toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the last name of the first author/editor
+&nbsp;     *
+&nbsp;     * @param authorList an {@link AuthorList}
+&nbsp;     * @return the surname of an author/editor or the von part if no lastname is prsent or &quot;&quot;  if no author was found or both firstname+lastname are empty
+&nbsp;     * This method is guaranteed to never return null.
+&nbsp;     */
+&nbsp;    private static String firstAuthor(AuthorList authorList) {
+<b class="nc">&nbsp;        return authorList.getAuthors().stream()</b>
+<b class="nc">&nbsp;                         .findFirst()</b>
+<b class="nc">&nbsp;                         .flatMap(author -&gt; author.getFamilyName().isPresent() ? author.getFamilyName() : author.getNamePrefix())</b>
+<b class="nc">&nbsp;                         .orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the first name initials of the first author/editor
+&nbsp;     *
+&nbsp;     * @param authorList an {@link AuthorList}
+&nbsp;     * @return the first name initial of an author/editor or &quot;&quot; if no author was found This method is guaranteed to
+&nbsp;     * never return null.
+&nbsp;     */
+&nbsp;    private static String firstAuthorForenameInitials(AuthorList authorList) {
+<b class="nc">&nbsp;        return authorList.getAuthors().stream()</b>
+<b class="nc">&nbsp;                         .findFirst()</b>
+<b class="nc">&nbsp;                         .flatMap(Author::getGivenNameAbbreviated)</b>
+<b class="nc">&nbsp;                         .map(s -&gt; s.substring(0, 1))</b>
+<b class="nc">&nbsp;                         .orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the von part and the last name of the first author/editor. No spaces are returned.
+&nbsp;     *
+&nbsp;     * @param authorList an {@link AuthorList}
+&nbsp;     * @return the von part and surname of an author/editor or &quot;&quot; if no author was found. This method is guaranteed to
+&nbsp;     * never return null.
+&nbsp;     */
+&nbsp;    private static String firstAuthorVonAndLast(AuthorList authorList) {
+<b class="nc">&nbsp;        return authorList.isEmpty() ? &quot;&quot; :</b>
+<b class="nc">&nbsp;               authorList.getAuthor(0).getNamePrefixAndFamilyName().replace(&quot; &quot;, &quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the last name of the last author/editor
+&nbsp;     *
+&nbsp;     * @param authorList an {@link AuthorList}
+&nbsp;     * @return the surname of an author/editor
+&nbsp;     */
+&nbsp;    private static String lastAuthor(AuthorList authorList) {
+<b class="nc">&nbsp;        if (authorList.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return authorList.getAuthors().get(authorList.getNumberOfAuthors() - 1).getFamilyName().orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the forename initials of the last author/editor
+&nbsp;     *
+&nbsp;     * @param authorList an {@link AuthorList}
+&nbsp;     * @return the forename initial of an author/editor or &quot;&quot; if no author was found This method is guaranteed to never
+&nbsp;     * return null.
+&nbsp;     */
+&nbsp;    private static String lastAuthorForenameInitials(AuthorList authorList) {
+<b class="nc">&nbsp;        if (authorList.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return authorList.getAuthor(authorList.getNumberOfAuthors() - 1).getGivenNameAbbreviated().map(s -&gt; s.substring(0, 1))</b>
+<b class="nc">&nbsp;                         .orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the last name of all authors/editors.
+&nbsp;     * Pattern &lt;code&gt;[authors]&lt;/code&gt;.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * &lt;code&gt;and others&lt;/code&gt; is converted to &lt;code&gt;EtAl&lt;/code&gt;
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * @param authorList an {@link AuthorList}
+&nbsp;     * @return the surname of all authors/editors
+&nbsp;     */
+&nbsp;    static String allAuthors(AuthorList authorList) {
+<b class="nc">&nbsp;        return joinAuthorsOnLastName(authorList, authorList.getNumberOfAuthors(), &quot;&quot;, &quot;EtAl&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the authors according to the BibTeX-alpha-Style
+&nbsp;     *
+&nbsp;     * @param authorList an {@link AuthorList}
+&nbsp;     * @return the initials of all authors&#39; names
+&nbsp;     */
+&nbsp;    public static String authorsAlpha(AuthorList authorList) {
+<b class="nc">&nbsp;        StringBuilder alphaStyle = new StringBuilder();</b>
+&nbsp;        int maxAuthors;
+&nbsp;        final boolean maxAuthorsExceeded;
+<b class="nc">&nbsp;        if (authorList.getNumberOfAuthors() &lt;= MAX_ALPHA_AUTHORS) {</b>
+<b class="nc">&nbsp;            maxAuthors = authorList.getNumberOfAuthors();</b>
+<b class="nc">&nbsp;            maxAuthorsExceeded = false;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            maxAuthors = MAX_ALPHA_AUTHORS - 1;</b>
+<b class="nc">&nbsp;            maxAuthorsExceeded = true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (authorList.getNumberOfAuthors() == 1) {</b>
+<b class="nc">&nbsp;            String[] firstAuthor = authorList.getAuthor(0).getNamePrefixAndFamilyName()</b>
+<b class="nc">&nbsp;                                             .replaceAll(&quot;\\s+&quot;, &quot; &quot;).trim().split(&quot; &quot;);</b>
+&nbsp;            // take first letter of any &quot;prefixes&quot; (e.g. van der Aalst -&gt; vd)
+<b class="nc">&nbsp;            for (int j = 0; j &lt; (firstAuthor.length - 1); j++) {</b>
+<b class="nc">&nbsp;                alphaStyle.append(firstAuthor[j], 0, 1);</b>
+&nbsp;            }
+&nbsp;            // append last part of last name completely
+<b class="nc">&nbsp;            alphaStyle.append(firstAuthor[firstAuthor.length - 1], 0,</b>
+<b class="nc">&nbsp;                    Math.min(3, firstAuthor[firstAuthor.length - 1].length()));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            boolean andOthersPresent = authorList.getAuthor(maxAuthors - 1).equals(Author.OTHERS);</b>
+<b class="nc">&nbsp;            if (andOthersPresent) {</b>
+<b class="nc">&nbsp;                maxAuthors--;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            List&lt;String&gt; vonAndLastNames = authorList.getAuthors().stream()</b>
+<b class="nc">&nbsp;                                                     .limit(maxAuthors)</b>
+<b class="nc">&nbsp;                                                     .map(Author::getNamePrefixAndFamilyName)</b>
+<b class="nc">&nbsp;                                                     .toList();</b>
+<b class="nc">&nbsp;            for (String vonAndLast : vonAndLastNames) {</b>
+&nbsp;                // replace all whitespaces by &quot; &quot;
+&nbsp;                // split the lastname at &quot; &quot;
+<b class="nc">&nbsp;                String[] nameParts = vonAndLast.replaceAll(&quot;\\s+&quot;, &quot; &quot;).trim().split(&quot; &quot;);</b>
+<b class="nc">&nbsp;                for (String part : nameParts) {</b>
+&nbsp;                    // use first character of each part of lastname
+<b class="nc">&nbsp;                    alphaStyle.append(part, 0, 1);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            if (andOthersPresent || maxAuthorsExceeded) {</b>
+<b class="nc">&nbsp;                alphaStyle.append(&quot;+&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return alphaStyle.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the authors according to the &lt;a href=&quot;https://github.com/michel-kraemer/citeproc-java&quot;&gt;BibTeX LNI template&lt;/a&gt;
+&nbsp;     * Examples: &lt;a href=&quot;https://github.com/gi-ev/biblatex-lni/blob/main/basic-test-en.tex&quot;&gt;Examples from the tmplate&lt;/a&gt;
+&nbsp;     * Also see discussion at the &lt;a href=&quot;https://github.com/JabRef/jabref/pull/11614&quot;&gt;pull request that introduced this&lt;/a&gt;.
+&nbsp;     *
+&nbsp;     * @param authorList an {@link AuthorList}
+&nbsp;     * @return the initials of all authors&#39; names
+&nbsp;     */
+&nbsp;    public static String authorsAlphaLNI(AuthorList authorList) {
+<b class="nc">&nbsp;        StringBuilder alphaStyle = new StringBuilder();</b>
+<b class="nc">&nbsp;        int numberOfAuthors = authorList.getNumberOfAuthors();</b>
+<b class="nc">&nbsp;        boolean andOthersPresent = numberOfAuthors &gt; 1 &amp;&amp;</b>
+<b class="nc">&nbsp;                authorList.getAuthor(numberOfAuthors - 1).equals(Author.OTHERS);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (numberOfAuthors == 1 || andOthersPresent) {</b>
+&nbsp;            // Single author or &quot;and others&quot; case
+<b class="nc">&nbsp;            String lastName = authorList.getAuthor(0).getFamilyName().orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;            String formattedName = ENCLOSING_BRACES_FORMATTER.format(lastName);</b>
+<b class="nc">&nbsp;            if (!formattedName.equals(lastName)) {</b>
+&nbsp;                // Inequality =&gt; braces were removed, indicating an organization
+<b class="nc">&nbsp;                alphaStyle.append(getOrganizationInitials(formattedName));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                alphaStyle.append(lastName, 0, Math.min(2, lastName.length()));</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            int maxAuthors = Math.min(numberOfAuthors, MAX_ALPHA_AUTHORS);</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; maxAuthors; i++) {</b>
+<b class="nc">&nbsp;                String lastName = authorList.getAuthor(i).getFamilyName().orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;                alphaStyle.append(lastName, 0, 1);</b>
+<b class="nc">&nbsp;                if (alphaStyle.length() &gt;= 4) {</b>
+&nbsp;                    // Stop after 4 authors
+&nbsp;                    break;
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return alphaStyle.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getOrganizationInitials(String orgName) {
+<b class="nc">&nbsp;        StringBuilder initials = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (String part : orgName.split(&quot;\\s+&quot;)) {</b>
+<b class="nc">&nbsp;            if (!part.isEmpty() &amp;&amp; Character.isUpperCase(part.charAt(0))) {</b>
+<b class="nc">&nbsp;                initials.append(part.charAt(0));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return initials.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a string with all last names separated by a `delimiter`. If the number of authors are larger than
+&nbsp;     * `maxAuthors`, replace all excess authors with `suffix`.
+&nbsp;     *
+&nbsp;     * @param authorList the list of authors
+&nbsp;     * @param maxAuthors the maximum number of authors in the string
+&nbsp;     * @param delimiter  delimiter separating the last names of the authors
+&nbsp;     * @param suffix     to replace excess authors with. Also used to replace &lt;code&gt;and others&lt;/code&gt;.
+&nbsp;     * @return a string consisting of authors&#39; last names separated by a `delimiter` and with any authors excess of
+&nbsp;     * `maxAuthors` replaced with `suffix`
+&nbsp;     */
+&nbsp;    public static String joinAuthorsOnLastName(AuthorList authorList, int maxAuthors, String delimiter, final String suffix) {
+<b class="nc">&nbsp;        final String finalSuffix = authorList.getNumberOfAuthors() &gt; maxAuthors ? suffix : &quot;&quot;;</b>
+<b class="nc">&nbsp;        return authorList.getAuthors().stream()</b>
+<b class="nc">&nbsp;                         .map(author -&gt; {</b>
+<b class="nc">&nbsp;                             if (author.equals(Author.OTHERS)) {</b>
+<b class="nc">&nbsp;                                 if (suffix.startsWith(delimiter)) {</b>
+<b class="nc">&nbsp;                                     return Optional.of(suffix.substring(delimiter.length()));</b>
+&nbsp;                                 } else {
+<b class="nc">&nbsp;                                     return Optional.of(suffix);</b>
+&nbsp;                                 }
+&nbsp;                             } else {
+<b class="nc">&nbsp;                                 return author.getFamilyName();</b>
+&nbsp;                             }
+&nbsp;                         })
+<b class="nc">&nbsp;                         .flatMap(Optional::stream)</b>
+<b class="nc">&nbsp;                         .limit(maxAuthors)</b>
+<b class="nc">&nbsp;                         .collect(Collectors.joining(delimiter, &quot;&quot;, finalSuffix));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the surnames of the first N authors and appends EtAl if there are more than N authors
+&nbsp;     *
+&nbsp;     * @param authorList an {@link AuthorList}
+&nbsp;     * @param n          the number of desired authors
+&nbsp;     * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
+&nbsp;     */
+&nbsp;    private static String nAuthors(AuthorList authorList, int n) {
+<b class="nc">&nbsp;        return joinAuthorsOnLastName(authorList, n, &quot;&quot;, &quot;EtAl&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the first part of the last name of the first author/editor, and appends the last name initial of the
+&nbsp;     * remaining authors/editors. Maximum 5 characters
+&nbsp;     *
+&nbsp;     * @param authorList an &lt;{@link AuthorList}
+&nbsp;     * @return the surname of all authors/editors
+&nbsp;     */
+&nbsp;    static String oneAuthorPlusInitials(AuthorList authorList) {
+<b class="nc">&nbsp;        if (authorList.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder authorSB = new StringBuilder();</b>
+&nbsp;        // authNofMth start index at 1 instead of 0
+<b class="nc">&nbsp;        authorSB.append(authNofMth(authorList, CHARS_OF_FIRST, 1));</b>
+<b class="nc">&nbsp;        for (int i = 2; i &lt;= authorList.getNumberOfAuthors(); i++) {</b>
+<b class="nc">&nbsp;            authorSB.append(authNofMth(authorList, 1, i));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return authorSB.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static String authAuthEa(AuthorList authorList) {
+<b class="nc">&nbsp;        return joinAuthorsOnLastName(authorList, 2, &quot;.&quot;, &quot;.ea&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * auth.etal, authEtAl, ... format
+&nbsp;     */
+&nbsp;    static String authEtal(AuthorList authorList, String delim, String append) {
+<b class="nc">&nbsp;        if (authorList.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((authorList.getNumberOfAuthors() &lt;= 2)</b>
+<b class="nc">&nbsp;                &amp;&amp; ((authorList.getNumberOfAuthors() == 1) || !authorList.getAuthor(1).equals(Author.OTHERS))) {</b>
+&nbsp;            // in case 1 or two authors, just name them
+&nbsp;            // exception: If the second author is &quot;and others&quot;, then do the appendix handling (in the other branch)
+<b class="nc">&nbsp;            return joinAuthorsOnLastName(authorList, 2, delim, &quot;&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return authorList.getAuthor(0).getFamilyName().orElse(&quot;&quot;) + append;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The first N characters of the Mth author&#39;s or editor&#39;s last name. M starts counting from 1.
+&nbsp;     * In case the Mth author is {@link Author#OTHERS}, &lt;code&gt;+&lt;/code&gt; is returned.
+&nbsp;     */
+&nbsp;    private static String authNofMth(AuthorList authorList, int n, int m) {
+&nbsp;        // have m counting from 0
+<b class="nc">&nbsp;        int mminusone = m - 1;</b>
+&nbsp;
+<b class="nc">&nbsp;        if ((authorList.getNumberOfAuthors() &lt;= mminusone) || (n &lt; 0) || (mminusone &lt; 0)) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Author lastAuthor = authorList.getAuthor(mminusone);</b>
+<b class="nc">&nbsp;        if (lastAuthor.equals(Author.OTHERS)) {</b>
+<b class="nc">&nbsp;            return &quot;+&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String lastName = lastAuthor.getFamilyName()</b>
+<b class="nc">&nbsp;                                    .map(CitationKeyGenerator::removeDefaultUnwantedCharacters).orElse(&quot;&quot;);</b>
+<b class="nc">&nbsp;        return lastName.length() &gt; n ? lastName.substring(0, n) : lastName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * First N chars of the first author&#39;s last name.
+&nbsp;     */
+&nbsp;    private static String authN(AuthorList authorList, int num) {
+<b class="nc">&nbsp;        return authNofMth(authorList, num, 1);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * authshort format
+&nbsp;     */
+&nbsp;    static String authShort(AuthorList authorList) {
+<b class="nc">&nbsp;        StringBuilder author = new StringBuilder();</b>
+<b class="nc">&nbsp;        final int numberOfAuthors = authorList.getNumberOfAuthors();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (numberOfAuthors == 1) {</b>
+<b class="nc">&nbsp;            author.append(authorList.getAuthor(0).getFamilyName().orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;        } else if (numberOfAuthors &gt;= 2) {</b>
+<b class="nc">&nbsp;            for (int i = 0; (i &lt; numberOfAuthors) &amp;&amp; (i &lt; 3); i++) {</b>
+<b class="nc">&nbsp;                author.append(authNofMth(authorList, 1, i + 1));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (numberOfAuthors &gt; 3) {</b>
+<b class="nc">&nbsp;                author.append(&#39;+&#39;);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return author.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * authIniN format
+&nbsp;     *
+&nbsp;     * @param authorList The authors to format.
+&nbsp;     * @param n          The maximum number of characters this string will be long. A negative number or zero will lead
+&nbsp;     *                   to &quot;&quot; be returned.
+&nbsp;     */
+&nbsp;    static String authIniN(AuthorList authorList, int n) {
+<b class="nc">&nbsp;        if ((n &lt;= 0) || authorList.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        final int numberOfAuthors = authorList.getNumberOfAuthors();</b>
+<b class="nc">&nbsp;        final boolean lastAuthorIsOthers = authorList.getAuthor(numberOfAuthors - 1).equals(Author.OTHERS);</b>
+<b class="nc">&nbsp;        if (n &gt;= numberOfAuthors &amp;&amp; lastAuthorIsOthers) {</b>
+<b class="nc">&nbsp;            final int limit = Math.min(n - 1, numberOfAuthors - 1);</b>
+&nbsp;            // special handling if the last author is &quot;Others&quot;
+&nbsp;            // This gets the single char &quot;+&quot; only
+<b class="nc">&nbsp;            AuthorList allButOthers = AuthorList.of(</b>
+<b class="nc">&nbsp;                    authorList.getAuthors()</b>
+<b class="nc">&nbsp;                              .stream()</b>
+<b class="nc">&nbsp;                              .limit(limit)</b>
+<b class="nc">&nbsp;                              .toList());</b>
+<b class="nc">&nbsp;            return authIniN(allButOthers, n - 1) + &quot;+&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder author = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        int charsAll = n / numberOfAuthors;</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; numberOfAuthors; i++) {</b>
+<b class="nc">&nbsp;            if (i &lt; (n % numberOfAuthors)) {</b>
+<b class="nc">&nbsp;                author.append(authNofMth(authorList, charsAll + 1, i + 1));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                author.append(authNofMth(authorList, charsAll, i + 1));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (author.length() &lt;= n) {</b>
+<b class="nc">&nbsp;            return author.toString();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return author.substring(0, n);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Split the pages field into separate numbers and return the lowest
+&nbsp;     *
+&nbsp;     * @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97 or 43+
+&nbsp;     * @return the first page number or &quot;&quot; if no number is found in the string
+&nbsp;     * @throws NullPointerException if pages is null
+&nbsp;     */
+&nbsp;    public static String firstPage(String pages) {
+&nbsp;        // FIXME: incorrectly exracts the first page when pages are
+&nbsp;        // specified with ellipse, e.g. &quot;213-6&quot;, which should stand
+&nbsp;        // for &quot;213-216&quot;. S.G.
+<b class="nc">&nbsp;        return NOT_DECIMAL_DIGIT.splitAsStream(pages)</b>
+<b class="nc">&nbsp;                                .filter(Predicate.not(String::isBlank))</b>
+<b class="nc">&nbsp;                                .map(BigInteger::new)</b>
+<b class="nc">&nbsp;                                .min(BigInteger::compareTo)</b>
+<b class="nc">&nbsp;                                .map(BigInteger::toString)</b>
+<b class="nc">&nbsp;                                .orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return the non-digit prefix of pages
+&nbsp;     *
+&nbsp;     * @param pages a pages string such as L42--111 or L7,41,73--97 or L43+
+&nbsp;     * @return the non-digit prefix of pages (like &quot;L&quot; of L7) or &quot;&quot; if no non-digit prefix is found in the string
+&nbsp;     * @throws NullPointerException if pages is null.
+&nbsp;     */
+&nbsp;    public static String pagePrefix(String pages) {
+<b class="nc">&nbsp;        if (pages.matches(&quot;^\\D+.*$&quot;)) {</b>
+<b class="nc">&nbsp;            return (pages.split(&quot;\\d+&quot;))[0];</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Split the pages field into separate numbers and return the highest
+&nbsp;     *
+&nbsp;     * @param pages a pages string such as 42--111 or 7,41,73--97 or 43+
+&nbsp;     * @return the first page number or &quot;&quot; if no number is found in the string
+&nbsp;     * @throws NullPointerException if pages is null.
+&nbsp;     */
+&nbsp;    public static String lastPage(String pages) {
+<b class="nc">&nbsp;        return NOT_DECIMAL_DIGIT.splitAsStream(pages)</b>
+<b class="nc">&nbsp;                                .filter(Predicate.not(String::isBlank))</b>
+<b class="nc">&nbsp;                                .map(BigInteger::new)</b>
+<b class="nc">&nbsp;                                .max(BigInteger::compareTo)</b>
+<b class="nc">&nbsp;                                .map(BigInteger::toString)</b>
+<b class="nc">&nbsp;                                .orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse a field marker with modifiers, possibly containing a parenthesised modifier, as well as escaped colons and
+&nbsp;     * parentheses.
+&nbsp;     *
+&nbsp;     * @param arg The argument string.
+&nbsp;     * @return An array of strings representing the parts of the marker
+&nbsp;     */
+&nbsp;    protected static List&lt;String&gt; parseFieldAndModifiers(String arg) {
+<b class="nc">&nbsp;        List&lt;String&gt; parts = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        StringBuilder current = new StringBuilder();</b>
+<b class="nc">&nbsp;        boolean escaped = false;</b>
+<b class="nc">&nbsp;        int inParenthesis = 0;</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; arg.length(); i++) {</b>
+<b class="nc">&nbsp;            char currentChar = arg.charAt(i);</b>
+<b class="nc">&nbsp;            if ((currentChar == &#39;:&#39;) &amp;&amp; !escaped &amp;&amp; (inParenthesis == 0)) {</b>
+<b class="nc">&nbsp;                parts.add(current.toString());</b>
+<b class="nc">&nbsp;                current = new StringBuilder();</b>
+<b class="nc">&nbsp;            } else if ((currentChar == &#39;(&#39;) &amp;&amp; !escaped) {</b>
+<b class="nc">&nbsp;                inParenthesis++;</b>
+<b class="nc">&nbsp;                current.append(currentChar);</b>
+<b class="nc">&nbsp;            } else if ((currentChar == &#39;)&#39;) &amp;&amp; !escaped &amp;&amp; (inParenthesis &gt; 0)) {</b>
+<b class="nc">&nbsp;                inParenthesis--;</b>
+<b class="nc">&nbsp;                current.append(currentChar);</b>
+<b class="nc">&nbsp;            } else if (currentChar == &#39;\\&#39;) {</b>
+<b class="nc">&nbsp;                if (escaped) {</b>
+<b class="nc">&nbsp;                    escaped = false;</b>
+&nbsp;                    // Only : needs to be escaped
+&nbsp;                    // &quot; -&gt; regex(&quot;...&quot;, &quot;...&quot;) - escaping should be passed through to the regex parser
+&nbsp;                    // : -&gt; :abc:def
+<b class="nc">&nbsp;                    current.append(&#39;\\&#39;);</b>
+<b class="nc">&nbsp;                    current.append(&#39;\\&#39;);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    escaped = true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (escaped) {</b>
+<b class="nc">&nbsp;                if (currentChar != &#39;:&#39;) {</b>
+&nbsp;                    // Only : needs to be escaped
+<b class="nc">&nbsp;                    current.append(&#39;\\&#39;);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                current.append(currentChar);</b>
+<b class="nc">&nbsp;                escaped = false;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                current.append(currentChar);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        parts.add(current.toString());</b>
+<b class="nc">&nbsp;        return parts;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * &lt;p&gt;
+&nbsp;     * An author or editor may be and institution not a person. In that case the key generator builds very long keys,
+&nbsp;     * e.g.: for &amp;ldquo;The Attributed Graph Grammar System (AGG)&amp;rdquo; -&gt; &amp;ldquo;TheAttributedGraphGrammarSystemAGG&amp;rdquo;.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * An institution name should be inside &lt;code&gt;{}&lt;/code&gt; brackets. If the institution name includes its abbreviation
+&nbsp;     * this abbreviation should be in &lt;code&gt;{}&lt;/code&gt; brackets. For the previous example the value should look like:
+&nbsp;     * &lt;code&gt;{The Attributed Graph Grammar System ({AGG})}&lt;/code&gt;.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If an institution includes its abbreviation, i.e. &quot;...({XYZ})&quot;, first such abbreviation should be used as the key
+&nbsp;     * value part of such author.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If an institution does not include its abbreviation the key should be generated from its name in the following
+&nbsp;     * way:
+&nbsp;     * &lt;/p&gt;
+&nbsp;     *
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The institution value can contain: institution name, part of the institution, address, etc. These values should
+&nbsp;     * be comma separated. Institution name and possible part of the institution should be in the beginning, while
+&nbsp;     * address and secondary information should be in the end.
+&nbsp;     * &lt;/p&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Each part is examined separately:
+&nbsp;     * &lt;ol&gt;
+&nbsp;     * &lt;li&gt;We remove all tokens of a part which are one of the defined ignore words (the, press), which end with a dot
+&nbsp;     * (ltd., co., ...) and which first character is lowercase (of, on, di, ...).&lt;/li&gt;
+&nbsp;     * &lt;li&gt;We detect the types of the part: university, technology institute,
+&nbsp;     * department, school, rest
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;University: &lt;code&gt;&quot;Uni[NameOfTheUniversity]&quot;&lt;/code&gt;&lt;/li&gt;
+&nbsp;     * &lt;li&gt;Department: If the institution value contains more than one comma separated part, the department will be an
+&nbsp;     * abbreviation of all words beginning with the uppercase letter except of words:
+&nbsp;     * &lt;code&gt;d[ei]p.*&lt;/code&gt;, school, faculty&lt;/li&gt;
+&nbsp;     * &lt;li&gt;School: same as department&lt;/li&gt;
+&nbsp;     * &lt;li&gt;Rest: If there are less than 3 tokens in such part than the result
+&nbsp;     * is a concatenation of those tokens. Otherwise, the result will be built
+&nbsp;     * from the first letter in each token.&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     * &lt;/ol&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Parts are concatenated together in the following way:
+&nbsp;     * &lt;ul&gt;
+&nbsp;     * &lt;li&gt;If there is a university part use it otherwise use the rest part.&lt;/li&gt;
+&nbsp;     * &lt;li&gt;If there is a school part append it.&lt;/li&gt;
+&nbsp;     * &lt;li&gt;If there is a department part and it is not same as school part
+&nbsp;     * append it.&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Rest part is only the first part which do not match any other type. All
+&nbsp;     * other parts (address, ...) are ignored.
+&nbsp;     *
+&nbsp;     * @param content the institution to generate a Bibtex key for
+&nbsp;     * @return &lt;ul&gt;
+&nbsp;     *         &lt;li&gt;the institution key&lt;/li&gt;
+&nbsp;     *         &lt;li&gt;&quot;&quot; in the case of a failure&lt;/li&gt;
+&nbsp;     *         &lt;li&gt;null if content is null&lt;/li&gt;
+&nbsp;     *         &lt;/ul&gt;
+&nbsp;     */
+&nbsp;    @VisibleForTesting
+&nbsp;    static String generateInstitutionKey(String content) {
+<b class="nc">&nbsp;        if (content == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (content.isBlank()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Matcher matcher = INLINE_ABBREVIATION.matcher(content);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            return LatexToUnicodeAdapter.format(matcher.group());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Optional&lt;String&gt; unicodeFormattedName = LatexToUnicodeAdapter.parse(content);</b>
+<b class="nc">&nbsp;        if (unicodeFormattedName.isEmpty()) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;{} could not be converted to unicode. This can result in an incorrect or missing institute citation key&quot;, content);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String result = unicodeFormattedName.orElse(Normalizer.normalize(content, Normalizer.Form.NFC));</b>
+&nbsp;
+&nbsp;        // Special characters can&#39;t be allowed past this point because the citation key generator might replace them with multiple mixed-case characters
+<b class="nc">&nbsp;        result = StringUtil.replaceSpecialCharacters(result);</b>
+&nbsp;
+<b class="nc">&nbsp;        String[] institutionNameTokens = result.split(&quot;,&quot;);</b>
+&nbsp;
+&nbsp;        // Key parts
+<b class="nc">&nbsp;        String university = null;</b>
+<b class="nc">&nbsp;        String department = null;</b>
+<b class="nc">&nbsp;        String school = null;</b>
+<b class="nc">&nbsp;        String rest = null;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int index = 0; index &lt; institutionNameTokens.length; index++) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; tokenParts = getValidInstitutionNameParts(institutionNameTokens[index]);</b>
+<b class="nc">&nbsp;            EnumSet&lt;Institution&gt; tokenTypes = Institution.findTypes(tokenParts);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (tokenTypes.contains(Institution.UNIVERSITY)) {</b>
+<b class="nc">&nbsp;                StringBuilder universitySB = new StringBuilder();</b>
+&nbsp;                // University part looks like: Uni[NameOfTheUniversity]
+<b class="nc">&nbsp;                universitySB.append(&quot;Uni&quot;);</b>
+<b class="nc">&nbsp;                for (String k : tokenParts) {</b>
+<b class="nc">&nbsp;                    if (!&quot;uni&quot;.regionMatches(true, 0, k, 0, 3)) {</b>
+<b class="nc">&nbsp;                        universitySB.append(k);</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                university = universitySB.toString();</b>
+&nbsp;                // If university is detected than the previous part is suggested
+&nbsp;                // as department
+<b class="nc">&nbsp;                if ((index &gt; 0) &amp;&amp; (department == null)) {</b>
+<b class="nc">&nbsp;                    department = institutionNameTokens[index - 1];</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if ((tokenTypes.contains(Institution.SCHOOL)</b>
+<b class="nc">&nbsp;                    || tokenTypes.contains(Institution.DEPARTMENT))</b>
+&nbsp;                    &amp;&amp; (institutionNameTokens.length &gt; 1)) {
+&nbsp;                // School is an abbreviation of all the words beginning with a
+&nbsp;                // capital letter excluding: department, school and faculty words.
+<b class="nc">&nbsp;                StringBuilder schoolSB = new StringBuilder();</b>
+<b class="nc">&nbsp;                StringBuilder departmentSB = new StringBuilder();</b>
+<b class="nc">&nbsp;                for (String k : tokenParts) {</b>
+<b class="nc">&nbsp;                    if (noOtherInstitutionKeyWord(k)) {</b>
+<b class="nc">&nbsp;                        if (tokenTypes.contains(Institution.SCHOOL)) {</b>
+<b class="nc">&nbsp;                            schoolSB.append(NOT_CAPITAL_CHARACTER.matcher(k).replaceAll(&quot;&quot;));</b>
+&nbsp;                        }
+&nbsp;                        // Explicitly defined department part is build the same way as school
+<b class="nc">&nbsp;                        if (tokenTypes.contains(Institution.DEPARTMENT)) {</b>
+<b class="nc">&nbsp;                            departmentSB.append(NOT_CAPITAL_CHARACTER.matcher(k).replaceAll(&quot;&quot;));</b>
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                if (tokenTypes.contains(Institution.SCHOOL)) {</b>
+<b class="nc">&nbsp;                    school = schoolSB.toString();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (tokenTypes.contains(Institution.DEPARTMENT)) {</b>
+<b class="nc">&nbsp;                    department = departmentSB.toString();</b>
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (rest == null) {</b>
+&nbsp;                // A part not matching university, department nor school
+<b class="nc">&nbsp;                if (tokenParts.size() &gt;= 3) {</b>
+&nbsp;                    // If there are more than 3 parts, only keep the first character of each word
+<b class="nc">&nbsp;                    final int[] codePoints = tokenParts.stream()</b>
+<b class="nc">&nbsp;                                                       .filter(Predicate.not(String::isBlank))</b>
+<b class="nc">&nbsp;                                                       .mapToInt(s -&gt; s.codePointAt(0))</b>
+<b class="nc">&nbsp;                                                       .toArray();</b>
+<b class="nc">&nbsp;                    rest = new String(codePoints, 0, codePoints.length);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    rest = String.join(&quot;&quot;, tokenParts);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Putting parts together.
+<b class="nc">&nbsp;        return (university == null ? Objects.toString(rest, &quot;&quot;) : university)</b>
+<b class="nc">&nbsp;                + (school == null ? &quot;&quot; : school)</b>
+<b class="nc">&nbsp;                + ((department == null) || (department.equals(school)) ? &quot;&quot; : department);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Helper method for {@link BracketedPattern#generateInstitutionKey(String)}. Checks that the word is not an
+&nbsp;     * institution keyword and has an uppercase first letter, except univ/tech key word.
+&nbsp;     *
+&nbsp;     * @param word to check
+&nbsp;     */
+&nbsp;    private static boolean noOtherInstitutionKeyWord(String word) {
+<b class="nc">&nbsp;        return !DEPARTMENTS.matcher(word).matches()</b>
+<b class="nc">&nbsp;                &amp;&amp; !StandardField.SCHOOL.getName().equalsIgnoreCase(word)</b>
+<b class="nc">&nbsp;                &amp;&amp; !&quot;faculty&quot;.equalsIgnoreCase(word)</b>
+<b class="nc">&nbsp;                &amp;&amp; !NOT_CAPITAL_CHARACTER.matcher(word).replaceAll(&quot;&quot;).isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;String&gt; getValidInstitutionNameParts(String name) {
+<b class="nc">&nbsp;        List&lt;String&gt; nameParts = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; ignore = Arrays.asList(&quot;press&quot;, &quot;the&quot;);</b>
+&nbsp;
+&nbsp;        // Cleanup: remove unnecessary words.
+<b class="nc">&nbsp;        for (String part : name.replaceAll(&quot;\\{[A-Z]+}&quot;, &quot;&quot;).split(&quot;[ \\-_]&quot;)) {</b>
+<b class="nc">&nbsp;            if ((!part.isEmpty() // remove empty</b>
+<b class="nc">&nbsp;                    &amp;&amp; !ignore.contains(part.toLowerCase(Locale.ENGLISH)) // remove ignored words</b>
+<b class="nc">&nbsp;                    &amp;&amp; (part.charAt(part.length() - 1) != &#39;.&#39;)</b>
+<b class="nc">&nbsp;                    &amp;&amp; Character.isUpperCase(part.charAt(0)))</b>
+<b class="nc">&nbsp;                    || ((part.length() &gt;= 3) &amp;&amp; &quot;uni&quot;.equalsIgnoreCase(part.substring(0, 3)))) {</b>
+<b class="nc">&nbsp;                nameParts.add(part);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return nameParts;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

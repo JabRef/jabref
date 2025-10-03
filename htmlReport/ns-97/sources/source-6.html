@@ -1,0 +1,139 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SimpleJsonFormatter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.http.server.cayw.format</a>
+</div>
+
+<h1>Coverage Summary for Class: SimpleJsonFormatter (org.jabref.http.server.cayw.format)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SimpleJsonFormatter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.http.server.cayw.format;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import org.jabref.http.dto.GsonFactory;
+&nbsp;import org.jabref.http.dto.cayw.SimpleJson;
+&nbsp;import org.jabref.http.server.cayw.CAYWQueryParams;
+&nbsp;import org.jabref.http.server.cayw.gui.CAYWEntry;
+&nbsp;
+&nbsp;import com.google.gson.Gson;
+&nbsp;import jakarta.ws.rs.core.MediaType;
+&nbsp;import org.jvnet.hk2.annotations.Service;
+&nbsp;
+&nbsp;@Service
+&nbsp;public class SimpleJsonFormatter implements CAYWFormatter {
+&nbsp;
+&nbsp;    private final Gson gson;
+&nbsp;
+<b class="nc">&nbsp;    public SimpleJsonFormatter() {</b>
+<b class="nc">&nbsp;        this.gson = new GsonFactory().provide();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public MediaType getMediaType() {
+<b class="nc">&nbsp;        return MediaType.APPLICATION_JSON_TYPE;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(CAYWQueryParams queryParams, List&lt;CAYWEntry&gt; caywEntries) {
+<b class="nc">&nbsp;        List&lt;SimpleJson&gt; simpleJsons = caywEntries.stream()</b>
+<b class="nc">&nbsp;                                                  .map(caywEntry -&gt; SimpleJson.fromBibEntry(caywEntry.bibEntry()))</b>
+<b class="nc">&nbsp;                                                  .toList();</b>
+<b class="nc">&nbsp;        return gson.toJson(simpleJsons);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

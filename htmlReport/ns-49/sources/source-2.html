@@ -1,0 +1,353 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ContentSelectorViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.libraryproperties.contentselectors</a>
+</div>
+
+<h1>Coverage Summary for Class: ContentSelectorViewModel (org.jabref.gui.libraryproperties.contentselectors)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ContentSelectorViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/84)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.libraryproperties.contentselectors;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.BooleanBinding;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
+&nbsp;import org.jabref.gui.util.FieldsUtil;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.FieldTextMapper;
+&nbsp;import org.jabref.model.metadata.ContentSelector;
+&nbsp;import org.jabref.model.metadata.ContentSelectors;
+&nbsp;import org.jabref.model.metadata.MetaData;
+&nbsp;
+&nbsp;public class ContentSelectorViewModel implements PropertiesTabViewModel {
+&nbsp;
+&nbsp;    private final MetaData metaData;
+&nbsp;
+&nbsp;    private final DialogService dialogService;
+&nbsp;
+&nbsp;    // The map from each field to its predefined strings (&quot;keywords&quot;) that can be selected
+<b class="nc">&nbsp;    private Map&lt;Field, List&lt;String&gt;&gt; fieldKeywordsMap = new HashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ListProperty&lt;Field&gt; fields = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ListProperty&lt;String&gt; keywords = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;Field&gt; selectedField = new SimpleObjectProperty&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final StringProperty selectedKeyword = new SimpleStringProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;    ContentSelectorViewModel(BibDatabaseContext databaseContext, DialogService dialogService) {</b>
+<b class="nc">&nbsp;        this.metaData = databaseContext.getMetaData();</b>
+<b class="nc">&nbsp;        this.dialogService = dialogService;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setValues() {
+&nbsp;        // Populate field names keyword map
+<b class="nc">&nbsp;        fieldKeywordsMap = ContentSelectors.getFieldKeywordsMap(metaData.getContentSelectors().getContentSelectors());</b>
+&nbsp;
+&nbsp;        // Populate Field names list
+<b class="nc">&nbsp;        List&lt;Field&gt; existingFields = new ArrayList&lt;&gt;(fieldKeywordsMap.keySet());</b>
+<b class="nc">&nbsp;        fields.addAll(existingFields);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fields.isEmpty()) {</b>
+<b class="nc">&nbsp;            ContentSelectors.DEFAULT_FIELD_NAMES.forEach(this::addFieldIfUnique);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeSettings() {
+<b class="nc">&nbsp;        List&lt;Field&gt; metaDataFields = metaData.getContentSelectors().getFieldsWithSelectors();</b>
+&nbsp;        List&lt;Field&gt; fieldNamesToRemove;
+&nbsp;
+<b class="nc">&nbsp;        if (ContentSelectors.isDefaultMap(fieldKeywordsMap)) {</b>
+&nbsp;            // Remove all fields of the content selector
+<b class="nc">&nbsp;            fieldNamesToRemove = metaData.getContentSelectorsSorted().stream().map(ContentSelector::getField).toList();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            fieldNamesToRemove = determineFieldsToRemove();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        fieldKeywordsMap.forEach((field, keywords) -&gt; updateMetaDataContentSelector(metaDataFields, field, keywords));</b>
+<b class="nc">&nbsp;        fieldNamesToRemove.forEach(metaData::clearContentSelectors);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;Field&gt; getFieldNamesBackingList() {
+<b class="nc">&nbsp;        return fields;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;Field&gt; selectedFieldProperty() {
+<b class="nc">&nbsp;        return selectedField;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanBinding isFieldNameListEmpty() {
+<b class="nc">&nbsp;        return Bindings.isEmpty(fields);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanBinding isNoFieldNameSelected() {
+<b class="nc">&nbsp;        return Bindings.isEmpty(selectedField.asString());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;String&gt; getKeywordsBackingList() {
+<b class="nc">&nbsp;        return keywords;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    StringProperty selectedKeywordProperty() {
+<b class="nc">&nbsp;        return selectedKeyword;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    BooleanBinding isNoKeywordSelected() {
+<b class="nc">&nbsp;        return Bindings.isEmpty(selectedKeyword);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void showInputFieldNameDialog() {
+<b class="nc">&nbsp;        dialogService.showEditableChoiceDialogAndWait(Localization.lang(&quot;Add new field name&quot;),</b>
+<b class="nc">&nbsp;                             Localization.lang(&quot;Field name&quot;),</b>
+<b class="nc">&nbsp;                             Localization.lang(&quot;Add&quot;),</b>
+<b class="nc">&nbsp;                             FXCollections.observableArrayList(FieldFactory.getStandardFieldsWithCitationKey()),</b>
+&nbsp;                             FieldsUtil.FIELD_STRING_CONVERTER)
+<b class="nc">&nbsp;                     .ifPresent(this::addFieldIfUnique);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addFieldIfUnique(Field fieldToAdd) {
+<b class="nc">&nbsp;        boolean exists = fieldKeywordsMap.containsKey(fieldToAdd);</b>
+<b class="nc">&nbsp;        if (exists) {</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Field name \&quot;%0\&quot; already exists&quot;, FieldTextMapper.getDisplayName(fieldToAdd)));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        fieldKeywordsMap.put(fieldToAdd, new ArrayList&lt;&gt;());</b>
+<b class="nc">&nbsp;        fields.add(fieldToAdd);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void showRemoveFieldNameConfirmationDialog(Field fieldToRemove) {
+<b class="nc">&nbsp;        if (fieldToRemove == null) {</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;No field name selected!&quot;));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Remove field name&quot;),</b>
+<b class="nc">&nbsp;                Localization.lang(&quot;Are you sure you want to remove field name: \&quot;%0\&quot;?&quot;, FieldTextMapper.getDisplayName(fieldToRemove))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        if (deleteConfirmed) {</b>
+<b class="nc">&nbsp;            removeFieldName(fieldToRemove);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeFieldName(Field fieldToRemove) {
+<b class="nc">&nbsp;        fieldKeywordsMap.remove(fieldToRemove);</b>
+<b class="nc">&nbsp;        fields.remove(fieldToRemove);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void populateKeywords(Field selectedField) {
+<b class="nc">&nbsp;        keywords.clear();</b>
+<b class="nc">&nbsp;        if (selectedField != null) {</b>
+<b class="nc">&nbsp;            keywords.addAll(fieldKeywordsMap.get(selectedField));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    void showInputKeywordDialog(Field selectedField) {
+<b class="nc">&nbsp;        dialogService.showInputDialogAndWait(Localization.lang(&quot;Add new keyword&quot;), Localization.lang(&quot;Keyword:&quot;))</b>
+<b class="nc">&nbsp;                     .ifPresent(newKeyword -&gt; addKeywordIfUnique(selectedField, newKeyword));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addKeywordIfUnique(Field field, String keywordToAdd) {
+<b class="nc">&nbsp;        boolean exists = fieldKeywordsMap.get(field).contains(keywordToAdd);</b>
+<b class="nc">&nbsp;        if (exists) {</b>
+<b class="nc">&nbsp;            dialogService.showErrorDialogAndWait(Localization.lang(&quot;Keyword \&quot;%0\&quot; already exists&quot;, keywordToAdd));</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; existingKeywords = fieldKeywordsMap.getOrDefault(field, new ArrayList&lt;&gt;());</b>
+<b class="nc">&nbsp;        existingKeywords.add(keywordToAdd);</b>
+<b class="nc">&nbsp;        existingKeywords.sort(Comparator.naturalOrder());</b>
+<b class="nc">&nbsp;        fieldKeywordsMap.put(field, existingKeywords);</b>
+<b class="nc">&nbsp;        populateKeywords(field);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void showRemoveKeywordConfirmationDialog(Field field, String keywordToRemove) {
+<b class="nc">&nbsp;        boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(Localization.lang(&quot;Remove keyword&quot;), Localization.lang(&quot;Are you sure you want to remove keyword: \&quot;%0\&quot;?&quot;, keywordToRemove));</b>
+<b class="nc">&nbsp;        if (deleteConfirmed) {</b>
+<b class="nc">&nbsp;            removeKeyword(field, keywordToRemove);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void removeKeyword(Field field, String keywordToRemove) {
+<b class="nc">&nbsp;        fieldKeywordsMap.get(field).remove(keywordToRemove);</b>
+<b class="nc">&nbsp;        keywords.remove(keywordToRemove);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determines the list of fields to remove in case a non-default map:
+&nbsp;     *
+&nbsp;     * &lt;ul&gt;
+&nbsp;     *     &lt;li&gt;Fields that are not in the new list of fields and&lt;/li&gt;
+&nbsp;     *     &lt;li&gt;&gt;all default fields that have no associated keywords&lt;/li&gt;
+&nbsp;     * &lt;/ul&gt;
+&nbsp;     */
+&nbsp;    private List&lt;Field&gt; determineFieldsToRemove() {
+<b class="nc">&nbsp;        Set&lt;Field&gt; newlyAddedKeywords = fieldKeywordsMap.keySet();</b>
+&nbsp;
+&nbsp;        // Remove all content selectors that are not in the new list
+<b class="nc">&nbsp;        List&lt;Field&gt; result = new ArrayList&lt;&gt;(metaData.getContentSelectors().getFieldsWithSelectors().stream()</b>
+<b class="nc">&nbsp;                                                     .filter(field -&gt; !newlyAddedKeywords.contains(field))</b>
+<b class="nc">&nbsp;                                                     .toList());</b>
+&nbsp;        // Remove all unset default fields
+<b class="nc">&nbsp;        result.addAll(fieldKeywordsMap.entrySet()</b>
+<b class="nc">&nbsp;                                      .stream()</b>
+<b class="nc">&nbsp;                                      .filter(entry -&gt; ContentSelectors.DEFAULT_FIELD_NAMES.contains(entry.getKey()) &amp;&amp; entry.getValue().isEmpty()).map(Map.Entry::getKey)</b>
+<b class="nc">&nbsp;                                      .toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updateMetaDataContentSelector(List&lt;Field&gt; existingFields, Field field, List&lt;String&gt; keywords) {
+<b class="nc">&nbsp;        boolean fieldNameDoNotExists = !existingFields.contains(field);</b>
+<b class="nc">&nbsp;        if (fieldNameDoNotExists) {</b>
+<b class="nc">&nbsp;            metaData.addContentSelector(new ContentSelector(field, keywords));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (keywordsHaveChanged(field, keywords)) {</b>
+<b class="nc">&nbsp;            metaData.clearContentSelectors(field);</b>
+<b class="nc">&nbsp;            metaData.addContentSelector(new ContentSelector(field, keywords));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean keywordsHaveChanged(Field field, List&lt;String&gt; keywords) {
+<b class="nc">&nbsp;        HashSet&lt;String&gt; keywordsSet = asHashSet(keywords);</b>
+<b class="nc">&nbsp;        List&lt;String&gt; existingKeywords = metaData.getContentSelectorValuesForField(field);</b>
+<b class="nc">&nbsp;        if (!keywordsSet.equals(asHashSet(existingKeywords))) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return !keywordsSet.isEmpty() &amp;&amp; existingKeywords.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private HashSet&lt;String&gt; asHashSet(List&lt;String&gt; listToConvert) {
+<b class="nc">&nbsp;        return new HashSet&lt;&gt;(listToConvert);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

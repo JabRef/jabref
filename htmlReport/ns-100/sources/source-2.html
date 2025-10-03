@@ -1,0 +1,208 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ConvertMarkingToGroups</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.migrations</a>
+</div>
+
+<h1>Coverage Summary for Class: ConvertMarkingToGroups (org.jabref.migrations)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConvertMarkingToGroups</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.migrations;
+&nbsp;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.logic.groups.DefaultGroupsFactory;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.groups.ExplicitGroup;
+&nbsp;import org.jabref.model.groups.GroupHierarchyType;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;
+&nbsp;import com.google.common.collect.Multimap;
+&nbsp;import com.google.common.collect.MultimapBuilder;
+&nbsp;
+&nbsp;/**
+&nbsp; * Converts legacy explicit groups, where the group contained a list of assigned entries, to the new format,
+&nbsp; * where the entry stores a list of groups it belongs to.
+&nbsp; */
+<b class="nc">&nbsp;public class ConvertMarkingToGroups implements PostOpenMigration {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern MARKING_PATTERN = Pattern.compile(&quot;\\[(.*):(\\d+)\\]&quot;);</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void performMigration(ParserResult parserResult) {
+<b class="nc">&nbsp;        Objects.requireNonNull(parserResult);</b>
+&nbsp;
+<b class="nc">&nbsp;        ObservableList&lt;BibEntry&gt; entries = parserResult.getDatabase().getEntries();</b>
+<b class="nc">&nbsp;        Multimap&lt;String, BibEntry&gt; markings = getMarkingWithEntries(entries);</b>
+<b class="nc">&nbsp;        if (!markings.isEmpty()) {</b>
+<b class="nc">&nbsp;            GroupTreeNode markingRoot = GroupTreeNode.fromGroup(</b>
+<b class="nc">&nbsp;                    new ExplicitGroup(Localization.lang(&quot;Markings&quot;), GroupHierarchyType.INCLUDING, &#39;,&#39;));</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Map.Entry&lt;String, Collection&lt;BibEntry&gt;&gt; marking : markings.asMap().entrySet()) {</b>
+<b class="nc">&nbsp;                String markingName = marking.getKey();</b>
+<b class="nc">&nbsp;                Collection&lt;BibEntry&gt; markingMatchedEntries = marking.getValue();</b>
+&nbsp;
+<b class="nc">&nbsp;                GroupTreeNode markingGroup = markingRoot.addSubgroup(</b>
+<b class="nc">&nbsp;                        new ExplicitGroup(markingName, GroupHierarchyType.INCLUDING, &#39;,&#39;));</b>
+<b class="nc">&nbsp;                markingGroup.addEntriesToGroup(markingMatchedEntries);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (parserResult.getMetaData().getGroups().isEmpty()) {</b>
+<b class="nc">&nbsp;                parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup()));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            GroupTreeNode root = parserResult.getMetaData().getGroups().get();</b>
+<b class="nc">&nbsp;            root.addChild(markingRoot, 0);</b>
+<b class="nc">&nbsp;            parserResult.getMetaData().setGroups(root);</b>
+&nbsp;
+<b class="nc">&nbsp;            clearMarkings(entries);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Looks for markings (such as __markedentry = {[Nicolas:6]}) in the given list of entries.
+&nbsp;     */
+&nbsp;    private Multimap&lt;String, BibEntry&gt; getMarkingWithEntries(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        Multimap&lt;String, BibEntry&gt; markings = MultimapBuilder.treeKeys().linkedListValues().build();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry entry : entries) {</b>
+<b class="nc">&nbsp;            Optional&lt;String&gt; marking = entry.getField(InternalField.MARKED_INTERNAL);</b>
+<b class="nc">&nbsp;            if (marking.isEmpty()) {</b>
+&nbsp;                continue;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            Matcher matcher = MARKING_PATTERN.matcher(marking.get());</b>
+<b class="nc">&nbsp;            if (matcher.find()) {</b>
+<b class="nc">&nbsp;                String owner = matcher.group(1);</b>
+<b class="nc">&nbsp;                String number = matcher.group(2);</b>
+<b class="nc">&nbsp;                markings.put(owner + &quot;:&quot; + number, entry);</b>
+&nbsp;            } else {
+&nbsp;                // Not in the expected format, so just add it to not loose information
+<b class="nc">&nbsp;                markings.put(marking.get(), entry);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return markings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearMarkings(List&lt;BibEntry&gt; entries) {
+<b class="nc">&nbsp;        entries.forEach(entry -&gt; entry.clearField(InternalField.MARKED_INTERNAL));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

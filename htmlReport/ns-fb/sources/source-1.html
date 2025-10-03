@@ -1,0 +1,268 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultLatexParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.texparser</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultLatexParser (org.jabref.logic.texparser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultLatexParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/55)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.texparser;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.io.LineNumberReader;
+&nbsp;import java.io.Reader;
+&nbsp;import java.io.UncheckedIOException;
+&nbsp;import java.nio.channels.ClosedChannelException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.model.texparser.LatexParserResult;
+&nbsp;import org.jabref.model.texparser.LatexParserResults;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class DefaultLatexParser implements LatexParser {</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLatexParser.class);</b>
+&nbsp;    private static final String TEX_EXT = &quot;.tex&quot;;
+&nbsp;    private static final String BIB_EXT = &quot;.bib&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * It is allowed to add new cite commands for pattern matching. Some valid examples: &quot;citep&quot;, &quot;[cC]ite&quot;, and
+&nbsp;     * &quot;[cC]ite(author|title|year|t|p)?&quot;.
+&nbsp;     */
+<b class="nc">&nbsp;    private static final String[] CITE_COMMANDS = {</b>
+&nbsp;            &quot;[cC]ite(alt|alp|author|authorfull|date|num|p|t|text|title|url|year|yearpar)?&quot;,
+&nbsp;            &quot;([aA]|[aA]uto|fnote|foot|footfull|full|no|[nN]ote|[pP]aren|[pP]note|[tT]ext|[sS]mart|super)cite([s*]?)&quot;,
+&nbsp;            &quot;footcitetext&quot;, &quot;(block|text)cquote&quot;
+&nbsp;    };
+&nbsp;    private static final String CITE_GROUP = &quot;key&quot;;
+<b class="nc">&nbsp;    private static final Pattern CITE_PATTERN = Pattern.compile(</b>
+<b class="nc">&nbsp;            &quot;\\\\(%s)\\*?(?:\\[(?:[^\\]]*)\\]){0,2}\\{(?&lt;%s&gt;[^\\}]*)\\}(?:\\{[^\\}]*\\})?&quot;.formatted(</b>
+<b class="nc">&nbsp;                    String.join(&quot;|&quot;, CITE_COMMANDS), CITE_GROUP));</b>
+&nbsp;
+&nbsp;    private static final String BIBLIOGRAPHY_GROUP = &quot;bib&quot;;
+<b class="nc">&nbsp;    private static final Pattern BIBLIOGRAPHY_PATTERN = Pattern.compile(</b>
+<b class="nc">&nbsp;            &quot;\\\\(?:bibliography|addbibresource)\\{(?&lt;%s&gt;[^\\}]*)\\}&quot;.formatted(BIBLIOGRAPHY_GROUP));</b>
+&nbsp;
+&nbsp;    private static final String INCLUDE_GROUP = &quot;file&quot;;
+<b class="nc">&nbsp;    private static final Pattern INCLUDE_PATTERN = Pattern.compile(</b>
+<b class="nc">&nbsp;            &quot;\\\\(?:include|input)\\{(?&lt;%s&gt;[^\\}]*)\\}&quot;.formatted(INCLUDE_GROUP));</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public LatexParserResult parse(String citeString) {
+<b class="nc">&nbsp;        Path path = Path.of(&quot;&quot;);</b>
+<b class="nc">&nbsp;        LatexParserResult latexParserResult = new LatexParserResult(path);</b>
+<b class="nc">&nbsp;        matchCitation(path, 1, citeString, latexParserResult);</b>
+<b class="nc">&nbsp;        return latexParserResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;LatexParserResult&gt; parse(Path latexFile) {
+<b class="nc">&nbsp;        if (!Files.exists(latexFile)) {</b>
+<b class="nc">&nbsp;            LOGGER.error(&quot;File does not exist: {}&quot;, latexFile);</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        LatexParserResult latexParserResult = new LatexParserResult(latexFile);</b>
+&nbsp;
+<b class="nc">&nbsp;        try (InputStream inputStream = Files.newInputStream(latexFile);</b>
+<b class="nc">&nbsp;             Reader reader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;             LineNumberReader lineNumberReader = new LineNumberReader(reader)) {</b>
+<b class="nc">&nbsp;            for (String line = lineNumberReader.readLine(); line != null; line = lineNumberReader.readLine()) {</b>
+&nbsp;                // Skip comments and blank lines.
+<b class="nc">&nbsp;                if (line.trim().isEmpty() || line.trim().charAt(0) == &#39;%&#39;) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+<b class="nc">&nbsp;                matchCitation(latexFile, lineNumberReader.getLineNumber(), line, latexParserResult);</b>
+<b class="nc">&nbsp;                matchBibFile(latexFile, line, latexParserResult);</b>
+<b class="nc">&nbsp;                matchNestedFile(latexFile, line, latexParserResult);</b>
+&nbsp;            }
+&nbsp;        } catch (ClosedChannelException e) {
+&nbsp;            // User changed the underlying LaTeX file
+&nbsp;            // We ignore this error and just continue with parsing
+<b class="nc">&nbsp;            LOGGER.info(&quot;Parsing has been interrupted&quot;);</b>
+&nbsp;        } catch (IOException | UncheckedIOException e) {
+&nbsp;            // Some weired error during reading
+&nbsp;            // We ignore this error and just continue with parsing
+<b class="nc">&nbsp;            LOGGER.info(&quot;Error while parsing file {}&quot;, latexFile, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Optional.of(latexParserResult);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public LatexParserResults parse(List&lt;Path&gt; latexFiles) {
+<b class="nc">&nbsp;        LatexParserResults results = new LatexParserResults();</b>
+<b class="nc">&nbsp;        latexFiles.forEach(file -&gt; parse(file).ifPresent(result -&gt; results.add(file, result)));</b>
+<b class="nc">&nbsp;        return results;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find cites along a specific line and store them.
+&nbsp;     */
+&nbsp;    private void matchCitation(Path file, int lineNumber, String line, LatexParserResult latexParserResult) {
+<b class="nc">&nbsp;        Matcher citeMatch = CITE_PATTERN.matcher(line);</b>
+&nbsp;
+<b class="nc">&nbsp;        while (citeMatch.find()) {</b>
+<b class="nc">&nbsp;            for (String key : citeMatch.group(CITE_GROUP).split(&quot;,&quot;)) {</b>
+<b class="nc">&nbsp;                latexParserResult.addKey(key.trim(), file, lineNumber, citeMatch.start(), citeMatch.end(), line);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find BIB files along a specific line and store them.
+&nbsp;     */
+&nbsp;    private void matchBibFile(Path file, String line, LatexParserResult latexParserResult) {
+<b class="nc">&nbsp;        Matcher bibliographyMatch = BIBLIOGRAPHY_PATTERN.matcher(line);</b>
+&nbsp;
+<b class="nc">&nbsp;        while (bibliographyMatch.find()) {</b>
+<b class="nc">&nbsp;            for (String bibString : bibliographyMatch.group(BIBLIOGRAPHY_GROUP).split(&quot;,&quot;)) {</b>
+<b class="nc">&nbsp;                bibString = bibString.trim();</b>
+<b class="nc">&nbsp;                Path bibFile = file.getParent().resolve(</b>
+<b class="nc">&nbsp;                        bibString.endsWith(BIB_EXT)</b>
+<b class="nc">&nbsp;                        ? bibString</b>
+<b class="nc">&nbsp;                        : &quot;%s%s&quot;.formatted(bibString, BIB_EXT)).normalize();</b>
+&nbsp;
+<b class="nc">&nbsp;                if (Files.exists(bibFile)) {</b>
+<b class="nc">&nbsp;                    latexParserResult.addBibFile(bibFile);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Find inputs and includes along a specific line and store them for parsing later.
+&nbsp;     */
+&nbsp;    private void matchNestedFile(Path texFile, String line, LatexParserResult latexParserResult) {
+<b class="nc">&nbsp;        Matcher includeMatch = INCLUDE_PATTERN.matcher(line);</b>
+&nbsp;
+<b class="nc">&nbsp;        while (includeMatch.find()) {</b>
+<b class="nc">&nbsp;            String filenamePassedToInclude = includeMatch.group(INCLUDE_GROUP);</b>
+<b class="nc">&nbsp;            String texFileName = filenamePassedToInclude.endsWith(TEX_EXT)</b>
+<b class="nc">&nbsp;                                 ? filenamePassedToInclude</b>
+<b class="nc">&nbsp;                                 : &quot;%s%s&quot;.formatted(filenamePassedToInclude, TEX_EXT);</b>
+<b class="nc">&nbsp;            Path nestedFile = texFile.getParent().resolve(texFileName).normalize();</b>
+<b class="nc">&nbsp;            if (Files.exists(nestedFile)) {</b>
+<b class="nc">&nbsp;                latexParserResult.addNestedFile(nestedFile);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

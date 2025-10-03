@@ -1,0 +1,441 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WrapFileLinks</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.layout.format</a>
+</div>
+
+<h1>Coverage Summary for Class: WrapFileLinks (org.jabref.logic.layout.format)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WrapFileLinks</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WrapFileLinks$FormatEntry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.layout.format;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import org.jabref.logic.importer.util.FileFieldParser;
+&nbsp;import org.jabref.logic.layout.AbstractParamLayoutFormatter;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;
+&nbsp;/// This formatter iterates over all file links, or all file links of a specified
+&nbsp;/// type, outputting a format string given as the first argument. The format string
+&nbsp;/// can contain a number of escape sequences indicating file link information to
+&nbsp;/// be inserted into the string.
+&nbsp;///
+&nbsp;/// This formatter can take an optional second argument specifying the name of a file
+&nbsp;/// type. If specified, the iteration will only include those files with a file type
+&nbsp;/// matching the given name (case-insensitively). If specified as an empty argument,
+&nbsp;/// all file links will be included.
+&nbsp;///
+&nbsp;/// After the second argument, pairs of additional arguments can be added in order to
+&nbsp;/// specify regular expression replacements to be done upon the inserted link information
+&nbsp;/// before insertion into the output string. A non-paired argument will be ignored.
+&nbsp;/// In order to specify replacements without filtering on file types, use an empty second
+&nbsp;/// argument.
+&nbsp;///
+&nbsp;///
+&nbsp;///
+&nbsp;/// The escape sequences for embedding information are as follows:
+&nbsp;///
+&nbsp;/// `\i`   : This inserts the iteration index (starting from 1), and can be useful if
+&nbsp;/// the output list of files should be enumerated.
+&nbsp;/// `\p`   : This inserts the file path of the file link. Relative links below your file directory
+&nbsp;///        will be expanded to their absolute path.
+&nbsp;/// `\r`   : This inserts the file path without expanding relative links.
+&nbsp;/// `\f`   : This inserts the name of the file link&#39;s type.
+&nbsp;/// `\x`   : This inserts the file&#39;s extension, if any.
+&nbsp;/// `\d`   : This inserts the file link&#39;s description, if any.
+&nbsp;///
+&nbsp;/// For instance, an entry could contain a file link to the file &quot;/home/john/report.pdf&quot;
+&nbsp;/// of the &quot;PDF&quot; type with description &quot;John&#39;s final report&quot;.
+&nbsp;///
+&nbsp;/// Using the WrapFileLinks formatter with the following argument:
+&nbsp;///
+&nbsp;///     \format[WrapFileLinks(\i. \d (\p))]{\file}
+&nbsp;///
+&nbsp;/// would give the following output:
+&nbsp;///
+&nbsp;///     1. John&#39;s final report (/home/john/report.pdf)
+&nbsp;///
+&nbsp;/// If the entry contained a second file link to the file &quot;/home/john/draft.txt&quot; of the
+&nbsp;/// &quot;Text file&quot; type with description &#39;An early &quot;draft&quot;&#39;, the output would be as follows:
+&nbsp;///
+&nbsp;/// ```
+&nbsp;/// 1. John&#39;s final report (/home/john/report.pdf)
+&nbsp;/// 2. An early &quot;draft&quot; (/home/john/draft.txt)
+&nbsp;///```
+&nbsp;///
+&nbsp;/// If the formatter was called with a second argument, the list would be filtered.
+&nbsp;/// For instance:
+&nbsp;///
+&nbsp;///     \format[WrapFileLinks(\i. \d (\p),text file)]{\file}
+&nbsp;///
+&nbsp;/// would show only the text file:
+&nbsp;///
+&nbsp;/// ```
+&nbsp;/// 1. An early &quot;draft&quot; (/home/john/draft.txt)
+&nbsp;///```
+&nbsp;///
+&nbsp;/// If we wanted this output to be part of an XML styled output, the quotes in the
+&nbsp;/// file description could cause problems. Adding two additional arguments to translate
+&nbsp;/// the quotes into XML characters solves this:
+&nbsp;///
+&nbsp;///     \format[WrapFileLinks(\i. \d (\p),text file,&quot;,&amp;quot;)]{\file}
+&nbsp;///
+&nbsp;/// would give the following output:
+&nbsp;///
+&nbsp;/// ```
+&nbsp;/// 1. An early &amp;quot;draft&amp;quot; (/home/john/draft.txt)
+&nbsp;///```
+&nbsp;///
+&nbsp;/// Additional pairs of replacements can be added.
+&nbsp;public class WrapFileLinks extends AbstractParamLayoutFormatter {
+&nbsp;
+&nbsp;    private static final int STRING = 0;
+&nbsp;    private static final int ITERATION_COUNT = 1;
+&nbsp;    private static final int FILE_PATH = 2;
+&nbsp;    private static final int FILE_TYPE = 3;
+&nbsp;    private static final int FILE_EXTENSION = 4;
+&nbsp;    private static final int FILE_DESCRIPTION = 5;
+&nbsp;    private static final int RELATIVE_FILE_PATH = 6;
+&nbsp;    // Define which escape sequences give what results:
+<b class="nc">&nbsp;    private static final Map&lt;Character, Integer&gt; ESCAPE_SEQ = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        WrapFileLinks.ESCAPE_SEQ.put(&#39;i&#39;, WrapFileLinks.ITERATION_COUNT);</b>
+<b class="nc">&nbsp;        WrapFileLinks.ESCAPE_SEQ.put(&#39;p&#39;, WrapFileLinks.FILE_PATH);</b>
+<b class="nc">&nbsp;        WrapFileLinks.ESCAPE_SEQ.put(&#39;r&#39;, WrapFileLinks.RELATIVE_FILE_PATH);</b>
+<b class="nc">&nbsp;        WrapFileLinks.ESCAPE_SEQ.put(&#39;f&#39;, WrapFileLinks.FILE_TYPE);</b>
+<b class="nc">&nbsp;        WrapFileLinks.ESCAPE_SEQ.put(&#39;x&#39;, WrapFileLinks.FILE_EXTENSION);</b>
+<b class="nc">&nbsp;        WrapFileLinks.ESCAPE_SEQ.put(&#39;d&#39;, WrapFileLinks.FILE_DESCRIPTION);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;String, String&gt; replacements = new HashMap&lt;&gt;();</b>
+&nbsp;    private final List&lt;Path&gt; fileDirectories;
+&nbsp;    private final String mainFileDirectory;
+&nbsp;    private String fileType;
+&nbsp;    private List&lt;FormatEntry&gt; format;
+&nbsp;
+<b class="nc">&nbsp;    public WrapFileLinks(List&lt;Path&gt; fileDirectories, String mainFileDirectory) {</b>
+<b class="nc">&nbsp;        this.fileDirectories = fileDirectories;</b>
+<b class="nc">&nbsp;        this.mainFileDirectory = mainFileDirectory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse a format string and return a list of FormatEntry objects. The format
+&nbsp;     * string is basically marked up with &quot;\i&quot; marking that the iteration number should
+&nbsp;     * be inserted, and with &quot;\p&quot; marking that the file path of the current iteration
+&nbsp;     * should be inserted, plus additional markers.
+&nbsp;     *
+&nbsp;     * @param format The marked-up string.
+&nbsp;     * @return the resulting format entries.
+&nbsp;     */
+&nbsp;    private static List&lt;FormatEntry&gt; parseFormatString(String format) {
+<b class="nc">&nbsp;        List&lt;FormatEntry&gt; l = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        boolean escaped = false;</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; format.length(); i++) {</b>
+<b class="nc">&nbsp;            char c = format.charAt(i);</b>
+<b class="nc">&nbsp;            if (escaped) {</b>
+<b class="nc">&nbsp;                escaped = false; // we know we&#39;ll be out of escape mode after this</b>
+&nbsp;                // Check if this escape sequence is meaningful:
+<b class="nc">&nbsp;                if (c == &#39;\\&#39;) {</b>
+&nbsp;                    // Escaped backslash: means that we add a backslash:
+<b class="nc">&nbsp;                    sb.append(&#39;\\&#39;);</b>
+<b class="nc">&nbsp;                } else if (WrapFileLinks.ESCAPE_SEQ.containsKey(c)) {</b>
+&nbsp;                    // Ok, we have the code. Add the previous string (if any) and
+&nbsp;                    // the entry indicated by the escape sequence:
+<b class="nc">&nbsp;                    if (!sb.isEmpty()) {</b>
+<b class="nc">&nbsp;                        l.add(new FormatEntry(sb.toString()));</b>
+&nbsp;                        // Clear the buffer:
+<b class="nc">&nbsp;                        sb = new StringBuilder();</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    l.add(new FormatEntry(WrapFileLinks.ESCAPE_SEQ.get(c)));</b>
+&nbsp;                } else {
+&nbsp;                    // Unknown escape sequence.
+<b class="nc">&nbsp;                    sb.append(&#39;\\&#39;);</b>
+<b class="nc">&nbsp;                    sb.append(c);</b>
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                // Check if we are at the start of an escape sequence:
+<b class="nc">&nbsp;                if (c == &#39;\\&#39;) {</b>
+<b class="nc">&nbsp;                    escaped = true;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    sb.append(c);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        // Finished scanning the string. If we collected text at the end, add an entry for it:
+<b class="nc">&nbsp;        if (!sb.isEmpty()) {</b>
+<b class="nc">&nbsp;            l.add(new FormatEntry(sb.toString()));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return l;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void setArgument(String arg) {
+<b class="nc">&nbsp;        List&lt;String&gt; parts = AbstractParamLayoutFormatter.parseArgument(arg);</b>
+<b class="nc">&nbsp;        format = parseFormatString(parts.getFirst());</b>
+<b class="nc">&nbsp;        if ((parts.size() &gt; 1) &amp;&amp; !parts.get(1).trim().isEmpty()) {</b>
+<b class="nc">&nbsp;            fileType = parts.get(1);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (parts.size() &gt; 2) {</b>
+<b class="nc">&nbsp;            for (int i = 2; i &lt; (parts.size() - 1); i += 2) {</b>
+<b class="nc">&nbsp;                replacements.put(parts.get(i), parts.get(i + 1));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String format(String field) {
+<b class="nc">&nbsp;        if (field == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+&nbsp;        // Build the list containing the links:
+<b class="nc">&nbsp;        List&lt;LinkedFile&gt; fileList = FileFieldParser.parse(field);</b>
+&nbsp;
+<b class="nc">&nbsp;        int piv = 1; // counter for relevant iterations</b>
+<b class="nc">&nbsp;        for (LinkedFile flEntry : fileList) {</b>
+&nbsp;            // Use this entry if we don&#39;t discriminate on types, or if the type fits:
+<b class="nc">&nbsp;            if ((fileType == null) || flEntry.getFileType().equalsIgnoreCase(fileType)) {</b>
+<b class="nc">&nbsp;                for (FormatEntry entry : format) {</b>
+<b class="nc">&nbsp;                    switch (entry.getType()) {</b>
+&nbsp;                        case STRING:
+<b class="nc">&nbsp;                            sb.append(entry.getString());</b>
+&nbsp;                            break;
+&nbsp;                        case ITERATION_COUNT:
+<b class="nc">&nbsp;                            sb.append(piv);</b>
+&nbsp;                            break;
+&nbsp;                        case FILE_PATH:
+&nbsp;                            List&lt;Path&gt; dirs;
+<b class="nc">&nbsp;                            if (fileDirectories.isEmpty()) {</b>
+<b class="nc">&nbsp;                                dirs = List.of(Path.of(mainFileDirectory));</b>
+&nbsp;                            } else {
+<b class="nc">&nbsp;                                dirs = fileDirectories;</b>
+&nbsp;                            }
+&nbsp;
+<b class="nc">&nbsp;                            String pathString = flEntry.findIn(dirs)</b>
+<b class="nc">&nbsp;                                                       .map(path -&gt; path.toAbsolutePath().toString())</b>
+<b class="nc">&nbsp;                                                       .orElse(flEntry.getLink());</b>
+&nbsp;
+<b class="nc">&nbsp;                            sb.append(replaceStrings(pathString));</b>
+&nbsp;                            break;
+&nbsp;                        case RELATIVE_FILE_PATH:
+&nbsp;
+&nbsp;                            /*
+&nbsp;                             * Stumbled over this while investigating
+&nbsp;                             *
+&nbsp;                             * https://sourceforge.net/tracker/index.php?func=detail&amp;aid=1469903&amp;group_id=92314&amp;atid=600306
+&nbsp;                             */
+<b class="nc">&nbsp;                            sb.append(replaceStrings(flEntry.getLink())); // f.toURI().toString();</b>
+&nbsp;
+&nbsp;                            break;
+&nbsp;                        case FILE_EXTENSION:
+<b class="nc">&nbsp;                            FileUtil.getFileExtension(flEntry.getLink())</b>
+<b class="nc">&nbsp;                                    .ifPresent(extension -&gt; sb.append(replaceStrings(extension)));</b>
+&nbsp;                            break;
+&nbsp;                        case FILE_TYPE:
+<b class="nc">&nbsp;                            sb.append(replaceStrings(flEntry.getFileType()));</b>
+&nbsp;                            break;
+&nbsp;                        case FILE_DESCRIPTION:
+<b class="nc">&nbsp;                            sb.append(replaceStrings(flEntry.getDescription()));</b>
+&nbsp;                            break;
+&nbsp;                        default:
+&nbsp;                            break;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                piv++; // update counter</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String replaceStrings(String text) {
+<b class="nc">&nbsp;        String result = text;</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, String&gt; stringStringEntry : replacements.entrySet()) {</b>
+<b class="nc">&nbsp;            String to = stringStringEntry.getValue();</b>
+<b class="nc">&nbsp;            result = result.replaceAll(stringStringEntry.getKey(), to);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This class defines the building blocks of a parsed format strings. Each FormatEntry
+&nbsp;     * represents either a literal string or a piece of information pertaining to the file
+&nbsp;     * link to be exported or to the iteration through a series of file links. For literal
+&nbsp;     * strings this class encapsulates the literal itself, while for other types of information,
+&nbsp;     * only a type code is provided, and the subclass needs to fill in the proper information
+&nbsp;     * based on the file link to be exported or the iteration status.
+&nbsp;     */
+&nbsp;    static class FormatEntry {
+&nbsp;
+&nbsp;        private final int type;
+&nbsp;        private String string;
+&nbsp;
+<b class="nc">&nbsp;        public FormatEntry(int type) {</b>
+<b class="nc">&nbsp;            this.type = type;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        public FormatEntry(String value) {</b>
+<b class="nc">&nbsp;            this.type = WrapFileLinks.STRING;</b>
+<b class="nc">&nbsp;            this.string = value;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public int getType() {
+<b class="nc">&nbsp;            return type;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String getString() {
+<b class="nc">&nbsp;            return string;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

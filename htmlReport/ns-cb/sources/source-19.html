@@ -1,0 +1,197 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GvkFetcher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher</a>
+</div>
+
+<h1>Coverage Summary for Class: GvkFetcher (org.jabref.logic.importer.fetcher)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GvkFetcher</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher;
+&nbsp;
+&nbsp;import java.net.MalformedURLException;
+&nbsp;import java.net.URISyntaxException;
+&nbsp;import java.net.URL;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanup;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
+&nbsp;import org.jabref.logic.help.HelpFile;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.Parser;
+&nbsp;import org.jabref.logic.importer.SearchBasedParserFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.transformers.GVKQueryTransformer;
+&nbsp;import org.jabref.logic.importer.fileformat.PicaXmlParser;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.search.query.BaseQueryNode;
+&nbsp;
+&nbsp;import org.apache.hc.core5.net.URIBuilder;
+&nbsp;
+&nbsp;public class GvkFetcher extends AbstractIsbnFetcher implements SearchBasedParserFetcher {
+&nbsp;
+&nbsp;    private static final String URL_PATTERN = &quot;https://sru.k10plus.de/opac-de-627?&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Searchkeys are used to specify a search request. For example &quot;tit&quot; stands for &quot;title&quot;.
+&nbsp;     * If no searchkey is used, the default searchkey &quot;all&quot; is used.
+&nbsp;     */
+<b class="nc">&nbsp;    private final Collection&lt;String&gt; searchKeys = Arrays.asList(&quot;all&quot;, &quot;tit&quot;, &quot;per&quot;, &quot;thm&quot;, &quot;slw&quot;, &quot;txt&quot;, &quot;num&quot;, &quot;kon&quot;, &quot;ppn&quot;, &quot;bkl&quot;, &quot;erj&quot;);</b>
+&nbsp;
+&nbsp;    public GvkFetcher(ImportFormatPreferences importFormatPreferences) {
+<b class="nc">&nbsp;        super(importFormatPreferences);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;GVK&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;HelpFile&gt; getHelpPage() {
+<b class="nc">&nbsp;        return Optional.of(HelpFile.FETCHER_GVK);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;version&quot;, &quot;1.1&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;operation&quot;, &quot;searchRetrieve&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;query&quot;, new GVKQueryTransformer().transformSearchQuery(queryNode).orElse(&quot;&quot;));</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;maximumRecords&quot;, &quot;50&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;recordSchema&quot;, &quot;picaxml&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;sortKeys&quot;, &quot;Year,,1&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Using URL {}&quot;, uriBuilder.build());</b>
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
+<b class="nc">&nbsp;        this.ensureThatIsbnIsValid(identifier);</b>
+<b class="nc">&nbsp;        URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;version&quot;, &quot;1.1&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;operation&quot;, &quot;searchRetrieve&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;query&quot;, &quot;pica.isb=&quot; + identifier);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;maximumRecords&quot;, &quot;50&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;recordSchema&quot;, &quot;picaxml&quot;);</b>
+<b class="nc">&nbsp;        uriBuilder.addParameter(&quot;sortKeys&quot;, &quot;Year,,1&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Using URL {}&quot;, uriBuilder.build());</b>
+<b class="nc">&nbsp;        return uriBuilder.build().toURL();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Parser getParser() {
+<b class="nc">&nbsp;        return new PicaXmlParser();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void doPostCleanup(BibEntry entry) {
+<b class="nc">&nbsp;        super.doPostCleanup(entry);</b>
+&nbsp;
+&nbsp;        // Fetcher returns page numbers as &quot;30 Seiten&quot; -&gt; remove every non-digit character in the PAGETOTAL field
+<b class="nc">&nbsp;        entry.getField(StandardField.PAGETOTAL).ifPresent(pages -&gt;</b>
+<b class="nc">&nbsp;                entry.setField(StandardField.PAGETOTAL, pages.replaceAll(&quot;[\\D]&quot;, &quot;&quot;)));</b>
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.PAGETOTAL, new NormalizePagesFormatter()).cleanup(entry);</b>
+<b class="nc">&nbsp;        new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

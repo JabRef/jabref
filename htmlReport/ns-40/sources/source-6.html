@@ -1,0 +1,541 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImportEntriesDialog</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.importer</a>
+</div>
+
+<h1>Coverage Summary for Class: ImportEntriesDialog (org.jabref.gui.importer)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImportEntriesDialog</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/66)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/194)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.importer;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.binding.BooleanBinding;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.css.PseudoClass;
+&nbsp;import javafx.fxml.FXML;
+&nbsp;import javafx.geometry.Insets;
+&nbsp;import javafx.scene.Cursor;
+&nbsp;import javafx.scene.Node;
+&nbsp;import javafx.scene.control.Button;
+&nbsp;import javafx.scene.control.ButtonType;
+&nbsp;import javafx.scene.control.CheckBox;
+&nbsp;import javafx.scene.control.ComboBox;
+&nbsp;import javafx.scene.control.Label;
+&nbsp;import javafx.scene.control.ToggleButton;
+&nbsp;import javafx.scene.control.Tooltip;
+&nbsp;import javafx.scene.layout.Border;
+&nbsp;import javafx.scene.layout.BorderStroke;
+&nbsp;import javafx.scene.layout.BorderStrokeStyle;
+&nbsp;import javafx.scene.layout.BorderWidths;
+&nbsp;import javafx.scene.layout.CornerRadii;
+&nbsp;import javafx.scene.layout.HBox;
+&nbsp;import javafx.scene.layout.Priority;
+&nbsp;import javafx.scene.layout.VBox;
+&nbsp;import javafx.scene.paint.Color;
+&nbsp;
+&nbsp;import org.jabref.gui.DialogService;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.entryeditor.citationrelationtab.BibEntryView;
+&nbsp;import org.jabref.gui.icon.IconTheme;
+&nbsp;import org.jabref.gui.preferences.GuiPreferences;
+&nbsp;import org.jabref.gui.util.BaseDialog;
+&nbsp;import org.jabref.gui.util.NoSelectionModel;
+&nbsp;import org.jabref.gui.util.ViewModelListCellFactory;
+&nbsp;import org.jabref.logic.importer.PagedSearchBasedFetcher;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.SearchBasedFetcher;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.shared.DatabaseLocation;
+&nbsp;import org.jabref.logic.util.BackgroundTask;
+&nbsp;import org.jabref.logic.util.TaskExecutor;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.util.FileUpdateMonitor;
+&nbsp;
+&nbsp;import com.airhacks.afterburner.views.ViewLoader;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import jakarta.inject.Inject;
+&nbsp;import org.controlsfx.control.CheckListView;
+&nbsp;import org.fxmisc.richtext.CodeArea;
+&nbsp;
+&nbsp;public class ImportEntriesDialog extends BaseDialog&lt;Boolean&gt; {
+&nbsp;    @FXML private HBox paginationBox;
+&nbsp;    @FXML private Label pageNumberLabel;
+&nbsp;    @FXML private CheckListView&lt;BibEntry&gt; entriesListView;
+&nbsp;    @FXML private ComboBox&lt;BibDatabaseContext&gt; libraryListView;
+&nbsp;    @FXML private ButtonType importButton;
+&nbsp;    @FXML private Label totalItems;
+&nbsp;    @FXML private Label selectedItems;
+&nbsp;    @FXML private Label bibTeXDataLabel;
+&nbsp;    @FXML private CheckBox downloadLinkedOnlineFiles;
+&nbsp;    @FXML private CheckBox showEntryInformation;
+&nbsp;    @FXML private CodeArea bibTeXData;
+&nbsp;    @FXML private VBox bibTeXDataBox;
+&nbsp;    @FXML private Button nextPageButton;
+&nbsp;    @FXML private Button prevPageButton;
+&nbsp;    @FXML private Label statusLabel;
+&nbsp;
+&nbsp;    private final BackgroundTask&lt;ParserResult&gt; task;
+&nbsp;    private final BibDatabaseContext database;
+&nbsp;    private ImportEntriesViewModel viewModel;
+&nbsp;    private final Optional&lt;SearchBasedFetcher&gt; searchBasedFetcher;
+&nbsp;    private final Optional&lt;String&gt; query;
+&nbsp;
+&nbsp;    @Inject private TaskExecutor taskExecutor;
+&nbsp;    @Inject private DialogService dialogService;
+&nbsp;    @Inject private UndoManager undoManager;
+&nbsp;    @Inject private GuiPreferences preferences;
+&nbsp;    @Inject private StateManager stateManager;
+&nbsp;    @Inject private BibEntryTypesManager entryTypesManager;
+&nbsp;    @Inject private FileUpdateMonitor fileUpdateMonitor;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an import dialog for entries from file sources.
+&nbsp;     * This constructor is used for importing entries from local files, BibTeX files,
+&nbsp;     * or other file-based sources that don&#39;t require pagination or search functionality.
+&nbsp;     *
+&nbsp;     * @param database the database to import into
+&nbsp;     * @param task     the task executed for parsing the selected files(s).
+&nbsp;     */
+<b class="nc">&nbsp;    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask&lt;ParserResult&gt; task) {</b>
+<b class="nc">&nbsp;        this.database = database;</b>
+<b class="nc">&nbsp;        this.task = task;</b>
+<b class="nc">&nbsp;        this.searchBasedFetcher = Optional.empty();</b>
+<b class="nc">&nbsp;        this.query = Optional.empty();</b>
+&nbsp;
+<b class="nc">&nbsp;        initializeDialog();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates an import dialog for entries from web-based search sources.
+&nbsp;     * This constructor is used for importing entries that support pagination and require search queries.
+&nbsp;     *
+&nbsp;     * @param database database where the imported entries will be added
+&nbsp;     * @param task     task that handles parsing and loading entries from the search results
+&nbsp;     * @param fetcher  the search-based fetcher implementation used to retrieve entries from the web source
+&nbsp;     * @param query    the search string used to find relevant entries
+&nbsp;     */
+<b class="nc">&nbsp;    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask&lt;ParserResult&gt; task, SearchBasedFetcher fetcher, String query) {</b>
+<b class="nc">&nbsp;        this.database = database;</b>
+<b class="nc">&nbsp;        this.task = task;</b>
+<b class="nc">&nbsp;        this.searchBasedFetcher = Optional.of(fetcher);</b>
+<b class="nc">&nbsp;        this.query = Optional.of(query);</b>
+&nbsp;
+<b class="nc">&nbsp;        initializeDialog();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void initialize() {
+<b class="nc">&nbsp;        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, entryTypesManager, fileUpdateMonitor, searchBasedFetcher, query);</b>
+<b class="nc">&nbsp;        Label placeholder = new Label();</b>
+<b class="nc">&nbsp;        placeholder.textProperty().bind(viewModel.messageProperty());</b>
+<b class="nc">&nbsp;        entriesListView.setPlaceholder(placeholder);</b>
+<b class="nc">&nbsp;        entriesListView.setItems(viewModel.getEntries());</b>
+<b class="nc">&nbsp;        entriesListView.getCheckModel().getCheckedItems().addListener((ListChangeListener&lt;BibEntry&gt;) change -&gt; {</b>
+<b class="nc">&nbsp;            while (change.next()) {</b>
+<b class="nc">&nbsp;                if (change.wasAdded()) {</b>
+<b class="nc">&nbsp;                    for (BibEntry entry : change.getAddedSubList()) {</b>
+<b class="nc">&nbsp;                        viewModel.getCheckedEntries().add(entry);</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                if (change.wasRemoved()) {</b>
+<b class="nc">&nbsp;                    for (BibEntry entry : change.getRemoved()) {</b>
+<b class="nc">&nbsp;                        viewModel.getCheckedEntries().remove(entry);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        libraryListView.setEditable(false);</b>
+<b class="nc">&nbsp;        libraryListView.getItems().addAll(stateManager.getOpenDatabases());</b>
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;BibDatabaseContext&gt;()</b>
+<b class="nc">&nbsp;                .withText(database -&gt; {</b>
+<b class="nc">&nbsp;                    Optional&lt;String&gt; dbOpt = Optional.empty();</b>
+<b class="nc">&nbsp;                    if (database.getDatabasePath().isPresent()) {</b>
+<b class="nc">&nbsp;                        dbOpt = FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), database.getDatabasePath().get());</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (database.getLocation() == DatabaseLocation.SHARED) {</b>
+<b class="nc">&nbsp;                        return database.getDBMSSynchronizer().getDBName() + &quot; [&quot; + Localization.lang(&quot;shared&quot;) + &quot;]&quot;;</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    return dbOpt.orElseGet(() -&gt; Localization.lang(&quot;untitled&quot;));</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .install(libraryListView);</b>
+<b class="nc">&nbsp;        viewModel.selectedDbProperty().bind(libraryListView.getSelectionModel().selectedItemProperty());</b>
+<b class="nc">&nbsp;        stateManager.getActiveDatabase().ifPresent(database1 -&gt; libraryListView.getSelectionModel().select(database1));</b>
+&nbsp;
+<b class="nc">&nbsp;        PseudoClass entrySelected = PseudoClass.getPseudoClass(&quot;selected&quot;);</b>
+<b class="nc">&nbsp;        new ViewModelListCellFactory&lt;BibEntry&gt;()</b>
+<b class="nc">&nbsp;                .withGraphic(entry -&gt; {</b>
+<b class="nc">&nbsp;                    ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();</b>
+<b class="nc">&nbsp;                    EasyBind.subscribe(addToggle.selectedProperty(), selected -&gt; {</b>
+<b class="nc">&nbsp;                        if (selected) {</b>
+<b class="nc">&nbsp;                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD_FILLED.withColor(IconTheme.SELECTED_COLOR).getGraphicNode());</b>
+&nbsp;                        } else {
+<b class="nc">&nbsp;                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());</b>
+&nbsp;                        }
+&nbsp;                    });
+<b class="nc">&nbsp;                    addToggle.getStyleClass().add(&quot;addEntryButton&quot;);</b>
+<b class="nc">&nbsp;                    addToggle.selectedProperty().bindBidirectional(entriesListView.getItemBooleanProperty(entry));</b>
+<b class="nc">&nbsp;                    HBox separator = new HBox();</b>
+<b class="nc">&nbsp;                    HBox.setHgrow(separator, Priority.SOMETIMES);</b>
+<b class="nc">&nbsp;                    Node entryNode = BibEntryView.getEntryNode(entry);</b>
+<b class="nc">&nbsp;                    HBox.setHgrow(entryNode, Priority.ALWAYS);</b>
+<b class="nc">&nbsp;                    HBox container = new HBox(entryNode, separator, addToggle);</b>
+<b class="nc">&nbsp;                    container.getStyleClass().add(&quot;entry-container&quot;);</b>
+<b class="nc">&nbsp;                    container.prefWidthProperty().bind(entriesListView.widthProperty().subtract(25));</b>
+&nbsp;
+<b class="nc">&nbsp;                    BackgroundTask.wrap(() -&gt; viewModel.hasDuplicate(entry)).onSuccess(duplicateFound -&gt; {</b>
+<b class="nc">&nbsp;                        if (duplicateFound) {</b>
+<b class="nc">&nbsp;                            Node icon = IconTheme.JabRefIcons.ERROR.getGraphicNode();</b>
+<b class="nc">&nbsp;                            Tooltip tooltip = new Tooltip(Localization.lang(&quot;Possible duplicate of existing entry. Will be resolved on import.&quot;));</b>
+<b class="nc">&nbsp;                            Tooltip.install(icon, tooltip);</b>
+<b class="nc">&nbsp;                            container.getChildren().add(icon);</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                    }).executeWith(taskExecutor);</b>
+&nbsp;
+&nbsp;                    /*
+&nbsp;                    inserted the if-statement here, since a Platform.runLater() call did not work.
+&nbsp;                    also tried to move it to the end of the initialize method, but it did not select the entry.
+&nbsp;                    */
+<b class="nc">&nbsp;                    if (entriesListView.getItems().size() == 1) {</b>
+<b class="nc">&nbsp;                        selectAllNewEntries();</b>
+&nbsp;                    }
+&nbsp;
+<b class="nc">&nbsp;                    return container;</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .withOnMouseClickedEvent((entry, event) -&gt; {</b>
+<b class="nc">&nbsp;                    entriesListView.getCheckModel().toggleCheckState(entry);</b>
+<b class="nc">&nbsp;                    displayBibTeX(entry, viewModel.getSourceString(entry));</b>
+&nbsp;                })
+<b class="nc">&nbsp;                .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)</b>
+<b class="nc">&nbsp;                .install(entriesListView);</b>
+&nbsp;
+<b class="nc">&nbsp;        selectedItems.textProperty().bind(Bindings.size(viewModel.getCheckedEntries()).asString());</b>
+<b class="nc">&nbsp;        totalItems.textProperty().bind(Bindings.size(viewModel.getAllEntries()).asString());</b>
+<b class="nc">&nbsp;        entriesListView.setSelectionModel(new NoSelectionModel&lt;&gt;());</b>
+<b class="nc">&nbsp;        initBibTeX();</b>
+<b class="nc">&nbsp;        if (searchBasedFetcher.isPresent()) {</b>
+<b class="nc">&nbsp;            updatePageUI();</b>
+<b class="nc">&nbsp;            setupPaginationBindings();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initializeDialog() {
+<b class="nc">&nbsp;        ViewLoader.view(this)</b>
+<b class="nc">&nbsp;                  .load()</b>
+<b class="nc">&nbsp;                  .setAsDialogPane(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        paginationBox.setVisible(searchBasedFetcher.isPresent());</b>
+<b class="nc">&nbsp;        paginationBox.setManaged(searchBasedFetcher.isPresent());</b>
+&nbsp;
+<b class="nc">&nbsp;        BooleanBinding booleanBind = Bindings.isEmpty(entriesListView.getCheckModel().getCheckedItems());</b>
+<b class="nc">&nbsp;        Button btn = (Button) this.getDialogPane().lookupButton(importButton);</b>
+<b class="nc">&nbsp;        btn.disableProperty().bind(booleanBind);</b>
+&nbsp;
+<b class="nc">&nbsp;        downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldDownloadLinkedFiles());</b>
+&nbsp;
+<b class="nc">&nbsp;        setResultConverter(button -&gt; {</b>
+<b class="nc">&nbsp;            if (button == importButton) {</b>
+<b class="nc">&nbsp;                viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                dialogService.notify(Localization.lang(&quot;Import canceled&quot;));</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setupPaginationBindings() {
+<b class="nc">&nbsp;        BooleanProperty loading = viewModel.loadingProperty();</b>
+<b class="nc">&nbsp;        BooleanProperty initialLoadComplete = viewModel.initialLoadCompleteProperty();</b>
+&nbsp;
+<b class="nc">&nbsp;        BooleanBinding isOnLastPage = Bindings.createBooleanBinding(() -&gt; {</b>
+<b class="nc">&nbsp;            int currentPage = viewModel.currentPageProperty().get();</b>
+<b class="nc">&nbsp;            int totalPages = viewModel.totalPagesProperty().get();</b>
+<b class="nc">&nbsp;            return currentPage &gt;= totalPages - 1;</b>
+<b class="nc">&nbsp;        }, viewModel.currentPageProperty(), viewModel.totalPagesProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        BooleanBinding isPagedFetcher = Bindings.createBooleanBinding(() -&gt;</b>
+<b class="nc">&nbsp;                searchBasedFetcher.isPresent() &amp;&amp; searchBasedFetcher.get() instanceof PagedSearchBasedFetcher</b>
+&nbsp;        );
+&nbsp;
+&nbsp;        // Disable: during loading OR when on the last page for non-paged fetchers
+&nbsp;        // OR when the initial load is not complete for paged fetchers
+<b class="nc">&nbsp;        nextPageButton.disableProperty().bind(</b>
+<b class="nc">&nbsp;                loading.or(isOnLastPage.and(isPagedFetcher.not()))</b>
+<b class="nc">&nbsp;                       .or(isPagedFetcher.and(initialLoadComplete.not()))</b>
+&nbsp;        );
+<b class="nc">&nbsp;        prevPageButton.disableProperty().bind(loading.or(viewModel.currentPageProperty().isEqualTo(0)));</b>
+&nbsp;
+<b class="nc">&nbsp;        prevPageButton.textProperty().bind(</b>
+<b class="nc">&nbsp;                Bindings.when(loading)</b>
+<b class="nc">&nbsp;                        .then(&quot;&lt; &quot; + Localization.lang(&quot;Loading...&quot;))</b>
+<b class="nc">&nbsp;                        .otherwise(&quot;&lt; &quot; + Localization.lang(&quot;Previous&quot;))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        nextPageButton.textProperty().bind(</b>
+<b class="nc">&nbsp;                Bindings.when(loading)</b>
+<b class="nc">&nbsp;                        .then(Localization.lang(&quot;Loading...&quot;) + &quot; &gt;&quot;)</b>
+<b class="nc">&nbsp;                        .otherwise(</b>
+<b class="nc">&nbsp;                                Bindings.when(initialLoadComplete.not().and(isPagedFetcher))</b>
+<b class="nc">&nbsp;                                        .then(Localization.lang(&quot;Loading initial entries...&quot;))</b>
+<b class="nc">&nbsp;                                        .otherwise(</b>
+<b class="nc">&nbsp;                                                Bindings.when(isOnLastPage)</b>
+<b class="nc">&nbsp;                                                        .then(</b>
+<b class="nc">&nbsp;                                                                Bindings.when(isPagedFetcher)</b>
+<b class="nc">&nbsp;                                                                        .then(Localization.lang(&quot;Load More&quot;) + &quot; &gt;&gt;&quot;)</b>
+<b class="nc">&nbsp;                                                                        .otherwise(Localization.lang(&quot;No more entries&quot;))</b>
+&nbsp;                                                        )
+<b class="nc">&nbsp;                                                        .otherwise(Localization.lang(&quot;Next&quot;) + &quot; &gt;&quot;)</b>
+&nbsp;                                        )
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        statusLabel.textProperty().bind(</b>
+<b class="nc">&nbsp;                Bindings.when(loading)</b>
+<b class="nc">&nbsp;                        .then(Localization.lang(&quot;Fetching more entries...&quot;))</b>
+<b class="nc">&nbsp;                        .otherwise(</b>
+<b class="nc">&nbsp;                                Bindings.when(initialLoadComplete.not().and(isPagedFetcher))</b>
+<b class="nc">&nbsp;                                        .then(Localization.lang(&quot;Loading initial results...&quot;))</b>
+<b class="nc">&nbsp;                                        .otherwise(</b>
+<b class="nc">&nbsp;                                                Bindings.when(isOnLastPage)</b>
+<b class="nc">&nbsp;                                                        .then(</b>
+<b class="nc">&nbsp;                                                                Bindings.when(isPagedFetcher)</b>
+<b class="nc">&nbsp;                                                                        .then(Localization.lang(&quot;Click &#39;Load More&#39; to fetch additional entries&quot;))</b>
+<b class="nc">&nbsp;                                                                        .otherwise(Bindings.createStringBinding(() -&gt; {</b>
+<b class="nc">&nbsp;                                                                            int totalEntries = viewModel.getAllEntries().size();</b>
+<b class="nc">&nbsp;                                                                            return totalEntries &gt; 0 ?</b>
+<b class="nc">&nbsp;                                                                                   Localization.lang(&quot;All %0 entries loaded&quot;, String.valueOf(totalEntries)) :</b>
+<b class="nc">&nbsp;                                                                                   Localization.lang(&quot;No entries available&quot;);</b>
+<b class="nc">&nbsp;                                                                        }, viewModel.getAllEntries()))</b>
+&nbsp;                                                        )
+<b class="nc">&nbsp;                                                        .otherwise(&quot;&quot;)</b>
+&nbsp;                                        )
+&nbsp;                        )
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        loading.addListener((_, _, newVal) -&gt; {</b>
+<b class="nc">&nbsp;            getDialogPane().getScene().setCursor(newVal ? Cursor.WAIT : Cursor.DEFAULT);</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        isOnLastPage.addListener((_, oldVal, newVal) -&gt; {</b>
+<b class="nc">&nbsp;            if (newVal &amp;&amp; !oldVal) {</b>
+<b class="nc">&nbsp;                statusLabel.getStyleClass().add(&quot;info-message&quot;);</b>
+<b class="nc">&nbsp;            } else if (!newVal &amp;&amp; oldVal) {</b>
+<b class="nc">&nbsp;                statusLabel.getStyleClass().remove(&quot;info-message&quot;);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void updatePageUI() {
+<b class="nc">&nbsp;        pageNumberLabel.textProperty().bind(Bindings.createStringBinding(() -&gt; {</b>
+<b class="nc">&nbsp;            int totalPages = viewModel.totalPagesProperty().get();</b>
+<b class="nc">&nbsp;            int currentPage = viewModel.currentPageProperty().get() + 1;</b>
+<b class="nc">&nbsp;            if (totalPages != 0) {</b>
+<b class="nc">&nbsp;                return Localization.lang(&quot;%0 of %1&quot;, currentPage, totalPages);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+<b class="nc">&nbsp;        }, viewModel.currentPageProperty(), viewModel.totalPagesProperty()));</b>
+&nbsp;
+<b class="nc">&nbsp;        viewModel.getAllEntries().addListener((ListChangeListener&lt;BibEntry&gt;) change -&gt; {</b>
+<b class="nc">&nbsp;            while (change.next()) {</b>
+<b class="nc">&nbsp;                if (change.wasAdded() || change.wasRemoved()) {</b>
+<b class="nc">&nbsp;                    viewModel.updateTotalPages();</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    private void displayBibTeX(BibEntry entry, String bibTeX) {
+<b class="nc">&nbsp;        if (viewModel.getCheckedEntries().contains(entry)) {</b>
+<b class="nc">&nbsp;            bibTeXData.clear();</b>
+<b class="nc">&nbsp;            bibTeXData.appendText(bibTeX);</b>
+<b class="nc">&nbsp;            bibTeXData.moveTo(0);</b>
+<b class="nc">&nbsp;            bibTeXData.requestFollowCaret();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            bibTeXData.clear();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initBibTeX() {
+<b class="nc">&nbsp;        bibTeXDataLabel.setText(Localization.lang(&quot;%0 source&quot;, &quot;BibTeX&quot;));</b>
+<b class="nc">&nbsp;        bibTeXData.setBorder(new Border(new BorderStroke(Color.GREY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));</b>
+<b class="nc">&nbsp;        bibTeXData.setPadding(new Insets(5.0));</b>
+<b class="nc">&nbsp;        showEntryInformation.selectedProperty().addListener((observableValue, old_val, new_val) -&gt; {</b>
+<b class="nc">&nbsp;            bibTeXDataBox.setVisible(new_val);</b>
+<b class="nc">&nbsp;            bibTeXDataBox.setManaged(new_val);</b>
+&nbsp;        });
+&nbsp;    }
+&nbsp;
+&nbsp;    public void unselectAll() {
+<b class="nc">&nbsp;        viewModel.getCheckedEntries().clear();</b>
+<b class="nc">&nbsp;        entriesListView.getItems().forEach(entry -&gt; entriesListView.getCheckModel().clearCheck(entry));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectAllNewEntries() {
+<b class="nc">&nbsp;        unselectAll();</b>
+<b class="nc">&nbsp;        for (BibEntry entry : viewModel.getAllEntries()) {</b>
+<b class="nc">&nbsp;            if (!viewModel.hasDuplicate(entry)) {</b>
+<b class="nc">&nbsp;                entriesListView.getCheckModel().check(entry);</b>
+<b class="nc">&nbsp;                viewModel.getCheckedEntries().add(entry);</b>
+<b class="nc">&nbsp;                displayBibTeX(entry, viewModel.getSourceString(entry));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void selectAllEntries() {
+<b class="nc">&nbsp;        unselectAll();</b>
+<b class="nc">&nbsp;        entriesListView.getCheckModel().checkAll();</b>
+<b class="nc">&nbsp;        viewModel.getCheckedEntries().addAll(viewModel.getAllEntries());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isOnLastPageAndPagedFetcher() {
+<b class="nc">&nbsp;        if (searchBasedFetcher.isEmpty() || !(searchBasedFetcher.get() instanceof PagedSearchBasedFetcher)) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int currentPage = viewModel.currentPageProperty().get();</b>
+<b class="nc">&nbsp;        int totalPages = viewModel.totalPagesProperty().get();</b>
+<b class="nc">&nbsp;        return currentPage &gt;= totalPages - 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void onPrevPage() {
+<b class="nc">&nbsp;        viewModel.goToPrevPage();</b>
+<b class="nc">&nbsp;        restoreCheckedEntries();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @FXML
+&nbsp;    private void onNextPage() {
+<b class="nc">&nbsp;        if (isOnLastPageAndPagedFetcher()) {</b>
+<b class="nc">&nbsp;            viewModel.fetchMoreEntries();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            viewModel.goToNextPage();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        restoreCheckedEntries();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void restoreCheckedEntries() {
+<b class="nc">&nbsp;        for (BibEntry entry : viewModel.getEntries()) {</b>
+<b class="nc">&nbsp;            if (viewModel.getCheckedEntries().contains(entry)) {</b>
+<b class="nc">&nbsp;                entriesListView.getCheckModel().check(entry);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

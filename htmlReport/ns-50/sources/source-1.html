@@ -1,0 +1,319 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibEntryTableViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.maintable</a>
+</div>
+
+<h1>Coverage Summary for Class: BibEntryTableViewModel (org.jabref.gui.maintable)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibEntryTableViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/81)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.maintable;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.function.Predicate;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javafx.beans.Observable;
+&nbsp;import javafx.beans.binding.Binding;
+&nbsp;import javafx.beans.binding.Bindings;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.ReadOnlyStringWrapper;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.beans.value.ObservableValue;
+&nbsp;
+&nbsp;import org.jabref.gui.search.MatchCategory;
+&nbsp;import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+&nbsp;import org.jabref.gui.util.uithreadaware.UiThreadBinding;
+&nbsp;import org.jabref.logic.importer.util.FileFieldParser;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.OrFields;
+&nbsp;import org.jabref.model.entry.field.SpecialField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.groups.AbstractGroup;
+&nbsp;import org.jabref.model.groups.GroupTreeNode;
+&nbsp;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import com.tobiasdiez.easybind.EasyBinding;
+&nbsp;import com.tobiasdiez.easybind.optional.OptionalBinding;
+&nbsp;
+&nbsp;public class BibEntryTableViewModel {
+&nbsp;    private final BibEntry entry;
+&nbsp;    private final ObservableValue&lt;MainTableFieldValueFormatter&gt; fieldValueFormatter;
+<b class="nc">&nbsp;    private final Map&lt;OrFields, ObservableValue&lt;String&gt;&gt; fieldValues = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    private final Map&lt;SpecialField, OptionalBinding&lt;SpecialFieldValueViewModel&gt;&gt; specialFieldValues = new HashMap&lt;&gt;();</b>
+&nbsp;    private final EasyBinding&lt;List&lt;LinkedFile&gt;&gt; linkedFiles;
+&nbsp;    private final EasyBinding&lt;Map&lt;Field, String&gt;&gt; linkedIdentifiers;
+&nbsp;    private final Binding&lt;List&lt;AbstractGroup&gt;&gt; matchedGroups;
+&nbsp;    private final BibDatabaseContext bibDatabaseContext;
+<b class="nc">&nbsp;    private final BooleanProperty hasFullTextResults = new SimpleBooleanProperty(false);</b>
+<b class="nc">&nbsp;    private final BooleanProperty isMatchedBySearch = new SimpleBooleanProperty(true);</b>
+<b class="nc">&nbsp;    private final BooleanProperty isVisibleBySearch = new SimpleBooleanProperty(true);</b>
+<b class="nc">&nbsp;    private final BooleanProperty isMatchedByGroup = new SimpleBooleanProperty(true);</b>
+<b class="nc">&nbsp;    private final BooleanProperty isVisibleByGroup = new SimpleBooleanProperty(true);</b>
+<b class="nc">&nbsp;    private final ObjectProperty&lt;MatchCategory&gt; matchCategory = new SimpleObjectProperty&lt;&gt;(MatchCategory.MATCHING_SEARCH_AND_GROUPS);</b>
+&nbsp;
+<b class="nc">&nbsp;    public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue&lt;MainTableFieldValueFormatter&gt; fieldValueFormatter) {</b>
+<b class="nc">&nbsp;        this.entry = entry;</b>
+<b class="nc">&nbsp;        this.bibDatabaseContext = bibDatabaseContext;</b>
+<b class="nc">&nbsp;        this.fieldValueFormatter = fieldValueFormatter;</b>
+&nbsp;
+<b class="nc">&nbsp;        this.linkedFiles = getField(StandardField.FILE).mapOpt(FileFieldParser::parse).orElseOpt(List.of());</b>
+<b class="nc">&nbsp;        this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);</b>
+<b class="nc">&nbsp;        this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static EasyBinding&lt;Map&lt;Field, String&gt;&gt; createLinkedIdentifiersBinding(BibEntry entry) {
+<b class="nc">&nbsp;        return EasyBind.combine(</b>
+<b class="nc">&nbsp;                entry.getFieldBinding(StandardField.URL),</b>
+<b class="nc">&nbsp;                entry.getFieldBinding(StandardField.DOI),</b>
+<b class="nc">&nbsp;                entry.getFieldBinding(StandardField.URI),</b>
+<b class="nc">&nbsp;                entry.getFieldBinding(StandardField.EPRINT),</b>
+<b class="nc">&nbsp;                entry.getFieldBinding(StandardField.ISBN),</b>
+&nbsp;                (url, doi, uri, eprint, isbn) -&gt; {
+<b class="nc">&nbsp;                    Map&lt;Field, String&gt; identifiers = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;                    url.ifPresent(value -&gt; identifiers.put(StandardField.URL, value));</b>
+<b class="nc">&nbsp;                    doi.ifPresent(value -&gt; identifiers.put(StandardField.DOI, value));</b>
+<b class="nc">&nbsp;                    uri.ifPresent(value -&gt; identifiers.put(StandardField.URI, value));</b>
+<b class="nc">&nbsp;                    eprint.ifPresent(value -&gt; identifiers.put(StandardField.EPRINT, value));</b>
+<b class="nc">&nbsp;                    isbn.ifPresent(value -&gt; identifiers.put(StandardField.ISBN, value));</b>
+<b class="nc">&nbsp;                    return identifiers;</b>
+&nbsp;                });
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibEntry getEntry() {
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Binding&lt;List&lt;AbstractGroup&gt;&gt; createMatchedGroupsBinding(BibDatabaseContext database, BibEntry entry) {
+<b class="nc">&nbsp;        return new UiThreadBinding&lt;&gt;(EasyBind.combine(entry.getFieldBinding(StandardField.GROUPS), database.getMetaData().groupsBinding(),</b>
+&nbsp;                (_, _) -&gt;
+<b class="nc">&nbsp;                        database.getMetaData().getGroups().map(groupTreeNode -&gt;</b>
+<b class="nc">&nbsp;                                        groupTreeNode.getMatchingGroups(entry).stream()</b>
+<b class="nc">&nbsp;                                                     .map(GroupTreeNode::getGroup)</b>
+<b class="nc">&nbsp;                                                     .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))</b>
+<b class="nc">&nbsp;                                                     .collect(Collectors.toList()))</b>
+<b class="nc">&nbsp;                                .orElse(List.of())));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OptionalBinding&lt;String&gt; getField(Field field) {
+<b class="nc">&nbsp;        return entry.getFieldBinding(field);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableValue&lt;List&lt;LinkedFile&gt;&gt; getLinkedFiles() {
+<b class="nc">&nbsp;        return linkedFiles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableValue&lt;Map&lt;Field, String&gt;&gt; getLinkedIdentifiers() {
+<b class="nc">&nbsp;        return linkedIdentifiers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableValue&lt;List&lt;AbstractGroup&gt;&gt; getMatchedGroups() {
+<b class="nc">&nbsp;        return matchedGroups;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableValue&lt;Optional&lt;SpecialFieldValueViewModel&gt;&gt; getSpecialField(SpecialField field) {
+<b class="nc">&nbsp;        OptionalBinding&lt;SpecialFieldValueViewModel&gt; value = specialFieldValues.get(field);</b>
+&nbsp;        // Fetch possibly updated value from BibEntry entry
+<b class="nc">&nbsp;        Optional&lt;String&gt; currentValue = this.entry.getField(field);</b>
+<b class="nc">&nbsp;        if (value != null) {</b>
+<b class="nc">&nbsp;            if (currentValue.isEmpty() &amp;&amp; value.getValue().isEmpty()) {</b>
+<b class="nc">&nbsp;                OptionalBinding&lt;SpecialFieldValueViewModel&gt; zeroValue = getField(field).flatMapOpt(_ -&gt; field.parseValue(&quot;CLEAR_RANK&quot;).map(SpecialFieldValueViewModel::new));</b>
+<b class="nc">&nbsp;                specialFieldValues.put(field, zeroValue);</b>
+<b class="nc">&nbsp;                return zeroValue;</b>
+<b class="nc">&nbsp;            } else if (value.getValue().isEmpty() || !value.getValue().get().getValue().getFieldValue().equals(currentValue)) {</b>
+&nbsp;                // specialFieldValues value and BibEntry value differ =&gt; Set specialFieldValues value to BibEntry value
+<b class="nc">&nbsp;                value = getField(field).flatMapOpt(fieldValue -&gt; field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));</b>
+<b class="nc">&nbsp;                specialFieldValues.put(field, value);</b>
+<b class="nc">&nbsp;                return value;</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            value = getField(field).flatMapOpt(fieldValue -&gt; field.parseValue(fieldValue).map(SpecialFieldValueViewModel::new));</b>
+<b class="nc">&nbsp;            specialFieldValues.put(field, value);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableValue&lt;String&gt; getFields(OrFields fields) {
+<b class="nc">&nbsp;        ObservableValue&lt;String&gt; value = fieldValues.get(fields);</b>
+<b class="nc">&nbsp;        if (value != null) {</b>
+<b class="nc">&nbsp;            return value;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ArrayList&lt;Observable&gt; observables = new ArrayList&lt;&gt;(List.of(entry.getObservables()));</b>
+<b class="nc">&nbsp;        observables.add(fieldValueFormatter);</b>
+&nbsp;
+<b class="nc">&nbsp;        value = Bindings.createStringBinding(() -&gt;</b>
+<b class="nc">&nbsp;                        fieldValueFormatter.getValue().formatFieldsValues(fields, entry),</b>
+<b class="nc">&nbsp;                observables.toArray(Observable[]::new));</b>
+<b class="nc">&nbsp;        fieldValues.put(fields, value);</b>
+<b class="nc">&nbsp;        return value;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringProperty bibDatabasePathProperty() {
+<b class="nc">&nbsp;        return new ReadOnlyStringWrapper(bibDatabaseContext.getDatabasePath().map(Path::toString).orElse(&quot;&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BibDatabaseContext getBibDatabaseContext() {
+<b class="nc">&nbsp;        return bibDatabaseContext;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty hasFullTextResultsProperty() {
+<b class="nc">&nbsp;        return hasFullTextResults;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty isMatchedBySearch() {
+<b class="nc">&nbsp;        return isMatchedBySearch;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty isVisibleBySearch() {
+<b class="nc">&nbsp;        return isVisibleBySearch;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty isMatchedByGroup() {
+<b class="nc">&nbsp;        return isMatchedByGroup;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty isVisibleByGroup() {
+<b class="nc">&nbsp;        return isVisibleByGroup;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;MatchCategory&gt; matchCategory() {
+<b class="nc">&nbsp;        return matchCategory;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isVisible() {
+<b class="nc">&nbsp;        return isVisibleBySearch.get() &amp;&amp; isVisibleByGroup.get();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void updateMatchCategory() {
+<b class="nc">&nbsp;        MatchCategory category = MatchCategory.NOT_MATCHING_SEARCH_AND_GROUPS;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isMatchedBySearch.get() &amp;&amp; isMatchedByGroup.get()) {</b>
+<b class="nc">&nbsp;            category = MatchCategory.MATCHING_SEARCH_AND_GROUPS;</b>
+<b class="nc">&nbsp;        } else if (isMatchedBySearch.get()) {</b>
+<b class="nc">&nbsp;            category = MatchCategory.MATCHING_SEARCH_NOT_GROUPS;</b>
+<b class="nc">&nbsp;        } else if (isMatchedByGroup.get()) {</b>
+<b class="nc">&nbsp;            category = MatchCategory.MATCHING_GROUPS_NOT_SEARCH;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        matchCategory.set(category);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

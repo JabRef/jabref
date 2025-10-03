@@ -1,0 +1,111 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TaskExecutor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.util</a>
+</div>
+
+<h1>Coverage Summary for Class: TaskExecutor (org.jabref.logic.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">TaskExecutor</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.util;
+&nbsp;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;/**
+&nbsp; * An object that executes submitted {@link javafx.concurrent.Task}s. This
+&nbsp; * interface provides a way of decoupling task submission from the
+&nbsp; * mechanics of how each task will be run, including details of thread
+&nbsp; * use, scheduling, thread pooling, etc.
+&nbsp; */
+&nbsp;public interface TaskExecutor {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Runs the given task and returns a Future representing that task.
+&nbsp;     *
+&nbsp;     * @param &lt;V&gt;  type of return value of the task
+&nbsp;     * @param task the task to run
+&nbsp;     */
+&nbsp;    &lt;V&gt; Future&lt;V&gt; execute(BackgroundTask&lt;V&gt; task);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Submits a one-shot task that becomes enabled after the given delay.
+&nbsp;     *
+&nbsp;     * @param task  the task to execute
+&nbsp;     * @param delay the time from now to delay execution
+&nbsp;     * @param unit  the time unit of the delay parameter
+&nbsp;     * @return a ScheduledFuture representing pending completion of
+&nbsp;     * the task and whose {@code get()} method will return
+&nbsp;     * {@code null} upon completion
+&nbsp;     */
+&nbsp;    &lt;V&gt; Future&lt;?&gt; schedule(BackgroundTask&lt;V&gt; task, long delay, TimeUnit unit);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Shutdown the task executor. May happen in the background or may be finished when this method returns.
+&nbsp;     */
+&nbsp;    void shutdown();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a new task throttler, and registers it so that it gets properly shutdown.
+&nbsp;     */
+&nbsp;    DelayTaskThrottler createThrottler(int delay);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

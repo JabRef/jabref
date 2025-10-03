@@ -1,0 +1,388 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PdfMergeMetadataImporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: PdfMergeMetadataImporter (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PdfMergeMetadataImporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PdfMergeMetadataImporter$EntryBasedFetcherWrapper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/63)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.cleanup.RelativePathsCleanup;
+&nbsp;import org.jabref.logic.importer.EntryBasedFetcher;
+&nbsp;import org.jabref.logic.importer.FetcherException;
+&nbsp;import org.jabref.logic.importer.IdBasedFetcher;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ParseException;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.fetcher.ArXivFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.DoiFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfEmbeddedBibFileImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfGrobidImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfVerbatimBibtexImporter;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfXmpImporter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.util.io.FileUtil;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.LinkedFile;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocument;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Tries to import BibTeX data trying multiple {@link PdfImporter}s and merging the results.
+&nbsp; * See {@link PdfMergeMetadataImporter#metadataImporters} for the list of importers used.
+&nbsp; * &lt;p&gt;
+&nbsp; * After all importers are applied, this importer tries to fetch additional metadata for the entry using the DOI and ISBN.
+&nbsp; */
+&nbsp;public class PdfMergeMetadataImporter extends PdfImporter {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(PdfMergeMetadataImporter.class);</b>
+&nbsp;
+&nbsp;    private final List&lt;PdfImporter&gt; metadataImporters;
+&nbsp;
+&nbsp;    private final DoiFetcher doiFetcher;
+&nbsp;    private final ArXivFetcher arXivFetcher;
+&nbsp;    private final IsbnFetcher isbnFetcher;
+&nbsp;
+<b class="nc">&nbsp;    public PdfMergeMetadataImporter(ImportFormatPreferences importFormatPreferences) {</b>
+&nbsp;        // TODO: Evaluate priorities of these {@link PdfBibExtractor}s.
+<b class="nc">&nbsp;        this.metadataImporters = new ArrayList&lt;&gt;(List.of(</b>
+&nbsp;                new PdfVerbatimBibtexImporter(importFormatPreferences),
+&nbsp;                new PdfEmbeddedBibFileImporter(importFormatPreferences),
+<b class="nc">&nbsp;                new PdfXmpImporter(importFormatPreferences.xmpPreferences()),</b>
+&nbsp;                new PdfContentImporter()
+&nbsp;        ));
+&nbsp;
+<b class="nc">&nbsp;        if (importFormatPreferences.grobidPreferences().isGrobidEnabled()) {</b>
+<b class="nc">&nbsp;            this.metadataImporters.add(2, new PdfGrobidImporter(importFormatPreferences));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        doiFetcher = new DoiFetcher(importFormatPreferences);</b>
+<b class="nc">&nbsp;        arXivFetcher = new ArXivFetcher(importFormatPreferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        isbnFetcher = new IsbnFetcher(importFormatPreferences);</b>
+&nbsp;        // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences))
+&nbsp;        // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences))
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Makes {@link BibEntry} out of PDF file via merging results of several PDF analysis steps ({@link PdfImporter}).
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Algorithm:
+&nbsp;     * 1. Store all candidates (possible {@link BibEntry}ies) in a list. First elements in this list will have higher
+&nbsp;     * priority for merging, which means that more fields will be stored for first entries, rather than last.
+&nbsp;     * 2. Run {@link PdfImporter}s, and store extracted candidates in the list.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public List&lt;BibEntry&gt; importDatabase(Path filePath, PDDocument document) throws IOException, ParseException {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; extractedCandidates = extractCandidatesFromPdf(filePath, document);</b>
+<b class="nc">&nbsp;        if (extractedCandidates.isEmpty()) {</b>
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; fetchedCandidates = fetchIdsOfCandidates(extractedCandidates);</b>
+&nbsp;
+<b class="nc">&nbsp;        Stream&lt;BibEntry&gt; allCandidates = Stream.concat(fetchedCandidates.stream(), extractedCandidates.stream());</b>
+<b class="nc">&nbsp;        BibEntry entry = mergeCandidates(allCandidates);</b>
+&nbsp;
+&nbsp;        // We use the absolute path here as we do not know the context where this import will be used.
+&nbsp;        // The caller is responsible for making the path relative if necessary.
+<b class="nc">&nbsp;        entry.addFile(new LinkedFile(&quot;&quot;, filePath, StandardFileType.PDF.getName()));</b>
+<b class="nc">&nbsp;        return List.of(entry);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntry&gt; extractCandidatesFromPdf(Path filePath, PDDocument document) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; candidates = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (PdfImporter metadataImporter : metadataImporters) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                List&lt;BibEntry&gt; extractedEntries = metadataImporter.importDatabase(filePath, document);</b>
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Importer {} extracted {}&quot;, metadataImporter.getName(), extractedEntries);</b>
+<b class="nc">&nbsp;                candidates.addAll(extractedEntries);</b>
+&nbsp;            } catch (ParseException | IOException e) {
+<b class="nc">&nbsp;                LOGGER.error(&quot;Got an exception while importing PDF file&quot;, e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return candidates;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntry&gt; fetchIdsOfCandidates(List&lt;BibEntry&gt; candidates) {
+<b class="nc">&nbsp;        List&lt;BibEntry&gt; fetchedCandidates = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Collects Ids already looked for - to avoid multiple calls for one id
+<b class="nc">&nbsp;        final Set&lt;String&gt; fetchedIds = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (BibEntry candidate : candidates) {</b>
+<b class="nc">&nbsp;            fetchData(candidate, StandardField.DOI, doiFetcher, fetchedIds, fetchedCandidates);</b>
+&nbsp;
+&nbsp;            // This code assumes that `eprint` field refers to an arXiv preprint, which is not correct.
+&nbsp;            // One should also check if `archivePrefix` is equal to `arXiv`, and handle other cases too.
+<b class="nc">&nbsp;            fetchData(candidate, StandardField.EPRINT, arXivFetcher, fetchedIds, fetchedCandidates);</b>
+&nbsp;
+<b class="nc">&nbsp;            fetchData(candidate, StandardField.ISBN, isbnFetcher, fetchedIds, fetchedCandidates);</b>
+&nbsp;
+&nbsp;            // TODO: Handle URLs too.
+&nbsp;            // However, it may have problems if URL refers to the same identifier in DOI, ISBN, or arXiv.
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return fetchedCandidates;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param candidate         The BibEntry to look for the field
+&nbsp;     * @param field             The field to look for
+&nbsp;     * @param fetcher           The fetcher to use
+&nbsp;     * @param fetchedIds        The already fetched ids (will be updated)
+&nbsp;     * @param fetchedCandidates New candidate (will be updated)
+&nbsp;     */
+&nbsp;    private void fetchData(BibEntry candidate, StandardField field, IdBasedFetcher fetcher, Set&lt;String&gt; fetchedIds, List&lt;BibEntry&gt; fetchedCandidates) {
+<b class="nc">&nbsp;        candidate.getField(field)</b>
+<b class="nc">&nbsp;                 .filter(id -&gt; !fetchedIds.contains(id))</b>
+<b class="nc">&nbsp;                 .ifPresent(id -&gt; {</b>
+<b class="nc">&nbsp;                     fetchedIds.add(id);</b>
+&nbsp;                     try {
+<b class="nc">&nbsp;                         fetcher.performSearchById(id)</b>
+<b class="nc">&nbsp;                                .ifPresent(fetchedCandidates::add);</b>
+&nbsp;                     } catch (FetcherException e) {
+<b class="nc">&nbsp;                         LOGGER.error(&quot;Fetching failed for id \&quot;{}\&quot;.&quot;, id, e);</b>
+&nbsp;                     }
+&nbsp;                 });
+&nbsp;    }
+&nbsp;
+&nbsp;    private static BibEntry mergeCandidates(Stream&lt;BibEntry&gt; candidates) {
+<b class="nc">&nbsp;        final BibEntry entry = new BibEntry();</b>
+<b class="nc">&nbsp;        candidates.forEach(entry::mergeWith);</b>
+&nbsp;
+&nbsp;        // Retain online links only
+<b class="nc">&nbsp;        List&lt;LinkedFile&gt; onlineLinks = entry.getFiles().stream().filter(LinkedFile::isOnlineLink).toList();</b>
+<b class="nc">&nbsp;        entry.clearField(StandardField.FILE);</b>
+<b class="nc">&nbsp;        entry.addFiles(onlineLinks);</b>
+&nbsp;
+<b class="nc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Imports the BibTeX data from the given PDF file and relativized the paths of each linked file based on the context and the file preferences.
+&nbsp;     */
+&nbsp;    public ParserResult importDatabase(Path filePath, BibDatabaseContext context, FilePreferences filePreferences) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(context);</b>
+<b class="nc">&nbsp;        Objects.requireNonNull(filePreferences);</b>
+&nbsp;
+<b class="nc">&nbsp;        ParserResult parserResult = importDatabase(filePath);</b>
+&nbsp;
+<b class="nc">&nbsp;        RelativePathsCleanup relativePathsCleanup = new RelativePathsCleanup(context, filePreferences);</b>
+<b class="nc">&nbsp;        parserResult.getDatabase().getEntries().forEach(relativePathsCleanup::cleanup);</b>
+&nbsp;
+<b class="nc">&nbsp;        return parserResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return &quot;pdfMerged&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;PDF meta data merger&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Imports BibTeX data from a PDF using multiple strategies (e.g., XMP, embedded BibTeX, text parsing, Grobid, and DOI lookup) and merges the result.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class EntryBasedFetcherWrapper extends PdfMergeMetadataImporter implements EntryBasedFetcher {
+&nbsp;
+&nbsp;        private final FilePreferences filePreferences;
+&nbsp;        private final BibDatabaseContext databaseContext;
+&nbsp;
+&nbsp;        public EntryBasedFetcherWrapper(ImportFormatPreferences importFormatPreferences, FilePreferences filePreferences, BibDatabaseContext context) {
+<b class="nc">&nbsp;            super(importFormatPreferences);</b>
+<b class="nc">&nbsp;            this.filePreferences = filePreferences;</b>
+<b class="nc">&nbsp;            this.databaseContext = context;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public List&lt;BibEntry&gt; performSearch(BibEntry entry) throws FetcherException {
+<b class="nc">&nbsp;            for (LinkedFile file : entry.getFiles()) {</b>
+<b class="nc">&nbsp;                Optional&lt;Path&gt; filePath = file.findIn(databaseContext, filePreferences);</b>
+<b class="nc">&nbsp;                if (filePath.isPresent()) {</b>
+<b class="nc">&nbsp;                    ParserResult result = importDatabase(filePath.get());</b>
+<b class="nc">&nbsp;                    if (!result.isEmpty()) {</b>
+<b class="nc">&nbsp;                        return FileUtil.relativize(result.getDatabase().getEntries(), databaseContext, filePreferences);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

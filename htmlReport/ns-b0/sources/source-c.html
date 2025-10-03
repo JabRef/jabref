@@ -1,0 +1,195 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BstVisitor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.bst</a>
+</div>
+
+<h1>Coverage Summary for Class: BstVisitor (org.jabref.logic.bst)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">BstVisitor</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;// Generated from org/jabref/logic/bst/Bst.g4 by ANTLR 4.13.2
+&nbsp;
+&nbsp;package org.jabref.logic.bst;
+&nbsp;
+&nbsp;import org.antlr.v4.runtime.tree.ParseTreeVisitor;
+&nbsp;
+&nbsp;/**
+&nbsp; * This interface defines a complete generic visitor for a parse tree produced
+&nbsp; * by {@link BstParser}.
+&nbsp; *
+&nbsp; * @param &lt;T&gt; The return type of the visit operation. Use {@link Void} for
+&nbsp; * operations with no return type.
+&nbsp; */
+&nbsp;public interface BstVisitor&lt;T&gt; extends ParseTreeVisitor&lt;T&gt; {
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link BstParser#bstFile}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitBstFile(BstParser.BstFileContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code stringsCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitStringsCommand(BstParser.StringsCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code integersCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitIntegersCommand(BstParser.IntegersCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code functionCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitFunctionCommand(BstParser.FunctionCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code macroCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitMacroCommand(BstParser.MacroCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code readCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitReadCommand(BstParser.ReadCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code executeCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitExecuteCommand(BstParser.ExecuteCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code iterateCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitIterateCommand(BstParser.IterateCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code reverseCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitReverseCommand(BstParser.ReverseCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code entryCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitEntryCommand(BstParser.EntryCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by the {@code sortCommand}
+&nbsp;	 * labeled alternative in {@link BstParser#commands}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitSortCommand(BstParser.SortCommandContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link BstParser#identifier}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitIdentifier(BstParser.IdentifierContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link BstParser#idListObl}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitIdListObl(BstParser.IdListOblContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link BstParser#idListOpt}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitIdListOpt(BstParser.IdListOptContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link BstParser#bstFunction}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitBstFunction(BstParser.BstFunctionContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link BstParser#stack}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitStack(BstParser.StackContext ctx);
+&nbsp;	/**
+&nbsp;	 * Visit a parse tree produced by {@link BstParser#stackitem}.
+&nbsp;	 * @param ctx the parse tree
+&nbsp;	 * @return the visitor result
+&nbsp;	 */
+&nbsp;	T visitStackitem(BstParser.StackitemContext ctx);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,226 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ISIDOREQueryTransformer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fetcher.transformers</a>
+</div>
+
+<h1>Coverage Summary for Class: ISIDOREQueryTransformer (org.jabref.logic.importer.fetcher.transformers)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ISIDOREQueryTransformer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fetcher.transformers;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;import org.jabref.logic.formatter.casechanger.Word;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+<b class="nc">&nbsp;public class ISIDOREQueryTransformer extends YearRangeByFilteringQueryTransformer {</b>
+&nbsp;
+&nbsp;    public static final int MAX_TERMS = 4;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(ISIDOREQueryTransformer.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private int handleCountTitle = 0;</b>
+<b class="nc">&nbsp;    private int handleCountAuthor = 0;</b>
+<b class="nc">&nbsp;    private int handleUnfieldedTermCount = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;    private Map&lt;String, String&gt; parameterMap = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String getLogicalAndOperator() {
+<b class="nc">&nbsp;        return &quot;+AND+&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String getLogicalOrOperator() {
+<b class="nc">&nbsp;        return &quot;+OR+&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String getLogicalNotOperator() {
+<b class="nc">&nbsp;        return &quot;+NOT+&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleAuthor(String author) {
+<b class="nc">&nbsp;        handleCountAuthor++;</b>
+<b class="nc">&nbsp;        if (handleCountAuthor &gt; 3) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String lastFirst = AuthorList.fixAuthorLastNameFirstCommas(author, false, true);</b>
+<b class="nc">&nbsp;        lastFirst = lastFirst.replace(&quot;, &quot;, &quot;_&quot;).toLowerCase(Locale.ENGLISH);</b>
+<b class="nc">&nbsp;        parameterMap.put(&quot;author&quot;, lastFirst);</b>
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleTitle(String title) {
+<b class="nc">&nbsp;        handleCountTitle++;</b>
+<b class="nc">&nbsp;        if (handleCountTitle &gt; 3) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return handleUnFieldedTerm(title).orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleJournal(String journalTitle) {
+<b class="nc">&nbsp;        LOGGER.warn(&quot;ISIDORE does not support searching by journal&quot;);</b>
+<b class="nc">&nbsp;        return handleUnFieldedTerm(journalTitle).orElse(&quot;&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String handleYear(String year) {
+<b class="nc">&nbsp;        parameterMap.put(&quot;date&quot;, year);</b>
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected Optional&lt;String&gt; handleUnFieldedTerm(String term) {
+<b class="nc">&nbsp;        if (Word.SMALLER_WORDS.contains(term)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // if not letter or digit, ignore
+<b class="nc">&nbsp;        if (!term.matches(&quot;\\w+&quot;)) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        handleUnfieldedTermCount++;</b>
+<b class="nc">&nbsp;        if (handleUnfieldedTermCount &gt; MAX_TERMS) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return super.handleUnFieldedTerm(term);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, String&gt; getParameterMap() {
+<b class="nc">&nbsp;        return this.parameterMap;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected Optional&lt;String&gt; handleOtherField(String fieldAsString, String term) {
+<b class="nc">&nbsp;        Optional&lt;String&gt; first = handleUnFieldedTerm(fieldAsString);</b>
+<b class="nc">&nbsp;        Optional&lt;String&gt; second = handleUnFieldedTerm(term);</b>
+<b class="nc">&nbsp;        if (first.isEmpty() &amp;&amp; second.isEmpty()) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (first.isEmpty()) {</b>
+<b class="nc">&nbsp;            return second;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (second.isEmpty()) {</b>
+<b class="nc">&nbsp;            return first;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(fieldAsString + &quot; &quot; + term);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

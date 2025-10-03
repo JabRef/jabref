@@ -1,0 +1,596 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibliographyFromPdfImporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer.fileformat</a>
+</div>
+
+<h1>Coverage Summary for Class: BibliographyFromPdfImporter (org.jabref.logic.importer.fileformat)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibliographyFromPdfImporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/74)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/184)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BibliographyFromPdfImporter$EntryUpdateResult</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">BibliographyFromPdfImporter$IntermediateData</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/74)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/187)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer.fileformat;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.StringWriter;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+&nbsp;import org.jabref.logic.cleanup.URLCleanup;
+&nbsp;import org.jabref.logic.formatter.bibtexfields.NormalizeUnicodeFormatter;
+&nbsp;import org.jabref.logic.importer.AuthorListParser;
+&nbsp;import org.jabref.logic.importer.Importer;
+&nbsp;import org.jabref.logic.importer.ParserResult;
+&nbsp;import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.util.FileType;
+&nbsp;import org.jabref.logic.util.StandardFileType;
+&nbsp;import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
+&nbsp;import org.jabref.logic.xmp.XmpUtilReader;
+&nbsp;import org.jabref.model.entry.AuthorList;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.Date;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.StandardEntryType;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;import org.apache.pdfbox.pdmodel.PDDocument;
+&nbsp;import org.apache.pdfbox.text.PDFTextStripper;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * Parses the references from the &quot;References&quot; section from a PDF.
+&nbsp; * &lt;p&gt;
+&nbsp; * Currently, IEEE two column format is supported.
+&nbsp; * &lt;p&gt;
+&nbsp; * To extract a {@link BibEntry} matching the PDF, see {@link PdfContentImporter}.
+&nbsp; * &lt;p&gt;
+&nbsp; * TODO: This class is similar to {@link org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser}, we need to unify them.
+&nbsp; */
+&nbsp;@AllowedToUseApacheCommonsLang3(&quot;Fastest method to count spaces in a string&quot;)
+&nbsp;public class BibliographyFromPdfImporter extends Importer {
+&nbsp;
+<b class="nc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(BibliographyFromPdfImporter.class);</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern REFERENCES = Pattern.compile(&quot;References&quot;, Pattern.CASE_INSENSITIVE);</b>
+<b class="nc">&nbsp;    private static final Pattern REFERENCE_PATTERN = Pattern.compile(&quot;\\[(\\d+)\\](.*?)(?=\\[|$)&quot;, Pattern.DOTALL);</b>
+<b class="nc">&nbsp;    private static final Pattern YEAR_AT_END = Pattern.compile(&quot;, (\\d{4})\\.$&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern YEAR = Pattern.compile(&quot;, (\\d{4})(.*)&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern PAGES = Pattern.compile(&quot;, pp\\. (\\d+--?\\d+)\\.?(.*)&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern PAGE = Pattern.compile(&quot;, p\\. (\\d+)(.*)&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern SERIES = Pattern.compile(&quot;, ser\\. ([^.,]+)(.*)&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern MONTH_RANGE_AND_YEAR = Pattern.compile(&quot;, ([A-Z][a-z]{2,7}\\.?)-[A-Z][a-z]{2,7}\\.? (\\d+)(.*)&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern MONTH_AND_YEAR = Pattern.compile(&quot;, ([A-Z][a-z]{2,7}\\.? \\d+),? ?(.*)&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern VOLUME = Pattern.compile(&quot;, vol\\. (\\d+)(.*)&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern NO = Pattern.compile(&quot;, no\\. (\\d+)(.*)&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern PROCEEDINGS_INDICATION = Pattern.compile(&quot;^in (Proc\\. )?(.*)&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern WORKSHOP = Pattern.compile(&quot;Workshop&quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern AUTHORS_AND_TITLE_AT_BEGINNING = Pattern.compile(&quot;^([^“]+), “(.*?)(”,|,”) &quot;);</b>
+<b class="nc">&nbsp;    private static final Pattern TITLE = Pattern.compile(&quot;“(.*?)”, (.*)&quot;);</b>
+&nbsp;
+&nbsp;    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+<b class="nc">&nbsp;    private final NormalizeUnicodeFormatter normalizeUnicodeFormatter = new NormalizeUnicodeFormatter();</b>
+&nbsp;
+<b class="nc">&nbsp;    public BibliographyFromPdfImporter() {</b>
+<b class="nc">&nbsp;        this.citationKeyPatternPreferences = null;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public BibliographyFromPdfImporter(CitationKeyPatternPreferences citationKeyPatternPreferences) {</b>
+<b class="nc">&nbsp;        this.citationKeyPatternPreferences = citationKeyPatternPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+<b class="nc">&nbsp;        return input.readLine().startsWith(&quot;%PDF&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+<b class="nc">&nbsp;        Objects.requireNonNull(reader);</b>
+<b class="nc">&nbsp;        throw new UnsupportedOperationException(&quot;BibliopgraphyFromPdfImporter does not support importDatabase(BufferedReader reader).&quot;</b>
+&nbsp;                + &quot;Instead use importDatabase(Path filePath).&quot;);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return &quot;pdfBibiliography&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return &quot;Bibliography from PDF&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return Localization.lang(&quot;Reads the references from the &#39;References&#39; section of a PDF file.&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public FileType getFileType() {
+<b class="nc">&nbsp;        return StandardFileType.PDF;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ParserResult importDatabase(Path filePath) {
+&nbsp;        List&lt;BibEntry&gt; result;
+&nbsp;
+<b class="nc">&nbsp;        try (PDDocument document = new XmpUtilReader().loadWithAutomaticDecryption(filePath)) {</b>
+<b class="nc">&nbsp;            String contents = getReferencesPagesText(document);</b>
+<b class="nc">&nbsp;            result = getEntriesFromPDFContent(contents);</b>
+&nbsp;        } catch (EncryptedPdfsNotSupportedException e) {
+<b class="nc">&nbsp;            return ParserResult.fromErrorMessage(Localization.lang(&quot;Decryption not supported.&quot;));</b>
+&nbsp;        } catch (IOException exception) {
+<b class="nc">&nbsp;            return ParserResult.fromError(exception);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ParserResult parserResult = new ParserResult(result);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (citationKeyPatternPreferences == null) {</b>
+<b class="nc">&nbsp;            return parserResult;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Generate citation keys for result
+<b class="nc">&nbsp;        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(parserResult.getDatabaseContext(), citationKeyPatternPreferences);</b>
+<b class="nc">&nbsp;        parserResult.getDatabase().getEntries().forEach(citationKeyGenerator::generateAndSetKey);</b>
+&nbsp;
+<b class="nc">&nbsp;        return parserResult;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    @VisibleForTesting</b>
+<b class="nc">&nbsp;    record IntermediateData(String number, String reference) {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * In: &lt;code&gt;&quot;[1] ...\n...\n...[2]...\n...\n...\n[3]...&quot;&lt;/code&gt;&lt;br&gt;
+&nbsp;     * Out: &lt;code&gt;List&amp;lt;String&gt; = [&quot;[1] ...&quot;, &quot;[2]...&quot;, &quot;[3]...&quot;]&lt;/code&gt;
+&nbsp;     */
+&nbsp;    private List&lt;BibEntry&gt; getEntriesFromPDFContent(String contents) {
+<b class="nc">&nbsp;        List&lt;IntermediateData&gt; referencesStrings = getIntermediateData(contents);</b>
+&nbsp;
+<b class="nc">&nbsp;        return referencesStrings.stream()</b>
+<b class="nc">&nbsp;                                .map(data -&gt; parseReference(data.number(), data.reference()))</b>
+<b class="nc">&nbsp;                                .toList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @VisibleForTesting
+&nbsp;    static List&lt;IntermediateData&gt; getIntermediateData(String contents) {
+<b class="nc">&nbsp;        List&lt;IntermediateData&gt; referencesStrings = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        Matcher matcher = REFERENCE_PATTERN.matcher(contents);</b>
+<b class="nc">&nbsp;        while (matcher.find()) {</b>
+<b class="nc">&nbsp;            String reference = matcher.group(2).replaceAll(&quot;\\r?\\n&quot;, &quot; &quot;).trim();</b>
+<b class="nc">&nbsp;            referencesStrings.add(new IntermediateData(matcher.group(1), reference));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return referencesStrings;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Extracts the text from all pages containing references. It simply goes from the last page backwards until there is probably no reference anymore.
+&nbsp;     */
+&nbsp;    private String getReferencesPagesText(PDDocument document) throws IOException {
+<b class="nc">&nbsp;        int lastPage = document.getNumberOfPages();</b>
+<b class="nc">&nbsp;        String result = prependToResult(&quot;&quot;, document, new PDFTextStripper(), lastPage);</b>
+&nbsp;
+&nbsp;        // Same matcher uses as in {@link containsWordReferences}
+<b class="nc">&nbsp;        Matcher matcher = REFERENCES.matcher(result);</b>
+<b class="nc">&nbsp;        if (!matcher.find()) {</b>
+&nbsp;            // Ensure that not too much is returned
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not found &#39;References&#39;. Returning last page only.&quot;);</b>
+<b class="nc">&nbsp;            return getPageContents(document, new PDFTextStripper(), lastPage);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int end = matcher.end();</b>
+<b class="nc">&nbsp;        return result.substring(end);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static boolean containsWordReferences(String result) {
+<b class="nc">&nbsp;        Matcher matcher = REFERENCES.matcher(result);</b>
+<b class="nc">&nbsp;        return matcher.find();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String prependToResult(String currentText, PDDocument document, PDFTextStripper stripper, int pageNumber) throws IOException {
+<b class="nc">&nbsp;        String pageContents = getPageContents(document, stripper, pageNumber);</b>
+<b class="nc">&nbsp;        String result = pageContents + currentText;</b>
+<b class="nc">&nbsp;        if (!containsWordReferences(pageContents) &amp;&amp; (pageNumber &gt; 0)) {</b>
+<b class="nc">&nbsp;            return prependToResult(result, document, stripper, pageNumber - 1);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String getPageContents(PDDocument document, PDFTextStripper stripper, int lastPage) throws IOException {
+<b class="nc">&nbsp;        stripper.setStartPage(lastPage);</b>
+<b class="nc">&nbsp;        stripper.setEndPage(lastPage);</b>
+<b class="nc">&nbsp;        StringWriter writer = new StringWriter();</b>
+<b class="nc">&nbsp;        stripper.writeText(document, writer);</b>
+<b class="nc">&nbsp;        return writer.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Example: &lt;code&gt;J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016, 2017. doi:10.1088/ 1741-4326/aa6a6a&lt;/code&gt;
+&nbsp;     *
+&nbsp;     * @param number The number of the reference - used for logging only
+&nbsp;     */
+&nbsp;    @VisibleForTesting
+&nbsp;    BibEntry parseReference(String number, String reference) {
+<b class="nc">&nbsp;        reference = normalizeUnicodeFormatter.format(reference);</b>
+<b class="nc">&nbsp;        String originalReference = &quot;[&quot; + number + &quot;] &quot; + reference;</b>
+<b class="nc">&nbsp;        BibEntry result = new BibEntry(StandardEntryType.Article)</b>
+<b class="nc">&nbsp;                .withCitationKey(number);</b>
+&nbsp;
+<b class="nc">&nbsp;        reference = reference</b>
+<b class="nc">&nbsp;                .replace(&quot;.-&quot;, &quot;-&quot;)</b>
+&nbsp;                // Unicode en dash (used as page separator)
+<b class="nc">&nbsp;                .replace(&quot;–&quot;, &quot;-&quot;)</b>
+&nbsp;                // Remove &quot;- &quot; introduced by linebreaks in the PDF
+<b class="nc">&nbsp;                .replaceAll(&quot;([^ ])- &quot;, &quot;$1&quot;);</b>
+&nbsp;
+&nbsp;        // Move URL to URL field
+<b class="nc">&nbsp;        Matcher urlPatternMatcher = URLCleanup.URL_PATTERN.matcher(reference);</b>
+<b class="nc">&nbsp;        if (urlPatternMatcher.find()) {</b>
+<b class="nc">&nbsp;            String url = urlPatternMatcher.group();</b>
+<b class="nc">&nbsp;            result.setField(StandardField.URL, url);</b>
+<b class="nc">&nbsp;            reference = reference.replace(url, &quot;&quot;).trim();</b>
+<b class="nc">&nbsp;            if (reference.endsWith(&quot;,&quot;)) {</b>
+<b class="nc">&nbsp;                reference = reference.substring(0, reference.length() - 1);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016, 2017. doi:10.1088/ 1741-4326/aa6a6a
+&nbsp;        // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia, May 2019, pp. 977-979. doi:10.18429/ JACoW-IPAC2019-MOPTS051
+<b class="nc">&nbsp;        int pos = reference.indexOf(&quot;doi:&quot;);</b>
+<b class="nc">&nbsp;        if (pos &gt;= 0) {</b>
+<b class="nc">&nbsp;            String doi = reference.substring(pos + &quot;doi:&quot;.length()).trim();</b>
+<b class="nc">&nbsp;            doi = doi.replace(&quot; &quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;            result.setField(StandardField.DOI, doi);</b>
+<b class="nc">&nbsp;            reference = reference.substring(0, pos).trim();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        reference = updateEntryAndReferenceIfMatches(reference, PAGES, result, StandardField.PAGES).newReference;</b>
+&nbsp;
+&nbsp;        // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016
+&nbsp;        // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia, May 2019
+<b class="nc">&nbsp;        reference = updateEntryAndReferenceIfMatches(reference, PAGE, result, StandardField.PAGES).newReference;</b>
+&nbsp;
+<b class="nc">&nbsp;        reference = updateEntryAndReferenceIfMatches(reference, SERIES, result, StandardField.SERIES).newReference;</b>
+&nbsp;
+<b class="nc">&nbsp;        Matcher matcher = MONTH_RANGE_AND_YEAR.matcher(reference);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+&nbsp;            // strip out second monthp
+<b class="nc">&nbsp;            reference = reference.substring(0, matcher.start()) + &quot;, &quot; + matcher.group(1) + &quot; &quot; + matcher.group(2) + matcher.group(3);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57
+&nbsp;        // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia, May 2019
+<b class="nc">&nbsp;        matcher = MONTH_AND_YEAR.matcher(reference);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            Optional&lt;Date&gt; parsedDate = Date.parse(matcher.group(1));</b>
+<b class="nc">&nbsp;            if (parsedDate.isPresent()) {</b>
+<b class="nc">&nbsp;                Date date = parsedDate.get();</b>
+<b class="nc">&nbsp;                date.getYear().ifPresent(year -&gt; result.setField(StandardField.YEAR, year.toString()));</b>
+<b class="nc">&nbsp;                date.getMonth().ifPresent(month -&gt; result.setField(StandardField.MONTH, month.getJabRefFormat()));</b>
+&nbsp;
+<b class="nc">&nbsp;                String prefix = reference.substring(0, matcher.start()).trim();</b>
+<b class="nc">&nbsp;                String suffix = matcher.group(2);</b>
+<b class="nc">&nbsp;                if (!suffix.isEmpty() &amp;&amp; !&quot;.&quot;.equals(suffix)) {</b>
+<b class="nc">&nbsp;                    suffix = &quot;, &quot; + suffix.replaceAll(&quot;^\\. &quot;, &quot;&quot;);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    suffix = &quot;&quot;;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                reference = prefix + suffix;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57, p. 102016, 2017.
+&nbsp;        // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia, May 2019, pp. 977-979
+<b class="nc">&nbsp;        matcher = YEAR_AT_END.matcher(reference);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.YEAR, matcher.group(1));</b>
+<b class="nc">&nbsp;            reference = reference.substring(0, matcher.start()).trim();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        reference = updateEntryAndReferenceIfMatches(reference, YEAR, result, StandardField.YEAR).newReference;</b>
+&nbsp;
+&nbsp;        // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion, vol. 57
+&nbsp;        // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia
+<b class="nc">&nbsp;        EntryUpdateResult entryUpdateResult = updateEntryAndReferenceIfMatches(reference, VOLUME, result, StandardField.VOLUME);</b>
+<b class="nc">&nbsp;        boolean volumeFound = entryUpdateResult.modified;</b>
+<b class="nc">&nbsp;        reference = entryUpdateResult.newReference;</b>
+&nbsp;
+<b class="nc">&nbsp;        entryUpdateResult = updateEntryAndReferenceIfMatches(reference, NO, result, StandardField.NUMBER);</b>
+<b class="nc">&nbsp;        boolean numberFound = entryUpdateResult.modified;</b>
+<b class="nc">&nbsp;        reference = entryUpdateResult.newReference;</b>
+&nbsp;
+&nbsp;        // J. Knaster et al., “Overview of the IFMIF/EVEDA project”, Nucl. Fusion
+&nbsp;        // Y. Shimosaki et al., “Lattice design for 5 MeV – 125 mA CW RFQ operation in LIPAc”, in Proc. IPAC’19, Mel- bourne, Australia
+<b class="nc">&nbsp;        matcher = AUTHORS_AND_TITLE_AT_BEGINNING.matcher(reference);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            String authors = matcher.group(1).replaceAll(&quot;et al\\.?&quot;, &quot;and others&quot;);</b>
+&nbsp;
+&nbsp;            // Alternative: AuthorList.fixAuthorFirstNameFirst(authors) only
+&nbsp;            // However, this does not work with special cases. Thus, we do a simple transformation only.
+<b class="nc">&nbsp;            String fixedAuthors = AuthorListParser.normalizeSimply(authors).orElseGet(() -&gt; AuthorList.fixAuthorFirstNameFirst(authors));</b>
+&nbsp;
+<b class="nc">&nbsp;            result.setField(StandardField.AUTHOR, fixedAuthors);</b>
+<b class="nc">&nbsp;            result.setField(StandardField.TITLE, matcher.group(2).replaceAll(&quot;et al\\.?&quot;, &quot;and others&quot;));</b>
+<b class="nc">&nbsp;            reference = reference.substring(matcher.end()).trim();</b>
+&nbsp;        } else {
+&nbsp;            // No authors present
+&nbsp;            // Example: “AF4.1.1 SRF Linac Engineering Design Report”, Internal note.
+<b class="nc">&nbsp;            reference = updateEntryAndReferenceIfMatches(reference, TITLE, result, StandardField.TITLE).newReference;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Nucl. Fusion
+&nbsp;        // in Proc. IPAC’19, Mel- bourne, Australia
+&nbsp;        // presented at th 8th DITANET Topical Workshop on Beam Position Monitors, CERN, Geneva, Switzreland
+<b class="nc">&nbsp;        List&lt;String&gt; stringsToRemove = List.of(&quot;presented at&quot;, &quot;to be presented at&quot;);</b>
+&nbsp;        // need to use &quot;for&quot; loop instead of &quot;stream().foreach&quot;, because &quot;reference&quot; is modified inside the loop
+<b class="nc">&nbsp;        for (String check : stringsToRemove) {</b>
+<b class="nc">&nbsp;            if (reference.startsWith(check)) {</b>
+<b class="nc">&nbsp;                reference = reference.substring(check.length()).trim();</b>
+<b class="nc">&nbsp;                result.setType(StandardEntryType.InProceedings);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Matcher proceedingsMatcher = PROCEEDINGS_INDICATION.matcher(reference);</b>
+<b class="nc">&nbsp;        Matcher workshopMatcher = WORKSHOP.matcher(reference);</b>
+<b class="nc">&nbsp;        if (proceedingsMatcher.find() || workshopMatcher.find() &amp;&amp; (!volumeFound &amp;&amp; !numberFound)) {</b>
+<b class="nc">&nbsp;            result.setType(StandardEntryType.InProceedings);</b>
+&nbsp;
+&nbsp;            String bookTitle;
+&nbsp;            int offset;
+<b class="nc">&nbsp;            if (proceedingsMatcher.hasMatch()) {</b>
+<b class="nc">&nbsp;                offset = proceedingsMatcher.start(2) - 3; // 3 is the length of &quot;in &quot;</b>
+<b class="nc">&nbsp;                String proc = proceedingsMatcher.group(1);</b>
+<b class="nc">&nbsp;                if (proc == null) {</b>
+<b class="nc">&nbsp;                    bookTitle = proceedingsMatcher.group(2);</b>
+&nbsp;                } else {
+&nbsp;                    // We keep &quot;Proc. &quot;
+<b class="nc">&nbsp;                    bookTitle = proc + proceedingsMatcher.group(2);</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                offset = 0;</b>
+<b class="nc">&nbsp;                bookTitle = reference;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            reference = &quot;&quot;;</b>
+&nbsp;
+<b class="nc">&nbsp;            int lastDot = bookTitle.substring(offset).lastIndexOf(&quot;. &quot;);</b>
+<b class="nc">&nbsp;            if (lastDot == -1) {</b>
+<b class="nc">&nbsp;                lastDot = bookTitle.substring(offset).lastIndexOf(&#39;.&#39;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (lastDot &gt; offset) {</b>
+<b class="nc">&nbsp;                String textAfterDot = bookTitle.substring(offset + lastDot + 1).trim();</b>
+&nbsp;                // We use Apache Commons here, because it is fastest - see table at https://stackoverflow.com/a/35242882/873282
+<b class="nc">&nbsp;                if (!textAfterDot.contains(&quot;http&quot;) &amp;&amp; (StringUtils.countMatches(textAfterDot, &#39; &#39;) &lt;= 1)) {</b>
+<b class="nc">&nbsp;                    bookTitle = bookTitle.substring(0, offset + lastDot).trim();</b>
+<b class="nc">&nbsp;                    if (bookTitle.startsWith(&quot;in &quot;)) {</b>
+<b class="nc">&nbsp;                        bookTitle = bookTitle.substring(3);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    result.setField(StandardField.PUBLISHER, textAfterDot);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            result.setField(StandardField.BOOKTITLE, bookTitle);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (reference.isEmpty()) {</b>
+&nbsp;            // Early quit if everything was handled
+<b class="nc">&nbsp;            result.setField(StandardField.COMMENT, originalReference);</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Nucl. Fusion
+<b class="nc">&nbsp;        reference = reference.trim().replaceAll(&quot;\\.$&quot;, &quot;&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (volumeFound || numberFound) {</b>
+<b class="nc">&nbsp;            result.setField(StandardField.JOURNAL, reference);</b>
+<b class="nc">&nbsp;        } else if (!reference.contains(&quot;,&quot;) &amp;&amp; !reference.isEmpty()) {</b>
+<b class="nc">&nbsp;            if (reference.endsWith(&quot; Note&quot;) || reference.endsWith(&quot; note&quot;)) {</b>
+<b class="nc">&nbsp;                result.setField(StandardField.NOTE, reference);</b>
+<b class="nc">&nbsp;                result.setType(StandardEntryType.TechReport);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                LOGGER.debug(&quot;Falling back to journal even if no volume and no number was found. Reference: {}&quot;, reference);</b>
+<b class="nc">&nbsp;                result.setField(StandardField.JOURNAL, reference);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            LOGGER.trace(&quot;InProceedings fallback used. Reference: {}&quot;, reference);</b>
+<b class="nc">&nbsp;            result.setType(StandardEntryType.InProceedings);</b>
+<b class="nc">&nbsp;            if (result.hasField(StandardField.BOOKTITLE)) {</b>
+<b class="nc">&nbsp;                String oldTitle = result.getField(StandardField.BOOKTITLE).get();</b>
+<b class="nc">&nbsp;                result.setField(StandardField.BOOKTITLE, oldTitle + &quot; &quot; + reference);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                result.setField(StandardField.BOOKTITLE, reference);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        result.setField(StandardField.COMMENT, originalReference);</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param pattern A pattern matching two groups: The first one to take, the second one to leave at the end of the string
+&nbsp;     */
+&nbsp;    private static EntryUpdateResult updateEntryAndReferenceIfMatches(String reference, Pattern pattern, BibEntry result, Field field) {
+&nbsp;        Matcher matcher;
+<b class="nc">&nbsp;        matcher = pattern.matcher(reference);</b>
+<b class="nc">&nbsp;        if (!matcher.find()) {</b>
+<b class="nc">&nbsp;            return new EntryUpdateResult(false, reference);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        result.setField(field, matcher.group(1));</b>
+<b class="nc">&nbsp;        String suffix = matcher.group(2);</b>
+<b class="nc">&nbsp;        reference = reference.substring(0, matcher.start()).trim() + suffix;</b>
+<b class="nc">&nbsp;        return new EntryUpdateResult(true, reference);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private record EntryUpdateResult(boolean modified, String newReference) {</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

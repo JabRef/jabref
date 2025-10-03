@@ -1,0 +1,252 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LinkedEntriesEditorViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.fieldeditors</a>
+</div>
+
+<h1>Coverage Summary for Class: LinkedEntriesEditorViewModel (org.jabref.gui.fieldeditors)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LinkedEntriesEditorViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/23)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LinkedEntriesEditorViewModel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.fieldeditors;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.swing.undo.UndoManager;
+&nbsp;
+&nbsp;import javafx.beans.property.ListProperty;
+&nbsp;import javafx.beans.property.SimpleListProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.util.StringConverter;
+&nbsp;
+&nbsp;import org.jabref.gui.StateManager;
+&nbsp;import org.jabref.gui.autocompleter.SuggestionProvider;
+&nbsp;import org.jabref.gui.util.BindingsHelper;
+&nbsp;import org.jabref.logic.integrity.FieldCheckers;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.BibEntry;
+&nbsp;import org.jabref.model.entry.EntryLinkList;
+&nbsp;import org.jabref.model.entry.ParsedEntryLink;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;
+&nbsp;public class LinkedEntriesEditorViewModel extends AbstractEditorViewModel {
+&nbsp;
+&nbsp;    private final BibDatabaseContext databaseContext;
+&nbsp;    private final SuggestionProvider&lt;?&gt; suggestionProvider;
+&nbsp;    private final ListProperty&lt;ParsedEntryLink&gt; linkedEntries;
+&nbsp;    private final StateManager stateManager;
+&nbsp;
+&nbsp;    public LinkedEntriesEditorViewModel(Field field,
+&nbsp;                                        SuggestionProvider&lt;?&gt; suggestionProvider,
+&nbsp;                                        BibDatabaseContext databaseContext,
+&nbsp;                                        FieldCheckers fieldCheckers,
+&nbsp;                                        UndoManager undoManager,
+&nbsp;                                        StateManager stateManager) {
+<b class="nc">&nbsp;        super(field, suggestionProvider, fieldCheckers, undoManager);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.databaseContext = databaseContext;</b>
+<b class="nc">&nbsp;        this.suggestionProvider = suggestionProvider;</b>
+<b class="nc">&nbsp;        this.stateManager = stateManager;</b>
+&nbsp;
+<b class="nc">&nbsp;        linkedEntries = new SimpleListProperty&lt;&gt;(FXCollections.observableArrayList());</b>
+<b class="nc">&nbsp;        BindingsHelper.bindContentBidirectional(</b>
+&nbsp;                linkedEntries,
+&nbsp;                text,
+&nbsp;                EntryLinkList::serialize,
+<b class="nc">&nbsp;                newText -&gt; EntryLinkList.parse(newText, databaseContext.getDatabase()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ListProperty&lt;ParsedEntryLink&gt; linkedEntriesProperty() {
+<b class="nc">&nbsp;        return linkedEntries;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public StringConverter&lt;ParsedEntryLink&gt; getStringConverter() {
+<b class="nc">&nbsp;        return new StringConverter&lt;&gt;() {</b>
+&nbsp;            @Override
+&nbsp;            public String toString(ParsedEntryLink linkedEntry) {
+<b class="nc">&nbsp;                if (linkedEntry == null) {</b>
+<b class="nc">&nbsp;                    return &quot;&quot;;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return linkedEntry.getKey();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public ParsedEntryLink fromString(String key) {
+<b class="nc">&nbsp;                return new ParsedEntryLink(key, databaseContext.getDatabase());</b>
+&nbsp;            }
+&nbsp;        };
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;ParsedEntryLink&gt; getSuggestions(String request) {
+<b class="nc">&nbsp;        List&lt;ParsedEntryLink&gt; suggestions = suggestionProvider</b>
+<b class="nc">&nbsp;                .getPossibleSuggestions()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(suggestion -&gt; suggestion instanceof BibEntry bibEntry ? bibEntry.getCitationKey().orElse(&quot;&quot;) : (String) suggestion)</b>
+<b class="nc">&nbsp;                .filter(suggestion -&gt; suggestion.toLowerCase(Locale.ROOT).contains(request.toLowerCase(Locale.ROOT)))</b>
+<b class="nc">&nbsp;                .map(suggestion -&gt; new ParsedEntryLink(suggestion, databaseContext.getDatabase()))</b>
+<b class="nc">&nbsp;                .distinct()</b>
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;        ParsedEntryLink requestedLink = new ParsedEntryLink(request, databaseContext.getDatabase());</b>
+<b class="nc">&nbsp;        if (!suggestions.contains(requestedLink)) {</b>
+<b class="nc">&nbsp;            suggestions.addFirst(requestedLink);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return suggestions;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void jumpToEntry(ParsedEntryLink parsedEntryLink) {
+<b class="nc">&nbsp;        parsedEntryLink.getLinkedEntry().ifPresent(entry -&gt;</b>
+<b class="nc">&nbsp;                stateManager.activeTabProperty().get().ifPresent(tab -&gt; tab.clearAndSelect(entry)));</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

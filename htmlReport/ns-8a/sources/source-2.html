@@ -1,0 +1,376 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PanelStep</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.walkthrough.declarative.step</a>
+</div>
+
+<h1>Coverage Summary for Class: PanelStep (org.jabref.gui.walkthrough.declarative.step)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PanelStep</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">PanelStep$Builder</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/56)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.walkthrough.declarative.step;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.OptionalDouble;
+&nbsp;
+&nbsp;import org.jabref.gui.walkthrough.declarative.NodeResolver;
+&nbsp;import org.jabref.gui.walkthrough.declarative.Trigger;
+&nbsp;import org.jabref.gui.walkthrough.declarative.WindowResolver;
+&nbsp;import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
+&nbsp;import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
+&nbsp;import org.jabref.gui.walkthrough.declarative.effect.WindowEffect;
+&nbsp;import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
+&nbsp;
+&nbsp;import org.jspecify.annotations.NonNull;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;
+<b class="nc">&nbsp;public record PanelStep(@NonNull String title,</b>
+&nbsp;                        @NonNull List&lt;WalkthroughRichTextBlock&gt; content,
+&nbsp;                        @Nullable NodeResolver resolverValue,
+&nbsp;                        @Nullable String continueButtonTextValue,
+&nbsp;                        @Nullable String skipButtonTextValue,
+&nbsp;                        @Nullable String backButtonTextValue,
+&nbsp;                        @Nullable Trigger triggerValue,
+&nbsp;                        @NonNull PanelPosition position,
+&nbsp;                        @Nullable Double widthValue,
+&nbsp;                        @Nullable Double heightValue,
+&nbsp;                        @Nullable WalkthroughEffect highlightValue,
+&nbsp;                        @Nullable WindowResolver activeWindowResolverValue,
+&nbsp;                        boolean showQuitButtonValue,
+&nbsp;                        @NonNull QuitButtonPosition quitButtonPositionValue) implements VisibleComponent {
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;NodeResolver&gt; nodeResolver() {
+<b class="nc">&nbsp;        return Optional.ofNullable(resolverValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;String&gt; continueButtonText() {
+<b class="nc">&nbsp;        return Optional.ofNullable(continueButtonTextValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;String&gt; skipButtonText() {
+<b class="nc">&nbsp;        return Optional.ofNullable(skipButtonTextValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;String&gt; backButtonText() {
+<b class="nc">&nbsp;        return Optional.ofNullable(backButtonTextValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;Trigger&gt; trigger() {
+<b class="nc">&nbsp;        return Optional.ofNullable(triggerValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public OptionalDouble maxWidth() {
+<b class="nc">&nbsp;        return widthValue != null ? OptionalDouble.of(widthValue) : OptionalDouble.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public OptionalDouble maxHeight() {
+<b class="nc">&nbsp;        return heightValue != null ? OptionalDouble.of(heightValue) : OptionalDouble.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;WalkthroughEffect&gt; highlight() {
+<b class="nc">&nbsp;        return Optional.ofNullable(highlightValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Optional&lt;WindowResolver&gt; windowResolver() {
+<b class="nc">&nbsp;        return Optional.ofNullable(activeWindowResolverValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean showQuitButton() {
+<b class="nc">&nbsp;        return showQuitButtonValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public QuitButtonPosition quitButtonPosition() {
+<b class="nc">&nbsp;        return quitButtonPositionValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Builder builder(@NonNull String title) {
+<b class="nc">&nbsp;        return new Builder(title);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class Builder {
+&nbsp;        private final String title;
+<b class="nc">&nbsp;        private List&lt;WalkthroughRichTextBlock&gt; content = List.of();</b>
+&nbsp;        private @Nullable NodeResolver resolver;
+&nbsp;        private @Nullable String continueButtonText;
+&nbsp;        private @Nullable String skipButtonText;
+&nbsp;        private @Nullable String backButtonText;
+&nbsp;        private @Nullable Trigger trigger;
+<b class="nc">&nbsp;        private PanelPosition position = PanelPosition.LEFT;</b>
+&nbsp;        private @Nullable Double width;
+&nbsp;        private @Nullable Double height;
+&nbsp;        private @Nullable WalkthroughEffect highlight;
+&nbsp;        private @Nullable WindowResolver activeWindowResolver;
+<b class="nc">&nbsp;        private boolean showQuitButton = true;</b>
+<b class="nc">&nbsp;        private QuitButtonPosition quitButtonPosition = QuitButtonPosition.AUTO;</b>
+&nbsp;
+<b class="nc">&nbsp;        private Builder(@NonNull String title) {</b>
+<b class="nc">&nbsp;            this.title = title;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder content(@NonNull WalkthroughRichTextBlock... blocks) {
+<b class="nc">&nbsp;            this.content = List.of(blocks);</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder content(@NonNull List&lt;WalkthroughRichTextBlock&gt; content) {
+<b class="nc">&nbsp;            this.content = content;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder resolver(@NonNull NodeResolver resolver) {
+<b class="nc">&nbsp;            this.resolver = resolver;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder continueButton(@NonNull String text) {
+<b class="nc">&nbsp;            this.continueButtonText = text;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder skipButton(@NonNull String text) {
+<b class="nc">&nbsp;            this.skipButtonText = text;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder backButton(@NonNull String text) {
+<b class="nc">&nbsp;            this.backButtonText = text;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder trigger(@NonNull Trigger trigger) {
+<b class="nc">&nbsp;            this.trigger = trigger;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder trigger(Trigger.@NonNull Builder triggerBuilder) {
+<b class="nc">&nbsp;            this.trigger = triggerBuilder.build();</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder position(@NonNull PanelPosition position) {
+<b class="nc">&nbsp;            this.position = position;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder width(double width) {
+<b class="nc">&nbsp;            this.width = width;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder height(double height) {
+<b class="nc">&nbsp;            this.height = height;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder highlight(@NonNull WalkthroughEffect highlight) {
+<b class="nc">&nbsp;            this.highlight = highlight;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder highlight(@NonNull WindowEffect effect) {
+<b class="nc">&nbsp;            return highlight(new WalkthroughEffect(effect));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder highlight(@NonNull HighlightEffect effect) {
+<b class="nc">&nbsp;            return highlight(new WindowEffect(effect));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder activeWindow(@NonNull WindowResolver activeWindowResolver) {
+<b class="nc">&nbsp;            this.activeWindowResolver = activeWindowResolver;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder showQuitButton(boolean showQuitButton) {
+<b class="nc">&nbsp;            this.showQuitButton = showQuitButton;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public Builder quitButtonPosition(@NonNull QuitButtonPosition quitButtonPosition) {
+<b class="nc">&nbsp;            this.quitButtonPosition = quitButtonPosition;</b>
+<b class="nc">&nbsp;            return this;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public PanelStep build() {
+<b class="nc">&nbsp;            if (height != null &amp;&amp; (position == PanelPosition.LEFT || position == PanelPosition.RIGHT)) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Height is not applicable for left/right positioned panels.&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (width != null &amp;&amp; (position == PanelPosition.TOP || position == PanelPosition.BOTTOM)) {</b>
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;Width is not applicable for top/bottom positioned panels.&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return new PanelStep(title,</b>
+&nbsp;                    content,
+&nbsp;                    resolver,
+&nbsp;                    continueButtonText,
+&nbsp;                    skipButtonText,
+&nbsp;                    backButtonText,
+&nbsp;                    trigger,
+&nbsp;                    position,
+&nbsp;                    width,
+&nbsp;                    height,
+&nbsp;                    highlight,
+&nbsp;                    activeWindowResolver,
+&nbsp;                    showQuitButton,
+&nbsp;                    quitButtonPosition);
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

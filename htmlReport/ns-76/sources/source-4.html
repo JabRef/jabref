@@ -1,0 +1,243 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PreviewPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.gui.preview</a>
+</div>
+
+<h1>Coverage Summary for Class: PreviewPreferences (org.jabref.gui.preview)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PreviewPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.gui.preview;
+&nbsp;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import javafx.beans.property.BooleanProperty;
+&nbsp;import javafx.beans.property.IntegerProperty;
+&nbsp;import javafx.beans.property.ObjectProperty;
+&nbsp;import javafx.beans.property.SimpleBooleanProperty;
+&nbsp;import javafx.beans.property.SimpleIntegerProperty;
+&nbsp;import javafx.beans.property.SimpleObjectProperty;
+&nbsp;import javafx.beans.property.SimpleStringProperty;
+&nbsp;import javafx.beans.property.StringProperty;
+&nbsp;import javafx.collections.FXCollections;
+&nbsp;import javafx.collections.ObservableList;
+&nbsp;
+&nbsp;import org.jabref.logic.layout.TextBasedPreviewLayout;
+&nbsp;import org.jabref.logic.preview.PreviewLayout;
+&nbsp;
+&nbsp;public class PreviewPreferences {
+&nbsp;
+&nbsp;    private final ObservableList&lt;PreviewLayout&gt; layoutCycle;
+&nbsp;    private final IntegerProperty layoutCyclePosition;
+&nbsp;    private final ObjectProperty&lt;TextBasedPreviewLayout&gt; customPreviewLayout;
+&nbsp;    private final StringProperty defaultCustomPreviewLayout;
+&nbsp;    private final BooleanProperty showPreviewAsExtraTab;
+&nbsp;    private final BooleanProperty showPreviewEntryTableTooltip;
+&nbsp;    private final ObservableList&lt;Path&gt; bstPreviewLayoutPaths;
+&nbsp;
+&nbsp;    public PreviewPreferences(List&lt;PreviewLayout&gt; layoutCycle,
+&nbsp;                              int layoutCyclePosition,
+&nbsp;                              TextBasedPreviewLayout customPreviewLayout,
+&nbsp;                              String defaultCustomPreviewLayout,
+&nbsp;                              boolean showPreviewAsExtraTab,
+&nbsp;                              boolean showPreviewEntryTableTooltip,
+<b class="nc">&nbsp;                              List&lt;Path&gt; bstPreviewLayoutPaths) {</b>
+<b class="nc">&nbsp;        this.layoutCycle = FXCollections.observableArrayList(layoutCycle);</b>
+<b class="nc">&nbsp;        this.layoutCyclePosition = new SimpleIntegerProperty(layoutCyclePosition);</b>
+<b class="nc">&nbsp;        this.customPreviewLayout = new SimpleObjectProperty&lt;&gt;(customPreviewLayout);</b>
+<b class="nc">&nbsp;        this.defaultCustomPreviewLayout = new SimpleStringProperty(defaultCustomPreviewLayout);</b>
+<b class="nc">&nbsp;        this.showPreviewAsExtraTab = new SimpleBooleanProperty(showPreviewAsExtraTab);</b>
+<b class="nc">&nbsp;        this.showPreviewEntryTableTooltip = new SimpleBooleanProperty(showPreviewEntryTableTooltip);</b>
+<b class="nc">&nbsp;        this.bstPreviewLayoutPaths = FXCollections.observableList(bstPreviewLayoutPaths);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;PreviewLayout&gt; getLayoutCycle() {
+<b class="nc">&nbsp;        return layoutCycle;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getLayoutCyclePosition() {
+<b class="nc">&nbsp;        return layoutCyclePosition.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IntegerProperty layoutCyclePositionProperty() {
+<b class="nc">&nbsp;        return layoutCyclePosition;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLayoutCyclePosition(int position) {
+<b class="nc">&nbsp;        if (layoutCycle.isEmpty()) {</b>
+<b class="nc">&nbsp;            this.layoutCyclePosition.setValue(0);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            int previewCyclePosition = position;</b>
+<b class="nc">&nbsp;            while (previewCyclePosition &lt; 0) {</b>
+<b class="nc">&nbsp;                previewCyclePosition += layoutCycle.size();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            this.layoutCyclePosition.setValue(previewCyclePosition % layoutCycle.size());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public PreviewLayout getSelectedPreviewLayout() {
+<b class="nc">&nbsp;        if (layoutCycle.isEmpty()</b>
+<b class="nc">&nbsp;                || layoutCyclePosition.getValue() &lt; 0</b>
+<b class="nc">&nbsp;                || layoutCyclePosition.getValue() &gt;= layoutCycle.size()) {</b>
+<b class="nc">&nbsp;            return getCustomPreviewLayout();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return layoutCycle.get(layoutCyclePosition.getValue());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public TextBasedPreviewLayout getCustomPreviewLayout() {
+<b class="nc">&nbsp;        return customPreviewLayout.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObjectProperty&lt;TextBasedPreviewLayout&gt; customPreviewLayoutProperty() {
+<b class="nc">&nbsp;        return customPreviewLayout;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCustomPreviewLayout(TextBasedPreviewLayout layout) {
+<b class="nc">&nbsp;        this.customPreviewLayout.set(layout);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDefaultCustomPreviewLayout() {
+<b class="nc">&nbsp;        return defaultCustomPreviewLayout.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShowPreviewAsExtraTab() {
+<b class="nc">&nbsp;        return showPreviewAsExtraTab.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShowPreviewAsExtraTab(boolean showPreviewAsExtraTab) {
+<b class="nc">&nbsp;        this.showPreviewAsExtraTab.set(showPreviewAsExtraTab);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty showPreviewAsExtraTabProperty() {
+<b class="nc">&nbsp;        return showPreviewAsExtraTab;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean shouldShowPreviewEntryTableTooltip() {
+<b class="nc">&nbsp;        return showPreviewEntryTableTooltip.getValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShowPreviewEntryTableTooltip(boolean showPreviewEntryTableTooltip) {
+<b class="nc">&nbsp;        this.showPreviewEntryTableTooltip.set(showPreviewEntryTableTooltip);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public BooleanProperty showPreviewEntryTableTooltip() {
+<b class="nc">&nbsp;        return showPreviewEntryTableTooltip;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ObservableList&lt;Path&gt; getBstPreviewLayoutPaths() {
+<b class="nc">&nbsp;        return bstPreviewLayoutPaths;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setBstPreviewLayoutPaths(List&lt;Path&gt; bstPreviewLayoutPaths) {
+<b class="nc">&nbsp;        this.bstPreviewLayoutPaths.setAll(bstPreviewLayoutPaths);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

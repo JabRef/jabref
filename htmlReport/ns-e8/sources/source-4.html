@@ -1,0 +1,2694 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JabRefCliPreferences</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.preferences</a>
+</div>
+
+<h1>Coverage Summary for Class: JabRefCliPreferences (org.jabref.logic.preferences)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JabRefCliPreferences</td>
+<td class="coverageStat">
+  <span class="percent">
+    27%
+  </span>
+  <span class="absValue">
+    (40/148)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    13.4%
+  </span>
+  <span class="absValue">
+    (29/216)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.4%
+  </span>
+  <span class="absValue">
+    (468/1103)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">JabRefCliPreferences$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    26.8%
+  </span>
+  <span class="absValue">
+    (40/149)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    13.4%
+  </span>
+  <span class="absValue">
+    (29/216)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    42.4%
+  </span>
+  <span class="absValue">
+    (468/1105)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.preferences;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.TreeSet;
+&nbsp;import java.util.prefs.BackingStoreException;
+&nbsp;import java.util.prefs.InvalidPreferencesFormatException;
+&nbsp;import java.util.prefs.Preferences;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;import java.util.stream.Stream;
+&nbsp;
+&nbsp;import javafx.beans.InvalidationListener;
+&nbsp;import javafx.collections.ListChangeListener;
+&nbsp;import javafx.collections.SetChangeListener;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.InternalPreferences;
+&nbsp;import org.jabref.logic.JabRefException;
+&nbsp;import org.jabref.logic.LibraryPreferences;
+&nbsp;import org.jabref.logic.ai.AiDefaultPreferences;
+&nbsp;import org.jabref.logic.ai.AiPreferences;
+&nbsp;import org.jabref.logic.ai.templates.AiTemplate;
+&nbsp;import org.jabref.logic.bibtex.FieldPreferences;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+&nbsp;import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+&nbsp;import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+&nbsp;import org.jabref.logic.citationstyle.CSLStyleLoader;
+&nbsp;import org.jabref.logic.citationstyle.CSLStyleUtils;
+&nbsp;import org.jabref.logic.cleanup.CleanupPreferences;
+&nbsp;import org.jabref.logic.cleanup.FieldFormatterCleanups;
+&nbsp;import org.jabref.logic.exporter.BibDatabaseWriter;
+&nbsp;import org.jabref.logic.exporter.ExportPreferences;
+&nbsp;import org.jabref.logic.exporter.MetaDataSerializer;
+&nbsp;import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+&nbsp;import org.jabref.logic.exporter.TemplateExporter;
+&nbsp;import org.jabref.logic.git.preferences.GitPreferences;
+&nbsp;import org.jabref.logic.importer.ImportException;
+&nbsp;import org.jabref.logic.importer.ImportFormatPreferences;
+&nbsp;import org.jabref.logic.importer.ImporterPreferences;
+&nbsp;import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+&nbsp;import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
+&nbsp;import org.jabref.logic.importer.fetcher.DBLPFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.IEEE;
+&nbsp;import org.jabref.logic.importer.fetcher.MrDlibPreferences;
+&nbsp;import org.jabref.logic.importer.fetcher.ScienceDirect;
+&nbsp;import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
+&nbsp;import org.jabref.logic.importer.fileformat.CustomImporter;
+&nbsp;import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
+&nbsp;import org.jabref.logic.importer.util.GrobidPreferences;
+&nbsp;import org.jabref.logic.importer.util.MetaDataParser;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationPreferences;
+&nbsp;import org.jabref.logic.journals.JournalAbbreviationRepository;
+&nbsp;import org.jabref.logic.l10n.Language;
+&nbsp;import org.jabref.logic.l10n.Localization;
+&nbsp;import org.jabref.logic.layout.LayoutFormatterPreferences;
+&nbsp;import org.jabref.logic.layout.format.NameFormatterPreferences;
+&nbsp;import org.jabref.logic.net.ProxyPreferences;
+&nbsp;import org.jabref.logic.net.ssl.SSLPreferences;
+&nbsp;import org.jabref.logic.net.ssl.TrustStoreManager;
+&nbsp;import org.jabref.logic.openoffice.OpenOfficePreferences;
+&nbsp;import org.jabref.logic.openoffice.style.JStyle;
+&nbsp;import org.jabref.logic.openoffice.style.JStyleLoader;
+&nbsp;import org.jabref.logic.openoffice.style.OOStyle;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+&nbsp;import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
+&nbsp;import org.jabref.logic.push.CitationCommandString;
+&nbsp;import org.jabref.logic.push.PushApplications;
+&nbsp;import org.jabref.logic.push.PushToApplicationPreferences;
+&nbsp;import org.jabref.logic.remote.RemotePreferences;
+&nbsp;import org.jabref.logic.search.SearchPreferences;
+&nbsp;import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+&nbsp;import org.jabref.logic.shared.security.Password;
+&nbsp;import org.jabref.logic.util.BuildInfo;
+&nbsp;import org.jabref.logic.util.Directories;
+&nbsp;import org.jabref.logic.util.Version;
+&nbsp;import org.jabref.logic.util.io.AutoLinkPreferences;
+&nbsp;import org.jabref.logic.util.io.FileHistory;
+&nbsp;import org.jabref.logic.xmp.XmpPreferences;
+&nbsp;import org.jabref.model.ai.AiProvider;
+&nbsp;import org.jabref.model.ai.EmbeddingModel;
+&nbsp;import org.jabref.model.database.BibDatabaseMode;
+&nbsp;import org.jabref.model.entry.BibEntryPreferences;
+&nbsp;import org.jabref.model.entry.BibEntryType;
+&nbsp;import org.jabref.model.entry.BibEntryTypesManager;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.FieldFactory;
+&nbsp;import org.jabref.model.entry.field.InternalField;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.types.EntryType;
+&nbsp;import org.jabref.model.entry.types.EntryTypeFactory;
+&nbsp;import org.jabref.model.metadata.SaveOrder;
+&nbsp;import org.jabref.model.metadata.SelfContainedSaveOrder;
+&nbsp;import org.jabref.model.metadata.UserHostInfo;
+&nbsp;import org.jabref.model.search.SearchDisplayMode;
+&nbsp;import org.jabref.model.search.SearchFlags;
+&nbsp;import org.jabref.model.strings.StringUtil;
+&nbsp;
+&nbsp;import com.github.javakeyring.Keyring;
+&nbsp;import com.github.javakeyring.PasswordAccessException;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;import com.google.common.base.Splitter;
+&nbsp;import com.tobiasdiez.easybind.EasyBind;
+&nbsp;import jakarta.inject.Singleton;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;/**
+&nbsp; * The {@code JabRefPreferences} class provides the preferences and their defaults using
+&nbsp; * the JDK {@code java.util.prefs} class.
+&nbsp; * &lt;p&gt;
+&nbsp; * Internally it defines symbols used to pick a value from the {@code java.util.prefs}
+&nbsp; * interface and keeps a hashmap with all the default values.
+&nbsp; * &lt;p&gt;
+&nbsp; * There are still some similar preferences classes ({@link OpenOfficePreferences} and
+&nbsp; * {@link SharedDatabasePreferences}) which also use the {@code java.util.prefs} API.
+&nbsp; * &lt;p&gt;
+&nbsp; * contents of the defaults HashMap that are defined in this class.
+&nbsp; * There are more default parameters in this map which belong to separate preference classes.
+&nbsp; * &lt;p&gt;
+&nbsp; * This class is injected into formatter using reflection to avoid tight coupling and
+&nbsp; * is easier than injecting via constructor due to amount of refactoring
+&nbsp; */
+&nbsp;@Singleton
+&nbsp;public class JabRefCliPreferences implements CliPreferences {
+&nbsp;
+&nbsp;    public static final String LANGUAGE = &quot;language&quot;;
+&nbsp;
+&nbsp;    public static final String BIBLATEX_DEFAULT_MODE = &quot;biblatexMode&quot;;
+&nbsp;
+&nbsp;    public static final String REFORMAT_FILE_ON_SAVE_AND_EXPORT = &quot;reformatFileOnSaveAndExport&quot;;
+&nbsp;    public static final String EXPORT_IN_ORIGINAL_ORDER = &quot;exportInOriginalOrder&quot;;
+&nbsp;    public static final String EXPORT_IN_SPECIFIED_ORDER = &quot;exportInSpecifiedOrder&quot;;
+&nbsp;
+&nbsp;    public static final String EXPORT_PRIMARY_SORT_FIELD = &quot;exportPriSort&quot;;
+&nbsp;    public static final String EXPORT_PRIMARY_SORT_DESCENDING = &quot;exportPriDescending&quot;;
+&nbsp;    public static final String EXPORT_SECONDARY_SORT_FIELD = &quot;exportSecSort&quot;;
+&nbsp;    public static final String EXPORT_SECONDARY_SORT_DESCENDING = &quot;exportSecDescending&quot;;
+&nbsp;    public static final String EXPORT_TERTIARY_SORT_FIELD = &quot;exportTerSort&quot;;
+&nbsp;    public static final String EXPORT_TERTIARY_SORT_DESCENDING = &quot;exportTerDescending&quot;;
+&nbsp;    public static final String NEWLINE = &quot;newline&quot;;
+&nbsp;
+&nbsp;    public static final String XMP_PRIVACY_FILTERS = &quot;xmpPrivacyFilters&quot;;
+&nbsp;    public static final String USE_XMP_PRIVACY_FILTER = &quot;useXmpPrivacyFilter&quot;;
+&nbsp;    public static final String DEFAULT_SHOW_SOURCE = &quot;defaultShowSource&quot;;
+&nbsp;
+&nbsp;    public static final String AUTO_OPEN_FORM = &quot;autoOpenForm&quot;;
+&nbsp;    public static final String IMPORT_WORKING_DIRECTORY = &quot;importWorkingDirectory&quot;;
+&nbsp;    public static final String LAST_USED_EXPORT = &quot;lastUsedExport&quot;;
+&nbsp;    public static final String EXPORT_WORKING_DIRECTORY = &quot;exportWorkingDirectory&quot;;
+&nbsp;    public static final String WORKING_DIRECTORY = &quot;workingDirectory&quot;;
+&nbsp;    public static final String BACKUP_DIRECTORY = &quot;backupDirectory&quot;;
+&nbsp;    public static final String CREATE_BACKUP = &quot;createBackup&quot;;
+&nbsp;
+&nbsp;    public static final String KEYWORD_SEPARATOR = &quot;groupKeywordSeparator&quot;;
+&nbsp;
+&nbsp;    public static final String MEMORY_STICK_MODE = &quot;memoryStickMode&quot;;
+&nbsp;    public static final String DEFAULT_ENCODING = &quot;defaultEncoding&quot;;
+&nbsp;
+&nbsp;    public static final String ADD_IMPORTED_ENTRIES = &quot;addImportedEntries&quot;;
+&nbsp;    public static final String ADD_IMPORTED_ENTRIES_GROUP_NAME = &quot;addImportedEntriesGroupName&quot;;
+&nbsp;
+&nbsp;    public static final String BASE_DOI_URI = &quot;baseDOIURI&quot;;
+&nbsp;    public static final String USE_CUSTOM_DOI_URI = &quot;useCustomDOIURI&quot;;
+&nbsp;
+&nbsp;    public static final String USE_OWNER = &quot;useOwner&quot;;
+&nbsp;    public static final String DEFAULT_OWNER = &quot;defaultOwner&quot;;
+&nbsp;    public static final String OVERWRITE_OWNER = &quot;overwriteOwner&quot;;
+&nbsp;
+&nbsp;    // Required for migration from pre-v5.3 only
+&nbsp;    public static final String UPDATE_TIMESTAMP = &quot;updateTimestamp&quot;;
+&nbsp;    public static final String TIME_STAMP_FIELD = &quot;timeStampField&quot;;
+&nbsp;    public static final String TIME_STAMP_FORMAT = &quot;timeStampFormat&quot;;
+&nbsp;
+&nbsp;    public static final String ADD_CREATION_DATE = &quot;addCreationDate&quot;;
+&nbsp;    public static final String ADD_MODIFICATION_DATE = &quot;addModificationDate&quot;;
+&nbsp;
+&nbsp;    public static final String NON_WRAPPABLE_FIELDS = &quot;nonWrappableFields&quot;;
+&nbsp;    public static final String RESOLVE_STRINGS_FOR_FIELDS = &quot;resolveStringsForFields&quot;;
+&nbsp;    public static final String DO_NOT_RESOLVE_STRINGS = &quot;doNotResolveStrings&quot;;
+&nbsp;
+&nbsp;    // merge related
+&nbsp;    public static final String MERGE_ENTRIES_DIFF_MODE = &quot;mergeEntriesDiffMode&quot;;
+&nbsp;    public static final String MERGE_ENTRIES_SHOULD_SHOW_DIFF = &quot;mergeEntriesShouldShowDiff&quot;;
+&nbsp;    public static final String MERGE_ENTRIES_SHOULD_SHOW_UNIFIED_DIFF = &quot;mergeEntriesShouldShowUnifiedDiff&quot;;
+&nbsp;    public static final String MERGE_ENTRIES_HIGHLIGHT_WORDS = &quot;mergeEntriesHighlightWords&quot;;
+&nbsp;
+&nbsp;    public static final String MERGE_SHOW_ONLY_CHANGED_FIELDS = &quot;mergeShowOnlyChangedFields&quot;;
+&nbsp;
+&nbsp;    public static final String SHOW_USER_COMMENTS_FIELDS = &quot;showUserCommentsFields&quot;;
+&nbsp;
+&nbsp;    public static final String MERGE_APPLY_TO_ALL_ENTRIES = &quot;mergeApplyToAllEntries&quot;;
+&nbsp;
+&nbsp;    public static final String DUPLICATE_RESOLVER_DECISION_RESULT_ALL_ENTRIES = &quot;duplicateResolverDecisionResult&quot;;
+&nbsp;
+&nbsp;    public static final String CUSTOM_EXPORT_FORMAT = &quot;customExportFormat&quot;;
+&nbsp;    public static final String CUSTOM_IMPORT_FORMAT = &quot;customImportFormat&quot;;
+&nbsp;    public static final String KEY_PATTERN_REGEX = &quot;KeyPatternRegex&quot;;
+&nbsp;    public static final String KEY_PATTERN_REPLACEMENT = &quot;KeyPatternReplacement&quot;;
+&nbsp;    public static final String MAIN_FILE_DIRECTORY = &quot;fileDirectory&quot;;
+&nbsp;
+&nbsp;    public static final String SEARCH_DISPLAY_MODE = &quot;searchDisplayMode&quot;;
+&nbsp;    public static final String SEARCH_CASE_SENSITIVE = &quot;caseSensitiveSearch&quot;;
+&nbsp;    public static final String SEARCH_REG_EXP = &quot;regExpSearch&quot;;
+&nbsp;    public static final String SEARCH_FULLTEXT = &quot;fulltextSearch&quot;;
+&nbsp;    public static final String SEARCH_KEEP_SEARCH_STRING = &quot;keepSearchString&quot;;
+&nbsp;    public static final String SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP = &quot;keepOnTop&quot;;
+&nbsp;    public static final String SEARCH_WINDOW_HEIGHT = &quot;searchWindowHeight&quot;;
+&nbsp;    public static final String SEARCH_WINDOW_WIDTH = &quot;searchWindowWidth&quot;;
+&nbsp;    public static final String SEARCH_WINDOW_DIVIDER_POS = &quot;searchWindowDividerPos&quot;;
+&nbsp;    public static final String SEARCH_CATALOGS = &quot;searchCatalogs&quot;;
+&nbsp;    public static final String DEFAULT_PLAIN_CITATION_PARSER = &quot;defaultPlainCitationParser&quot;;
+&nbsp;    public static final String CITATIONS_RELATIONS_STORE_TTL = &quot;citationsRelationsStoreTTL&quot;;
+&nbsp;    public static final String IMPORTERS_ENABLED = &quot;importersEnabled&quot;;
+&nbsp;    public static final String GENERATE_KEY_ON_IMPORT = &quot;generateKeyOnImport&quot;;
+&nbsp;    public static final String GROBID_ENABLED = &quot;grobidEnabled&quot;;
+&nbsp;    public static final String GROBID_PREFERENCE = &quot;grobidPreference&quot;;
+&nbsp;    public static final String GROBID_URL = &quot;grobidURL&quot;;
+&nbsp;
+&nbsp;    public static final String DEFAULT_CITATION_KEY_PATTERN = &quot;defaultBibtexKeyPattern&quot;;
+&nbsp;    public static final String UNWANTED_CITATION_KEY_CHARACTERS = &quot;defaultUnwantedBibtexKeyCharacters&quot;;
+&nbsp;    public static final String CONFIRM_LINKED_FILE_DELETE = &quot;confirmLinkedFileDelete&quot;;
+&nbsp;    public static final String TRASH_INSTEAD_OF_DELETE = &quot;trashInsteadOfDelete&quot;;
+&nbsp;    public static final String WARN_BEFORE_OVERWRITING_KEY = &quot;warnBeforeOverwritingKey&quot;;
+&nbsp;    public static final String AVOID_OVERWRITING_KEY = &quot;avoidOverwritingKey&quot;;
+&nbsp;    public static final String AUTOLINK_EXACT_KEY_ONLY = &quot;autolinkExactKeyOnly&quot;;
+&nbsp;    public static final String AUTOLINK_FILES_ENABLED = &quot;autoLinkFilesEnabled&quot;;
+&nbsp;
+&nbsp;    public static final String GENERATE_KEYS_BEFORE_SAVING = &quot;generateKeysBeforeSaving&quot;;
+&nbsp;    public static final String KEY_GEN_ALWAYS_ADD_LETTER = &quot;keyGenAlwaysAddLetter&quot;;
+&nbsp;    public static final String KEY_GEN_FIRST_LETTER_A = &quot;keyGenFirstLetterA&quot;;
+&nbsp;    public static final String ALLOW_INTEGER_EDITION_BIBTEX = &quot;allowIntegerEditionBibtex&quot;;
+&nbsp;    public static final String LOCAL_AUTO_SAVE = &quot;localAutoSave&quot;;
+&nbsp;    public static final String AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY = &quot;regExpSearchExpression&quot;;
+&nbsp;    public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = &quot;useRegExpSearch&quot;;
+&nbsp;    // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
+&nbsp;
+&nbsp;    public static final String STORE_RELATIVE_TO_BIB = &quot;bibLocAsPrimaryDir&quot;;
+&nbsp;    public static final String CUSTOM_TAB_NAME = &quot;customTabName_&quot;;
+&nbsp;    public static final String CUSTOM_TAB_FIELDS = &quot;customTabFields_&quot;;
+&nbsp;    public static final String ASK_AUTO_NAMING_PDFS_AGAIN = &quot;AskAutoNamingPDFsAgain&quot;;
+&nbsp;    public static final String CLEANUP_JOBS = &quot;CleanUpJobs&quot;;
+&nbsp;    public static final String CLEANUP_FIELD_FORMATTERS_ENABLED = &quot;CleanUpFormattersEnabled&quot;;
+&nbsp;    public static final String CLEANUP_FIELD_FORMATTERS = &quot;CleanUpFormatters&quot;;
+&nbsp;    public static final String AUTO_RENAME_FILES_ON_CHANGE = &quot;autoRenameFilesOnChange&quot;;
+&nbsp;    public static final String IMPORT_FILENAMEPATTERN = &quot;importFileNamePattern&quot;;
+&nbsp;    public static final String IMPORT_FILEDIRPATTERN = &quot;importFileDirPattern&quot;;
+&nbsp;    public static final String NAME_FORMATTER_VALUE = &quot;nameFormatterFormats&quot;;
+&nbsp;    public static final String NAME_FORMATER_KEY = &quot;nameFormatterNames&quot;;
+&nbsp;    public static final String SHOW_RECOMMENDATIONS = &quot;showRecommendations&quot;;
+&nbsp;    public static final String SHOW_AI_SUMMARY = &quot;showAiSummary&quot;;
+&nbsp;    public static final String SMART_FILE_ANNOTATIONS = &quot;smartFileAnnotations&quot;;
+&nbsp;    public static final String SHOW_AI_CHAT = &quot;showAiChat&quot;;
+&nbsp;    public static final String ACCEPT_RECOMMENDATIONS = &quot;acceptRecommendations&quot;;
+&nbsp;    public static final String SHOW_LATEX_CITATIONS = &quot;showLatexCitations&quot;;
+&nbsp;    public static final String SEND_LANGUAGE_DATA = &quot;sendLanguageData&quot;;
+&nbsp;    public static final String SEND_OS_DATA = &quot;sendOSData&quot;;
+&nbsp;    public static final String SEND_TIMEZONE_DATA = &quot;sendTimezoneData&quot;;
+&nbsp;    public static final String VALIDATE_IN_ENTRY_EDITOR = &quot;validateInEntryEditor&quot;;
+&nbsp;    public static final String SHOW_SCITE_TAB = &quot;showSciteTab&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for
+&nbsp;     * OO/LO installation, used to detect location on Win/macOS when using manual
+&nbsp;     * connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that
+&nbsp;     * contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the
+&nbsp;     * reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO
+&nbsp;     * panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should
+&nbsp;     * be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file
+&nbsp;     * OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size
+&nbsp;     * and position of &quot;Select style&quot; dialog
+&nbsp;     */
+&nbsp;    public static final String OO_EXECUTABLE_PATH = &quot;ooExecutablePath&quot;;
+&nbsp;    public static final String OO_SYNC_WHEN_CITING = &quot;syncOOWhenCiting&quot;;
+&nbsp;    public static final String OO_USE_ALL_OPEN_BASES = &quot;useAllOpenBases&quot;;
+&nbsp;    public static final String OO_BIBLIOGRAPHY_STYLE_FILE = &quot;ooBibliographyStyleFile&quot;;
+&nbsp;    public static final String OO_EXTERNAL_STYLE_FILES = &quot;ooExternalStyleFiles&quot;;
+&nbsp;    public static final String OO_EXTERNAL_CSL_STYLES = &quot;externalCslStyles&quot;;
+&nbsp;    public static final String OO_CURRENT_STYLE = &quot;ooCurrentStyle&quot;;
+&nbsp;    public static final String OO_ALWAYS_ADD_CITED_ON_PAGES = &quot;ooAlwaysAddCitedOnPages&quot;;
+&nbsp;    public static final String OO_CSL_BIBLIOGRAPHY_TITLE = &quot;cslBibliographyTitle&quot;;
+&nbsp;    public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = &quot;cslBibliographyHeaderFormat&quot;;
+&nbsp;    public static final String OO_CSL_BIBLIOGRAPHY_BODY_FORMAT = &quot;cslBibliographyBodyFormat&quot;;
+&nbsp;    public static final String OO_ADD_SPACE_AFTER = &quot;ooAddSpaceAfter&quot;;
+&nbsp;    // Prefs node for CitationKeyPatterns
+&nbsp;    public static final String CITATION_KEY_PATTERNS_NODE = &quot;bibtexkeypatterns&quot;;
+&nbsp;    // Prefs node for customized entry types
+&nbsp;    public static final String CUSTOMIZED_BIBTEX_TYPES = &quot;customizedBibtexTypes&quot;;
+&nbsp;    public static final String CUSTOMIZED_BIBLATEX_TYPES = &quot;customizedBiblatexTypes&quot;;
+&nbsp;    // Version
+&nbsp;    public static final String VERSION_IGNORED_UPDATE = &quot;versionIgnoreUpdate&quot;;
+&nbsp;    public static final String VERSION_CHECK_ENABLED = &quot;versionCheck&quot;;
+&nbsp;
+&nbsp;    // String delimiter
+<b class="fc">&nbsp;    public static final Character STRINGLIST_DELIMITER = &#39;;&#39;;</b>
+&nbsp;
+&nbsp;    // TODO: USed by both importer preferences and workspace preferences
+&nbsp;    protected static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = &quot;warnAboutDuplicatesInInspection&quot;;
+&nbsp;
+&nbsp;    // Helper string
+<b class="fc">&nbsp;    protected static final String USER_HOME = System.getProperty(&quot;user.home&quot;);</b>
+&nbsp;
+&nbsp;    // UI
+&nbsp;    private static final String FONT_FAMILY = &quot;fontFamily&quot;;
+&nbsp;
+&nbsp;    // region last files opened
+&nbsp;    private static final String LAST_EDITED = &quot;lastEdited&quot;;
+&nbsp;    private static final String LAST_FOCUSED = &quot;lastFocused&quot;;
+&nbsp;    private static final String RECENT_DATABASES = &quot;recentDatabases&quot;;
+&nbsp;    // endregion
+&nbsp;
+&nbsp;    // Proxy
+&nbsp;    private static final String PROXY_PORT = &quot;proxyPort&quot;;
+&nbsp;    private static final String PROXY_HOSTNAME = &quot;proxyHostname&quot;;
+&nbsp;    private static final String PROXY_USE = &quot;useProxy&quot;;
+&nbsp;    private static final String PROXY_USE_AUTHENTICATION = &quot;useProxyAuthentication&quot;;
+&nbsp;    private static final String PROXY_USERNAME = &quot;proxyUsername&quot;;
+&nbsp;    private static final String PROXY_PASSWORD = &quot;proxyPassword&quot;;
+&nbsp;    private static final String PROXY_PERSIST_PASSWORD = &quot;persistPassword&quot;;
+&nbsp;
+&nbsp;    // Web search
+&nbsp;    private static final String FETCHER_CUSTOM_KEY_NAMES = &quot;fetcherCustomKeyNames&quot;;
+&nbsp;    private static final String FETCHER_CUSTOM_KEY_USES = &quot;fetcherCustomKeyUses&quot;;
+&nbsp;    private static final String FETCHER_CUSTOM_KEY_PERSIST = &quot;fetcherCustomKeyPersist&quot;;
+&nbsp;
+&nbsp;    // SSL
+&nbsp;    private static final String TRUSTSTORE_PATH = &quot;truststorePath&quot;;
+&nbsp;
+&nbsp;    // User
+&nbsp;    private static final String USER_ID = &quot;userId&quot;;
+&nbsp;
+&nbsp;    // Journal
+&nbsp;    private static final String EXTERNAL_JOURNAL_LISTS = &quot;externalJournalLists&quot;;
+&nbsp;    private static final String USE_AMS_FJOURNAL = &quot;useAMSFJournal&quot;;
+&nbsp;
+&nbsp;    // Protected terms
+&nbsp;    private static final String PROTECTED_TERMS_ENABLED_EXTERNAL = &quot;protectedTermsEnabledExternal&quot;;
+&nbsp;    private static final String PROTECTED_TERMS_DISABLED_EXTERNAL = &quot;protectedTermsDisabledExternal&quot;;
+&nbsp;    private static final String PROTECTED_TERMS_ENABLED_INTERNAL = &quot;protectedTermsEnabledInternal&quot;;
+&nbsp;    private static final String PROTECTED_TERMS_DISABLED_INTERNAL = &quot;protectedTermsDisabledInternal&quot;;
+&nbsp;
+&nbsp;    // Dialog states
+&nbsp;    private static final String PREFS_EXPORT_PATH = &quot;prefsExportPath&quot;;
+&nbsp;    private static final String DOWNLOAD_LINKED_FILES = &quot;downloadLinkedFiles&quot;;
+&nbsp;    private static final String FULLTEXT_INDEX_LINKED_FILES = &quot;fulltextIndexLinkedFiles&quot;;
+&nbsp;    private static final String KEEP_DOWNLOAD_URL = &quot;keepDownloadUrl&quot;;
+&nbsp;
+&nbsp;    // Indexes for Strings within stored custom export entries
+&nbsp;    private static final int EXPORTER_NAME_INDEX = 0;
+&nbsp;    private static final int EXPORTER_FILENAME_INDEX = 1;
+&nbsp;    private static final int EXPORTER_EXTENSION_INDEX = 2;
+&nbsp;
+&nbsp;    // Remote
+&nbsp;    private static final String USE_REMOTE_SERVER = &quot;useRemoteServer&quot;;
+&nbsp;    private static final String REMOTE_SERVER_PORT = &quot;remoteServerPort&quot;;
+&nbsp;    private static final String HTTP_SERVER_PORT = &quot;httpServerPort&quot;;
+&nbsp;    private static final String ENABLE_HTTP_SERVER = &quot;enableHttpServer&quot;;
+&nbsp;    private static final String ENABLE_LANGUAGE_SERVER = &quot;enableLanguageServer&quot;;
+&nbsp;    private static final String LANGUAGE_SERVER_PORT = &quot;languageServerPort&quot;;
+&nbsp;
+&nbsp;    private static final String AI_ENABLED = &quot;aiEnabled&quot;;
+&nbsp;    private static final String AI_AUTO_GENERATE_EMBEDDINGS = &quot;aiAutoGenerateEmbeddings&quot;;
+&nbsp;    private static final String AI_AUTO_GENERATE_SUMMARIES = &quot;aiAutoGenerateSummaries&quot;;
+&nbsp;    private static final String AI_PROVIDER = &quot;aiProvider&quot;;
+&nbsp;    private static final String AI_OPEN_AI_CHAT_MODEL = &quot;aiOpenAiChatModel&quot;;
+&nbsp;    private static final String AI_MISTRAL_AI_CHAT_MODEL = &quot;aiMistralAiChatModel&quot;;
+&nbsp;    private static final String AI_GEMINI_CHAT_MODEL = &quot;aiGeminiChatModel&quot;;
+&nbsp;    private static final String AI_HUGGING_FACE_CHAT_MODEL = &quot;aiHuggingFaceChatModel&quot;;
+&nbsp;    private static final String AI_GPT_4_ALL_MODEL = &quot;aiGpt4AllChatModel&quot;;
+&nbsp;    private static final String AI_CUSTOMIZE_SETTINGS = &quot;aiCustomizeSettings&quot;;
+&nbsp;    private static final String AI_EMBEDDING_MODEL = &quot;aiEmbeddingModel&quot;;
+&nbsp;    private static final String AI_OPEN_AI_API_BASE_URL = &quot;aiOpenAiApiBaseUrl&quot;;
+&nbsp;    private static final String AI_MISTRAL_AI_API_BASE_URL = &quot;aiMistralAiApiBaseUrl&quot;;
+&nbsp;    private static final String AI_GEMINI_API_BASE_URL = &quot;aiGeminiApiBaseUrl&quot;;
+&nbsp;    private static final String AI_HUGGING_FACE_API_BASE_URL = &quot;aiHuggingFaceApiBaseUrl&quot;;
+&nbsp;    private static final String AI_GPT_4_ALL_API_BASE_URL = &quot;aiGpt4AllApiBaseUrl&quot;;
+&nbsp;    private static final String AI_SYSTEM_MESSAGE = &quot;aiSystemMessage&quot;;
+&nbsp;    private static final String AI_TEMPERATURE = &quot;aiTemperature&quot;;
+&nbsp;    private static final String AI_CONTEXT_WINDOW_SIZE = &quot;aiMessageWindowSize&quot;;
+&nbsp;    private static final String AI_DOCUMENT_SPLITTER_CHUNK_SIZE = &quot;aiDocumentSplitterChunkSize&quot;;
+&nbsp;    private static final String AI_DOCUMENT_SPLITTER_OVERLAP_SIZE = &quot;aiDocumentSplitterOverlapSize&quot;;
+&nbsp;    private static final String AI_RAG_MAX_RESULTS_COUNT = &quot;aiRagMaxResultsCount&quot;;
+&nbsp;    private static final String AI_RAG_MIN_SCORE = &quot;aiRagMinScore&quot;;
+&nbsp;
+&nbsp;    private static final String AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE = &quot;aiChattingSystemMessageTemplate&quot;;
+&nbsp;    private static final String AI_CHATTING_USER_MESSAGE_TEMPLATE = &quot;aiChattingUserMessageTemplate&quot;;
+&nbsp;    private static final String AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE = &quot;aiSummarizationChunkSystemMessageTemplate&quot;;
+&nbsp;    private static final String AI_SUMMARIZATION_CHUNK_USER_MESSAGE_TEMPLATE = &quot;aiSummarizationChunkUserMessageTemplate&quot;;
+&nbsp;    private static final String AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE = &quot;aiSummarizationCombineSystemMessageTemplate&quot;;
+&nbsp;    private static final String AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE = &quot;aiSummarizationCombineUserMessageTemplate&quot;;
+&nbsp;    private static final String AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE = &quot;aiCitationParsingSystemMessageTemplate&quot;;
+&nbsp;    private static final String AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE = &quot;aiCitationParsingUserMessageTemplate&quot;;
+&nbsp;
+&nbsp;    private static final String LAST_USED_DIRECTORY = &quot;lastUsedDirectory&quot;;
+&nbsp;
+&nbsp;    private static final String OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY = &quot;openFileExplorerInFileDirectory&quot;;
+&nbsp;    private static final String OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY = &quot;openFileExplorerInLastUsedDirectory&quot;;
+&nbsp;
+&nbsp;    private static final String MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED = &quot;mainFileDirectoryWalkthroughCompleted&quot;;
+&nbsp;
+&nbsp;    // region Push to application preferences
+&nbsp;    private static final String PUSH_TO_APPLICATION = &quot;pushToApplication&quot;;
+&nbsp;    private static final String PUSH_EMACS_PATH = &quot;emacsPath&quot;;
+&nbsp;    private static final String PUSH_EMACS_ADDITIONAL_PARAMETERS = &quot;emacsParameters&quot;;
+&nbsp;    private static final String PUSH_LYXPIPE = &quot;lyxpipe&quot;;
+&nbsp;    private static final String PUSH_TEXSTUDIO_PATH = &quot;TeXstudioPath&quot;;
+&nbsp;    private static final String PUSH_TEXWORKS_PATH = &quot;TeXworksPath&quot;;
+&nbsp;    private static final String PUSH_WINEDT_PATH = &quot;winEdtPath&quot;;
+&nbsp;    private static final String PUSH_TEXMAKER_PATH = &quot;texmakerPath&quot;;
+&nbsp;    private static final String PUSH_VIM_SERVER = &quot;vimServer&quot;;
+&nbsp;    private static final String PUSH_VIM = &quot;vim&quot;;
+&nbsp;    private static final String PUSH_SUBLIME_TEXT_PATH = &quot;sublimeTextPath&quot;;
+&nbsp;    private static final String PUSH_VSCODE_PATH = &quot;VScodePath&quot;;
+&nbsp;    private static final String PUSH_CITE_COMMAND = &quot;citeCommand&quot;;
+&nbsp;
+&nbsp;    // Git
+&nbsp;    private static final String GITHUB_PAT_KEY = &quot;githubPersonalAccessToken&quot;;
+&nbsp;    private static final String GITHUB_USERNAME_KEY = &quot;githubUsername&quot;;
+&nbsp;    private static final String GITHUB_REMOTE_URL_KEY = &quot;githubRemoteUrl&quot;;
+&nbsp;    private static final String GITHUB_REMEMBER_PAT_KEY = &quot;githubRememberPat&quot;;
+&nbsp;    // endregion
+&nbsp;
+<b class="fc">&nbsp;    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);</b>
+<b class="fc">&nbsp;    private static final Preferences PREFS_NODE = Preferences.userRoot().node(&quot;/org/jabref&quot;);</b>
+&nbsp;
+&nbsp;    // The only instance of this class:
+&nbsp;    private static JabRefCliPreferences singleton;
+&nbsp;    /**
+&nbsp;     * HashMap that contains all preferences which are set by default
+&nbsp;     */
+<b class="fc">&nbsp;    public final Map&lt;String, Object&gt; defaults = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final Preferences prefs;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Cache variables
+&nbsp;     */
+&nbsp;    private UserHostInfo userAndHost;
+&nbsp;
+&nbsp;    private LibraryPreferences libraryPreferences;
+&nbsp;    private DOIPreferences doiPreferences;
+&nbsp;    private OwnerPreferences ownerPreferences;
+&nbsp;    private TimestampPreferences timestampPreferences;
+&nbsp;    private OpenOfficePreferences openOfficePreferences;
+&nbsp;    private ImporterPreferences importerPreferences;
+&nbsp;    private GrobidPreferences grobidPreferences;
+&nbsp;    private ProtectedTermsPreferences protectedTermsPreferences;
+&nbsp;    private MrDlibPreferences mrDlibPreferences;
+&nbsp;    private FilePreferences filePreferences;
+&nbsp;    private RemotePreferences remotePreferences;
+&nbsp;    private ProxyPreferences proxyPreferences;
+&nbsp;    private SSLPreferences sslPreferences;
+&nbsp;    private SearchPreferences searchPreferences;
+&nbsp;    private AutoLinkPreferences autoLinkPreferences;
+&nbsp;    private ExportPreferences exportPreferences;
+&nbsp;    private NameFormatterPreferences nameFormatterPreferences;
+&nbsp;    private BibEntryPreferences bibEntryPreferences;
+&nbsp;    private InternalPreferences internalPreferences;
+&nbsp;    private XmpPreferences xmpPreferences;
+&nbsp;    private CleanupPreferences cleanupPreferences;
+&nbsp;    private CitationKeyPatternPreferences citationKeyPatternPreferences;
+&nbsp;    private JournalAbbreviationPreferences journalAbbreviationPreferences;
+&nbsp;    private FieldPreferences fieldPreferences;
+&nbsp;    private AiPreferences aiPreferences;
+&nbsp;    private LastFilesOpenedPreferences lastFilesOpenedPreferences;
+&nbsp;    private PushToApplicationPreferences pushToApplicationPreferences;
+&nbsp;    private GitPreferences gitPreferences;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @implNote The constructor was made public because dependency injection via constructor
+&nbsp;     * required widespread refactoring, currently we are using reflection in some formatters
+&nbsp;     * to gain access
+&nbsp;     */
+<b class="fc">&nbsp;    public JabRefCliPreferences() {</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Path preferencesPath = Path.of(&quot;jabref.xml&quot;);</b>
+<b class="pc">&nbsp;            if (Files.exists(preferencesPath)) {</b>
+<b class="nc">&nbsp;                importPreferences(preferencesPath);</b>
+&nbsp;            }
+&nbsp;        } catch (JabRefException e) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not import preferences from jabref.xml&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // load user preferences
+<b class="fc">&nbsp;        prefs = PREFS_NODE;</b>
+&nbsp;
+&nbsp;        // Since some of the preference settings themselves use localized strings, we cannot set the language after
+&nbsp;        // the initialization of the preferences in main
+&nbsp;        // Otherwise that language framework will be instantiated and more importantly, statically initialized preferences
+&nbsp;        // will never be translated.
+<b class="fc">&nbsp;        Localization.setLanguage(getLanguage());</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(SEARCH_DISPLAY_MODE, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(SEARCH_REG_EXP, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(SEARCH_FULLTEXT, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(SEARCH_KEEP_SEARCH_STRING, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(SEARCH_WINDOW_HEIGHT, 176.0);</b>
+<b class="fc">&nbsp;        defaults.put(SEARCH_WINDOW_WIDTH, 600.0);</b>
+<b class="fc">&nbsp;        defaults.put(SEARCH_WINDOW_DIVIDER_POS, 0.5);</b>
+<b class="fc">&nbsp;        defaults.put(SEARCH_CATALOGS, convertListToString(List.of(</b>
+&nbsp;                ACMPortalFetcher.FETCHER_NAME,
+&nbsp;                SpringerNatureWebFetcher.FETCHER_NAME,
+&nbsp;                DBLPFetcher.FETCHER_NAME,
+&nbsp;                IEEE.FETCHER_NAME)));
+<b class="fc">&nbsp;        defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED.name());</b>
+<b class="fc">&nbsp;        defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(CITATIONS_RELATIONS_STORE_TTL, 30);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(ADD_IMPORTED_ENTRIES, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(ADD_IMPORTED_ENTRIES_GROUP_NAME, Localization.lang(&quot;Imported entries&quot;));</b>
+&nbsp;
+&nbsp;        // region: Grobid
+<b class="fc">&nbsp;        defaults.put(GROBID_ENABLED, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(GROBID_PREFERENCE, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(GROBID_URL, &quot;http://grobid.jabref.org:8070&quot;);</b>
+&nbsp;        // endregion
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(BIBLATEX_DEFAULT_MODE, Boolean.FALSE);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(BASE_DOI_URI, &quot;https://doi.org&quot;);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (OS.OS_X) {</b>
+<b class="nc">&nbsp;            defaults.put(FONT_FAMILY, &quot;SansSerif&quot;);</b>
+&nbsp;        } else {
+&nbsp;            // Linux
+<b class="fc">&nbsp;            defaults.put(FONT_FAMILY, &quot;SansSerif&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(KEY_PATTERN_REGEX, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(KEY_PATTERN_REPLACEMENT, &quot;&quot;);</b>
+&nbsp;
+&nbsp;        // Proxy
+<b class="fc">&nbsp;        defaults.put(PROXY_USE, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(PROXY_HOSTNAME, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(PROXY_PORT, &quot;80&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(PROXY_USE_AUTHENTICATION, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(PROXY_USERNAME, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(PROXY_PASSWORD, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(PROXY_PERSIST_PASSWORD, Boolean.FALSE);</b>
+&nbsp;
+&nbsp;        // SSL
+<b class="fc">&nbsp;        defaults.put(TRUSTSTORE_PATH, Directories</b>
+<b class="fc">&nbsp;                .getSslDirectory()</b>
+<b class="fc">&nbsp;                .resolve(&quot;truststore.jks&quot;).toString());</b>
+&nbsp;
+&nbsp;        // system locale as default
+<b class="fc">&nbsp;        defaults.put(LANGUAGE, Locale.getDefault().getLanguage());</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(REFORMAT_FILE_ON_SAVE_AND_EXPORT, Boolean.FALSE);</b>
+&nbsp;
+&nbsp;        // export order
+<b class="fc">&nbsp;        defaults.put(EXPORT_IN_ORIGINAL_ORDER, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);</b>
+&nbsp;
+&nbsp;        // export order: if EXPORT_IN_SPECIFIED_ORDER, then use following criteria
+<b class="fc">&nbsp;        defaults.put(EXPORT_PRIMARY_SORT_FIELD, InternalField.KEY_FIELD.getName());</b>
+<b class="fc">&nbsp;        defaults.put(EXPORT_PRIMARY_SORT_DESCENDING, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(EXPORT_SECONDARY_SORT_FIELD, StandardField.AUTHOR.getName());</b>
+<b class="fc">&nbsp;        defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(EXPORT_TERTIARY_SORT_FIELD, StandardField.TITLE.getName());</b>
+<b class="fc">&nbsp;        defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.FALSE);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(NEWLINE, System.lineSeparator());</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(XMP_PRIVACY_FILTERS, &quot;pdf;timestamp;keywords;owner;note;review&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(WORKING_DIRECTORY, USER_HOME);</b>
+<b class="fc">&nbsp;        defaults.put(EXPORT_WORKING_DIRECTORY, USER_HOME);</b>
+<b class="fc">&nbsp;        defaults.put(LAST_USED_DIRECTORY, getDefaultPath().toString());</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(CREATE_BACKUP, Boolean.TRUE);</b>
+&nbsp;
+&nbsp;        // Remembers working directory of last import
+<b class="fc">&nbsp;        defaults.put(IMPORT_WORKING_DIRECTORY, USER_HOME);</b>
+<b class="fc">&nbsp;        defaults.put(PREFS_EXPORT_PATH, USER_HOME);</b>
+<b class="fc">&nbsp;        defaults.put(AUTO_OPEN_FORM, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(SHOW_USER_COMMENTS_FIELDS, Boolean.TRUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(SHOW_AI_CHAT, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(SHOW_AI_SUMMARY, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(SMART_FILE_ANNOTATIONS, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(SHOW_LATEX_CITATIONS, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(SHOW_SCITE_TAB, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(SEND_LANGUAGE_DATA, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(SEND_OS_DATA, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(SEND_TIMEZONE_DATA, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(VALIDATE_IN_ENTRY_EDITOR, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(KEYWORD_SEPARATOR, &quot;, &quot;);</b>
+<b class="fc">&nbsp;        defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());</b>
+<b class="fc">&nbsp;        defaults.put(DEFAULT_OWNER, System.getProperty(&quot;user.name&quot;));</b>
+<b class="fc">&nbsp;        defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));</b>
+<b class="fc">&nbsp;        defaults.put(PROTECTED_TERMS_DISABLED_INTERNAL, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(PROTECTED_TERMS_ENABLED_EXTERNAL, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(PROTECTED_TERMS_DISABLED_EXTERNAL, &quot;&quot;);</b>
+&nbsp;
+&nbsp;        // OpenOffice/LibreOffice
+<b class="pc">&nbsp;        if (OS.WINDOWS) {</b>
+<b class="fc">&nbsp;            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WIN_EXEC_PATH);</b>
+<b class="nc">&nbsp;        } else if (OS.OS_X) {</b>
+<b class="nc">&nbsp;            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_EXEC_PATH);</b>
+&nbsp;        } else { // Linux
+<b class="nc">&nbsp;            defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(OO_SYNC_WHEN_CITING, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(OO_ALWAYS_ADD_CITED_ON_PAGES, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);</b>
+<b class="fc">&nbsp;        defaults.put(OO_EXTERNAL_STYLE_FILES, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(OO_CURRENT_STYLE, CSLStyleLoader.getDefaultStyle().getPath()); // Default CSL Style is IEEE</b>
+<b class="fc">&nbsp;        defaults.put(OO_CSL_BIBLIOGRAPHY_TITLE, &quot;References&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, &quot;Heading 2&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, &quot;Text body&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(OO_EXTERNAL_CSL_STYLES, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(OO_ADD_SPACE_AFTER, Boolean.TRUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(FETCHER_CUSTOM_KEY_NAMES, &quot;Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(FETCHER_CUSTOM_KEY_USES, &quot;FALSE;FALSE;FALSE;FALSE;FALSE&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(FETCHER_CUSTOM_KEY_PERSIST, Boolean.FALSE);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(USE_OWNER, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(OVERWRITE_OWNER, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(CONFIRM_LINKED_FILE_DELETE, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(KEEP_DOWNLOAD_URL, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(DEFAULT_CITATION_KEY_PATTERN, &quot;[auth][year]&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, &quot;-`ʹ:!;?^$&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(RESOLVE_STRINGS_FOR_FIELDS, &quot;author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;monthfiled;publisher;shortauthor;shorteditor;subtitle;titleaddon&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(DO_NOT_RESOLVE_STRINGS, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(NON_WRAPPABLE_FIELDS, &quot;pdf;ps;url;doi;file;isbn;issn&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(ADD_CREATION_DATE, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(ADD_MODIFICATION_DATE, Boolean.FALSE);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(TIME_STAMP_FIELD, StandardField.TIMESTAMP.getName());</b>
+&nbsp;        // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
+<b class="fc">&nbsp;        defaults.put(TIME_STAMP_FORMAT, &quot;yyyy-MM-dd&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(USE_REMOTE_SERVER, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(REMOTE_SERVER_PORT, 6050);</b>
+<b class="fc">&nbsp;        defaults.put(ENABLE_HTTP_SERVER, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(HTTP_SERVER_PORT, 23119);</b>
+<b class="fc">&nbsp;        defaults.put(ENABLE_LANGUAGE_SERVER, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(LANGUAGE_SERVER_PORT, 2087);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(EXTERNAL_JOURNAL_LISTS, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(USE_AMS_FJOURNAL, true);</b>
+<b class="fc">&nbsp;        defaults.put(LAST_USED_EXPORT, &quot;&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(AUTOLINK_FILES_ENABLED, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(ALLOW_INTEGER_EDITION_BIBTEX, Boolean.FALSE);</b>
+&nbsp;        // Curly brackets ({}) are the default delimiters, not quotes (&quot;) as these cause trouble when they appear within the field value:
+&nbsp;        // Currently, JabRef does not escape them
+<b class="fc">&nbsp;        defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);</b>
+<b class="fc">&nbsp;        defaults.put(CLEANUP_JOBS, convertListToString(getDefaultCleanupJobs().stream().map(Enum::name).toList()));</b>
+<b class="fc">&nbsp;        defaults.put(CLEANUP_FIELD_FORMATTERS_ENABLED, Boolean.FALSE);</b>
+<b class="fc">&nbsp;        defaults.put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS, OS.NEWLINE));</b>
+&nbsp;
+<b class="fc">&nbsp;        defaults.put(AUTO_RENAME_FILES_ON_CHANGE, false);</b>
+&nbsp;        // use citation key appended with filename as default pattern
+<b class="fc">&nbsp;        defaults.put(IMPORT_FILENAMEPATTERN, FilePreferences.DEFAULT_FILENAME_PATTERNS[1]);</b>
+&nbsp;        // Default empty String to be backwards compatible
+<b class="fc">&nbsp;        defaults.put(IMPORT_FILEDIRPATTERN, &quot;&quot;);</b>
+&nbsp;        // Download files by default
+<b class="fc">&nbsp;        defaults.put(DOWNLOAD_LINKED_FILES, true);</b>
+&nbsp;        // Create Fulltext-Index by default
+<b class="fc">&nbsp;        defaults.put(FULLTEXT_INDEX_LINKED_FILES, true);</b>
+&nbsp;
+<b class="fc">&nbsp;        String defaultExpression = &quot;**/.*[citationkey].*\\\\.[extension]&quot;;</b>
+<b class="fc">&nbsp;        defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);</b>
+<b class="fc">&nbsp;        defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);</b>
+&nbsp;
+&nbsp;        // version check defaults
+<b class="fc">&nbsp;        defaults.put(VERSION_IGNORED_UPDATE, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(VERSION_CHECK_ENABLED, Boolean.TRUE);</b>
+&nbsp;
+<b class="fc">&nbsp;        setLanguageDependentDefaultValues();</b>
+&nbsp;
+&nbsp;        // region last files opened
+<b class="fc">&nbsp;        defaults.put(RECENT_DATABASES, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(LAST_FOCUSED, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(LAST_EDITED, &quot;&quot;);</b>
+&nbsp;        // endregion
+&nbsp;
+&nbsp;        // region:AI
+<b class="fc">&nbsp;        defaults.put(AI_ENABLED, AiDefaultPreferences.ENABLE_CHAT);</b>
+<b class="fc">&nbsp;        defaults.put(AI_AUTO_GENERATE_EMBEDDINGS, AiDefaultPreferences.AUTO_GENERATE_EMBEDDINGS);</b>
+<b class="fc">&nbsp;        defaults.put(AI_AUTO_GENERATE_SUMMARIES, AiDefaultPreferences.AUTO_GENERATE_SUMMARIES);</b>
+<b class="fc">&nbsp;        defaults.put(AI_PROVIDER, AiDefaultPreferences.PROVIDER.name());</b>
+<b class="fc">&nbsp;        defaults.put(AI_OPEN_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.OPEN_AI).getName());</b>
+<b class="fc">&nbsp;        defaults.put(AI_MISTRAL_AI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.MISTRAL_AI).getName());</b>
+<b class="fc">&nbsp;        defaults.put(AI_GEMINI_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.GEMINI).getName());</b>
+<b class="fc">&nbsp;        defaults.put(AI_HUGGING_FACE_CHAT_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.HUGGING_FACE).getName());</b>
+<b class="fc">&nbsp;        defaults.put(AI_GPT_4_ALL_MODEL, AiDefaultPreferences.CHAT_MODELS.get(AiProvider.GPT4ALL).getName());</b>
+<b class="fc">&nbsp;        defaults.put(AI_CUSTOMIZE_SETTINGS, AiDefaultPreferences.CUSTOMIZE_SETTINGS);</b>
+<b class="fc">&nbsp;        defaults.put(AI_EMBEDDING_MODEL, AiDefaultPreferences.EMBEDDING_MODEL.name());</b>
+<b class="fc">&nbsp;        defaults.put(AI_OPEN_AI_API_BASE_URL, AiProvider.OPEN_AI.getApiUrl());</b>
+<b class="fc">&nbsp;        defaults.put(AI_MISTRAL_AI_API_BASE_URL, AiProvider.MISTRAL_AI.getApiUrl());</b>
+<b class="fc">&nbsp;        defaults.put(AI_GEMINI_API_BASE_URL, AiProvider.GEMINI.getApiUrl());</b>
+<b class="fc">&nbsp;        defaults.put(AI_HUGGING_FACE_API_BASE_URL, AiProvider.HUGGING_FACE.getApiUrl());</b>
+<b class="fc">&nbsp;        defaults.put(AI_GPT_4_ALL_API_BASE_URL, AiProvider.GPT4ALL.getApiUrl());</b>
+<b class="fc">&nbsp;        defaults.put(AI_SYSTEM_MESSAGE, AiDefaultPreferences.SYSTEM_MESSAGE);</b>
+<b class="fc">&nbsp;        defaults.put(AI_TEMPERATURE, AiDefaultPreferences.TEMPERATURE);</b>
+<b class="fc">&nbsp;        defaults.put(AI_CONTEXT_WINDOW_SIZE, AiDefaultPreferences.getContextWindowSize(AiDefaultPreferences.PROVIDER, AiDefaultPreferences.CHAT_MODELS.get(AiDefaultPreferences.PROVIDER).getName()));</b>
+<b class="fc">&nbsp;        defaults.put(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_CHUNK_SIZE);</b>
+<b class="fc">&nbsp;        defaults.put(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, AiDefaultPreferences.DOCUMENT_SPLITTER_OVERLAP);</b>
+<b class="fc">&nbsp;        defaults.put(AI_RAG_MAX_RESULTS_COUNT, AiDefaultPreferences.RAG_MAX_RESULTS_COUNT);</b>
+<b class="fc">&nbsp;        defaults.put(AI_RAG_MIN_SCORE, AiDefaultPreferences.RAG_MIN_SCORE);</b>
+&nbsp;
+&nbsp;        // region:AI templates
+<b class="fc">&nbsp;        defaults.put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CHATTING_SYSTEM_MESSAGE));</b>
+<b class="fc">&nbsp;        defaults.put(AI_CHATTING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CHATTING_USER_MESSAGE));</b>
+<b class="fc">&nbsp;        defaults.put(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE));</b>
+<b class="fc">&nbsp;        defaults.put(AI_SUMMARIZATION_CHUNK_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE));</b>
+<b class="fc">&nbsp;        defaults.put(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE));</b>
+<b class="fc">&nbsp;        defaults.put(AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE));</b>
+<b class="fc">&nbsp;        defaults.put(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE));</b>
+<b class="fc">&nbsp;        defaults.put(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE, AiDefaultPreferences.TEMPLATES.get(AiTemplate.CITATION_PARSING_USER_MESSAGE));</b>
+&nbsp;        // endregion
+&nbsp;
+&nbsp;        // endregion
+&nbsp;
+&nbsp;        // region PushToApplicationPreferences
+<b class="fc">&nbsp;        defaults.put(PUSH_TEXMAKER_PATH, OS.detectProgramPath(&quot;texmaker&quot;, &quot;Texmaker&quot;));</b>
+<b class="fc">&nbsp;        defaults.put(PUSH_WINEDT_PATH, OS.detectProgramPath(&quot;WinEdt&quot;, &quot;WinEdt Team\\WinEdt&quot;));</b>
+<b class="fc">&nbsp;        defaults.put(PUSH_TO_APPLICATION, &quot;TeXstudio&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(PUSH_TEXSTUDIO_PATH, OS.detectProgramPath(&quot;texstudio&quot;, &quot;TeXstudio&quot;));</b>
+<b class="fc">&nbsp;        defaults.put(PUSH_TEXWORKS_PATH, OS.detectProgramPath(&quot;texworks&quot;, &quot;TeXworks&quot;));</b>
+<b class="fc">&nbsp;        defaults.put(PUSH_SUBLIME_TEXT_PATH, OS.detectProgramPath(&quot;subl&quot;, &quot;Sublime&quot;));</b>
+<b class="fc">&nbsp;        defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + &quot;.lyx/lyxpipe&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(PUSH_VIM, &quot;vim&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(PUSH_VIM_SERVER, &quot;vim&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(PUSH_EMACS_ADDITIONAL_PARAMETERS, &quot;-n -e&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(PUSH_VSCODE_PATH, OS.detectProgramPath(&quot;Code&quot;, &quot;Microsoft VS Code&quot;));</b>
+<b class="fc">&nbsp;        defaults.put(PUSH_CITE_COMMAND, &quot;\\cite{key1,key2}&quot;);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (OS.OS_X) {</b>
+<b class="nc">&nbsp;            defaults.put(PUSH_EMACS_PATH, &quot;emacsclient&quot;);</b>
+<b class="pc">&nbsp;        } else if (OS.WINDOWS) {</b>
+<b class="fc">&nbsp;            defaults.put(PUSH_EMACS_PATH, &quot;emacsclient.exe&quot;);</b>
+&nbsp;        } else {
+&nbsp;            // Linux
+<b class="nc">&nbsp;            defaults.put(PUSH_EMACS_PATH, &quot;emacsclient&quot;);</b>
+&nbsp;        }
+&nbsp;        // endregion
+&nbsp;
+&nbsp;        // WalkThrough
+<b class="fc">&nbsp;        defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);</b>
+&nbsp;
+&nbsp;        // region: Git preferences
+<b class="fc">&nbsp;        defaults.put(GITHUB_PAT_KEY, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(GITHUB_USERNAME_KEY, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(GITHUB_REMOTE_URL_KEY, &quot;&quot;);</b>
+<b class="fc">&nbsp;        defaults.put(GITHUB_REMEMBER_PAT_KEY, false);</b>
+&nbsp;        // endregion
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLanguageDependentDefaultValues() {
+&nbsp;        // Entry editor tab 0:
+<b class="fc">&nbsp;        defaults.put(CUSTOM_TAB_NAME + &quot;_def0&quot;, Localization.lang(&quot;General&quot;));</b>
+<b class="fc">&nbsp;        String fieldNames = FieldFactory.getDefaultGeneralFields().stream().map(Field::getName).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));</b>
+<b class="fc">&nbsp;        defaults.put(CUSTOM_TAB_FIELDS + &quot;_def0&quot;, fieldNames);</b>
+&nbsp;
+&nbsp;        // Entry editor tab 1:
+<b class="fc">&nbsp;        defaults.put(CUSTOM_TAB_FIELDS + &quot;_def1&quot;, StandardField.ABSTRACT.getName());</b>
+<b class="fc">&nbsp;        defaults.put(CUSTOM_TAB_NAME + &quot;_def1&quot;, Localization.lang(&quot;Abstract&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // region PushToApplicationPreferences
+&nbsp;
+&nbsp;    public PushToApplicationPreferences getPushToApplicationPreferences() {
+<b class="nc">&nbsp;        if (pushToApplicationPreferences != null) {</b>
+<b class="nc">&nbsp;            return pushToApplicationPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, String&gt; applicationCommands = new HashMap&lt;&gt;();</b>
+&nbsp;        // getEmptyIsDefault is used to ensure that an installation of a tool leads to the new path (instead of leaving the empty one)
+&nbsp;        // Reason: empty string is returned by org.jabref.gui.desktop.os.Windows.detectProgramPath if program is not found. That path is stored in the preferences.
+<b class="nc">&nbsp;        applicationCommands.put(PushApplications.EMACS.getDisplayName(), getEmptyIsDefault(PUSH_EMACS_PATH));</b>
+<b class="nc">&nbsp;        applicationCommands.put(PushApplications.LYX.getDisplayName(), getEmptyIsDefault(PUSH_LYXPIPE));</b>
+<b class="nc">&nbsp;        applicationCommands.put(PushApplications.TEXMAKER.getDisplayName(), getEmptyIsDefault(PUSH_TEXMAKER_PATH));</b>
+<b class="nc">&nbsp;        applicationCommands.put(PushApplications.TEXSTUDIO.getDisplayName(), getEmptyIsDefault(PUSH_TEXSTUDIO_PATH));</b>
+<b class="nc">&nbsp;        applicationCommands.put(PushApplications.TEXWORKS.getDisplayName(), getEmptyIsDefault(PUSH_TEXWORKS_PATH));</b>
+<b class="nc">&nbsp;        applicationCommands.put(PushApplications.VIM.getDisplayName(), getEmptyIsDefault(PUSH_VIM));</b>
+<b class="nc">&nbsp;        applicationCommands.put(PushApplications.WIN_EDT.getDisplayName(), getEmptyIsDefault(PUSH_WINEDT_PATH));</b>
+<b class="nc">&nbsp;        applicationCommands.put(PushApplications.SUBLIME_TEXT.getDisplayName(), getEmptyIsDefault(PUSH_SUBLIME_TEXT_PATH));</b>
+<b class="nc">&nbsp;        applicationCommands.put(PushApplications.VSCODE.getDisplayName(), getEmptyIsDefault(PUSH_VSCODE_PATH));</b>
+&nbsp;
+<b class="nc">&nbsp;        pushToApplicationPreferences = new PushToApplicationPreferences(</b>
+<b class="nc">&nbsp;                get(PUSH_TO_APPLICATION),</b>
+&nbsp;                applicationCommands,
+<b class="nc">&nbsp;                get(PUSH_EMACS_ADDITIONAL_PARAMETERS),</b>
+<b class="nc">&nbsp;                get(PUSH_VIM_SERVER),</b>
+<b class="nc">&nbsp;                CitationCommandString.from(get(PUSH_CITE_COMMAND)),</b>
+<b class="nc">&nbsp;                CitationCommandString.from((String) defaults.get(PUSH_CITE_COMMAND))</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(pushToApplicationPreferences.activeApplicationNameProperty(), (obs, oldValue, newValue) -&gt; put(PUSH_TO_APPLICATION, newValue));</b>
+<b class="nc">&nbsp;        pushToApplicationPreferences.getCommandPaths().addListener((obs, oldValue, newValue) -&gt; storePushToApplicationPath(newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (obs, oldValue, newValue) -&gt; put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (obs, oldValue, newValue) -&gt; put(PUSH_VIM_SERVER, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(pushToApplicationPreferences.citeCommandProperty(),</b>
+<b class="nc">&nbsp;                (obs, oldValue, newValue) -&gt; put(PUSH_CITE_COMMAND, newValue.toString()));</b>
+&nbsp;
+<b class="nc">&nbsp;        return pushToApplicationPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void storePushToApplicationPath(Map&lt;String, String&gt; commandPair) {
+<b class="nc">&nbsp;        commandPair.forEach((key, value) -&gt; {</b>
+&nbsp;            // is only for the preferences and therefore is okay to throw NoSuchElementException
+<b class="nc">&nbsp;            switch (PushApplications.getApplicationByDisplayName(key).get()) {</b>
+&nbsp;                case PushApplications.EMACS -&gt;
+<b class="nc">&nbsp;                        put(PUSH_EMACS_PATH, value);</b>
+&nbsp;                case PushApplications.LYX -&gt;
+<b class="nc">&nbsp;                        put(PUSH_LYXPIPE, value);</b>
+&nbsp;                case PushApplications.TEXMAKER -&gt;
+<b class="nc">&nbsp;                        put(PUSH_TEXMAKER_PATH, value);</b>
+&nbsp;                case PushApplications.TEXSTUDIO -&gt;
+<b class="nc">&nbsp;                        put(PUSH_TEXSTUDIO_PATH, value);</b>
+&nbsp;                case PushApplications.TEXWORKS -&gt;
+<b class="nc">&nbsp;                        put(PUSH_TEXWORKS_PATH, value);</b>
+&nbsp;                case PushApplications.VIM -&gt;
+<b class="nc">&nbsp;                        put(PUSH_VIM, value);</b>
+&nbsp;                case PushApplications.WIN_EDT -&gt;
+<b class="nc">&nbsp;                        put(PUSH_WINEDT_PATH, value);</b>
+&nbsp;                case PushApplications.SUBLIME_TEXT -&gt;
+<b class="nc">&nbsp;                        put(PUSH_SUBLIME_TEXT_PATH, value);</b>
+&nbsp;                case PushApplications.VSCODE -&gt;
+<b class="nc">&nbsp;                        put(PUSH_VSCODE_PATH, value);</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;    }
+&nbsp;    // endregion
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @deprecated Never ever add a call to this method. There should be only one
+&nbsp;     * caller. All other usages should get the preferences passed (or injected). The
+&nbsp;     * JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing
+&nbsp;     * this method with a strike-through.
+&nbsp;     */
+&nbsp;    @Deprecated
+&nbsp;    public static JabRefCliPreferences getInstance() {
+<b class="nc">&nbsp;        if (JabRefCliPreferences.singleton == null) {</b>
+<b class="nc">&nbsp;            JabRefCliPreferences.singleton = new JabRefCliPreferences();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return JabRefCliPreferences.singleton;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //*************************************************************************************************************
+&nbsp;    // Common serializer logic
+&nbsp;    //*************************************************************************************************************
+&nbsp;
+&nbsp;    @VisibleForTesting
+&nbsp;    static String convertListToString(List&lt;String&gt; value) {
+<b class="fc">&nbsp;        return value.stream().map(val -&gt; StringUtil.quote(val, STRINGLIST_DELIMITER.toString(), &#39;\\&#39;)).collect(Collectors.joining(STRINGLIST_DELIMITER.toString()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @VisibleForTesting
+&nbsp;    static List&lt;String&gt; convertStringToList(String toConvert) {
+<b class="fc">&nbsp;        if (StringUtil.isBlank(toConvert)) {</b>
+<b class="fc">&nbsp;            return List.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //*************************************************************************************************************
+&nbsp;    // Backingstore access logic
+&nbsp;    //*************************************************************************************************************
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check whether a key is set (differently from null).
+&nbsp;     *
+&nbsp;     * @param key The key to check.
+&nbsp;     * @return true if the key is set, false otherwise.
+&nbsp;     */
+&nbsp;    public boolean hasKey(String key) {
+<b class="nc">&nbsp;        return prefs.get(key, null) != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String get(String key) {
+<b class="fc">&nbsp;        return prefs.get(key, (String) defaults.get(key));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getEmptyIsDefault(String key) {
+<b class="nc">&nbsp;        String defaultValue = (String) defaults.get(key);</b>
+<b class="nc">&nbsp;        String result = prefs.get(key, defaultValue);</b>
+<b class="nc">&nbsp;        if (&quot;&quot;.equals(result)) {</b>
+<b class="nc">&nbsp;            return defaultValue;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Optional&lt;String&gt; getAsOptional(String key) {
+<b class="fc">&nbsp;        return Optional.ofNullable(prefs.get(key, (String) defaults.get(key)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String get(String key, String def) {
+<b class="fc">&nbsp;        return prefs.get(key, def);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getBoolean(String key) {
+<b class="fc">&nbsp;        return prefs.getBoolean(key, getBooleanDefault(key));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean getBoolean(String key, boolean def) {
+<b class="fc">&nbsp;        return prefs.getBoolean(key, def);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean getBooleanDefault(String key) {
+<b class="fc">&nbsp;        return (Boolean) defaults.get(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getInt(String key) {
+<b class="fc">&nbsp;        return prefs.getInt(key, getIntDefault(key));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double getDouble(String key) {
+<b class="fc">&nbsp;        return prefs.getDouble(key, getDoubleDefault(key));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getIntDefault(String key) {
+<b class="fc">&nbsp;        return (Integer) defaults.get(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private double getDoubleDefault(String key) {
+<b class="fc">&nbsp;        return ((Number) defaults.get(key)).doubleValue();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void put(String key, String value) {
+<b class="fc">&nbsp;        prefs.put(key, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void putBoolean(String key, boolean value) {
+<b class="nc">&nbsp;        prefs.putBoolean(key, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void putInt(String key, int value) {
+<b class="nc">&nbsp;        prefs.putInt(key, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void putInt(String key, Number value) {
+<b class="nc">&nbsp;        prefs.putInt(key, value.intValue());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void putDouble(String key, double value) {
+<b class="nc">&nbsp;        prefs.putDouble(key, value);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected void remove(String key) {
+<b class="nc">&nbsp;        prefs.remove(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Puts a list of strings into the Preferences, by linking its elements with a
+&nbsp;     * STRINGLIST_DELIMITER into a single string. Escape characters make the process
+&nbsp;     * transparent even if strings contains a STRINGLIST_DELIMITER.
+&nbsp;     */
+&nbsp;    public void putStringList(String key, List&lt;String&gt; value) {
+<b class="pc">&nbsp;        if (value == null) {</b>
+<b class="nc">&nbsp;            remove(key);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        put(key, convertListToString(value));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a List of Strings containing the chosen columns.
+&nbsp;     */
+&nbsp;    public List&lt;String&gt; getStringList(String key) {
+<b class="fc">&nbsp;        return convertStringToList(get(key));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a Path
+&nbsp;     */
+&nbsp;    private Path getPath(String key, Path defaultValue) {
+<b class="fc">&nbsp;        String rawPath = get(key);</b>
+<b class="fc">&nbsp;        return StringUtil.isNotBlank(rawPath) ? Path.of(rawPath) : defaultValue;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Clear all preferences.
+&nbsp;     *
+&nbsp;     * @throws BackingStoreException if JabRef is unable to write to the registry/the
+&nbsp;     *                               preferences storage
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void clear() throws BackingStoreException {
+<b class="nc">&nbsp;        clearAllBibEntryTypes();</b>
+<b class="nc">&nbsp;        clearCitationKeyPatterns();</b>
+<b class="nc">&nbsp;        clearTruststoreFromCustomCertificates();</b>
+<b class="nc">&nbsp;        clearCustomFetcherKeys();</b>
+<b class="nc">&nbsp;        prefs.clear();</b>
+<b class="nc">&nbsp;        new SharedDatabasePreferences().clear();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearTruststoreFromCustomCertificates() {
+<b class="nc">&nbsp;        TrustStoreManager trustStoreManager = new TrustStoreManager(Path.of(defaults.get(TRUSTSTORE_PATH).toString()));</b>
+<b class="nc">&nbsp;        trustStoreManager.clearCustomCertificates();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes the given key from the preferences.
+&nbsp;     *
+&nbsp;     * @throws IllegalArgumentException if the key does not exist
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void deleteKey(String key) throws IllegalArgumentException {
+<b class="nc">&nbsp;        String keyTrimmed = key.trim();</b>
+<b class="nc">&nbsp;        if (hasKey(keyTrimmed)) {</b>
+<b class="nc">&nbsp;            remove(keyTrimmed);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Unknown preference key&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calling this method will write all preferences into the preference store.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void flush() {
+<b class="nc">&nbsp;        if (getBoolean(MEMORY_STICK_MODE)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                exportPreferences(Path.of(&quot;jabref.xml&quot;));</b>
+&nbsp;            } catch (JabRefException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Could not export preferences for memory stick mode: {}&quot;, e.getMessage(), e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            prefs.flush();</b>
+&nbsp;        } catch (BackingStoreException ex) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Cannot communicate with backing store&quot;, ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Map&lt;String, Object&gt; getPreferences() {
+<b class="nc">&nbsp;        Map&lt;String, Object&gt; result = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            addPrefsRecursively(this.prefs, result);</b>
+&nbsp;        } catch (BackingStoreException e) {
+<b class="nc">&nbsp;            LOGGER.info(&quot;could not retrieve preference keys&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Map&lt;String, Object&gt; getDefaults() {
+<b class="nc">&nbsp;        return defaults;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void addPrefsRecursively(Preferences prefs, Map&lt;String, Object&gt; result) throws BackingStoreException {
+<b class="nc">&nbsp;        for (String key : prefs.keys()) {</b>
+<b class="nc">&nbsp;            result.put(key, getObject(prefs, key));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        for (String child : prefs.childrenNames()) {</b>
+<b class="nc">&nbsp;            addPrefsRecursively(prefs.node(child), result);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Object getObject(Preferences prefs, String key) {
+&nbsp;        try {
+<b class="nc">&nbsp;            return prefs.get(key, (String) defaults.get(key));</b>
+&nbsp;        } catch (ClassCastException e) {
+&nbsp;            try {
+<b class="nc">&nbsp;                return prefs.getBoolean(key, getBooleanDefault(key));</b>
+&nbsp;            } catch (ClassCastException e2) {
+&nbsp;                try {
+<b class="nc">&nbsp;                    return prefs.getInt(key, getIntDefault(key));</b>
+&nbsp;                } catch (ClassCastException e3) {
+<b class="nc">&nbsp;                    return prefs.getDouble(key, getDoubleDefault(key));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a list of Strings stored by key+N with N being an incrementing number
+&nbsp;     */
+&nbsp;    protected List&lt;String&gt; getSeries(String key) {
+<b class="fc">&nbsp;        int i = 0;</b>
+<b class="fc">&nbsp;        List&lt;String&gt; series = new ArrayList&lt;&gt;();</b>
+&nbsp;        String item;
+<b class="fc">&nbsp;        while (!StringUtil.isBlank(item = get(key + i))) {</b>
+<b class="fc">&nbsp;            series.add(item);</b>
+<b class="fc">&nbsp;            i++;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return series;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes all entries keyed by prefix+number, where number is equal to or higher
+&nbsp;     * than the given number.
+&nbsp;     *
+&nbsp;     * @param number or higher.
+&nbsp;     */
+&nbsp;    protected void purgeSeries(String prefix, int number) {
+<b class="nc">&nbsp;        int n = number;</b>
+<b class="nc">&nbsp;        while (get(prefix + n) != null) {</b>
+<b class="nc">&nbsp;            remove(prefix + n);</b>
+<b class="nc">&nbsp;            n++;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Exports Preferences to an XML file.
+&nbsp;     *
+&nbsp;     * @param path Path to export to
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void exportPreferences(Path path) throws JabRefException {
+<b class="nc">&nbsp;        LOGGER.debug(&quot;Exporting preferences {}&quot;, path.toAbsolutePath());</b>
+<b class="nc">&nbsp;        try (OutputStream os = Files.newOutputStream(path)) {</b>
+<b class="nc">&nbsp;            prefs.exportSubtree(os);</b>
+&nbsp;        } catch (BackingStoreException
+&nbsp;                 | IOException ex) {
+<b class="nc">&nbsp;            throw new JabRefException(</b>
+&nbsp;                    &quot;Could not export preferences&quot;,
+<b class="nc">&nbsp;                    Localization.lang(&quot;Could not export preferences&quot;),</b>
+&nbsp;                    ex);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Imports Preferences from an XML file.
+&nbsp;     *
+&nbsp;     * @param file Path of file to import from
+&nbsp;     * @throws JabRefException thrown if importing the preferences failed due to an
+&nbsp;     *                         InvalidPreferencesFormatException or an IOException
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void importPreferences(Path file) throws JabRefException {
+<b class="nc">&nbsp;        try (InputStream is = Files.newInputStream(file)) {</b>
+<b class="nc">&nbsp;            Preferences.importPreferences(is);</b>
+&nbsp;        } catch (InvalidPreferencesFormatException
+&nbsp;                 | IOException ex) {
+<b class="nc">&nbsp;            throw new JabRefException(</b>
+&nbsp;                    &quot;Could not import preferences&quot;,
+<b class="nc">&nbsp;                    Localization.lang(&quot;Could not import preferences&quot;),</b>
+&nbsp;                    ex);
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    //*************************************************************************************************************
+&nbsp;    // ToDo: Cleanup
+&nbsp;    //*************************************************************************************************************
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public LayoutFormatterPreferences getLayoutFormatterPreferences() {
+<b class="nc">&nbsp;        return new LayoutFormatterPreferences(</b>
+<b class="nc">&nbsp;                getNameFormatterPreferences(),</b>
+<b class="nc">&nbsp;                getDOIPreferences(),</b>
+<b class="nc">&nbsp;                getFilePreferences().mainFileDirectoryProperty());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
+<b class="pc">&nbsp;        if (journalAbbreviationPreferences != null) {</b>
+<b class="nc">&nbsp;            return journalAbbreviationPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        journalAbbreviationPreferences = new JournalAbbreviationPreferences(</b>
+<b class="fc">&nbsp;                getStringList(EXTERNAL_JOURNAL_LISTS),</b>
+<b class="fc">&nbsp;                getBoolean(USE_AMS_FJOURNAL));</b>
+&nbsp;
+<b class="fc">&nbsp;        journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) _ -&gt;</b>
+<b class="nc">&nbsp;                putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));</b>
+<b class="fc">&nbsp;        EasyBind.listen(journalAbbreviationPreferences.useFJournalFieldProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; putBoolean(USE_AMS_FJOURNAL, newValue));</b>
+&nbsp;
+<b class="fc">&nbsp;        return journalAbbreviationPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //*************************************************************************************************************
+&nbsp;    // CustomEntryTypes
+&nbsp;    //*************************************************************************************************************
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BibEntryTypesManager getCustomEntryTypesRepository() {
+<b class="fc">&nbsp;        BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();</b>
+<b class="fc">&nbsp;        EnumSet.allOf(BibDatabaseMode.class).forEach(mode -&gt;</b>
+<b class="fc">&nbsp;                bibEntryTypesManager.addCustomOrModifiedTypes(getBibEntryTypes(mode), mode));</b>
+<b class="fc">&nbsp;        return bibEntryTypesManager;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;BibEntryType&gt; getBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
+<b class="fc">&nbsp;        List&lt;BibEntryType&gt; storedEntryTypes = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            Arrays.stream(prefsNode.keys())</b>
+<b class="fc">&nbsp;                  .map(key -&gt; prefsNode.get(key, null))</b>
+<b class="fc">&nbsp;                  .filter(Objects::nonNull)</b>
+<b class="fc">&nbsp;                  .forEach(typeString -&gt; MetaDataParser.parseCustomEntryType(typeString).ifPresent(storedEntryTypes::add));</b>
+&nbsp;        } catch (BackingStoreException e) {
+<b class="nc">&nbsp;            LOGGER.info(&quot;Parsing customized entry types failed.&quot;, e);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return storedEntryTypes;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearAllBibEntryTypes() {
+<b class="nc">&nbsp;        for (BibDatabaseMode mode : BibDatabaseMode.values()) {</b>
+<b class="nc">&nbsp;            clearBibEntryTypes(mode);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearBibEntryTypes(BibDatabaseMode mode) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);</b>
+<b class="nc">&nbsp;            prefsNode.clear();</b>
+<b class="nc">&nbsp;            prefsNode.flush();</b>
+&nbsp;        } catch (BackingStoreException e) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Resetting customized entry types failed.&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager) {
+<b class="nc">&nbsp;        clearAllBibEntryTypes();</b>
+<b class="nc">&nbsp;        storeBibEntryTypes(entryTypesManager.getAllCustomizedTypes(BibDatabaseMode.BIBTEX), BibDatabaseMode.BIBTEX);</b>
+<b class="nc">&nbsp;        storeBibEntryTypes(entryTypesManager.getAllCustomizedTypes(BibDatabaseMode.BIBLATEX), BibDatabaseMode.BIBLATEX);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void storeBibEntryTypes(Collection&lt;BibEntryType&gt; bibEntryTypes, BibDatabaseMode bibDatabaseMode) {
+<b class="nc">&nbsp;        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);</b>
+&nbsp;
+&nbsp;        try {
+&nbsp;            // clear old custom types
+<b class="nc">&nbsp;            clearBibEntryTypes(bibDatabaseMode);</b>
+&nbsp;
+&nbsp;            // store current custom types
+<b class="nc">&nbsp;            bibEntryTypes.forEach(type -&gt; prefsNode.put(type.getType().getName(), MetaDataSerializer.serializeCustomEntryTypes(type)));</b>
+&nbsp;
+<b class="nc">&nbsp;            prefsNode.flush();</b>
+&nbsp;        } catch (BackingStoreException e) {
+<b class="nc">&nbsp;            LOGGER.info(&quot;Updating stored custom entry types failed.&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static Preferences getPrefsNodeForCustomizedEntryTypes(BibDatabaseMode mode) {
+<b class="fc">&nbsp;        return mode == BibDatabaseMode.BIBTEX</b>
+<b class="fc">&nbsp;               ? PREFS_NODE.node(CUSTOMIZED_BIBTEX_TYPES)</b>
+<b class="fc">&nbsp;               : PREFS_NODE.node(CUSTOMIZED_BIBLATEX_TYPES);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //*************************************************************************************************************
+&nbsp;    // Misc
+&nbsp;    //*************************************************************************************************************
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public LibraryPreferences getLibraryPreferences() {
+<b class="nc">&nbsp;        if (libraryPreferences != null) {</b>
+<b class="nc">&nbsp;            return libraryPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        libraryPreferences = new LibraryPreferences(</b>
+<b class="nc">&nbsp;                getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,</b>
+<b class="nc">&nbsp;                getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),</b>
+<b class="nc">&nbsp;                getBoolean(LOCAL_AUTO_SAVE),</b>
+<b class="nc">&nbsp;                getBoolean(ADD_IMPORTED_ENTRIES),</b>
+<b class="nc">&nbsp;                get(ADD_IMPORTED_ENTRIES_GROUP_NAME));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(libraryPreferences.defaultBibDatabaseModeProperty(), (_, _, newValue) -&gt; putBoolean(BIBLATEX_DEFAULT_MODE, newValue == BibDatabaseMode.BIBLATEX));</b>
+<b class="nc">&nbsp;        EasyBind.listen(libraryPreferences.alwaysReformatOnSaveProperty(), (_, _, newValue) -&gt; putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(libraryPreferences.autoSaveProperty(), (_, _, newValue) -&gt; putBoolean(LOCAL_AUTO_SAVE, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(libraryPreferences.addImportedEntriesProperty(), (_, _, newValue) -&gt; putBoolean(ADD_IMPORTED_ENTRIES, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(libraryPreferences.addImportedEntriesGroupNameProperty(), (_, _, newValue) -&gt; put(ADD_IMPORTED_ENTRIES_GROUP_NAME, newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        return libraryPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public DOIPreferences getDOIPreferences() {
+<b class="nc">&nbsp;        if (doiPreferences != null) {</b>
+<b class="nc">&nbsp;            return doiPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        doiPreferences = new DOIPreferences(</b>
+<b class="nc">&nbsp;                getBoolean(USE_CUSTOM_DOI_URI),</b>
+<b class="nc">&nbsp;                get(BASE_DOI_URI));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(doiPreferences.useCustomProperty(), (_, _, newValue) -&gt; putBoolean(USE_CUSTOM_DOI_URI, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(doiPreferences.defaultBaseURIProperty(), (_, _, newValue) -&gt; put(BASE_DOI_URI, newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        return doiPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public OwnerPreferences getOwnerPreferences() {
+<b class="nc">&nbsp;        if (ownerPreferences != null) {</b>
+<b class="nc">&nbsp;            return ownerPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ownerPreferences = new OwnerPreferences(</b>
+<b class="nc">&nbsp;                getBoolean(USE_OWNER),</b>
+<b class="nc">&nbsp;                get(DEFAULT_OWNER),</b>
+<b class="nc">&nbsp;                getBoolean(OVERWRITE_OWNER));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(ownerPreferences.useOwnerProperty(), (_, _, newValue) -&gt; putBoolean(USE_OWNER, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            put(DEFAULT_OWNER, newValue);</b>
+&nbsp;            // trigger re-determination of userAndHost and the dependent preferences
+<b class="nc">&nbsp;            userAndHost = null;</b>
+&nbsp;
+&nbsp;            // this propagates down to filePreferences
+<b class="nc">&nbsp;            getInternalPreferences().getUserAndHostProperty().setValue(newValue);</b>
+&nbsp;        });
+<b class="nc">&nbsp;        EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (_, _, newValue) -&gt; putBoolean(OVERWRITE_OWNER, newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        return ownerPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TimestampPreferences getTimestampPreferences() {
+<b class="nc">&nbsp;        if (timestampPreferences != null) {</b>
+<b class="nc">&nbsp;            return timestampPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        timestampPreferences = new TimestampPreferences(</b>
+<b class="nc">&nbsp;                getBoolean(ADD_CREATION_DATE),</b>
+<b class="nc">&nbsp;                getBoolean(ADD_MODIFICATION_DATE),</b>
+<b class="nc">&nbsp;                getBoolean(UPDATE_TIMESTAMP),</b>
+<b class="nc">&nbsp;                FieldFactory.parseField(get(TIME_STAMP_FIELD)),</b>
+<b class="nc">&nbsp;                get(TIME_STAMP_FORMAT));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(timestampPreferences.addCreationDateProperty(), (_, _, newValue) -&gt; putBoolean(ADD_CREATION_DATE, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(timestampPreferences.addModificationDateProperty(), (_, _, newValue) -&gt; putBoolean(ADD_MODIFICATION_DATE, newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        return timestampPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //*************************************************************************************************************
+&nbsp;    // Network preferences
+&nbsp;    //*************************************************************************************************************
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public RemotePreferences getRemotePreferences() {
+<b class="pc">&nbsp;        if (remotePreferences != null) {</b>
+<b class="nc">&nbsp;            return remotePreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        remotePreferences = new RemotePreferences(</b>
+<b class="fc">&nbsp;                getInt(REMOTE_SERVER_PORT),</b>
+<b class="fc">&nbsp;                getBoolean(USE_REMOTE_SERVER),</b>
+<b class="fc">&nbsp;                getInt(HTTP_SERVER_PORT),</b>
+<b class="fc">&nbsp;                getBoolean(ENABLE_HTTP_SERVER),</b>
+<b class="fc">&nbsp;                getBoolean(ENABLE_LANGUAGE_SERVER),</b>
+<b class="fc">&nbsp;                getInt(LANGUAGE_SERVER_PORT));</b>
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(remotePreferences.portProperty(), (_, _, newValue) -&gt; putInt(REMOTE_SERVER_PORT, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(remotePreferences.useRemoteServerProperty(), (_, _, newValue) -&gt; putBoolean(USE_REMOTE_SERVER, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(remotePreferences.httpPortProperty(), (_, _, newValue) -&gt; putInt(HTTP_SERVER_PORT, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -&gt; putBoolean(ENABLE_HTTP_SERVER, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(remotePreferences.languageServerPortProperty(), (_, _, newValue) -&gt; putInt(LANGUAGE_SERVER_PORT, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(remotePreferences.enableLanguageServerProperty(), (_, _, newValue) -&gt; putBoolean(ENABLE_LANGUAGE_SERVER, newValue));</b>
+&nbsp;
+<b class="fc">&nbsp;        return remotePreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ProxyPreferences getProxyPreferences() {
+<b class="pc">&nbsp;        if (proxyPreferences != null) {</b>
+<b class="nc">&nbsp;            return proxyPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        proxyPreferences = new ProxyPreferences(</b>
+<b class="fc">&nbsp;                getBoolean(PROXY_USE),</b>
+<b class="fc">&nbsp;                get(PROXY_HOSTNAME),</b>
+<b class="fc">&nbsp;                get(PROXY_PORT),</b>
+<b class="fc">&nbsp;                getBoolean(PROXY_USE_AUTHENTICATION),</b>
+<b class="fc">&nbsp;                get(PROXY_USERNAME),</b>
+<b class="fc">&nbsp;                getProxyPassword(),</b>
+<b class="fc">&nbsp;                getBoolean(PROXY_PERSIST_PASSWORD));</b>
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(proxyPreferences.useProxyProperty(), (_, _, newValue) -&gt; putBoolean(PROXY_USE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(proxyPreferences.hostnameProperty(), (_, _, newValue) -&gt; put(PROXY_HOSTNAME, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(proxyPreferences.portProperty(), (_, _, newValue) -&gt; put(PROXY_PORT, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(proxyPreferences.useAuthenticationProperty(), (_, _, newValue) -&gt; putBoolean(PROXY_USE_AUTHENTICATION, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(proxyPreferences.usernameProperty(), (_, _, newValue) -&gt; put(PROXY_USERNAME, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(proxyPreferences.passwordProperty(), (_, _, newValue) -&gt; setProxyPassword(newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(proxyPreferences.persistPasswordProperty(), (_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            putBoolean(PROXY_PERSIST_PASSWORD, newValue);</b>
+<b class="nc">&nbsp;            if (!newValue) {</b>
+<b class="nc">&nbsp;                try (final Keyring keyring = Keyring.create()) {</b>
+<b class="nc">&nbsp;                    keyring.deletePassword(&quot;org.jabref&quot;, &quot;proxy&quot;);</b>
+&nbsp;                } catch (Exception ex) {
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Unable to remove proxy credentials&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="fc">&nbsp;        return proxyPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getProxyPassword() {
+<b class="pc">&nbsp;        if (getBoolean(PROXY_PERSIST_PASSWORD)) {</b>
+<b class="nc">&nbsp;            try (final Keyring keyring = Keyring.create()) {</b>
+<b class="nc">&nbsp;                return new Password(</b>
+<b class="nc">&nbsp;                        keyring.getPassword(&quot;org.jabref&quot;, &quot;proxy&quot;),</b>
+<b class="nc">&nbsp;                        getInternalPreferences().getUserAndHost())</b>
+<b class="nc">&nbsp;                        .decrypt();</b>
+&nbsp;            } catch (PasswordAccessException ex) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;JabRef uses proxy password from key store but no password is stored&quot;);</b>
+&nbsp;            } catch (Exception ex) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;JabRef could not open the key store&quot;, ex);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return (String) defaults.get(PROXY_PASSWORD);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setProxyPassword(String password) {
+<b class="nc">&nbsp;        if (getProxyPreferences().shouldPersistPassword()) {</b>
+<b class="nc">&nbsp;            try (final Keyring keyring = Keyring.create()) {</b>
+<b class="nc">&nbsp;                if (StringUtil.isBlank(password)) {</b>
+<b class="nc">&nbsp;                    keyring.deletePassword(&quot;org.jabref&quot;, &quot;proxy&quot;);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    keyring.setPassword(&quot;org.jabref&quot;, &quot;proxy&quot;, new Password(</b>
+<b class="nc">&nbsp;                            password.trim(),</b>
+<b class="nc">&nbsp;                            getInternalPreferences().getUserAndHost())</b>
+<b class="nc">&nbsp;                            .encrypt());</b>
+&nbsp;                }
+&nbsp;            } catch (Exception ex) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Unable to open key store&quot;, ex);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SSLPreferences getSSLPreferences() {
+<b class="pc">&nbsp;        if (sslPreferences != null) {</b>
+<b class="nc">&nbsp;            return sslPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        sslPreferences = new SSLPreferences(</b>
+<b class="fc">&nbsp;                get(TRUSTSTORE_PATH)</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        return sslPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //*************************************************************************************************************
+&nbsp;    // CitationKeyPatternPreferences
+&nbsp;    //*************************************************************************************************************
+&nbsp;
+&nbsp;    private GlobalCitationKeyPatterns getGlobalCitationKeyPattern() {
+<b class="fc">&nbsp;        GlobalCitationKeyPatterns citationKeyPattern = GlobalCitationKeyPatterns.fromPattern(get(DEFAULT_CITATION_KEY_PATTERN));</b>
+<b class="fc">&nbsp;        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);</b>
+&nbsp;        try {
+<b class="fc">&nbsp;            String[] keys = preferences.keys();</b>
+<b class="pc">&nbsp;            for (String key : keys) {</b>
+<b class="nc">&nbsp;                citationKeyPattern.addCitationKeyPattern(</b>
+<b class="nc">&nbsp;                        EntryTypeFactory.parse(key),</b>
+<b class="nc">&nbsp;                        preferences.get(key, null));</b>
+&nbsp;            }
+&nbsp;        } catch (BackingStoreException ex) {
+<b class="nc">&nbsp;            LOGGER.info(&quot;BackingStoreException in JabRefPreferences.getKeyPattern&quot;, ex);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return citationKeyPattern;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // public for use in PreferenceMigrations
+&nbsp;    public void storeGlobalCitationKeyPattern(GlobalCitationKeyPatterns pattern) {
+<b class="nc">&nbsp;        if ((pattern.getDefaultValue() == null)</b>
+<b class="nc">&nbsp;                || pattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {</b>
+<b class="nc">&nbsp;            put(DEFAULT_CITATION_KEY_PATTERN, &quot;&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            put(DEFAULT_CITATION_KEY_PATTERN, pattern.getDefaultValue().stringRepresentation());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Store overridden definitions to Preferences.
+<b class="nc">&nbsp;        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            preferences.clear(); // We remove all old entries.</b>
+&nbsp;        } catch (BackingStoreException ex) {
+<b class="nc">&nbsp;            LOGGER.info(&quot;BackingStoreException in JabRefPreferences::putKeyPattern&quot;, ex);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        for (EntryType entryType : pattern.getAllKeys()) {</b>
+<b class="nc">&nbsp;            if (!pattern.isDefaultValue(entryType)) {</b>
+&nbsp;                // first entry in the map is the full pattern
+<b class="nc">&nbsp;                preferences.put(entryType.getName(), pattern.getValue(entryType).stringRepresentation());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearCitationKeyPatterns() throws BackingStoreException {
+<b class="nc">&nbsp;        Preferences preferences = PREFS_NODE.node(CITATION_KEY_PATTERNS_NODE);</b>
+<b class="nc">&nbsp;        preferences.clear();</b>
+<b class="nc">&nbsp;        getCitationKeyPatternPreferences().setKeyPatterns(getGlobalCitationKeyPattern());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
+<b class="pc">&nbsp;        if (citationKeyPatternPreferences != null) {</b>
+<b class="nc">&nbsp;            return citationKeyPatternPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        citationKeyPatternPreferences = new CitationKeyPatternPreferences(</b>
+<b class="fc">&nbsp;                getBoolean(AVOID_OVERWRITING_KEY),</b>
+<b class="fc">&nbsp;                getBoolean(WARN_BEFORE_OVERWRITING_KEY),</b>
+<b class="fc">&nbsp;                getBoolean(GENERATE_KEYS_BEFORE_SAVING),</b>
+<b class="fc">&nbsp;                getKeySuffix(),</b>
+<b class="fc">&nbsp;                get(KEY_PATTERN_REGEX),</b>
+<b class="fc">&nbsp;                get(KEY_PATTERN_REPLACEMENT),</b>
+<b class="fc">&nbsp;                get(UNWANTED_CITATION_KEY_CHARACTERS),</b>
+<b class="fc">&nbsp;                getGlobalCitationKeyPattern(),</b>
+<b class="fc">&nbsp;                (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN),</b>
+<b class="fc">&nbsp;                getBibEntryPreferences().keywordSeparatorProperty());</b>
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; putBoolean(AVOID_OVERWRITING_KEY, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(citationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; putBoolean(WARN_BEFORE_OVERWRITING_KEY, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSavingProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; putBoolean(GENERATE_KEYS_BEFORE_SAVING, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(citationKeyPatternPreferences.keySuffixProperty(), (_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, newValue == CitationKeyPatternPreferences.KeySuffix.ALWAYS);</b>
+<b class="nc">&nbsp;            putBoolean(KEY_GEN_FIRST_LETTER_A, newValue == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A);</b>
+&nbsp;        });
+<b class="fc">&nbsp;        EasyBind.listen(citationKeyPatternPreferences.keyPatternRegexProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; put(KEY_PATTERN_REGEX, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(citationKeyPatternPreferences.keyPatternReplacementProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; put(KEY_PATTERN_REPLACEMENT, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(citationKeyPatternPreferences.unwantedCharactersProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; put(UNWANTED_CITATION_KEY_CHARACTERS, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(citationKeyPatternPreferences.keyPatternsProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; storeGlobalCitationKeyPattern(newValue));</b>
+&nbsp;
+<b class="fc">&nbsp;        return citationKeyPatternPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private CitationKeyPatternPreferences.KeySuffix getKeySuffix() {
+<b class="fc">&nbsp;        CitationKeyPatternPreferences.KeySuffix keySuffix =</b>
+&nbsp;                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_B;
+<b class="pc">&nbsp;        if (getBoolean(KEY_GEN_ALWAYS_ADD_LETTER)) {</b>
+<b class="nc">&nbsp;            keySuffix = CitationKeyPatternPreferences.KeySuffix.ALWAYS;</b>
+<b class="pc">&nbsp;        } else if (getBoolean(KEY_GEN_FIRST_LETTER_A)) {</b>
+<b class="fc">&nbsp;            keySuffix = CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return keySuffix;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //*************************************************************************************************************
+&nbsp;    // BibEntryPreferences
+&nbsp;    //*************************************************************************************************************
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BibEntryPreferences getBibEntryPreferences() {
+<b class="pc">&nbsp;        if (bibEntryPreferences != null) {</b>
+<b class="nc">&nbsp;            return bibEntryPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        bibEntryPreferences = new BibEntryPreferences(</b>
+<b class="fc">&nbsp;                get(KEYWORD_SEPARATOR).charAt(0)</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(bibEntryPreferences.keywordSeparatorProperty(), (_, _, newValue) -&gt; put(KEYWORD_SEPARATOR, String.valueOf(newValue)));</b>
+&nbsp;
+<b class="fc">&nbsp;        return bibEntryPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //*************************************************************************************************************
+&nbsp;    // InternalPreferences
+&nbsp;    //*************************************************************************************************************
+&nbsp;
+&nbsp;    protected Path getDefaultPath() {
+<b class="nc">&nbsp;        return Path.of(&quot;/&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public InternalPreferences getInternalPreferences() {
+<b class="pc">&nbsp;        if (internalPreferences != null) {</b>
+<b class="nc">&nbsp;            return internalPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        internalPreferences = new InternalPreferences(</b>
+<b class="fc">&nbsp;                Version.parse(get(VERSION_IGNORED_UPDATE)),</b>
+<b class="fc">&nbsp;                getBoolean(VERSION_CHECK_ENABLED),</b>
+<b class="fc">&nbsp;                getPath(PREFS_EXPORT_PATH, getDefaultPath()),</b>
+<b class="fc">&nbsp;                userAndHost.getUserHostString(),</b>
+<b class="fc">&nbsp;                getBoolean(MEMORY_STICK_MODE));</b>
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(internalPreferences.ignoredVersionProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; put(VERSION_IGNORED_UPDATE, newValue.toString()));</b>
+<b class="fc">&nbsp;        EasyBind.listen(internalPreferences.versionCheckEnabledProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; putBoolean(VERSION_CHECK_ENABLED, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(internalPreferences.lastPreferencesExportPathProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; put(PREFS_EXPORT_PATH, newValue.toString()));</b>
+&nbsp;        // user is a static value, should only be changed for debugging
+<b class="fc">&nbsp;        EasyBind.listen(internalPreferences.memoryStickModeProperty(), (_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            putBoolean(MEMORY_STICK_MODE, newValue);</b>
+<b class="nc">&nbsp;            if (!newValue) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    Files.deleteIfExists(Path.of(&quot;jabref.xml&quot;));</b>
+&nbsp;                } catch (IOException e) {
+<b class="nc">&nbsp;                    LOGGER.warn(&quot;Error accessing filesystem&quot;, e);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="fc">&nbsp;        return internalPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private UserHostInfo getUserHostInfo() {
+<b class="pc">&nbsp;        if (userAndHost != null) {</b>
+<b class="nc">&nbsp;            return userAndHost;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        userAndHost = new UserHostInfo(get(DEFAULT_OWNER), OS.getHostName());</b>
+<b class="fc">&nbsp;        return userAndHost;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected Language getLanguage() {
+<b class="fc">&nbsp;        return Stream.of(Language.values())</b>
+<b class="fc">&nbsp;                     .filter(language -&gt; language.getId().equalsIgnoreCase(get(LANGUAGE)))</b>
+<b class="fc">&nbsp;                     .findFirst()</b>
+<b class="fc">&nbsp;                     .orElse(Language.ENGLISH);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public FieldPreferences getFieldPreferences() {
+<b class="nc">&nbsp;        if (fieldPreferences != null) {</b>
+<b class="nc">&nbsp;            return fieldPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        fieldPreferences = new FieldPreferences(</b>
+<b class="nc">&nbsp;                !getBoolean(DO_NOT_RESOLVE_STRINGS), // mind the !</b>
+<b class="nc">&nbsp;                getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream()</b>
+<b class="nc">&nbsp;                                                         .map(FieldFactory::parseField)</b>
+<b class="nc">&nbsp;                                                         .collect(Collectors.toList()),</b>
+<b class="nc">&nbsp;                getStringList(NON_WRAPPABLE_FIELDS).stream()</b>
+<b class="nc">&nbsp;                                                   .map(FieldFactory::parseField)</b>
+<b class="nc">&nbsp;                                                   .collect(Collectors.toList()));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(fieldPreferences.resolveStringsProperty(), (_, _, newValue) -&gt; putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));</b>
+<b class="nc">&nbsp;        fieldPreferences.getResolvableFields().addListener((InvalidationListener) _ -&gt;</b>
+<b class="nc">&nbsp;                put(RESOLVE_STRINGS_FOR_FIELDS, FieldFactory.serializeFieldsList(fieldPreferences.getResolvableFields())));</b>
+<b class="nc">&nbsp;        fieldPreferences.getNonWrappableFields().addListener((InvalidationListener) _ -&gt;</b>
+<b class="nc">&nbsp;                put(NON_WRAPPABLE_FIELDS, FieldFactory.serializeFieldsList(fieldPreferences.getNonWrappableFields())));</b>
+&nbsp;
+<b class="nc">&nbsp;        return fieldPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //*************************************************************************************************************
+&nbsp;    // Linked files preferences
+&nbsp;    //*************************************************************************************************************
+&nbsp;
+&nbsp;    protected boolean moveToTrashSupported() {
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public FilePreferences getFilePreferences() {
+<b class="pc">&nbsp;        if (filePreferences != null) {</b>
+<b class="nc">&nbsp;            return filePreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        filePreferences = new FilePreferences(</b>
+<b class="fc">&nbsp;                getUserHostInfo().getUserHostString(),</b>
+<b class="fc">&nbsp;                getPath(MAIN_FILE_DIRECTORY, getDefaultPath()).toString(),</b>
+<b class="fc">&nbsp;                getBoolean(STORE_RELATIVE_TO_BIB),</b>
+<b class="fc">&nbsp;                getBoolean(AUTO_RENAME_FILES_ON_CHANGE),</b>
+<b class="fc">&nbsp;                get(IMPORT_FILENAMEPATTERN),</b>
+<b class="fc">&nbsp;                get(IMPORT_FILEDIRPATTERN),</b>
+<b class="fc">&nbsp;                getBoolean(DOWNLOAD_LINKED_FILES),</b>
+<b class="fc">&nbsp;                getBoolean(FULLTEXT_INDEX_LINKED_FILES),</b>
+<b class="fc">&nbsp;                Path.of(get(WORKING_DIRECTORY)),</b>
+<b class="fc">&nbsp;                getBoolean(CREATE_BACKUP),</b>
+&nbsp;                // We choose the data directory, because a &quot;.bak&quot; file should survive cache cleanups
+<b class="fc">&nbsp;                getPath(BACKUP_DIRECTORY, Directories.getBackupDirectory()),</b>
+<b class="fc">&nbsp;                getBoolean(CONFIRM_LINKED_FILE_DELETE),</b>
+&nbsp;                // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
+<b class="fc">&nbsp;                getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),</b>
+<b class="fc">&nbsp;                getBoolean(KEEP_DOWNLOAD_URL),</b>
+<b class="fc">&nbsp;                getPath(LAST_USED_DIRECTORY, getDefaultPath()),</b>
+<b class="fc">&nbsp;                getBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY),</b>
+<b class="fc">&nbsp;                getBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY));</b>
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (_, _, newValue) -&gt; filePreferences.getUserAndHostProperty().setValue(newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (_, _, newValue) -&gt; put(MAIN_FILE_DIRECTORY, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (_, _, newValue) -&gt; putBoolean(STORE_RELATIVE_TO_BIB, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.autoRenameFilesOnChangeProperty(), (_, _, newValue) -&gt; putBoolean(AUTO_RENAME_FILES_ON_CHANGE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.fileNamePatternProperty(), (_, _, newValue) -&gt; put(IMPORT_FILENAMEPATTERN, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (_, _, newValue) -&gt; put(IMPORT_FILEDIRPATTERN, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (_, _, newValue) -&gt; putBoolean(DOWNLOAD_LINKED_FILES, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (_, _, newValue) -&gt; putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.workingDirectoryProperty(), (_, _, newValue) -&gt; put(WORKING_DIRECTORY, newValue.toString()));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.createBackupProperty(), (_, _, newValue) -&gt; putBoolean(CREATE_BACKUP, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.backupDirectoryProperty(), (_, _, newValue) -&gt; put(BACKUP_DIRECTORY, newValue.toString()));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.confirmDeleteLinkedFileProperty(), (_, _, newValue) -&gt; putBoolean(CONFIRM_LINKED_FILE_DELETE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.moveToTrashProperty(), (_, _, newValue) -&gt; putBoolean(TRASH_INSTEAD_OF_DELETE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.shouldKeepDownloadUrlProperty(), (_, _, newValue) -&gt; putBoolean(KEEP_DOWNLOAD_URL, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.lastUsedDirectoryProperty(), (_, _, newValue) -&gt; put(LAST_USED_DIRECTORY, newValue.toString()));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.openFileExplorerInFileDirectoryProperty(), (_, _, newValue) -&gt; putBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(filePreferences.openFileExplorerInLastUsedDirectoryProperty(), (_, _, newValue) -&gt; putBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, newValue));</b>
+&nbsp;
+<b class="fc">&nbsp;        return filePreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AutoLinkPreferences getAutoLinkPreferences() {
+<b class="nc">&nbsp;        if (autoLinkPreferences != null) {</b>
+<b class="nc">&nbsp;            return autoLinkPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        autoLinkPreferences = new AutoLinkPreferences(</b>
+<b class="nc">&nbsp;                getAutoLinkKeyDependency(),</b>
+<b class="nc">&nbsp;                get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),</b>
+<b class="nc">&nbsp;                getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN),</b>
+<b class="nc">&nbsp;                bibEntryPreferences.keywordSeparatorProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (_, _, newValue) -&gt; {</b>
+&nbsp;            // Starts bibtex only omitted, as it is not being saved
+<b class="nc">&nbsp;            putBoolean(AUTOLINK_EXACT_KEY_ONLY, newValue == AutoLinkPreferences.CitationKeyDependency.EXACT);</b>
+<b class="nc">&nbsp;            putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, newValue == AutoLinkPreferences.CitationKeyDependency.REGEX);</b>
+&nbsp;        });
+<b class="nc">&nbsp;        EasyBind.listen(autoLinkPreferences.askAutoNamingPdfsProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(autoLinkPreferences.regularExpressionProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        return autoLinkPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private AutoLinkPreferences.CitationKeyDependency getAutoLinkKeyDependency() {
+<b class="nc">&nbsp;        AutoLinkPreferences.CitationKeyDependency citationKeyDependency =</b>
+&nbsp;                AutoLinkPreferences.CitationKeyDependency.START; // default
+<b class="nc">&nbsp;        if (getBoolean(AUTOLINK_EXACT_KEY_ONLY)) {</b>
+<b class="nc">&nbsp;            citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.EXACT;</b>
+<b class="nc">&nbsp;        } else if (getBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {</b>
+<b class="nc">&nbsp;            citationKeyDependency = AutoLinkPreferences.CitationKeyDependency.REGEX;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return citationKeyDependency;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //*************************************************************************************************************
+&nbsp;    // Import/Export preferences
+&nbsp;    //*************************************************************************************************************
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ExportPreferences getExportPreferences() {
+<b class="nc">&nbsp;        if (exportPreferences != null) {</b>
+<b class="nc">&nbsp;            return exportPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        exportPreferences = new ExportPreferences(</b>
+<b class="nc">&nbsp;                get(LAST_USED_EXPORT),</b>
+<b class="nc">&nbsp;                Path.of(get(EXPORT_WORKING_DIRECTORY)),</b>
+<b class="nc">&nbsp;                getExportSaveOrder(),</b>
+<b class="nc">&nbsp;                getCustomExportFormats());</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(exportPreferences.lastExportExtensionProperty(), (_, _, newValue) -&gt; put(LAST_USED_EXPORT, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(exportPreferences.exportWorkingDirectoryProperty(), (_, _, newValue) -&gt; put(EXPORT_WORKING_DIRECTORY, newValue.toString()));</b>
+<b class="nc">&nbsp;        EasyBind.listen(exportPreferences.exportSaveOrderProperty(), (_, _, newValue) -&gt; storeExportSaveOrder(newValue));</b>
+<b class="nc">&nbsp;        exportPreferences.getCustomExporters().addListener((InvalidationListener) _ -&gt; storeCustomExportFormats(exportPreferences.getCustomExporters()));</b>
+&nbsp;
+<b class="nc">&nbsp;        return exportPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected SaveOrder getExportSaveOrder() {
+<b class="nc">&nbsp;        List&lt;SaveOrder.SortCriterion&gt; sortCriteria = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!&quot;&quot;.equals(get(EXPORT_PRIMARY_SORT_FIELD))) {</b>
+<b class="nc">&nbsp;            sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_PRIMARY_SORT_FIELD)), getBoolean(EXPORT_PRIMARY_SORT_DESCENDING)));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!&quot;&quot;.equals(get(EXPORT_SECONDARY_SORT_FIELD))) {</b>
+<b class="nc">&nbsp;            sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_SECONDARY_SORT_FIELD)), getBoolean(EXPORT_SECONDARY_SORT_DESCENDING)));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!&quot;&quot;.equals(get(EXPORT_TERTIARY_SORT_FIELD))) {</b>
+<b class="nc">&nbsp;            sortCriteria.add(new SaveOrder.SortCriterion(FieldFactory.parseField(get(EXPORT_TERTIARY_SORT_FIELD)), getBoolean(EXPORT_TERTIARY_SORT_DESCENDING)));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new SaveOrder(</b>
+<b class="nc">&nbsp;                SaveOrder.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),</b>
+&nbsp;                sortCriteria
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    private void storeExportSaveOrder(SaveOrder saveOrder) {
+<b class="nc">&nbsp;        putBoolean(EXPORT_IN_ORIGINAL_ORDER, saveOrder.getOrderType() == SaveOrder.OrderType.ORIGINAL);</b>
+<b class="nc">&nbsp;        putBoolean(EXPORT_IN_SPECIFIED_ORDER, saveOrder.getOrderType() == SaveOrder.OrderType.SPECIFIED);</b>
+&nbsp;
+<b class="nc">&nbsp;        long saveOrderCount = saveOrder.getSortCriteria().size();</b>
+<b class="nc">&nbsp;        if (saveOrderCount &gt;= 1) {</b>
+<b class="nc">&nbsp;            put(EXPORT_PRIMARY_SORT_FIELD, saveOrder.getSortCriteria().getFirst().field.getName());</b>
+<b class="nc">&nbsp;            putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, saveOrder.getSortCriteria().getFirst().descending);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            put(EXPORT_PRIMARY_SORT_FIELD, &quot;&quot;);</b>
+<b class="nc">&nbsp;            putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, false);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (saveOrderCount &gt;= 2) {</b>
+<b class="nc">&nbsp;            put(EXPORT_SECONDARY_SORT_FIELD, saveOrder.getSortCriteria().get(1).field.getName());</b>
+<b class="nc">&nbsp;            putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(1).descending);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            put(EXPORT_SECONDARY_SORT_FIELD, &quot;&quot;);</b>
+<b class="nc">&nbsp;            putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, false);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (saveOrderCount &gt;= 3) {</b>
+<b class="nc">&nbsp;            put(EXPORT_TERTIARY_SORT_FIELD, saveOrder.getSortCriteria().get(2).field.getName());</b>
+<b class="nc">&nbsp;            putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, saveOrder.getSortCriteria().get(2).descending);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            put(EXPORT_TERTIARY_SORT_FIELD, &quot;&quot;);</b>
+<b class="nc">&nbsp;            putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, false);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SelfContainedSaveConfiguration getSelfContainedExportConfiguration() {
+<b class="nc">&nbsp;        SaveOrder exportSaveOrder = getExportSaveOrder();</b>
+<b class="nc">&nbsp;        SelfContainedSaveOrder saveOrder = switch (exportSaveOrder.getOrderType()) {</b>
+&nbsp;            case TABLE -&gt; {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Table sort order requested, but JabRef is in CLI mode. Falling back to defeault save order&quot;);</b>
+<b class="nc">&nbsp;                yield SaveOrder.getDefaultSaveOrder();</b>
+&nbsp;            }
+&nbsp;            case SPECIFIED -&gt;
+<b class="nc">&nbsp;                    SelfContainedSaveOrder.of(exportSaveOrder);</b>
+&nbsp;            case ORIGINAL -&gt;
+<b class="nc">&nbsp;                    SaveOrder.getDefaultSaveOrder();</b>
+&nbsp;        };
+&nbsp;
+<b class="nc">&nbsp;        return new SelfContainedSaveConfiguration(</b>
+<b class="nc">&nbsp;                saveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, getLibraryPreferences()</b>
+<b class="nc">&nbsp;                .shouldAlwaysReformatOnSave());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;TemplateExporter&gt; getCustomExportFormats() {
+<b class="nc">&nbsp;        LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences();</b>
+<b class="nc">&nbsp;        SelfContainedSaveConfiguration saveConfiguration = getSelfContainedExportConfiguration();</b>
+<b class="nc">&nbsp;        List&lt;TemplateExporter&gt; formats = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String toImport : getSeries(CUSTOM_EXPORT_FORMAT)) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; formatData = convertStringToList(toImport);</b>
+<b class="nc">&nbsp;            TemplateExporter format = new TemplateExporter(</b>
+<b class="nc">&nbsp;                    formatData.getFirst(),</b>
+<b class="nc">&nbsp;                    formatData.get(EXPORTER_FILENAME_INDEX),</b>
+<b class="nc">&nbsp;                    formatData.get(EXPORTER_EXTENSION_INDEX),</b>
+&nbsp;                    layoutPreferences,
+<b class="nc">&nbsp;                    saveConfiguration.getSelfContainedSaveOrder());</b>
+<b class="nc">&nbsp;            format.setCustomExport(true);</b>
+<b class="nc">&nbsp;            formats.add(format);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return formats;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void storeCustomExportFormats(List&lt;TemplateExporter&gt; exporters) {
+<b class="nc">&nbsp;        if (exporters.isEmpty()) {</b>
+<b class="nc">&nbsp;            purgeSeries(CUSTOM_EXPORT_FORMAT, 0);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            for (int i = 0; i &lt; exporters.size(); i++) {</b>
+<b class="nc">&nbsp;                List&lt;String&gt; exporterData = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;                exporterData.addFirst(exporters.get(i).getName());</b>
+<b class="nc">&nbsp;                exporterData.add(EXPORTER_FILENAME_INDEX, exporters.get(i).getLayoutFileName());</b>
+&nbsp;                // Only stores the first extension associated with FileType
+<b class="nc">&nbsp;                exporterData.add(EXPORTER_EXTENSION_INDEX, exporters.get(i).getFileType().getExtensions().getFirst());</b>
+<b class="nc">&nbsp;                putStringList(CUSTOM_EXPORT_FORMAT + i, exporterData);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            purgeSeries(CUSTOM_EXPORT_FORMAT, exporters.size());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // region Cleanup preferences
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public CleanupPreferences getCleanupPreferences() {
+<b class="nc">&nbsp;        if (cleanupPreferences != null) {</b>
+<b class="nc">&nbsp;            return cleanupPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        cleanupPreferences = new CleanupPreferences(</b>
+<b class="nc">&nbsp;                EnumSet.copyOf(getStringList(CLEANUP_JOBS).stream()</b>
+<b class="nc">&nbsp;                                                          .map(CleanupPreferences.CleanupStep::valueOf)</b>
+<b class="nc">&nbsp;                                                          .collect(Collectors.toSet())),</b>
+<b class="nc">&nbsp;                new FieldFormatterCleanups(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),</b>
+<b class="nc">&nbsp;                        FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), &quot;&quot;))</b>
+&nbsp;                ));
+&nbsp;
+<b class="nc">&nbsp;        cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener&lt;CleanupPreferences.CleanupStep&gt;) _ -&gt;</b>
+<b class="nc">&nbsp;                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());</b>
+<b class="nc">&nbsp;            put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(newValue.getConfiguredActions(), OS.NEWLINE));</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        return cleanupPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public CleanupPreferences getDefaultCleanupPreset() {
+<b class="nc">&nbsp;        return new CleanupPreferences(</b>
+<b class="nc">&nbsp;                getDefaultCleanupJobs(),</b>
+&nbsp;                new FieldFormatterCleanups(
+<b class="nc">&nbsp;                        (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),</b>
+<b class="nc">&nbsp;                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))</b>
+&nbsp;                ));
+&nbsp;    }
+&nbsp;
+&nbsp;    private static EnumSet&lt;CleanupPreferences.CleanupStep&gt; getDefaultCleanupJobs() {
+<b class="fc">&nbsp;        EnumSet&lt;CleanupPreferences.CleanupStep&gt; activeJobs = EnumSet.allOf(CleanupPreferences.CleanupStep.class);</b>
+<b class="fc">&nbsp;        activeJobs.removeAll(EnumSet.of(</b>
+&nbsp;                CleanupPreferences.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS,
+&nbsp;                CleanupPreferences.CleanupStep.MOVE_PDF,
+&nbsp;                CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
+&nbsp;                CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
+&nbsp;                CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX,
+&nbsp;                CleanupPreferences.CleanupStep.CONVERT_MSC_CODES));
+<b class="fc">&nbsp;        return activeJobs;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // endregion
+&nbsp;
+&nbsp;    // region last files opened
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public LastFilesOpenedPreferences getLastFilesOpenedPreferences() {
+<b class="nc">&nbsp;        if (lastFilesOpenedPreferences != null) {</b>
+<b class="nc">&nbsp;            return lastFilesOpenedPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        lastFilesOpenedPreferences = new LastFilesOpenedPreferences(</b>
+<b class="nc">&nbsp;                getStringList(LAST_EDITED).stream()</b>
+<b class="nc">&nbsp;                                          .map(Path::of)</b>
+<b class="nc">&nbsp;                                          .toList(),</b>
+<b class="nc">&nbsp;                Path.of(get(LAST_FOCUSED)),</b>
+<b class="nc">&nbsp;                getFileHistory());</b>
+&nbsp;
+<b class="nc">&nbsp;        lastFilesOpenedPreferences.getLastFilesOpened().addListener((ListChangeListener&lt;Path&gt;) change -&gt; {</b>
+<b class="nc">&nbsp;            if (change.getList().isEmpty()) {</b>
+<b class="nc">&nbsp;                remove(LAST_EDITED);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                putStringList(LAST_EDITED, lastFilesOpenedPreferences.getLastFilesOpened().stream()</b>
+<b class="nc">&nbsp;                                                                     .map(Path::toAbsolutePath)</b>
+<b class="nc">&nbsp;                                                                     .map(Path::toString)</b>
+<b class="nc">&nbsp;                                                                     .toList());</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        EasyBind.listen(lastFilesOpenedPreferences.lastFocusedFileProperty(), (_, _, newValue) -&gt; {</b>
+<b class="nc">&nbsp;            if (newValue != null) {</b>
+<b class="nc">&nbsp;                put(LAST_FOCUSED, newValue.toAbsolutePath().toString());</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                remove(LAST_FOCUSED);</b>
+&nbsp;            }
+&nbsp;        });
+<b class="nc">&nbsp;        lastFilesOpenedPreferences.getFileHistory().addListener((InvalidationListener) _ -&gt; storeFileHistory(lastFilesOpenedPreferences.getFileHistory()));</b>
+&nbsp;
+<b class="nc">&nbsp;        return lastFilesOpenedPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private FileHistory getFileHistory() {
+<b class="nc">&nbsp;        return FileHistory.of(getStringList(RECENT_DATABASES).stream()</b>
+<b class="nc">&nbsp;                                                             .map(Path::of)</b>
+<b class="nc">&nbsp;                                                             .toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void storeFileHistory(FileHistory history) {
+<b class="nc">&nbsp;        putStringList(RECENT_DATABASES, history.stream()</b>
+<b class="nc">&nbsp;                                               .map(Path::toAbsolutePath)</b>
+<b class="nc">&nbsp;                                               .map(Path::toString)</b>
+<b class="nc">&nbsp;                                               .toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // endregion
+&nbsp;
+&nbsp;    // region other preferences
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AiPreferences getAiPreferences() {
+<b class="pc">&nbsp;        if (aiPreferences != null) {</b>
+<b class="nc">&nbsp;            return aiPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        boolean aiEnabled = getBoolean(AI_ENABLED);</b>
+&nbsp;
+<b class="fc">&nbsp;        aiPreferences = new AiPreferences(</b>
+&nbsp;                aiEnabled,
+<b class="fc">&nbsp;                getBoolean(AI_AUTO_GENERATE_EMBEDDINGS),</b>
+<b class="fc">&nbsp;                getBoolean(AI_AUTO_GENERATE_SUMMARIES),</b>
+<b class="fc">&nbsp;                AiProvider.valueOf(get(AI_PROVIDER)),</b>
+<b class="fc">&nbsp;                get(AI_OPEN_AI_CHAT_MODEL),</b>
+<b class="fc">&nbsp;                get(AI_MISTRAL_AI_CHAT_MODEL),</b>
+<b class="fc">&nbsp;                get(AI_GEMINI_CHAT_MODEL),</b>
+<b class="fc">&nbsp;                get(AI_HUGGING_FACE_CHAT_MODEL),</b>
+<b class="fc">&nbsp;                get(AI_GPT_4_ALL_MODEL),</b>
+<b class="fc">&nbsp;                getBoolean(AI_CUSTOMIZE_SETTINGS),</b>
+<b class="fc">&nbsp;                get(AI_OPEN_AI_API_BASE_URL),</b>
+<b class="fc">&nbsp;                get(AI_MISTRAL_AI_API_BASE_URL),</b>
+<b class="fc">&nbsp;                get(AI_GEMINI_API_BASE_URL),</b>
+<b class="fc">&nbsp;                get(AI_HUGGING_FACE_API_BASE_URL),</b>
+<b class="fc">&nbsp;                get(AI_GPT_4_ALL_API_BASE_URL),</b>
+<b class="fc">&nbsp;                EmbeddingModel.valueOf(get(AI_EMBEDDING_MODEL)),</b>
+<b class="fc">&nbsp;                getDouble(AI_TEMPERATURE),</b>
+<b class="fc">&nbsp;                getInt(AI_CONTEXT_WINDOW_SIZE),</b>
+<b class="fc">&nbsp;                getInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE),</b>
+<b class="fc">&nbsp;                getInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE),</b>
+<b class="fc">&nbsp;                getInt(AI_RAG_MAX_RESULTS_COUNT),</b>
+<b class="fc">&nbsp;                getDouble(AI_RAG_MIN_SCORE),</b>
+<b class="fc">&nbsp;                Map.of(</b>
+<b class="fc">&nbsp;                        AiTemplate.CHATTING_SYSTEM_MESSAGE, get(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE),</b>
+<b class="fc">&nbsp;                        AiTemplate.CHATTING_USER_MESSAGE, get(AI_CHATTING_USER_MESSAGE_TEMPLATE),</b>
+<b class="fc">&nbsp;                        AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, get(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE),</b>
+<b class="fc">&nbsp;                        AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, get(AI_SUMMARIZATION_CHUNK_USER_MESSAGE_TEMPLATE),</b>
+<b class="fc">&nbsp;                        AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, get(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE),</b>
+<b class="fc">&nbsp;                        AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, get(AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE),</b>
+<b class="fc">&nbsp;                        AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, get(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE),</b>
+<b class="fc">&nbsp;                        AiTemplate.CITATION_PARSING_USER_MESSAGE, get(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE)</b>
+&nbsp;                ));
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.enableAiProperty(), (_, _, newValue) -&gt; putBoolean(AI_ENABLED, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.autoGenerateEmbeddingsProperty(), (_, _, newValue) -&gt; putBoolean(AI_AUTO_GENERATE_EMBEDDINGS, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.autoGenerateSummariesProperty(), (_, _, newValue) -&gt; putBoolean(AI_AUTO_GENERATE_SUMMARIES, newValue));</b>
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.aiProviderProperty(), (_, _, newValue) -&gt; put(AI_PROVIDER, newValue.name()));</b>
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.openAiChatModelProperty(), (_, _, newValue) -&gt; put(AI_OPEN_AI_CHAT_MODEL, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.mistralAiChatModelProperty(), (_, _, newValue) -&gt; put(AI_MISTRAL_AI_CHAT_MODEL, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.geminiChatModelProperty(), (_, _, newValue) -&gt; put(AI_GEMINI_CHAT_MODEL, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.huggingFaceChatModelProperty(), (_, _, newValue) -&gt; put(AI_HUGGING_FACE_CHAT_MODEL, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.gpt4AllChatModelProperty(), (_, _, newValue) -&gt; put(AI_GPT_4_ALL_MODEL, newValue));</b>
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.customizeExpertSettingsProperty(), (_, _, newValue) -&gt; putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));</b>
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.openAiApiBaseUrlProperty(), (_, _, newValue) -&gt; put(AI_OPEN_AI_API_BASE_URL, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.mistralAiApiBaseUrlProperty(), (_, _, newValue) -&gt; put(AI_MISTRAL_AI_API_BASE_URL, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.geminiApiBaseUrlProperty(), (_, _, newValue) -&gt; put(AI_GEMINI_API_BASE_URL, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.huggingFaceApiBaseUrlProperty(), (_, _, newValue) -&gt; put(AI_HUGGING_FACE_API_BASE_URL, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.gpt4AllApiBaseUrlProperty(), (_, _, newValue) -&gt; put(AI_GPT_4_ALL_API_BASE_URL, newValue));</b>
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.embeddingModelProperty(), (_, _, newValue) -&gt; put(AI_EMBEDDING_MODEL, newValue.name()));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.temperatureProperty(), (_, _, newValue) -&gt; putDouble(AI_TEMPERATURE, newValue.doubleValue()));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.contextWindowSizeProperty(), (_, _, newValue) -&gt; putInt(AI_CONTEXT_WINDOW_SIZE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.documentSplitterChunkSizeProperty(), (_, _, newValue) -&gt; putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.documentSplitterOverlapSizeProperty(), (_, _, newValue) -&gt; putInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.ragMaxResultsCountProperty(), (_, _, newValue) -&gt; putInt(AI_RAG_MAX_RESULTS_COUNT, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.ragMinScoreProperty(), (_, _, newValue) -&gt; putDouble(AI_RAG_MIN_SCORE, newValue.doubleValue()));</b>
+&nbsp;
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CHATTING_SYSTEM_MESSAGE), (_, _, newValue) -&gt; put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CHATTING_USER_MESSAGE), (_, _, newValue) -&gt; put(AI_CHATTING_USER_MESSAGE_TEMPLATE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE), (_, _, newValue) -&gt; put(AI_SUMMARIZATION_CHUNK_SYSTEM_MESSAGE_TEMPLATE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE), (_, _, newValue) -&gt; put(AI_SUMMARIZATION_CHUNK_USER_MESSAGE_TEMPLATE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE), (_, _, newValue) -&gt; put(AI_SUMMARIZATION_COMBINE_SYSTEM_MESSAGE_TEMPLATE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE), (_, _, newValue) -&gt; put(AI_SUMMARIZATION_COMBINE_USER_MESSAGE_TEMPLATE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE), (_, _, newValue) -&gt; put(AI_CITATION_PARSING_SYSTEM_MESSAGE_TEMPLATE, newValue));</b>
+<b class="fc">&nbsp;        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CITATION_PARSING_USER_MESSAGE), (_, _, newValue) -&gt; put(AI_CITATION_PARSING_USER_MESSAGE_TEMPLATE, newValue));</b>
+&nbsp;
+<b class="fc">&nbsp;        return aiPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public SearchPreferences getSearchPreferences() {
+<b class="nc">&nbsp;        if (searchPreferences != null) {</b>
+<b class="nc">&nbsp;            return searchPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        searchPreferences = new SearchPreferences(</b>
+<b class="nc">&nbsp;                getBoolean(SEARCH_DISPLAY_MODE) ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT,</b>
+<b class="nc">&nbsp;                getBoolean(SEARCH_REG_EXP),</b>
+<b class="nc">&nbsp;                getBoolean(SEARCH_CASE_SENSITIVE),</b>
+<b class="nc">&nbsp;                getBoolean(SEARCH_FULLTEXT),</b>
+<b class="nc">&nbsp;                getBoolean(SEARCH_KEEP_SEARCH_STRING),</b>
+<b class="nc">&nbsp;                getBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP),</b>
+<b class="nc">&nbsp;                getDouble(SEARCH_WINDOW_HEIGHT),</b>
+<b class="nc">&nbsp;                getDouble(SEARCH_WINDOW_WIDTH),</b>
+<b class="nc">&nbsp;                getDouble(SEARCH_WINDOW_DIVIDER_POS));</b>
+&nbsp;
+<b class="nc">&nbsp;        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener&lt;SearchFlags&gt;) _ -&gt;</b>
+<b class="nc">&nbsp;                putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT)));</b>
+<b class="nc">&nbsp;        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (_, _, newValue) -&gt; putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));</b>
+<b class="nc">&nbsp;        EasyBind.listen(searchPreferences.keepSearchStringProperty(), (_, _, newValue) -&gt; putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (_, _, _) -&gt; putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));</b>
+<b class="nc">&nbsp;        EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (_, _, _) -&gt; putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));</b>
+<b class="nc">&nbsp;        EasyBind.listen(searchPreferences.getSearchWindowWidthProperty(), (_, _, _) -&gt; putDouble(SEARCH_WINDOW_WIDTH, searchPreferences.getSearchWindowWidth()));</b>
+<b class="nc">&nbsp;        EasyBind.listen(searchPreferences.getSearchWindowDividerPositionProperty(), (_, _, _) -&gt; putDouble(SEARCH_WINDOW_DIVIDER_POS, searchPreferences.getSearchWindowDividerPosition()));</b>
+&nbsp;
+<b class="nc">&nbsp;        return searchPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public XmpPreferences getXmpPreferences() {
+<b class="nc">&nbsp;        if (xmpPreferences != null) {</b>
+<b class="nc">&nbsp;            return xmpPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        xmpPreferences = new XmpPreferences(</b>
+<b class="nc">&nbsp;                getBoolean(USE_XMP_PRIVACY_FILTER),</b>
+<b class="nc">&nbsp;                getStringList(XMP_PRIVACY_FILTERS).stream().map(FieldFactory::parseField).collect(Collectors.toSet()),</b>
+<b class="nc">&nbsp;                getBibEntryPreferences().keywordSeparatorProperty());</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(xmpPreferences.useXmpPrivacyFilterProperty(),</b>
+<b class="nc">&nbsp;                (_, _, newValue) -&gt; putBoolean(USE_XMP_PRIVACY_FILTER, newValue));</b>
+<b class="nc">&nbsp;        xmpPreferences.getXmpPrivacyFilter().addListener((SetChangeListener&lt;Field&gt;) _ -&gt;</b>
+<b class="nc">&nbsp;                putStringList(XMP_PRIVACY_FILTERS, xmpPreferences.getXmpPrivacyFilter().stream()</b>
+<b class="nc">&nbsp;                                                                 .map(Field::getName)</b>
+<b class="nc">&nbsp;                                                                 .collect(Collectors.toList())));</b>
+&nbsp;
+<b class="nc">&nbsp;        return xmpPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public NameFormatterPreferences getNameFormatterPreferences() {
+<b class="nc">&nbsp;        if (nameFormatterPreferences != null) {</b>
+<b class="nc">&nbsp;            return nameFormatterPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        nameFormatterPreferences = new NameFormatterPreferences(</b>
+<b class="nc">&nbsp;                getStringList(NAME_FORMATER_KEY),</b>
+<b class="nc">&nbsp;                getStringList(NAME_FORMATTER_VALUE));</b>
+&nbsp;
+<b class="nc">&nbsp;        nameFormatterPreferences.getNameFormatterKey().addListener((InvalidationListener) _ -&gt;</b>
+<b class="nc">&nbsp;                putStringList(NAME_FORMATER_KEY, nameFormatterPreferences.getNameFormatterKey()));</b>
+<b class="nc">&nbsp;        nameFormatterPreferences.getNameFormatterValue().addListener((InvalidationListener) _ -&gt;</b>
+<b class="nc">&nbsp;                putStringList(NAME_FORMATTER_VALUE, nameFormatterPreferences.getNameFormatterValue()));</b>
+&nbsp;
+<b class="nc">&nbsp;        return nameFormatterPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public MrDlibPreferences getMrDlibPreferences() {
+<b class="nc">&nbsp;        if (mrDlibPreferences != null) {</b>
+<b class="nc">&nbsp;            return mrDlibPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        mrDlibPreferences = new MrDlibPreferences(</b>
+<b class="nc">&nbsp;                getBoolean(ACCEPT_RECOMMENDATIONS),</b>
+<b class="nc">&nbsp;                getBoolean(SEND_LANGUAGE_DATA),</b>
+<b class="nc">&nbsp;                getBoolean(SEND_OS_DATA),</b>
+<b class="nc">&nbsp;                getBoolean(SEND_TIMEZONE_DATA));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(mrDlibPreferences.acceptRecommendationsProperty(), (_, _, newValue) -&gt; putBoolean(ACCEPT_RECOMMENDATIONS, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(mrDlibPreferences.sendLanguageProperty(), (_, _, newValue) -&gt; putBoolean(SEND_LANGUAGE_DATA, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(mrDlibPreferences.sendOsProperty(), (_, _, newValue) -&gt; putBoolean(SEND_OS_DATA, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(mrDlibPreferences.sendTimezoneProperty(), (_, _, newValue) -&gt; putBoolean(SEND_TIMEZONE_DATA, newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        return mrDlibPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ProtectedTermsPreferences getProtectedTermsPreferences() {
+<b class="pc">&nbsp;        if (protectedTermsPreferences != null) {</b>
+<b class="nc">&nbsp;            return protectedTermsPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        protectedTermsPreferences = new ProtectedTermsPreferences(</b>
+<b class="fc">&nbsp;                getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),</b>
+<b class="fc">&nbsp;                getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),</b>
+<b class="fc">&nbsp;                getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),</b>
+<b class="fc">&nbsp;                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL)</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        protectedTermsPreferences.getEnabledExternalTermLists().addListener((InvalidationListener) _ -&gt;</b>
+<b class="nc">&nbsp;                putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, protectedTermsPreferences.getEnabledExternalTermLists()));</b>
+<b class="fc">&nbsp;        protectedTermsPreferences.getDisabledExternalTermLists().addListener((InvalidationListener) _ -&gt;</b>
+<b class="nc">&nbsp;                putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, protectedTermsPreferences.getDisabledExternalTermLists()));</b>
+<b class="fc">&nbsp;        protectedTermsPreferences.getEnabledInternalTermLists().addListener((InvalidationListener) _ -&gt;</b>
+<b class="nc">&nbsp;                putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, protectedTermsPreferences.getEnabledInternalTermLists()));</b>
+<b class="fc">&nbsp;        protectedTermsPreferences.getDisabledInternalTermLists().addListener((InvalidationListener) _ -&gt;</b>
+<b class="nc">&nbsp;                putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, protectedTermsPreferences.getDisabledInternalTermLists()));</b>
+&nbsp;
+<b class="fc">&nbsp;        return protectedTermsPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //*************************************************************************************************************
+&nbsp;    // Importer preferences
+&nbsp;    //*************************************************************************************************************
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ImporterPreferences getImporterPreferences() {
+<b class="nc">&nbsp;        if (importerPreferences != null) {</b>
+<b class="nc">&nbsp;            return importerPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        importerPreferences = new ImporterPreferences(</b>
+<b class="nc">&nbsp;                getBoolean(IMPORTERS_ENABLED),</b>
+<b class="nc">&nbsp;                getBoolean(GENERATE_KEY_ON_IMPORT),</b>
+<b class="nc">&nbsp;                Path.of(get(IMPORT_WORKING_DIRECTORY)),</b>
+<b class="nc">&nbsp;                getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION),</b>
+<b class="nc">&nbsp;                getCustomImportFormats(),</b>
+<b class="nc">&nbsp;                getFetcherKeys(),</b>
+<b class="nc">&nbsp;                getDefaultFetcherKeys(),</b>
+<b class="nc">&nbsp;                getBoolean(FETCHER_CUSTOM_KEY_PERSIST),</b>
+<b class="nc">&nbsp;                getStringList(SEARCH_CATALOGS),</b>
+<b class="nc">&nbsp;                PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER)),</b>
+<b class="nc">&nbsp;                getInt(CITATIONS_RELATIONS_STORE_TTL)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(importerPreferences.importerEnabledProperty(), (_, _, newValue) -&gt; putBoolean(IMPORTERS_ENABLED, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (_, _, newValue) -&gt; putBoolean(GENERATE_KEY_ON_IMPORT, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (_, _, newValue) -&gt; put(IMPORT_WORKING_DIRECTORY, newValue.toString()));</b>
+<b class="nc">&nbsp;        EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (_, _, newValue) -&gt; putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (_, _, newValue) -&gt; putBoolean(FETCHER_CUSTOM_KEY_PERSIST, newValue));</b>
+<b class="nc">&nbsp;        importerPreferences.getApiKeys().addListener((InvalidationListener) _ -&gt; storeFetcherKeys(importerPreferences.getApiKeys()));</b>
+<b class="nc">&nbsp;        importerPreferences.getCustomImporters().addListener((InvalidationListener) _ -&gt; storeCustomImportFormats(importerPreferences.getCustomImporters()));</b>
+<b class="nc">&nbsp;        importerPreferences.getCatalogs().addListener((InvalidationListener) _ -&gt; putStringList(SEARCH_CATALOGS, importerPreferences.getCatalogs()));</b>
+<b class="nc">&nbsp;        EasyBind.listen(importerPreferences.defaultPlainCitationParserProperty(), (_, _, newValue) -&gt; put(DEFAULT_PLAIN_CITATION_PARSER, newValue.name()));</b>
+<b class="nc">&nbsp;        EasyBind.listen(importerPreferences.citationsRelationsStoreTTLProperty(), (_, _, newValue) -&gt; put(CITATIONS_RELATIONS_STORE_TTL, newValue.toString()));</b>
+&nbsp;
+<b class="nc">&nbsp;        return importerPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Set&lt;CustomImporter&gt; getCustomImportFormats() {
+<b class="nc">&nbsp;        Set&lt;CustomImporter&gt; importers = new TreeSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (String toImport : getSeries(CUSTOM_IMPORT_FORMAT)) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; importerString = convertStringToList(toImport);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                if (importerString.size() == 2) {</b>
+&nbsp;                    // New format: basePath, className
+<b class="nc">&nbsp;                    importers.add(new CustomImporter(importerString.getFirst(), importerString.get(1)));</b>
+&nbsp;                } else {
+&nbsp;                    // Old format: name, cliId, className, basePath
+<b class="nc">&nbsp;                    importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));</b>
+&nbsp;                }
+&nbsp;            } catch (ImportException e) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Could not load {} from preferences. Will ignore.&quot;, importerString.getFirst(), e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return importers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void storeCustomImportFormats(Set&lt;CustomImporter&gt; importers) {
+<b class="nc">&nbsp;        purgeSeries(CUSTOM_IMPORT_FORMAT, 0);</b>
+<b class="nc">&nbsp;        CustomImporter[] importersArray = importers.toArray(new CustomImporter[0]);</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; importersArray.length; i++) {</b>
+<b class="nc">&nbsp;            putStringList(CUSTOM_IMPORT_FORMAT + i, importersArray[i].getAsStringList());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private Set&lt;FetcherApiKey&gt; getFetcherKeys() {
+<b class="nc">&nbsp;        Set&lt;FetcherApiKey&gt; fetcherApiKeys = new HashSet&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; names = getStringList(FETCHER_CUSTOM_KEY_NAMES);</b>
+<b class="nc">&nbsp;        List&lt;String&gt; uses = getStringList(FETCHER_CUSTOM_KEY_USES);</b>
+<b class="nc">&nbsp;        List&lt;String&gt; keys = getFetcherKeysFromKeyring(names);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; names.size(); i++) {</b>
+<b class="nc">&nbsp;            fetcherApiKeys.add(new FetcherApiKey(</b>
+<b class="nc">&nbsp;                    names.get(i),</b>
+&nbsp;                    // i &lt; uses.size() ? Boolean.parseBoolean(uses.get(i)) : false
+<b class="nc">&nbsp;                    (i &lt; uses.size()) &amp;&amp; Boolean.parseBoolean(uses.get(i)),</b>
+<b class="nc">&nbsp;                    i &lt; keys.size() ? keys.get(i) : &quot;&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return fetcherApiKeys;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;String&gt; getFetcherKeysFromKeyring(List&lt;String&gt; names) {
+<b class="nc">&nbsp;        List&lt;String&gt; keys = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        try (final Keyring keyring = Keyring.create()) {</b>
+<b class="nc">&nbsp;            for (String fetcher : names) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    keys.add(new Password(</b>
+<b class="nc">&nbsp;                            keyring.getPassword(&quot;org.jabref.customapikeys&quot;, fetcher),</b>
+<b class="nc">&nbsp;                            getInternalPreferences().getUserAndHost())</b>
+<b class="nc">&nbsp;                            .decrypt());</b>
+&nbsp;                } catch (PasswordAccessException ex) {
+<b class="nc">&nbsp;                    LOGGER.debug(&quot;No api key stored for {} fetcher&quot;, fetcher);</b>
+<b class="nc">&nbsp;                    keys.add(&quot;&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (Exception ex) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;JabRef could not open the key store&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return keys;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, String&gt; getDefaultFetcherKeys() {
+&nbsp;        // TODO: We do not want to have a depdency on afterburner.fx (because of huge JavaFX depdencny tree). - Should be rewritten to new DI framework
+&nbsp;        // BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+<b class="nc">&nbsp;        BuildInfo buildInfo = new BuildInfo();</b>
+<b class="nc">&nbsp;        if (buildInfo == null) {</b>
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Could not instantiate BuildInfo.&quot;);</b>
+<b class="nc">&nbsp;            return Map.of();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, String&gt; keys = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);</b>
+<b class="nc">&nbsp;        keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);</b>
+<b class="nc">&nbsp;        keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);</b>
+<b class="nc">&nbsp;        keys.put(ScienceDirect.FETCHER_NAME, buildInfo.scienceDirectApiKey);</b>
+<b class="nc">&nbsp;        keys.put(SpringerNatureWebFetcher.FETCHER_NAME, buildInfo.springerNatureAPIKey);</b>
+&nbsp;        // SpringerLink uses the same key and fetcher name as SpringerFetcher
+&nbsp;
+<b class="nc">&nbsp;        return keys;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void storeFetcherKeys(Set&lt;FetcherApiKey&gt; fetcherApiKeys) {
+<b class="nc">&nbsp;        List&lt;String&gt; names = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; uses = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; keys = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (FetcherApiKey apiKey : fetcherApiKeys) {</b>
+<b class="nc">&nbsp;            names.add(apiKey.getName());</b>
+<b class="nc">&nbsp;            uses.add(String.valueOf(apiKey.shouldUse()));</b>
+<b class="nc">&nbsp;            keys.add(apiKey.getKey());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        putStringList(FETCHER_CUSTOM_KEY_NAMES, names);</b>
+<b class="nc">&nbsp;        putStringList(FETCHER_CUSTOM_KEY_USES, uses);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (getBoolean(FETCHER_CUSTOM_KEY_PERSIST)) {</b>
+<b class="nc">&nbsp;            storeFetcherKeysToKeyring(names, keys);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            clearCustomFetcherKeys();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void storeFetcherKeysToKeyring(List&lt;String&gt; names, List&lt;String&gt; keys) {
+<b class="nc">&nbsp;        try (final Keyring keyring = Keyring.create()) {</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; names.size(); i++) {</b>
+<b class="nc">&nbsp;                if (StringUtil.isNullOrEmpty(keys.get(i))) {</b>
+&nbsp;                    try {
+<b class="nc">&nbsp;                        keyring.deletePassword(&quot;org.jabref.customapikeys&quot;, names.get(i));</b>
+&nbsp;                    } catch (PasswordAccessException ex) {
+&nbsp;                        // Already removed
+&nbsp;                    }
+&nbsp;                } else {
+<b class="nc">&nbsp;                    keyring.setPassword(&quot;org.jabref.customapikeys&quot;, names.get(i), new Password(</b>
+<b class="nc">&nbsp;                            keys.get(i),</b>
+<b class="nc">&nbsp;                            getInternalPreferences().getUserAndHost())</b>
+<b class="nc">&nbsp;                            .encrypt());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        } catch (Exception ex) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Unable to open key store&quot;, ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void clearCustomFetcherKeys() {
+<b class="nc">&nbsp;        List&lt;String&gt; names = getStringList(FETCHER_CUSTOM_KEY_NAMES);</b>
+<b class="nc">&nbsp;        try (final Keyring keyring = Keyring.create()) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                for (String name : names) {</b>
+<b class="nc">&nbsp;                    keyring.deletePassword(&quot;org.jabref.customapikeys&quot;, name);</b>
+&nbsp;                }
+&nbsp;            } catch (PasswordAccessException ex) {
+&nbsp;                // nothing to do, no password to remove
+&nbsp;            }
+&nbsp;        } catch (Exception ex) {
+<b class="nc">&nbsp;            LOGGER.error(&quot;Unable to open key store&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public GrobidPreferences getGrobidPreferences() {
+<b class="nc">&nbsp;        if (grobidPreferences != null) {</b>
+<b class="nc">&nbsp;            return grobidPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        grobidPreferences = new GrobidPreferences(</b>
+<b class="nc">&nbsp;                getBoolean(GROBID_ENABLED),</b>
+<b class="nc">&nbsp;                getBoolean(GROBID_PREFERENCE),</b>
+<b class="nc">&nbsp;                get(GROBID_URL));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(grobidPreferences.grobidEnabledProperty(), (_, _, newValue) -&gt; putBoolean(GROBID_ENABLED, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(grobidPreferences.grobidUseAskedProperty(), (_, _, newValue) -&gt; putBoolean(GROBID_PREFERENCE, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(grobidPreferences.grobidURLProperty(), (_, _, newValue) -&gt; put(GROBID_URL, newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        return grobidPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ImportFormatPreferences getImportFormatPreferences() {
+<b class="nc">&nbsp;        return new ImportFormatPreferences(</b>
+<b class="nc">&nbsp;                getBibEntryPreferences(),</b>
+<b class="nc">&nbsp;                getCitationKeyPatternPreferences(),</b>
+<b class="nc">&nbsp;                getFieldPreferences(),</b>
+<b class="nc">&nbsp;                getXmpPreferences(),</b>
+<b class="nc">&nbsp;                getDOIPreferences(),</b>
+<b class="nc">&nbsp;                getGrobidPreferences(),</b>
+<b class="nc">&nbsp;                getFilePreferences());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // endregion
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository) {
+<b class="nc">&nbsp;        if (openOfficePreferences != null) {</b>
+<b class="nc">&nbsp;            return openOfficePreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String currentStylePath = get(OO_CURRENT_STYLE);</b>
+&nbsp;
+<b class="nc">&nbsp;        OOStyle currentStyle = CSLStyleLoader.getDefaultStyle(); // Defaults to IEEE CSL Style</b>
+&nbsp;
+&nbsp;        // Reassign currentStyle based on actual last used CSL style or JStyle
+<b class="nc">&nbsp;        if (CSLStyleUtils.isCitationStyleFile(currentStylePath)) {</b>
+<b class="nc">&nbsp;            currentStyle = CSLStyleUtils.createCitationStyleFromFile(currentStylePath)</b>
+<b class="nc">&nbsp;                                        .orElse(CSLStyleLoader.getDefaultStyle());</b>
+&nbsp;        } else {
+&nbsp;            // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
+&nbsp;            try {
+<b class="nc">&nbsp;                currentStyle = new JStyle(currentStylePath, getLayoutFormatterPreferences(), journalAbbreviationRepository);</b>
+&nbsp;            } catch (IOException ex) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Could not create JStyle&quot;, ex);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        openOfficePreferences = new OpenOfficePreferences(</b>
+<b class="nc">&nbsp;                get(OO_EXECUTABLE_PATH),</b>
+<b class="nc">&nbsp;                getBoolean(OO_USE_ALL_OPEN_BASES),</b>
+<b class="nc">&nbsp;                getBoolean(OO_SYNC_WHEN_CITING),</b>
+<b class="nc">&nbsp;                getStringList(OO_EXTERNAL_STYLE_FILES),</b>
+<b class="nc">&nbsp;                get(OO_BIBLIOGRAPHY_STYLE_FILE),</b>
+&nbsp;                currentStyle,
+<b class="nc">&nbsp;                getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES),</b>
+<b class="nc">&nbsp;                get(OO_CSL_BIBLIOGRAPHY_TITLE),</b>
+<b class="nc">&nbsp;                get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT),</b>
+<b class="nc">&nbsp;                get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT),</b>
+<b class="nc">&nbsp;                getStringList(OO_EXTERNAL_CSL_STYLES),</b>
+<b class="nc">&nbsp;                getBoolean(OO_ADD_SPACE_AFTER));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(openOfficePreferences.executablePathProperty(), (_, _, newValue) -&gt; put(OO_EXECUTABLE_PATH, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (_, _, newValue) -&gt; putBoolean(OO_USE_ALL_OPEN_BASES, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(openOfficePreferences.alwaysAddCitedOnPagesProperty(), (_, _, newValue) -&gt; putBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(openOfficePreferences.syncWhenCitingProperty(), (_, _, newValue) -&gt; putBoolean(OO_SYNC_WHEN_CITING, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(openOfficePreferences.addSpaceAfterProperty(), (_, _, newValue) -&gt; putBoolean(OO_ADD_SPACE_AFTER, newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        openOfficePreferences.getExternalJStyles().addListener((InvalidationListener) _ -&gt;</b>
+<b class="nc">&nbsp;                putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalJStyles()));</b>
+<b class="nc">&nbsp;        openOfficePreferences.getExternalCslStyles().addListener((InvalidationListener) _ -&gt;</b>
+<b class="nc">&nbsp;                putStringList(OO_EXTERNAL_CSL_STYLES, openOfficePreferences.getExternalCslStyles()));</b>
+<b class="nc">&nbsp;        EasyBind.listen(openOfficePreferences.currentJStyleProperty(), (_, _, newValue) -&gt; put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (_, _, newValue) -&gt; put(OO_CURRENT_STYLE, newValue.getPath()));</b>
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(openOfficePreferences.cslBibliographyTitleProperty(), (_, _, newValue) -&gt; put(OO_CSL_BIBLIOGRAPHY_TITLE, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(openOfficePreferences.cslBibliographyHeaderFormatProperty(), (_, _, newValue) -&gt; put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, newValue));</b>
+<b class="nc">&nbsp;        EasyBind.listen(openOfficePreferences.cslBibliographyBodyFormatProperty(), (_, _, newValue) -&gt; put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, newValue));</b>
+&nbsp;
+<b class="nc">&nbsp;        return openOfficePreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public GitPreferences getGitPreferences() {
+<b class="nc">&nbsp;        if (gitPreferences != null) {</b>
+<b class="nc">&nbsp;            return gitPreferences;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        gitPreferences = new GitPreferences(</b>
+<b class="nc">&nbsp;                get(GITHUB_USERNAME_KEY),</b>
+<b class="nc">&nbsp;                getGitHubPat(),</b>
+<b class="nc">&nbsp;                get(GITHUB_REMOTE_URL_KEY),</b>
+<b class="nc">&nbsp;                getBoolean(GITHUB_REMEMBER_PAT_KEY)</b>
+&nbsp;        );
+&nbsp;
+<b class="nc">&nbsp;        EasyBind.listen(gitPreferences.usernameProperty(), (_, _, newVal) -&gt; put(GITHUB_USERNAME_KEY, newVal));</b>
+<b class="nc">&nbsp;        EasyBind.listen(gitPreferences.patProperty(), (_, _, newVal) -&gt; setGitHubPat(newVal));</b>
+<b class="nc">&nbsp;        EasyBind.listen(gitPreferences.repositoryUrlProperty(), (_, _, newVal) -&gt; put(GITHUB_REMOTE_URL_KEY, newVal));</b>
+<b class="nc">&nbsp;        EasyBind.listen(gitPreferences.rememberPatProperty(), (_, _, newVal) -&gt; {</b>
+<b class="nc">&nbsp;            putBoolean(GITHUB_REMEMBER_PAT_KEY, newVal);</b>
+<b class="nc">&nbsp;            if (!newVal) {</b>
+<b class="nc">&nbsp;                deleteGitHubPat();</b>
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        return gitPreferences;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void deleteGitHubPat() {
+<b class="nc">&nbsp;        try (final Keyring keyring = Keyring.create()) {</b>
+<b class="nc">&nbsp;            keyring.deletePassword(&quot;org.jabref&quot;, &quot;github&quot;);</b>
+&nbsp;        } catch (Exception ex) {
+<b class="nc">&nbsp;            LOGGER.warn(&quot;Unable to remove GitHub credentials&quot;, ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getGitHubPat() {
+<b class="nc">&nbsp;        if (getBoolean(GITHUB_REMEMBER_PAT_KEY)) {</b>
+<b class="nc">&nbsp;            try (final Keyring keyring = Keyring.create()) {</b>
+<b class="nc">&nbsp;                return new Password(</b>
+<b class="nc">&nbsp;                        keyring.getPassword(&quot;org.jabref&quot;, &quot;github&quot;),</b>
+<b class="nc">&nbsp;                        getInternalPreferences().getUserAndHost())</b>
+<b class="nc">&nbsp;                        .decrypt();</b>
+&nbsp;            } catch (PasswordAccessException ex) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;No GitHub token stored in keyring&quot;);</b>
+&nbsp;            } catch (Exception ex) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Could not read GitHub token from keyring&quot;, ex);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return (String) defaults.get(GITHUB_PAT_KEY);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void setGitHubPat(String pat) {
+<b class="nc">&nbsp;        if (getGitPreferences().rememberPatProperty().get()) {</b>
+<b class="nc">&nbsp;            try (final Keyring keyring = Keyring.create()) {</b>
+<b class="nc">&nbsp;                if (StringUtil.isBlank(pat)) {</b>
+<b class="nc">&nbsp;                    keyring.deletePassword(&quot;org.jabref&quot;, &quot;github&quot;);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    keyring.setPassword(&quot;org.jabref&quot;, &quot;github&quot;, new Password(</b>
+<b class="nc">&nbsp;                            pat.trim(),</b>
+<b class="nc">&nbsp;                            getInternalPreferences().getUserAndHost())</b>
+<b class="nc">&nbsp;                            .encrypt());</b>
+&nbsp;                }
+&nbsp;            } catch (Exception ex) {
+<b class="nc">&nbsp;                LOGGER.warn(&quot;Failed to save GitHub token to keyring&quot;, ex);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

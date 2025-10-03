@@ -1,0 +1,364 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > BibtexString</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.entry</a>
+</div>
+
+<h1>Coverage Summary for Class: BibtexString (org.jabref.model.entry)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">BibtexString</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/43)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">BibtexString$Type</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/58)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.entry;
+&nbsp;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;/**
+&nbsp; * This class models a BibTex String (&quot;@String&quot;)
+&nbsp; */
+&nbsp;public class BibtexString implements Cloneable {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Type of a \@String.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Differentiate a \@String based on its usage:
+&nbsp;     * &lt;p&gt;
+&nbsp;     * - {@link #AUTHOR}: prefix &quot;a&quot;, for author and editor fields.
+&nbsp;     * - {@link #INSTITUTION}: prefix &quot;i&quot;, for institution and organization
+&nbsp;     * field
+&nbsp;     * - {@link #PUBLISHER}: prefix &quot;p&quot;, for publisher fields
+&nbsp;     * - {@link #OTHER}: no prefix, for any field
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Examples:
+&nbsp;     * &lt;p&gt;
+&nbsp;     * \@String { aKahle    = &quot;Kahle, Brewster &quot; } -&gt; author
+&nbsp;     * \@String { aStallman = &quot;Stallman, Richard&quot; } -&gt; author
+&nbsp;     * \@String { iMIT      = &quot;{Massachusetts Institute of Technology ({MIT})}&quot; } -&gt; institution
+&nbsp;     * \@String { pMIT      = &quot;{Massachusetts Institute of Technology ({MIT}) press}&quot; } -&gt; publisher
+&nbsp;     * \@String { anct      = &quot;Anecdote&quot; } -&gt; other
+&nbsp;     * \@String { eg        = &quot;for example&quot; } -&gt; other
+&nbsp;     * \@String { et        = &quot; and &quot; } -&gt; other
+&nbsp;     * \@String { lBigMac   = &quot;Big Mac&quot; } -&gt; other
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Usage:
+&nbsp;     * &lt;p&gt;
+&nbsp;     * \@Misc {
+&nbsp;     * title       = &quot;The GNU Project&quot;
+&nbsp;     * author      = aStallman # et # aKahle
+&nbsp;     * institution = iMIT
+&nbsp;     * publisher   = pMIT
+&nbsp;     * note        = &quot;Just &quot; # eg
+&nbsp;     * }
+&nbsp;     */
+<b class="nc">&nbsp;    public enum Type {</b>
+<b class="nc">&nbsp;        AUTHOR(&quot;a&quot;),</b>
+<b class="nc">&nbsp;        INSTITUTION(&quot;i&quot;),</b>
+<b class="nc">&nbsp;        PUBLISHER(&quot;p&quot;),</b>
+<b class="nc">&nbsp;        OTHER(&quot;&quot;);</b>
+&nbsp;
+&nbsp;        private final String prefix;
+&nbsp;
+<b class="nc">&nbsp;        Type(String prefix) {</b>
+<b class="nc">&nbsp;            this.prefix = prefix;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static Type get(String key) {
+<b class="nc">&nbsp;            if (key.length() &lt;= 1) {</b>
+<b class="nc">&nbsp;                return OTHER;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Second character is not upper case
+&nbsp;            // aStallman -&gt; AUTHOR
+&nbsp;            // asdf -&gt; OTHER
+<b class="nc">&nbsp;            if (!String.valueOf(key.charAt(1)).toUpperCase(Locale.ROOT).equals(String.valueOf(key.charAt(1)))) {</b>
+<b class="nc">&nbsp;                return OTHER;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            for (Type t : Type.values()) {</b>
+<b class="nc">&nbsp;                if (t.prefix.equals(String.valueOf(key.charAt(0)))) {</b>
+<b class="nc">&nbsp;                    return t;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            return OTHER;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String name;
+&nbsp;    private String content;
+&nbsp;    private String id;
+&nbsp;    private Type type;
+&nbsp;    private String parsedSerialization;
+&nbsp;    private boolean hasChanged;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Default constructor. Use this if in doubt.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * In case this constructor is used - and the library is eventually written, the serialization is generated from scratch (and not some null from parsedSerialization)
+&nbsp;     */
+<b class="nc">&nbsp;    public BibtexString(String name, String content) {</b>
+<b class="nc">&nbsp;        this.id = IdGenerator.next();</b>
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        this.content = content;</b>
+<b class="nc">&nbsp;        hasChanged = true;</b>
+<b class="nc">&nbsp;        type = Type.get(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is used to set the parsed serialization of the string. This is used when the string is read from a BibTeX file.
+&nbsp;     * Do not use if not working with reading BibTeX files (or similar actions).     *
+&nbsp;     *
+&nbsp;     * @param parsedSerialization The serialization read during parsing
+&nbsp;     */
+&nbsp;    public BibtexString(String name, String content, String parsedSerialization) {
+<b class="nc">&nbsp;        this(name, content);</b>
+<b class="nc">&nbsp;        this.parsedSerialization = parsedSerialization;</b>
+<b class="nc">&nbsp;        hasChanged = false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getId() {
+<b class="nc">&nbsp;        return id;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setId(String id) {
+<b class="nc">&nbsp;        this.id = id;</b>
+<b class="nc">&nbsp;        hasChanged = true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the name/label of the string
+&nbsp;     */
+&nbsp;    public String getName() {
+<b class="nc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setName(String name) {
+<b class="nc">&nbsp;        this.name = name;</b>
+<b class="nc">&nbsp;        hasChanged = true;</b>
+<b class="nc">&nbsp;        type = Type.get(name);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Never returns null
+&nbsp;     */
+&nbsp;    public String getContent() {
+<b class="nc">&nbsp;        return content == null ? &quot;&quot; : content;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setContent(String content) {
+<b class="nc">&nbsp;        this.content = content;</b>
+<b class="nc">&nbsp;        hasChanged = true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Type getType() {
+<b class="nc">&nbsp;        return type;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getParsedSerialization() {
+<b class="nc">&nbsp;        return parsedSerialization;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean hasChanged() {
+<b class="nc">&nbsp;        return hasChanged;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * Returns user comments (arbitrary text before the string) if there are any. If not returns the empty string
+&nbsp;     */
+&nbsp;    public String getUserComments() {
+<b class="nc">&nbsp;        if (parsedSerialization != null) {</b>
+&nbsp;            try {
+&nbsp;                // get the text before the string
+<b class="nc">&nbsp;                String prolog = parsedSerialization.substring(0, parsedSerialization.indexOf(&#39;@&#39;));</b>
+<b class="nc">&nbsp;                return prolog;</b>
+&nbsp;            } catch (StringIndexOutOfBoundsException ignore) {
+&nbsp;                // if this occurs a broken parsed serialization has been set, so just do nothing
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return &quot;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Object clone() {
+&nbsp;        BibtexString clone;
+<b class="nc">&nbsp;        if (parsedSerialization == null) {</b>
+<b class="nc">&nbsp;            clone = new BibtexString(name, content);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            clone = new BibtexString(name, content, parsedSerialization);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        clone.setId(id);</b>
+<b class="nc">&nbsp;        return clone;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return name + &quot;=&quot; + content;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean equals(Object o) {
+<b class="nc">&nbsp;        if (this == o) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((o == null) || (getClass() != o.getClass())) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        BibtexString that = (BibtexString) o;</b>
+<b class="nc">&nbsp;        return Objects.equals(hasChanged, that.hasChanged) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(name, that.name) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(content, that.content) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(type, that.type) &amp;&amp;</b>
+<b class="nc">&nbsp;                Objects.equals(parsedSerialization, that.parsedSerialization);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public int hashCode() {
+<b class="nc">&nbsp;        return Objects.hash(hasChanged, name, content, type, parsedSerialization);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

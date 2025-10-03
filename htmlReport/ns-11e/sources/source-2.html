@@ -1,0 +1,933 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StringUtil</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.model.strings</a>
+</div>
+
+<h1>Coverage Summary for Class: StringUtil (org.jabref.model.strings)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">StringUtil</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.2%
+  </span>
+  <span class="absValue">
+    (6/49)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4%
+  </span>
+  <span class="absValue">
+    (11/274)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    6.2%
+  </span>
+  <span class="absValue">
+    (17/275)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.model.strings;
+&nbsp;
+&nbsp;import java.text.Normalizer;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.StringTokenizer;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import javafx.util.Pair;
+&nbsp;
+&nbsp;import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
+&nbsp;import org.jabref.architecture.AllowedToUseLogic;
+&nbsp;import org.jabref.logic.bibtex.FieldWriter;
+&nbsp;import org.jabref.logic.os.OS;
+&nbsp;
+&nbsp;import com.google.common.base.CharMatcher;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;@SuppressWarnings(&quot;checkstyle:NoMultipleClosingBracesAtEndOfLine&quot;)
+&nbsp;@AllowedToUseApacheCommonsLang3(&quot;There is no equivalent in Google&#39;s Guava&quot;)
+&nbsp;@AllowedToUseLogic(&quot;OS.NewLine is most basic&quot;)
+<b class="nc">&nbsp;public class StringUtil {</b>
+&nbsp;
+&nbsp;    // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\&quot;{a}}
+&nbsp;    public static final String SPECIAL_COMMAND_CHARS = &quot;\&quot;`^~&#39;=.|&quot;;
+&nbsp;    // contains all possible line breaks, not omitting any break such as &quot;\\n&quot;
+<b class="fc">&nbsp;    private static final Pattern LINE_BREAKS = Pattern.compile(&quot;\\r\\n|\\r|\\n&quot;);</b>
+<b class="fc">&nbsp;    private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile(&quot;\\{[A-Z]+\\}&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pattern for normalizing whitespace and punctuation using named capture groups
+&nbsp;     */
+<b class="fc">&nbsp;    private static final Pattern NORMALIZE_PATTERN = Pattern.compile(</b>
+&nbsp;            &quot;(?&lt;whitespace&gt;\\s+)|&quot; +                   // multiple whitespace
+&nbsp;                    &quot;(?&lt;hyphen&gt;\\s*-+\\s*)|&quot; +         // hyphens with surrounding spaces
+&nbsp;                    &quot;(?&lt;comma&gt;\\s*,\\s*)|&quot; +           // commas with surrounding spaces
+&nbsp;                    &quot;(?&lt;semicolon&gt;\\s*;\\s*)|&quot; +       // semicolons with surrounding spaces
+&nbsp;                    &quot;(?&lt;colon&gt;\\s*:\\s*)&quot;              // colons with surrounding spaces
+&nbsp;    );
+&nbsp;
+<b class="fc">&nbsp;    private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();</b>
+&nbsp;    private static final String WRAPPED_LINE_PREFIX = &quot;&quot;; // If a line break is added, this prefix will be inserted at the beginning of the next line
+&nbsp;    private static final String STRING_TABLE_DELIMITER = &quot; : &quot;;
+&nbsp;
+&nbsp;    public static String booleanToBinaryString(boolean expression) {
+<b class="nc">&nbsp;        return expression ? &quot;1&quot; : &quot;0&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Quote special characters.
+&nbsp;     *
+&nbsp;     * @param toQuote   The String which may contain special characters.
+&nbsp;     * @param specials  A String containing all special characters except the quoting character itself, which is automatically quoted.
+&nbsp;     * @param quoteChar The quoting character.
+&nbsp;     * @return A String with every special character (including the quoting character itself) quoted.
+&nbsp;     */
+&nbsp;    public static String quote(String toQuote, String specials, char quoteChar) {
+<b class="pc">&nbsp;        if (toQuote == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        StringBuilder result = new StringBuilder();</b>
+&nbsp;        char c;
+&nbsp;        boolean isSpecial;
+<b class="fc">&nbsp;        for (int i = 0; i &lt; toQuote.length(); ++i) {</b>
+<b class="fc">&nbsp;            c = toQuote.charAt(i);</b>
+&nbsp;
+<b class="pc">&nbsp;            isSpecial = c == quoteChar;</b>
+&nbsp;            // If non-null specials performs logic-or with specials.indexOf(c) &gt;= 0
+<b class="pc">&nbsp;            isSpecial |= (specials != null) &amp;&amp; (specials.indexOf(c) &gt;= 0);</b>
+&nbsp;
+<b class="pc">&nbsp;            if (isSpecial) {</b>
+<b class="nc">&nbsp;                result.append(quoteChar);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            result.append(c);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return result.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates a substring from a text
+&nbsp;     */
+&nbsp;    public static String getPart(String text, int startIndex, boolean terminateOnEndBraceOnly) {
+&nbsp;        char c;
+<b class="nc">&nbsp;        int count = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder part = new StringBuilder();</b>
+&nbsp;
+&nbsp;        // advance to first char and skip whitespace
+<b class="nc">&nbsp;        int index = startIndex + 1;</b>
+<b class="nc">&nbsp;        while ((index &lt; text.length()) &amp;&amp; Character.isWhitespace(text.charAt(index))) {</b>
+<b class="nc">&nbsp;            index++;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // then grab whatever is the first token (counting braces)
+<b class="nc">&nbsp;        while (index &lt; text.length()) {</b>
+<b class="nc">&nbsp;            c = text.charAt(index);</b>
+<b class="nc">&nbsp;            if (!terminateOnEndBraceOnly &amp;&amp; (count == 0) &amp;&amp; Character.isWhitespace(c)) {</b>
+&nbsp;                // end argument and leave whitespace for further processing
+&nbsp;                break;
+&nbsp;            }
+<b class="nc">&nbsp;            if ((c == &#39;}&#39;) &amp;&amp; (--count &lt; 0)) {</b>
+&nbsp;                break;
+<b class="nc">&nbsp;            } else if (c == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                count++;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            part.append(c);</b>
+<b class="nc">&nbsp;            index++;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return part.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns the string, after shaving off whitespace at the beginning and end,
+&nbsp;     * and removing (at most) one pair of braces or &quot; surrounding it.
+&nbsp;     */
+&nbsp;    public static String shaveString(String toShave) {
+<b class="nc">&nbsp;        if ((toShave == null) || (toShave.isEmpty())) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String shaved = toShave.trim();</b>
+<b class="nc">&nbsp;        if (isInCurlyBrackets(shaved) || isInCitationMarks(shaved)) {</b>
+<b class="nc">&nbsp;            return shaved.substring(1, shaved.length() - 1);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return shaved;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Concatenate all strings in the array from index &#39;from&#39; to &#39;to&#39; (excluding
+&nbsp;     * to) with the given separator.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Example:
+&nbsp;     * &lt;p&gt;
+&nbsp;     * String[] s = &quot;ab/cd/ed&quot;.split(&quot;/&quot;); join(s, &quot;\\&quot;, 0, s.length) -&gt;
+&nbsp;     * &quot;ab\\cd\\ed&quot;
+&nbsp;     *
+&nbsp;     * @param to Excluding strings[to]
+&nbsp;     */
+&nbsp;    public static String join(String[] strings, String separator, int from, int to) {
+<b class="nc">&nbsp;        if ((strings.length == 0) || (from &gt;= to)) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int updatedFrom = Math.max(0, from);</b>
+<b class="nc">&nbsp;        int updatedTo = Math.min(strings.length, to);</b>
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (int i = updatedFrom; i &lt; (updatedTo - 1); i++) {</b>
+<b class="nc">&nbsp;            stringBuilder.append(strings[i]).append(separator);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return stringBuilder.append(strings[updatedTo - 1]).toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Removes optional square brackets from the string s
+&nbsp;     */
+&nbsp;    public static String stripBrackets(String toStrip) {
+<b class="nc">&nbsp;        if (isInSquareBrackets(toStrip)) {</b>
+<b class="nc">&nbsp;            return toStrip.substring(1, toStrip.length() - 1);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return toStrip;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * extends the filename with a default Extension, if no Extension &#39;.x&#39; could
+&nbsp;     * be found
+&nbsp;     */
+&nbsp;    public static String getCorrectFileName(String orgName, String defaultExtension) {
+<b class="nc">&nbsp;        if (orgName == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (orgName.toLowerCase(Locale.ROOT).endsWith(&quot;.&quot; + defaultExtension.toLowerCase(Locale.ROOT))) {</b>
+<b class="nc">&nbsp;            return orgName;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int hiddenChar = orgName.indexOf(&#39;.&#39;, 1); // hidden files Linux/Unix (?)</b>
+<b class="nc">&nbsp;        if (hiddenChar &lt; 1) {</b>
+<b class="nc">&nbsp;            return orgName + &quot;.&quot; + defaultExtension;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return orgName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Formats field contents for output. Must be &quot;symmetric&quot; with the parse method above, so stored and reloaded fields
+&nbsp;     * are not mangled.
+&nbsp;     *
+&nbsp;     * @param in         the string to wrap
+&nbsp;     * @param wrapAmount the number of characters belonging to a line of text
+&nbsp;     * @param newline    the newline character(s)
+&nbsp;     * @return the wrapped string
+&nbsp;     */
+&nbsp;    public static String wrap(String in, int wrapAmount, String newline) {
+<b class="nc">&nbsp;        String[] lines = in.split(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;        StringBuilder result = new StringBuilder();</b>
+&nbsp;        // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
+<b class="nc">&nbsp;        addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline);</b>
+<b class="nc">&nbsp;        for (int i = 1; i &lt; lines.length; i++) {</b>
+<b class="nc">&nbsp;            if (lines[i].trim().isEmpty()) {</b>
+<b class="nc">&nbsp;                result.append(newline);</b>
+<b class="nc">&nbsp;                result.append(&#39;\t&#39;);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                result.append(newline);</b>
+<b class="nc">&nbsp;                result.append(&#39;\t&#39;);</b>
+<b class="nc">&nbsp;                result.append(newline);</b>
+<b class="nc">&nbsp;                result.append(&#39;\t&#39;);</b>
+&nbsp;                // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
+<b class="nc">&nbsp;                String line = CharMatcher.whitespace().trimTrailingFrom(lines[i]);</b>
+<b class="nc">&nbsp;                addWrappedLine(result, line, wrapAmount, newline);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return result.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Appends a text to a string builder. Wraps the text so that each line is approx wrapAmount characters long.
+&nbsp;     * Wrapping is done using newline and tab character.
+&nbsp;     *
+&nbsp;     * @param line          the line of text to be wrapped and appended
+&nbsp;     * @param wrapAmount    the number of characters belonging to a line of text
+&nbsp;     * @param newlineString a string containing the newline character(s)
+&nbsp;     */
+&nbsp;    private static void addWrappedLine(StringBuilder result, String line, int wrapAmount, String newlineString) {
+&nbsp;        // Set our pointer to the beginning of the new line in the StringBuffer:
+<b class="nc">&nbsp;        int length = result.length();</b>
+&nbsp;        // Add the line, unmodified:
+<b class="nc">&nbsp;        result.append(line);</b>
+&nbsp;
+&nbsp;        // insert newlines and one tab character at each position, where wrapping is necessary
+<b class="nc">&nbsp;        while (length &lt; result.length()) {</b>
+<b class="nc">&nbsp;            int current = result.indexOf(&quot; &quot;, length + wrapAmount);</b>
+<b class="nc">&nbsp;            if ((current &lt; 0) || (current &gt;= result.length())) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            result.deleteCharAt(current);</b>
+<b class="nc">&nbsp;            result.insert(current, newlineString + &quot;\t&quot;);</b>
+<b class="nc">&nbsp;            length = current + newlineString.length();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Quotes each and every character, e.g. &#39;!&#39; as &amp;#33;. Used for verbatim
+&nbsp;     * display of arbitrary strings that may contain HTML entities.
+&nbsp;     */
+&nbsp;    public static String quoteForHTML(String toQuote) {
+<b class="nc">&nbsp;        StringBuilder result = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; toQuote.length(); ++i) {</b>
+<b class="nc">&nbsp;            result.append(&quot;&amp;#&quot;).append((int) toQuote.charAt(i)).append(&#39;;&#39;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Decodes an encoded double String array back into array form. The array
+&nbsp;     * is assumed to be square, and delimited by the characters &#39;;&#39; (first dim) and
+&nbsp;     * &#39;:&#39; (second dim).
+&nbsp;     *
+&nbsp;     * @param value The encoded String to be decoded.
+&nbsp;     * @return The decoded String array.
+&nbsp;     */
+&nbsp;    public static String[][] decodeStringDoubleArray(String value) {
+<b class="nc">&nbsp;        List&lt;List&lt;String&gt;&gt; newList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; thisEntry = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        boolean escaped = false;</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; value.length(); i++) {</b>
+<b class="nc">&nbsp;            char c = value.charAt(i);</b>
+<b class="nc">&nbsp;            if (!escaped &amp;&amp; (c == &#39;\\&#39;)) {</b>
+<b class="nc">&nbsp;                escaped = true;</b>
+&nbsp;                continue;
+<b class="nc">&nbsp;            } else if (!escaped &amp;&amp; (c == &#39;:&#39;)) {</b>
+<b class="nc">&nbsp;                thisEntry.add(sb.toString());</b>
+<b class="nc">&nbsp;                sb = new StringBuilder();</b>
+<b class="nc">&nbsp;            } else if (!escaped &amp;&amp; (c == &#39;;&#39;)) {</b>
+<b class="nc">&nbsp;                thisEntry.add(sb.toString());</b>
+<b class="nc">&nbsp;                sb = new StringBuilder();</b>
+<b class="nc">&nbsp;                newList.add(thisEntry);</b>
+<b class="nc">&nbsp;                thisEntry = new ArrayList&lt;&gt;();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                sb.append(c);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            escaped = false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!sb.isEmpty()) {</b>
+<b class="nc">&nbsp;            thisEntry.add(sb.toString());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (!thisEntry.isEmpty()) {</b>
+<b class="nc">&nbsp;            newList.add(thisEntry);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Convert to String[][]:
+<b class="nc">&nbsp;        String[][] res = new String[newList.size()][];</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; res.length; i++) {</b>
+<b class="nc">&nbsp;            res[i] = new String[newList.get(i).size()];</b>
+<b class="nc">&nbsp;            for (int j = 0; j &lt; res[i].length; j++) {</b>
+<b class="nc">&nbsp;                res[i][j] = newList.get(i).get(j);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return res;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Wrap all uppercase letters, or sequences of uppercase letters, in curly
+&nbsp;     * braces. Ignore letters within a pair of # character, as these are part of
+&nbsp;     * a string label that should not be modified.
+&nbsp;     *
+&nbsp;     * @param s The string to modify.
+&nbsp;     * @return The resulting string after wrapping capitals.
+&nbsp;     */
+&nbsp;    public static String putBracesAroundCapitals(String s) {
+<b class="nc">&nbsp;        boolean inString = false;</b>
+<b class="nc">&nbsp;        boolean isBracing = false;</b>
+<b class="nc">&nbsp;        boolean escaped = false;</b>
+<b class="nc">&nbsp;        int inBrace = 0;</b>
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; s.length(); i++) {</b>
+&nbsp;            // Update variables based on special characters:
+<b class="nc">&nbsp;            int c = s.charAt(i);</b>
+<b class="nc">&nbsp;            if (c == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                inBrace++;</b>
+<b class="nc">&nbsp;            } else if (c == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                inBrace--;</b>
+<b class="nc">&nbsp;            } else if (!escaped &amp;&amp; (c == FieldWriter.BIBTEX_STRING_START_END_SYMBOL)) {</b>
+<b class="nc">&nbsp;                inString = !inString;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // See if we should start bracing:
+<b class="nc">&nbsp;            if ((inBrace == 0) &amp;&amp; !isBracing &amp;&amp; !inString &amp;&amp; Character.isLetter((char) c)</b>
+<b class="nc">&nbsp;                    &amp;&amp; Character.isUpperCase((char) c)) {</b>
+<b class="nc">&nbsp;                buf.append(&#39;{&#39;);</b>
+<b class="nc">&nbsp;                isBracing = true;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // See if we should close a brace set:
+<b class="nc">&nbsp;            if (isBracing &amp;&amp; !(Character.isLetter((char) c) &amp;&amp; Character.isUpperCase((char) c))) {</b>
+<b class="nc">&nbsp;                buf.append(&#39;}&#39;);</b>
+<b class="nc">&nbsp;                isBracing = false;</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Add the current character:
+<b class="nc">&nbsp;            buf.append((char) c);</b>
+&nbsp;
+&nbsp;            // Check if we are entering an escape sequence:
+<b class="nc">&nbsp;            escaped = (c == &#39;\\&#39;) &amp;&amp; !escaped;</b>
+&nbsp;        }
+&nbsp;        // Check if we have an unclosed brace:
+<b class="nc">&nbsp;        if (isBracing) {</b>
+<b class="nc">&nbsp;            buf.append(&#39;}&#39;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method looks for occurrences of capital letters enclosed in an
+&nbsp;     * arbitrary number of pairs of braces, e.g. &quot;{AB}&quot; or &quot;{{T}}&quot;. All of these
+&nbsp;     * pairs of braces are removed.
+&nbsp;     *
+&nbsp;     * @param s The String to analyze.
+&nbsp;     * @return A new String with braces removed.
+&nbsp;     */
+&nbsp;    public static String removeBracesAroundCapitals(String s) {
+<b class="nc">&nbsp;        String current = s;</b>
+<b class="nc">&nbsp;        String previous = s;</b>
+<b class="nc">&nbsp;        while ((current = removeSingleBracesAroundCapitals(current)).length() &lt; previous.length()) {</b>
+<b class="nc">&nbsp;            previous = current;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return current;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method looks for occurrences of capital letters enclosed in one pair
+&nbsp;     * of braces, e.g. &quot;{AB}&quot;. All these are replaced by only the capitals in
+&nbsp;     * between the braces.
+&nbsp;     *
+&nbsp;     * @param s The String to analyze.
+&nbsp;     * @return A new String with braces removed.
+&nbsp;     */
+&nbsp;    private static String removeSingleBracesAroundCapitals(String s) {
+<b class="nc">&nbsp;        Matcher mcr = BRACED_TITLE_CAPITAL_PATTERN.matcher(s);</b>
+<b class="nc">&nbsp;        StringBuilder buf = new StringBuilder();</b>
+<b class="nc">&nbsp;        while (mcr.find()) {</b>
+<b class="nc">&nbsp;            String replaceStr = mcr.group();</b>
+<b class="nc">&nbsp;            mcr.appendReplacement(buf, replaceStr.substring(1, replaceStr.length() - 1));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        mcr.appendTail(buf);</b>
+<b class="nc">&nbsp;        return buf.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Replaces all platform-dependent line breaks by OS.NEWLINE line breaks.
+&nbsp;     * AKA normalize newlines
+&nbsp;     * &lt;p&gt;
+&nbsp;     * We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
+&nbsp;     *
+&nbsp;     * &lt;h4&gt;Example&lt;/h4&gt;
+&nbsp;     * &lt;pre&gt;{@code
+&nbsp;     * Legacy Macintosh \r -&gt; OS.NEWLINE
+&nbsp;     * Windows \r\n -&gt; OS.NEWLINE
+&nbsp;     * }&lt;/pre&gt;
+&nbsp;     *
+&nbsp;     * @return a String with only OS.NEWLINE as line breaks
+&nbsp;     */
+&nbsp;    public static String unifyLineBreaks(String s, String newline) {
+<b class="fc">&nbsp;        return LINE_BREAKS.matcher(s).replaceAll(newline);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the given String has exactly one pair of surrounding curly braces &lt;br&gt;
+&nbsp;     * Strings with escaped characters in curly braces at the beginning and end are respected, too
+&nbsp;     *
+&nbsp;     * @param toCheck The string to check
+&nbsp;     * @return True, if the check was successful. False otherwise.
+&nbsp;     */
+&nbsp;    public static boolean isInCurlyBrackets(String toCheck) {
+<b class="nc">&nbsp;        int count = 0;</b>
+<b class="nc">&nbsp;        int brackets = 0;</b>
+<b class="nc">&nbsp;        if ((toCheck == null) || toCheck.isEmpty()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            if ((toCheck.charAt(0) == &#39;{&#39;) &amp;&amp; (toCheck.charAt(toCheck.length() - 1) == &#39;}&#39;)) {</b>
+<b class="nc">&nbsp;                for (char c : toCheck.toCharArray()) {</b>
+<b class="nc">&nbsp;                    if (c == &#39;{&#39;) {</b>
+<b class="nc">&nbsp;                        if (brackets == 0) {</b>
+<b class="nc">&nbsp;                            count++;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        brackets++;</b>
+<b class="nc">&nbsp;                    } else if (c == &#39;}&#39;) {</b>
+<b class="nc">&nbsp;                        brackets--;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                return count == 1;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isInSquareBrackets(String toCheck) {
+<b class="nc">&nbsp;        if ((toCheck == null) || toCheck.isEmpty()) {</b>
+<b class="nc">&nbsp;            return false; // In case of null or empty string</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return (toCheck.charAt(0) == &#39;[&#39;) &amp;&amp; (toCheck.charAt(toCheck.length() - 1) == &#39;]&#39;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isInCitationMarks(String toCheck) {
+<b class="nc">&nbsp;        if ((toCheck == null) || (toCheck.length() &lt;= 1)) {</b>
+<b class="nc">&nbsp;            return false; // In case of null, empty string, or a single citation mark</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return (toCheck.charAt(0) == &#39;&quot;&#39;) &amp;&amp; (toCheck.charAt(toCheck.length() - 1) == &#39;&quot;&#39;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Optimized method for converting a String into an Integer
+&nbsp;     * &lt;p&gt;
+&nbsp;     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
+&nbsp;     *
+&nbsp;     * @param str the String holding an Integer value
+&nbsp;     * @return the int value of str
+&nbsp;     * @throws NumberFormatException if str cannot be parsed to an int
+&nbsp;     */
+&nbsp;    public static int intValueOf(String str) {
+<b class="nc">&nbsp;        int idx = 0;</b>
+&nbsp;        int end;
+<b class="nc">&nbsp;        boolean sign = false;</b>
+&nbsp;        char ch;
+&nbsp;
+<b class="nc">&nbsp;        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) &lt; &#39;0&#39;) || (ch &gt; &#39;9&#39;)) &amp;&amp; (!(sign = ch == &#39;-&#39;) || (++idx == end) || ((ch = str.charAt(idx)) &lt; &#39;0&#39;) || (ch &gt; &#39;9&#39;)))) {</b>
+<b class="nc">&nbsp;            throw new NumberFormatException(str);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int ival = 0;</b>
+<b class="nc">&nbsp;        for (; ; ival *= 10) {</b>
+<b class="nc">&nbsp;            ival += &#39;0&#39; - ch;</b>
+<b class="nc">&nbsp;            if (++idx == end) {</b>
+<b class="nc">&nbsp;                return sign ? ival : -ival;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (((ch = str.charAt(idx)) &lt; &#39;0&#39;) || (ch &gt; &#39;9&#39;)) {</b>
+<b class="nc">&nbsp;                throw new NumberFormatException(str);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Optimized method for converting a String into an Integer
+&nbsp;     * &lt;p&gt;
+&nbsp;     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
+&nbsp;     *
+&nbsp;     * @param str the String holding an Integer value
+&nbsp;     * @return the int value of str or Optional.empty() if not possible
+&nbsp;     */
+&nbsp;    public static Optional&lt;Integer&gt; intValueOfOptional(String str) {
+<b class="nc">&nbsp;        int idx = 0;</b>
+&nbsp;        int end;
+<b class="nc">&nbsp;        boolean sign = false;</b>
+&nbsp;        char ch;
+&nbsp;
+<b class="nc">&nbsp;        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) &lt; &#39;0&#39;) || (ch &gt; &#39;9&#39;)) &amp;&amp; (!(sign = ch == &#39;-&#39;) || (++idx == end) || ((ch = str.charAt(idx)) &lt; &#39;0&#39;) || (ch &gt; &#39;9&#39;)))) {</b>
+<b class="nc">&nbsp;            return Optional.empty();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int ival = 0;</b>
+<b class="nc">&nbsp;        for (; ; ival *= 10) {</b>
+<b class="nc">&nbsp;            ival += &#39;0&#39; - ch;</b>
+<b class="nc">&nbsp;            if (++idx == end) {</b>
+<b class="nc">&nbsp;                return Optional.of(sign ? ival : -ival);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (((ch = str.charAt(idx)) &lt; &#39;0&#39;) || (ch &gt; &#39;9&#39;)) {</b>
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This method ensures that the output String has only
+&nbsp;     * valid XML unicode characters as specified by the
+&nbsp;     * XML 1.0 standard. For reference, please see
+&nbsp;     * &lt;a href=&quot;http://www.w3.org/TR/2000/REC-xml-20001006#NT-Char&quot;&gt;the
+&nbsp;     * standard&lt;/a&gt;. This method will return an empty
+&nbsp;     * String if the input is null or empty.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * URL: http://cse-mjmcl.cse.bris.ac.uk/blog/2007/02/14/1171465494443.html
+&nbsp;     *
+&nbsp;     * @param in The String whose non-valid characters we want to remove.
+&nbsp;     * @return The in String, stripped of non-valid characters.
+&nbsp;     */
+&nbsp;    public static String stripNonValidXMLCharacters(String in) {
+<b class="nc">&nbsp;        if ((in == null) || in.isEmpty()) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;; // vacancy test.</b>
+&nbsp;        }
+<b class="nc">&nbsp;        StringBuilder out = new StringBuilder(); // Used to hold the output.</b>
+&nbsp;        char current; // Used to reference the current character.
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; in.length(); i++) {</b>
+<b class="nc">&nbsp;            current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.</b>
+<b class="nc">&nbsp;            if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current &gt;= 0x20) &amp;&amp; (current &lt;= 0xD7FF))</b>
+&nbsp;                    || ((current &gt;= 0xE000) &amp;&amp; (current &lt;= 0xFFFD))) {
+<b class="nc">&nbsp;                out.append(current);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return out.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*
+&nbsp;     * @param  buf       String to be tokenized
+&nbsp;     * @param  delimstr  Delimiter string
+&nbsp;     * @return list      {@link java.util.List} of &lt;tt&gt;String&lt;/tt&gt;
+&nbsp;     */
+&nbsp;    public static List&lt;String&gt; tokenizeToList(String buf, String delimstr) {
+<b class="nc">&nbsp;        List&lt;String&gt; list = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        String buffer = buf + &#39;\n&#39;;</b>
+&nbsp;
+<b class="nc">&nbsp;        StringTokenizer st = new StringTokenizer(buffer, delimstr);</b>
+&nbsp;
+<b class="nc">&nbsp;        while (st.hasMoreTokens()) {</b>
+<b class="nc">&nbsp;            list.add(st.nextToken());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return list;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /// Limits the length of a string to a maximum length.
+&nbsp;    ///
+&nbsp;    /// Note the implementation is different from [StringUtils.substring](https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/StringUtils.html#substring%28java.lang.String,%20int,%20int%29), because it accepts parameters smaller than 4.
+&nbsp;    ///
+&nbsp;    /// @param maxLength the maximum length of the string - &lt;= 0 means no limit
+&nbsp;    public static String limitStringLength(String s, int maxLength) {
+<b class="nc">&nbsp;        if (s == null) {</b>
+<b class="nc">&nbsp;            return &quot;&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (maxLength &lt;= 0 || s.length() &lt;= maxLength) {</b>
+<b class="nc">&nbsp;            return s;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return s.substring(0, Math.max(0, maxLength - 3)) + &quot;...&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+&nbsp;     * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
+&nbsp;     */
+&nbsp;    public static String replaceSpecialCharacters(String s) {
+&nbsp;        /* Some unicode characters can be encoded in multiple ways. This uses &lt;a href=&quot;https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/text/Normalizer.Form.html#NFC&quot;&gt;NFC&lt;/a&gt;
+&nbsp;         * to re-encode the characters so that these characters can be found.
+&nbsp;         * Most people expect Unicode to work similar to NFC, i.e., if characters looks the same, it is likely that they are equivalent.
+&nbsp;         * Hence, if someone debugs issues in the `UNICODE_CHAR_MAP`, they will expect NFC.
+&nbsp;         * A more holistic approach should likely start with the &lt;a href=&quot;http://unicode.org/reports/tr15/#Compatibility_Equivalence_Figure&quot;&gt;compatibility equivalence&lt;/a&gt;. */
+<b class="nc">&nbsp;        String result = Normalizer.normalize(s, Normalizer.Form.NFC);</b>
+<b class="nc">&nbsp;        for (Map.Entry&lt;String, String&gt; chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {</b>
+<b class="nc">&nbsp;            result = result.replace(chrAndReplace.getKey(), chrAndReplace.getValue());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return a String with n spaces
+&nbsp;     *
+&nbsp;     * @param n Number of spaces
+&nbsp;     * @return String with n spaces
+&nbsp;     */
+&nbsp;    public static String repeatSpaces(int n) {
+<b class="nc">&nbsp;        return repeat(Math.max(0, n), &#39; &#39;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return a String with n copies of the char c
+&nbsp;     *
+&nbsp;     * @param n Number of copies
+&nbsp;     * @param c char to copy
+&nbsp;     * @return String with n copies of c
+&nbsp;     */
+&nbsp;    public static String repeat(int n, char c) {
+<b class="nc">&nbsp;        StringBuilder resultSB = new StringBuilder(n);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; n; i++) {</b>
+<b class="nc">&nbsp;            resultSB.append(c);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return resultSB.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isNullOrEmpty(String toTest) {
+<b class="fc">&nbsp;        return (toTest == null) || toTest.isEmpty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isBlank(String string) {
+<b class="fc">&nbsp;        return (string == null) || string.isBlank();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isBlank(Optional&lt;String&gt; string) {
+<b class="nc">&nbsp;        return string.isEmpty() || isBlank(string.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if a CharSequence is not empty (&quot;&quot;), not null and not whitespace only.
+&nbsp;     */
+&nbsp;    public static boolean isNotBlank(String string) {
+<b class="fc">&nbsp;        return !isBlank(string);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isNotBlank(Optional&lt;String&gt; string) {
+<b class="nc">&nbsp;        return string.isPresent() &amp;&amp; isNotBlank(string.get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return string enclosed in HTML bold tags
+&nbsp;     */
+&nbsp;    public static String boldHTML(String input) {
+<b class="nc">&nbsp;        return &quot;&lt;b&gt;&quot; + input + &quot;&lt;/b&gt;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return string enclosed in HTML bold tags  if not null, otherwise return alternative text in HTML bold tags
+&nbsp;     */
+&nbsp;    public static String boldHTML(String input, String alternative) {
+<b class="nc">&nbsp;        if (input == null) {</b>
+<b class="nc">&nbsp;            return &quot;&lt;b&gt;&quot; + alternative + &quot;&lt;/b&gt;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return &quot;&lt;b&gt;&quot; + input + &quot;&lt;/b&gt;&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Unquote special characters.
+&nbsp;     *
+&nbsp;     * @param toUnquote The String which may contain quoted special characters.
+&nbsp;     * @param quoteChar The quoting character.
+&nbsp;     * @return A String with all quoted characters unquoted.
+&nbsp;     */
+&nbsp;    public static String unquote(String toUnquote, char quoteChar) {
+<b class="nc">&nbsp;        StringBuilder result = new StringBuilder();</b>
+&nbsp;        char c;
+<b class="nc">&nbsp;        boolean quoted = false;</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; toUnquote.length(); ++i) {</b>
+<b class="nc">&nbsp;            c = toUnquote.charAt(i);</b>
+<b class="nc">&nbsp;            if (quoted) { // append literally...</b>
+<b class="nc">&nbsp;                if (c != &#39;\n&#39;) {</b>
+<b class="nc">&nbsp;                    result.append(c);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                quoted = false;</b>
+<b class="nc">&nbsp;            } else if (c == quoteChar) {</b>
+&nbsp;                // quote char
+<b class="nc">&nbsp;                quoted = true;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                result.append(c);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return result.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @AllowedToUseApacheCommonsLang3(&quot;No Guava equivalent existing - see https://stackoverflow.com/q/3322152/873282 for a list of other implementations&quot;)
+&nbsp;    public static String stripAccents(String searchQuery) {
+<b class="nc">&nbsp;        return StringUtils.stripAccents(searchQuery);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Make first character of String uppercase, and the rest lowercase.
+&nbsp;     */
+&nbsp;    public static String capitalizeFirst(String toCapitalize) {
+<b class="nc">&nbsp;        if (toCapitalize.length() &gt; 1) {</b>
+<b class="nc">&nbsp;            return toCapitalize.substring(0, 1).toUpperCase(Locale.ROOT)</b>
+<b class="nc">&nbsp;                    + toCapitalize.substring(1).toLowerCase(Locale.ROOT);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return toCapitalize.toUpperCase(Locale.ROOT);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a list of words contained in the given text.
+&nbsp;     * Whitespace, comma and semicolon are considered as separator between words.
+&nbsp;     *
+&nbsp;     * @param text the input
+&nbsp;     * @return a list of words
+&nbsp;     */
+&nbsp;    public static List&lt;String&gt; getStringAsWords(String text) {
+<b class="nc">&nbsp;        return Arrays.asList(text.split(&quot;[\\s,;]+&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a list of sentences contained in the given text.
+&nbsp;     */
+&nbsp;    public static List&lt;String&gt; getStringAsSentences(String text) {
+&nbsp;        // A sentence ends with a .?!;, but not in the case of &quot;Mr.&quot;, &quot;Ms.&quot;, &quot;Mrs.&quot;, &quot;Dr.&quot;, &quot;st.&quot;, &quot;jr.&quot;, &quot;co.&quot;, &quot;inc.&quot;, and &quot;ltd.&quot;
+<b class="nc">&nbsp;        Pattern splitTextPattern = Pattern.compile(&quot;(?&lt;=[\\.!;\\?])(?&lt;![Mm](([Rr]|[Rr][Ss])|[Ss])\\.|[Dd][Rr]\\.|[Ss][Tt]\\.|[Jj][Rr]\\.|[Cc][Oo]\\.|[Ii][Nn][Cc]\\.|[Ll][Tt][Dd]\\.)\\s+&quot;);</b>
+<b class="nc">&nbsp;        return Arrays.asList(splitTextPattern.split(text));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @AllowedToUseApacheCommonsLang3(&quot;No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282&quot;)
+&nbsp;    public static boolean containsIgnoreCase(String text, String searchString) {
+<b class="nc">&nbsp;        return StringUtils.containsIgnoreCase(text, searchString);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean equalsUnifiedLineBreak(Optional&lt;String&gt; stringOne, Optional&lt;String&gt; stringTwo) {
+<b class="nc">&nbsp;        if (stringOne.isEmpty() &amp;&amp; stringTwo.isEmpty()) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (stringOne.isEmpty() || stringTwo.isEmpty()) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return StringUtil.unifyLineBreaks(stringOne.get(), OS.NEWLINE).equals(</b>
+<b class="nc">&nbsp;                StringUtil.unifyLineBreaks(stringTwo.get(), OS.NEWLINE));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String substringBetween(String str, String open, String close) {
+<b class="nc">&nbsp;        return StringUtils.substringBetween(str, open, close);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String ignoreCurlyBracket(String title) {
+<b class="nc">&nbsp;        return isNotBlank(title) ? title.replace(&quot;{&quot;, &quot;&quot;).replace(&quot;}&quot;, &quot;&quot;) : title;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Encloses the given string with &quot; if there is a space contained
+&nbsp;     *
+&nbsp;     * @return Returns a string
+&nbsp;     */
+&nbsp;    public static String quoteStringIfSpaceIsContained(String string) {
+<b class="nc">&nbsp;        if (string.contains(&quot; &quot;)) {</b>
+<b class="nc">&nbsp;            return &quot;\&quot;&quot; + string + &quot;\&quot;&quot;;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return string;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Checks if the given string contains any whitespace characters. The supported whitespace characters
+&nbsp;     * are the set of characters matched by {@code \s} in regular expressions, which are {@code [ \t\n\x0B\f\r]}.
+&nbsp;     *
+&nbsp;     * @param s The string to check
+&nbsp;     * @return {@code True} if the given string does contain at least one whitespace character, {@code False} otherwise
+&nbsp;     */
+&nbsp;    public static boolean containsWhitespace(String s) {
+<b class="nc">&nbsp;        return s.chars().anyMatch(Character::isWhitespace);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @AllowedToUseApacheCommonsLang3(&quot;No Guava equivalent existing - see https://stackoverflow.com/a/23825984&quot;)
+&nbsp;    public static String removeStringAtTheEnd(String string, String stringToBeRemoved) {
+<b class="nc">&nbsp;        return StringUtils.removeEndIgnoreCase(string, stringToBeRemoved);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @AllowedToUseApacheCommonsLang3(&quot;No Guava equivalent existing&quot;)
+&nbsp;    public static boolean endsWithIgnoreCase(String string, String suffix) {
+<b class="nc">&nbsp;        return StringUtils.endsWithIgnoreCase(string, suffix);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String alignStringTable(List&lt;Pair&lt;String, String&gt;&gt; table) {
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+&nbsp;
+<b class="nc">&nbsp;        int maxLength = table.stream()</b>
+<b class="nc">&nbsp;                             .mapToInt(pair -&gt; Objects.requireNonNullElse(pair.getKey(), &quot;&quot;).length())</b>
+<b class="nc">&nbsp;                             .max().orElse(0);</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Pair&lt;String, String&gt; pair : table) {</b>
+<b class="nc">&nbsp;            int padding = Math.max(0, maxLength - pair.getKey().length());</b>
+<b class="nc">&nbsp;            sb.append(WRAPPED_LINE_PREFIX);</b>
+<b class="nc">&nbsp;            sb.append(pair.getKey());</b>
+&nbsp;
+<b class="nc">&nbsp;            sb.append(StringUtil.repeatSpaces(padding));</b>
+&nbsp;
+<b class="nc">&nbsp;            sb.append(STRING_TABLE_DELIMITER);</b>
+<b class="nc">&nbsp;            sb.append(pair.getValue());</b>
+<b class="nc">&nbsp;            sb.append(OS.NEWLINE);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>

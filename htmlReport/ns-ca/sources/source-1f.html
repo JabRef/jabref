@@ -1,0 +1,373 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebFetchers</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.jabref.logic.importer</a>
+</div>
+
+<h1>Coverage Summary for Class: WebFetchers (org.jabref.logic.importer)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebFetchers</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/95)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.jabref.logic.importer;
+&nbsp;
+&nbsp;import java.util.Comparator;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.SortedSet;
+&nbsp;import java.util.TreeSet;
+&nbsp;
+&nbsp;import org.jabref.logic.FilePreferences;
+&nbsp;import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.ACS;
+&nbsp;import org.jabref.logic.importer.fetcher.ApsFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.ArXivFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+&nbsp;import org.jabref.logic.importer.fetcher.BiodiversityLibrary;
+&nbsp;import org.jabref.logic.importer.fetcher.BvbFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.CiteSeer;
+&nbsp;import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.CrossRef;
+&nbsp;import org.jabref.logic.importer.fetcher.CustomizableKeyFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.DBLPFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.DOABFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.DOAJFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.DiVA;
+&nbsp;import org.jabref.logic.importer.fetcher.DoiFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.DoiResolution;
+&nbsp;import org.jabref.logic.importer.fetcher.EuropePmcFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.GvkFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.IEEE;
+&nbsp;import org.jabref.logic.importer.fetcher.INSPIREFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.ISIDOREFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.IssnFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.LOBIDFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.LibraryOfCongress;
+&nbsp;import org.jabref.logic.importer.fetcher.MathSciNet;
+&nbsp;import org.jabref.logic.importer.fetcher.MedlineFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.Medra;
+&nbsp;import org.jabref.logic.importer.fetcher.OpenAccessDoi;
+&nbsp;import org.jabref.logic.importer.fetcher.ResearchGate;
+&nbsp;import org.jabref.logic.importer.fetcher.RfcFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.ScholarArchiveFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.ScienceDirect;
+&nbsp;import org.jabref.logic.importer.fetcher.SemanticScholar;
+&nbsp;import org.jabref.logic.importer.fetcher.SpringerNatureFullTextFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.SpringerNatureWebFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.TitleFetcher;
+&nbsp;import org.jabref.logic.importer.fetcher.ZbMATH;
+&nbsp;import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
+&nbsp;import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+&nbsp;import org.jabref.model.database.BibDatabaseContext;
+&nbsp;import org.jabref.model.entry.field.Field;
+&nbsp;import org.jabref.model.entry.field.StandardField;
+&nbsp;import org.jabref.model.entry.identifier.DOI;
+&nbsp;import org.jabref.model.entry.identifier.Identifier;
+&nbsp;
+&nbsp;import static org.jabref.model.entry.field.StandardField.DOI;
+&nbsp;import static org.jabref.model.entry.field.StandardField.EPRINT;
+&nbsp;import static org.jabref.model.entry.field.StandardField.ISBN;
+&nbsp;import static org.jabref.model.entry.field.StandardField.ISSN;
+&nbsp;
+&nbsp;public class WebFetchers {
+&nbsp;
+&nbsp;    private WebFetchers() {
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;IdBasedFetcher&gt; getIdBasedFetcherForField(Field field, ImportFormatPreferences importFormatPreferences) {
+&nbsp;        IdBasedFetcher fetcher;
+&nbsp;
+<b class="nc">&nbsp;        switch (field) {</b>
+&nbsp;            case DOI -&gt;
+<b class="nc">&nbsp;                    fetcher = new DoiFetcher(importFormatPreferences);</b>
+&nbsp;            case ISBN -&gt;
+<b class="nc">&nbsp;                    fetcher = new IsbnFetcher(importFormatPreferences);</b>
+&nbsp;            case EPRINT -&gt;
+<b class="nc">&nbsp;                    fetcher = new ArXivFetcher(importFormatPreferences);</b>
+&nbsp;            case ISSN -&gt;
+<b class="nc">&nbsp;                    fetcher = new IssnFetcher();</b>
+&nbsp;            case null,
+&nbsp;                 default -&gt; {
+<b class="nc">&nbsp;                return Optional.empty();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.of(fetcher);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    public static &lt;T extends Identifier&gt; IdFetcher&lt;T&gt; getIdFetcherForIdentifier(Class&lt;T&gt; clazz) {
+<b class="nc">&nbsp;        if (clazz == DOI.class) {</b>
+<b class="nc">&nbsp;            return (IdFetcher&lt;T&gt;) new CrossRef();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;No fetcher found for identifier&quot; + clazz.getCanonicalName());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Optional&lt;IdFetcher&lt;? extends Identifier&gt;&gt; getIdFetcherForField(Field field) {
+<b class="nc">&nbsp;        if (field == StandardField.DOI) {</b>
+<b class="nc">&nbsp;            return Optional.of(new CrossRef());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return Optional.empty();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return sorted set containing search based fetchers
+&nbsp;     */
+&nbsp;    public static SortedSet&lt;SearchBasedFetcher&gt; getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+<b class="nc">&nbsp;        SortedSet&lt;SearchBasedFetcher&gt; set = new TreeSet&lt;&gt;(new CompositeSearchFirstComparator());</b>
+<b class="nc">&nbsp;        set.add(new ArXivFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new ISIDOREFetcher());</b>
+<b class="nc">&nbsp;        set.add(new INSPIREFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new GvkFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new BvbFetcher());</b>
+<b class="nc">&nbsp;        set.add(new MedlineFetcher(importerPreferences));</b>
+<b class="nc">&nbsp;        set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));</b>
+<b class="nc">&nbsp;        set.add(new MathSciNet(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new ZbMATH(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new ACMPortalFetcher());</b>
+&nbsp;        // set.add(new GoogleScholar(importFormatPreferences));
+<b class="nc">&nbsp;        set.add(new DBLPFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new SpringerNatureWebFetcher(importerPreferences));</b>
+<b class="nc">&nbsp;        set.add(new CrossRef());</b>
+<b class="nc">&nbsp;        set.add(new CiteSeer());</b>
+<b class="nc">&nbsp;        set.add(new DOAJFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new IEEE(importFormatPreferences, importerPreferences));</b>
+<b class="nc">&nbsp;        set.add(new CompositeSearchBasedFetcher(set, importerPreferences, 30));</b>
+&nbsp;        // set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
+<b class="nc">&nbsp;        set.add(new DOABFetcher());</b>
+&nbsp;        // set.add(new JstorFetcher(importFormatPreferences));
+<b class="nc">&nbsp;        set.add(new SemanticScholar(importerPreferences));</b>
+<b class="nc">&nbsp;        set.add(new ResearchGate(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new BiodiversityLibrary(importerPreferences));</b>
+<b class="nc">&nbsp;        set.add(new LOBIDFetcher());</b>
+<b class="nc">&nbsp;        set.add(new ScholarArchiveFetcher());</b>
+<b class="nc">&nbsp;        return set;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return sorted set containing id based fetchers
+&nbsp;     */
+&nbsp;    public static SortedSet&lt;IdBasedFetcher&gt; getIdBasedFetchers(ImportFormatPreferences importFormatPreferences,
+&nbsp;                                                               ImporterPreferences importerPreferences) {
+<b class="nc">&nbsp;        SortedSet&lt;IdBasedFetcher&gt; set = new TreeSet&lt;&gt;(Comparator.comparing(WebFetcher::getName));</b>
+<b class="nc">&nbsp;        set.add(new ArXivFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));</b>
+<b class="nc">&nbsp;        set.add(new IsbnFetcher(importFormatPreferences));</b>
+&nbsp;        // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
+&nbsp;        // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
+<b class="nc">&nbsp;        set.add(new DiVA(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new DoiFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new EuropePmcFetcher());</b>
+<b class="nc">&nbsp;        set.add(new MedlineFetcher(importerPreferences));</b>
+<b class="nc">&nbsp;        set.add(new TitleFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new MathSciNet(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new ZbMATH(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new CrossRef());</b>
+<b class="nc">&nbsp;        set.add(new LibraryOfCongress(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new LOBIDFetcher());</b>
+<b class="nc">&nbsp;        set.add(new IacrEprintFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new RfcFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new Medra());</b>
+&nbsp;        // set.add(new JstorFetcher(importFormatPreferences));
+<b class="nc">&nbsp;        return set;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static SortedSet&lt;EntryBasedFetcher&gt; getEntryBasedFetchers(ImporterPreferences importerPreferences,
+&nbsp;                                                                     ImportFormatPreferences importFormatPreferences,
+&nbsp;                                                                     FilePreferences filePreferences,
+&nbsp;                                                                     BibDatabaseContext databaseContext) {
+<b class="nc">&nbsp;        SortedSet&lt;EntryBasedFetcher&gt; set = new TreeSet&lt;&gt;(Comparator.comparing(WebFetcher::getName));</b>
+<b class="nc">&nbsp;        set.add(new INSPIREFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));</b>
+<b class="nc">&nbsp;        set.add(new DoiFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new IsbnFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new IssnFetcher());</b>
+&nbsp;        // .addRetryFetcher(new EbookDeIsbnFetcher(importFormatPreferences)));
+&nbsp;        // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
+<b class="nc">&nbsp;        set.add(new MathSciNet(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new CrossRef());</b>
+<b class="nc">&nbsp;        set.add(new ZbMATH(importFormatPreferences));</b>
+<b class="nc">&nbsp;        set.add(new SemanticScholar(importerPreferences));</b>
+<b class="nc">&nbsp;        set.add(new ResearchGate(importFormatPreferences));</b>
+&nbsp;
+&nbsp;        // Uses the PDFs - and then uses the parsed DOI. Makes it 10% a web fetcher.
+&nbsp;        // We list it here, because otherwise, it would be much more effort (other UI button, ...)
+<b class="nc">&nbsp;        set.add(new PdfMergeMetadataImporter.EntryBasedFetcherWrapper(importFormatPreferences, filePreferences, databaseContext));</b>
+&nbsp;
+<b class="nc">&nbsp;        return set;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return sorted set containing id fetchers
+&nbsp;     */
+&nbsp;    public static SortedSet&lt;IdFetcher&lt;? extends Identifier&gt;&gt; getIdFetchers(ImportFormatPreferences importFormatPreferences) {
+<b class="nc">&nbsp;        SortedSet&lt;IdFetcher&lt;?&gt;&gt; set = new TreeSet&lt;&gt;(Comparator.comparing(WebFetcher::getName));</b>
+<b class="nc">&nbsp;        set.add(new CrossRef());</b>
+<b class="nc">&nbsp;        set.add(new ArXivFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        return set;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return set containing fulltext fetchers
+&nbsp;     */
+&nbsp;    public static Set&lt;FulltextFetcher&gt; getFullTextFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+<b class="nc">&nbsp;        Set&lt;FulltextFetcher&gt; fetchers = new HashSet&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Original
+<b class="nc">&nbsp;        fetchers.add(new DoiResolution(importFormatPreferences.doiPreferences()));</b>
+&nbsp;
+&nbsp;        // Publishers
+<b class="nc">&nbsp;        fetchers.add(new ScienceDirect(importerPreferences));</b>
+<b class="nc">&nbsp;        fetchers.add(new SpringerNatureFullTextFetcher(importerPreferences));</b>
+<b class="nc">&nbsp;        fetchers.add(new ACS());</b>
+<b class="nc">&nbsp;        fetchers.add(new ArXivFetcher(importFormatPreferences));</b>
+<b class="nc">&nbsp;        fetchers.add(new IEEE(importFormatPreferences, importerPreferences));</b>
+<b class="nc">&nbsp;        fetchers.add(new ApsFetcher());</b>
+<b class="nc">&nbsp;        fetchers.add(new IacrEprintFetcher(importFormatPreferences));</b>
+&nbsp;
+&nbsp;        // Meta search
+&nbsp;        // fetchers.add(new JstorFetcher(importFormatPreferences));
+&nbsp;        // fetchers.add(new GoogleScholar(importFormatPreferences));
+<b class="nc">&nbsp;        fetchers.add(new CiteSeer());</b>
+<b class="nc">&nbsp;        fetchers.add(new OpenAccessDoi());</b>
+<b class="nc">&nbsp;        fetchers.add(new SemanticScholar(importerPreferences));</b>
+<b class="nc">&nbsp;        fetchers.add(new ResearchGate(importFormatPreferences));</b>
+<b class="nc">&nbsp;        return fetchers;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return set containing customizable api key fetchers
+&nbsp;     */
+&nbsp;    public static Set&lt;CustomizableKeyFetcher&gt; getCustomizableKeyFetchers(ImportFormatPreferences importFormatPreferences, ImporterPreferences importerPreferences) {
+<b class="nc">&nbsp;        Set&lt;CustomizableKeyFetcher&gt; fetchers = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        fetchers.add(new IEEE(importFormatPreferences, importerPreferences));</b>
+<b class="nc">&nbsp;        fetchers.add(new SpringerNatureWebFetcher(importerPreferences));</b>
+<b class="nc">&nbsp;        fetchers.add(new ScienceDirect(importerPreferences));</b>
+<b class="nc">&nbsp;        fetchers.add(new AstrophysicsDataSystem(importFormatPreferences, importerPreferences));</b>
+<b class="nc">&nbsp;        fetchers.add(new BiodiversityLibrary(importerPreferences));</b>
+<b class="nc">&nbsp;        fetchers.add(new MedlineFetcher(importerPreferences));</b>
+<b class="nc">&nbsp;        return fetchers;</b>
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Places &quot;Search pre-configured&quot; to the first of the set
+&nbsp; */
+&nbsp;class CompositeSearchFirstComparator implements Comparator&lt;SearchBasedFetcher&gt; {
+&nbsp;    @Override
+&nbsp;    public int compare(SearchBasedFetcher s1, SearchBasedFetcher s2) {
+&nbsp;        if (Objects.equals(s1.getName(), CompositeSearchBasedFetcher.FETCHER_NAME)) {
+&nbsp;            return -1;
+&nbsp;        } else {
+&nbsp;            return s1.getName().compareTo(s2.getName());
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-09-29 22:51</div>
+</div>
+</body>
+</html>
