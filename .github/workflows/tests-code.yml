@@ -463,6 +463,9 @@ jobs:
       - run: jbang build --fresh .jbang/JabKitLauncher.java
       - run: jbang build --fresh .jbang/JabLsLauncher.java
       - run: jbang build --fresh .jbang/JabSrvLauncher.java
+      - run: jbang run .jbang/JabKitLauncher.java --help
+      - run: jbang run .jbang/JabLsLauncher.java --help
+      - run: jbang run .jbang/JabSrvLauncher.java --help
 
   jbang-pr:
     name: JBang (PR)
@@ -499,7 +502,6 @@ jobs:
             jbang-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
-
       - name: Detect changed jablib classes
         id: changed-jablib-files
         uses: tj-actions/changed-files@v47
@@ -508,7 +510,6 @@ jobs:
             jablib/src/main/java/**/*.java
           files_ignore: |
             jablib/src/main/java/**/*-*.java
-
       - name: Build ${{ matrix.launcher }} launcher including changed classes
         shell: bash
         # We always run, because changes in jabls, jabsrv also could cause JBang to fail
@@ -518,6 +519,8 @@ jobs:
             echo "//SOURCES ../$f" >> ".jbang/${{ matrix.launcher }}.java"
           done
           jbang build --fresh ".jbang/${{ matrix.launcher }}.java"
+      - run: jbang ".jbang/${{ matrix.launcher }}.java" --help
+        shell: bash
 
   codecoverage:
     if: false

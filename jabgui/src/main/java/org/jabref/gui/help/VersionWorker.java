@@ -2,7 +2,6 @@ package org.jabref.gui.help;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -15,6 +14,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.Version;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,13 +40,13 @@ public class VersionWorker {
     private final InternalPreferences internalPreferences;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
-    public VersionWorker(Version installedVersion,
-                         DialogService dialogService,
-                         TaskExecutor taskExecutor,
-                         GuiPreferences preferences) {
-        this.installedVersion = Objects.requireNonNull(installedVersion);
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.taskExecutor = Objects.requireNonNull(taskExecutor);
+    public VersionWorker(@NonNull Version installedVersion,
+                         @NonNull DialogService dialogService,
+                         @NonNull TaskExecutor taskExecutor,
+                         @NonNull GuiPreferences preferences) {
+        this.installedVersion = installedVersion;
+        this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
         this.internalPreferences = preferences.getInternalPreferences();
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
     }

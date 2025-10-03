@@ -16,6 +16,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import org.jspecify.annotations.NonNull;
+
 public abstract class Exporter {
 
     private final String id;
@@ -61,9 +63,9 @@ public abstract class Exporter {
      * @param file            the file to write to
      * @param entries         a list containing all entries that should be exported
      */
-    public abstract void export(BibDatabaseContext databaseContext,
+    public abstract void export(@NonNull BibDatabaseContext databaseContext,
                                 Path file,
-                                List<BibEntry> entries)
+                                @NonNull List<BibEntry> entries)
             throws IOException, TransformerException, ParserConfigurationException, SaveException;
 
     public void export(BibDatabaseContext databaseContext,

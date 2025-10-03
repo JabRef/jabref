@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.cleanup.DoiCleanup;
@@ -24,6 +23,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Fetches BibTeX data from DBLP (dblp.org)
@@ -37,8 +37,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     private final ImportFormatPreferences importFormatPreferences;
 
-    public DBLPFetcher(ImportFormatPreferences importFormatPreferences) {
-        Objects.requireNonNull(importFormatPreferences);
+    public DBLPFetcher(@NonNull ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }
 
