@@ -1,7 +1,8 @@
 package org.jabref.model.texparser;
 
 import java.nio.file.Path;
-import java.util.Objects;
+
+import org.jspecify.annotations.NonNull;
 
 public record Citation(Path path, int line, int colStart, int colEnd, String lineText) {
     /**
@@ -9,7 +10,7 @@ public record Citation(Path path, int line, int colStart, int colEnd, String lin
      */
     private static final int CONTEXT_WIDTH = 300;
 
-    public Citation(Path path, int line, int colStart, int colEnd, String lineText) {
+    public Citation(@NonNull Path path, int line, int colStart, int colEnd, String lineText) {
         if (line <= 0) {
             throw new IllegalArgumentException("Line has to be greater than 0.");
         }
@@ -18,7 +19,7 @@ public record Citation(Path path, int line, int colStart, int colEnd, String lin
             throw new IllegalArgumentException("Citation has to be between 0 and line length.");
         }
 
-        this.path = Objects.requireNonNull(path);
+        this.path = path;
         this.line = line;
         this.colStart = colStart;
         this.colEnd = colEnd;

@@ -34,10 +34,10 @@
 //DEPS org.jspecify:jspecify:1.0.0
 
 // from jabls
+//DEPS com.fasterxml.jackson.core:jackson-databind:2.20.0
 //DEPS com.github.eclipse:lsp4j:0.24.0
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.2
-//DEPS org.hisp.dhis:json-tree:1.8.1
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS org.slf4j:jul-to-slf4j:2.0.17
 //DEPS org.slf4j:slf4j-api:2.0.17

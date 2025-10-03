@@ -28,6 +28,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.search.query.BaseQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Fetches data from the INSPIRE database.
@@ -85,7 +86,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher, EntryBasedFetch
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         Optional<String> doi = entry.getField(StandardField.DOI);
         Optional<String> archiveprefix = entry.getFieldOrAlias(StandardField.ARCHIVEPREFIX);
         Optional<String> eprint = entry.getField(StandardField.EPRINT);

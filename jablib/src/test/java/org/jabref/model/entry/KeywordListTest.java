@@ -85,7 +85,7 @@ class KeywordListTest {
     void parseHierarchicalChain() {
         Keyword expected = Keyword.of(List.of("Parent", "Node", "Child"));
 
-        assertEquals(new KeywordList(expected), KeywordList.parse("Parent > Node > Child", ',', '>'));
+        assertEquals(new KeywordList(expected), KeywordList.parse("Parent > Node > Child", ','));
     }
 
     @Test
@@ -94,7 +94,7 @@ class KeywordListTest {
         Keyword expectedTwo = Keyword.of(List.of("Parent2", "Node2", "Child2"));
 
         assertEquals(new KeywordList(expectedOne, expectedTwo),
-                KeywordList.parse("Parent1 > Node1 > Child1, Parent2 > Node2 > Child2", ',', '>'));
+                KeywordList.parse("Parent1 > Node1 > Child1, Parent2 > Node2 > Child2", ','));
     }
 
     @Test

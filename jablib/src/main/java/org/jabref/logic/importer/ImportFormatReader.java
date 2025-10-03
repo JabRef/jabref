@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -37,6 +36,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
+
+import org.jspecify.annotations.NonNull;
 
 public class ImportFormatReader {
 
@@ -145,9 +146,8 @@ public class ImportFormatReader {
     /// This method first attempts to read this file as bibtex.
     ///
     /// @throws ImportException if the import fails (for example, if no suitable importer is found)
-    public UnknownFormatImport importUnknownFormat(Path filePath, FileUpdateMonitor fileMonitor) throws ImportException {
-        Objects.requireNonNull(filePath);
-
+    public UnknownFormatImport importUnknownFormat(@NonNull Path filePath,
+                                                   FileUpdateMonitor fileMonitor) throws ImportException {
         try {
             UnknownFormatImport unknownFormatImport = importUnknownFormat(importer -> importer.importDatabase(filePath), importer -> importer.isRecognizedFormat(filePath));
             unknownFormatImport.parserResult.setPath(filePath);
@@ -231,9 +231,7 @@ public class ImportFormatReader {
      * @return an UnknownFormatImport with the imported entries and metadata
      * @throws ImportException if the import fails (for example, if no suitable importer is found)
      */
-    public UnknownFormatImport importUnknownFormat(String data) throws ImportException {
-        Objects.requireNonNull(data);
-
+    public UnknownFormatImport importUnknownFormat(@NonNull String data) throws ImportException {
         return importUnknownFormat(importer -> importer.importDatabase(data), importer -> importer.isRecognizedFormat(data));
     }
 }

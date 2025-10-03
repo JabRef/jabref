@@ -3,6 +3,8 @@ package org.jabref.gui.theme;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Represents one of three types of a css based Theme for JabRef:
  * <p>
@@ -22,9 +24,7 @@ public class Theme {
     private final String name;
     private final Optional<StyleSheet> additionalStylesheet;
 
-    public Theme(String name) {
-        Objects.requireNonNull(name);
-
+    public Theme(@NonNull String name) {
         if (name.isEmpty() || BASE_CSS.equalsIgnoreCase(name)) {
             this.additionalStylesheet = Optional.empty();
             this.type = Type.DEFAULT;

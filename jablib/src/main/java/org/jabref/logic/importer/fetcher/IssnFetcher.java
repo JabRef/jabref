@@ -10,6 +10,8 @@ import org.jabref.logic.journals.JournalInformation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Fetcher to generate the BibTex entry from an ISSN.
  * As an ISSN ist just a journal identifier, so we only return journal title and publisher
@@ -25,7 +27,7 @@ public class IssnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         Optional<String> issn = entry.getField(StandardField.ISSN);
         if (issn.isPresent()) {
             Optional<JournalInformation> journalInformation = journalInformationFetcher.getJournalInformation(issn.get(), "");

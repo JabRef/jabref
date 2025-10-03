@@ -2,7 +2,6 @@ package org.jabref.gui.push;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
@@ -78,7 +77,7 @@ public class GuiPushToApplicationCommand extends SimpleCommand {
                                                                 .orElseGet(() -> new GuiPushToEmacs(dialogService, preferences.getPushToApplicationPreferences()));
 
         preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
-        this.application = Objects.requireNonNull(application);
+        this.application = application;
 
         reconfigurableControls.forEach(object -> {
             if (object instanceof MenuItem item) {
