@@ -13,6 +13,7 @@ import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -20,6 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
 import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
@@ -36,75 +38,62 @@ import static org.mockito.Mockito.when;
 @ExtendWith(ApplicationExtension.class)
 class ContextMenuFactoryTest {
 
-    @Test
-    void createMenuForSelectionThrowsNPEWhenSelectionIsNull() {
-        DialogService dialogService = mock(DialogService.class);
+    private FilePreferences filePreferences;
+    private BibDatabaseContext bibDatabaseContext;
+    private ContextMenuFactory factory;
+
+    @BeforeEach
+    @SuppressWarnings("unchecked")
+    public void setUp() {
         GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
-        ObservableOptionalValue<BibEntry> bibEntryOptional = mockEmptyBibEntryOptional();
+        ObservableOptionalValue<BibEntry> bibEntry = (ObservableOptionalValue<BibEntry>) mock(ObservableOptionalValue.class);
+        when(bibEntry.getValue()).thenReturn(Optional.of(new BibEntry()));
 
-        ContextMenuFactory contextMenuFactory = new ContextMenuFactory(
-                dialogService, guiPreferences, bibDatabaseContext, bibEntryOptional, mockEditorViewModel()
+        bibDatabaseContext = mock(BibDatabaseContext.class);
+        filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
+
+        when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
+
+        factory = new ContextMenuFactory(
+                mock(DialogService.class),
+                guiPreferences,
+                bibDatabaseContext,
+                bibEntry,
+                mock(LinkedFilesEditorViewModel.class)
         );
+    }
 
-        assertThrows(NullPointerException.class, () -> contextMenuFactory.createMenuForSelection(null),
+    @Test
+    void createMenuForSelectionNull() {
+        assertThrows(NullPointerException.class, () -> factory.createMenuForSelection(null),
                 "Factory should reject null selection");
     }
 
     @Test
-    void createMenuForSelectionReturnsEmptyMenuWhenSelectionIsEmpty() {
-        DialogService dialogService = mock(DialogService.class);
-        GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
-        ObservableOptionalValue<BibEntry> bibEntryOptional = mockEmptyBibEntryOptional();
-
-        ContextMenuFactory contextMenuFactory = new ContextMenuFactory(
-                dialogService, guiPreferences, bibDatabaseContext, bibEntryOptional, mockEditorViewModel()
-        );
-
+    void createMenuForSelectionEmpty() {
         ObservableList<LinkedFileViewModel> emptySelection = FXCollections.observableArrayList();
-        ContextMenu contextMenu = contextMenuFactory.createMenuForSelection(emptySelection);
+        ContextMenu contextMenu = factory.createMenuForSelection(emptySelection);
 
         assertNotNull(contextMenu);
         assertTrue(contextMenu.getItems().isEmpty(), "Menu should be empty for empty selection");
     }
 
     @Test
-    void createMenuForSelectionReturnsNonEmptyMenuForSingleSelectionOfflineExistingFile() {
-        DialogService dialogService = mock(DialogService.class);
-        GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
-
-        BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
-        ObservableOptionalValue<BibEntry> bibEntryOptional = mockEmptyBibEntryOptional();
-
+    void createMenuForSingleOfflineFile() {
         LinkedFileViewModel offlineExistingFileViewModel = mockOfflineExistingFileViewModel(
                 bibDatabaseContext, filePreferences, ""
         );
 
         ObservableList<LinkedFileViewModel> singleSelection = FXCollections.observableArrayList(offlineExistingFileViewModel);
 
-        ContextMenuFactory contextMenuFactory = new ContextMenuFactory(
-                dialogService, guiPreferences, bibDatabaseContext, bibEntryOptional, mockEditorViewModel()
-        );
-
-        ContextMenu contextMenu = contextMenuFactory.createMenuForSelection(singleSelection);
+        ContextMenu contextMenu = factory.createMenuForSelection(singleSelection);
 
         assertNotNull(contextMenu);
         assertFalse(contextMenu.getItems().isEmpty(), "Single-selection menu should not be empty");
     }
 
     @Test
-    void createMenuForSelectionReturnsNonEmptyMenuAndContainsExpectedItemsForMultiSelectionMixed() {
-        DialogService dialogService = mock(DialogService.class);
-        GuiPreferences guiPreferences = mock(GuiPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        FilePreferences filePreferences = mock(FilePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
-
-        BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
-        ObservableOptionalValue<BibEntry> bibEntryOptional = mockEmptyBibEntryOptional();
-
+    void createMenuForOfflineAndOnlineFilesMixed() {
         LinkedFileViewModel offlineExistingFileViewModel = mockOfflineExistingFileViewModel(
                 bibDatabaseContext, filePreferences, "https://example.com/file.pdf"
         );
@@ -114,14 +103,11 @@ class ContextMenuFactoryTest {
                 List.of(offlineExistingFileViewModel, onlineFileViewModel)
         );
 
-        ContextMenuFactory contextMenuFactory = new ContextMenuFactory(
-                dialogService, guiPreferences, bibDatabaseContext, bibEntryOptional, mockEditorViewModel()
-        );
-
-        ContextMenu contextMenu = contextMenuFactory.createMenuForSelection(multiSelection);
+        ContextMenu contextMenu = factory.createMenuForSelection(multiSelection);
 
         assertNotNull(contextMenu);
-        assertFalse(contextMenu.getItems().isEmpty(), "Multi-selection menu should not be empty");
+        assertFalse(contextMenu.getItems().isEmpty(),
+                "Multi-selection menu should not be empty");
         assertTrue(containsMenuItemWithText(contextMenu, "Remove link"),
                 "Menu should contain 'Remove link' in multi-selection");
         assertTrue(containsMenuItemWithText(contextMenu, "Copy linked file"),
@@ -133,19 +119,6 @@ class ContextMenuFactoryTest {
                           .map(MenuItem::getText)
                           .filter(Objects::nonNull)
                           .anyMatch(text -> text.contains(expectedFragment));
-    }
-
-    private static org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel mockEditorViewModel() {
-        return mock(org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel.class);
-    }
-
-    private static ObservableOptionalValue<BibEntry> mockEmptyBibEntryOptional() {
-        @SuppressWarnings("unchecked")
-        ObservableOptionalValue<BibEntry> optional =
-                (ObservableOptionalValue<BibEntry>) mock(ObservableOptionalValue.class);
-
-        when(optional.getValue()).thenReturn(Optional.empty());
-        return optional;
     }
 
     private static LinkedFileViewModel mockOfflineExistingFileViewModel(BibDatabaseContext bibDatabaseContext,
