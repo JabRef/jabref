@@ -55,18 +55,18 @@ class OpenAlexFetcherTest {
     void parserParsesResultsArray() throws Exception {
         Parser parser = fetcher.getParser();
         String json = "{" +
-                      "\"results\":[{" +
-                      "\"type\":\"article\"," +
-                      "\"title\":\"Sample Title\"," +
-                      "\"publication_year\":2020," +
-                      "\"doi\":\"https://doi.org/10.1234/ABC.5678\"," +
-                      "\"id\":\"https://openalex.org/W12345\"," +
-                      "\"authorships\":[{" +
-                      "\"author\":{\"display_name\":\"Alice\"}}," +
-                      "{\"author\":{\"display_name\":\"Bob\"}}]," +
-                      "\"biblio\":{\"volume\":\"12\",\"issue\":\"3\",\"first_page\":\"45\",\"last_page\":\"67\"}," +
-                      "\"concepts\":[{\"display_name\":\"Machine Learning\"},{\"display_name\":\"AI\"}]" +
-                      "}]}";
+                "\"results\":[{" +
+                "\"type\":\"article\"," +
+                "\"title\":\"Sample Title\"," +
+                "\"publication_year\":2020," +
+                "\"doi\":\"https://doi.org/10.1234/ABC.5678\"," +
+                "\"id\":\"https://openalex.org/W12345\"," +
+                "\"authorships\":[{" +
+                "\"author\":{\"display_name\":\"Alice\"}}," +
+                "{\"author\":{\"display_name\":\"Bob\"}}]," +
+                "\"biblio\":{\"volume\":\"12\",\"issue\":\"3\",\"first_page\":\"45\",\"last_page\":\"67\"}," +
+                "\"concepts\":[{\"display_name\":\"Machine Learning\"},{\"display_name\":\"AI\"}]" +
+                "}]}";
         InputStream is = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
         List<BibEntry> entries = parser.parseEntries(is);
         assertEquals(1, entries.size());
