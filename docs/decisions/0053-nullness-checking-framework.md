@@ -29,7 +29,7 @@ Chosen option: "Error Prone + NullAway" because it comes out best (see below).
 
 ## Consequences
 
-* We will annotate public APIs (interfaces, service endpoints, widely used modules) using JSpecify @Nullable / @NonNull (or @NullMarked scoping) progressively.
+* We will annotate public APIs (interfaces, service endpoints, widely used modules) using JSpecify `@Nullable` / `@NonNull` (or `@NullMarked` scoping) progressively.
 * We enable NullAway in CI builds; thus violations break the build.
 * NullAway may not check some corner cases (especially around generics); therefore, manual reviews need to keep that in mind.
 * Developers must be trained on JSpecify and on how NullAway behaves.
@@ -41,7 +41,7 @@ Chosen option: "Error Prone + NullAway" because it comes out best (see below).
 
 Good, because it supports advanced nullness contracts, refinement, and pluggability.
 Bad, because compile times increase significantly.
-Bad, because it lacks support for JSpecify’s @NullMarked / @NullUnmarked scopes.
+Bad, because it lacks support for JSpecify’s `@NullMarked` / `@NullUnmarked` scopes.
 
 ## Error Prone + NullAway
 
