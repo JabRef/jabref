@@ -3,7 +3,6 @@ package org.jabref.logic.exporter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -15,12 +14,14 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
 
+import org.jspecify.annotations.NonNull;
+
 public class ExporterFactory {
 
     private final List<Exporter> exporters;
 
-    private ExporterFactory(List<Exporter> exporters) {
-        this.exporters = Objects.requireNonNull(exporters);
+    private ExporterFactory(@NonNull List<Exporter> exporters) {
+        this.exporters = exporters;
     }
 
     public static ExporterFactory create(CliPreferences preferences) {

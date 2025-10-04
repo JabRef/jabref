@@ -2,7 +2,6 @@ package org.jabref.gui.cleanup;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
-import java.util.Objects;
 import java.util.Optional;
 
 import javafx.collections.FXCollections;
@@ -21,6 +20,7 @@ import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jspecify.annotations.NonNull;
 
 public class CleanupPresetPanel extends VBox {
 
@@ -41,10 +41,11 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpTimestampToModificationDate;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
-    public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
-        this.databaseContext = Objects.requireNonNull(databaseContext);
+    public CleanupPresetPanel(@NonNull BibDatabaseContext databaseContext,
+                              CleanupPreferences cleanupPreferences,
+                              FilePreferences filePreferences) {
+        this.databaseContext = databaseContext;
 
-        // Load FXML
         ViewLoader.view(this)
                   .root(this)
                   .load();

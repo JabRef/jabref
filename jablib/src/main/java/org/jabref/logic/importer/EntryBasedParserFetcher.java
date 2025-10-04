@@ -7,10 +7,10 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 
 import org.jabref.model.entry.BibEntry;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -34,9 +34,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher, ParserFetche
     Parser getParser();
 
     @Override
-    default List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-        Objects.requireNonNull(entry);
-
+    default List<BibEntry> performSearch(@NonNull BibEntry entry) throws FetcherException {
         URL urlForEntry;
         try {
             if ((urlForEntry = getURLForEntry(entry)) == null) {

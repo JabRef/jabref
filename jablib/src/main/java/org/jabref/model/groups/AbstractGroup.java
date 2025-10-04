@@ -6,11 +6,12 @@ import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.scene.paint.Color;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.strings.StringUtil;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Base class for all groups.
@@ -25,14 +26,15 @@ public abstract class AbstractGroup implements SearchMatcher {
      * The hierarchical context of the group.
      */
     protected final GroupHierarchyType context;
-    protected Optional<Color> color = Optional.empty();
+    // group color stored as a String (e.g., hex like "#RRGGBB" or any CSS-compatible representation)
+    protected Optional<String> color = Optional.empty();
     protected boolean isExpanded = true;
     protected Optional<String> description = Optional.empty();
     protected Optional<String> iconName = Optional.empty();
 
-    protected AbstractGroup(String name, GroupHierarchyType context) {
+    protected AbstractGroup(String name, @NonNull GroupHierarchyType context) {
         this.name.setValue(name);
-        this.context = Objects.requireNonNull(context);
+        this.context = context;
     }
 
     @Override
@@ -65,19 +67,18 @@ public abstract class AbstractGroup implements SearchMatcher {
         return Objects.hash(name.getValue(), description, context);
     }
 
-    public Optional<Color> getColor() {
+    public Optional<String> getColor() {
         return color;
     }
 
-    public void setColor(Color color) {
-        this.color = Optional.ofNullable(color);
-    }
-
+    /**
+     * Sets the group's color string. Pass null or blank to clear.
+     */
     public void setColor(String colorString) {
         if (StringUtil.isBlank(colorString)) {
-            color = Optional.empty();
+            this.color = Optional.empty();
         } else {
-            setColor(Color.valueOf(colorString));
+            this.color = Optional.of(colorString);
         }
     }
 

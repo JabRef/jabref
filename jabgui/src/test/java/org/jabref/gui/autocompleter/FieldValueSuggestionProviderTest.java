@@ -33,11 +33,6 @@ class FieldValueSuggestionProviderTest {
     }
 
     @Test
-    void initAutoCompleterWithNullFieldThrowsException() {
-        assertThrows(NullPointerException.class, () -> new FieldValueSuggestionProvider(null, new BibDatabase()));
-    }
-
-    @Test
     void completeWithoutAddingAnythingReturnsNothing() {
         Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
         assertEquals(List.of(), result);

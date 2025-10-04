@@ -16,7 +16,6 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -32,6 +31,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -324,18 +324,15 @@ public class FileUtil {
     /**
      * Returns the list of linked files. The files have the absolute filename
      *
-     * @param bes      list of BibTeX entries
+     * @param entries      list of BibTeX entries
      * @param fileDirs list of directories to try for expansion
      * @return list of files. May be empty
      */
-    public static List<Path> getListOfLinkedFiles(List<BibEntry> bes, List<Path> fileDirs) {
-        Objects.requireNonNull(bes);
-        Objects.requireNonNull(fileDirs);
-
-        return bes.stream()
-                  .flatMap(entry -> entry.getFiles().stream())
-                  .flatMap(file -> file.findIn(fileDirs).stream())
-                  .toList();
+    public static List<Path> getListOfLinkedFiles(@NonNull List<BibEntry> entries, @NonNull List<Path> fileDirs) {
+        return entries.stream()
+                      .flatMap(entry -> entry.getFiles().stream())
+                      .flatMap(file -> file.findIn(fileDirs).stream())
+                      .toList();
     }
 
     /**
@@ -346,11 +343,15 @@ public class FileUtil {
      * @param fileNamePattern the filename pattern
      * @return a suggested fileName
      */
-    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
-        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database);
+    public static Optional<String> createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern) {
+        String targetName = BracketedPattern.expandBrackets(fileNamePattern, ';', entry, database).trim();
 
-        if (targetName.isEmpty()) {
+        if (targetName.isEmpty() || "-".equals(targetName)) {
             targetName = entry.getCitationKey().orElse("default");
+        }
+
+        if ("default".equals(targetName)) {
+            return Optional.empty();
         }
 
         // Remove LaTeX commands (e.g., \mkbibquote{}) from expanded fields before cleaning filename
@@ -359,7 +360,7 @@ public class FileUtil {
         // Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
 
-        return targetName;
+        return Optional.of(targetName);
     }
 
     /**
@@ -402,8 +403,9 @@ public class FileUtil {
         return Optional.empty();
     }
 
-    public static Optional<Path> find(final BibDatabaseContext databaseContext, String fileName, FilePreferences filePreferences) {
-        Objects.requireNonNull(fileName, "fileName");
+    public static Optional<Path> find(final BibDatabaseContext databaseContext,
+                                      @NonNull String fileName,
+                                      FilePreferences filePreferences) {
         return find(fileName, databaseContext.getFileDirectories(filePreferences));
     }
 
@@ -437,10 +439,7 @@ public class FileUtil {
      * @param directory the directory which should be search starting point
      * @return an empty optional if the file does not exist, otherwise, the absolute path
      */
-    public static Optional<Path> find(String fileName, Path directory) {
-        Objects.requireNonNull(fileName);
-        Objects.requireNonNull(directory);
-
+    public static Optional<Path> find(@NonNull String fileName, @NonNull Path directory) {
         if (detectBadFileName(fileName)) {
             LOGGER.error("Invalid characters in path for file {}", fileName);
             return Optional.empty();

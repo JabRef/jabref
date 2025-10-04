@@ -102,7 +102,7 @@ class GroupsParserTest {
         ExplicitGroup expected = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
         expected.setIconName("test icon");
         expected.setExpanded(true);
-        expected.setColor(Color.ALICEBLUE);
+        expected.setColor(Color.ALICEBLUE.toString());
         expected.setDescription("test description");
         AbstractGroup parsed = GroupsParser.fromString("StaticGroup:myExplicitGroup;0;1;0xf0f8ffff;test icon;test description;", ',', fileMonitor, metaData, "userAndHost");
 

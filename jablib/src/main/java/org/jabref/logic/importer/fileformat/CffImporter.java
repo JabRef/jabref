@@ -29,6 +29,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.common.collect.HashBiMap;
+import org.jspecify.annotations.NonNull;
 
 public class CffImporter extends Importer {
 
@@ -169,7 +170,7 @@ public class CffImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         CffFormat citation = mapper.readValue(reader, CffFormat.class);
         List<BibEntry> entriesList = new ArrayList<>();
@@ -261,7 +262,7 @@ public class CffImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         CffFormat citation;

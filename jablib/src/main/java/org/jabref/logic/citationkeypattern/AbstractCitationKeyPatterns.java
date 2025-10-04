@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.entry.types.EntryType;
 
+import org.jspecify.annotations.NonNull;
+
 /// A small table, where an entry type is associated with a citation key pattern.
 /// A parent CitationKeyPattern can be set.
 public abstract class AbstractCitationKeyPatterns {
@@ -90,8 +92,7 @@ public abstract class AbstractCitationKeyPatterns {
      *
      * @param bibtexKeyPattern the pattern to store
      */
-    public void setDefaultValue(String bibtexKeyPattern) {
-        Objects.requireNonNull(bibtexKeyPattern);
+    public void setDefaultValue(@NonNull String bibtexKeyPattern) {
         this.defaultPattern = new CitationKeyPattern(bibtexKeyPattern);
     }
 
