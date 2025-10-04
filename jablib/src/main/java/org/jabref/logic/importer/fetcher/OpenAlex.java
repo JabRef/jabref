@@ -29,7 +29,7 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,7 +165,7 @@ public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, Entr
     }
 
     @Override
-    public Optional<URL> findFullText(@NotNull BibEntry entry) throws IOException, FetcherException {
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException, FetcherException {
         Objects.requireNonNull(entry);
         // Build an OpenAlex API URL from DOI or OpenAlex ID/URL
         Optional<URL> apiUrl = buildApiUrl(entry);
