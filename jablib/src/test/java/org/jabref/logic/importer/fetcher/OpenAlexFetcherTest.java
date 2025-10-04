@@ -55,18 +55,18 @@ class OpenAlexFetcherTest {
     void parserParsesResultsArray() throws Exception {
         Parser parser = fetcher.getParser();
         String json = "{" +
-                "\"results\":[{" +
-                "\"type\":\"article\"," +
-                "\"title\":\"Sample Title\"," +
-                "\"publication_year\":2020," +
-                "\"doi\":\"https://doi.org/10.1234/ABC.5678\"," +
-                "\"id\":\"https://openalex.org/W12345\"," +
-                "\"authorships\":[{" +
-                "\"author\":{\"display_name\":\"Alice\"}}," +
-                "{\"author\":{\"display_name\":\"Bob\"}}]," +
-                "\"biblio\":{\"volume\":\"12\",\"issue\":\"3\",\"first_page\":\"45\",\"last_page\":\"67\"}," +
-                "\"concepts\":[{\"display_name\":\"Machine Learning\"},{\"display_name\":\"AI\"}]" +
-                "}]}";
+                      "\"results\":[{" +
+                      "\"type\":\"article\"," +
+                      "\"title\":\"Sample Title\"," +
+                      "\"publication_year\":2020," +
+                      "\"doi\":\"https://doi.org/10.1234/ABC.5678\"," +
+                      "\"id\":\"https://openalex.org/W12345\"," +
+                      "\"authorships\":[{" +
+                      "\"author\":{\"display_name\":\"Alice\"}}," +
+                      "{\"author\":{\"display_name\":\"Bob\"}}]," +
+                      "\"biblio\":{\"volume\":\"12\",\"issue\":\"3\",\"first_page\":\"45\",\"last_page\":\"67\"}," +
+                      "\"concepts\":[{\"display_name\":\"Machine Learning\"},{\"display_name\":\"AI\"}]" +
+                      "}]}";
         InputStream is = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
         List<BibEntry> entries = parser.parseEntries(is);
         assertEquals(1, entries.size());
@@ -87,15 +87,17 @@ class OpenAlexFetcherTest {
     @Test
     void parserParsesSingleWorkObject() throws Exception {
         Parser parser = fetcher.getParser();
-        String json = "{" +
-                "\"type\":\"article\"," +
-                "\"title\":\"Single Title\"," +
-                "\"publication_year\":2019," +
-                "\"doi\":\"https://doi.org/10.5555/xyz\"," +
-                "\"id\":\"https://openalex.org/W999\"," +
-                "\"authorships\":[{\"author\":{\"display_name\":\"Carol\"}}]," +
-                "\"biblio\":{\"first_page\":\"1\",\"last_page\":\"10\"}" +
-                "}";
+        String json = """
+                {
+                    "type":"article",
+                    "title":"Single Title",
+                    "publication_year":2019,
+                    "doi":"https://doi.org/10.5555/xyz",
+                    "id":"https://openalex.org/W999",
+                    "authorships":[{"author":{"display_name":"Carol"}}],
+                    "biblio":{"first_page":"1","last_page":"10"}
+                }
+                """;
         InputStream is = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
         List<BibEntry> entries = parser.parseEntries(is);
         assertEquals(1, entries.size());
@@ -170,7 +172,6 @@ class OpenAlexFetcherTest {
     @Test
     void searchByQuotedQueryFindsEntry() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("\"Mega-NeRF: Scalable Construction of Large-Scale NeRFs for Virtual Fly- Throughs\"");
-        // Abstract should not be included in JabRef tests
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.PAGES));
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.KEYWORDS));

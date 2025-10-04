@@ -182,6 +182,7 @@ public class WebFetchers {
         set.add(new CrossRef());
         set.add(new ZbMATH(importFormatPreferences));
         set.add(new SemanticScholar(importerPreferences));
+        set.add(new OpenAlex());
         set.add(new ResearchGate(importFormatPreferences));
 
         // Uses the PDFs - and then uses the parsed DOI. Makes it 10% a web fetcher.

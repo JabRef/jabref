@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.cleanup.DoiCleanup;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -28,12 +29,13 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Fetcher for OpenAlex Works API
- * Docs: https://docs.openalex.org/api-entities/works
+ * Docs: <a href="https://docs.openalex.org/api-entities/works"> OpenAlex API Docs</a>
  */
 public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, EntryBasedFetcher {
 
@@ -83,6 +85,7 @@ public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, Entr
 
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
+            DoiCleanup DoiCleanup = new DoiCleanup();
             BibEntry entry = new BibEntry();
 
             // Type
@@ -98,9 +101,7 @@ public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, Entr
 
             // DOI
             if (item.has("publication_year")) {
-                String doi = item.optString("doi");
-                doi = doi.replaceFirst("^https://doi\\.org/", "");
-                entry.setField(StandardField.DOI, doi);
+                entry.setField(StandardField.DOI, item.optString("doi"));
             }
 
             String url = item.optString("id");
@@ -111,10 +112,7 @@ public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, Entr
             // Authors
             JSONArray authorships = item.optJSONArray("authorships");
             if (authorships != null) {
-                String authors = new StringBuilder()
-                        .append(
-                                collectAuthorships(authorships)
-                        ).toString();
+                String authors = collectAuthorships(authorships);
                 entry.setField(StandardField.AUTHOR, authors);
             }
             // Volume / Issue / Pages
@@ -145,7 +143,7 @@ public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, Entr
                     entry.setField(StandardField.KEYWORDS, String.join(", ", kws));
                 }
             }
-
+            DoiCleanup.cleanup(entry);
             return entry;
         } catch (JSONException e) {
             throw new ParseException("OpenAlex API JSON format has changed", e);
@@ -167,7 +165,7 @@ public class OpenAlex implements SearchBasedParserFetcher, FulltextFetcher, Entr
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
+    public Optional<URL> findFullText(@NotNull BibEntry entry) throws IOException, FetcherException {
         Objects.requireNonNull(entry);
         // Build an OpenAlex API URL from DOI or OpenAlex ID/URL
         Optional<URL> apiUrl = buildApiUrl(entry);
