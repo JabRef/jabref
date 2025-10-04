@@ -111,6 +111,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiPreferences.class);
 
+    // WorkspacePreferences
+    private static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
+    private static final String MAIN_FONT_SIZE = "mainFontSize";
+    private static final String THEME = "fxTheme";
+    private static final String THEME_SYNC_OS = "themeSyncOs";
+    private static final String OPEN_LAST_EDITED = "openLastEdited";
+    private static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
+    private static final String CONFIRM_DELETE = "confirmDelete";
+    private static final String CONFIRM_HIDE_TAB_BAR = "confirmHideTabBar";
+    private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
+
     // region core GUI preferences
     private static final String MAIN_WINDOW_POS_X = "mainWindowPosX";
     private static final String MAIN_WINDOW_POS_Y = "mainWindowPosY";
@@ -629,16 +640,16 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         workspacePreferences = new WorkspacePreferences(
                 getLanguage(),
-                getBoolean(WorkspacePreferences.OVERRIDE_DEFAULT_FONT_SIZE, defaults.shouldOverrideDefaultFontSize()),
-                getInt(WorkspacePreferences.MAIN_FONT_SIZE, defaults.getMainFontSize()),
+                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE, defaults.shouldOverrideDefaultFontSize()),
+                getInt(MAIN_FONT_SIZE, defaults.getMainFontSize()),
                 new WorkspacePreferences().getDefaultFontSize(),
-                new Theme(get(WorkspacePreferences.THEME, Theme.BASE_CSS)),
-                getBoolean(WorkspacePreferences.THEME_SYNC_OS, defaults.shouldThemeSyncOs()),
-                getBoolean(WorkspacePreferences.OPEN_LAST_EDITED, defaults.shouldOpenLastEdited()),
-                getBoolean(WorkspacePreferences.SHOW_ADVANCED_HINTS, defaults.shouldShowAdvancedHints()),
-                getBoolean(WorkspacePreferences.CONFIRM_DELETE, defaults.shouldConfirmDelete()),
-                getBoolean(WorkspacePreferences.CONFIRM_HIDE_TAB_BAR, defaults.shouldHideTabBar()),
-                getStringList(WorkspacePreferences.SELECTED_SLR_CATALOGS));
+                new Theme(get(THEME, Theme.BASE_CSS)),
+                getBoolean(THEME_SYNC_OS, defaults.shouldThemeSyncOs()),
+                getBoolean(OPEN_LAST_EDITED, defaults.shouldOpenLastEdited()),
+                getBoolean(SHOW_ADVANCED_HINTS, defaults.shouldShowAdvancedHints()),
+                getBoolean(CONFIRM_DELETE, defaults.shouldConfirmDelete()),
+                getBoolean(CONFIRM_HIDE_TAB_BAR, defaults.shouldHideTabBar()),
+                getStringList(SELECTED_SLR_CATALOGS));
 
         EasyBind.listen(workspacePreferences.languageProperty(), (_, oldValue, newValue) -> {
             put(LANGUAGE, newValue.getId());
@@ -648,16 +659,24 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             }
         });
 
-        EasyBind.listen(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), (_, _, newValue) -> putBoolean(WorkspacePreferences.OVERRIDE_DEFAULT_FONT_SIZE, newValue));
-        EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (_, _, newValue) -> putInt(WorkspacePreferences.MAIN_FONT_SIZE, newValue));
-        EasyBind.listen(workspacePreferences.themeProperty(), (_, _, newValue) -> put(WorkspacePreferences.THEME, newValue.getName()));
-        EasyBind.listen(workspacePreferences.themeSyncOsProperty(), (_, _, newValue) -> putBoolean(WorkspacePreferences.THEME_SYNC_OS, newValue));
-        EasyBind.listen(workspacePreferences.openLastEditedProperty(), (_, _, newValue) -> putBoolean(WorkspacePreferences.OPEN_LAST_EDITED, newValue));
-        EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (_, _, newValue) -> putBoolean(WorkspacePreferences.SHOW_ADVANCED_HINTS, newValue));
-        EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (_, _, newValue) -> putBoolean(WorkspacePreferences.CONFIRM_DELETE, newValue));
-        EasyBind.listen(workspacePreferences.hideTabBarProperty(), (_, _, newValue) -> putBoolean(WorkspacePreferences.CONFIRM_HIDE_TAB_BAR, newValue));
+        EasyBind.listen(workspacePreferences.shouldOverrideDefaultFontSizeProperty(), (_, _, newValue) ->
+                putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, newValue));
+        EasyBind.listen(workspacePreferences.mainFontSizeProperty(), (_, _, newValue) ->
+                putInt(MAIN_FONT_SIZE, newValue));
+        EasyBind.listen(workspacePreferences.themeProperty(), (_, _, newValue) ->
+                put(THEME, newValue.getName()));
+        EasyBind.listen(workspacePreferences.themeSyncOsProperty(), (_, _, newValue) ->
+                putBoolean(THEME_SYNC_OS, newValue));
+        EasyBind.listen(workspacePreferences.openLastEditedProperty(), (_, _, newValue) ->
+                putBoolean(OPEN_LAST_EDITED, newValue));
+        EasyBind.listen(workspacePreferences.showAdvancedHintsProperty(), (_, _, newValue) ->
+                putBoolean(SHOW_ADVANCED_HINTS, newValue));
+        EasyBind.listen(workspacePreferences.confirmDeleteProperty(), (_, _, newValue) ->
+                putBoolean(CONFIRM_DELETE, newValue));
+        EasyBind.listen(workspacePreferences.hideTabBarProperty(), (_, _, newValue) ->
+                putBoolean(CONFIRM_HIDE_TAB_BAR, newValue));
         workspacePreferences.getSelectedSlrCatalogs().addListener((ListChangeListener<String>) _ ->
-                putStringList(WorkspacePreferences.SELECTED_SLR_CATALOGS, workspacePreferences.getSelectedSlrCatalogs()));
+                putStringList(SELECTED_SLR_CATALOGS, workspacePreferences.getSelectedSlrCatalogs()));
         return workspacePreferences;
     }
 

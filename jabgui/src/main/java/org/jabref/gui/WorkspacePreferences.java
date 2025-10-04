@@ -16,16 +16,6 @@ import org.jabref.gui.theme.Theme;
 import org.jabref.logic.l10n.Language;
 
 public class WorkspacePreferences {
-    public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
-    public static final String MAIN_FONT_SIZE = "mainFontSize";
-    public static final String THEME = "fxTheme";
-    public static final String THEME_SYNC_OS = "themeSyncOs";
-    public static final String OPEN_LAST_EDITED = "openLastEdited";
-    public static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
-    public static final String CONFIRM_DELETE = "confirmDelete";
-    public static final String CONFIRM_HIDE_TAB_BAR = "confirmHideTabBar";
-    public static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
-
     private final ObjectProperty<Language> language;
     private final BooleanProperty shouldOverrideDefaultFontSize;
     private final IntegerProperty mainFontSize;
