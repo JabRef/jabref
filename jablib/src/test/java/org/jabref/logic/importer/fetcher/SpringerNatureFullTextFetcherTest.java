@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -35,11 +34,6 @@ class SpringerNatureFullTextFetcherTest {
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         finder = new SpringerNatureFullTextFetcher(importerPreferences);
         entry = new BibEntry();
-    }
-
-    @Test
-    void rejectNullParameter() {
-        assertThrows(NullPointerException.class, () -> finder.findFullText(null));
     }
 
     @Test

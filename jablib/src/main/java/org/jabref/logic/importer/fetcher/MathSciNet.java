@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -41,6 +40,7 @@ import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +62,8 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
 
     private final ImportFormatPreferences preferences;
 
-    public MathSciNet(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public MathSciNet(@NonNull ImportFormatPreferences preferences) {
+        this.preferences = preferences;
     }
 
     @Override

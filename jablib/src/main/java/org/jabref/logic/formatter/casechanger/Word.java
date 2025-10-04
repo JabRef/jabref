@@ -3,9 +3,10 @@ package org.jabref.logic.formatter.casechanger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents a word in a title of a bibtex entry.
@@ -46,9 +47,9 @@ public final class Word {
                                     .collect(Collectors.toUnmodifiableSet());
     }
 
-    public Word(char[] chars, boolean[] protectedChars) {
-        this.chars = Objects.requireNonNull(chars);
-        this.protectedChars = Objects.requireNonNull(protectedChars);
+    public Word(char @NonNull [] chars, boolean @NonNull [] protectedChars) {
+        this.chars = chars;
+        this.protectedChars = protectedChars;
 
         if (this.chars.length != this.protectedChars.length) {
             throw new IllegalArgumentException("the chars and the protectedChars array must be of same length");

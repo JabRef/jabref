@@ -2,7 +2,6 @@ package org.jabref.logic.openoffice.backend;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -10,6 +9,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.model.openoffice.style.CitationType;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * How and what is encoded in reference mark names under JabRef 5.2.
@@ -43,9 +44,7 @@ class Codec52 {
          */
         public final List<String> citationKeys;
 
-        ParsedMarkName(String index, CitationType citationType, List<String> citationKeys) {
-            Objects.requireNonNull(index);
-            Objects.requireNonNull(citationKeys);
+        ParsedMarkName(@NonNull String index, CitationType citationType, @NonNull List<String> citationKeys) {
             this.index = index;
             this.citationType = citationType;
             this.citationKeys = citationKeys;

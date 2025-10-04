@@ -13,7 +13,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -23,6 +22,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,10 +49,7 @@ public class TrustStoreManager {
         }
     }
 
-    public void addCertificate(String alias, Path certPath) {
-        Objects.requireNonNull(alias);
-        Objects.requireNonNull(certPath);
-
+    public void addCertificate(@NonNull String alias, @NonNull Path certPath) {
         try {
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
             store.setCertificateEntry(alias, certificateFactory.generateCertificate(Files.newInputStream(certPath)));
@@ -61,8 +58,7 @@ public class TrustStoreManager {
         }
     }
 
-    public void deleteCertificate(String alias) {
-        Objects.requireNonNull(alias);
+    public void deleteCertificate(@NonNull String alias) {
         try {
             store.deleteEntry(alias);
         } catch (KeyStoreException e) {
@@ -70,8 +66,7 @@ public class TrustStoreManager {
         }
     }
 
-    public boolean certificateExists(String alias) {
-        Objects.requireNonNull(alias);
+    public boolean certificateExists(@NonNull String alias) {
         try {
             return store.isCertificateEntry(alias);
         } catch (KeyStoreException e) {

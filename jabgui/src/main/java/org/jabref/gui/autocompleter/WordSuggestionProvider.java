@@ -1,10 +1,11 @@
 package org.jabref.gui.autocompleter;
 
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Stores all words in the given field.
@@ -14,8 +15,8 @@ public class WordSuggestionProvider extends StringSuggestionProvider {
     private final Field field;
     private final BibDatabase database;
 
-    public WordSuggestionProvider(Field field, BibDatabase database) {
-        this.field = Objects.requireNonNull(field);
+    public WordSuggestionProvider(@NonNull Field field, BibDatabase database) {
+        this.field = field;
         this.database = database;
     }
 

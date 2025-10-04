@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class FormatterTest {
 
@@ -72,12 +71,6 @@ class FormatterTest {
     @MethodSource("getFormatters")
     void getKeyReturnsNotEmpty(Formatter formatter) {
         assertNotEquals("", formatter.getKey());
-    }
-
-    @ParameterizedTest
-    @MethodSource("getFormatters")
-    void formatOfNullThrowsException(Formatter formatter) {
-        assertThrows(NullPointerException.class, () -> formatter.format(null));
     }
 
     @ParameterizedTest
