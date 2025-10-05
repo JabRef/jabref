@@ -6,7 +6,6 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -26,6 +25,7 @@ import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
+import org.controlsfx.control.SearchableComboBox;
 
 public class FieldFormatterCleanupsPanel extends VBox {
 
@@ -34,8 +34,8 @@ public class FieldFormatterCleanupsPanel extends VBox {
     @FXML private TableColumn<FieldFormatterCleanup, Field> fieldColumn;
     @FXML private TableColumn<FieldFormatterCleanup, Formatter> formatterColumn;
     @FXML private TableColumn<FieldFormatterCleanup, Field> actionsColumn;
-    @FXML private ComboBox<Field> addableFields;
-    @FXML private ComboBox<Formatter> addableFormatters;
+    @FXML private SearchableComboBox<Field> addableFields;
+    @FXML private SearchableComboBox<Formatter> addableFormatters;
 
     @Inject private StateManager stateManager;
 
