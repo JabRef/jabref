@@ -1,7 +1,6 @@
 package org.jabref.languageserver.util;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -13,9 +12,7 @@ import java.util.stream.Stream;
 import org.jabref.languageserver.ExtensionSettings;
 import org.jabref.languageserver.LspClientHandler;
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -32,18 +29,18 @@ public class LspDiagnosticHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(LspDiagnosticHandler.class);
     private static final int NO_VERSION = -1;
 
-    private final CliPreferences jabRefCliPreferences;
     private final LspIntegrityCheck lspIntegrityCheck;
     private final LspConsistencyCheck lspConsistencyCheck;
     private final LspClientHandler clientHandler;
+    private final LspParserHandler parserHandler;
+    private final CliPreferences cliPreferences;
     private final Map<String, List<Diagnostic>> integrityDiagnosticsCache; // Maps file URIs to the corresponding list of integrity diagnostics
     private final Map<String, List<Diagnostic>> consistencyDiagnosticsCache; // Maps file URIs to the corresponding list of consistency diagnostics
 
-    private LanguageClient client;
-
-    public LspDiagnosticHandler(LspClientHandler clientHandler, CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+    public LspDiagnosticHandler(LspClientHandler clientHandler, LspParserHandler parserHandler, CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.clientHandler = clientHandler;
-        this.jabRefCliPreferences = cliPreferences;
+        this.parserHandler = parserHandler;
+        this.cliPreferences = cliPreferences;
         this.lspIntegrityCheck = new LspIntegrityCheck(cliPreferences, abbreviationRepository);
         this.lspConsistencyCheck = new LspConsistencyCheck(clientHandler.getSettings());
         this.integrityDiagnosticsCache = new ConcurrentHashMap<>();
@@ -70,8 +67,9 @@ public class LspDiagnosticHandler {
     private List<Diagnostic> computeDiagnostics(String content, String uri) {
         List<Diagnostic> diagnostics = new ArrayList<>();
         ParserResult parserResult;
+
         try {
-            parserResult = parserResultFromString(content, jabRefCliPreferences.getImportFormatPreferences());
+            parserResult = parserHandler.parserResultFromString(uri, content, cliPreferences.getImportFormatPreferences());
         } catch (JabRefException | IOException e) {
             Diagnostic parseDiagnostic = LspDiagnosticBuilder.create(Localization.lang(
                     "Failed to parse entries.\nThe following error was encountered:\n%0",
@@ -116,10 +114,5 @@ public class LspDiagnosticHandler {
             List<Diagnostic> diagnostics = getFinalDiagnosticsList(uri);
             publishDiagnostics(client, uri, diagnostics);
         });
-    }
-
-    private ParserResult parserResultFromString(String content, ImportFormatPreferences importFormatPreferences) throws JabRefException, IOException {
-        BibtexParser parser = new BibtexParser(importFormatPreferences);
-        return parser.parse(Reader.of(content));
     }
 }
