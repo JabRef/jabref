@@ -22,22 +22,30 @@ public abstract class AbstractAutomaticFieldEditorTabViewModel extends AbstractV
 
     private final ObservableList<Field> allFields = FXCollections.observableArrayList();
 
+    private final ObservableList<Field> setFields = FXCollections.observableArrayList();
+
     public AbstractAutomaticFieldEditorTabViewModel(@NonNull BibDatabase bibDatabase,
                                                     @NonNull StateManager stateManager) {
         this.stateManager = stateManager;
 
-        addFields(EnumSet.allOf(StandardField.class));
-        addFields(bibDatabase.getAllVisibleFields());
+        addFields(EnumSet.allOf(StandardField.class), allFields);
+        addFields(bibDatabase.getAllVisibleFields(), allFields);
+        addFields(bibDatabase.getAllVisibleFieldsForConcreteEntries(stateManager.getSelectedEntries()), setFields);
         allFields.sort(Comparator.comparing(Field::getName));
+        setFields.sort(Comparator.comparing(Field::getName));
     }
 
     public ObservableList<Field> getAllFields() {
         return allFields;
     }
 
-    private void addFields(Collection<? extends Field> fields) {
-        Set<Field> fieldsSet = new HashSet<>(allFields);
+    public ObservableList<Field> getSetFields() {
+        return setFields;
+    }
+
+    private void addFields(Collection<? extends Field> fields, ObservableList<Field> fieldsList) {
+        Set<Field> fieldsSet = new HashSet<>(fieldsList);
         fieldsSet.addAll(fields);
-        allFields.setAll(fieldsSet);
+        fieldsList.setAll(fieldsSet);
     }
 }

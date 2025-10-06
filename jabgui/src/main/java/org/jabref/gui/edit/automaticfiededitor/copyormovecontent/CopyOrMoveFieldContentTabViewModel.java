@@ -44,6 +44,7 @@ public class CopyOrMoveFieldContentTabViewModel extends AbstractAutomaticFieldEd
     public CopyOrMoveFieldContentTabViewModel(List<BibEntry> selectedEntries, BibDatabase bibDatabase, StateManager stateManager) {
         super(bibDatabase, stateManager);
         this.selectedEntries = new ArrayList<>(selectedEntries);
+        this.fromField.setValue(selectedEntries.getFirst().getFields().getFirst());
 
         toFieldValidator = new FunctionBasedValidator<>(toField, field -> {
             if (StringUtil.isBlank(field.getName())) {

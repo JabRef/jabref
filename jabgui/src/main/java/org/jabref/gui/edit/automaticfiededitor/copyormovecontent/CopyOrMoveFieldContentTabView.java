@@ -71,7 +71,7 @@ public class CopyOrMoveFieldContentTabView extends AbstractAutomaticFieldEditorT
     }
 
     private void initializeFromAndToComboBox() {
-        fromFieldComboBox.getItems().setAll(viewModel.getAllFields());
+        fromFieldComboBox.getItems().setAll(viewModel.getSetFields());
         toFieldComboBox.getItems().setAll(viewModel.getAllFields());
 
         fromFieldComboBox.setConverter(FIELD_STRING_CONVERTER);

@@ -142,6 +142,24 @@ public class BibDatabase {
     }
 
     /**
+     * Returns a set of Strings, that contains all field names that are visible in selected entries. This means
+     * that the fields are not internal fields. Internal fields are fields, that are starting with "_".
+     *
+     * @return set of fieldnames, that are visible in selected entries
+     */
+    public Set<Field> getAllVisibleFieldsForConcreteEntries(Collection<BibEntry> entries) {
+        if (entries == null || entries.isEmpty()) {
+            return Collections.emptySet();
+        }
+        Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
+        for (BibEntry e : entries) {
+            allFields.addAll(e.getFields());
+        }
+        return allFields.stream().filter(field -> !FieldFactory.isInternalField(field))
+                        .collect(Collectors.toSet());
+    }
+
+    /**
      * Returns the entry with the given citation key.
      */
     public synchronized Optional<BibEntry> getEntryByCitationKey(String key) {

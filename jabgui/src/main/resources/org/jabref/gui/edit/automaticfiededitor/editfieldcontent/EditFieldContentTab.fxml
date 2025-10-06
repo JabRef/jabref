@@ -22,12 +22,5 @@
         <Button fx:id="setValueButton" mnemonicParsing="false" onAction="#setFieldValue" text="%Set"/>
         <Button fx:id="appendValueButton" mnemonicParsing="false" onAction="#appendToFieldValue"
                 text="%Append"/>
-        <Separator orientation="VERTICAL"/>
-        <Button fx:id="clearFieldButton" mnemonicParsing="false" onAction="#clearField"
-                text="%Clear field content">
-            <graphic>
-                <JabRefIconView glyph="DELETE_ENTRY"/>
-            </graphic>
-        </Button>
     </HBox>
 </fx:root>
