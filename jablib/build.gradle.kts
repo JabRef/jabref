@@ -1,6 +1,5 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.SonatypeHost
 import dev.jbang.gradle.tasks.JBangTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.net.URI
@@ -507,8 +506,7 @@ mavenPublishing {
     sourcesJar = true,
   ))
 
-  publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
-
+  publishToMavenCentral()
   signAllPublications()
 
   coordinates("org.jabref", "jablib", version)
