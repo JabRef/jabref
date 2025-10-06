@@ -70,7 +70,8 @@ class PreferencesSearchHandler {
      * @return True if the tab matches the query.
      */
     private boolean tabMatchesQuery(PreferencesTab tab, String query) {
-        boolean tabNameMatches = tab.getTabName().toLowerCase(Locale.ROOT).contains(query);
+        boolean tabNameMatches = tab.getSearchKeywords().stream()
+                                    .anyMatch(keyword -> keyword.toLowerCase(Locale.ROOT).contains(query));
 
         boolean controlMatches = preferenceTabsControls.get(tab).stream()
                                                        .filter(control -> controlMatchesQuery(control, query))

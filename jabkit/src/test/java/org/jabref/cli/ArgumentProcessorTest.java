@@ -30,7 +30,6 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.support.BibEntryAssert;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
@@ -135,7 +134,6 @@ class ArgumentProcessorTest {
     }
 
     @Test
-    @Disabled("Does not work in this branch, but we did not touch it. TODO: Fix this")
     void checkConsistency() throws URISyntaxException {
         Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
@@ -147,9 +145,9 @@ class ArgumentProcessorTest {
 
         int executionResult = commandLine.execute(args.toArray(String[]::new));
 
-        String output = outContent.toString();
-        assertTrue(output.contains("Checking consistency for entry type 1 of 1\n"));
-        assertTrue(output.contains("Consistency check completed"));
+        String output = outContent.toString().replace("\r\n", "\n");
+        assertTrue(output.contains("Checking consistency for entry type 1 of 1\n"), "Expected output to contain sentence: Checking consistency for entry type 1 of 1");
+        assertTrue(output.contains("Consistency check completed"), "Expected output to contain sentence: Consistency check completed");
         assertEquals(0, executionResult);
 
         System.setOut(System.out);
