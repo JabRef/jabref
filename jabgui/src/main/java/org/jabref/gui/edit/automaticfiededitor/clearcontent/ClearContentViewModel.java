@@ -15,7 +15,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
 public class ClearContentViewModel {
-    public static final int TAB_INDEX = 3;
+    public static final int TAB_INDEX = 2;
     private final StateManager stateManager;
 
     public ClearContentViewModel(StateManager stateManager) {
