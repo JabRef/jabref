@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We made the "Configure API key" option in the Web Search preferences tab searchable via preferences search. [#13929](https://github.com/JabRef/jabref/issues/13929)
 - We added the integrity check to the jabkit cli application. [#13848](https://github.com/JabRef/jabref/issues/13848)
 - We added support for Cygwin-file paths on a Windows Operating System. [#13274](https://github.com/JabRef/jabref/issues/13274)
 - We fixed an issue where "Print preview" would throw a `NullPointerException` if no printers were available. [#13708](https://github.com/JabRef/jabref/issues/13708)
@@ -41,6 +42,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added more supported formats of CAYW endpoint of HTTP server. [#13578](https://github.com/JabRef/jabref/issues/13578)
 - We added chronological navigation for entries in each library. [#6352](https://github.com/JabRef/jabref/issues/6352)
 - We added support for using Medline/Pubmed fetcher with an API key. [#11296](https://github.com/JabRef/jabref/issues/11296#issuecomment-3289005011)
+- We added support for using OpenAlex fetcher. [#13940](https://github.com/JabRef/jabref/issues/13940)
+- We added an option to choose the group during import of the entry(s). [#9191](https://github.com/JabRef/jabref/issues/9191)
 
 ### Changed
 
@@ -95,9 +98,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved the event viewer for debugging [#13783](https://github.com/JabRef/jabref/pull/13783).
 - We improved "REDACTED" replacement of API key value in web fetcher search URL [#13796](https://github.com/JabRef/jabref/issues/13796)
 - When the pin "Keep dialog always on top" in the global search dialog is selected, the search window stays open when double-clicking on an entry. [#13840](https://github.com/JabRef/jabref/issues/13840)
+- We improved the way we check for matching curly braces in BibTeX fields and made error messages easier to understand. [#12605](https://github.com/JabRef/jabref/issues/12605)
 
 ### Fixed
 
+- When filename pattern is missing for linked files, pattern handling has been introduced to avoid suggesting meaningless filenames like "-". [#13735](https://github.com/JabRef/jabref/issues/13735)
 - We fixed an issue where "Specify Bib(La)TeX" tab was not focused when Bib(La)TeX was in the clipboard [#13597](https://github.com/JabRef/jabref/issues/13597)
 - We fixed an issue whereby the 'About' dialog was not honouring the user's configured font preferences. [#13558](https://github.com/JabRef/jabref/issues/13558)
 - We fixed an issue where the Pagetotal column was sorting the values alphabetically instead of numerically. [#12533](https://github.com/JabRef/jabref/issues/12533)
