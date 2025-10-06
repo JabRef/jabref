@@ -64,7 +64,7 @@ Coverage improvement analysis (compare with Baseline)
 - No one tested if the user simply enters a white space, no need to compute power...
 
 ## Test Results
-![image](test_results.png)
+![image](testReport.png)
 Coverage improvement analysis (compare with Baseline)
 
 
