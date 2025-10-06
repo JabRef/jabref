@@ -11,6 +11,10 @@ import javafx.scene.Node;
  */
 public interface PreferencesTab {
 
+    default List<String> getSearchKeywords() {
+        return List.of(getTabName());
+    }
+
     Node getBuilder();
 
     /**

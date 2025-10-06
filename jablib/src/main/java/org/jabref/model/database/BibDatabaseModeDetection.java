@@ -13,10 +13,10 @@ public class BibDatabaseModeDetection {
 
     /**
      * Tries to infer the database type by examining a BibDatabase database.
-     *
+     * <p>
      * All checks are based on the case-insensitive comparison of entry tag names.
      * Only standard BibTex and Biblatex entry types are considered in the decision process.
-     *
+     * <p>
      * 1. Check if any of the entries is a type exclusive to Biblatex
      * 2. Otherwise return BibTex
      *

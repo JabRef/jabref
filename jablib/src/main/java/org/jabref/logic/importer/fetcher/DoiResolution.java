@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
@@ -28,12 +27,13 @@ import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
- *
+ * <p>
  * Note that we also have custom fetchers in place.
  * See {@link WebFetchers#getFullTextFetchers(ImportFormatPreferences, ImporterPreferences)}.
  */
@@ -48,9 +48,7 @@ public class DoiResolution implements FulltextFetcher {
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
-        Objects.requireNonNull(entry);
-
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (doi.isEmpty()) {

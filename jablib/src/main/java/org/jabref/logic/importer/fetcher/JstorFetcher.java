@@ -31,6 +31,7 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Fetcher for jstor.org
@@ -111,7 +112,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws FetcherException, IOException {
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws FetcherException, IOException {
         if (entry.getField(StandardField.URL).isEmpty()) {
             return Optional.empty();
         }

@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
@@ -14,6 +13,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +31,7 @@ public class ACS implements FulltextFetcher {
      * In case no DOI is present, an empty Optional is returned.
      */
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
-        Objects.requireNonNull(entry);
+    public Optional<URL> findFullText(@NonNull BibEntry entry) throws IOException {
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
         if (doi.isEmpty()) {
             return Optional.empty();

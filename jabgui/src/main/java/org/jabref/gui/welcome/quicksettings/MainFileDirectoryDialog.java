@@ -8,7 +8,6 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.FXDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.gui.welcome.quicksettings.viewmodel.MainFileDirectoryDialogViewModel;
@@ -24,9 +23,8 @@ public class MainFileDirectoryDialog extends FXDialog {
     private final GuiPreferences preferences;
     private final DialogService dialogService;
 
-    public MainFileDirectoryDialog(GuiPreferences preferences, DialogService dialogService, ThemeManager themeManager) {
+    public MainFileDirectoryDialog(GuiPreferences preferences, DialogService dialogService) {
         super(Alert.AlertType.NONE, Localization.lang("Set main file directory"));
-        themeManager.updateFontStyle(this.getDialogPane().getScene());
 
         this.preferences = preferences;
         this.dialogService = dialogService;

@@ -74,7 +74,7 @@ public class CAYWResource {
         if (queryParams.isProbe()) {
             return Response.ok("ready").build();
         }
-        
+
         BibDatabaseContext databaseContext = getBibDatabaseContext(queryParams);
 
         // Selected parameter handling
@@ -127,7 +127,7 @@ public class CAYWResource {
 
         // Push to Application parameter handling
         if (queryParams.getApplication().isPresent()) {
-            CitationCommandString citationCmd = new CitationCommandString("\\".concat(queryParams.getCommand()).concat("{"), ",", "}");
+            CitationCommandString citationCmd = new CitationCommandString("\\".concat(queryParams.getCommand().orElse("autocite")).concat("{"), ",", "}");
             PushToApplications.getApplication(queryParams.getApplication().get(), LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
                               .ifPresent(application -> application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList()));
         }

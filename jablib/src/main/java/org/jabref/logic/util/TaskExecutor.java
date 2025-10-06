@@ -26,8 +26,8 @@ public interface TaskExecutor {
      * @param delay the time from now to delay execution
      * @param unit  the time unit of the delay parameter
      * @return a ScheduledFuture representing pending completion of
-     *         the task and whose {@code get()} method will return
-     *         {@code null} upon completion
+     * the task and whose {@code get()} method will return
+     * {@code null} upon completion
      */
     <V> Future<?> schedule(BackgroundTask<V> task, long delay, TimeUnit unit);
 

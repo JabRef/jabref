@@ -61,8 +61,8 @@ class AutoRenameFileOnEntryChangeTest {
         when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
 
         entry = new BibEntry(StandardEntryType.Article).withCitationKey("oldKey2081")
-                .withField(StandardField.AUTHOR, "oldKey")
-                .withField(StandardField.YEAR, "2081");
+                                                       .withField(StandardField.AUTHOR, "oldKey")
+                                                       .withField(StandardField.YEAR, "2081");
 
         bibDatabaseContext.getDatabase().insertEntry(entry);
         AutoRenameFileOnEntryChange autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, guiPreferences.getFilePreferences());

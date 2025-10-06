@@ -20,12 +20,12 @@ public class BibEntryRelationsRepositoryTestHelpers {
      */
     public static class Mocks {
         public static BibEntryCitationsAndReferencesRepository from(
-            Function<BibEntry, List<BibEntry>> retrieveCitations,
-            BiConsumer<BibEntry, List<BibEntry>> insertCitations,
-            Function<BibEntry, List<BibEntry>> retrieveReferences,
-            BiConsumer<BibEntry, List<BibEntry>> insertReferences,
-            Function<BibEntry, Boolean> isCitationsUpdatable,
-            Function<BibEntry, Boolean> isReferencesUpdatable
+                Function<BibEntry, List<BibEntry>> retrieveCitations,
+                BiConsumer<BibEntry, List<BibEntry>> insertCitations,
+                Function<BibEntry, List<BibEntry>> retrieveReferences,
+                BiConsumer<BibEntry, List<BibEntry>> insertReferences,
+                Function<BibEntry, Boolean> isCitationsUpdatable,
+                Function<BibEntry, Boolean> isReferencesUpdatable
         ) {
             return new BibEntryCitationsAndReferencesRepository() {
                 @Override
@@ -76,7 +76,7 @@ public class BibEntryRelationsRepositoryTestHelpers {
         }
 
         public static BibEntryCitationsAndReferencesRepository from(
-            Map<BibEntry, List<BibEntry>> citationsDB, Map<BibEntry, List<BibEntry>> referencesDB, boolean isCitationsUpdatable
+                Map<BibEntry, List<BibEntry>> citationsDB, Map<BibEntry, List<BibEntry>> referencesDB, boolean isCitationsUpdatable
         ) {
             return new BibEntryCitationsAndReferencesRepository() {
                 @Override

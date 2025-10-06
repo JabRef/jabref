@@ -9,8 +9,6 @@ import jakarta.ws.rs.core.MediaType;
 
 public interface CAYWFormatter {
 
-    String getFormatName();
-
     MediaType getMediaType();
 
     String format(CAYWQueryParams caywQueryParams, List<CAYWEntry> caywEntries);

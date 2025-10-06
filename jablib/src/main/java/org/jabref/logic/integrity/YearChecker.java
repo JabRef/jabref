@@ -9,8 +9,7 @@ import org.jabref.model.strings.StringUtil;
 
 public class YearChecker implements ValueChecker {
 
-    private static final Predicate<String> CONTAINS_FOUR_DIGIT = Pattern.compile("([^0-9]|^)[0-9]{4}([^0-9]|$)")
-                                                                        .asPredicate();
+    private static final Predicate<String> CONTAINS_FOUR_DIGIT = Pattern.compile("([^0-9]|^)[0-9]{4}([^0-9]|$)").asPredicate();
     private static final Predicate<String> ENDS_WITH_FOUR_DIGIT = Pattern.compile("[0-9]{4}$").asPredicate();
     private static final String PUNCTUATION_MARKS = "[(){},.;!?<>%&$]";
 
@@ -36,5 +35,17 @@ public class YearChecker implements ValueChecker {
         }
 
         return Optional.empty();
+    }
+
+    public static boolean isValueCorrectlyFormatted(String value) {
+        if (StringUtil.isBlank(value)) {
+            return false;
+        }
+
+        if (!CONTAINS_FOUR_DIGIT.test(value.trim())) {
+            return false;
+        }
+
+        return ENDS_WITH_FOUR_DIGIT.test(value.replaceAll(PUNCTUATION_MARKS, ""));
     }
 }

@@ -33,6 +33,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     private final StringProperty commitMessage = new SimpleStringProperty("");
     private final BooleanProperty amend = new SimpleBooleanProperty(false);
@@ -42,10 +43,12 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
     public GitCommitDialogViewModel(
             StateManager stateManager,
             DialogService dialogService,
-            TaskExecutor taskExecutor) {
+            TaskExecutor taskExecutor,
+            GitHandlerRegistry gitHandlerRegistry) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = gitHandlerRegistry;
 
         this.commitMessageValidator = new FunctionBasedValidator<>(
                 commitMessage,
@@ -56,7 +59,7 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
 
     public void commit(Runnable onSuccess) {
         commitTask()
-                .onSuccess(_-> {
+                .onSuccess(_ -> {
                     dialogService.notify(Localization.lang("Committed successfully"));
                     onSuccess.run();
                 })
@@ -90,13 +93,12 @@ public class GitCommitDialogViewModel extends AbstractViewModel {
         }
 
         Path bibFilePath = bibFilePathOpt.get();
-        GitHandlerRegistry registry = new GitHandlerRegistry();
         Optional<Path> repoRootOpt = GitHandler.findRepositoryRoot(bibFilePath);
         if (repoRootOpt.isEmpty()) {
             throw new JabRefException(Localization.lang("Commit aborted: Path is not inside a Git repository."));
         }
 
-        GitHandler gitHandler = registry.get(repoRootOpt.get());
+        GitHandler gitHandler = gitHandlerRegistry.get(repoRootOpt.get());
 
         GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
         if (!status.tracking()) {

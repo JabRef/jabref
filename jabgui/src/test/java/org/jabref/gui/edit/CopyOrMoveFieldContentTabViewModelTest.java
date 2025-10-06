@@ -71,8 +71,8 @@ class CopyOrMoveFieldContentTabViewModelTest {
         copyOrMoveFieldContentTabViewModel.swapValues();
 
         assertEquals(List.of(Optional.of("2014"), Optional.of("2015")),
-                     List.of(entryA.getField(StandardField.YEAR), entryA.getField(StandardField.DATE)),
-                     "YEAR and DATE values didn't swap");
+                List.of(entryA.getField(StandardField.YEAR), entryA.getField(StandardField.DATE)),
+                "YEAR and DATE values didn't swap");
     }
 
     @Test

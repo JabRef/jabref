@@ -2,17 +2,23 @@ package org.jabref.gui.importer;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -24,7 +30,9 @@ import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
@@ -40,6 +48,7 @@ import org.slf4j.LoggerFactory;
 public class ImportEntriesViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportEntriesViewModel.class);
+    private static final int PAGE_SIZE = 20;
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;
@@ -54,6 +63,16 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final BibEntryTypesManager entryTypesManager;
     private final ObjectProperty<BibDatabaseContext> selectedDb;
 
+    private final IntegerProperty currentPageProperty = new SimpleIntegerProperty(0);
+    private final IntegerProperty totalPagesProperty = new SimpleIntegerProperty(0);
+    private final BooleanProperty loading = new SimpleBooleanProperty(false);
+    private final BooleanProperty initialLoadComplete = new SimpleBooleanProperty(false);
+    private final ObservableList<BibEntry> pagedEntries = FXCollections.observableArrayList();
+    private final ObservableSet<BibEntry> checkedEntries = FXCollections.observableSet();
+    private final ObservableList<BibEntry> allEntries = FXCollections.observableArrayList();
+    private final Optional<SearchBasedFetcher> fetcher;
+    private final Optional<String> query;
+
     /**
      * @param databaseContext the database to import into
      * @param task            the task executed for parsing the selected files(s).
@@ -66,7 +85,9 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                                   GuiPreferences preferences,
                                   StateManager stateManager,
                                   BibEntryTypesManager entryTypesManager,
-                                  FileUpdateMonitor fileUpdateMonitor) {
+                                  FileUpdateMonitor fileUpdateMonitor,
+                                  Optional<SearchBasedFetcher> fetcher,
+                                  Optional<String> query) {
         this.taskExecutor = taskExecutor;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
@@ -79,19 +100,30 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         this.message = new SimpleStringProperty();
         this.message.bind(task.messageProperty());
         this.selectedDb = new SimpleObjectProperty<>();
+        this.fetcher = fetcher;
+        this.query = query;
 
         task.onSuccess(parserResult -> {
             // store the complete parser result (to import groups, ... later on)
             this.parserResult = parserResult;
             // fill in the list for the user, where one can select the entries to import
             entries.addAll(parserResult.getDatabase().getEntries());
+            loadEntries(entries);
+            updatePagedEntries();
+            updateTotalPages();
+            initialLoadComplete.set(true);
             if (entries.isEmpty()) {
                 task.updateMessage(Localization.lang("No entries corresponding to given query"));
             }
         }).onFailure(ex -> {
             LOGGER.error("Error importing", ex);
+            initialLoadComplete.set(true);
             dialogService.showErrorDialogAndWait(ex);
         }).executeWith(taskExecutor);
+    }
+
+    public BooleanProperty initialLoadCompleteProperty() {
+        return initialLoadComplete;
     }
 
     public String getMessage() {
@@ -110,14 +142,30 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         return selectedDb.get();
     }
 
+    public BooleanProperty loadingProperty() {
+        return loading;
+    }
+
     public ObservableList<BibEntry> getEntries() {
-        return entries;
+        return pagedEntries;
+    }
+
+    public ObservableSet<BibEntry> getCheckedEntries() {
+        return checkedEntries;
+    }
+
+    public ObservableList<BibEntry> getAllEntries() {
+        return allEntries;
+    }
+
+    public void loadEntries(List<BibEntry> entries) {
+        allEntries.addAll(entries);
     }
 
     public boolean hasDuplicate(BibEntry entry) {
         return findInternalDuplicate(entry).isPresent() ||
                 new DuplicateCheck(entryTypesManager)
-                .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();
+                        .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();
     }
 
     public String getSourceString(BibEntry entry) {
@@ -178,5 +226,89 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             }
         }
         return Optional.empty();
+    }
+
+    public void goToPrevPage() {
+        if (hasPrevPage()) {
+            currentPageProperty.set(currentPageProperty.get() - 1);
+            updatePagedEntries();
+        }
+    }
+
+    public void goToNextPage() {
+        if (hasNextPage()) {
+            currentPageProperty.set(currentPageProperty.get() + 1);
+            updatePagedEntries();
+        }
+    }
+
+    public boolean hasNextPage() {
+        return (currentPageProperty.get() + 1) * PAGE_SIZE < allEntries.size();
+    }
+
+    public boolean hasPrevPage() {
+        return currentPageProperty.get() > 0;
+    }
+
+    public IntegerProperty currentPageProperty() {
+        return currentPageProperty;
+    }
+
+    public IntegerProperty totalPagesProperty() {
+        return totalPagesProperty;
+    }
+
+    public void updateTotalPages() {
+        int total = (int) Math.ceil((double) allEntries.size() / PAGE_SIZE);
+        totalPagesProperty.set(total);
+    }
+
+    private boolean isFromWebSearch() {
+        return fetcher.isPresent() && query.isPresent();
+    }
+
+    private void updatePagedEntries() {
+        if (!isFromWebSearch()) {
+            // For entries other than web search, show all entries at once
+            pagedEntries.setAll(allEntries);
+            return;
+        }
+
+        int fromIdx = currentPageProperty.get() * PAGE_SIZE;
+        int toIdx = Math.min(fromIdx + PAGE_SIZE, allEntries.size());
+        pagedEntries.setAll(allEntries.subList(fromIdx, toIdx));
+    }
+
+    public void fetchMoreEntries() {
+        if (fetcher.isPresent() &&
+                fetcher.get() instanceof PagedSearchBasedFetcher pagedFetcher &&
+                query.isPresent() && !loading.get()) {
+            loading.set(true);
+            BackgroundTask<ArrayList<BibEntry>> fetchTask = BackgroundTask
+                    .wrap(() -> {
+                        LOGGER.info("Fetching entries from {} for page {}", fetcher.get().getName(), currentPageProperty.get() + 2);
+                        return new ArrayList<>(pagedFetcher.performSearchPaged(query.get(), currentPageProperty.get() + 1).getContent());
+                    })
+                    .onSuccess(newEntries -> {
+                        if (newEntries != null && !newEntries.isEmpty()) {
+                            allEntries.addAll(newEntries);
+                            updateTotalPages();
+                        } else {
+                            LOGGER.warn("No new entries fetched from {} for page {}", fetcher.get().getName(), currentPageProperty.get() + 2);
+                            dialogService.notify(Localization.lang("No new entries found from %0", fetcher.get().getName()));
+                        }
+                        loading.set(false);
+                    })
+                    .onFailure(exception -> {
+                        loading.set(false);
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Error fetching entries"),
+                                Localization.lang("An error occurred while fetching entries from %0: %1",
+                                        fetcher.get().getName(), exception.getMessage())
+                        );
+                    });
+
+            fetchTask.executeWith(taskExecutor);
+        }
     }
 }

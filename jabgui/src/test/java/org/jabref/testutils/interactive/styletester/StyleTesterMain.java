@@ -26,8 +26,8 @@ public class StyleTesterMain extends Application {
         HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
         ThemeManager themeManager = new ThemeManager(
                 JabRefGuiPreferences.getInstance().getWorkspacePreferences(),
-                fileUpdateMonitor,
-                Runnable::run);
+                fileUpdateMonitor
+        );
 
         Scene scene = new Scene(view.getContent());
         themeManager.installCss(scene);

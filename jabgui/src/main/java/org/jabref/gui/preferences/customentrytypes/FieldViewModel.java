@@ -13,6 +13,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.FieldPriority;
 import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.FieldTextMapper;
 import org.jabref.model.entry.types.EntryType;
 
 public class FieldViewModel {
@@ -26,7 +27,7 @@ public class FieldViewModel {
                           Mandatory required,
                           FieldPriority priorityProperty,
                           boolean multiline) {
-        this.displayName.setValue(field.getDisplayName());
+        this.displayName.setValue(FieldTextMapper.getDisplayName(field));
         this.required.setValue(required == Mandatory.REQUIRED);
         this.priorityProperty.setValue(priorityProperty);
         this.multiline.setValue(multiline);

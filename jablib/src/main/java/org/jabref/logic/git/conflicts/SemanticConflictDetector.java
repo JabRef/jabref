@@ -31,6 +31,7 @@ import static com.google.common.collect.Sets.union;
 /// - Only entries with the same citation key are considered matching.
 /// - Entries without citation keys are currently ignored.
 /// - Changing a citation key is not supported and is treated as deletion + addition.
+@Deprecated
 public class SemanticConflictDetector {
     public static List<ThreeWayEntryConflict> detectConflicts(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
         // 1. get diffs between base, local and remote
@@ -64,8 +65,8 @@ public class SemanticConflictDetector {
      * Detect entry-level conflicts among base, local, and remote versions of an entry.
      * <p>
      *
-     * @param base the entry in the common ancestor
-     * @param local the entry in the local version
+     * @param base   the entry in the common ancestor
+     * @param local  the entry in the local version
      * @param remote the entry in the remote version
      * @return optional conflict (if detected)
      */
@@ -179,7 +180,7 @@ public class SemanticConflictDetector {
      * This plan is meant to be applied to local during merge:
      * result = local + (remote − base)
      *
-     * @param base The base version of the database.
+     * @param base   The base version of the database.
      * @param remote The remote version to be merged.
      * @return A {@link MergePlan} describing how to update the local copy with remote changes.
      */
@@ -188,6 +189,7 @@ public class SemanticConflictDetector {
 
         Map<String, Map<Field, String>> fieldPatches = new LinkedHashMap<>();
         List<BibEntry> newEntries = new ArrayList<>();
+        List<String> deletedEntryKeys = new ArrayList<>();
 
         for (Map.Entry<String, BibEntry> remoteEntryPair : triples.remoteMap.entrySet()) {
             String key = remoteEntryPair.getKey();
@@ -221,17 +223,16 @@ public class SemanticConflictDetector {
         return new MergePlan(fieldPatches, newEntries);
     }
 
-    /**
-     * Compares base and remote and constructs a patch at the field level. null == the field is deleted.
-     * - Apply remote change when local kept base value (including deletions: null);
-     * - If both sides changed to the same value, no patch needed;
-     * - Fallback: if a divergence is still observed, do not override local; skip this field,
-     *
-     * @param base base version
-     * @param local local version
-     * @param remote remote version
-     * @return A map from field to new value
-     */
+    /// Compares base and remote and constructs a patch at the field level. null == the field is deleted.
+    ///
+    /// - Apply remote change when local kept base value (including deletions: null);
+    /// - If both sides changed to the same value, no patch needed;
+    /// - Fallback: if a divergence is still observed, do not override local; skip this field,
+    ///
+    /// @param base base version
+    /// @param local local version
+    /// @param remote remote version
+    /// @return A map from field to new value
     private static Map<Field, String> computeFieldPatch(BibEntry base, BibEntry local, BibEntry remote) {
         Map<Field, String> patch = new LinkedHashMap<>();
 

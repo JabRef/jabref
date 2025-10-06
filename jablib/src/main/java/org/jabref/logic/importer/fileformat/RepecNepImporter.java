@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
@@ -19,6 +18,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,14 +51,14 @@ import org.slf4j.LoggerFactory;
 ///       OverviewMessageSection
 ///       OtherMessageSection
 ///
-/// # we skip the overview
+///# we skip the overview
 /// OverviewMessageSection:
 ///       'In this issue we have: ' SectionSeparator OtherStuff
 ///
 /// OtherMessageSection:
 ///       SectionSeparator  OtherMessageSectionContent
 ///
-/// # we skip other stuff and read only full working paper references
+///# we skip other stuff and read only full working paper references
 /// OtherMessageSectionContent:
 ///       WorkingPaper EmptyLine OtherMessageSectionContent
 ///       OtherStuff EmptyLine OtherMessageSectionContent
@@ -71,8 +71,8 @@ import org.slf4j.LoggerFactory;
 /// NonEmptyLine:
 ///       a non-empty String that does not start with a number followed by a '.'
 ///
-/// # working papers are recognized by a number followed by a '.'
-/// # in a non-overview section
+///# working papers are recognized by a number followed by a '.'
+///# in a non-overview section
 /// WorkingPaper:
 ///       Number'.' WhiteSpace TitleString EmptyLine Authors EmptyLine Abstract AdditionalFields
 ///       Number'.' WhiteSpace TitleString AdditionalFields Abstract AdditionalFields
@@ -80,17 +80,17 @@ import org.slf4j.LoggerFactory;
 /// TitleString:
 ///       a String that may span several lines and should be joined
 ///
-/// # there must be at least one author
+///# there must be at least one author
 /// Authors:
 ///       Author '\n' Authors
 ///       Author '\n'
 ///
-/// # optionally, an institution is given for an author
+///# optionally, an institution is given for an author
 /// Author:
 ///       AuthorName
 ///       AuthorName '(' Institution ')'
 ///
-/// # there are no rules about the name, it may be firstname lastname or lastname, firstname or anything else
+///# there are no rules about the name, it may be firstname lastname or lastname, firstname or anything else
 /// AuthorName:
 ///       a non-empty String without '(' or ')' characters, not spanning more that one line
 ///
@@ -120,7 +120,7 @@ import org.slf4j.LoggerFactory;
 /// Keyword:
 ///        non-empty String that does not contain ',' (may contain whitespace)
 ///
-/// # if no date is given, the current year as given by the system clock is assumed
+///# if no date is given, the current year as given by the system clock is assumed
 /// DateString:
 ///        'yyyy-MM-dd'
 ///        'yyyy-MM'
@@ -130,14 +130,14 @@ import org.slf4j.LoggerFactory;
 ///        JelClassification JelClassificationList
 ///        JelClassification
 ///
-/// # the JEL Classifications are set into a new BIBTEX-field 'jel'
-/// # they will appear if you add it as a field to one of the BIBTex Entry sections
+///# the JEL Classifications are set into a new BIBTEX-field 'jel'
+///# they will appear if you add it as a field to one of the BIBTex Entry sections
 /// JelClassification:
 ///        one of the allowed classes, see http://ideas.repec.org/j/
 ///
 /// SectionSeparator:
 ///       '\n-----------------------------'
-/// ```
+///```
 public class RepecNepImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RepecNepImporter.class);
@@ -174,7 +174,7 @@ public class RepecNepImporter extends Importer {
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(@NonNull BufferedReader reader) throws IOException {
         // read the first couple of lines
         // NEP message usually contain the String 'NEP: New Economics Papers'
         // or, they are from nep.repec.org
@@ -257,9 +257,9 @@ public class RepecNepImporter extends Importer {
                 institutionDone = this.lastLine.indexOf(')') >= 1;
                 institution
                         .append(this.lastLine.substring(this.lastLine.indexOf('(') + 1,
-                                institutionDone && (this.lastLine
-                                        .indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine
-                                        .indexOf(')') : this.lastLine.length())
+                                            institutionDone && (this.lastLine
+                                                    .indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine
+                                                    .indexOf(')') : this.lastLine.length())
                                              .trim());
             } else {
                 author = this.lastLine.trim();
@@ -363,9 +363,7 @@ public class RepecNepImporter extends Importer {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-
+    public ParserResult importDatabase(@NonNull BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         String paperNoStr = null;
         this.line = 0;

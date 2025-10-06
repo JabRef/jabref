@@ -1,7 +1,5 @@
 package org.jabref.logic.citationstyle;
 
-import java.util.Objects;
-
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesRemovedEvent;
@@ -12,6 +10,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Caches the generated Citations for quicker access
@@ -45,8 +44,7 @@ public class CitationStyleCache {
         return citationStyleCache.getUnchecked(entry);
     }
 
-    public void setCitationStyle(PreviewLayout citationStyle) {
-        Objects.requireNonNull(citationStyle);
+    public void setCitationStyle(@NonNull PreviewLayout citationStyle) {
         if (!this.citationStyle.equals(citationStyle)) {
             this.citationStyle = citationStyle;
             this.citationStyleCache.invalidateAll();

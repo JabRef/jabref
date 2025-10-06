@@ -83,6 +83,7 @@
     -jr-info: -jr-light-green;
     -jr-warn: -jr-orange;
     -jr-error: -jr-light-red;
+    -jr-success: -jr-green;
 
     /* Color for the small group view indicator for the number of hits */
     -jr-group-hits-bg: derive(-jr-sidepane-background, -50%);
@@ -405,13 +406,18 @@ TextFlow > .tooltip-text-monospaced {
     -fx-text-fill: -fx-text-base-color;
 }
 
-
 .button {
     -fx-background-color: transparent;
     -fx-border-color: -fx-outer-border; /* rgba(0, 0, 0, 0.23); */
     -fx-border-width: 0.062em;
     -fx-border-radius: 0.25em;
     -fx-padding: 0.5em 1em 0.5em 1em;
+}
+
+.dialog-pane .button-bar .button {
+    -fx-min-width: 6em;
+    -fx-pref-width: 6em;
+    -fx-max-width: 6em;
 }
 
 .menu-button > .label {
@@ -1091,12 +1097,26 @@ TextFlow > .tooltip-text-monospaced {
     -fx-border-width: 0;
 }
 
+.mainToolbar .icon-button {
+    -fx-padding: 0.5em;
+}
+
+/*
+ * -fx-icon-size is intentionally omitted to prevent a rendering loop. The library sets font size
+ * based on the computed icon size, which is itself relative to the font size.
+ */
 .mainToolbar .glyph-icon,
 .mainToolbar .ikonli-font-icon {
-    -fx-font-size: 1.7em;
+    /* `!important` is override library's default font size */
+    -fx-font-size: 1.7em!important;
     -fx-fill: -jr-theme-text;
     -fx-text-fill: -jr-theme-text;
     -fx-icon-color: -jr-theme-text;
+}
+
+.mainToolbar .progress-indicator {
+    -fx-min-width: 2.8em;
+    -fx-max-width: 2.8em;
 }
 
 .search-field {
@@ -1350,11 +1370,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 .warning-icon {
     -fx-fill: -jr-warn;
-}
-
-.info-message {
-    -fx-fill: -jr-info;
-    -fx-text-fill: -jr-info;
 }
 
 .warning-message {
@@ -2143,47 +2158,69 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 /* ErrorConsole */
-
 #errorConsole .list-content {
-    -fx-padding: 0.625em;
+    -fx-padding: 0em;
 }
 
 #errorConsole .info-section {
-    -fx-padding: 0.625em;
-    -fx-background-color: -fx-background;
+    -fx-graphic-text-gap: 0.8em;
+    -fx-font-size: 1.1em;
+    -fx-line-spacing: 0.2em;
+    -fx-padding: 0.6em 1em;
+    -fx-background-color: -jr-transparent-accent;
 }
 
-#errorConsole .info-section .glyph-icon {
-    -fx-font-size: 24.0;
+#errorConsole .button-bar {
+    -fx-padding: 1em 0em 0em 0em;
+}
+
+#errorConsole .error-console-cell {
+    -fx-padding: 0.6em 1em;
+}
+
+#errorConsole .error-console-cell HBox {
+    -fx-spacing: 0.8em;
+}
+
+#errorConsole .message-box {
+    -fx-spacing: 0.5em;
+}
+
+#errorConsole .info-section .glyph-icon,
+#errorConsole .exception .glyph-icon,
+#errorConsole .output .glyph-icon,
+#errorConsole .log .glyph-icon
+{
+    -fx-font-size: 1.5em;
 }
 
 #errorConsole .exception .glyph-icon {
-    -fx-font-size: 18.0;
-    -fx-fill: -jr-error;
+    -fx-icon-color: -jr-error;
 }
 
 #errorConsole .output .glyph-icon {
-    -fx-font-size: 18.0;
-    -fx-fill: -jr-warn;
+    -fx-icon-color: -jr-warn;
 }
 
 #errorConsole .log .glyph-icon {
-    -fx-font-size: 18.0;
-    -fx-fill: -jr-info;
+    -fx-icon-color: -jr-info;
 }
 
-#errorConsole .custom-buttons {
-    -fx-padding: 0.312em;
+/* Poor readability on -jr-accent. See: https://webaim.org/resources/contrastchecker/?fcolor=9E4C00&bcolor=A3B7E6 */
+#errorConsole .error-console-cell:selected .exception .glyph-icon {
+    -fx-icon-color: derive(-jr-error, -50%);
 }
 
-#errorConsole .exception {
-    -fx-text-fill: -fx-text-base-color;
+#errorConsole .error-console-cell:selected .output .glyph-icon {
+    -fx-icon-color: derive(-jr-warn, -50%);
 }
 
-#errorConsole .output {
-    -fx-text-fill: -fx-text-base-color;
+#errorConsole .error-console-cell:selected .log .glyph-icon {
+    -fx-icon-color: derive(-jr-info, -50%);
 }
 
+#errorConsole .exception,
+#errorConsole .output,
 #errorConsole .log {
     -fx-text-fill: -fx-text-base-color;
 }
@@ -2475,6 +2512,51 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-padding: 2;
 }
 
+/* WebSearchTab */
+.fetcher-list-cell {
+    -fx-padding: 0.3em 0.6em;
+    -fx-alignment: center-left;
+    -fx-spacing: 0.5em;
+}
+
+.fetcher-list-cell:nth-child(odd) {
+    -fx-background-color: -jr-row-odd-background;
+}
+
+.fetcher-list-cell .label {
+    -fx-font-size: 100%;
+}
+
+.fetcher-list-cell .configure-button {
+    -fx-padding: 0.25em 0.5em;
+    -fx-background-color: -fx-control-inner-background;
+    -fx-text-fill: -fx-mid-text-color;
+}
+
+#testButton {
+    -fx-padding: 0.25em 0.5em;
+}
+
+#testButton.success {
+    -fx-text-fill: -jr-success;
+}
+
+#testButton.success .glyph-icon {
+    -fx-icon-color: -jr-success;
+}
+
+#testButton.error {
+    -fx-text-fill: -jr-error;
+}
+
+#testButton.error .glyph-icon {
+    -fx-icon-color: -jr-error;
+}
+
+.api-key-dialog-content {
+    -fx-padding: 1em;
+}
+
 /* CitationRelationsTab */
 
 #citationRelationsTab .addEntryButton {
@@ -2642,6 +2724,10 @@ journalInfo .grid-cell-b {
     -fx-border-color: transparent;
 }
 
+.add-certificate {
+    -fx-pref-width: 17em;
+    -fx-min-width: 17em;
+}
 
 /* Quick Settings */
 .quick-settings-container,
@@ -3129,4 +3215,37 @@ journalInfo .grid-cell-b {
     -fx-background-color: rgba(238, 82, 83, 0.2);
     -fx-border-color: -jr-error;
     -fx-border-width: 1px;
+}
+
+.checkbox-flowpane {
+    -fx-hgap: 1.5em;
+    -fx-vgap: 0.8em;
+}
+
+/* Automatic Field Editor */
+.edit-field-content-pane {
+    -fx-padding: 0em 1em;
+    -fx-spacing: 1em;
+}
+
+.edit-field-content-pane .text-field {
+    -fx-padding: 0.5625em 0.75em;
+}
+
+.edit-field-content-pane .actions {
+    -fx-spacing: 0.75em;
+    -fx-alignment: BASELINE_LEFT;
+}
+
+.edit-field-content-pane .grid-pane {
+    -fx-hgap: 0.75em;
+    -fx-vgap: 0.75em;
+}
+
+.edit-field-content-pane .grid-pane .label {
+    -fx-min-width: 3.5em;
+}
+
+.automatic-field-editor .button-bar .button:default {
+    -fx-min-width: 12em;
 }

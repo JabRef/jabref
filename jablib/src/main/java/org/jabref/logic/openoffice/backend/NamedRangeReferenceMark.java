@@ -98,8 +98,8 @@ public class NamedRangeReferenceMark implements NamedRange {
         final String left = NamedRangeReferenceMark.REFERENCE_MARK_LEFT_BRACKET;
         final String right = NamedRangeReferenceMark.REFERENCE_MARK_RIGHT_BRACKET;
         String bracketedContent = withoutBrackets
-                ? ""
-                : left + right;
+                                  ? ""
+                                  : left + right;
 
         cursor.getText().insertString(cursor, bracketedContent, true);
         DocumentAnnotation documentAnnotation = new DocumentAnnotation(doc, refMarkName, cursor, true /* absorb */);
@@ -135,7 +135,7 @@ public class NamedRangeReferenceMark implements NamedRange {
             NoDocumentException,
             WrappedTargetException {
         return UnoReferenceMark.getAnchor(doc, refMarkName)
-                                .map(e -> new NamedRangeReferenceMark(refMarkName));
+                               .map(e -> new NamedRangeReferenceMark(refMarkName));
     }
 
     /**

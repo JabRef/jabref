@@ -28,7 +28,7 @@ public class WalkthroughScroller {
         LOGGER.debug("Setting up scrollable parent monitoring for node: {}", node.getClass().getSimpleName());
         List<Node> scrollableParents = findScrollableParents(node);
         LOGGER.debug("Found {} scrollable parents", scrollableParents.size());
-        debouncedScroller = WalkthroughUtils.debounced((_) -> scrollNodeIntoView(node, scrollableParents));
+        debouncedScroller = WalkthroughUtils.debounced(_ -> scrollNodeIntoView(node, scrollableParents));
 
         scrollableParents
                 .stream()
@@ -76,10 +76,14 @@ public class WalkthroughScroller {
                     Bounds targetBounds = targetNode.localToScene(targetNode.getBoundsInLocal());
                     scrollIntoScrollPane(scrollPane, targetBounds);
                 }
-                case ListView<?> listView -> scrollIntoListView(targetNode, listView);
-                case TableView<?> tableView -> scrollIntoTableView(targetNode, tableView);
-                case TreeView<?> treeView -> scrollIntoTreeView(targetNode, treeView);
-                default -> LOGGER.warn("Unsupported scrollable type: {}", scrollableParent.getClass().getSimpleName());
+                case ListView<?> listView ->
+                        scrollIntoListView(targetNode, listView);
+                case TableView<?> tableView ->
+                        scrollIntoTableView(targetNode, tableView);
+                case TreeView<?> treeView ->
+                        scrollIntoTreeView(targetNode, treeView);
+                default ->
+                        LOGGER.warn("Unsupported scrollable type: {}", scrollableParent.getClass().getSimpleName());
             }
         } catch (RuntimeException e) {
             LOGGER.warn("Failed to scroll node into view for parent {}", scrollableParent.getClass().getSimpleName(), e);

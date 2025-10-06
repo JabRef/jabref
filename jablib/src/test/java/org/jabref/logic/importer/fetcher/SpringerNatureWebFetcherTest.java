@@ -76,20 +76,20 @@ class SpringerNatureWebFetcherTest implements SearchBasedFetcherCapabilityTest, 
                 .withField(StandardField.ABSTRACT, "Labeling issues with the skills required to complete them can help contributors to choose tasks in Open Source Software projects. However, manually labeling issues is time-consuming and error-prone, and current automated approaches are mostly limited to classifying issues as bugs/non-bugs. We investigate the feasibility and relevance of automatically labeling issues with what we call “API-domains,” which are high-level categories of APIs. Therefore, we posit that the APIs used in the source code affected by an issue can be a proxy for the type of skills (e.g., DB, security, UI) needed to work on the issue. We ran a user study (n=74) to assess API-domain labels’ relevancy to potential contributors, leveraged the issues’ descriptions and the project history to build prediction models, and validated the predictions with contributors (n=20) of the projects. Our results show that (i) newcomers to the project consider API-domain labels useful in choosing tasks, (ii) labels can be predicted with a precision of 84% and a recall of 78.6% on average, (iii) the results of the predictions reached up to 71.3% in precision and 52.5% in recall when training with a project and testing in another (transfer learning), and (iv) project contributors consider most of the predictions helpful in identifying needed skills. These findings suggest our approach can be applied in practice to automatically label issues, assisting developers in finding tasks that better match their skills.");
 
         BibEntry firstArticle = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.AUTHOR, "Steinmacher, Igor and Balali, Sogol and Trinkenreich, Bianca and Guizani, Mariam and Izquierdo-Cortazar, Daniel and Cuevas Zambrano, Griselda G. and Gerosa, Marco Aurelio and Sarma, Anita")
-            .withField(StandardField.DATE, "2021-09-09")
-            .withField(StandardField.DOI, "10.1186/s13174-021-00140-z")
-            .withField(StandardField.ISSN, "1867-4828")
-            .withField(StandardField.JOURNAL, "Journal of Internet Services and Applications")
-            .withField(StandardField.MONTH, "#sep#")
-            .withField(StandardField.PAGES, "1--33")
-            .withField(StandardField.NUMBER, "1")
-            .withField(StandardField.VOLUME, "12")
-            .withField(StandardField.PUBLISHER, "Springer")
-            .withField(StandardField.TITLE, "Being a Mentor in open source projects")
-            .withField(StandardField.YEAR, "2021")
-            .withField(StandardField.FILE, ":https\\://www.biomedcentral.com/openurl/pdf?id=doi\\:10.1186/s13174-021-00140-z:PDF")
-            .withField(StandardField.ABSTRACT, "Mentoring is a well-known way to help newcomers to Open Source Software (OSS) projects overcome initial contribution barriers. Through mentoring, newcomers learn to acquire essential technical, social, and organizational skills. Despite the importance of OSS mentors, they are understudied in the literature. Understanding who OSS project mentors are, the challenges they face, and the strategies they use can help OSS projects better support mentors’ work. In this paper, we employ a two-stage study to comprehensively investigate mentors in OSS. First, we identify the characteristics of mentors in the Apache Software Foundation, a large OSS community, using an online survey. We found that less experienced volunteer contributors are less likely to take on the mentorship role. Second, through interviews with OSS mentors (n=18), we identify the challenges that mentors face and how they mitigate them. In total, we identified 25 general mentorship challenges and 7 sub-categories of challenges regarding task recommendation. We also identified 13 strategies to overcome the challenges related to task recommendation. Our results provide insights for OSS communities, formal mentorship programs, and tool builders who design automated support for task assignment and internship.");
+                .withField(StandardField.AUTHOR, "Steinmacher, Igor and Balali, Sogol and Trinkenreich, Bianca and Guizani, Mariam and Izquierdo-Cortazar, Daniel and Cuevas Zambrano, Griselda G. and Gerosa, Marco Aurelio and Sarma, Anita")
+                .withField(StandardField.DATE, "2021-09-09")
+                .withField(StandardField.DOI, "10.1186/s13174-021-00140-z")
+                .withField(StandardField.ISSN, "1867-4828")
+                .withField(StandardField.JOURNAL, "Journal of Internet Services and Applications")
+                .withField(StandardField.MONTH, "#sep#")
+                .withField(StandardField.PAGES, "1--33")
+                .withField(StandardField.NUMBER, "1")
+                .withField(StandardField.VOLUME, "12")
+                .withField(StandardField.PUBLISHER, "Springer")
+                .withField(StandardField.TITLE, "Being a Mentor in open source projects")
+                .withField(StandardField.YEAR, "2021")
+                .withField(StandardField.FILE, ":https\\://www.biomedcentral.com/openurl/pdf?id=doi\\:10.1186/s13174-021-00140-z:PDF")
+                .withField(StandardField.ABSTRACT, "Mentoring is a well-known way to help newcomers to Open Source Software (OSS) projects overcome initial contribution barriers. Through mentoring, newcomers learn to acquire essential technical, social, and organizational skills. Despite the importance of OSS mentors, they are understudied in the literature. Understanding who OSS project mentors are, the challenges they face, and the strategies they use can help OSS projects better support mentors’ work. In this paper, we employ a two-stage study to comprehensively investigate mentors in OSS. First, we identify the characteristics of mentors in the Apache Software Foundation, a large OSS community, using an online survey. We found that less experienced volunteer contributors are less likely to take on the mentorship role. Second, through interviews with OSS mentors (n=18), we identify the challenges that mentors face and how they mitigate them. In total, we identified 25 general mentorship challenges and 7 sub-categories of challenges regarding task recommendation. We also identified 13 strategies to overcome the challenges related to task recommendation. Our results provide insights for OSS communities, formal mentorship programs, and tool builders who design automated support for task assignment and internship.");
 
         BibEntry secondArticle = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Steinmacher, Igor and Gerosa, Marco and Conte, Tayana U. and Redmiles, David F.")
@@ -108,33 +108,33 @@ class SpringerNatureWebFetcherTest implements SearchBasedFetcherCapabilityTest, 
                 .withField(StandardField.ABSTRACT, "An influx of newcomers is critical to the survival, long-term success, and continuity of many Open Source Software (OSS) community-based projects. However, newcomers face many barriers when making their first contribution, leading in many cases to dropouts. Due to the collaborative nature of community-based OSS projects, newcomers may be susceptible to social barriers, such as communication breakdowns and reception issues. In this article, we report a two-phase study aimed at better understanding social barriers faced by newcomers. In the first phase, we qualitatively analyzed the literature and data collected from practitioners to identify barriers that hinder newcomers’ first contribution. We designed a model composed of 58 barriers, including 13 social barriers. In the second phase, based on the barriers model, we developed FLOSScoach, a portal to support newcomers making their first contribution. We evaluated the portal in a diary-based study and found that the portal guided the newcomers and reduced the need for communication. Our results provide insights for communities that want to support newcomers and lay a foundation for building better onboarding tools. The contributions of this paper include identifying and gathering empirical evidence of social barriers faced by newcomers; understanding how social barriers can be reduced or avoided by using a portal that organizes proper information for newcomers (FLOSScoach); presenting guidelines for communities and newcomers on how to reduce or avoid social barriers; and identifying new streams of research.");
 
         BibEntry thirdArticle = new BibEntry(StandardEntryType.InCollection)
-            .withField(StandardField.AUTHOR, "Serrano Alves, Luiz Philipe and Wiese, Igor Scaliante and Chaves, Ana Paula and Steinmacher, Igor")
-            .withField(StandardField.BOOKTITLE, "Chatbot Research and Design")
-            .withField(StandardField.DATE, "2022-01-01")
-            .withField(StandardField.DOI, "10.1007/978-3-030-94890-0_6")
-            .withField(StandardField.ISBN, "978-3-030-94889-4")
-            .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/978-3-030-94890-0_6:PDF")
-            .withField(StandardField.MONTH, "#jan#")
-            .withField(StandardField.PUBLISHER, "Springer")
-            .withField(StandardField.YEAR, "2022")
-            .withField(StandardField.TITLE, "How to Find My Task? Chatbot to Assist Newcomers in Choosing Tasks in OSS Projects")
-            .withField(StandardField.ABSTRACT, "Open Source Software (OSS) is making a meteoric rise in the software industry since several big companies have entered this market. Unfortunately, newcomers enter these projects and usually lose interest in contributing because of several factors. This paper aims to reduce the problems users face when they walk their first steps into OSS projects: finding the appropriate task. This paper presents a chatbot that filters tasks to help newcomers choose a task that fits their skills. We performed a quantitative and a qualitative study comparing the chatbot with the current GitHub issue tracker interface, which uses labels to categorize and identify tasks. The results show that users perceived the chatbot as easier to use than the GitHub issue tracker. Additionally, users tend to interpret the use of chatbots as situational, helping mainly newcomers and inexperienced contributors.");
+                .withField(StandardField.AUTHOR, "Serrano Alves, Luiz Philipe and Wiese, Igor Scaliante and Chaves, Ana Paula and Steinmacher, Igor")
+                .withField(StandardField.BOOKTITLE, "Chatbot Research and Design")
+                .withField(StandardField.DATE, "2022-01-01")
+                .withField(StandardField.DOI, "10.1007/978-3-030-94890-0_6")
+                .withField(StandardField.ISBN, "978-3-030-94889-4")
+                .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/978-3-030-94890-0_6:PDF")
+                .withField(StandardField.MONTH, "#jan#")
+                .withField(StandardField.PUBLISHER, "Springer")
+                .withField(StandardField.YEAR, "2022")
+                .withField(StandardField.TITLE, "How to Find My Task? Chatbot to Assist Newcomers in Choosing Tasks in OSS Projects")
+                .withField(StandardField.ABSTRACT, "Open Source Software (OSS) is making a meteoric rise in the software industry since several big companies have entered this market. Unfortunately, newcomers enter these projects and usually lose interest in contributing because of several factors. This paper aims to reduce the problems users face when they walk their first steps into OSS projects: finding the appropriate task. This paper presents a chatbot that filters tasks to help newcomers choose a task that fits their skills. We performed a quantitative and a qualitative study comparing the chatbot with the current GitHub issue tracker interface, which uses labels to categorize and identify tasks. The results show that users perceived the chatbot as easier to use than the GitHub issue tracker. Additionally, users tend to interpret the use of chatbots as situational, helping mainly newcomers and inexperienced contributors.");
 
         BibEntry fourthArticle = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.AUTHOR, "Calefato, Fabio and Gerosa, Marco Aurélio and Iaffaldano, Giuseppe and Lanubile, Filippo and Steinmacher, Igor")
-            .withField(StandardField.DATE, "2022-03-19")
-            .withField(StandardField.DOI, "10.1007/s10664-021-10012-6")
-            .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/s10664-021-10012-6:PDF")
-            .withField(StandardField.ISSN, "1382-3256")
-            .withField(StandardField.JOURNAL, "Empirical Software Engineering")
-            .withField(StandardField.MONTH, "#mar#")
-            .withField(StandardField.NUMBER, "3")
-            .withField(StandardField.PAGES, "1--41")
-            .withField(StandardField.PUBLISHER, "Springer")
-            .withField(StandardField.TITLE, "Will you come back to contribute? Investigating the inactivity of OSS core developers in GitHub")
-            .withField(StandardField.VOLUME, "27")
-            .withField(StandardField.YEAR, "2022")
-            .withField(StandardField.ABSTRACT, "Several Open-Source Software (OSS) projects depend on the continuity of their development communities to remain sustainable. Understanding how developers become inactive or why they take breaks can help communities prevent abandonment and incentivize developers to come back. In this paper, we propose a novel method to identify developers’ inactive periods by analyzing the individual rhythm of contributions to the projects. Using this method, we quantitatively analyze the inactivity of core developers in 18 OSS organizations hosted on GitHub. We also survey core developers to receive their feedback about the identified breaks and transitions. Our results show that our method was effective for identifying developers’ breaks. About 94% of the surveyed core developers agreed with our state model of inactivity; 71% and 79% of them acknowledged their breaks and state transition, respectively. We also show that all core developers take breaks (at least once) and about a half of them (~45%) have completely disengaged from a project for at least one year. We also analyzed the probability of transitions to/from inactivity and found that developers who pause their activity have a ~35 to ~55% chance to return to an active state; yet, if the break lasts for a year or longer, then the probability of resuming activities drops to ~21–26%, with a ~54% chance of complete disengagement. These results may support the creation of policies and mechanisms to make OSS community managers aware of breaks and potential project abandonment.");
+                .withField(StandardField.AUTHOR, "Calefato, Fabio and Gerosa, Marco Aurélio and Iaffaldano, Giuseppe and Lanubile, Filippo and Steinmacher, Igor")
+                .withField(StandardField.DATE, "2022-03-19")
+                .withField(StandardField.DOI, "10.1007/s10664-021-10012-6")
+                .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/s10664-021-10012-6:PDF")
+                .withField(StandardField.ISSN, "1382-3256")
+                .withField(StandardField.JOURNAL, "Empirical Software Engineering")
+                .withField(StandardField.MONTH, "#mar#")
+                .withField(StandardField.NUMBER, "3")
+                .withField(StandardField.PAGES, "1--41")
+                .withField(StandardField.PUBLISHER, "Springer")
+                .withField(StandardField.TITLE, "Will you come back to contribute? Investigating the inactivity of OSS core developers in GitHub")
+                .withField(StandardField.VOLUME, "27")
+                .withField(StandardField.YEAR, "2022")
+                .withField(StandardField.ABSTRACT, "Several Open-Source Software (OSS) projects depend on the continuity of their development communities to remain sustainable. Understanding how developers become inactive or why they take breaks can help communities prevent abandonment and incentivize developers to come back. In this paper, we propose a novel method to identify developers’ inactive periods by analyzing the individual rhythm of contributions to the projects. Using this method, we quantitatively analyze the inactivity of core developers in 18 OSS organizations hosted on GitHub. We also survey core developers to receive their feedback about the identified breaks and transitions. Our results show that our method was effective for identifying developers’ breaks. About 94% of the surveyed core developers agreed with our state model of inactivity; 71% and 79% of them acknowledged their breaks and state transition, respectively. We also show that all core developers take breaks (at least once) and about a half of them (~45%) have completely disengaged from a project for at least one year. We also analyzed the probability of transitions to/from inactivity and found that developers who pause their activity have a ~35 to ~55% chance to return to an active state; yet, if the break lasts for a year or longer, then the probability of resuming activities drops to ~21–26%, with a ~54% chance of complete disengagement. These results may support the creation of policies and mechanisms to make OSS community managers aware of breaks and potential project abandonment.");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef Social Barriers Steinmacher");
         assertEquals(List.of(articleSupportingIdentification, articleTagThatIssue, fourthArticle, thirdArticle, firstArticle, secondArticle), fetchedEntries);
@@ -233,8 +233,8 @@ class SpringerNatureWebFetcherTest implements SearchBasedFetcherCapabilityTest, 
         assertTrue(resultJustByAuthor.containsAll(result));
         List<BibEntry> allEntriesFromCSCW = result.stream()
                                                   .filter(bibEntry -> "Computer Supported Cooperative Work (CSCW)"
-                                                                              .equals(bibEntry.getField(StandardField.JOURNAL)
-                                                                                              .orElse("")))
+                                                          .equals(bibEntry.getField(StandardField.JOURNAL)
+                                                                          .orElse("")))
                                                   .toList();
         allEntriesFromCSCW.stream()
                           .map(bibEntry -> bibEntry.getField(StandardField.AUTHOR))

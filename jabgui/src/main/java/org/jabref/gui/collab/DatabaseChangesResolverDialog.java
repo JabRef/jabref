@@ -66,7 +66,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
      * A dialog going through given <code>changes</code>, which are diffs to the provided <code>database</code>.
      * Each accepted change is written to the provided <code>database</code>.
      *
-     * @param changes The list of changes
+     * @param changes  The list of changes
      * @param database The database to apply the changes to
      */
     public DatabaseChangesResolverDialog(List<DatabaseChange> changes, BibDatabaseContext database, String dialogTitle) {
@@ -75,8 +75,8 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
 
         this.setTitle(dialogTitle);
         ViewLoader.view(this)
-                .load()
-                .setAsDialogPane(this);
+                  .load()
+                  .setAsDialogPane(this);
 
         this.setResultConverter(button -> {
             if (viewModel.areAllChangesResolved()) {
@@ -103,7 +103,7 @@ public class DatabaseChangesResolverDialog extends BaseDialog<Boolean> {
         previewViewer.setDatabaseContext(database);
         DatabaseChangeDetailsViewFactory databaseChangeDetailsViewFactory = new DatabaseChangeDetailsViewFactory(database, dialogService, themeManager, preferences, entryTypesManager, previewViewer, taskExecutor);
 
-        viewModel = new ExternalChangesResolverViewModel(changes, undoManager);
+        viewModel = new ExternalChangesResolverViewModel(changes);
 
         changeName.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
         askUserToResolveChangeButton.disableProperty().bind(viewModel.canAskUserToResolveChangeProperty().not());

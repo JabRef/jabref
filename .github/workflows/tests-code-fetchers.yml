@@ -32,7 +32,8 @@ env:
   SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
-  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS }}
+  MedlineApiKey: ${{ secrets.MedlineApiKey_FOR_TESTS }}
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
@@ -57,8 +58,9 @@ jobs:
         with:
           java-version: 24
           distribution: 'corretto'
+          check-latest: true
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Run fetcher tests
         run: ./gradlew fetcherTest
         env:

@@ -78,15 +78,15 @@ class ParserResultTest {
     void warningAddedForMissingCommaInCitationKeyImport(@TempDir Path tmpDir) throws IOException {
         // Comma replaced by whitespace instead in citation key "myArticle "
         String bibtexEntry = """
-            @article{myArticle\s
-               author    = "Author Name",
-               title     = "Title of the Article",
-               journal   = "Journal Name",
-               year      = "2024",
-               pages     = "1-10",
-               publisher = "Publisher Name"
-             }
-            """;
+                @article{myArticle\s
+                   author    = "Author Name",
+                   title     = "Title of the Article",
+                   journal   = "Journal Name",
+                   year      = "2024",
+                   pages     = "1-10",
+                   publisher = "Publisher Name"
+                 }
+                """;
         Path tempFile = tmpDir.resolve("invalidBibTex.bib");
         Files.write(tempFile, bibtexEntry.getBytes());
         ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
@@ -96,15 +96,15 @@ class ParserResultTest {
     @Test
     void warningAddedForCorruptedCitationKeyInImport(@TempDir Path tmpDir) throws IOException {
         String bibtexEntry = """
-            @article{myArticle
-               author    = "Author Name",
-               title     = "Title of the Article",
-               journal   = "Journal Name",
-               year      = "2024",
-               pages     = "1-10",
-               publisher = "Publisher Name"
-             }
-            """;
+                @article{myArticle
+                   author    = "Author Name",
+                   title     = "Title of the Article",
+                   journal   = "Journal Name",
+                   year      = "2024",
+                   pages     = "1-10",
+                   publisher = "Publisher Name"
+                 }
+                """;
 
         Path tempFile = tmpDir.resolve("invalidBibTex.bib");
         Files.write(tempFile, bibtexEntry.getBytes());
@@ -116,15 +116,15 @@ class ParserResultTest {
     void skipsImportEntryForImproperSyntax(@TempDir Path tmpDir) throws IOException {
         // Comma after '=' character on line 2 throws error
         String bibtexEntry = """
-            @article{myArticle,
-               author    =, "Author Name",
-               title     = "Title of the Article",
-               journal   = "Journal Name",
-               year      = "2024",
-               pages     = "1-10",
-               publisher = "Publisher Name"
-             }
-            """;
+                @article{myArticle,
+                   author    =, "Author Name",
+                   title     = "Title of the Article",
+                   journal   = "Journal Name",
+                   year      = "2024",
+                   pages     = "1-10",
+                   publisher = "Publisher Name"
+                 }
+                """;
         Path tempFile = tmpDir.resolve("invalidBibTex.bib");
         Files.write(tempFile, bibtexEntry.getBytes());
         ParserResult parserResult = OpenDatabase.loadDatabase(tempFile, mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());

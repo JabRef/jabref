@@ -5,8 +5,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
+import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -58,6 +60,11 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
     @Override
     public String getTestUrl() {
         return TEST_URL_WIH_OPTIONAL_KEY;
+    }
+
+    @Override
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_BIODIVERSITY_HERITAGE_LIBRARY);
     }
 
     public URL getBaseURL() throws URISyntaxException, MalformedURLException {

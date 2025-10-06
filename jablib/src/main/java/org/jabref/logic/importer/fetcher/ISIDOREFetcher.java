@@ -8,14 +8,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.StringJoiner;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
@@ -230,10 +228,5 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     @Override
     public String getName() {
         return "ISIDORE";
-    }
-
-    @Override
-    public Optional<HelpFile> getHelpPage() {
-        return Optional.of(HelpFile.FETCHER_ISIDORE);
     }
 }

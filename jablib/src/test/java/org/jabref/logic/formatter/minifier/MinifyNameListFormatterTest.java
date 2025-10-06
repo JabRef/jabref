@@ -35,6 +35,6 @@ class MinifyNameListFormatterTest {
                 Arguments.of("Simon Harrer and others", "Simon Harrer and Jörg Lenhard and Guido Wirtz"),
                 Arguments.of("Simon Harrer and others", "Simon Harrer and Jörg Lenhard and Guido Wirtz and others"),
                 Arguments.of("Stefan Kolb and others", new MinifyNameListFormatter().getExampleInput())
-                );
+        );
     }
 }

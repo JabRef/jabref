@@ -22,7 +22,6 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class GitPushAction extends SimpleCommand {
@@ -30,15 +29,18 @@ public class GitPushAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences guiPreferences;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry gitHandlerRegistry;
 
     public GitPushAction(DialogService dialogService,
                          StateManager stateManager,
                          GuiPreferences guiPreferences,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         GitHandlerRegistry handlerRegistry) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.guiPreferences = guiPreferences;
         this.taskExecutor = taskExecutor;
+        this.gitHandlerRegistry = handlerRegistry;
 
         this.executable.bind(ActionHelper.needsDatabase(stateManager)
                                          .and(ActionHelper.needsGitRemoteConfigured(stateManager)));
@@ -67,12 +69,11 @@ public class GitPushAction extends SimpleCommand {
 
         Path bibFilePath = bibFilePathOpt.get();
 
-        GitHandlerRegistry registry = Injector.instantiateModelOrService(GitHandlerRegistry.class);
         GitStatusViewModel gitStatusViewModel =
-                GitStatusViewModel.fromPathAndContext(stateManager, taskExecutor, registry, bibFilePath);
+                GitStatusViewModel.fromPathAndContext(stateManager, taskExecutor, gitHandlerRegistry, bibFilePath);
 
         BackgroundTask
-                .wrap(() -> doPush(activeDatabase, bibFilePath, gitStatusViewModel, registry))
+                .wrap(() -> doPush(activeDatabase, bibFilePath, gitStatusViewModel, gitHandlerRegistry))
                 .onSuccess(result -> {
                     if (result.noop()) {
                         dialogService.showInformationDialogAndWait(

@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 /**
  * Tests whole citation key patterns such as <code>[authorsAlpha][year]</code>.
  * The concrete patterns such as <code>authorsAlpha</code> should better be tested at {@link BracketedPatternTest}.
- *
+ * <p>
  * Concurrent execution leads to issues on GitHub actions.
  */
 class CitationKeyGeneratorTest {
@@ -234,7 +234,7 @@ class CitationKeyGeneratorTest {
      * not tested/ not in hashmap UNICODE_CHARS:
      * {@code
      * Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə Đ đ   Ů ů    Ǣ ǣ ǖ ǘ ǚ ǜ
-     *  Ǣ ǣ ǖ ǘ ǚ ǜ
+     * Ǣ ǣ ǖ ǘ ǚ ǜ
      * Đ đ   Ů ů
      * Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə
      * }

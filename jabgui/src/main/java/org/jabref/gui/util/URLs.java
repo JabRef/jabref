@@ -30,7 +30,7 @@ public class URLs {
     public static final String LINK_EXTERNAL_FILE_WALKTHROUGH_EXAMPLE_PDF = "https://nutritionandmetabolism.biomedcentral.com/counter/pdf/10.1186/1743-7075-3-2.pdf";
     public static final String ADD_PDF_DOC = "https://docs.jabref.org/collect/add-pdfs-to-an-entry";
     public static final String FIND_UNLINKED_FILES_DOC = "https://docs.jabref.org/collect/findunlinkedfiles";
-    
+
     // AboutDialogViewModel URLs
     public static final String HOMEPAGE_URL = "https://www.jabref.org";
     public static final String DONATION_URL = "https://donations.jabref.org";

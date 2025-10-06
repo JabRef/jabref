@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
  * Searches web resources for bibliographic information based on a free-text query.
  * May return multiple search hits.
  * <p>
- *    This interface is used for web resources which directly return BibTeX data ({@link BibEntry})
+ * This interface is used for web resources which directly return BibTeX data ({@link BibEntry})
  * </p>
  */
 public interface SearchBasedFetcher extends WebFetcher {
@@ -39,7 +39,7 @@ public interface SearchBasedFetcher extends WebFetcher {
 
         SearchQuery searchQueryObject = new SearchQuery(searchQuery);
         if (!searchQueryObject.isValid()) {
-           throw new FetcherException("The query is not valid");
+            throw new FetcherException("The query is not valid");
         }
         BaseQueryNode queryNode;
         SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());

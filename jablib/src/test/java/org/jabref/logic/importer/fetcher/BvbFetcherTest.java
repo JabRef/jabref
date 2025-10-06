@@ -55,10 +55,10 @@ class BvbFetcherTest {
         List<BibEntry> result = fetcher.performSearch(searchquery);
         assertFalse(result.isEmpty());
 
-//        System.out.println("Query:\n");
-//        System.out.println(fetcher.getURLForQuery(new StandardSyntaxParser().parse(searchquery, NO_EXPLICIT_FIELD)));
-//        System.out.println("Test result:\n");
-//        result.forEach(entry -> System.out.println(entry.toString()));
+        //        System.out.println("Query:\n");
+        //        System.out.println(fetcher.getURLForQuery(new StandardSyntaxParser().parse(searchquery, NO_EXPLICIT_FIELD)));
+        //        System.out.println("Test result:\n");
+        //        result.forEach(entry -> System.out.println(entry.toString()));
     }
 
     @Test

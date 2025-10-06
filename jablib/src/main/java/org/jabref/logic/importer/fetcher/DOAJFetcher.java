@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -15,7 +14,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fetcher.transformers.DefaultLuceneQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformers.DefaultSearchQueryTransformer;
 import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -27,6 +26,7 @@ import org.jabref.model.strings.StringUtil;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +42,8 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     private static final String SEARCH_URL = "https://doaj.org/api/v1/search/articles/";
     private final ImportFormatPreferences preferences;
 
-    public DOAJFetcher(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public DOAJFetcher(@NonNull ImportFormatPreferences preferences) {
+        this.preferences = preferences;
     }
 
     /**
@@ -186,7 +186,7 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     @Override
     public URL getURLForQuery(BaseQueryNode queryNode) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        DOAJFetcher.addPath(uriBuilder, new DefaultLuceneQueryTransformer().transformSearchQuery(queryNode).orElse(""));
+        DOAJFetcher.addPath(uriBuilder, new DefaultSearchQueryTransformer().transformSearchQuery(queryNode).orElse(""));
         // Number of results
         uriBuilder.addParameter("pageSize", "30");
         // Page (not needed so far)

@@ -94,16 +94,16 @@ class BiodiversityLibraryTest {
     @Test
     void performSearch() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
-            .withField(StandardField.AUTHOR, "Clark, John L. (John Littner)  and Neill, David A. ")
-            .withField(StandardField.JOURNALTITLE, "PhytoKeys")
-            .withField(StandardField.LANGUAGE, "English")
-            .withField(StandardField.PUBLISHER, "Pensoft Publishers")
-            .withField(StandardField.TITLE, "\uFEFFAmanoa condorensis (Phyllanthaceae), a new shrubby species from the Cordillera del Condor in southern Ecuador")
-            .withField(StandardField.URL, "https://www.biodiversitylibrary.org/part/356490")
-            .withField(StandardField.DATE, "2023")
-            .withField(StandardField.VOLUME, "227")
-            .withField(StandardField.PAGES, "89--97")
-            .withField(StandardField.DOI, "10.3897/phytokeys.227.104703");
+                .withField(StandardField.AUTHOR, "Clark, John L. (John Littner)  and Neill, David A. ")
+                .withField(StandardField.JOURNALTITLE, "PhytoKeys")
+                .withField(StandardField.LANGUAGE, "English")
+                .withField(StandardField.PUBLISHER, "Pensoft Publishers")
+                .withField(StandardField.TITLE, "\uFEFFAmanoa condorensis (Phyllanthaceae), a new shrubby species from the Cordillera del Condor in southern Ecuador")
+                .withField(StandardField.URL, "https://www.biodiversitylibrary.org/part/356490")
+                .withField(StandardField.DATE, "2023")
+                .withField(StandardField.VOLUME, "227")
+                .withField(StandardField.PAGES, "89--97")
+                .withField(StandardField.DOI, "10.3897/phytokeys.227.104703");
 
         assertEquals(expected, fetcher.performSearch("Amanoa condorensis (Phyllanthaceae)").getFirst());
     }
@@ -141,7 +141,7 @@ class BiodiversityLibraryTest {
                             "Genre": "Book",
                             "Title": "Potatoes : the poor man's own crop : illustrated with plates, showing the decay and disease of the potatoe [sic] : with hints to improve the land and life of the poor man : published to aid the Industrial Marlborough Exhibition"
                         }""");
-         expected = new BibEntry(StandardEntryType.Book)
+        expected = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Potatoes : the poor man's own crop : illustrated with plates, showing the decay and disease of the potatoe [sic] : with hints to improve the land and life of the poor man : published to aid the Industrial Marlborough Exhibition")
                 .withField(StandardField.AUTHOR, "George, George ")
                 .withField(StandardField.YEAR, "1861")

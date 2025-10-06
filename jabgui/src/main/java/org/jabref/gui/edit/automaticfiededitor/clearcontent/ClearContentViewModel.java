@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.edit.automaticfiededitor.LastAutomaticFieldEditorEdit;
-import org.jabref.gui.undo.NamedCompound;
+import org.jabref.gui.undo.NamedCompoundEdit;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -33,7 +33,7 @@ public class ClearContentViewModel {
     }
 
     public void clearField(Field field) {
-        NamedCompound edits = new NamedCompound("Clear field content");
+        NamedCompoundEdit edits = new NamedCompoundEdit("Clear field content");
         List<BibEntry> selected = stateManager.getSelectedEntries();
 
         for (BibEntry entry : selected) {

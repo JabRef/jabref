@@ -7,7 +7,7 @@ Closes _____
 
 ### Steps to test
 
-<!-- Describe how reviewers can test this fix/feature. Ideally, think of how you would guide a beginner user of Jabef to try out your change. -->
+<!-- Describe how reviewers can test this fix/feature. Ideally, think of how you would guide a beginner user of JabRef to try out your change. -->
 <!-- You can add screenshots or videos (using Loom - https://www.loom.com or by just adding .mp4 files). -->
 <!-- (REPLACE THIS PARAGRAPH) -->
 

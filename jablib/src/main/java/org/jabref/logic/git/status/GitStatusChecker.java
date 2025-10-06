@@ -72,18 +72,15 @@ public class GitStatusChecker {
     }
 
     public static GitStatusSnapshot checkStatus(Path anyPathInsideRepo) {
-        Optional<GitHandler> handlerOpt = GitHandler.fromAnyPath(anyPathInsideRepo);
-        if (handlerOpt.isEmpty()) {
-            return new GitStatusSnapshot(
-                    !GitStatusSnapshot.TRACKING,
-                    SyncStatus.UNTRACKED,
-                    !GitStatusSnapshot.CONFLICT,
-                    !GitStatusSnapshot.UNCOMMITTED,
-                    Optional.empty()
-            );
-        }
-
-        return checkStatus(handlerOpt.get());
+        return GitHandler.fromAnyPath(anyPathInsideRepo)
+                         .map(GitStatusChecker::checkStatus)
+                         .orElse(new GitStatusSnapshot(
+                                 !GitStatusSnapshot.TRACKING,
+                                 SyncStatus.UNTRACKED,
+                                 !GitStatusSnapshot.CONFLICT,
+                                 !GitStatusSnapshot.UNCOMMITTED,
+                                 Optional.empty()
+                         ));
     }
 
     public static GitStatusSnapshot checkStatusAndFetch(GitHandler gitHandler) throws IOException, JabRefException {
