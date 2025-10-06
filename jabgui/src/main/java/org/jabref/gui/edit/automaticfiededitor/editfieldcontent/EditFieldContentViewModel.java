@@ -67,28 +67,6 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
         return canAppend;
     }
 
-    public void clearSelectedField() {
-        NamedCompoundEdit clearFieldEdit = new NamedCompoundEdit("CLEAR_SELECTED_FIELD");
-        int affectedEntriesCount = 0;
-        for (BibEntry entry : selectedEntries) {
-            Optional<String> oldFieldValue = entry.getField(selectedField.get());
-            if (oldFieldValue.isPresent()) {
-                entry.clearField(selectedField.get())
-                     .ifPresent(fieldChange -> clearFieldEdit.addEdit(new UndoableFieldChange(fieldChange)));
-                affectedEntriesCount++;
-            }
-        }
-
-        if (clearFieldEdit.hasEdits()) {
-            clearFieldEdit.end();
-        }
-        stateManager.setLastAutomaticFieldEditorEdit(new LastAutomaticFieldEditorEdit(
-                affectedEntriesCount,
-                TAB_INDEX,
-                clearFieldEdit
-        ));
-    }
-
     public void setFieldValue() {
         NamedCompoundEdit setFieldEdit = new NamedCompoundEdit("CHANGE_SELECTED_FIELD");
         String toSetFieldValue = fieldValue.getValue();
@@ -148,10 +126,6 @@ public class EditFieldContentViewModel extends AbstractAutomaticFieldEditorTabVi
 
     public Field getSelectedField() {
         return selectedFieldProperty().get();
-    }
-
-    public String getFieldValue() {
-        return fieldValue.get();
     }
 
     public StringProperty fieldValueProperty() {

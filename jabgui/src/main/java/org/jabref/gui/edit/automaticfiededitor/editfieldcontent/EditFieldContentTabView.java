@@ -25,6 +25,7 @@ import static org.jabref.gui.util.FieldsUtil.FIELD_STRING_CONVERTER;
 public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView {
     public Button appendValueButton;
     public Button setValueButton;
+
     @FXML
     private ComboBox<Field> fieldComboBox;
 
@@ -63,7 +64,7 @@ public class EditFieldContentTabView extends AbstractAutomaticFieldEditorTabView
         fieldComboBox.getSelectionModel().selectFirst();
 
         fieldComboBox.valueProperty().bindBidirectional(viewModel.selectedFieldProperty());
-        EasyBind.listen(fieldComboBox.getEditor().textProperty(), observable -> fieldComboBox.commitValue());
+        EasyBind.listen(fieldComboBox.getEditor().textProperty(), _ -> fieldComboBox.commitValue());
 
         fieldValueTextField.textProperty().bindBidirectional(viewModel.fieldValueProperty());
 
