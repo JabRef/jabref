@@ -47,7 +47,6 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.collab.entrychange.PreviewWithSourceTab;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditorTab;
-import org.jabref.gui.entryeditor.SciteTallyModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
 import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
@@ -77,6 +76,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.sciteTallies.TalliesResponse;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -280,7 +280,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         return errorMessageBox;
     }
 
-    private VBox getTalliesPane(SciteTallyModel tallModel) {
+    private VBox getTalliesPane(TalliesResponse tallModel) {
         Text message = new Text(Localization.lang(
                 "Total Citations: %0 | Supporting: %1 | Contradicting: %2 | Mentioning: %3 | Unclassified: %4 | Citing Publications: %5",
                 tallModel.total(),
