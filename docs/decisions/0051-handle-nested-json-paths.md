@@ -12,13 +12,14 @@ When trying to parse nested JSON structures in JabLS which receives the VSCode s
 ## Considered Options
 
 * Use `org.hisp.dhis:json-tree`
+* Use Jackson
 * Use Unirest and Optional
 * Use GSON and chaining Optional
 * Use an own method to parse the path
 
 ## Decision Outcome
 
-Chosen option: "Use `org.hisp.dhis:json-tree`", because comes out best (see below).
+Chosen option: "Use Jackson" because it comes out best (see below).
 
 ## Pros and Cons of the Options
 
@@ -33,6 +34,17 @@ this.integrityCheck = json.getBoolean("jabref.integrityCheck.enabled").booleanVa
 * Good, because it supports nested paths directly
 * Good, because it has a fallback value
 * Bad, because it introduces a new dependency
+
+### Use Jackson
+
+```java
+this.consistencyCheck = node.at("/jabref/consistencyCheck/enabled").asBoolean(this.consistencyCheck);
+```
+
+* Good, because very compact and readable
+* Good, because no Exception is thrown if path does not exist
+* Good, because it supports nested paths directly
+* Good, because it has a fallback value
 
 ### Use Unirest and Optional
 

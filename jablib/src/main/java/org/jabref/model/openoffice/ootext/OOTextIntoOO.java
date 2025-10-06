@@ -43,6 +43,7 @@ import com.sun.star.text.XParagraphCursor;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,14 +130,12 @@ public class OOTextIntoOO {
      * @param position The cursor giving the insert location. Not modified.
      * @param ootext   The marked-up text to insert.
      */
-    public static void write(XTextDocument doc, XTextCursor position, OOText ootext)
+    public static void write(@NonNull XTextDocument doc,
+                             @NonNull XTextCursor position,
+                             @NonNull OOText ootext)
             throws
             WrappedTargetException,
             CreationException {
-
-        Objects.requireNonNull(doc);
-        Objects.requireNonNull(ootext);
-        Objects.requireNonNull(position);
 
         String lText = OOText.toString(ootext);
 

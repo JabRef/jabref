@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,6 +13,8 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * Search class for files. <br>
@@ -31,8 +32,7 @@ public class DatabaseFileLookup {
     /**
      * Creates an instance by passing a {@link BibDatabase} which will be used for the searches.
      */
-    public DatabaseFileLookup(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
-        Objects.requireNonNull(databaseContext);
+    public DatabaseFileLookup(@NonNull BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectories(filePreferences))
                                     .orElse(new ArrayList<>());
 
@@ -59,9 +59,7 @@ public class DatabaseFileLookup {
         return fileCache.contains(pathname);
     }
 
-    private List<Path> parseFileField(BibEntry entry) {
-        Objects.requireNonNull(entry);
-
+    private List<Path> parseFileField(@NonNull BibEntry entry) {
         return entry.getFiles().stream()
                     .filter(file -> !file.isOnlineLink()) // Do not query external file links (huge performance leak)
                     .map(file -> file.findIn(possibleFilePaths))

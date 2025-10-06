@@ -17,6 +17,8 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 
+import org.jspecify.annotations.NonNull;
+
 public class BibEntryType implements Comparable<BibEntryType> {
 
     private final EntryType type;
@@ -32,8 +34,8 @@ public class BibEntryType implements Comparable<BibEntryType> {
      * @param allFields      A BibFields list of all fields, including the required fields
      * @param requiredFields A OrFields list of just the required fields
      */
-    public BibEntryType(EntryType type, Collection<BibField> allFields, Collection<OrFields> requiredFields) {
-        this.type = Objects.requireNonNull(type);
+    public BibEntryType(@NonNull EntryType type, Collection<BibField> allFields, Collection<OrFields> requiredFields) {
+        this.type = type;
         this.allFields = new LinkedHashSet<>(allFields);
         this.requiredFields = new LinkedHashSet<>(requiredFields);
     }

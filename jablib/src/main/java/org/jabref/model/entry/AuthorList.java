@@ -132,8 +132,8 @@ public class AuthorList implements Iterable<Author> {
      *
      * @param authors the list of authors which should underlie this instance
      */
-    private AuthorList(List<Author> authors) {
-        this.authors = Objects.requireNonNull(authors);
+    private AuthorList(@NonNull List<Author> authors) {
+        this.authors = authors;
     }
 
     public static AuthorList of(List<Author> authors) {

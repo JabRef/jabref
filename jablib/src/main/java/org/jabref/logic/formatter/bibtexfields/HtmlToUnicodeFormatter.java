@@ -6,6 +6,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.jspecify.annotations.NonNull;
 
 @AllowedToUseApacheCommonsLang3("There is no equivalent in Google's Guava")
 public class HtmlToUnicodeFormatter extends Formatter implements LayoutFormatter {
@@ -31,7 +32,7 @@ public class HtmlToUnicodeFormatter extends Formatter implements LayoutFormatter
     }
 
     @Override
-    public String format(String fieldText) {
+    public String format(@NonNull String fieldText) {
         // StringEscapeUtils converts characters and regex kills tags
         return StringEscapeUtils.unescapeHtml4(fieldText).replaceAll("<[^>]*>", "");
     }
