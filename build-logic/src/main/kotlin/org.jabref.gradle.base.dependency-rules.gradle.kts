@@ -222,7 +222,8 @@ extraJavaModuleInfo {
         exportAllPackages()
     }
     module("io.github.adr:e-adr", "io.github.adr") {
-        preserveExisting()
+        patchRealModule()
+        exportAllPackages()
     }
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64", "embedded.postgres.binaries.darwin.amd64")
