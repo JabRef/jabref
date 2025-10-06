@@ -37,7 +37,7 @@ jobs:
           distribution: 'corretto'
           check-latest: true
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
