@@ -7,7 +7,7 @@ javaPlatform {
 }
 
 val javafx = "25"
-val lucene = "10.3.0"
+val lucene = "10.3.1"
 val pdfbox = "3.0.5"
 
 dependencies {
@@ -34,7 +34,7 @@ dependencies.constraints {
     api("com.ibm.icu:icu4j:72.0.1!!")
 
     api("com.dlsc.gemsfx:gemsfx:3.5.7")
-    api("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
+    api("com.dlsc.pdfviewfx:pdfviewfx:3.3.2")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0")
     api("com.fasterxml:aalto-xml:1.3.3")
